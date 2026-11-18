@@ -25,14 +25,28 @@ const counted = (count: number, one: string, many: string) =>
   `${countFormat.format(count)} ${count === 1 ? one : many}`;
 
 /**
- * P01's «Por resolver», in the board's order: each waiting thing, what it
- * is, and the tab that settles it. Nothing waiting, no row.
+ * P01's «Por resolver»: each waiting thing, what it is, and the tab that
+ * settles it. Nothing waiting, no row. FIX-084 (Inicio A): the pay to approve
+ * leads, as the most urgent.
  */
 export function pendingRows(
   counts: PendingCounts,
   context: { branchName: string | undefined; monthLabel: string },
 ): PendingRow[] {
   const rows: (PendingRow | null)[] = [
+    counts.statements === 0
+      ? null
+      : {
+          kind: "statements",
+          count: counts.statements,
+          title: counted(
+            counts.statements,
+            "sueldo por aprobar",
+            "sueldos por aprobar",
+          ),
+          note: context.monthLabel,
+          to: "/dinero/sueldos",
+        },
     counts.payments === 0
       ? null
       : {
@@ -103,19 +117,6 @@ export function pendingRows(
               ? "La sucursal elegida"
               : `Sucursal ${context.branchName}`,
           to: "/estudio/insumos",
-        },
-    counts.statements === 0
-      ? null
-      : {
-          kind: "statements",
-          count: counts.statements,
-          title: counted(
-            counts.statements,
-            "sueldo por aprobar",
-            "sueldos por aprobar",
-          ),
-          note: context.monthLabel,
-          to: "/dinero/sueldos",
         },
   ];
   return rows.filter((row): row is PendingRow => row !== null);

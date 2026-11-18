@@ -59,12 +59,11 @@ describe("the widened Coordinator", () => {
     );
     renderAdmin("/");
 
-    const card = await screen.findByRole("region", { name: "Por resolver" });
-    expect(await within(card).findByText("3 pendientes")).toBeVisible();
+    const pending = await screen.findByRole("region", { name: "Por resolver" });
     expect(
-      within(screen.getByRole("list", { name: "Pendientes" }))
-        .getAllByRole("link")
-        .map((link) => link.getAttribute("href")),
+      (await within(pending).findAllByRole("link")).map((link) =>
+        link.getAttribute("href"),
+      ),
     ).toEqual(["/clientas/congelamientos", "/comentarios", "/estudio/insumos"]);
     expect(screen.queryByText(/Bs/)).toBeNull();
   });

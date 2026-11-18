@@ -86,54 +86,59 @@ function BranchSchedule({
   const count = sessions.data?.length ?? 0;
 
   return (
-    <article className="flex flex-col gap-5">
-      <PageHeader
-        title="Horario"
-        subtitle={
-          sessions.isSuccess
-            ? `Sucursal ${branch.name} · sala única · ${weekCount(sessions.data)}`
-            : `Sucursal ${branch.name} · sala única`
-        }
-        actions={
-          isForbidden(sessions.error) ? undefined : (
-            <Button
-              onClick={() => {
-                setNotice(null);
-                setPanel({ mode: "create" });
-              }}
-            >
-              <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Nueva sesión
-            </Button>
-          )
-        }
-      />
-      <WeekStepper monday={monday} today={today} onChange={onWeekChange} />
-      {notice === null ? null : <PageNotice>{notice}</PageNotice>}
-      {sessions.isSuccess ? (
-        <EquipmentFlagsNotice flags={flags.data ?? []} />
-      ) : null}
-      {sessions.isPending ? (
-        <LoadingNotice>Cargando el horario…</LoadingNotice>
-      ) : sessions.isError ? (
-        <QueryFailure
-          error={sessions.error}
-          what="el horario"
-          onRetry={() => void sessions.refetch()}
+    <EquipmentFlagsContext.Provider value={flagged}>
+      <article className="flex flex-col gap-5">
+        <PageHeader
+          title="Horario"
+          subtitle={
+            sessions.isSuccess
+              ? `Sucursal ${branch.name} · sala única · ${weekCount(sessions.data)}`
+              : `Sucursal ${branch.name} · sala única`
+          }
+          actions={
+            isForbidden(sessions.error) ? undefined : (
+              <Button
+                onClick={() => {
+                  setNotice(null);
+                  setPanel({ mode: "create" });
+                }}
+              >
+                <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
+                Nueva sesión
+              </Button>
+            )
+          }
         />
-      ) : (
-        <>
-          {standingCount(sessions.data) === 0 ? (
-            <p className="text-nota text-texto-tenue">
-              No hay sesiones programadas esta semana.
-            </p>
+        {/* FIX-084 (Horario A): the Equipment shortage is one quiet line
+          beside the week, not a banner over it. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <WeekStepper monday={monday} today={today} onChange={onWeekChange} />
+          {sessions.isSuccess ? (
+            <EquipmentFlagsNotice flags={flags.data ?? []} />
           ) : null}
-          {count >= weekSessionLimit ? (
-            <p className="text-nota text-advertencia-texto">
-              Se muestran las primeras {weekSessionLimit} sesiones de la semana.
-            </p>
-          ) : null}
-          <EquipmentFlagsContext.Provider value={flagged}>
+        </div>
+        {notice === null ? null : <PageNotice>{notice}</PageNotice>}
+        {sessions.isPending ? (
+          <LoadingNotice>Cargando el horario…</LoadingNotice>
+        ) : sessions.isError ? (
+          <QueryFailure
+            error={sessions.error}
+            what="el horario"
+            onRetry={() => void sessions.refetch()}
+          />
+        ) : (
+          <>
+            {standingCount(sessions.data) === 0 ? (
+              <p className="text-nota text-texto-tenue">
+                No hay sesiones programadas esta semana.
+              </p>
+            ) : null}
+            {count >= weekSessionLimit ? (
+              <p className="text-nota text-advertencia-texto">
+                Se muestran las primeras {weekSessionLimit} sesiones de la
+                semana.
+              </p>
+            ) : null}
             {narrow ? (
               <DayList
                 monday={monday}
@@ -155,19 +160,19 @@ function BranchSchedule({
                 }}
               />
             )}
-          </EquipmentFlagsContext.Provider>
-        </>
-      )}
-      <SessionPanel
-        state={panel}
-        branch={branch}
-        onClose={() => setPanel({ mode: "closed" })}
-        onDone={(message) => {
-          setPanel({ mode: "closed" });
-          setNotice(message);
-        }}
-      />
-    </article>
+          </>
+        )}
+        <SessionPanel
+          state={panel}
+          branch={branch}
+          onClose={() => setPanel({ mode: "closed" })}
+          onDone={(message) => {
+            setPanel({ mode: "closed" });
+            setNotice(message);
+          }}
+        />
+      </article>
+    </EquipmentFlagsContext.Provider>
   );
 }
 

@@ -150,3 +150,37 @@ export function formatPayPeriod(
   if (last === periodStart) return formatCivilDate(periodStart);
   return `Del ${formatCivilDate(periodStart)} al ${formatCivilDate(last)}`;
 }
+
+/**
+ * FIX-084 (Sueldos B): «Otro período». Inside the open month a Trainer is
+ * paid up to yesterday (finding 105); on its 1st, or for any other month,
+ * the range is the whole month.
+ */
+export function otherPeriodSearch(
+  current: PayStatementsSearch,
+  today: string = boliviaToday(),
+): PayStatementsSearch {
+  const shown = windowOf(current, today);
+  if (
+    shown.kind === "month" &&
+    current.month === today.slice(0, 7) &&
+    !today.endsWith("-01")
+  ) {
+    return {
+      month: current.month,
+      period: "range",
+      from: `${current.month}-01`,
+      to: addDays(today, -1),
+    };
+  }
+  return searchFor("range", current, today);
+}
+
+/** The one help line while the month being paid is still open. */
+export function monthOpenLine(month: string, today: string): string {
+  const monthName = capitalized(formatMonth(month).split(" ")[0] ?? "");
+  const closes = `${monthName} cierra el ${Number(lastDayOf(month).slice(8))}.`;
+  return today.endsWith("-01")
+    ? closes
+    : `${closes} Para pagarle antes a una instructora, elige «Otro período».`;
+}

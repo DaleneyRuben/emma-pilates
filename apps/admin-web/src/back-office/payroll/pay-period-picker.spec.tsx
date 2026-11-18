@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
+import { payrollStaffHandler } from "../../test/payroll-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 
@@ -20,7 +21,8 @@ const statement = {
   lines: [{ kind: "class", detail: "3 alumnas", amountCentavos: 6_500 }],
 };
 
-// BKO-009: Sueldos › Por aprobar is paid by Día · Semana · Rango · Mes.
+// BKO-009, FIX-084 (Sueldos B): one month control with «Otro período» for a
+// range; a day or a week stays reachable by its address.
 describe("the pay period picker", () => {
   useMockServer();
   const asked: URLSearchParams[] = [];
@@ -29,7 +31,7 @@ describe("the pay period picker", () => {
   beforeEach(() => {
     asked.length = 0;
     drafted.length = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), payrollStaffHandler());
     server.use(
       http.get(apiUrl(statementsPath), ({ request }) => {
         asked.push(new URL(request.url).searchParams);
@@ -44,10 +46,13 @@ describe("the pay period picker", () => {
 
   const lastAsked = () => Object.fromEntries(asked[asked.length - 1] ?? []);
 
-  it("opens on Mes and asks for the month, as before", async () => {
+  it("opens on the month and asks for it, as before", async () => {
     renderAdmin("/dinero/sueldos?month=2026-09");
 
-    expect(await screen.findByRole("radio", { name: "Mes" })).toBeChecked();
+    expect(
+      await screen.findByRole("button", { name: "Mes anterior" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { name: "Emma Vargas" }),
     ).toBeInTheDocument();
@@ -60,8 +65,9 @@ describe("the pay period picker", () => {
       "/dinero/sueldos?month=2026-09&period=day&date=2026-09-07",
     );
 
-    expect(await screen.findByRole("radio", { name: "Día" })).toBeChecked();
-    expect(screen.getByText("Lunes 7 de septiembre de 2026")).toBeVisible();
+    expect(
+      await screen.findByText("Lunes 7 de septiembre de 2026"),
+    ).toBeVisible();
     await waitFor(() =>
       expect(lastAsked()).toEqual({ from: "2026-09-07", until: "2026-09-08" }),
     );
@@ -80,26 +86,27 @@ describe("the pay period picker", () => {
   });
 
   it("asks for the whole week from its Monday and drafts it", async () => {
-    const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
+    const { user } = renderAdmin(
+      "/dinero/sueldos?month=2026-09&period=week&date=2026-09-09",
+    );
 
-    await user.click(await screen.findByRole("radio", { name: "Semana" }));
-    await user.click(screen.getByRole("button", { name: "Semana anterior" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Semana anterior" }),
+    );
     await user.click(screen.getByRole("button", { name: "Semana siguiente" }));
     await user.click(screen.getByRole("button", { name: "Volver a calcular" }));
 
     await waitFor(() => expect(drafted).toHaveLength(1));
     const week = Object.fromEntries(drafted[0] ?? []);
-    expect(Object.keys(week)).toEqual(["from", "until"]);
-    const from = new Date(`${week.from ?? ""}T00:00:00Z`);
-    const until = new Date(`${week.until ?? ""}T00:00:00Z`);
-    expect((until.getTime() - from.getTime()) / (24 * 3_600_000)).toBe(7);
-    expect(from.getUTCDay()).toBe(1);
+    expect(week).toEqual({ from: "2026-09-07", until: "2026-09-14" });
   });
 
   it("asks for a range between two typed dates, the last one included", async () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
-    await user.click(await screen.findByRole("radio", { name: "Rango" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Otro período" }),
+    );
     const from = screen.getByLabelText("Desde");
     const to = screen.getByLabelText("Hasta");
     await user.clear(from);
@@ -126,7 +133,7 @@ describe("the pay period picker", () => {
     expect(
       screen.getByRole("button", { name: "Volver a calcular" }),
     ).toBeDisabled();
-    await user.click(screen.getByRole("radio", { name: "Mes" }));
+    await user.click(screen.getByRole("button", { name: "Volver al mes" }));
     await waitFor(() => expect(lastAsked()).toEqual({ month: "2026-09" }));
   });
 });

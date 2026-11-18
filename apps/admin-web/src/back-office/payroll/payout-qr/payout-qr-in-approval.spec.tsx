@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../../../test/msw";
+import { payrollStaffHandler } from "../../../test/payroll-fixtures";
 import { renderAdmin } from "../../../test/render-admin";
 import { signedInHandlers } from "../../../test/session-handlers";
 import { imageFile } from "../../../test/image-stubs";
@@ -40,7 +41,7 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
   const seen: UploadSeen = { polls: 0 };
   beforeEach(() => {
     seen.polls = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), payrollStaffHandler());
   });
 
   it("shows her QR and approves only with the transfer's photo", async () => {
@@ -79,7 +80,7 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar pago" }),
+      await screen.findByRole("button", { name: /^Aprobar Bs/ }),
     );
     const dialog = await screen.findByRole("alertdialog");
     expect(
@@ -136,7 +137,7 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar pago" }),
+      await screen.findByRole("button", { name: /^Aprobar Bs/ }),
     );
     const dialog = await screen.findByRole("alertdialog");
     expect(

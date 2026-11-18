@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { countFormat } from "../components/table/pagination";
-import { StatusPill } from "../components/ui/status-pill";
 import { monthKpisQueryOptions } from "../indicators/indicator-queries";
 import { boliviaParts } from "../lib/bolivia-time";
-import { cn } from "../lib/cn";
 import { incomeReportQueryOptions } from "../report/report-queries";
 import { weekSessionsQueryOptions } from "../schedule/schedule-queries";
 import { todaySummary } from "./home-pending";
@@ -14,8 +12,11 @@ import { todaySummary } from "./home-pending";
 const wholeBolivianos = (centavos: number) =>
   `Bs ${countFormat.format(Math.round(centavos / 100))}`;
 
-const eyebrow =
-  "font-sans text-pie font-medium tracking-[0.12em] text-texto-tenue uppercase";
+const asideLink =
+  "text-nota font-medium text-primario-profundo hover:text-primario-presionado";
+
+const plural = (count: number, one: string, many: string) =>
+  `${countFormat.format(count)} ${count === 1 ? one : many}`;
 
 export function SummaryCard({
   title,
@@ -30,10 +31,10 @@ export function SummaryCard({
   return (
     <section
       aria-labelledby={id}
-      className="flex flex-col gap-3 rounded-marco bg-lino p-5"
+      className="flex flex-col gap-2 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id={id} className={eyebrow}>
+        <h2 id={id} className="text-nota font-normal text-texto-tenue">
           {title}
         </h2>
         {aside}
@@ -46,7 +47,7 @@ export function SummaryCard({
 function Figure({ value, label }: { value: string; label: string }) {
   return (
     <span className="flex flex-col">
-      <span className="font-serif text-[28px] leading-tight text-texto tabular">
+      <span className="font-serif text-titulo-2 text-texto tabular">
         {value}
       </span>
       <span className="text-nota text-texto-tenue">{label}</span>
@@ -54,7 +55,10 @@ function Figure({ value, label }: { value: string; label: string }) {
   );
 }
 
-/** P01's «Hoy en …»: today's classes at the selected Branch. */
+/**
+ * P01's «Hoy», FIX-084 (Inicio A): today's classes at the selected Branch,
+ * their bookings and occupancy in one line, then each class.
+ */
 export function TodayCard({
   branch,
   today,
@@ -68,53 +72,27 @@ export function TodayCard({
   const day = todaySummary(week.data ?? [], today);
   return (
     <SummaryCard
-      title={`Hoy en ${branch.name}`}
+      title="Hoy"
       aside={
-        <Link
-          to="/horario"
-          className="text-celda font-semibold text-primario-profundo hover:text-primario-presionado"
-        >
+        <Link to="/horario" className={asideLink}>
           Ver horario
         </Link>
       }
     >
-      <div className="grid grid-cols-3 gap-2">
-        <Figure value={countFormat.format(day.classes)} label="clases" />
-        <Figure value={countFormat.format(day.bookings)} label="reservas" />
-        <Figure
-          value={
-            day.occupancyPercent === null ? "—" : `${day.occupancyPercent} %`
-          }
-          label="ocupación"
-        />
-      </div>
+      <p className="text-cuerpo text-texto tabular">
+        {[
+          plural(day.classes, "clase", "clases"),
+          plural(day.bookings, "reserva", "reservas"),
+          `${day.occupancyPercent === null ? "—" : `${day.occupancyPercent} %`} ocupación`,
+        ].join(" · ")}
+      </p>
       {day.classes === 0 ? (
-        <p className="text-nota text-texto-tenue">Sin clases hoy.</p>
+        <p className="text-celda text-texto-tenue">Sin clases hoy.</p>
       ) : (
-        <ul className="flex flex-col border-t border-divisor">
-          {day.sessions.slice(0, 3).map((session) => (
-            <li
-              key={session.id}
-              className="flex items-center gap-3 border-b border-divisor py-2 last:border-b-0"
-            >
-              <span className="w-14 font-serif text-cuerpo-grande tabular">
-                {boliviaParts(session.startsAt).time}
-              </span>
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate font-medium">
-                  {session.classTypeName}
-                </span>
-                <span className="truncate text-pie text-texto-tenue">
-                  {session.trainerName}
-                </span>
-              </span>
-              {session.availableSeats === 0 ? (
-                <StatusPill tone="neutral">Llena</StatusPill>
-              ) : (
-                <span className="text-celda text-texto-tenue tabular">
-                  {session.bookedCount} de {session.capacity}
-                </span>
-              )}
+        <ul className="flex flex-col gap-0.5 text-celda text-texto-secundario">
+          {day.sessions.map((session) => (
+            <li key={session.id} className="tabular">
+              {`${boliviaParts(session.startsAt).time} ${session.classTypeName} · ${session.trainerName} (${session.bookedCount} de ${session.capacity})`}
             </li>
           ))}
         </ul>
@@ -123,9 +101,7 @@ export function TodayCard({
   );
 }
 
-type Span = "hoy" | "mes";
-
-/** P01's «Dinero · Todo el estudio» with Hoy | Mes; the Administrator's. */
+/** P01's «Cobrado hoy», FIX-084 (Inicio A): the Administrator's day. */
 export function MoneyCard({
   today,
   pendingPayments,
@@ -133,68 +109,38 @@ export function MoneyCard({
   today: string;
   pendingPayments: number;
 }) {
-  const [span, setSpan] = useState<Span>("hoy");
-  const range = {
-    from: span === "hoy" ? today : `${today.slice(0, 7)}-01`,
-    to: today,
-  };
-  const income = useQuery(incomeReportQueryOptions(range, undefined));
+  const income = useQuery(
+    incomeReportQueryOptions({ from: today, to: today }, undefined),
+  );
   return (
     <SummaryCard
-      title="Dinero"
+      title="Cobrado hoy"
       aside={
-        <span className="flex gap-0.5 rounded-full bg-superficie p-[3px]">
-          {(["hoy", "mes"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={span === option}
-              onClick={() => setSpan(option)}
-              className={cn(
-                "h-[30px] rounded-full px-3 text-nota text-texto-tenue focus-visible:shadow-foco",
-                span === option &&
-                  "bg-primario-tinte font-semibold text-primario-profundo",
-              )}
-            >
-              {option === "hoy" ? "Hoy" : "Mes"}
-            </button>
-          ))}
-        </span>
+        <Link to="/dinero/pagos" className={asideLink}>
+          Ver pagos
+        </Link>
       }
     >
       {income.data === undefined ? (
-        <p className="text-nota text-texto-tenue">
+        <p className="text-celda text-texto-tenue">
           {income.isError
-            ? "No pudimos cargar el dinero."
-            : "Cargando el dinero…"}
+            ? "No pudimos cargar lo cobrado."
+            : "Cargando lo cobrado…"}
         </p>
       ) : (
         <>
-          <span className="font-serif text-[32px] leading-tight text-texto tabular">
+          <span className="text-cuerpo text-texto tabular">
             {wholeBolivianos(income.data.totalCentavos)}
           </span>
-          <span className="text-nota text-texto-tenue">
-            {span === "hoy" ? "Cobrado hoy" : "Cobrado este mes"} · todo el
-            estudio
+          <span className="text-celda text-texto-secundario tabular">
+            {[
+              `Efectivo ${wholeBolivianos(income.data.byMethod.cash)}`,
+              `QR ${wholeBolivianos(income.data.byMethod.transfer)}`,
+              pendingPayments === 0
+                ? "ninguno por revisar"
+                : `${countFormat.format(pendingPayments)} QR por revisar, aún no cuentan`,
+            ].join(" · ")}
           </span>
-          <dl className="flex flex-col border-t border-divisor pt-2 text-celda">
-            <div className="flex justify-between py-1">
-              <dt>Efectivo</dt>
-              <dd className="tabular">
-                {wholeBolivianos(income.data.byMethod.cash)}
-              </dd>
-            </div>
-            <div className="flex justify-between py-1">
-              <dt>QR confirmados</dt>
-              <dd className="tabular">
-                {wholeBolivianos(income.data.byMethod.transfer)}
-              </dd>
-            </div>
-            <div className="flex justify-between py-1 text-advertencia-texto">
-              <dt>QR por revisar (aún no cuenta)</dt>
-              <dd className="tabular">{countFormat.format(pendingPayments)}</dd>
-            </div>
-          </dl>
         </>
       )}
     </SummaryCard>
@@ -208,10 +154,7 @@ export function ClientsCard({ month }: { month: string }) {
     <SummaryCard
       title="Clientas"
       aside={
-        <Link
-          to="/clientas"
-          className="text-celda font-semibold text-primario-profundo hover:text-primario-presionado"
-        >
+        <Link to="/clientas" className={asideLink}>
           Ver clientas
         </Link>
       }

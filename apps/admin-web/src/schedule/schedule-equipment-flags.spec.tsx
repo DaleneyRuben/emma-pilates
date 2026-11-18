@@ -43,7 +43,7 @@ const reformerShort = [
 
 const showWeek = () => {
   server.use(http.get(apiUrl(sessionsPath), () => jsonResponse(weekSessions)));
-  renderAdmin(`/horario?week=${nextMonday}`);
+  return renderAdmin(`/horario?week=${nextMonday}`);
 };
 
 // BKO-004, follow-up 170: Horario flags the Sessions with more places than
@@ -55,24 +55,26 @@ describe("AW02 equipment flags", () => {
     server.use(...signedInHandlers(), ...sessionFormHandlers());
   });
 
-  it("marks each flagged Session and says how many are short above the week", async () => {
+  it("marks each flagged Session with a dot and says how many are short in one line", async () => {
     server.use(flags(reformerShort));
     showWeek();
 
     const flagged = await screen.findByRole("button", {
       name: "Reformer Pilates, 07:00, Valeria Peña, 4 de 10 lugares, faltan equipos: 7 equipos Reformer funcionando para 10 lugares",
     });
-    expect(within(flagged).getByText("Faltan equipos")).toBeInTheDocument();
+    // FIX-084 (Horario A): one small amber dot, no warning line in the block.
+    expect(within(flagged).getByTestId("equipment-dot")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "2 sesiones de esta semana tienen más lugares que equipos Reformer funcionando. Baja su capacidad o revisa",
-        { exact: false },
-      ),
-    ).toBeInTheDocument();
+      within(flagged).queryByText(/Faltan equipos/),
+    ).not.toBeInTheDocument();
+    const notice = screen.getByRole("status", {
+      name: "2 clases con más lugares que equipos",
+    });
+    expect(notice).toHaveTextContent(
+      "2 clases con más lugares que equipos · Revisar",
+    );
     expect(
-      within(screen.getByText(/^2 sesiones/)).getByRole("link", {
-        name: "Equipos",
-      }),
+      within(notice).getByRole("link", { name: "Revisar" }),
     ).toHaveAttribute("href", "/estudio/equipos");
     expect(
       screen.getByRole("button", {
@@ -83,18 +85,17 @@ describe("AW02 equipment flags", () => {
     expect(flagReads[0]?.get("from")).toBe(boliviaInstant(nextMonday, "00:00"));
   });
 
-  it("names one Session in the singular and shows no notice without flags", async () => {
+  it("names one class in the singular", async () => {
     server.use(flags(reformerShort.slice(0, 1)));
     showWeek();
     expect(
-      await screen.findByText(
-        "1 sesión de esta semana tiene más lugares que equipos Reformer funcionando. Baja su capacidad o revisa",
-        { exact: false },
-      ),
+      await screen.findByRole("status", {
+        name: "1 clase con más lugares que equipos",
+      }),
     ).toBeInTheDocument();
   });
 
-  it("names a studio type and says equipos when the week mixes types", async () => {
+  it("explains the shortage, with the studio's type, in the session panel", async () => {
     server.use(
       flags([
         reformerShort[0]!,
@@ -106,18 +107,27 @@ describe("AW02 equipment flags", () => {
         },
       ]),
     );
-    showWeek();
+    const { user } = showWeek();
     expect(
       await screen.findByRole("button", {
         name: /faltan equipos: 7 equipos Silla funcionando para 10 lugares$/,
       }),
     ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", {
+        name: /^Reformer Pilates, 07:00, .*faltan equipos: 7 equipos Reformer/,
+      }),
+    );
+    const dialog = await screen.findByRole("dialog");
     expect(
-      screen.getByText(
-        "2 sesiones de esta semana tienen más lugares que equipos funcionando. Baja su capacidad o revisa",
+      within(dialog).getByText(
+        "Faltan equipos: 7 equipos Reformer funcionando para 10 lugares. Baja su capacidad o revisa",
         { exact: false },
       ),
     ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("link", { name: "Equipos" }),
+    ).toHaveAttribute("href", "/estudio/equipos");
   });
 
   it("stays quiet when nothing is short", async () => {
@@ -125,7 +135,9 @@ describe("AW02 equipment flags", () => {
     await screen.findByRole("button", {
       name: "Reformer Pilates, 07:00, Valeria Peña, 4 de 10 lugares",
     });
-    expect(screen.queryByText(/Baja su capacidad/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/con más lugares que equipos/),
+    ).not.toBeInTheDocument();
   });
 
   describe("on a narrow browser", () => {
@@ -137,7 +149,7 @@ describe("AW02 equipment flags", () => {
       const card = await screen.findByRole("button", {
         name: /^Reformer Pilates, 07:00, .*faltan equipos/,
       });
-      expect(within(card).getByText("Faltan equipos")).toBeInTheDocument();
+      expect(within(card).getByTestId("equipment-dot")).toBeInTheDocument();
     });
   });
 });
