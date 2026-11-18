@@ -28,11 +28,11 @@ async function renewFromMyPlan(current: unknown) {
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: "Renovar mi plan" })).toBeOnTheScreen();
   });

@@ -43,9 +43,9 @@ async function openFreeze(routes: Parameters<typeof routeFetcher>[0]) {
   });
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: /^Congelar plan/ })).toBeOnTheScreen();
   });
