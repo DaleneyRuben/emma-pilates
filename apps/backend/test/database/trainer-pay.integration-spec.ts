@@ -3,6 +3,7 @@ import { BackOfficeError } from '../../src/back-office/back-office-errors';
 import { createPrismaPayStatements } from '../../src/back-office/payroll/prisma-pay-statements';
 import { trainerMonthFacts } from '../../src/back-office/payroll/trainer-pay-facts';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 import {
   fixtureNow,
   startEvaluationTestWorld,
@@ -165,14 +166,36 @@ describe('trainer pay statements', () => {
     ]);
     expect(emmaStatement!.approvableOn).toEqual(new Date('2026-10-01'));
 
+    // Finding 112: approving pays her, so it needs the transfer's photo.
+    await expect(
+      codeOf(
+        statements(afterSeptember).approveStatement(
+          { statementId: emmaStatement!.id },
+          admin,
+        ),
+      ),
+    ).resolves.toBe('salary_receipt_required');
+    const photoId = await readySalaryReceiptId(prisma, admin.accountId);
     const approved = await statements(afterSeptember).approveStatement(
-      { statementId: emmaStatement!.id },
+      { statementId: emmaStatement!.id, receiptImageAssetId: photoId },
       admin,
     );
     expect(approved.state).toBe('approved');
     expect(approved.salaryPaymentId).not.toBeNull();
+    await expect(
+      prisma.salaryPayment.findUniqueOrThrow({
+        where: { id: approved.salaryPaymentId! },
+        select: { receiptImageAssetId: true },
+      }),
+    ).resolves.toEqual({ receiptImageAssetId: photoId });
+    await expect(
+      prisma.imageAsset.findUniqueOrThrow({
+        where: { id: photoId },
+        select: { state: true },
+      }),
+    ).resolves.toEqual({ state: 'ATTACHED' });
     const again = await statements(afterSeptember).approveStatement(
-      { statementId: emmaStatement!.id },
+      { statementId: emmaStatement!.id, receiptImageAssetId: photoId },
       admin,
     );
     expect(again.salaryPaymentId).toBe(approved.salaryPaymentId);
@@ -196,7 +219,7 @@ describe('trainer pay statements', () => {
     await expect(
       codeOf(
         statements().approveStatement(
-          { statementId: emmaStatement!.id },
+          { statementId: emmaStatement!.id, receiptImageAssetId: photoId },
           await assistant(),
         ),
       ),

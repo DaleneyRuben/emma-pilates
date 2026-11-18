@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="440" viewBox="0 0 300 440" font-family="Helvetica, Arial, sans-serif">
+  <rect width="300" height="440" fill="#ffffff"/>
+  <rect width="300" height="64" fill="#2F5D8A"/>
+  <text x="20" y="40" fill="#ffffff" font-size="18" font-weight="700">Banco</text>
+  <circle cx="150" cy="112" r="26" fill="#E3F0E6"/>
+  <path d="M138 112l8 8 16-16" fill="none" stroke="#2E7D4A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="168" text-anchor="middle" font-size="16" font-weight="700" fill="#222">Transferencia exitosa</text>
+  <text x="150" y="208" text-anchor="middle" font-size="28" font-weight="700" fill="#222">Bs 1.534,90</text>
+  <line x1="20" y1="236" x2="280" y2="236" stroke="#E2E2E2"/>
+  <text x="20" y="264" font-size="12" fill="#777">Fecha</text><text x="280" y="264" text-anchor="end" font-size="12" fill="#222">18/11/2026 10:42</text>
+  <text x="20" y="292" font-size="12" fill="#777">Origen</text><text x="280" y="292" text-anchor="end" font-size="12" fill="#222">Emma Pilates Studio</text>
+  <text x="20" y="320" font-size="12" fill="#777">Destino</text><text x="280" y="320" text-anchor="end" font-size="12" fill="#222">Daniela Ortiz</text>
+  <text x="20" y="348" font-size="12" fill="#777">Glosa</text><text x="280" y="348" text-anchor="end" font-size="12" fill="#222">Sueldo 1–17 nov</text>
+  <text x="20" y="376" font-size="12" fill="#777">Nro. de operación</text><text x="280" y="376" text-anchor="end" font-size="12" fill="#222">004 218 773</text>
+  <line x1="20" y1="404" x2="280" y2="404" stroke="#E2E2E2"/>
+</svg>

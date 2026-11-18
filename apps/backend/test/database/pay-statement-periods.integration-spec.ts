@@ -11,6 +11,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 
 const codeOf = async (work: Promise<unknown>): Promise<string> => {
   try {
@@ -161,7 +162,16 @@ describe('pay statements for any period', () => {
     ).resolves.toBe('pay_statement_month_open');
     const approved = await statements(
       new Date('2027-06-08T05:00:00.000Z'),
-    ).approveStatement({ statementId: emma.id }, admin);
+    ).approveStatement(
+      {
+        statementId: emma.id,
+        receiptImageAssetId: await readySalaryReceiptId(
+          world.prisma,
+          admin.accountId,
+        ),
+      },
+      admin,
+    );
     expect(approved.state).toBe('approved');
   });
 

@@ -1,0 +1,155 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-18T20:00:00Z"
+ },
+ "title": "Hallazgo 110 · Reportar una falla",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Antes-Una.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Antes · una unidad, ya elegida",
+   "is_interactive": true
+  },
+  "Antes-Seis.dc.html": {
+   "x": 470,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Antes · seis unidades, ninguna elegida",
+   "is_interactive": true
+  },
+  "Antes-Balones.dc.html": {
+   "x": 940,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Antes · Balones, por cantidad",
+   "is_interactive": true
+  },
+  "A-Una.dc.html": {
+   "x": 0,
+   "y": 1264,
+   "w": 390,
+   "h": 844,
+   "title": "A · una unidad, ya elegida",
+   "is_interactive": true
+  },
+  "A-Seis.dc.html": {
+   "x": 470,
+   "y": 1264,
+   "w": 390,
+   "h": 844,
+   "title": "A · seis unidades, ninguna elegida",
+   "is_interactive": true
+  },
+  "A-Balones.dc.html": {
+   "x": 940,
+   "y": 1264,
+   "w": 390,
+   "h": 844,
+   "title": "A · Balones, por cantidad",
+   "is_interactive": true
+  },
+  "B-Una.dc.html": {
+   "x": 0,
+   "y": 2528,
+   "w": 390,
+   "h": 844,
+   "title": "B · una unidad, ya elegida",
+   "is_interactive": true
+  },
+  "B-Seis.dc.html": {
+   "x": 470,
+   "y": 2528,
+   "w": 390,
+   "h": 844,
+   "title": "B · seis unidades, ninguna elegida",
+   "is_interactive": true
+  },
+  "B-Balones.dc.html": {
+   "x": 940,
+   "y": 2528,
+   "w": 390,
+   "h": 844,
+   "title": "B · Balones, por cantidad",
+   "is_interactive": true
+  },
+  "C-Una.dc.html": {
+   "x": 0,
+   "y": 3792,
+   "w": 390,
+   "h": 844,
+   "title": "C · una unidad, ya elegida",
+   "is_interactive": true
+  },
+  "C-Seis.dc.html": {
+   "x": 470,
+   "y": 3792,
+   "w": 390,
+   "h": 844,
+   "title": "C · seis unidades, ninguna elegida",
+   "is_interactive": true
+  },
+  "C-Balones.dc.html": {
+   "x": 940,
+   "y": 3792,
+   "w": 390,
+   "h": 844,
+   "title": "C · Balones, por cantidad",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Antes-Una.dc.html",
+  "Antes-Seis.dc.html",
+  "Antes-Balones.dc.html",
+  "A-Una.dc.html",
+  "A-Seis.dc.html",
+  "A-Balones.dc.html",
+  "B-Una.dc.html",
+  "B-Seis.dc.html",
+  "B-Balones.dc.html",
+  "C-Una.dc.html",
+  "C-Seis.dc.html",
+  "C-Balones.dc.html"
+ ],
+ "notes": {
+  "r0": {
+   "x": 0,
+   "y": -260,
+   "text": "Antes · hoy",
+   "kind": "title1",
+   "maxW": 1330
+  },
+  "r1": {
+   "x": 0,
+   "y": 1004,
+   "text": "A · «N.º 1» con «Número del equipo» (recomendada)",
+   "kind": "title1",
+   "maxW": 1330
+  },
+  "r2": {
+   "x": 0,
+   "y": 2268,
+   "text": "B · «Reformer 1» con «¿Cuál?»",
+   "kind": "title1",
+   "maxW": 1330
+  },
+  "r3": {
+   "x": 0,
+   "y": 3532,
+   "text": "C · lista para elegir",
+   "kind": "title1",
+   "maxW": 1330
+  }
+ },
+ "designSystems": []
+}

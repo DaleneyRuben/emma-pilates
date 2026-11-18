@@ -8,6 +8,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 
 const civil = (value: string) => new Date(`${value}T00:00:00.000Z`);
 // 12:00 on 20 October 2026 in Bolivia, so September and October dates are past.
@@ -66,6 +67,10 @@ describe('Prisma Back Office expense report', () => {
         staffMemberId: emma.staffMemberId!,
         amountCentavos: 350_000,
         paidOn: civil('2026-09-30'),
+        receiptImageAssetId: await readySalaryReceiptId(
+          world.prisma,
+          admin.accountId,
+        ),
       },
       admin,
       randomUUID(),

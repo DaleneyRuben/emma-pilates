@@ -1,6 +1,7 @@
 import {
   applyDecorators,
   BadRequestException,
+  Body,
   Controller,
   Get,
   Header,
@@ -14,6 +15,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -24,12 +26,18 @@ import type { PrincipalResolver } from '../../system-identity/authentication/bea
 import {
   BackOfficeController,
   backOfficeOperations,
+  parsed,
   requireId,
   run,
   type BackOfficeOperations,
 } from '../back-office-http';
 import { civilText, parsePayPeriod, type PayPeriod } from './pay-period';
-import { PayStatementDraftDto, PayStatementDto } from './pay-statements.dto';
+import {
+  parsePayStatementApproval,
+  PayStatementApprovalDto,
+  PayStatementDraftDto,
+  PayStatementDto,
+} from './pay-statements.dto';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
 
 const toDto = <
@@ -137,17 +145,28 @@ export class AdministratorPayStatementsController extends BackOfficeController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'approvePayStatement' })
   @ApiParam({ name: 'statementId', format: 'uuid' })
+  @ApiBody({ type: PayStatementApprovalDto })
   @ApiOkResponse({ type: PayStatementDto })
   async approve(
     @Headers('authorization') authorization: string | undefined,
     @Param('statementId') statementId: string,
+    @Body() body: unknown,
   ): Promise<PayStatementDto> {
     const id = requireId(statementId, 'Invalid Pay Statement identifier');
+    const { receiptImageAssetId } = parsed(
+      parsePayStatementApproval(body),
+      'Invalid Pay Statement approval',
+    );
     const principal = await this.authenticate(authorization);
     return toDto(
       await run(() =>
         this.operations.payStatements.approveStatement(
-          { statementId: id },
+          {
+            statementId: id,
+            ...(receiptImageAssetId === undefined
+              ? {}
+              : { receiptImageAssetId }),
+          },
           principal,
         ),
       ),

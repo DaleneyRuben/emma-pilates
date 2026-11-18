@@ -1,40 +1,28 @@
-import {
-  getListOwnPayStatementsQueryKey,
-  getListOwnSalaryPaymentsQueryKey,
-  useListOwnPayStatements,
-  useListOwnSalaryPayments,
-} from "@pilates/api-contracts";
-import {
-  LoadingState,
-  QueryFailure,
-  Screen,
-  SectionTitle,
-  spacing,
-  StateScreen,
-  usePullToRefresh,
-  useRefetchOnFocus,
-} from "@pilates/mobile-core";
+import { LoadingState, QueryFailure, Screen, spacing, StateScreen } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
-import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { DraftStatementCard, PayStatementCard } from "./pay-statement-card";
-import { PaymentsReceived } from "./payments-received";
 import { useIsTablet } from "../ui/use-is-tablet";
+import { OtherPayments } from "./other-payments";
+import { PayHistory } from "./pay-history";
+import { otherPayments, paySummary } from "./pay-ledger";
+import { PaySummaryCard } from "./pay-summary-card";
+import { useOwnPay } from "./use-own-pay";
 
+type PayNavigation = {
+  navigate: (...args: ["AgendaTab"] | ["PayStatement", { statementId: string }]) => void;
+};
+
+// Finding 111, proposal B: what matters now on top, then «Historial» with one
+// row per statement, then any payment that has no statement.
 export function StaffPayScreen() {
-  const navigation = useNavigation<{ navigate: (screen: "AgendaTab") => void }>();
-  const fetcher = useStaffFetcher();
+  const navigation = useNavigation<PayNavigation>();
   const tablet = useIsTablet();
-  const statements = useListOwnPayStatements({ fetcher, query: { refetchOnMount: "always" } });
-  const payments = useListOwnSalaryPayments({ fetcher, query: { refetchOnMount: "always" } });
-  const queryKeys = [getListOwnPayStatementsQueryKey(), getListOwnSalaryPaymentsQueryKey()];
-  useRefetchOnFocus(queryKeys);
-  const refreshControl = usePullToRefresh(queryKeys);
+  const pay = useOwnPay();
 
   const header = <RootHeader title="Mis pagos" />;
-  if (statements.isPending || payments.isPending) {
+  if (pay.pending) {
     return (
       <Screen style={styles.screen}>
         {header}
@@ -42,24 +30,17 @@ export function StaffPayScreen() {
       </Screen>
     );
   }
-  if (statements.data?.status !== 200 || payments.data?.status !== 200) {
+  if (pay.loaded === null) {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tus pagos."
-          onRetry={() => {
-            void statements.refetch();
-            void payments.refetch();
-          }}
-        />
+        <QueryFailure label="No pudimos cargar tus pagos." onRetry={pay.retry} />
       </Screen>
     );
   }
 
-  const monthly = statements.data.data;
-  const received = payments.data.data;
-  if (monthly.length === 0 && received.length === 0) {
+  const { statements, payments } = pay.loaded;
+  if (statements.length === 0 && payments.length === 0) {
     return (
       <Screen style={styles.screen}>
         {header}
@@ -75,37 +56,30 @@ export function StaffPayScreen() {
       </Screen>
     );
   }
-  // v2 S29: the open month is the hero; the approved ones follow.
-  const draft = monthly[0]?.state === "draft" ? monthly[0] : undefined;
-  const earlier = draft === undefined ? monthly : monthly.slice(1);
+  const summary = paySummary(statements, payments);
+  const others = otherPayments(statements, payments);
   return (
     <Screen style={styles.screen}>
       <ScrollView
         contentContainerStyle={[styles.content, tablet && styles.tablet]}
-        refreshControl={refreshControl}
+        refreshControl={pay.refreshControl}
       >
         {header}
-        {draft === undefined ? null : <DraftStatementCard statement={draft} />}
-        {earlier.length === 0 ? null : (
-          <View>
-            <SectionTitle>
-              {draft === undefined ? "Liquidaciones" : "Liquidaciones anteriores"}
-            </SectionTitle>
-            <View style={styles.cards}>
-              {earlier.map((statement) => (
-                <PayStatementCard key={statement.id} statement={statement} />
-              ))}
-            </View>
-          </View>
+        {summary === null ? null : <PaySummaryCard summary={summary} />}
+        {statements.length === 0 ? null : (
+          <PayHistory
+            onOpen={(statementId) => navigation.navigate("PayStatement", { statementId })}
+            payments={payments}
+            statements={statements}
+          />
         )}
-        {received.length === 0 ? null : <PaymentsReceived payments={received} />}
+        {others.length === 0 ? null : <OtherPayments payments={others} />}
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  cards: { gap: spacing.md },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },

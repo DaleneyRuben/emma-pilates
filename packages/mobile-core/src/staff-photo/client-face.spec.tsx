@@ -45,4 +45,18 @@ describe("ClientFace", () => {
     expect(screen.getByText("MQ")).toBeOnTheScreen();
     expect(fetcher).not.toHaveBeenCalled();
   });
+
+  // Walkthrough finding 113: S28's calm list draws initials without Rosa tinte.
+  it("draws her initials on the neutral wash when asked", async () => {
+    const client = new QueryClient();
+
+    await render(
+      <ClientFace fetcher={jest.fn()} name="Sofía Paredes" photo={null} size={40} tone="neutral" />,
+      { wrapper: wrapper(client) },
+    );
+
+    const letters = screen.getByText("SP");
+    expect(letters).toHaveStyle({ color: "#6F6662" });
+    expect(letters.parent).toHaveStyle({ backgroundColor: "rgba(216,201,187,0.34)" });
+  });
 });

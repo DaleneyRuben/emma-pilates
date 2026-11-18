@@ -25,7 +25,8 @@ const camilaSeptember = salaryRow("02", camila, 280_050, "2026-09-05");
 const fileInput = (panel: HTMLElement) =>
   within(panel).getByLabelText("Archivo del comprobante");
 
-// BKO-008, follow-up 224: AW12's optional receipt and AW11's column.
+// BKO-008, follow-up 224: AW12's receipt and AW11's column. Finding 112:
+// every payment needs one, so saving waits for it.
 describe("Salary Payment receipts on the admin web", () => {
   useMockServer();
   const seen: UploadSeen = { polls: 0 };
@@ -49,7 +50,11 @@ describe("Salary Payment receipts on the admin web", () => {
     const camilaRow = screen
       .getByRole("button", { name: "Camila Rojas" })
       .closest("tr")!;
-    expect(within(camilaRow).getByText("—")).toBeInTheDocument();
+    expect(
+      within(camilaRow).getByRole("button", {
+        name: "Adjuntar comprobante de Camila Rojas",
+      }),
+    ).toBeInTheDocument();
     await user.click(
       screen.getByRole("button", { name: "Ver comprobante de Emma Vargas" }),
     );
@@ -79,18 +84,25 @@ describe("Salary Payment receipts on the admin web", () => {
     await screen.findByRole("button", { name: "Emma Vargas" });
     await user.click(screen.getByRole("button", { name: "Registrar pago" }));
     const panel = await screen.findByRole("dialog", { name: "Registrar pago" });
+    expect(within(panel).getByText("Obligatorio")).toBeInTheDocument();
     expect(
       within(panel).getByText(
-        "JPG, PNG o WebP, hasta 10 MB. La entrenadora lo ve en su app.",
+        "Sin comprobante no se puede guardar el pago. JPG, PNG o WebP, hasta 10 MB.",
       ),
     ).toBeInTheDocument();
 
     await user.selectOptions(within(panel).getByLabelText("Empleado"), emma.id);
     await user.type(within(panel).getByLabelText("Monto"), "3.500,00");
     await user.type(within(panel).getByLabelText("Fecha"), "20/09/2026");
+    expect(
+      within(panel).getByRole("button", { name: "Guardar" }),
+    ).toBeDisabled();
     await user.upload(fileInput(panel), imageFile("transferencia.png"));
     expect(
       await within(panel).findByText("Comprobante adjunto"),
+    ).toBeInTheDocument();
+    expect(
+      within(panel).getByText("La entrenadora lo ve en su app."),
     ).toBeInTheDocument();
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -116,9 +128,14 @@ describe("Salary Payment receipts on the admin web", () => {
     );
     const { user } = renderAdmin("/dinero/sueldos/pagados");
     await user.click(
-      await screen.findByRole("button", { name: "Emma Vargas" }),
+      await screen.findByRole("button", {
+        name: "Adjuntar comprobante de Emma Vargas",
+      }),
     );
     const panel = await screen.findByRole("dialog", { name: "Editar pago" });
+    expect(
+      within(panel).getByRole("button", { name: "Guardar" }),
+    ).toBeDisabled();
 
     await user.upload(fileInput(panel), imageFile("transferencia.png"));
     await within(panel).findByText("Comprobante adjunto");

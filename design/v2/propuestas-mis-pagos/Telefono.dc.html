@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mis pagos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.wrap{width:390px;height:960px;display:flex;flex-direction:column;background:#FAF7F2;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;position:relative;overflow:hidden}
+.proto{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:#2E2724;color:#F5EFE9;font-size:12px;align-items:center;min-height:116px;align-content:flex-start}
+.proto b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:10px;width:100%}
+.pc{height:28px;padding:0 10px;border:0;border-radius:999px;background:rgba(245,239,233,.12);color:#F5EFE9;font:500 12px 'Work Sans',sans-serif;cursor:pointer}
+.pc.on{background:#F5EFE9;color:#2E2724}
+.phone{position:relative;width:390px;height:844px;overflow:hidden;display:flex;flex-direction:column}
+.scr{flex:1;padding:60px 20px 28px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;scrollbar-width:none}
+.title{font-family:Lora,Georgia,serif;font-size:30px}
+.sect{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.sec{display:flex;flex-direction:column;gap:12px}
+.note{font-size:14px;color:#6F6662;line-height:1.5}
+.back{display:flex;align-items:center;gap:2px;color:#7D4F4B;font-size:16px;font-weight:500;border:0;background:transparent;padding:0;margin-left:-6px;cursor:pointer;font-family:inherit;align-self:flex-start}
+.num{font-variant-numeric:tabular-nums}
+/* hero (open period / summary) */
+.hero{background:#93615D;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:6px;color:#fff}
+.hero .eb{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+.hero .hp{white-space:nowrap;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);font-size:12px;font-weight:600}
+.hero .ht{font-family:Lora,Georgia,serif;font-size:36px;font-variant-numeric:tabular-nums;line-height:1.15}
+.hero .hn{font-size:14px;color:rgba(255,255,255,.88);line-height:1.45}
+.hero .hl{align-self:flex-start;margin-top:6px;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font:600 14px 'Work Sans',sans-serif;height:36px;padding:0 14px 0 6px;cursor:pointer}
+.hero .hl img{width:26px;height:26px;border-radius:999px;object-fit:cover;object-position:top;background:#fff}
+/* statement card */
+.card{background:#F5EFE9;border-radius:18px;padding:18px 18px 6px;display:flex;flex-direction:column;gap:14px}
+.ch{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.per{font-family:Lora,Georgia,serif;font-size:18px;flex-shrink:1}
+.pill{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.ok{background:#E3EBDF;color:#3F5A36}.pill.wait{background:#F4E8D2;color:#7A5A1E}.pill.open{background:#F2E4E1;color:#7D4F4B}
+.big{font-family:Lora,Georgia,serif;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums;margin-top:-6px}
+.paystrip{display:flex;align-items:center;gap:12px;background:#FAF7F2;border-radius:14px;padding:10px 12px;min-height:60px;border:0;text-align:left;font-family:inherit;color:#4A4A4A;width:100%}
+.paystrip.tap{cursor:pointer}
+.psic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+.psic.ok{background:#E3EBDF;color:#3F5A36}.psic.wait{background:#F4E8D2;color:#7A5A1E}
+.psic img{width:40px;height:40px;border-radius:10px;object-fit:cover;object-position:top;border:1px solid #E6DBD0;background:#fff}
+.pst{flex:1;display:flex;flex-direction:column;gap:2px}
+.pst b{font-weight:500;font-size:15px}
+.pst span{font-size:13px;color:#6F6662}
+.pst span.lk{color:#7D4F4B;font-weight:600}
+.bar{display:flex;height:8px;border-radius:999px;overflow:hidden;gap:2px;background:#FAF7F2}
+.leg{display:flex;flex-direction:column;gap:8px}
+.lr{display:flex;align-items:center;gap:10px;font-size:14px}
+.lr .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:8px;height:8px;border-radius:999px;flex:none}
+.lr .l{flex:1}
+.lines{display:flex;flex-direction:column;gap:10px;border-top:1px solid #E6DBD0;padding-top:12px}
+.ln{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.ln .b{flex:1;display:flex;flex-direction:column;gap:1px}
+.ln .d{font-size:13px;color:#6F6662}
+.more{font-size:13px;color:#6F6662}
+.act{display:flex;justify-content:flex-end;border-top:1px solid #E6DBD0;margin:0 -18px;padding:0 6px}
+.lnk{border:0;background:transparent;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;cursor:pointer;height:44px;padding:0 12px;display:flex;align-items:center;gap:4px}
+/* B rows */
+.list{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.row{min-height:68px;padding:10px 14px 10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.row+.row{border-top:1px solid #E6DBD0}
+.rb{flex:1;display:flex;flex-direction:column;gap:3px}
+.rb b{font-weight:500;font-size:15px}
+.rs{font-size:13px;display:flex;align-items:center;gap:4px}
+.rs.ok{color:#3F5A36}.rs.wait{color:#7A5A1E}.rs.open{color:#7D4F4B}
+.ra{font-family:Lora,Georgia,serif;font-size:18px;font-variant-numeric:tabular-nums}
+.chev{color:#6F6662;font-size:18px}
+/* C stepper */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);position:relative;margin:2px 0 0}
+.st{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;position:relative;z-index:1}
+.sd{width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.sd.done{background:#93615D;color:#fff}.sd.now{background:#FAF7F2;border:2px solid #93615D;color:#93615D}.sd.wait{background:#FAF7F2;border:2px solid #C99A4E;color:#C99A4E}.sd.todo{background:#FAF7F2;border:2px dashed #D8C9BB;color:#B3A79F}
+.sl{font-size:13px;font-weight:600}
+.ss{font-size:12px;color:#6F6662}
+.track{position:absolute;top:12px;left:16.6%;right:16.6%;height:2px;background:#E6DBD0;z-index:0}
+.track i{display:block;height:2px;background:#93615D}
+.rcpt{display:flex;align-items:center;gap:10px;border:0;background:#FAF7F2;border-radius:12px;padding:8px 10px;cursor:pointer;font:500 14px 'Work Sans',sans-serif;color:#7D4F4B;text-align:left}
+.rcpt img{width:32px;height:32px;border-radius:8px;object-fit:cover;object-position:top;border:1px solid #E6DBD0;background:#fff}
+/* empty */
+.empty{display:flex;flex-direction:column;gap:18px;padding-top:12px}
+.eh{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.eic{width:64px;height:64px;border-radius:999px;background:#F2E4E1;color:#93615D;display:flex;align-items:center;justify-content:center}
+.et{font-family:Lora,Georgia,serif;font-size:22px}
+.how{background:#F5EFE9;border-radius:16px;padding:6px 16px;display:flex;flex-direction:column}
+.hw{display:flex;gap:12px;align-items:flex-start;padding:12px 0}
+.hw+.hw{border-top:1px solid #E6DBD0}
+.hn2{width:26px;height:26px;border-radius:999px;background:#93615D;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+.hw .b{display:flex;flex-direction:column;gap:2px;font-size:15px}
+.hw .b span{font-size:13px;color:#6F6662}
+.btn{height:52px;width:100%;border:0;border-radius:14px;font:600 16px 'Work Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.s{background:#F2E4E1;color:#7D4F4B}
+/* chrome */
+.tabbar{height:82px;padding-bottom:18px;background:#F5EFE9;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;flex:none}
+.tb{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6F6662;font-size:12px}
+.tb.on{color:#93615D;font-weight:600}
+.full{position:absolute;inset:0;background:#FAF7F2;z-index:7;display:flex;flex-direction:column;padding:60px 20px 36px;gap:16px}
+.full img{width:300px;height:440px;align-self:center;border-radius:8px;box-shadow:0 2px 12px rgba(74,58,48,.12)}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.32);display:flex;align-items:flex-end;z-index:5}
+.sheet{width:100%;max-height:92%;overflow-y:auto;background:#FAF7F2;border-radius:20px 20px 0 0;padding:14px 20px 36px;display:flex;flex-direction:column;gap:16px}
+.grab{width:40px;height:4px;border-radius:2px;background:#D8C9BB;align-self:center}
+</style>
+</helmet>
+<div class="wrap">
+<div class="proto"><b>Prototipo · opción {{op}} · {{opName}}</b><sc-for list="{{proto}}" as="p" hint-placeholder-count="5"><button type="button" class="{{p.cls}}" onClick="{{p.go}}">{{p.label}}</button></sc-for></div>
+<div class="phone">
+<div class="scr">
+<sc-if value="{{onList}}" hint-placeholder-val="{{true}}">
+<span class="title">Mis pagos</span>
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}"><div class="empty">
+<div class="eh"><span class="eic"><span class="ms" style="font-size:30px">payments</span></span><span class="et">Todavía no tienes pagos</span><span class="note">Aquí verás lo que ganas por tus clases y cada pago que recibas.</span></div>
+<div class="how">
+<div class="hw"><span class="hn2">1</span><span class="b">Dictas tus clases<span>Cada clase se suma sola a tu liquidación del periodo.</span></span></div>
+<div class="hw"><span class="hn2">2</span><span class="b">Administración la aprueba<span>Al cerrar el periodo revisa el total.</span></span></div>
+<div class="hw"><span class="hn2">3</span><span class="b">Te pagamos<span>Aquí ves la fecha del pago y su comprobante.</span></span></div>
+</div>
+<button type="button" class="btn s"><span class="ms">calendar_month</span>Ver mi agenda</button>
+</div></sc-if><sc-if value="{{isA}}" hint-placeholder-val="{{true}}"><sc-if value="{{hasDraft}}" hint-placeholder-val="{{false}}"><div class="hero">
+<div class="ch"><span class="eb">{{draft.short}}</span><span class="hp">En curso</span></div>
+<span class="ht">{{draft.total}}</span>
+<span class="hn">{{draft.note}}</span>
+</div></sc-if><sc-if value="{{hasClosed}}" hint-placeholder-val="{{true}}"><div class="sec"><span class="sect">{{closedTitle}}</span><sc-for list="{{closed}}" as="c" hint-placeholder-count="1"><div class="card">
+<div class="ch"><span class="per">{{c.short}}</span><span class="{{c.pillCls}}">{{c.pill}}</span></div>
+<span class="big">{{c.total}}</span>
+
+<sc-if value="{{c.hasReceipt}}" hint-placeholder-val="{{false}}"><button type="button" class="paystrip tap" onClick="{{openFull}}"><span class="psic"><img src="comprobante.svg" alt=""></span><span class="pst"><b>{{c.payTitle}}</b><span class="lk">Ver comprobante</span></span><span class="ms chev">chevron_right</span></button></sc-if>
+<sc-if value="{{c.plainStrip}}" hint-placeholder-val="{{true}}"><div class="paystrip"><span class="{{c.psicCls}}"><span class="ms">{{c.payIcon}}</span></span><span class="pst"><b>{{c.payTitle}}</b><span>{{c.paySub}}</span></span></div></sc-if>
+
+<div class="bar"><sc-for list="{{c.segs}}" as="s" hint-placeholder-count="3"><i style="display:block;height:8px;width:{{s.w}};background:{{s.color}}"></i></sc-for></div>
+<div class="leg"><sc-for list="{{c.groups}}" as="g" hint-placeholder-count="3"><div class="lr"><span class="dot" style="background:{{g.color}}"></span><span class="l">{{g.label}}</span><span class="num">{{g.amount}}</span></div></sc-for></div>
+<sc-if value="{{c.open}}" hint-placeholder-val="{{false}}"><div class="lines"><sc-for list="{{c.lines}}" as="x" hint-placeholder-count="5"><div class="ln"><span class="b"><span>{{x.label}}</span><span class="d">{{x.detail}}</span></span><span class="num">{{x.amount}}</span></div></sc-for><sc-if value="{{c.hasMore}}" hint-placeholder-val="{{true}}"><span class="more">{{c.more}}</span></sc-if></div></sc-if>
+<div class="act"><button type="button" class="lnk" onClick="{{c.toggle}}">{{c.toggleLabel}}</button></div>
+</div></sc-for></div></sc-if></sc-if><sc-if value="{{isB}}" hint-placeholder-val="{{false}}"><sc-if value="{{notEmpty}}" hint-placeholder-val="{{true}}">
+<div class="hero">
+<span class="eb">{{sum.eyebrow}}</span>
+<span class="ht">{{sum.total}}</span>
+<span class="hn">{{sum.note}}</span>
+<sc-if value="{{sum.receipt}}" hint-placeholder-val="{{false}}"><button type="button" class="hl" onClick="{{openFull}}"><img src="comprobante.svg" alt="">Ver comprobante</button></sc-if>
+</div>
+<div class="sec"><span class="sect">Historial</span><div class="list"><sc-for list="{{all}}" as="c" hint-placeholder-count="2"><div class="row" onClick="{{c.go}}"><span class="rb"><b>{{c.short}}</b><span class="{{c.rowCls}}"><span class="ms" style="font-size:16px">{{c.payIcon}}</span>{{c.rowText}}</span></span><span class="ra">{{c.total}}</span><span class="ms chev">chevron_right</span></div></sc-for></div></div>
+</sc-if></sc-if><sc-if value="{{isC}}" hint-placeholder-val="{{false}}"><sc-for list="{{all}}" as="c" hint-placeholder-count="1"><div class="card">
+<div class="ch"><span class="per">{{c.short}}</span><span class="{{c.pillCls}}">{{c.pill}}</span></div>
+<span class="big">{{c.total}}</span>
+<div class="steps"><div class="track"><i style="width:{{c.trackW}}"></i></div><sc-for list="{{c.steps}}" as="p" hint-placeholder-count="3"><div class="st"><span class="{{p.cls}}"><span class="ms" style="font-size:16px">{{p.icon}}</span></span><span class="sl">{{p.label}}</span><span class="ss">{{p.sub}}</span></div></sc-for></div>
+<sc-if value="{{c.draftNote}}" hint-placeholder-val="{{false}}"><span class="note">{{c.note}}</span></sc-if>
+<sc-if value="{{c.hasReceipt}}" hint-placeholder-val="{{false}}"><button type="button" class="rcpt" onClick="{{openFull}}"><img src="comprobante.svg" alt="">Ver comprobante del pago</button></sc-if>
+<sc-if value="{{c.noReceiptPaid}}" hint-placeholder-val="{{false}}"><span class="note" style="font-size:13px">Pagado sin comprobante adjunto.</span></sc-if>
+<div class="act"><button type="button" class="lnk" onClick="{{c.sheet}}">Ver detalle<span class="ms" style="font-size:18px">expand_less</span></button></div>
+</div></sc-for></sc-if>
+</sc-if>
+<sc-if value="{{onDetail}}" hint-placeholder-val="{{false}}">
+<button type="button" class="back" onClick="{{goList}}"><span class="ms">chevron_left</span>Mis pagos</button>
+<sc-for list="{{detail}}" as="c" hint-placeholder-count="1">
+<span class="sect">{{c.kindLabel}}</span>
+<div class="ch" style="margin-top:-12px"><span class="title" style="font-size:26px">{{c.period}}</span></div>
+<div class="card">
+<div class="ch"><span class="note">Total</span><span class="{{c.pillCls}}">{{c.pill}}</span></div>
+<span class="big">{{c.total}}</span>
+
+<sc-if value="{{c.hasReceipt}}" hint-placeholder-val="{{false}}"><button type="button" class="paystrip tap" onClick="{{openFull}}"><span class="psic"><img src="comprobante.svg" alt=""></span><span class="pst"><b>{{c.payTitle}}</b><span class="lk">Ver comprobante</span></span><span class="ms chev">chevron_right</span></button></sc-if>
+<sc-if value="{{c.plainStrip}}" hint-placeholder-val="{{true}}"><div class="paystrip"><span class="{{c.psicCls}}"><span class="ms">{{c.payIcon}}</span></span><span class="pst"><b>{{c.payTitle}}</b><span>{{c.paySub}}</span></span></div></sc-if>
+
+<div class="bar"><sc-for list="{{c.segs}}" as="s" hint-placeholder-count="3"><i style="display:block;height:8px;width:{{s.w}};background:{{s.color}}"></i></sc-for></div>
+<div class="leg"><sc-for list="{{c.groups}}" as="g" hint-placeholder-count="3"><div class="lr"><span class="dot" style="background:{{g.color}}"></span><span class="l">{{g.label}}</span><span class="num">{{g.amount}}</span></div></sc-for></div>
+<sc-if value="{{c.open}}" hint-placeholder-val="{{false}}"><div class="lines"><sc-for list="{{c.lines}}" as="x" hint-placeholder-count="5"><div class="ln"><span class="b"><span>{{x.label}}</span><span class="d">{{x.detail}}</span></span><span class="num">{{x.amount}}</span></div></sc-for><sc-if value="{{c.hasMore}}" hint-placeholder-val="{{true}}"><span class="more">{{c.more}}</span></sc-if></div></sc-if>
+<div class="act"><button type="button" class="lnk" onClick="{{c.toggle}}">{{c.toggleLabel}}</button></div>
+</div>
+</sc-for>
+</sc-if>
+</div>
+<nav class="tabbar"><span class="tb"><span class="ms" style="font-size:22px">calendar_month</span>Agenda</span><span class="tb on"><span class="ms" style="font-size:22px">account_balance_wallet</span>Mis pagos</span><span class="tb"><span class="ms" style="font-size:22px">person</span>Perfil</span></nav>
+<sc-if value="{{sheetOpen}}" hint-placeholder-val="{{false}}"><div class="scrim" onClick="{{closeSheet}}"><div class="sheet" onClick="{{stop}}"><span class="grab"></span>
+<sc-for list="{{detail}}" as="c" hint-placeholder-count="1">
+<div class="ch"><span class="per">{{c.period}}</span><span class="{{c.pillCls}}">{{c.pill}}</span></div>
+<span class="big">{{c.total}}</span>
+
+<div class="bar"><sc-for list="{{c.segs}}" as="s" hint-placeholder-count="3"><i style="display:block;height:8px;width:{{s.w}};background:{{s.color}}"></i></sc-for></div>
+<div class="leg"><sc-for list="{{c.groups}}" as="g" hint-placeholder-count="3"><div class="lr"><span class="dot" style="background:{{g.color}}"></span><span class="l">{{g.label}}</span><span class="num">{{g.amount}}</span></div></sc-for></div>
+<sc-if value="{{c.always}}" hint-placeholder-val="{{false}}"><div class="lines"><sc-for list="{{c.lines}}" as="x" hint-placeholder-count="5"><div class="ln"><span class="b"><span>{{x.label}}</span><span class="d">{{x.detail}}</span></span><span class="num">{{x.amount}}</span></div></sc-for><sc-if value="{{c.hasMore}}" hint-placeholder-val="{{true}}"><span class="more">{{c.more}}</span></sc-if></div></sc-if>
+</sc-for>
+<button type="button" class="btn s" onClick="{{closeSheet}}">Cerrar</button>
+</div></div></sc-if>
+<sc-if value="{{fullOpen}}" hint-placeholder-val="{{false}}"><div class="full"><button type="button" class="back" onClick="{{closeFull}}"><span class="ms">close</span>Cerrar</button><span class="title" style="font-size:24px">Pago del 18 de noviembre</span><img src="comprobante.svg" alt="Comprobante del pago"></div></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"$preview":{"width":390,"height":960}}'>
+var NOV = {
+  id: 'nov', period: '1 – 17 de noviembre de 2026', short: '1 – 17 de noviembre', total: 'Bs 1.534,90',
+  groups: [['Clases dictadas · 1', 'Bs 65,00', 65, '#93615D'], ['Canceladas por mínimo · 54', 'Bs 1.350,00', 1350, '#C9A49F'], ['Comisiones · 2', 'Bs 119,90', 119.9, '#C99A4E']],
+  lines: [['Clase', 'Reformer · lun 3 nov · 08:00', 'Bs 65,00'], ['Clase cancelada por mínimo', 'Mat · mar 4 nov · 07:00', 'Bs 25,00'], ['Clase cancelada por mínimo', 'Mat · mar 4 nov · 19:00', 'Bs 25,00'], ['Clase cancelada por mínimo', 'Reformer · mié 5 nov · 08:00', 'Bs 25,00'], ['Comisión', 'Plan 8 clases · Valeria Rojas', 'Bs 59,95'], ['Comisión', 'Plan 8 clases · Lucía Paz', 'Bs 59,95']],
+  more: 'Y 51 clases canceladas por mínimo más.'
+};
+var OPEN = {
+  id: 'open', period: '18 – 30 de noviembre de 2026', short: '18 – 30 de noviembre', total: 'Bs 211,00',
+  groups: [['Clases dictadas · 2', 'Bs 130,00', 130, '#93615D'], ['Comisiones · 1', 'Bs 81,00', 81, '#C99A4E']],
+  lines: [['Clase', 'Reformer · mar 18 nov · 08:00', 'Bs 65,00'], ['Clase', 'Reformer · mar 18 nov · 18:00', 'Bs 65,00'], ['Comisión', 'Plan 12 clases · Andrea Soliz', 'Bs 81,00']],
+  more: '', note: '2 clases dictadas hasta hoy. Puede cambiar hasta que administración lo apruebe.'
+};
+var NAMES = { A: 'Cada periodo con su pago', B: 'Resumen arriba e historial', C: 'Seguimiento en tres pasos' };
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var op = this.props.opcion ?? 'A';
+    var s = st.s || 'pagado';
+    var screen = st.screen || 'list';
+    var openMap = st.open || {};
+    function set(o) { return function () { self.setState(o); }; }
+    function card(src, kind) {
+      var total = src.groups.reduce(function (t, g) { return t + g[2]; }, 0);
+      var paid = kind === 'paid', wait = kind === 'wait', draft = kind === 'draft';
+      var receipt = paid && s === 'comprobante';
+      var isOpen = !!openMap[src.id];
+      var pay = paid ? { icon: 'check_circle', cls: 'psic ok', title: 'Pagado el 18 de noviembre', sub: receipt ? 'Ver comprobante' : 'Sin comprobante adjunto', row: 'Pagado el 18 nov', rowCls: 'rs ok' }
+        : wait ? { icon: 'schedule', cls: 'psic wait', title: 'Aprobado · falta el pago', sub: 'Administración ya aprobó este total.', row: 'Aprobado · por pagar', rowCls: 'rs wait' }
+        : { icon: 'edit_calendar', cls: 'psic wait', title: 'En curso', sub: '', row: 'En curso · puede cambiar', rowCls: 'rs open' };
+      var steps = [
+        { label: 'Clases', sub: draft ? 'en curso' : 'hasta 17 nov', cls: draft ? 'sd now' : 'sd done', icon: draft ? 'more_horiz' : 'check' },
+        { label: 'Aprobado', sub: draft ? 'al cerrar' : 'listo', cls: draft ? 'sd todo' : 'sd done', icon: draft ? 'hourglass_empty' : 'check' },
+        { label: 'Pagado', sub: paid ? '18 nov' : (wait ? 'pendiente' : '—'), cls: paid ? 'sd done' : (wait ? 'sd wait' : 'sd todo'), icon: paid ? 'check' : 'schedule' }
+      ];
+      return {
+        id: src.id, period: src.period, short: src.short, total: src.total,
+        kindLabel: draft ? 'Periodo en curso' : 'Liquidación',
+        pill: paid ? 'Pagado' : (wait ? 'Por pagar' : 'En curso'),
+        pillCls: paid ? 'pill ok' : (wait ? 'pill wait' : 'pill open'),
+        payIcon: pay.icon, psicCls: pay.cls, payTitle: pay.title, paySub: pay.sub, rowText: pay.row, rowCls: pay.rowCls,
+        hasReceipt: receipt, plainStrip: !receipt && !draft, noReceiptPaid: paid && !receipt,
+        draftNote: draft, note: src.note,
+        segs: src.groups.map(function (g) { return { w: (g[2] / total * 100).toFixed(1) + '%', color: g[3] }; }),
+        groups: src.groups.map(function (g) { return { label: g[0], amount: g[1], color: g[3] }; }),
+        lines: src.lines.map(function (l) { return { label: l[0], detail: l[1], amount: l[2] }; }),
+        more: src.more, hasMore: !!src.more,
+        open: isOpen, always: true,
+        toggle: function () { var m = Object.assign({}, openMap); m[src.id] = !isOpen; self.setState({ open: m }); },
+        toggleLabel: isOpen ? 'Ocultar detalle' : 'Ver cada clase',
+        steps: steps, trackW: paid ? '100%' : (wait ? '50%' : '0%'),
+        go: set({ screen: 'detail', id: src.id }),
+        sheet: set({ sheet: src.id })
+      };
+    }
+    var empty = s === 'vacio';
+    var closed = empty ? [] : [card(NOV, s === 'porpagar' ? 'wait' : 'paid')];
+    var draft = s === 'abierto' ? card(OPEN, 'draft') : null;
+    var all = (draft ? [draft] : []).concat(closed);
+    var sum = s === 'porpagar'
+      ? { eyebrow: 'Por cobrar', total: NOV.total, note: 'Liquidación del 1 – 17 de noviembre, ya aprobada. Falta el pago.', receipt: false }
+      : s === 'abierto'
+        ? { eyebrow: 'En curso · 18 – 30 de noviembre', total: OPEN.total, note: OPEN.note, receipt: false }
+        : { eyebrow: 'Último pago · 18 de noviembre', total: NOV.total, note: 'Por el 1 – 17 de noviembre de 2026.' + (s === 'comprobante' ? '' : ' Sin comprobante adjunto.'), receipt: s === 'comprobante' };
+    var target = st.id || st.sheet;
+    var detail = all.filter(function (c) { return c.id === target; });
+    var proto = [['Pagado', 'pagado'], ['Con comprobante', 'comprobante'], ['Aprobado sin pagar', 'porpagar'], ['Periodo abierto', 'abierto'], ['Sin pagos', 'vacio']].map(function (p) {
+      return { label: p[0], go: set({ s: p[1], screen: 'list', open: {}, full: false, sheet: null, id: null }), cls: p[1] === s ? 'pc on' : 'pc' };
+    });
+    return {
+      op: op, opName: NAMES[op], proto: proto,
+      isA: op === 'A' && !empty, isB: op === 'B', isC: op === 'C' && !empty,
+      empty: empty, notEmpty: !empty,
+      onList: screen === 'list', onDetail: screen === 'detail' && detail.length > 0, goList: set({ screen: 'list' }),
+      hasDraft: !!draft, draft: draft || {}, hasClosed: closed.length > 0, closed: closed,
+      closedTitle: draft ? 'Liquidaciones anteriores' : 'Liquidaciones',
+      all: all, sum: sum, detail: detail,
+      sheetOpen: !!st.sheet && detail.length > 0, closeSheet: set({ sheet: null }), stop: function (e) { if (e && e.stopPropagation) e.stopPropagation(); },
+      fullOpen: !!st.full, openFull: set({ full: true }), closeFull: set({ full: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

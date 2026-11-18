@@ -362,6 +362,7 @@ export * from "./paymentReviewDtoState";
 export * from "./payoutQrDto";
 export * from "./payoutQrDtoStanding";
 export * from "./payoutQrResultDto";
+export * from "./payStatementApprovalDto";
 export * from "./payStatementDraftDto";
 export * from "./payStatementDto";
 export * from "./payStatementDtoState";

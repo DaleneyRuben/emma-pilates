@@ -44,6 +44,7 @@ import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
 import { PayoutQrScreen } from "../profile/payout-qr/payout-qr-screen";
 import { StaffReferralCodeScreen } from "../profile/staff-referral-code-screen";
+import { PayStatementScreen } from "../profile/pay-statement-screen";
 import { StaffPayScreen } from "../profile/staff-pay-screen";
 import { StaffProfileScreen } from "../profile/staff-profile-screen";
 import { ScheduleScreen } from "../schedule/schedule-screen";
@@ -192,7 +193,8 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
         PayTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
-            screens: { MyPay: StaffPayScreen },
+            // Finding 111: a statement opens from «Historial» over the tab bar.
+            screens: { MyPay: StaffPayScreen, PayStatement: PayStatementScreen },
           }),
           options: tabOptions("Mis pagos", "pay", "MyPay"),
         },

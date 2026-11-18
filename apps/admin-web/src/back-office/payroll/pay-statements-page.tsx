@@ -1,14 +1,13 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarRange, CheckCircle2, RefreshCw } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   LoadingNotice,
   QueryFailure,
 } from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
-import { Button, buttonVariants } from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
 import {
   addDays,
   addMonths,
@@ -68,7 +67,8 @@ function MonthOpenNotice({
   );
 }
 
-// FIX-072: after approving, «Subir comprobante» opens Pagados on her.
+// Finding 112: the receipt goes with the approval, so the notice only says
+// what happened.
 function DoneNotice({ notice }: { notice: ApprovedNotice }) {
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-lino px-4 py-3 text-nota text-texto">
@@ -80,15 +80,6 @@ function DoneNotice({ notice }: { notice: ApprovedNotice }) {
         />
         {notice.text}
       </p>
-      {notice.receiptFor === undefined ? null : (
-        <Link
-          to="/dinero/sueldos/pagados"
-          search={{ staffMemberId: notice.receiptFor }}
-          className={buttonVariants({ variant: "secondary", size: "sm" })}
-        >
-          Subir comprobante
-        </Link>
-      )}
     </div>
   );
 }
