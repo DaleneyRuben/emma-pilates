@@ -137,7 +137,7 @@ describe("the admin web for the Coordinator", () => {
     );
     renderAdmin("/clientas");
 
-    await heading("Clientes");
+    await heading("Clientas");
     expect(
       screen.queryByRole("link", { name: "Dar clases de campaña" }),
     ).not.toBeInTheDocument();

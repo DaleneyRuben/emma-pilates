@@ -50,7 +50,7 @@ describe("the global search", () => {
       ).toHaveAttribute("aria-selected", "true");
       await user.keyboard("{Enter}");
 
-      await heading("Clientes");
+      await heading("Clientas");
       expect(router.state.location.pathname).toBe("/clientas");
       expect(router.state.location.search).toMatchObject({ q: "Lucía" });
     });

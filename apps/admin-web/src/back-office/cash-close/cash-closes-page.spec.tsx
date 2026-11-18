@@ -102,7 +102,7 @@ const october = {
 };
 
 const heading = () =>
-  screen.findByRole("heading", { level: 1, name: "Cierres de caja" });
+  screen.findByRole("heading", { level: 1, name: "Caja" });
 const rowOf = async (date: string) =>
   (await screen.findByRole("cell", { name: date }))
     .parentElement as HTMLElement;
@@ -205,6 +205,8 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       "text-error-texto",
     );
     expect(short).toHaveAttribute("data-difference", "short");
+    // FIX-088: every row keeps the same ground; the figure carries the color.
+    expect(short.className).not.toMatch(/bg-error|bg-advertencia/);
     expect(within(short).getByText("Camila Rojas · 19:05")).toBeVisible();
     expect(
       within(short).getByText("Faltó cambio para un billete de 200"),
@@ -231,6 +233,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       "text-advertencia-texto",
     );
     expect(over).toHaveAttribute("data-difference", "over");
+    expect(over.className).not.toMatch(/bg-error|bg-advertencia/);
 
     expect(within(await rowOf("sáb 24/10")).getByText("Abierta")).toBeVisible();
     expect(

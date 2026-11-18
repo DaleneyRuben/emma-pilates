@@ -34,7 +34,7 @@ const clientTable = (respond: (params: URLSearchParams) => Response) =>
   });
 
 const heading = () =>
-  screen.findByRole("heading", { level: 1, name: "Clientes" });
+  screen.findByRole("heading", { level: 1, name: "Clientas" });
 
 describe("AW21 Clientes on a desktop browser", () => {
   useMockServer();
