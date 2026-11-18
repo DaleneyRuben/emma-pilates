@@ -7,7 +7,11 @@ import { NoBranchPage } from "../../components/page/no-branch-page";
 import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
 import { useKnownOption } from "../../components/table/use-known-option";
-import { formatCivilDate } from "../../lib/bolivia-time";
+import { Pencil } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { StatusPill } from "../../components/ui/status-pill";
+import { formatCivilDate, formatCivilMoment } from "../../lib/bolivia-time";
+import { cn } from "../../lib/cn";
 import { formatBolivianos } from "../../lib/money";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
@@ -21,21 +25,53 @@ import { ExpenseCategoriesEditor } from "./categories-page";
 
 const columns = createColumnHelper<AdminExpenseDto>();
 
+const isVoided = (expense: AdminExpenseDto) => expense.voidedAt !== null;
+
+// Finding 104: an eliminated Expense stays listed, muted, with who and when.
+const voidedLine = (expense: AdminExpenseDto) =>
+  [
+    `Eliminado por ${expense.voidedByName ?? ""}`,
+    formatCivilMoment(expense.voidedAt ?? ""),
+    ...(expense.voidReason === null ? [] : [expense.voidReason]),
+  ].join(" · ");
+
 const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
   columns.accessor("expenseCategoryName", {
     header: "Categoría",
-    cell: ({ row }) => (
-      <RowOpener
-        label={row.original.expenseCategoryName}
-        onOpen={() => open(row.original)}
-      />
-    ),
+    cell: ({ row }) =>
+      isVoided(row.original) ? (
+        <span className="flex flex-col gap-1">
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="text-texto-tenue">
+              {row.original.expenseCategoryName}
+            </span>
+            <StatusPill tone="neutral">Eliminado</StatusPill>
+          </span>
+          <span className="text-nota text-texto-tenue">
+            {voidedLine(row.original)}
+          </span>
+        </span>
+      ) : (
+        <RowOpener
+          label={row.original.expenseCategoryName}
+          onOpen={() => open(row.original)}
+        />
+      ),
   }),
   columns.accessor("amountCentavos", {
     header: "Monto",
     meta: { align: "right" },
-    cell: ({ getValue }) => (
-      <span className="text-texto tabular">{formatBolivianos(getValue())}</span>
+    cell: ({ row, getValue }) => (
+      <span
+        className={cn(
+          "tabular",
+          isVoided(row.original)
+            ? "text-texto-tenue line-through"
+            : "text-texto",
+        )}
+      >
+        {formatBolivianos(getValue())}
+      </span>
     ),
   }),
   columns.accessor("incurredOn", {
@@ -45,6 +81,27 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
         {formatCivilDate(getValue())}
       </span>
     ),
+  }),
+  // Finding 104: the row says it opens «Editar gasto» (owner, 2026-11-18).
+  columns.display({
+    id: "edit",
+    header: "",
+    meta: { align: "right" },
+    cell: ({ row }) =>
+      isVoided(row.original) ? null : (
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label={`Editar el gasto de ${row.original.expenseCategoryName} del ${formatCivilDate(row.original.incurredOn)}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            open(row.original);
+          }}
+        >
+          <Pencil size={14} strokeWidth={1.8} aria-hidden="true" />
+          Editar
+        </Button>
+      ),
   }),
 ];
 
@@ -76,6 +133,7 @@ function BranchExpenses({
           : "No hay gastos de esta categoría en esta sucursal."
       }
       panelTitles={{ create: "Nuevo gasto", edit: "Editar gasto" }}
+      canOpen={(expense) => !isVoided(expense)}
       panelActions={categoriesAction}
       filter={
         <ListFilter

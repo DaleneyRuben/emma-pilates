@@ -33,6 +33,7 @@ import { formatBolivianos } from "../../lib/money";
 import type { Branch } from "../../shell/branch/branch-context";
 import { backOfficeProblem } from "../back-office-problems";
 import { CategoryAdder } from "./category-adder";
+import { ExpenseVoidAction } from "./expense-void-action";
 import {
   expenseCategoriesQueryOptions,
   useExpenseChange,
@@ -226,6 +227,13 @@ export function ExpensePanelForm({
           <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
+          {expense === undefined ? null : (
+            <ExpenseVoidAction
+              branchId={branch.id}
+              expense={expense}
+              onDone={onDone}
+            />
+          )}
         </SidePanelFooter>
       </form>
     </Form>
