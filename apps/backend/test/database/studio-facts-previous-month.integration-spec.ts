@@ -1,6 +1,9 @@
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
-import { recomputeCurrentStudioMonth } from '../../src/studio/studio.module';
+import {
+  recalculateStudioMonth,
+  recomputeCurrentStudioMonth,
+} from '../../src/studio/studio.module';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -86,5 +89,33 @@ describe('the daily studio facts run', () => {
          AND rule = 'weak_schedule'`,
     );
     expect(rows.rows).toEqual([{ rule: 'weak_schedule' }]);
+  });
+
+  // Review of finding 107: Recalcular on a final month must not rebuild its
+  // facts from today's Bookings (FIX-008); it recomputes the findings only.
+  it('recalculates a final month without touching its facts', async () => {
+    const sessionId = await insertSession(context, world, {
+      startsAt: '2026-09-30T22:00:00.000Z',
+      bookingsAtWindowClose: 2,
+    });
+    await recalculateStudioMonth(prisma, {
+      month: new Date('2026-09-01T00:00:00.000Z'),
+      now: new Date('2026-10-05T03:00:00.000Z'),
+    });
+    await context.pool.query(
+      `UPDATE booking.sessions SET bookings_at_window_close = 6 WHERE id = $1`,
+      [sessionId],
+    );
+
+    await recalculateStudioMonth(prisma, {
+      month: new Date('2026-09-01T00:00:00.000Z'),
+      now: new Date('2026-11-20T03:00:00.000Z'),
+    });
+    const facts = await context.pool.query<{ bookings: number }>(
+      `SELECT bookings_at_window_close AS bookings FROM studio.session_facts
+       WHERE deleted_at IS NULL AND session_id = $1`,
+      [sessionId],
+    );
+    expect(facts.rows).toEqual([{ bookings: 2 }]);
   });
 });

@@ -151,13 +151,13 @@ export const createStudioOperations = (deps: {
           kpis: (input, principal) => operations.kpis(input, principal, prisma),
           recommendations: (input, principal) =>
             operations.list(input, principal, prisma),
-          // «Recalcular» (walkthrough finding 107) refreshes the facts first,
-          // so the findings read today's Bookings, not last night's.
+          // «Recalcular» (walkthrough finding 107) refreshes an open month's
+          // facts first, so the findings read today's Bookings.
           recomputeRecommendations: async (input, principal) => {
             requireStudioAdministrator(principal);
-            await recomputeStudioFacts(prisma, {
+            await recalculateStudioMonth(prisma, {
               month: monthDate(input.month),
-              now: () => new Date(),
+              now: new Date(),
             });
             return operations.recomputeRecommendations(
               input,
@@ -204,4 +204,20 @@ export const recomputeCurrentStudioMonth = async (
   }
   if (failure !== null) throw failure;
   return total;
+};
+
+// «Recalcular» (finding 107) refreshes the facts of a month the daily run
+// still recomputes; a final month keeps its facts (FIX-008).
+export const recalculateStudioMonth = async (
+  prisma: PrismaClient,
+  input: { month: Date; now: Date },
+): Promise<void> => {
+  const open = studioMonthsToRecompute(input.now).some(
+    (month) => month.getTime() === input.month.getTime(),
+  );
+  if (!open) return;
+  await recomputeStudioFacts(prisma, {
+    month: input.month,
+    now: () => input.now,
+  });
 };
