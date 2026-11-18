@@ -12,6 +12,17 @@ describe('validateImageUploadDeclaration', () => {
     ).toEqual({ maxAxisPixels: 6_000 });
   });
 
+  it('accepts a payout QR photo as large as a receipt (FIX-072)', () => {
+    expect(
+      validateImageUploadDeclaration({
+        purpose: 'payout_qr',
+        mediaType: 'image/png',
+        byteSize: 10 * 1024 * 1024,
+        checksum: new Uint8Array(32),
+      }),
+    ).toEqual({ maxAxisPixels: 6_000 });
+  });
+
   it('rejects an oversized profile photo before issuing an upload URL', () => {
     expect(() =>
       validateImageUploadDeclaration({

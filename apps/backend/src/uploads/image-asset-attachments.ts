@@ -31,6 +31,7 @@ const purposeToPrisma: Record<ImagePurpose, ImageAssetPurpose> = {
   transfer_receipt: ImageAssetPurpose.TRANSFER_RECEIPT,
   promotion: ImageAssetPurpose.PROMOTION,
   invoice: ImageAssetPurpose.INVOICE,
+  payout_qr: ImageAssetPurpose.PAYOUT_QR,
 };
 
 export const imageMediaTypes: Record<ImageMediaType, string> = {

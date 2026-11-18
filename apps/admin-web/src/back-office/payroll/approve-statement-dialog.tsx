@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isApiError } from "../../api/problem";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { formatBolivianos } from "../../lib/money";
+import { PayoutQrSlot } from "./payout-qr/payout-qr-slot";
 import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
 import {
   approvePayStatementRequest,
@@ -24,6 +25,11 @@ const failureOf = (error: unknown): string =>
     ? "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular."
     : "No pudimos aprobar el pago.";
 
+/** What Sueldos says after approving, and whose receipt it leads to. */
+export type ApprovedNotice = { text: string; receiptFor?: string };
+
+const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
+
 // Finding 105: approving creates the Salary Payment, so it always names the
 // amount, the person and the period first.
 export function ApproveStatementDialog({
@@ -37,7 +43,7 @@ export function ApproveStatementDialog({
   period: PayPeriodQuery;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onApproved: (message: string) => void;
+  onApproved: (notice: ApprovedNotice) => void;
 }) {
   const queryClient = useQueryClient();
   const total = formatBolivianos(statement.totalCentavos);
@@ -49,9 +55,10 @@ export function ApproveStatementDialog({
     mutationFn: () => approvePayStatementRequest(statement.id),
     onSuccess: async () => {
       onOpenChange(false);
-      onApproved(
-        `Aprobamos ${total} a ${statement.staffMemberName}. Quedó en Pagados; ahí puedes subir el comprobante.`,
-      );
+      onApproved({
+        text: `Aprobamos ${total} a ${statement.staffMemberName}. Quedó en Pagados. ¿Ya le transferiste? Sube el comprobante y ${firstName(statement.staffMemberName)} lo verá en su app.`,
+        receiptFor: statement.staffMemberId,
+      });
       await queryClient.invalidateQueries({
         queryKey: payStatementsQueryOptions(period).queryKey,
       });
@@ -68,21 +75,31 @@ export function ApproveStatementDialog({
       title={`¿Aprobar ${total} a ${statement.staffMemberName} ${forPeriod(periodText)}?`}
       confirmLabel={`Aprobar ${total}`}
       tone="primary"
+      wide
       busy={approve.isPending}
       onConfirm={() => approve.mutate()}
     >
-      <dl className="grid grid-cols-[110px_minmax(0,1fr)] gap-x-3 gap-y-1 text-texto">
-        <dt className="text-texto-tenue">Período</dt>
-        <dd>{periodText}</dd>
-        <dt className="text-texto-tenue">Líneas</dt>
-        <dd>{`${lines} ${lines === 1 ? "línea" : "líneas"}`}</dd>
-        <dt className="text-texto-tenue">Se registra</dt>
-        <dd>Pago de sueldo con fecha de hoy</dd>
-      </dl>
-      <p>
-        Después de aprobarlo ya no cambia aunque vuelvas a calcular. Puedes
-        subir el comprobante desde Pagados.
-      </p>
+      <div className="grid gap-6 min-[640px]:grid-cols-[280px_minmax(0,1fr)]">
+        {/* FIX-072 (follow-up 276): the QR she is paid by, or why there is none. */}
+        <PayoutQrSlot
+          staffMemberId={statement.staffMemberId}
+          staffName={statement.staffMemberName}
+        />
+        <div className="flex flex-col gap-2">
+          <dl className="grid grid-cols-[110px_minmax(0,1fr)] gap-x-3 gap-y-1 text-texto">
+            <dt className="text-texto-tenue">Período</dt>
+            <dd>{periodText}</dd>
+            <dt className="text-texto-tenue">Líneas</dt>
+            <dd>{`${lines} ${lines === 1 ? "línea" : "líneas"}`}</dd>
+            <dt className="text-texto-tenue">Se registra</dt>
+            <dd>Pago de sueldo con fecha de hoy</dd>
+          </dl>
+          <p>
+            Después de aprobarlo ya no cambia aunque vuelvas a calcular. Puedes
+            subir el comprobante desde Pagados.
+          </p>
+        </div>
+      </div>
       {approve.isError ? (
         <p role="alert" className="text-error-texto">
           {failureOf(approve.error)}

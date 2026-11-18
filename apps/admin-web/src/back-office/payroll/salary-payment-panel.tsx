@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { AdminSalaryPaymentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useIdempotencyKey } from "../../api/idempotency-key";
 import { CivilDateInput } from "../../components/form/civil-date-input";
@@ -30,6 +30,7 @@ import { Select } from "../../components/ui/select";
 import { formatBolivianos } from "../../lib/money";
 import { backOfficeProblem } from "../back-office-problems";
 import { staffOptionLabel } from "./payroll-format";
+import { PayoutQrSlot } from "./payout-qr/payout-qr-slot";
 import { SalaryReceiptField, type SalaryReceipt } from "./salary-receipt-field";
 import {
   payrollStaffQueryOptions,
@@ -74,6 +75,9 @@ export function SalaryPaymentPanelForm({
       date: payment?.paidOn ?? "",
     },
   });
+
+  const chosenId = useWatch({ control: form.control, name: "staffMemberId" });
+  const chosen = staff.data?.find((member) => member.id === chosenId);
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
@@ -156,6 +160,9 @@ export function SalaryPaymentPanelForm({
               </FormItem>
             )}
           />
+          {chosen === undefined ? null : (
+            <PayoutQrSlot staffMemberId={chosen.id} staffName={chosen.name} />
+          )}
           <FormField
             control={form.control}
             name="amountCentavos"

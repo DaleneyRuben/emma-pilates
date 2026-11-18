@@ -5,7 +5,10 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { boliviaToday, formatDayMonth } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
-import { ApproveStatementDialog } from "./approve-statement-dialog";
+import {
+  ApproveStatementDialog,
+  type ApprovedNotice,
+} from "./approve-statement-dialog";
 import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
 import { StatementConcepts } from "./statement-concepts";
 
@@ -27,7 +30,7 @@ export function StatementCard({
 }: {
   statement: PayStatementDto;
   period: PayPeriodQuery;
-  onApproved: (message: string) => void;
+  onApproved: (notice: ApprovedNotice) => void;
   today?: string;
 }) {
   const headingId = useId();

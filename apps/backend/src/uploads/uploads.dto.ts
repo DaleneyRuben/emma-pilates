@@ -7,6 +7,7 @@ const imagePurposes: [ImagePurpose, ...ImagePurpose[]] = [
   'transfer_receipt',
   'promotion',
   'invoice',
+  'payout_qr',
 ];
 
 export class CreatePendingUploadDto {

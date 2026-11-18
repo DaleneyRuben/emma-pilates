@@ -145,6 +145,7 @@ model StaffMember {
   evaluationSlots     EvaluationSlot[]
   salaryPayments      SalaryPayment[]
   payStatements       PayStatement[]
+  payoutQrs           StaffPayoutQr[]
   impersonations      ImpersonationSession[]
   acquisitionsReferred ClientAcquisition[]
   referralCodes       ReferralCode[]

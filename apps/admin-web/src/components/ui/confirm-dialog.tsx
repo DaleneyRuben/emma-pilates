@@ -1,6 +1,7 @@
 import { AlertDialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { BodyScrollLock } from "./body-scroll-lock";
+import { cn } from "../../lib/cn";
 import { Button } from "./button";
 
 /**
@@ -19,6 +20,7 @@ export function ConfirmDialog({
   pending = false,
   busy = false,
   tone = "destructive",
+  wide = false,
   onConfirm,
 }: {
   open: boolean;
@@ -32,13 +34,22 @@ export function ConfirmDialog({
   /** The confirmation's own request is in flight (follow-up 93). */
   busy?: boolean;
   tone?: "destructive" | "primary";
+  /** Room for a picture beside the details (FIX-072's payout QR). */
+  wide?: boolean;
   onConfirm: () => void;
 }) {
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-50 bg-scrim" />
-        <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(420px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-marco bg-superficie p-5 shadow-popover">
+        <AlertDialog.Content
+          className={cn(
+            "fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-marco bg-superficie p-5 shadow-popover",
+            wide
+              ? "max-h-[calc(100vh-32px)] w-[min(820px,calc(100vw-32px))] overflow-y-auto"
+              : "w-[min(420px,calc(100vw-32px))]",
+          )}
+        >
           <BodyScrollLock />
           <AlertDialog.Title className="font-serif text-titulo-panel text-texto">
             {title}

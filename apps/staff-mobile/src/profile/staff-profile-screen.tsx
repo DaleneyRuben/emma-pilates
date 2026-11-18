@@ -1,5 +1,6 @@
 import {
   useGetCurrentStaffMemberProfile,
+  useGetOwnPayoutQr,
   useGetOwnReferralCode,
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
@@ -26,13 +27,21 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import appConfig from "../../app.json";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
+import { payoutQrRowValue } from "./payout-qr/payout-qr-copy";
 import { ProfileRow } from "./profile-row";
 import { StaffPhotoSummary } from "./staff-photo-summary";
 import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
   navigate: (
-    screen: "Notifications" | "PayTab" | "ChangePassword" | "Feedback" | "ReferralCode" | "ViewAs",
+    screen:
+      | "Notifications"
+      | "PayTab"
+      | "ChangePassword"
+      | "Feedback"
+      | "ReferralCode"
+      | "ViewAs"
+      | "PayoutQr",
   ) => void;
   setParams: (params: StaffProfileParams) => void;
 };
@@ -56,6 +65,10 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  // FIX-072: every role keeps the QR she is paid by.
+  const payoutQr = useGetOwnPayoutQr({ fetcher, query: { refetchOnMount: "always" } });
+  const payoutQrValue =
+    payoutQr.data?.status === 200 ? payoutQrRowValue(payoutQr.data.data.payoutQr) : undefined;
   const trainer = identity.session?.role === "trainer";
   // BKM-017: only a Trainer has a code of her own (follow-up 229).
   const ownCode = useGetOwnReferralCode({
@@ -113,6 +126,14 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
         <View>
           <SectionTitle>Ajustes</SectionTitle>
           <IconRowGroup>
+            <ProfileRow
+              icon="image"
+              label="Mi QR de cobro"
+              onPress={() => navigation.navigate("PayoutQr")}
+              testID="profile-payout-qr"
+              value={payoutQrValue?.text}
+              valueTone={payoutQrValue?.tone}
+            />
             {administrator ? (
               <ProfileRow
                 icon="eye"

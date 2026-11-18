@@ -158,6 +158,27 @@ model SalaryPayment {
   @@schema("back_office")
 }
 
+// FIX-072 (walkthrough finding 106): the bank QR a staff member is paid by and
+// its last valid day. One current row per person (a partial unique index in
+// the migration); a new QR ends the old one with `replacedAt`, never deletes.
+model StaffPayoutQr {
+  id                  String      @id @default(uuid()) @db.Uuid
+  staffMemberId       String      @map("staff_member_id") @db.Uuid
+  imageAssetId        String      @unique @map("image_asset_id") @db.Uuid
+  validUntil          DateTime    @map("valid_until") @db.Date
+  uploadedByAccountId String      @map("uploaded_by_account_id") @db.Uuid
+  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  replacedAt          DateTime?   @map("replaced_at") @db.Timestamptz(3)
+  staffMember         StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+  imageAsset          ImageAsset  @relation("StaffPayoutQrImage", fields: [imageAssetId], references: [id], onDelete: Restrict)
+  uploadedByAccount   Account     @relation("StaffPayoutQrUploadedBy", fields: [uploadedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([staffMemberId])
+  @@index([uploadedByAccountId])
+  @@map("staff_payout_qrs")
+  @@schema("back_office")
+}
+
 // BKO-005: the fixed-cost budget, one row per line. Contingencies are not a
 // row; they are a percent of the subtotal, computed when the month is read.
 model CostBudgetLine {

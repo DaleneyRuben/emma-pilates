@@ -68,6 +68,21 @@ export const variantPlans: Readonly<
       encode: { format: 'jpeg', quality: 80, chroma: '4:2:0' },
     },
   ],
+  // FIX-072: a payout QR must stay scannable, so it reads like a receipt.
+  payout_qr: [
+    {
+      kind: 'readable',
+      box: { width: 2048, height: 2048 },
+      fit: 'inside',
+      encode: { format: 'jpeg', quality: 85, chroma: '4:4:4' },
+    },
+    {
+      kind: 'thumbnail',
+      box: { width: 800, height: 800 },
+      fit: 'inside',
+      encode: { format: 'jpeg', quality: 80, chroma: '4:2:0' },
+    },
+  ],
   promotion: [
     {
       kind: 'promotion_480',

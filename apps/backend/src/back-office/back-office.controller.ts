@@ -57,6 +57,7 @@ import {
   WithdrawalPageDto,
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
+import { payoutQrControllers } from './payout-qr/payout-qr.controller';
 import { AdministratorFinanceController } from './finance/finance.controller';
 import { payrollControllers } from './payroll/pay-statements.controller';
 import { AdministratorSalaryPaymentsController } from './payroll/salary-payments.controller';
@@ -326,4 +327,5 @@ export const backOfficeControllers = [
   AdministratorFinanceController,
   ...payrollControllers,
   ...cashCloseControllers,
+  ...payoutQrControllers,
 ];

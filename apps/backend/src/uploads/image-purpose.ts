@@ -1,5 +1,5 @@
 export type ImagePurpose =
-  'profile_photo' | 'transfer_receipt' | 'promotion' | 'invoice';
+  'profile_photo' | 'transfer_receipt' | 'promotion' | 'invoice' | 'payout_qr';
 
 type ImageUploadDeclaration = {
   purpose: ImagePurpose;
@@ -16,6 +16,8 @@ const purposeLimits: Readonly<
   promotion: { maxByteSize: 20 * 1024 * 1024, maxAxisPixels: 6_000 },
   // FIX-044: the issued invoice, a PDF or a photo, as large as a receipt.
   invoice: { maxByteSize: 10 * 1024 * 1024, maxAxisPixels: 6_000 },
+  // FIX-072: a staff member's bank QR, a photo or capture like a receipt.
+  payout_qr: { maxByteSize: 10 * 1024 * 1024, maxAxisPixels: 6_000 },
 };
 
 const imageMediaTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -25,6 +27,7 @@ const acceptedMediaTypes: Readonly<Record<ImagePurpose, ReadonlySet<string>>> =
     profile_photo: new Set(imageMediaTypes),
     promotion: new Set(imageMediaTypes),
     invoice: new Set(['application/pdf', 'image/jpeg', 'image/png']),
+    payout_qr: new Set(imageMediaTypes),
   };
 
 export const validateImageUploadDeclaration = (

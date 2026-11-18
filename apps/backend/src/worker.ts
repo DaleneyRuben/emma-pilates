@@ -79,6 +79,10 @@ type WorkerDependencies = {
   subscriptionReminders: {
     execute(): Promise<{ reminded: number }>;
   };
+  // FIX-072: a staff member's payout QR expiring or expired.
+  payoutQrReminders: {
+    execute(): Promise<{ reminded: number }>;
+  };
   founderMemberships: {
     execute(): Promise<{ ended: number }>;
   };
@@ -183,6 +187,10 @@ export const startWorker = async (
           {
             job: 'subscription_reminders',
             execute: () => dependencies.subscriptionReminders.execute(),
+          },
+          {
+            job: 'payout_qr_reminders',
+            execute: () => dependencies.payoutQrReminders.execute(),
           },
           {
             job: 'founder_memberships',

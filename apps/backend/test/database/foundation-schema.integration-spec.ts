@@ -38,6 +38,7 @@ describe('foundation migration', () => {
       'back_office.pay_statement_lines',
       'back_office.pay_statements',
       'back_office.salary_payments',
+      'back_office.staff_payout_qrs',
       'back_office.supplies',
       'back_office.supply_restocks',
       'back_office.withdrawals',

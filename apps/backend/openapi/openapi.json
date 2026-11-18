@@ -10314,6 +10314,229 @@
         ]
       }
     },
+    "/api/v1/staff-members/current/payout-qr": {
+      "get": {
+        "operationId": "getOwnPayoutQr",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutQrResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPayoutQr"
+        ]
+      },
+      "put": {
+        "operationId": "setOwnPayoutQr",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPayoutQrDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutQrResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPayoutQr"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/payout-qr/{payoutQrId}/image": {
+      "get": {
+        "operationId": "getOwnPayoutQrImage",
+        "parameters": [
+          {
+            "name": "payoutQrId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPayoutQr"
+        ]
+      }
+    },
+    "/api/v1/administrator/staff-members/{staffMemberId}/payout-qr": {
+      "get": {
+        "operationId": "getStaffMemberPayoutQr",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutQrResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayoutQr"
+        ]
+      }
+    },
+    "/api/v1/administrator/payout-qrs/{payoutQrId}/image": {
+      "get": {
+        "operationId": "getPayoutQrImage",
+        "parameters": [
+          {
+            "name": "payoutQrId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayoutQr"
+        ]
+      }
+    },
     "/api/v1/administrator/studio-facts/recompute": {
       "post": {
         "operationId": "recomputeStudioFacts",
@@ -20014,6 +20237,74 @@
           "days"
         ]
       },
+      "PayoutQrDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date",
+            "description": "The last day the QR pays"
+          },
+          "standing": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "expiring",
+              "expired"
+            ]
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null for the Administrator once the QR has expired"
+          }
+        },
+        "required": [
+          "id",
+          "validUntil",
+          "standing",
+          "imageUrl"
+        ]
+      },
+      "PayoutQrResultDto": {
+        "type": "object",
+        "properties": {
+          "payoutQr": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PayoutQrDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "payoutQr"
+        ]
+      },
+      "SetPayoutQrDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date",
+            "description": "The last day the QR pays"
+          }
+        },
+        "required": [
+          "imageAssetId",
+          "validUntil"
+        ]
+      },
       "StudioRecomputeInputDto": {
         "type": "object",
         "properties": {
@@ -20315,7 +20606,8 @@
               "profile_photo",
               "transfer_receipt",
               "promotion",
-              "invoice"
+              "invoice",
+              "payout_qr"
             ]
           },
           "mediaType": {

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mi QR de cobro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.wrap{width:390px;height:960px;display:flex;flex-direction:column;background:#FAF7F2;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;position:relative;overflow:hidden}
+.proto{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:#2E2724;color:#F5EFE9;font-size:12px;align-items:center;min-height:116px;align-content:flex-start}
+.proto b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:10px;width:100%}
+.pc{height:28px;padding:0 10px;border:0;border-radius:999px;background:rgba(245,239,233,.12);color:#F5EFE9;font:500 12px 'Work Sans',sans-serif;cursor:pointer}
+.pc.on{background:#F5EFE9;color:#2E2724}
+.phone{position:relative;width:390px;height:844px;overflow:hidden;display:flex;flex-direction:column}
+.scr{flex:1;padding:60px 20px 24px;display:flex;flex-direction:column;gap:22px;overflow-y:auto}
+.title{font-family:Lora,Georgia,serif;font-size:30px}
+.back{display:flex;align-items:center;gap:4px;color:#7D4F4B;font-size:16px;font-weight:500;border:0;background:transparent;padding:0;cursor:pointer;font-family:inherit}
+.sect{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.list{background:#F5EFE9;border-radius:16px;display:flex;flex-direction:column}
+.row{min-height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;color:#4A4A4A;cursor:pointer}
+.row+.row{border-top:1px solid #E6DBD0}
+.ic{width:36px;height:36px;border-radius:999px;background:#F2E4E1;display:flex;align-items:center;justify-content:center;flex:none;color:#B78380}
+.rl{flex-grow:1;font-size:16px}
+.rv{font-size:14px;color:#6F6662}
+.rv.warn{color:#8A6420;font-weight:500}.rv.bad{color:#A04E3E;font-weight:600}
+.chev{color:#6F6662}
+.tabbar{height:82px;padding-bottom:18px;background:#F5EFE9;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;flex:none}
+.tb{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6F6662;font-size:12px;cursor:pointer}
+.tb.on{color:#93615D;font-weight:600}
+.qcard{background:#fff;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(74,58,48,.06)}
+.qcard img{width:220px;height:220px;display:block}
+.state{display:inline-flex;align-items:center;gap:6px;font-size:15px}
+.state.ok{color:#4F6347}.state.warn{color:#8A6420}.state.bad{color:#A04E3E;font-weight:600}
+.btn{height:52px;width:100%;border:0;border-radius:14px;font:600 16px 'Work Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.p{background:#93615D;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B}
+.note{font-size:14px;color:#6F6662;line-height:1.5}
+.empty{background:#F5EFE9;border:1px dashed #D8C9BB;border-radius:16px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
+.banner.warn{background:rgba(201,154,78,.16);color:#6B4F22}.banner.bad{background:#F7E5E0;color:#A04E3E}
+.qrc{background:#F5EFE9;border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center}
+.qrc img{width:72px;height:72px;border-radius:8px;background:#fff;border:1px solid #E6DBD0}
+.lnk{border:0;background:transparent;color:#7D4F4B;font:600 15px 'Work Sans',sans-serif;cursor:pointer;padding:8px 6px;height:40px}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.32);display:flex;align-items:flex-end;z-index:5}
+.sheet{width:100%;background:#FAF7F2;border-radius:20px 20px 0 0;padding:20px 20px 36px;display:flex;flex-direction:column;gap:14px}
+.grab{width:40px;height:4px;border-radius:2px;background:#D8C9BB;align-self:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:15px}
+.cal span{height:40px;display:flex;align-items:center;justify-content:center;border-radius:999px}
+.cal .h{font-size:12px;color:#6F6662;height:24px}
+.cal .off{color:#C9BDB3}
+.cal .on{background:#93615D;color:#fff;font-weight:600}
+.cal .d{cursor:pointer}
+.full{position:absolute;inset:0;background:#FAF7F2;z-index:7;display:flex;flex-direction:column;padding:60px 20px 36px;gap:20px;align-items:center}
+.full img{width:340px;height:340px}
+.notif{background:#F5EFE9;border-radius:16px;padding:14px 16px;display:flex;gap:12px;cursor:pointer}
+.dot{width:8px;height:8px;border-radius:999px;background:#93615D;margin-top:8px;flex:none}
+.pushb{position:absolute;top:12px;left:10px;right:10px;background:rgba(250,247,242,.97);border-radius:20px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:9;display:flex;gap:10px;font-size:14px;cursor:pointer}
+.appic{width:38px;height:38px;border-radius:9px;background:#93615D;color:#fff;font-family:Lora,serif;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.pay{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.pay+.pay{border-top:1px solid #E6DBD0}
+.thumb{width:44px;height:44px;border-radius:8px;background:#E6DBD0;flex:none}
+.toast{position:absolute;left:20px;right:20px;bottom:100px;background:#2E2724;color:#F5EFE9;border-radius:12px;padding:12px 16px;font-size:14px;z-index:9}
+</style>
+</helmet>
+<div class="wrap">
+  <div class="proto"><b>Prototipo · opción {{op}}</b><sc-for list="{{proto}}" as="p" hint-placeholder-count="7"><button type="button" class="{{p.cls}}" onClick="{{p.go}}">{{p.label}}</button></sc-for></div>
+  <div class="phone">
+
+    <sc-if value="{{onPerfil}}" hint-placeholder-val="{{true}}">
+      <div class="scr">
+        <span class="title">Perfil</span>
+        <div style="display: flex; align-items: center; gap: 16px"><img src="daniela.jpg" alt="" style="width: 72px; height: 72px; border-radius: 999px; object-fit: cover"><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, serif; font-size: 20px">Daniela Ortiz</span><span class="note">daniela.ortiz@emmapilates.bo</span></div></div>
+        <sc-if value="{{cardInPerfil}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <span class="sect">Mi QR de cobro</span>
+            <sc-if value="{{has}}" hint-placeholder-val="{{true}}"><div class="qrc"><img src="{{qrSrc}}" alt="Tu QR de cobro" onClick="{{openFull}}"><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span class="{{stateCls}}">{{stateText}}</span><span class="note" style="font-size: 13px">Administración lo usa para pagarte.</span><div style="display: flex; gap: 2px; margin-left: -6px"><button type="button" class="lnk" onClick="{{openFull}}">Ver</button><button type="button" class="lnk" onClick="{{startUpload}}">Cambiar</button></div></div></div></sc-if>
+            <sc-if value="{{none}}" hint-placeholder-val="{{false}}"><div class="qrc"><div class="ic" style="width: 72px; height: 72px; border-radius: 12px"><span class="ms" style="font-size: 34px">qr_code_2</span></div><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span>Todavía no subiste tu QR de cobro</span><button type="button" class="lnk" style="align-self: flex-start; margin-left: -6px" onClick="{{startUpload}}">Subir mi QR</button></div></div></sc-if>
+          </div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span class="sect">Ajustes</span>
+          <div class="list">
+            <sc-if value="{{rowInPerfil}}" hint-placeholder-val="{{true}}"><div class="row" onClick="{{goQr}}"><span class="ic"><span class="ms">qr_code_2</span></span><span class="rl">Mi QR de cobro</span><span class="{{rowCls}}">{{rowText}}</span><span class="ms chev" style="font-size: 18px">chevron_right</span></div></sc-if>
+            <div class="row" onClick="{{goPagos}}"><span class="ic"><span class="ms">payments</span></span><span class="rl">Mis pagos</span><span class="ms chev" style="font-size: 18px">chevron_right</span></div>
+            <div class="row" onClick="{{goInbox}}"><span class="ic"><span class="ms">notifications</span></span><span class="rl">Notificaciones</span><span class="ms chev" style="font-size: 18px">chevron_right</span></div>
+            <div class="row"><span class="ic"><span class="ms">lock</span></span><span class="rl">Cambiar contraseña</span><span class="ms chev" style="font-size: 18px">chevron_right</span></div>
+            <div class="row" style="color: #A04E3E"><span class="ic" style="background: #F7E5E0; color: #A04E3E"><span class="ms">logout</span></span><span class="rl">Cerrar sesión</span></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{onQr}}" hint-placeholder-val="{{false}}">
+      <div class="scr">
+        <button type="button" class="back" onClick="{{goBack}}"><span class="ms">chevron_left</span>{{backLabel}}</button>
+        <span class="title">Mi QR de cobro</span>
+        <span class="note">Administración lo usa para pagarte tu sueldo. Los QR del banco vencen: cuando subas uno nuevo, dinos hasta cuándo vale y te avisamos antes de que venza.</span>
+        <sc-if value="{{banner}}" hint-placeholder-val="{{false}}"><div class="{{bannerCls}}"><span class="ms">{{bannerIcon}}</span><span>{{bannerText}}</span></div></sc-if>
+        <sc-if value="{{has}}" hint-placeholder-val="{{true}}">
+          <div class="qcard"><img src="{{qrSrc}}" alt="Tu QR de cobro" onClick="{{openFull}}"><span class="{{stateCls}}"><span class="ms" style="font-size: 18px">{{stateIcon}}</span>{{stateText}}</span></div>
+          <button type="button" class="btn s" onClick="{{startUpload}}"><span class="ms">photo_camera</span>Cambiar QR</button>
+        </sc-if>
+        <sc-if value="{{none}}" hint-placeholder-val="{{false}}">
+          <div class="empty"><span class="ms" style="font-size: 44px; color: #B78380">qr_code_2</span><span style="font-size: 17px">Todavía no subiste tu QR de cobro</span><span class="note">Una foto o captura del QR de tu banco para recibir pagos.</span></div>
+          <button type="button" class="btn p" onClick="{{startUpload}}"><span class="ms">add_a_photo</span>Subir mi QR</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{onPagos}}" hint-placeholder-val="{{false}}">
+      <div class="scr">
+        <span class="title">Mis pagos</span>
+        <sc-if value="{{qrInPagos}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <span class="sect">Así te pagamos</span>
+            <sc-if value="{{has}}" hint-placeholder-val="{{true}}"><div class="qrc"><img src="{{qrSrc}}" alt="Tu QR de cobro" onClick="{{openFull}}"><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600">Tu QR de cobro</span><span class="{{stateCls}}" style="font-size: 14px">{{stateText}}</span><div style="display: flex; margin-left: -6px"><button type="button" class="lnk" onClick="{{openFull}}">Ver</button><button type="button" class="lnk" onClick="{{startUpload}}">Cambiar</button></div></div></div></sc-if>
+            <sc-if value="{{none}}" hint-placeholder-val="{{false}}"><div class="qrc"><div class="ic" style="width: 72px; height: 72px; border-radius: 12px"><span class="ms" style="font-size: 34px">qr_code_2</span></div><div style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span>Sube el QR de tu banco para que administración te pague escaneándolo.</span><button type="button" class="lnk" style="align-self: flex-start; margin-left: -6px" onClick="{{startUpload}}">Subir mi QR</button></div></div></sc-if>
+          </div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <span class="sect">Pagos recibidos</span>
+          <div class="list"><div class="pay"><span class="thumb"></span><span style="flex: 1; display: flex; flex-direction: column"><span>Pago del 01/12/2026</span><span class="note">Bs 1.534,90</span></span><button type="button" class="lnk">Ver</button></div><div class="pay"><span class="thumb"></span><span style="flex: 1; display: flex; flex-direction: column"><span>Pago del 01/11/2026</span><span class="note">Bs 1.380,00</span></span><button type="button" class="lnk">Ver</button></div></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{onInbox}}" hint-placeholder-val="{{false}}">
+      <div class="scr">
+        <button type="button" class="back" onClick="{{goPerfil}}"><span class="ms">chevron_left</span>Perfil</button>
+        <span class="title">Notificaciones</span>
+        <div class="notif" onClick="{{fromNotif}}"><span class="dot"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600">{{notifTitle}}</span><span class="note">{{notifBody}}</span><span class="note" style="font-size: 12px">Hoy, 09:00</span></span></div>
+        <div class="notif" style="opacity: .7"><span style="width: 8px"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 4px"><span>Recibiste un pago</span><span class="note">Administración registró tu pago de noviembre.</span></span></div>
+      </div>
+    </sc-if>
+
+    <div class="tabbar"><span class="tb" >Agenda</span><span class="{{tabPagos}}" onClick="{{goPagos}}">Mis pagos</span><span class="{{tabPerfil}}" onClick="{{goPerfil}}">Perfil</span></div>
+
+    <sc-if value="{{pickOpen}}" hint-placeholder-val="{{false}}">
+      <div class="scrim"><div class="sheet"><span class="grab"></span><span style="font-family: Lora, serif; font-size: 22px">Sube tu QR de cobro</span><span class="note">Una foto o captura del QR que te da tu banco para recibir pagos.</span><button type="button" class="btn s" onClick="{{toDate}}"><span class="ms">photo_library</span>Elegir de la galería</button><button type="button" class="btn s" onClick="{{toDate}}"><span class="ms">photo_camera</span>Tomar foto</button><button type="button" class="btn t" onClick="{{closeSheets}}">Cancelar</button></div></div>
+    </sc-if>
+    <sc-if value="{{dateOpen}}" hint-placeholder-val="{{false}}">
+      <div class="scrim"><div class="sheet">
+        <span class="grab"></span>
+        <div style="display: flex; gap: 14px; align-items: center"><img src="{{qrSrc}}" alt="" style="width: 64px; height: 64px; border: 1px solid #E6DBD0; border-radius: 8px"><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: Lora, serif; font-size: 22px">¿Hasta cuándo vale?</span><span class="note">Lo dice tu banco al generar el QR.</span></div></div>
+        <div style="display: flex; justify-content: space-between; align-items: center"><span class="ms" style="color: #7D4F4B">chevron_left</span><span style="font-weight: 600">Enero de 2027</span><span class="ms" style="color: #7D4F4B">chevron_right</span></div>
+        <div class="cal"><span class="h">L</span><span class="h">M</span><span class="h">M</span><span class="h">J</span><span class="h">V</span><span class="h">S</span><span class="h">D</span><span class="off"></span><span class="off"></span><span class="off"></span><span class="off"></span><sc-for list="{{days}}" as="d" hint-placeholder-count="31"><span class="{{d.cls}}" onClick="{{d.pick}}">{{d.n}}</span></sc-for></div>
+        <span class="note">Vale hasta el {{pickedText}}. Te avisaremos 7 días antes y ese día.</span>
+        <button type="button" class="btn p" onClick="{{saveNew}}">Guardar QR</button>
+        <button type="button" class="btn t" onClick="{{closeSheets}}">Cancelar</button>
+      </div></div>
+    </sc-if>
+    <sc-if value="{{fullOpen}}" hint-placeholder-val="{{false}}">
+      <div class="full"><div style="display: flex; width: 100%; align-items: center"><span style="flex: 1; font-family: Lora, serif; font-size: 19px">Tu QR de cobro</span><button type="button" class="back" aria-label="Cerrar" onClick="{{closeFull}}"><span class="ms" style="font-size: 24px; color: #4A4A4A">close</span></button></div><img src="{{qrSrc}}" alt="Tu QR de cobro"><span class="{{stateCls}}">{{stateText}}</span></div>
+    </sc-if>
+    <sc-if value="{{pushShown}}" hint-placeholder-val="{{false}}">
+      <div class="pushb" onClick="{{fromNotif}}"><span class="appic">E</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{notifTitle}}</span><span>{{notifBody}}</span></span><span class="note" style="font-size: 12px">ahora</span></div>
+    </sc-if>
+    <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">Guardamos tu QR. Vale hasta el {{pickedText}}.</div></sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"$preview":{"width":390,"height":960}}'>
+var QR_OLD = 'qr-viejo.svg', QR_NEW = 'qr-nuevo.svg';
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var op = this.props.opcion ?? 'A';
+    var qr = st.qr || 'ok';
+    var screen = st.screen || 'perfil';
+    function set(o) { return function () { self.setState(o); }; }
+    var base = { sheet: null, full: false, push: false, toast: false };
+    var picked = st.picked || 15;
+    var qrScreen = op === 'B' ? 'perfil' : (op === 'C' ? 'pagos' : 'qr');
+    var texts = {
+      ok: { s: 'Vale hasta el 15/12/2026', c: 'state ok', i: 'check_circle', r: 'Vale hasta 15/12', rc: 'rv' },
+      soon: { s: 'Vence el 5/12 · sube uno nuevo', c: 'state warn', i: 'schedule', r: 'Vence el 5/12', rc: 'rv warn' },
+      exp: { s: 'Venció el 15/12 · sube uno nuevo', c: 'state bad', i: 'error', r: 'Vencido', rc: 'rv bad' },
+      none: { s: '', c: '', i: '', r: 'Sin subir', rc: 'rv' },
+      fresh: { s: 'Vale hasta el ' + picked + '/01/2027', c: 'state ok', i: 'check_circle', r: 'Vale hasta ' + picked + '/01', rc: 'rv' }
+    };
+    var t = texts[qr];
+    var notif = qr === 'exp' ? ['Tu QR de cobro venció', 'Tu QR de cobro venció hoy, sube uno nuevo para que podamos pagarte.'] : ['Tu QR de cobro vence pronto', 'Tu QR de cobro vence el 5/12, sube uno nuevo.'];
+    var days = [];
+    for (var d = 1; d <= 31; d++) (function (d) { days.push({ n: d, cls: d === picked ? 'on' : 'd', pick: set({ picked: d }) }); })(d);
+    var proto = [
+      ['Con QR', { qr: 'ok' }], ['Sin QR', { qr: 'none' }], ['Por vencer', { qr: 'soon' }], ['Vencido', { qr: 'exp' }],
+      ['Subir o cambiar', { sheet: 'pick' }], ['Aviso push', { qr: 'soon', push: true, screen: 'perfil' }], ['Aviso vencido', { qr: 'exp', push: true, screen: 'perfil' }]
+    ].map(function (p) {
+      var o = Object.assign({}, base, { screen: p[1].screen || (p[0] === 'Subir o cambiar' ? screen : qrScreen) }, p[1]);
+      return { label: p[0], go: set(o), cls: (p[1].qr && p[1].qr === qr && !p[1].push && !st.push) ? 'pc on' : 'pc' };
+    });
+    var bannerOn = op === 'A' && (qr === 'soon' || qr === 'exp');
+    return {
+      op: op, proto: proto, qrSrc: qr === 'fresh' ? QR_NEW : QR_OLD,
+      onPerfil: screen === 'perfil', onQr: screen === 'qr', onPagos: screen === 'pagos', onInbox: screen === 'inbox',
+      cardInPerfil: op === 'B', rowInPerfil: op === 'A', qrInPagos: op === 'C',
+      has: qr !== 'none', none: qr === 'none',
+      stateText: t.s, stateCls: t.c, stateIcon: t.i, rowText: t.r, rowCls: t.rc,
+      banner: bannerOn, bannerCls: qr === 'exp' ? 'banner bad' : 'banner warn', bannerIcon: qr === 'exp' ? 'error' : 'schedule',
+      bannerText: qr === 'exp' ? 'Tu QR venció el 15/12. Administración no puede usarlo para pagarte: sube uno nuevo.' : 'Tu QR vence el 5/12. Sube uno nuevo antes para que no se atrase tu pago.',
+      goQr: set({ screen: 'qr', from: 'perfil' }), goPagos: set({ screen: 'pagos' }), goPerfil: set({ screen: 'perfil' }), goInbox: set({ screen: 'inbox' }),
+      goBack: set({ screen: st.from === 'inbox' ? 'inbox' : 'perfil' }), backLabel: st.from === 'inbox' ? 'Notificaciones' : 'Perfil',
+      tabPagos: screen === 'pagos' ? 'tb on' : 'tb', tabPerfil: screen === 'pagos' ? 'tb' : 'tb on',
+      startUpload: set({ sheet: 'pick' }), pickOpen: st.sheet === 'pick', dateOpen: st.sheet === 'date',
+      toDate: set({ sheet: 'date' }), closeSheets: set({ sheet: null }),
+      days: days, pickedText: picked + '/01/2027',
+      saveNew: function () { self.setState({ qr: 'fresh', sheet: null, toast: true }); setTimeout(function () { self.setState({ toast: false }); }, 2200); },
+      hasToast: !!st.toast,
+      openFull: set({ full: true }), closeFull: set({ full: false }), fullOpen: !!st.full && qr !== 'none',
+      pushShown: !!st.push, notifTitle: notif[0], notifBody: notif[1],
+      fromNotif: set({ push: false, screen: qrScreen, from: 'inbox' })
+    };
+  }
+}
+</script>
+</body>
+</html>

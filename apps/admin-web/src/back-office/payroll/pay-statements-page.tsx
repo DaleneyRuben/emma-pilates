@@ -1,13 +1,14 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarRange, CheckCircle2, RefreshCw } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   LoadingNotice,
   QueryFailure,
 } from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
-import { Button } from "../../components/ui/button";
+import { Button, buttonVariants } from "../../components/ui/button";
 import {
   addDays,
   addMonths,
@@ -26,6 +27,7 @@ import {
   payStatementsQueryOptions,
 } from "./pay-statement-queries";
 import { recalculationSummary } from "./recalculation-summary";
+import type { ApprovedNotice } from "./approve-statement-dialog";
 import { StatementCard } from "./statement-card";
 
 // Never sent: the query is disabled while a Rango ends before it starts.
@@ -66,19 +68,28 @@ function MonthOpenNotice({
   );
 }
 
-function DoneNotice({ children }: { children: string }) {
+// FIX-072: after approving, «Subir comprobante» opens Pagados on her.
+function DoneNotice({ notice }: { notice: ApprovedNotice }) {
   return (
-    <p
-      role="status"
-      className="flex items-start gap-3 rounded-tarjeta bg-lino px-4 py-3 text-nota text-texto"
-    >
-      <CheckCircle2
-        size={18}
-        aria-hidden="true"
-        className="mt-px flex-none text-exito"
-      />
-      {children}
-    </p>
+    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-lino px-4 py-3 text-nota text-texto">
+      <p role="status" className="flex min-w-[220px] flex-1 items-start gap-3">
+        <CheckCircle2
+          size={18}
+          aria-hidden="true"
+          className="mt-px flex-none text-exito"
+        />
+        {notice.text}
+      </p>
+      {notice.receiptFor === undefined ? null : (
+        <Link
+          to="/dinero/sueldos/pagados"
+          search={{ staffMemberId: notice.receiptFor }}
+          className={buttonVariants({ variant: "secondary", size: "sm" })}
+        >
+          Subir comprobante
+        </Link>
+      )}
+    </div>
   );
 }
 
@@ -99,7 +110,7 @@ export function PayStatementsPage({
   const shown = windowOf(search, today);
   const period = shown.query;
   const queryClient = useQueryClient();
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<ApprovedNotice | null>(null);
   const query = useQuery({
     ...payStatementsQueryOptions(period ?? noPeriod),
     enabled: period !== null,
@@ -136,7 +147,10 @@ export function PayStatementsPage({
             onClick={() =>
               // On the call, not the hook: changing the period resets the
               // mutation, and a summary of the old period then never shows.
-              period && draft.mutate(period, { onSuccess: setNotice })
+              period &&
+              draft.mutate(period, {
+                onSuccess: (text) => setNotice({ text }),
+              })
             }
           >
             <RefreshCw size={16} aria-hidden="true" />
@@ -150,7 +164,7 @@ export function PayStatementsPage({
           No pudimos calcular el período.
         </p>
       ) : null}
-      {notice === null ? null : <DoneNotice>{notice}</DoneNotice>}
+      {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
         <MonthOpenNotice
           month={search.month}

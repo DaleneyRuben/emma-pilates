@@ -43,6 +43,8 @@ const acceptedMediaTypes: Record<ImagePurpose, readonly string[]> = {
   profile_photo: imageTypes,
   promotion: imageTypes,
   invoice: ["application/pdf", "image/jpeg", "image/png"],
+  // FIX-072: the staff app uploads it; listed so the purposes stay complete.
+  payout_qr: imageTypes,
 };
 
 // ADR-0072 per purpose, and UPL-002's minimum for a Promotion image.
@@ -54,6 +56,7 @@ const limits: Record<
   profile_photo: { maxBytes: 5 * 1024 * 1024, minWidth: 0, minHeight: 0 },
   promotion: { maxBytes: 20 * 1024 * 1024, minWidth: 1200, minHeight: 675 },
   invoice: { maxBytes: 10 * 1024 * 1024, minWidth: 0, minHeight: 0 },
+  payout_qr: { maxBytes: 10 * 1024 * 1024, minWidth: 0, minHeight: 0 },
 };
 
 /** What the backend would refuse, checked before any call is made. */

@@ -120,6 +120,8 @@ enum ImageAssetPurpose {
   PROMOTION        @map("promotion")
   // FIX-044: an issued invoice, a PDF or a photo, on a confirmed Payment.
   INVOICE          @map("invoice")
+  // FIX-072: a staff member's bank QR for her salary.
+  PAYOUT_QR        @map("payout_qr")
 
   @@schema("system")
 }
@@ -220,6 +222,7 @@ model Account {
   recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
   studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
+  uploadedPayoutQrs         StaffPayoutQr[]         @relation("StaffPayoutQrUploadedBy")
   approvedPayStatements     PayStatement[]          @relation("PayStatementApprovedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
   voidedExpenses            Expense[]               @relation("ExpenseVoidedBy")
@@ -509,6 +512,7 @@ model ImageAsset {
   receiptPurchaseIntent PurchaseIntent? @relation("PurchaseIntentReceipt")
   receiptPayment        Payment?        @relation("PaymentReceipt")
   salaryPaymentReceipt  SalaryPayment?  @relation("SalaryPaymentReceipt")
+  staffPayoutQr         StaffPayoutQr?  @relation("StaffPayoutQrImage")
   paymentInvoice        PaymentInvoice? @relation("PaymentInvoiceFile")
 
   @@index([ownerAccountId, state])

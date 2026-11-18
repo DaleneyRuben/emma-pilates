@@ -21,6 +21,8 @@ const silent = [
   'evaluation_cancelled',
   'payment_confirmed',
   'subscription_expiring',
+  'payout_qr_expiring',
+  'payout_qr_expired',
 ];
 // Their inbox text names an Evaluation, a Client, a rejection reason, or an
 // amount, so the lock screen shows generic copy instead (ADR-0025).

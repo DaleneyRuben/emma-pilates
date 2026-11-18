@@ -45,6 +45,9 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
@@ -101,6 +104,9 @@ describe('worker entrypoint', () => {
     const subscriptionReminders = {
       execute: jest.fn().mockResolvedValue({ reminded: 1 }),
     };
+    const payoutQrReminders = {
+      execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+    };
     const founderMemberships = {
       execute: jest.fn().mockResolvedValue({ ended: 0 }),
     };
@@ -122,6 +128,7 @@ describe('worker entrypoint', () => {
       pendingAccountCleanup,
       imageUploadCleanup,
       subscriptionReminders,
+      payoutQrReminders,
       founderMemberships,
       purchaseIntentExpiry,
       ...occurrenceJobs(),
@@ -134,6 +141,7 @@ describe('worker entrypoint', () => {
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(1);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(1);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+    expect(payoutQrReminders.execute).toHaveBeenCalledTimes(1);
     expect(founderMemberships.execute).toHaveBeenCalledTimes(1);
     expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(1);
 
@@ -141,6 +149,7 @@ describe('worker entrypoint', () => {
     await jest.advanceTimersByTimeAsync(5 * 60 * 1_000);
     expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+    expect(payoutQrReminders.execute).toHaveBeenCalledTimes(1);
     expect(founderMemberships.execute).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(55 * 60 * 1_000);
@@ -148,6 +157,7 @@ describe('worker entrypoint', () => {
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(2);
+    expect(payoutQrReminders.execute).toHaveBeenCalledTimes(2);
     expect(founderMemberships.execute).toHaveBeenCalledTimes(2);
 
     await jest.advanceTimersByTimeAsync(23 * 60 * 60 * 1_000);
@@ -191,6 +201,9 @@ describe('worker entrypoint', () => {
           .fn()
           .mockResolvedValueOnce({ reminded: 0 })
           .mockRejectedValueOnce(new Error('sensitive database failure')),
+      },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
@@ -248,6 +261,9 @@ describe('worker entrypoint', () => {
         process: jest.fn(),
       },
       subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      payoutQrReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
@@ -310,6 +326,9 @@ describe('worker entrypoint', () => {
         process: jest.fn(),
       },
       subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      payoutQrReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
