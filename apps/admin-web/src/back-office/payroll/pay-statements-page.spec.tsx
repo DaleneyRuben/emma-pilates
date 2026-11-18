@@ -141,7 +141,7 @@ describe("Sueldos por aprobar", () => {
     await waitFor(() => expect(approved).toBe(1));
     expect(
       await screen.findByText(
-        "Aprobamos Bs 297,00 a Emma Vargas. Quedó en Pagados; ahí puedes subir el comprobante.",
+        "Aprobamos Bs 297,00 a Emma Vargas. Quedó en Pagados. ¿Ya le transferiste? Sube el comprobante y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
     expect(await screen.findByText("Aprobado")).toBeInTheDocument();
