@@ -54,7 +54,7 @@ function MonthOpenNotice({
       className="flex flex-wrap items-start gap-3 rounded-marco bg-primario-tinte px-4 py-3.5 md:px-5"
     >
       <p className="min-w-[240px] flex-1 text-nota text-texto">
-        {`${capitalized(monthName)} todavía no terminó: cierra el ${lastDay}. Desde el 1 de ${nextMonthName} puedes aprobar a las instructoras, y a la coordinadora siete días después, porque su bono espera las renovaciones. Para pagarle antes a una instructora, usa Rango hasta ayer.`}
+        {`${capitalized(monthName)} todavía no terminó: cierra el ${lastDay}. Desde el 1 de ${nextMonthName} puedes aprobar a las instructoras, y a la coordinadora siete días después, porque su bono espera las renovaciones. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular.`}
       </p>
       {today.endsWith("-01") ? null : (
         <Button variant="secondary" size="sm" onClick={onPayByRange}>

@@ -21,7 +21,7 @@ const forPeriod = (periodText: string) => {
 
 const failureOf = (error: unknown): string =>
   isApiError(error) && error.code === "pay_statement_month_open"
-    ? "Todavía no se puede aprobar: el período no terminó. Para pagar antes a una instructora, usa Rango hasta ayer."
+    ? "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular."
     : "No pudimos aprobar el pago.";
 
 // Finding 105: approving creates the Salary Payment, so it always names the
