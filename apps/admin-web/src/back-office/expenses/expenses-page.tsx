@@ -40,8 +40,8 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
     header: "Categoría",
     cell: ({ row }) =>
       isVoided(row.original) ? (
-        <span className="flex flex-col gap-1">
-          <span className="flex flex-wrap items-center gap-2">
+        <span className="flex flex-col gap-1 max-md:items-end max-md:text-right">
+          <span className="flex flex-wrap items-center gap-2 max-md:justify-end">
             <span className="text-texto-tenue">
               {row.original.expenseCategoryName}
             </span>
