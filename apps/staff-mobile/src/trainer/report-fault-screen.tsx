@@ -132,7 +132,8 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   const damaged = Math.max(1, Math.min(count, shown.usable));
   // FIX-076: a type with a single unit comes with it chosen.
   const only = shown.units.length === 1 ? shown.units[0] : undefined;
-  const piece = chosen ?? only ?? null;
+  // A unit a refetch dropped is no longer chosen.
+  const piece = shown.units.find((each) => each.id === chosen?.id) ?? only ?? null;
   const described = description.trim() !== "";
   const missing = missingStep({
     described,
