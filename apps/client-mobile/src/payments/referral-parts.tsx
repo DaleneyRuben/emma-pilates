@@ -20,27 +20,24 @@ const invitationStatus = {
 } as const;
 
 const steps = [
-  "Compartes tu código",
-  "Tu amiga toma una clase gratis",
-  "Compra su primer plan y tú ganas una clase",
+  "1. Compartes tu código.",
+  "2. Tu amiga toma una clase gratis.",
+  "3. Si compra su primer plan, tú ganas una clase.",
 ] as const;
 
-/** C16's «Cómo funciona»: three numbered rows and the limits line. */
+/**
+ * C16's «Cómo funciona»: three plain lines and the limits line. FIX-082
+ * (Invita option A): no numbered discs, no card.
+ */
 export function HowItWorks() {
   return (
     <View>
       <SectionTitle>Cómo funciona</SectionTitle>
-      <View style={styles.group}>
-        {steps.map((step, index) => (
-          <Fragment key={step}>
-            {index === 0 ? null : <View style={styles.hairline} />}
-            <View style={styles.row}>
-              <View style={styles.disc}>
-                <Text style={styles.discText}>{String(index + 1)}</Text>
-              </View>
-              <Text style={styles.label}>{step}</Text>
-            </View>
-          </Fragment>
+      <View style={styles.steps}>
+        {steps.map((step) => (
+          <Text key={step} style={styles.step}>
+            {step}
+          </Text>
         ))}
       </View>
       <Text style={styles.limits}>
@@ -89,6 +86,13 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
     marginTop: spacing.md,
   },
+  step: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  steps: { gap: spacing.xxs },
   row: {
     alignItems: "center",
     flexDirection: "row",
