@@ -1,3 +1,9 @@
+import {
+  boliviaParts,
+  boliviaToday,
+  formatDayMonth,
+} from "../lib/bolivia-time";
+
 export const recipientLine = (count: number): string =>
   count === 1 ? "1 clienta la recibirá." : `${count} clientas la recibirán.`;
 
@@ -22,4 +28,27 @@ export const owedLine = (owed: readonly { name: string }[]): string | null => {
   return owed.length === 1
     ? `1 sin plan: se le suma en su próximo plan (${names}).`
     : `${owed.length} sin plan: se les suma en su próximo plan (${names}).`;
+};
+
+// Walkthrough finding 92: a campaign has no table, so giving one twice gives
+// the classes twice. The page warns while the name matches one already given.
+const sameName = (name: string): string =>
+  name.trim().replace(/\s+/g, " ").toLocaleLowerCase("es");
+
+export const pastCampaignLine = (
+  name: string,
+  past: readonly { name: string; grantedAt: string }[],
+  now: Date = new Date(),
+): string | null => {
+  const typed = sameName(name);
+  if (typed === "") return null;
+  const match = past.find((campaign) => sameName(campaign.name) === typed);
+  if (match === undefined) return null;
+  const { date } = boliviaParts(match.grantedAt);
+  const year = date.slice(0, 4);
+  const day =
+    year === boliviaToday(now).slice(0, 4)
+      ? formatDayMonth(date)
+      : `${formatDayMonth(date)} de ${year}`;
+  return `Ya diste la campaña «${match.name}» el ${day}. Si la das otra vez, cada clienta recibe las clases de nuevo.`;
 };
