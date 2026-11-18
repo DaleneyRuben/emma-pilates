@@ -137,6 +137,7 @@ export function WeekGrid({
                   session={session}
                   onOpen={onOpen}
                   className="absolute inset-x-1"
+                  short={(minutes / 60) * hourHeight - 2 < 76}
                   style={{
                     top: ((item.minutes - first * 60) / 60) * hourHeight + 1,
                     height: Math.max((minutes / 60) * hourHeight - 2, 44),

@@ -10,7 +10,7 @@ export function EquipmentDot() {
     <span
       aria-hidden="true"
       data-testid="equipment-dot"
-      className="size-[7px] shrink-0 rounded-full bg-advertencia"
+      className="size-[7px] shrink-0 rounded-full bg-advertencia ring-1 ring-advertencia-texto"
     />
   );
 }

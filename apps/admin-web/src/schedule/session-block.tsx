@@ -82,11 +82,14 @@ function CancelledBlock({
 export function SessionBlock({
   session,
   onOpen,
+  short = false,
   className,
   style,
 }: {
   session: Session;
   onOpen: (session: Session) => void;
+  /** A class shorter than an hour puts its places on the time line. */
+  short?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -104,6 +107,7 @@ export function SessionBlock({
     <StandingBlock
       session={session}
       onOpen={onOpen}
+      short={short}
       className={className}
       style={style}
     />
@@ -116,11 +120,13 @@ export function SessionBlock({
 function StandingBlock({
   session,
   onOpen,
+  short,
   className,
   style,
 }: {
   session: Session;
   onOpen: (session: Session) => void;
+  short: boolean;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -145,6 +151,12 @@ function StandingBlock({
       </span>
       <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto-secundario tabular">
         {start} – {end}
+        {short ? (
+          <>
+            {" · "}
+            <span>{occupancy(session)}</span>
+          </>
+        ) : null}
       </span>
       <span className="flex w-full items-center text-ayuda leading-tight break-words text-texto-secundario">
         {/* Follow-up 242: her photo leads her name, when she has one. */}
@@ -158,9 +170,11 @@ function StandingBlock({
         )}
         <span className="min-w-0">{session.trainerName}</span>
       </span>
-      <span className="text-ayuda leading-tight text-texto-tenue tabular">
-        {occupancy(session)}
-      </span>
+      {short ? null : (
+        <span className="text-ayuda leading-tight text-texto-tenue tabular">
+          {occupancy(session)}
+        </span>
+      )}
     </button>
   );
 }
