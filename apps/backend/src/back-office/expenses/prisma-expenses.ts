@@ -23,20 +23,29 @@ export type ExpenseChange = Omit<ExpenseInput, 'branchId'> & {
   expenseId: string;
 };
 
-const expenseSelect = {
+export const expenseSelect = {
   id: true,
   branchId: true,
   expenseCategoryId: true,
   amountCentavos: true,
   incurredOn: true,
+  voidedAt: true,
+  voidReason: true,
   expenseCategory: { select: { name: true } },
+  voidedByAccount: { select: { staffMember: { select: { name: true } } } },
 } satisfies Prisma.ExpenseSelect;
 
 type ExpenseRow = Prisma.ExpenseGetPayload<{ select: typeof expenseSelect }>;
 
-const toExpenseView = ({ expenseCategory, ...expense }: ExpenseRow) => ({
+export const toExpenseView = ({
+  expenseCategory,
+  voidedByAccount,
+  ...expense
+}: ExpenseRow) => ({
   ...expense,
   expenseCategoryName: expenseCategory.name,
+  voidedByName:
+    voidedByAccount === null ? null : (voidedByAccount.staffMember?.name ?? ''),
 });
 
 const translate = (error: unknown): never => {
@@ -273,17 +282,29 @@ export const createPrismaExpenses = (
           if (previous === null) {
             throw new BackOfficeError('expense_not_found');
           }
+          // Finding 104: an eliminated Expense is read-only.
+          if (previous.voidedAt !== null) {
+            throw new BackOfficeError('expense_voided');
+          }
           await requireCategory(transaction, input.expenseCategoryId);
-          const updated = await transaction.expense.update({
-            where: { id: previous.id },
-            data: {
-              expenseCategoryId: input.expenseCategoryId,
-              amountCentavos: input.amountCentavos,
-              incurredOn: input.incurredOn,
-              updatedAt: dependencies.now(),
-            },
-            select: expenseSelect,
-          });
+          const updated = await transaction.expense
+            .update({
+              where: { id: previous.id, voidedAt: null },
+              data: {
+                expenseCategoryId: input.expenseCategoryId,
+                amountCentavos: input.amountCentavos,
+                incurredOn: input.incurredOn,
+                updatedAt: dependencies.now(),
+              },
+              select: expenseSelect,
+            })
+            .catch((error: unknown) => {
+              // Voided meanwhile: the row no longer matches.
+              if ((error as { code?: string }).code === 'P2025') {
+                throw new BackOfficeError('expense_voided');
+              }
+              throw error;
+            });
           const metadata: Record<string, string | number> = {};
           if (previous.expenseCategoryId !== updated.expenseCategoryId) {
             metadata.previousExpenseCategoryId = previous.expenseCategoryId;

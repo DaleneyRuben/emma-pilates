@@ -45,11 +45,13 @@ import {
   ExpenseChangeDto,
   ExpenseInputDto,
   ExpenseReportDto,
+  ExpenseVoidDto,
   parseExpenseCategoryInput,
   parseExpenseChange,
   parseExpenseInput,
   parseExpenseQuery,
   parseExpenseReportQuery,
+  parseExpenseVoid,
   parseWithdrawalQuery,
   WithdrawalPageDto,
 } from './back-office.dto';
@@ -243,6 +245,32 @@ export class AdministratorExpensesController extends BackOfficeController {
       await run(() =>
         this.operations.expenses.updateExpense(
           { ...input, expenseId: id },
+          principal,
+        ),
+      ),
+    );
+  }
+
+  // Finding 104: «Eliminar gasto» voids it; nothing is deleted (ADR-0086).
+  @Post(':expenseId/void')
+  @HttpCode(200)
+  @ApiOperation({ operationId: 'voidExpense' })
+  @ApiParam({ name: 'expenseId', format: 'uuid' })
+  @ApiBody({ type: ExpenseVoidDto })
+  @ApiOkResponse({ type: AdminExpenseDto })
+  @Header('Cache-Control', 'no-store')
+  async void(
+    @Param('expenseId') expenseId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<AdminExpenseDto> {
+    const id = requireId(expenseId, 'Invalid Expense identifier');
+    const input = parsed(parseExpenseVoid(body ?? {}), 'Invalid Expense void');
+    const principal = await this.authenticate(authorization);
+    return toExpenseDto(
+      await run(() =>
+        this.operations.expenses.voidExpense(
+          { expenseId: id, ...input },
           principal,
         ),
       ),

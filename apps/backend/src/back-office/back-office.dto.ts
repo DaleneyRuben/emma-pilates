@@ -213,7 +213,24 @@ export class AdminExpenseDto {
   @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Bolivia civil date' })
   incurredOn!: string;
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description:
+      'Set once the Expense is eliminated; it then counts for nothing',
+  })
+  voidedAt!: Date | null;
+  @ApiProperty({ type: String, nullable: true }) voidedByName!: string | null;
+  @ApiProperty({ type: String, nullable: true }) voidReason!: string | null;
 }
+
+export class ExpenseVoidDto {
+  @ApiProperty({ required: false, maxLength: 300 }) reason?: string;
+}
+
+export const parseExpenseVoid = (value: unknown) =>
+  z.strictObject({ reason: z.string().max(300).optional() }).safeParse(value);
 
 export class AdminExpensePageDto {
   @ApiProperty({ type: AdminExpenseDto, isArray: true })
