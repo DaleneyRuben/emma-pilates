@@ -27,7 +27,8 @@ export function useRetryCachedHome(
     if (!showingCachedHome) return undefined;
     const retry = () => {
       latestKeys.current.forEach((queryKey) => {
-        void queryClient.refetchQueries({ queryKey, type: "active" });
+        // A slow answer still in flight is left to finish, not restarted.
+        void queryClient.refetchQueries({ queryKey, type: "active" }, { cancelRefetch: false });
       });
     };
     const timer = setInterval(retry, everyMilliseconds);
