@@ -19,7 +19,7 @@ env:
 - extendedWaitUntil:
     visible: "Tu código"
     timeout: 15000
-- tapOn: "Copiar"
+- tapOn: "Copiar código"
 - extendedWaitUntil:
     visible: "Código copiado"
     timeout: 5000
