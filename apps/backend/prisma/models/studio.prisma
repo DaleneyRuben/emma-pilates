@@ -20,6 +20,25 @@ model SessionFact {
   @@schema("studio")
 }
 
+// Walkthrough finding 107: a Session cancelled automatically for low demand
+// (minimum_not_met or zero_bookings). Taught Sessions stay in session_facts.
+model CancelledSessionFact {
+  sessionId             String    @id @map("session_id") @db.Uuid
+  sessionDate           DateTime  @map("session_date") @db.Date
+  branchId              String    @map("branch_id") @db.Uuid
+  classTypeId           String    @map("class_type_id") @db.Uuid
+  trainerStaffMemberId  String    @map("trainer_staff_member_id") @db.Uuid
+  cause                 String
+  bookingsHeld          Int       @map("bookings_held") @db.SmallInt
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt             DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([sessionDate])
+  @@map("cancelled_session_facts")
+  @@schema("studio")
+}
+
 model ClientMonthFact {
   clientId         String    @map("client_id") @db.Uuid
   month            DateTime  @db.Date
