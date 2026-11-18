@@ -8881,6 +8881,20 @@
             }
           },
           {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "description": "Withdrawals when absent",
+            "schema": {
+              "enum": [
+                "withdrawal",
+                "restock",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "supplyId",
             "required": false,
             "in": "query",
@@ -9386,6 +9400,53 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ExpenseChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpenseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenses"
+        ]
+      }
+    },
+    "/api/v1/administrator/expenses/{expenseId}/void": {
+      "post": {
+        "operationId": "voidExpense",
+        "parameters": [
+          {
+            "name": "expenseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseVoidDto"
               }
             }
           }
@@ -18297,6 +18358,13 @@
             "type": "string",
             "format": "uuid"
           },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "withdrawal",
+              "restock"
+            ]
+          },
           "supplyId": {
             "type": "string",
             "format": "uuid"
@@ -18310,14 +18378,20 @@
           "recordedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "recordedByName": {
+            "type": "string",
+            "description": "Who recorded the movement"
           }
         },
         "required": [
           "id",
+          "kind",
           "supplyId",
           "supplyName",
           "quantity",
-          "recordedAt"
+          "recordedAt",
+          "recordedByName"
         ]
       },
       "WithdrawalTotalDto": {
@@ -18532,6 +18606,20 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date"
+          },
+          "voidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Set once the Expense is eliminated; it then counts for nothing"
+          },
+          "voidedByName": {
+            "type": "string",
+            "nullable": true
+          },
+          "voidReason": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -18540,7 +18628,10 @@
           "expenseCategoryId",
           "expenseCategoryName",
           "amountCentavos",
-          "incurredOn"
+          "incurredOn",
+          "voidedAt",
+          "voidedByName",
+          "voidReason"
         ]
       },
       "AdminExpensePageDto": {
@@ -18621,6 +18712,15 @@
           "amountCentavos",
           "incurredOn"
         ]
+      },
+      "ExpenseVoidDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
       },
       "ExpenseCategoryTotalDto": {
         "type": "object",

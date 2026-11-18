@@ -14,4 +14,13 @@ export interface AdminExpenseDto {
   amountCentavos: number;
   /** Bolivia civil date */
   incurredOn: string;
+  /**
+   * Set once the Expense is eliminated; it then counts for nothing
+   * @nullable
+   */
+  voidedAt: string | null;
+  /** @nullable */
+  voidedByName: string | null;
+  /** @nullable */
+  voidReason: string | null;
 }
