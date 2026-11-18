@@ -14,6 +14,8 @@ import { createPrismaExpenses } from './expenses/prisma-expenses';
 import { createPrismaFinance } from './finance/prisma-finance';
 import { monthFacts } from './finance/month-facts';
 import { coordinatorMonthFacts } from './payroll/coordinator-pay-facts';
+import { createPayoutQrs } from './payout-qr/payout-qrs';
+import { createPrismaPayoutQrs } from './payout-qr/prisma-payout-qrs';
 import { createPrismaPayStatements } from './payroll/prisma-pay-statements';
 import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaSalaryReceipts } from './payroll/prisma-salary-receipts';
@@ -51,6 +53,10 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
           equipment: createPrismaEquipment(prisma, { now }),
           sessionEquipment: createPrismaSessionEquipment(prisma, { now }),
           cashCloses: createPrismaCashCloses(prisma, { now }),
+          payoutQrs: createPayoutQrs({
+            gateway: createPrismaPayoutQrs(prisma),
+            now,
+          }),
         };
       },
     },

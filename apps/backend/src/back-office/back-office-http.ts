@@ -17,6 +17,7 @@ import { parseUuidValue } from './back-office.dto';
 import type { EquipmentOperations } from './equipment/prisma-equipment';
 import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
+import type { PayoutQrs } from './payout-qr/payout-qrs';
 import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
 import type { SalaryReceipts } from './payroll/prisma-salary-receipts';
@@ -39,6 +40,7 @@ export type BackOfficeOperations = {
   equipment: EquipmentOperations;
   sessionEquipment: SessionEquipment;
   cashCloses: CashCloses;
+  payoutQrs: PayoutQrs;
 };
 
 export const idempotencyHeader = {
