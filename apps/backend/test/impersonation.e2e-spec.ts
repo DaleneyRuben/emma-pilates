@@ -50,6 +50,7 @@ describe('impersonation (e2e)', () => {
     staffMemberId,
     staffMemberName: 'Camila Rojas',
     role: 'trainer',
+    gender: 'female',
     expiresAt: new Date('2026-10-22T15:30:00.000Z'),
   };
   const resolvePrincipal =
@@ -98,6 +99,7 @@ describe('impersonation (e2e)', () => {
         staffMemberId,
         staffMemberName: 'Camila Rojas',
         role: 'trainer',
+        gender: 'female',
         expiresAt: '2026-10-22T15:30:00.000Z',
       });
 

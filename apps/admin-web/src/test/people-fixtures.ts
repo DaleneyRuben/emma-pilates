@@ -121,6 +121,7 @@ export const member = (
   email: `${plain(name)}@emmapilates.bo`,
   phone: "+591 70822001",
   role: "trainer",
+  gender: "female",
   branchIds: [centro.id],
   status: "active",
   activationExpiresAt: null,

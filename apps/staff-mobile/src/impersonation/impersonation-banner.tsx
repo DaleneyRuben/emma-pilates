@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { roleLabel } from "../profile/staff-labels";
+import { staffRoleLabel } from "@pilates/api-contracts";
 
 const minute = 60_000;
 
@@ -46,7 +46,7 @@ export function ImpersonationBanner({
         <View style={styles.text}>
           <Text numberOfLines={1} style={styles.title}>{`Viendo como ${name}`}</Text>
           <Text numberOfLines={1} style={styles.detail}>
-            {`${roleLabel(impersonation.role)} · Quedan ${minutesLeft(impersonation.expiresAt, now)} min`}
+            {`${staffRoleLabel(impersonation.role, impersonation.gender)} · Quedan ${minutesLeft(impersonation.expiresAt, now)} min`}
           </Text>
         </View>
         <Pressable

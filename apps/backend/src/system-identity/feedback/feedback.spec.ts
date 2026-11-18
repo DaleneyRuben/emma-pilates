@@ -65,6 +65,7 @@ const row: FeedbackRow = {
   senderEmail: 'valeria@example.com',
   senderName: 'Valeria Quiroga',
   senderClientId: 'c1000000-0000-4000-8000-000000000001',
+  senderGender: null,
   createdAt: now,
   triagedAt: null,
 };

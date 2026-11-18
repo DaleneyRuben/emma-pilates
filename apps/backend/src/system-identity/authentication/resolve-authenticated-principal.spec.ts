@@ -252,7 +252,7 @@ describe('resolveAuthenticatedPrincipal while impersonating (FUT-001)', () => {
   const activeImpersonation = {
     id: 'impersonation-id',
     expiresAt: new Date('2026-10-22T15:20:00.000Z'),
-    staffMember: { ...trainer, name: 'Camila Rojas' },
+    staffMember: { ...trainer, name: 'Camila Rojas', gender: 'male' },
   };
   const dependencies = (
     session: Record<string, unknown>,
@@ -286,6 +286,8 @@ describe('resolveAuthenticatedPrincipal while impersonating (FUT-001)', () => {
         id: 'impersonation-id',
         administratorAccountId: 'administrator-account-id',
         staffMemberName: 'Camila Rojas',
+        // FIX-081: the banner's «Entrenador» survives a reload.
+        staffMemberGender: 'male',
         expiresAt: new Date('2026-10-22T15:20:00.000Z'),
       },
     });

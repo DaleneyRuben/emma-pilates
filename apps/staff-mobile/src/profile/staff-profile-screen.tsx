@@ -3,6 +3,7 @@ import {
   useGetOwnPayoutQr,
   useGetOwnReferralCode,
   useGetUnreadNotificationCount,
+  staffRoleLabel,
 } from "@pilates/api-contracts";
 import {
   BrandToast,
@@ -31,7 +32,7 @@ import { RootHeader } from "../ui/root-header";
 import { payoutQrRowValue } from "./payout-qr/payout-qr-copy";
 import { ProfileRow } from "./profile-row";
 import { StaffPhotoSummary } from "./staff-photo-summary";
-import { branchesLabel, roleLabel } from "./staff-labels";
+import { branchesLabel } from "./staff-labels";
 
 type ProfileNavigation = {
   navigate: (
@@ -124,7 +125,7 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
         <View>
           <SectionTitle>Tu cuenta</SectionTitle>
           <IconRowGroup>
-            <IconRow icon="person" label="Rol" value={roleLabel(member.role)} />
+            <IconRow icon="person" label="Rol" value={staffRoleLabel(member.role, member.gender)} />
             <IconRow
               icon="pin"
               label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}

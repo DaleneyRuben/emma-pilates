@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateStaffMemberDtoGender } from "./createStaffMemberDtoGender";
 import type { CreateStaffMemberDtoRole } from "./createStaffMemberDtoRole";
 
 export interface CreateStaffMemberDto {
@@ -16,5 +17,7 @@ export interface CreateStaffMemberDto {
   /** @nullable */
   phone?: string | null;
   role: CreateStaffMemberDtoRole;
+  /** How her Role reads (FIX-081) */
+  gender?: CreateStaffMemberDtoGender;
   branchIds: string[];
 }

@@ -1,4 +1,4 @@
-import type { StaffMemberDto } from "@pilates/api-contracts";
+import { staffRoleLabel, type StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
@@ -11,7 +11,7 @@ import { pageRangeLabel } from "../../components/table/pagination";
 import { StatusPill } from "../../components/ui/status-pill";
 import { namesById } from "../../lib/named";
 import { staffRoles, type StaffRole, type StaffSearch } from "../people-search";
-import { branchNames, roleLabels, statusPills } from "./staff-format";
+import { branchNames, statusPills } from "./staff-format";
 import { useAdminRole } from "../../session/admin-role";
 import { StaffPanelForm } from "./staff-panel";
 import { staffTableQueryOptions } from "./staff-queries";
@@ -19,7 +19,8 @@ import { phoneWithFlag } from "../../lib/phone-number";
 
 const roleOptions: { value: StaffSearch["role"]; label: string }[] = [
   { value: "all", label: "Todos" },
-  ...staffRoles.map((role) => ({ value: role, label: roleLabels[role] })),
+  // FIX-081: a filter covers everyone, so it reads in the default feminine.
+  ...staffRoles.map((role) => ({ value: role, label: staffRoleLabel(role) })),
 ];
 
 const columns = createColumnHelper<StaffMemberDto>();
@@ -47,9 +48,9 @@ const staffColumns =
     columns.accessor("role", {
       header: "Rol",
       // A category, not a state: never a status pill (AW23, follow-up 52).
-      cell: ({ getValue }) => (
+      cell: ({ getValue, row }) => (
         <span className="inline-flex rounded-control border border-borde bg-divisor px-2 py-0.5 text-ayuda text-texto-secundario">
-          {roleLabels[getValue() as StaffRole]}
+          {staffRoleLabel(getValue() as StaffRole, row.original.gender)}
         </span>
       ),
     }),

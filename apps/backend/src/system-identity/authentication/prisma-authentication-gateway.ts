@@ -1,3 +1,4 @@
+import { staffGenderOf } from './staff-gender';
 import { revokeAuthenticationSessions } from './revoke-authentication-sessions';
 import type { PrismaClient } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
@@ -6,6 +7,7 @@ import {
   AuthenticationSessionSurface,
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
+  type StaffGender,
   type StaffRole,
 } from '../../generated/prisma/enums';
 import type { AccountCredentials } from './authenticate-credentials';
@@ -29,6 +31,7 @@ type ImpersonationRow = {
     id: string;
     name: string;
     role: StaffRole;
+    gender: StaffGender;
     deletedAt: Date | null;
     account: { id: string; disabledAt: Date | null } | null;
     branchAssignments: { branchId: string }[];
@@ -48,6 +51,7 @@ const toImpersonationRecord = (
           // A Staff Member without an Account cannot be acted as.
           accountId: row.staffMember.account?.id ?? '',
           name: row.staffMember.name,
+          gender: staffGenderOf(row.staffMember.gender),
           role: row.staffMember.role,
           branchIds: row.staffMember.branchAssignments.map(
             ({ branchId }) => branchId,
@@ -238,6 +242,7 @@ export class PrismaAuthenticationGateway {
                   id: true,
                   name: true,
                   role: true,
+                  gender: true,
                   deletedAt: true,
                   account: { select: { id: true, disabledAt: true } },
                   branchAssignments: {

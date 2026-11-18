@@ -83,6 +83,15 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "coordinator",
     ]);
     expect(within(roles).queryByRole("radio", { checked: true })).toBeNull();
+    // FIX-081 (finding 118): «Género» decides how the Role reads; nothing is
+    // chosen for her, and the Roles read in the feminine until it is.
+    const genders = within(panel).getByRole("group", { name: "Género" });
+    expect(
+      within(genders)
+        .getAllByRole("radio")
+        .map((radio) => radio.getAttribute("value")),
+    ).toEqual(["female", "male"]);
+    expect(within(genders).queryByRole("radio", { checked: true })).toBeNull();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(await within(panel).findByText("Escribe el nombre.")).toBeVisible();
@@ -98,8 +107,10 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       ),
     ).toBeVisible();
     expect(within(panel).getByText("Elige un rol.")).toBeVisible();
+    expect(within(panel).getByText("Elige el género.")).toBeVisible();
 
-    await user.click(within(roles).getByRole("radio", { name: "Entrenadora" }));
+    await user.click(within(genders).getByRole("radio", { name: "Masculino" }));
+    await user.click(within(roles).getByRole("radio", { name: "Entrenador" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(
       await within(panel).findByText("Elige al menos una sucursal."),
@@ -120,7 +131,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     ).toHaveLength(3);
 
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
 
     expect(
@@ -149,6 +160,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "valentina@emmapilates.bo",
     );
     await user.type(within(panel).getByLabelText("Celular"), "71234567");
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(
       within(panel).getByRole("radio", { name: "Nutricionista" }),
     );
@@ -167,6 +179,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
         email: "valentina@emmapilates.bo",
         phone: "+591 71234567",
         role: "nutritionist",
+        gender: "female",
         branchIds: [centro.id, norte.id],
       },
     ]);
@@ -200,8 +213,9 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       within(frequent).getByRole("option", { name: "Argentina +54" }),
     );
     await user.type(within(panel).getByLabelText("Celular"), "9 11 2345 6789");
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -212,6 +226,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
           email: "sara@emmapilates.bo",
           phone: "+54 91123456789",
           role: "administrator",
+          gender: "female",
           branchIds: [],
         },
       ]),
@@ -233,7 +248,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       );
       await user.type(within(panel).getByLabelText("Celular"), typed);
       await user.click(
-        within(panel).getByRole("radio", { name: "Administración" }),
+        within(panel).getByRole("radio", { name: "Administradora" }),
       );
       await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -256,6 +271,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "emma@emmapilates.bo",
     );
     await user.type(within(panel).getByLabelText("Celular"), "71234567");
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(within(panel).getByRole("radio", { name: "Asistente" }));
     await user.click(within(panel).getByRole("checkbox", { name: "Centro" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
@@ -281,8 +297,9 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
       "sara@emmapilates.bo",
     );
     await user.type(within(panel).getByLabelText("Celular"), "71234567");
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 

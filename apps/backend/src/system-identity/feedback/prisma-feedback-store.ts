@@ -1,3 +1,4 @@
+import { staffGenderOf } from '../authentication/staff-gender';
 import { randomUUID } from 'node:crypto';
 import { runIdempotent } from '../../database/run-idempotent';
 import {
@@ -66,7 +67,7 @@ const feedbackSelect = {
       email: true,
       deletedAt: true,
       client: { select: { id: true, name: true, deletedAt: true } },
-      staffMember: { select: { name: true } },
+      staffMember: { select: { name: true, gender: true } },
     },
   },
 } as const satisfies Prisma.FeedbackSelect;
@@ -93,6 +94,10 @@ const toRow = (record: FeedbackRecord): FeedbackRow => ({
     record.account.staffMember?.name ??
     record.account.email,
   // A closed Account's Client is out of the directory: no link to follow.
+  senderGender:
+    record.account.staffMember === null
+      ? null
+      : staffGenderOf(record.account.staffMember.gender),
   senderClientId:
     record.account.deletedAt === null &&
     record.account.client !== null &&

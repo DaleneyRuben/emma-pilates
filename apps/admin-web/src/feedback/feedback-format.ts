@@ -1,9 +1,9 @@
-import type {
-  AdminFeedbackDto,
-  AdminFeedbackDtoApp,
-  AdminFeedbackDtoRole,
-  AdminFeedbackDtoStatus,
-  AdminFeedbackDtoType,
+import {
+  staffRoleLabel,
+  type AdminFeedbackDto,
+  type AdminFeedbackDtoApp,
+  type AdminFeedbackDtoStatus,
+  type AdminFeedbackDtoType,
 } from "@pilates/api-contracts";
 import { boliviaToday, formatCivilMoment } from "../lib/bolivia-time";
 import { toCsv } from "../lib/csv";
@@ -26,14 +26,13 @@ export const appLabels: Record<AdminFeedbackDtoApp, string> = {
   staff: "App del personal",
 };
 
-export const roleLabels: Record<AdminFeedbackDtoRole, string> = {
-  client: "Clienta",
-  trainer: "Entrenador",
-  assistant: "Asistente",
-  nutritionist: "Nutricionista",
-  administrator: "Administrador",
-  coordinator: "Coordinación",
-};
+/** «Clienta», or a Staff sender's Role in her gender (FIX-081). */
+export const roleLabelOf = (
+  feedback: Pick<AdminFeedbackDto, "role" | "senderGender">,
+): string =>
+  feedback.role === "client"
+    ? "Clienta"
+    : staffRoleLabel(feedback.role, feedback.senderGender);
 
 const systems = { android: "Android", ios: "iOS" } as const;
 

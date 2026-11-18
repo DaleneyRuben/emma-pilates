@@ -30,7 +30,7 @@ describe("AW33 user menu on a desktop browser", () => {
     expect(within(trigger).getByText("PM")).toBeInTheDocument();
     expect(within(trigger).getByText("Paola Mendoza")).toBeInTheDocument();
     // Follow-up 232: the top bar names her Role under her name.
-    expect(within(trigger).getByText("Administración")).toBeInTheDocument();
+    expect(within(trigger).getByText("Administradora")).toBeInTheDocument();
 
     const menu = await openMenu(user);
     expect(menu).toHaveAttribute("data-presentation", "popover");
@@ -38,7 +38,7 @@ describe("AW33 user menu on a desktop browser", () => {
     expect(
       within(menu).getByText("paola.mendoza@example.com"),
     ).toBeInTheDocument();
-    expect(within(menu).getByText("Administración")).toBeInTheDocument();
+    expect(within(menu).getByText("Administradora")).toBeInTheDocument();
     expect(
       within(menu)
         .getAllByRole("button")

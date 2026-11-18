@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StaffPhotoDto } from './photo/staff-photo.dto';
 import type { StaffProfile } from './staff-profile';
+import { staffGenders } from '../../system-identity/authentication/staff-gender';
 
 export const staffRoles: [StaffProfile['role'], ...StaffProfile['role'][]] = [
   'trainer',
@@ -33,6 +34,12 @@ export class StaffProfileDto {
 
   @ApiProperty({ enum: staffRoles })
   role!: StaffProfile['role'];
+
+  @ApiProperty({
+    enum: staffGenders,
+    description: 'How her Role reads (FIX-081)',
+  })
+  gender!: StaffProfile['gender'];
 
   @ApiProperty({ type: StaffBranchDto, isArray: true })
   branches!: StaffBranchDto[];

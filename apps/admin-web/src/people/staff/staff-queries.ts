@@ -1,4 +1,5 @@
 import {
+  type StaffGenderCode,
   cancelStaffMemberEmailChange,
   cancelStaffMemberInvitation,
   changeStaffMemberBranches,
@@ -52,6 +53,8 @@ type StaffChange =
       staffMemberId: string;
       name: string;
       phone: string | null;
+      /** FIX-081: only when it changed. */
+      gender?: StaffGenderCode;
     }
   | { kind: "deactivate"; staffMemberId: string }
   | { kind: "correctEmail"; staffMemberId: string; email: string }
@@ -88,7 +91,11 @@ const send = async (change: StaffChange) => {
     case "contact":
       return changeStaffMemberContact(
         change.staffMemberId,
-        { name: change.name, phone: change.phone },
+        {
+          name: change.name,
+          phone: change.phone,
+          ...(change.gender === undefined ? {} : { gender: change.gender }),
+        },
         undefined,
         adminFetch,
       );

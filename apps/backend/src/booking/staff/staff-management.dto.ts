@@ -1,6 +1,10 @@
 import { StaffPhotoDto } from './photo/staff-photo.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
+import {
+  staffGenders,
+  type StaffGenderName,
+} from '../../system-identity/authentication/staff-gender';
 import type {
   StaffDirectoryQuery,
   StaffRoleName,
@@ -51,6 +55,13 @@ export class StaffMemberDto {
 
   @ApiProperty({ enum: staffRoles })
   role!: StaffRoleName;
+
+  @ApiProperty({
+    enum: staffGenders,
+    description:
+      'How her Role reads: «Coordinadora» or «Coordinador» (FIX-081)',
+  })
+  gender!: StaffGenderName;
 
   @ApiProperty({
     type: String,
@@ -107,6 +118,12 @@ export class ChangeStaffContactDto {
 
   @ApiProperty({ type: String, nullable: true, maxLength: 40 })
   phone!: string | null;
+
+  @ApiPropertyOptional({
+    enum: staffGenders,
+    description: 'FIX-081: kept as it is when not sent',
+  })
+  gender?: StaffGenderName;
 }
 
 export class StaffMemberPageDto {
@@ -135,6 +152,13 @@ export class CreateStaffMemberDto {
 
   @ApiProperty({ enum: staffRoles })
   role!: StaffRoleName;
+
+  @ApiPropertyOptional({
+    enum: staffGenders,
+    default: 'female',
+    description: 'How her Role reads (FIX-081)',
+  })
+  gender?: StaffGenderName;
 
   @ApiProperty({ type: String, format: 'uuid', isArray: true })
   branchIds!: string[];
@@ -167,6 +191,7 @@ const createSchema = z.strictObject({
   email: z.email(),
   phone: z.string().trim().min(1).max(40).nullable().optional(),
   role: z.enum(staffRoles),
+  gender: z.enum(staffGenders).default('female'),
   branchIds: branchIdsSchema,
 });
 
@@ -180,13 +205,18 @@ const branchesSchema = z.strictObject({ branchIds: branchIdsSchema });
 const contactSchema = z.strictObject({
   name: z.string().trim().min(1).max(120),
   phone: z.string().trim().max(40).nullable(),
+  gender: z.enum(staffGenders).optional(),
 });
 
 export const parseChangeStaffContact = (value: unknown) => {
   const parsed = contactSchema.safeParse(value);
   if (!parsed.success) return null;
-  const { name, phone } = parsed.data;
-  return { name, phone: phone === '' ? null : phone };
+  const { name, phone, gender } = parsed.data;
+  return {
+    name,
+    phone: phone === '' ? null : phone,
+    ...(gender === undefined ? {} : { gender }),
+  };
 };
 
 const emailCorrectionSchema = z.strictObject({ email: z.email() });

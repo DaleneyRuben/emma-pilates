@@ -10,7 +10,7 @@ jest.setTimeout(20_000);
 // run Lun 19 through Dom 25 and include both weekend names.
 const wednesday = new Date("2026-10-21T16:00:00.000Z");
 
-const renderTrainer = () =>
+const renderTrainer = (gender: "female" | "male" = "female") =>
   render(
     <App
       runtime={createStaffRuntime(
@@ -23,6 +23,7 @@ const renderTrainer = () =>
               email: "emma.vargas@example.com",
               phone: null,
               role: "trainer",
+              gender,
               branches: [],
             }),
           "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
@@ -52,6 +53,15 @@ describe("Trainer agenda header", () => {
       expect(screen.getByLabelText("Mi agenda")).toHaveTextContent("Hola, Emma");
     });
     expect(screen.getByText("Entrenadora · Miércoles 21 de octubre")).toBeOnTheScreen();
+  });
+
+  // FIX-081 (finding 118): the eyebrow names his Role in his gender.
+  it("calls a man «Entrenador» over the greeting", async () => {
+    const screen = await renderTrainer("male");
+
+    await waitFor(() => {
+      expect(screen.getByText("Entrenador · Miércoles 21 de octubre")).toBeOnTheScreen();
+    });
   });
 
   it("starts the week strip today and never shows a past day", async () => {

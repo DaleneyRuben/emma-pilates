@@ -8,6 +8,7 @@ import {
   type StaffManagementDependencies,
   type StaffMemberRecord,
 } from './staff-management-model';
+import type { StaffGenderName } from '../../system-identity/authentication/staff-gender';
 
 // FIX-038, decision §20.22 (owner, 2026-11-05): the Administrator corrects
 // another Staff Member's name and phone, active or pending. The login email
@@ -15,7 +16,13 @@ import {
 // active one needs a confirmed change. The audit keeps the old and the new
 // values of what changed ("" for no phone).
 export const changeStaffContact = async (
-  command: { staffMemberId: string; name: string; phone: string | null },
+  command: {
+    staffMemberId: string;
+    name: string;
+    phone: string | null;
+    /** FIX-081: kept as it is when not sent. */
+    gender?: StaffGenderName;
+  },
   principal: AuthenticatedPrincipal,
   dependencies: StaffManagementDependencies,
 ): Promise<StaffMemberRecord> => {
@@ -40,6 +47,14 @@ export const changeStaffContact = async (
       await transaction.setPhone({ staffMemberId: member.id, phone });
       metadata.previousPhone = member.phone ?? '';
       metadata.phone = phone ?? '';
+    }
+    if (command.gender !== undefined && command.gender !== member.gender) {
+      await transaction.setGender({
+        staffMemberId: member.id,
+        gender: command.gender,
+      });
+      metadata.previousGender = member.gender;
+      metadata.gender = command.gender;
     }
     if (Object.keys(metadata).length === 0) return member;
 

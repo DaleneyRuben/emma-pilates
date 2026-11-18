@@ -129,6 +129,7 @@ export class AuthenticationController {
               staffMemberId: principal.identity.staffMemberId,
               staffMemberName: principal.impersonation.staffMemberName,
               role: principal.identity.role,
+              gender: principal.impersonation.staffMemberGender ?? 'female',
               expiresAt: principal.impersonation.expiresAt,
             }),
           }),

@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { StaffMemberDtoGender } from "./staffMemberDtoGender";
 import type { StaffMemberDtoRole } from "./staffMemberDtoRole";
 import type { StaffMemberDtoStatus } from "./staffMemberDtoStatus";
 import type { StaffPendingEmailDto } from "./staffPendingEmailDto";
@@ -17,6 +18,8 @@ export interface StaffMemberDto {
   /** @nullable */
   phone: string | null;
   role: StaffMemberDtoRole;
+  /** How her Role reads: «Coordinadora» or «Coordinador» (FIX-081) */
+  gender: StaffMemberDtoGender;
   /** Empty for Administrators, who hold every Branch implicitly */
   branchIds: string[];
   status: StaffMemberDtoStatus;

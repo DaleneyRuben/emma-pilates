@@ -1,3 +1,7 @@
+import {
+  staffGenderOf,
+  toStaffGender,
+} from '../../system-identity/authentication/staff-gender';
 import { staffPhotoOf } from './photo/staff-photo-of';
 import type { PgBoss } from 'pg-boss';
 import { retrySerializable } from '../../database/retry-serializable';
@@ -44,6 +48,7 @@ const staffSelect = {
   name: true,
   phone: true,
   role: true,
+  gender: true,
   profileImageAssetId: true,
   branchAssignments: {
     where: { deletedAt: null },
@@ -97,6 +102,7 @@ const toRecord = (row: StaffRow, now: Date): StaffMemberRecord | null => {
     email: row.account.email,
     phone: row.phone,
     role: roleNames[row.role],
+    gender: staffGenderOf(row.gender),
     branchIds: row.branchAssignments.map(({ branchId }) => branchId),
     status,
     activationExpiresAt:
@@ -238,6 +244,7 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
             name: input.name,
             phone: input.phone,
             role: roles[input.role],
+            gender: toStaffGender(input.gender),
             // BKM-017: a Trainer gets her readable code when she is created.
             referralCode:
               input.role === 'trainer'
@@ -266,6 +273,12 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
         await transaction.staffMember.update({
           where: { id: input.staffMemberId },
           data: { name: input.name },
+        });
+      },
+      setGender: async (input) => {
+        await transaction.staffMember.update({
+          where: { id: input.staffMemberId },
+          data: { gender: toStaffGender(input.gender) },
         });
       },
       reissueActivation: (input) => accounts.reissueActivation(input),

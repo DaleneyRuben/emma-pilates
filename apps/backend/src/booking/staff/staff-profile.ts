@@ -1,4 +1,5 @@
 import type { StaffPhotoRef } from './photo/staff-photo-of';
+import type { StaffGenderName } from '../../system-identity/authentication/staff-gender';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 
@@ -9,6 +10,8 @@ export type StaffProfile = {
   phone: string | null;
   role:
     'trainer' | 'nutritionist' | 'assistant' | 'administrator' | 'coordinator';
+  /** FIX-081: «Coordinadora» or «Coordinador» in Perfil and the eyebrows. */
+  gender: StaffGenderName;
   branches: { id: string; name: string }[];
   photo: StaffPhotoRef;
 };

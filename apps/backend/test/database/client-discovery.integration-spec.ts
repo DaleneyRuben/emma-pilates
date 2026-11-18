@@ -154,6 +154,8 @@ describe('Client discovery reads', () => {
         durationMinutes: 50,
       },
       trainerName: 'Emma Vargas',
+      // FIX-081: «Entrenadora» or «Entrenador» beside her name.
+      trainerGender: 'female',
       startsAt: session!.startsAt,
       endsAt: session!.endsAt,
       capacity: 12,

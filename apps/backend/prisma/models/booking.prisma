@@ -27,6 +27,15 @@ enum StaffRole {
   @@schema("booking")
 }
 
+// FIX-081 (finding 118): how a Staff Member's Role reads, «Coordinadora» or
+// «Coordinador». Existing rows keep the feminine form the labels used.
+enum StaffGender {
+  FEMALE @map("female")
+  MALE   @map("male")
+
+  @@schema("booking")
+}
+
 model Client {
   id                  String          @id @default(uuid()) @db.Uuid
   name                String
@@ -127,6 +136,7 @@ model StaffMember {
   name                String
   phone               String?
   role                StaffRole
+  gender              StaffGender             @default(FEMALE)
   // BKM-011: a Trainer's personal Referral Code, set by the Administrator.
   // Unique among live rows: a partial index in the BKM-011 migration.
   referralCode        String?                 @map("referral_code")

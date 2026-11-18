@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ImpersonationDtoGender } from "./impersonationDtoGender";
 import type { ImpersonationDtoRole } from "./impersonationDtoRole";
 
 export interface ImpersonationDto {
@@ -11,6 +12,8 @@ export interface ImpersonationDto {
   staffMemberId: string;
   staffMemberName: string;
   role: ImpersonationDtoRole;
+  /** How the Role reads */
+  gender: ImpersonationDtoGender;
   /** When the 30 minutes end */
   expiresAt: string;
 }

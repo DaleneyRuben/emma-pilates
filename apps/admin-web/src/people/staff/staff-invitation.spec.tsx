@@ -176,11 +176,12 @@ describe("AW24 Nuevo miembro with a known email", () => {
       ),
     );
     const { panel, user } = await openCreate();
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(
       within(within(panel).getByRole("group", { name: "Rol" })).getByRole(
         "radio",
         {
-          name: "Administración",
+          name: "Administradora",
         },
       ),
     );
@@ -200,11 +201,12 @@ describe("AW24 Nuevo miembro with a known email", () => {
       ),
     );
     const { panel, user } = await openCreate();
+    await user.click(within(panel).getByRole("radio", { name: "Femenino" }));
     await user.click(
       within(within(panel).getByRole("group", { name: "Rol" })).getByRole(
         "radio",
         {
-          name: "Administración",
+          name: "Administradora",
         },
       ),
     );
@@ -212,7 +214,7 @@ describe("AW24 Nuevo miembro with a known email", () => {
 
     expect(
       await screen.findByText(
-        "Valentina Soria ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol y sus sucursales no cambiaron.",
+        "Valentina Soria ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol, su género y sus sucursales no cambiaron.",
       ),
     ).toBeVisible();
   });

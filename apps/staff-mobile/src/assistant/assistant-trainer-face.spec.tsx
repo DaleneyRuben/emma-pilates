@@ -81,6 +81,22 @@ describe("The Trainer's face on the Assistant's screens", () => {
     expect(within(row).getByText("EV")).toBeOnTheScreen();
   });
 
+  // FIX-081 (finding 118): «Entrenador» beside a man's name.
+  it("names a male Trainer «Entrenador» on S08", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/sessions/session-1": () => jsonResponse({ ...sessionDetail, trainerGender: "male" }),
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar clase" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+
+    const row = await screen.findByTestId("session-trainer-row");
+    expect(within(row).getByText("Entrenador")).toBeOnTheScreen();
+  });
+
   it("puts her face on the reschedule option card", async () => {
     const alternativeStart = new Date(new Date(soonBooking.startsAt).getTime() + minute);
     const { from: dayFrom, until: dayUntil } = civilDateRange(boliviaCivilDate(alternativeStart));

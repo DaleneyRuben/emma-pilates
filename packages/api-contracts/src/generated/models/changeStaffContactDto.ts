@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ChangeStaffContactDtoGender } from "./changeStaffContactDtoGender";
 
 export interface ChangeStaffContactDto {
   /**
@@ -16,4 +17,6 @@ export interface ChangeStaffContactDto {
    * @nullable
    */
   phone: string | null;
+  /** FIX-081: kept as it is when not sent */
+  gender?: ChangeStaffContactDtoGender;
 }

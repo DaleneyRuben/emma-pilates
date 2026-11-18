@@ -23,6 +23,7 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
     accountId: 'trainer-account-id',
     name: 'Camila Rojas',
     role: 'trainer' as const,
+    gender: 'male' as const,
     status: 'active' as const,
   };
   const gateway = (overrides: Record<string, unknown> = {}) => ({
@@ -47,6 +48,8 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
         staffMemberId: trainer.id,
         staffMemberName: 'Camila Rojas',
         role: 'trainer',
+        // FIX-081: the banner reads «Entrenador» for a man.
+        gender: 'male',
         expiresAt: new Date('2026-10-22T15:30:00.000Z'),
       });
       expect(impersonationLifetimeMilliseconds).toBe(30 * 60 * 1_000);

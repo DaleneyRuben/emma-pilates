@@ -1,4 +1,5 @@
 import type { StaffPhotoRef } from './photo/staff-photo-of';
+import type { StaffGenderName } from '../../system-identity/authentication/staff-gender';
 import {
   auditActorOf,
   type AuditActor,
@@ -54,6 +55,7 @@ export type StaffMemberRecord = {
   email: string;
   phone: string | null;
   role: StaffRoleName;
+  gender: StaffGenderName;
   branchIds: string[];
   status: StaffStatus;
   activationExpiresAt: Date | null;
@@ -147,6 +149,7 @@ export interface StaffManagementTransaction {
     email: string;
     phone: string | null;
     role: StaffRoleName;
+    gender: StaffGenderName;
     branchIds: string[];
     pendingExpiresAt: Date;
     activationExpiresAt: Date;
@@ -161,6 +164,11 @@ export interface StaffManagementTransaction {
   }) => Promise<void>;
   /** FIX-038: the Administrator corrects the name. */
   setName: (input: { staffMemberId: string; name: string }) => Promise<void>;
+  /** FIX-081: the Administrator corrects how her Role reads. */
+  setGender: (input: {
+    staffMemberId: string;
+    gender: StaffGenderName;
+  }) => Promise<void>;
   reissueActivation: (input: {
     accountId: string;
     email: string;

@@ -6,6 +6,7 @@
  */
 import type { BranchDto } from "./branchDto";
 import type { ClassTypeDto } from "./classTypeDto";
+import type { SessionDetailDtoTrainerGender } from "./sessionDetailDtoTrainerGender";
 import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface SessionDetailDto {
@@ -18,6 +19,8 @@ export interface SessionDetailDto {
    * @nullable
    */
   trainerPhoto: StaffPhotoDto | null;
+  /** How the Trainer’s Role reads (FIX-081) */
+  trainerGender: SessionDetailDtoTrainerGender;
   startsAt: string;
   endsAt: string;
   /** @minimum 1 */

@@ -41,6 +41,8 @@ import {
   type StaffMemberRecord,
   type StaffRoleName,
 } from './staff-management';
+import type { changeStaffContact } from './staff-contact';
+import type { createStaffMember } from './staff-management';
 import {
   ChangeStaffBranchesDto,
   ChangeStaffContactDto,
@@ -72,13 +74,7 @@ export type StaffManagementOperations = {
     principal: Principal,
   ) => Promise<StaffMemberRecord>;
   create: (
-    command: {
-      name: string;
-      email: string;
-      phone: string | null;
-      role: StaffRoleName;
-      branchIds: string[];
-    },
+    command: Parameters<typeof createStaffMember>[0],
     principal: Principal,
   ) => Promise<StaffMemberRecord>;
   resendActivation: (
@@ -110,7 +106,7 @@ export type StaffManagementOperations = {
     principal: Principal,
   ) => Promise<void>;
   changeContact: (
-    command: { staffMemberId: string; name: string; phone: string | null },
+    command: Parameters<typeof changeStaffContact>[0],
     principal: Principal,
   ) => Promise<StaffMemberRecord>;
   requestEmailChange: (

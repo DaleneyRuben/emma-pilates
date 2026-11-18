@@ -103,6 +103,47 @@ describe('changeStaffContact', () => {
     expect(transaction.recordAudit).not.toHaveBeenCalled();
   });
 
+  // FIX-081 (finding 118): the gender decides how her Role reads.
+  it('changes and audits the gender, and leaves it alone when not sent', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValueOnce(record())
+        .mockResolvedValueOnce(record({ gender: 'male' }))
+        .mockResolvedValue(record({ gender: 'male' })),
+    });
+
+    const updated = await changeStaffContact(
+      {
+        staffMemberId: 'staff-1',
+        name: 'Daniela Ortiz',
+        phone: null,
+        gender: 'male',
+      },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.setGender).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      gender: 'male',
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'staff_member.contact_changed',
+        metadata: { previousGender: 'female', gender: 'male' },
+      }),
+    );
+    expect(updated.gender).toBe('male');
+
+    await changeStaffContact(
+      { staffMemberId: 'staff-1', name: 'Daniela Ortiz', phone: null },
+      administrator,
+      dependencies(transaction),
+    );
+    expect(transaction.setGender).toHaveBeenCalledTimes(1);
+  });
+
   // FIX-037: a number from another country is stored «+<code> <digits>».
   it('stores a foreign mobile with its country code', async () => {
     const transaction = createTransaction();

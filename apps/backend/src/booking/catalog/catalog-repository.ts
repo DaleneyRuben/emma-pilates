@@ -1,3 +1,4 @@
+import type { StaffGenderName } from '../../system-identity/authentication/staff-gender';
 import type { StaffPhotoRef } from '../staff/photo/staff-photo-of';
 export type PlanSummary = {
   id: string;
@@ -102,6 +103,8 @@ export type SessionDetail = {
   };
   trainerName: string;
   trainerPhoto: StaffPhotoRef;
+  /** FIX-081: «Entrenadora» or «Entrenador» beside her name. */
+  trainerGender: StaffGenderName;
   startsAt: Date;
   endsAt: Date;
   capacity: number;

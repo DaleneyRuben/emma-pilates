@@ -1,10 +1,10 @@
-import type { StaffMemberDto } from "@pilates/api-contracts";
+import { staffRoleLabel, type StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { everyBranchesQueryOptions } from "../../catalog/branches/branch-queries";
 import { SidePanelBody } from "../../components/panel/side-panel";
 import { namesById } from "../../lib/named";
 import type { StaffRole } from "../people-search";
-import { branchNames, roleLabels } from "./staff-format";
+import { branchNames } from "./staff-format";
 import { phoneWithFlag } from "../../lib/phone-number";
 import { StaffPhotoBlock } from "./staff-photo-block";
 
@@ -60,7 +60,7 @@ export function StaffReadOnly({
   const branches = useQuery(everyBranchesQueryOptions());
   const names = namesById(branches.data ?? []);
   const facts = [
-    ["Rol", roleLabels[member.role as StaffRole]],
+    ["Rol", staffRoleLabel(member.role as StaffRole, member.gender)],
     ["Sucursales asignadas", branchNames(member, names)],
   ] as const;
 

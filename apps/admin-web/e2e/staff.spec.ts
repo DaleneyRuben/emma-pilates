@@ -20,9 +20,9 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
     "Todos",
     "Entrenadora",
     "Asistente",
-    "Administración",
+    "Administradora",
     "Nutricionista",
-    "Coordinador",
+    "Coordinadora",
   ]);
   await expect(
     page.getByRole("row", { name: /Emma Vargas/ }).getByText("Entrenadora"),
@@ -30,7 +30,7 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   await expect(
     page
       .getByRole("row", { name: /Paola Mendoza/ })
-      .getByText("Administración"),
+      .getByText("Administradora"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Nuevo miembro" }).click();
@@ -46,6 +46,11 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   await panel.getByLabel("Celular", { exact: true }).fill("71234567");
   // The radio and the chip inputs are visually hidden; their labels take
   // the click.
+  // FIX-081: «Género» decides how her Role reads.
+  await panel
+    .getByRole("group", { name: "Género" })
+    .getByText("Femenino", { exact: true })
+    .click();
   await panel
     .getByRole("group", { name: "Rol" })
     .getByText("Nutricionista", { exact: true })

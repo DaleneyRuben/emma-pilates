@@ -47,6 +47,15 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen());
   });
 
+  // FIX-081 (finding 118, owner 2026-11-18): the eyebrow names the person's
+  // Role in his gender, not the area («Coordinación»).
+  it("names a male Coordinator «Coordinador» in the eyebrow", async () => {
+    const mario = { ...coordinator, name: "Mario Rivas", gender: "male" };
+    const screen = await openSchedule("coordinator", mario);
+
+    await waitFor(() => expect(screen.getByText("Coordinador · Centro")).toBeOnTheScreen());
+  });
+
   it("gives the Coordinator «Cancelar una clase» and says the day is read-only", async () => {
     const screen = await openSchedule("coordinator", coordinator);
 

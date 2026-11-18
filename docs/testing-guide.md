@@ -10584,3 +10584,45 @@ No migration; no API change.
    <día>). Podrás registrar otro pago cuando empiece.»
 6. A pending Client's ⋯ sheet: **Cancelar invitación** reads «Libera el
    correo y anula la cuenta pendiente».
+
+## Test 174: each Role reads in the person's gender (FIX-081)
+
+Walkthrough finding 118. Migration `20261118161542_staff_gender` adds
+`booking.staff_members.gender` (`female` or `male`, default `female`), so every
+existing member keeps the feminine labels. One helper,
+`staffRoleLabel(role, gender)` in `@pilates/api-contracts`, names a Role
+everywhere: Entrenadora/Entrenador, Coordinadora/Coordinador,
+Administradora/Administrador, Asistente, Nutricionista. By the owner's choice
+(2026-11-18) eyebrows and the account cell show the person's Role, not the
+area («Coordinadora · Achumani», not «Coordinación · Achumani»). Texts about
+the team as an area («Administración lo revisa…», «Para Administración y
+Coordinación») do not change.
+
+1. Sign in to the admin web as the Administrator (Ana Méndez). Under your
+   name the account cell reads «Administradora».
+2. **Personal.** Open **Estudio › Personal**. Expected: Paula Vargas reads
+   «Coordinadora», Daniela Ortiz «Entrenadora», Ana Méndez «Administradora».
+   The **Rol** filter lists Entrenadora, Asistente, Administradora,
+   Nutricionista, Coordinadora.
+3. **Nuevo miembro.** Press **Nuevo miembro**. Expected: a «Género» field
+   with Femenino and Masculino, neither chosen, and **Guardar** says «Elige el
+   género.» until one is. Choose **Masculino**: the Role chips read
+   Entrenador, Asistente, Administrador, Nutricionista, Coordinador. Invite a
+   male Coordinator; his row reads «Coordinador».
+4. **Editar.** Open Daniela Ortiz and switch «Género» to Masculino: the chip
+   reads «Entrenador». Save: the row reads «Entrenador». Switch back to
+   Femenino and save. Only `PUT …/contact` is sent, with `gender`.
+5. **Staff app.** Sign in as the male Coordinator (or switch Paula to
+   Masculino). Expected: Horario's eyebrow reads «COORDINADOR · …», Perfil's
+   «Rol» reads «Coordinador». As the Administrator, «Ver la app como…» lists
+   each member as «Entrenador · Centro» or «Entrenadora · Centro», and the
+   banner while acting reads «Entrenador · Quedan 29 min» for a man.
+6. **Class detail.** For a class led by a man, the trainer row reads
+   «Entrenador» in the client app's class detail and in the Assistant's S08.
+7. **Comentarios.** A comment sent by a male Trainer shows «Rol Entrenador».
+8. **API.** `POST /api/v1/administrator/staff-members` without `gender`
+   creates a `female` member; `gender: "x"` answers 400. `PUT
+   …/staff-members/{id}/contact` without `gender` keeps it; with it, it
+   changes and the audit `staff_member.contact_changed` records
+   `previousGender` and `gender`.
+9. Check at 1440 px and 420 px.

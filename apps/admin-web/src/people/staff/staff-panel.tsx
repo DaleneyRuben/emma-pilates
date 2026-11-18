@@ -62,6 +62,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
     defaultValues: emptyStaffForm(),
   });
   const role = useWatch({ control: form.control, name: "role" });
+  const gender = useWatch({ control: form.control, name: "gender" });
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
@@ -75,7 +76,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
       });
       onDone(
         created.invitationReopened === true
-          ? `${created.name} ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol y sus sucursales no cambiaron.`
+          ? `${created.name} ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol, su género y sus sucursales no cambiaron.`
           : `Invitación enviada a ${values.email}: tiene 7 días para activar su cuenta.`,
       );
     } catch (error) {
@@ -125,7 +126,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
             name="phone"
             description="La recepción lo usa para escribirle por WhatsApp."
           />
-          <StaffRoleFields control={form.control} role={role} />
+          <StaffRoleFields control={form.control} role={role} gender={gender} />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}

@@ -1,3 +1,7 @@
+import {
+  staffGenders,
+  type StaffGenderName,
+} from '../authentication/staff-gender';
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 import {
@@ -114,6 +118,13 @@ export class AdminFeedbackDto {
       'The Client who sent it, for a link to her file; null for Staff',
   })
   senderClientId!: string | null;
+
+  @ApiProperty({
+    enum: staffGenders,
+    nullable: true,
+    description: 'How a Staff sender’s Role reads (FIX-081); null for a Client',
+  })
+  senderGender!: StaffGenderName | null;
 
   @ApiProperty({ format: 'date-time' })
   createdAt!: string;

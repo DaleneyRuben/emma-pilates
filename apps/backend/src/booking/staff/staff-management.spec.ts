@@ -55,6 +55,8 @@ describe('createStaffMember', () => {
       email: 'andrea@example.com',
       phone: '+591 70000001',
       role: 'trainer',
+      // FIX-081: unsent, the gender is the feminine form labels used so far.
+      gender: 'female',
       branchIds: ['centro'],
       pendingExpiresAt: new Date(now.getTime() + 30 * day),
       activationExpiresAt: new Date(now.getTime() + 7 * day),
@@ -66,10 +68,24 @@ describe('createStaffMember', () => {
       impersonationId: null,
       targetAccountId: 'id-1',
       correlationId: 'id-3',
-      metadata: { role: 'trainer', branchIds: ['centro'] },
+      metadata: { role: 'trainer', gender: 'female', branchIds: ['centro'] },
       occurredAt: now,
     });
     expect(created).toMatchObject({ id: 'id-2', status: 'pending' });
+  });
+
+  it('creates a male Coordinator so his Role reads «Coordinador» (FIX-081)', async () => {
+    const transaction = createTransaction();
+
+    await createStaffMember(
+      { ...command, role: 'coordinator', gender: 'male' },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.createPendingStaffMember).toHaveBeenCalledWith(
+      expect.objectContaining({ role: 'coordinator', gender: 'male' }),
+    );
   });
 
   it('creates an Administrator without Branch rows', async () => {

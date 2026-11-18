@@ -7,6 +7,7 @@
 import type { AdminFeedbackDtoApp } from "./adminFeedbackDtoApp";
 import type { AdminFeedbackDtoPlatform } from "./adminFeedbackDtoPlatform";
 import type { AdminFeedbackDtoRole } from "./adminFeedbackDtoRole";
+import type { AdminFeedbackDtoSenderGender } from "./adminFeedbackDtoSenderGender";
 import type { AdminFeedbackDtoStatus } from "./adminFeedbackDtoStatus";
 import type { AdminFeedbackDtoType } from "./adminFeedbackDtoType";
 
@@ -36,6 +37,11 @@ export interface AdminFeedbackDto {
    * @nullable
    */
   senderClientId: string | null;
+  /**
+   * How a Staff sender’s Role reads (FIX-081); null for a Client
+   * @nullable
+   */
+  senderGender: AdminFeedbackDtoSenderGender;
   createdAt: string;
   /** @nullable */
   triagedAt: string | null;
