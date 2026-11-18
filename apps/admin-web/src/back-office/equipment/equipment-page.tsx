@@ -151,7 +151,6 @@ function BranchEquipment({ branch }: { branch: Branch }) {
           <AddUnitForm
             branchId={branch.id}
             type={panel.holding.type}
-            numbers={panel.holding.units.map((piece) => piece.number)}
             onDone={done}
           />
         ) : panel.mode === "edit" ? (

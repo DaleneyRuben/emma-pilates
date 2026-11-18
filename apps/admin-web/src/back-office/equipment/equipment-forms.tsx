@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useId, useState, type FormEvent } from "react";
 import {
   SidePanelBody,
@@ -9,7 +10,10 @@ import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { backOfficeProblem } from "../back-office-problems";
 import { firstFreeNumber, unitName } from "./equipment-format";
-import { useEquipmentChange } from "./equipment-queries";
+import {
+  branchEquipmentQueryOptions,
+  useEquipmentChange,
+} from "./equipment-queries";
 
 export const fieldError = "text-ayuda text-error-texto";
 
@@ -23,19 +27,22 @@ export function Failure({ message }: { message: string | null }) {
 
 // AW37 «Agregar» (follow-up 270): the type's first free number filled in,
 // a number its units already use warned while typing, and the server's
-// refusal kept for a number taken meanwhile.
+// refusal kept for a number taken meanwhile, whose refresh then names the
+// unit that took it.
 export function AddUnitForm({
   branchId,
   type,
-  numbers,
   onDone,
 }: {
   branchId: string;
   type: { id: string; name: string };
-  numbers: readonly number[];
   onDone: (notice: string) => void;
 }) {
   const change = useEquipmentChange(branchId);
+  const units = useQuery(branchEquipmentQueryOptions(branchId));
+  const numbers = (units.data ?? [])
+    .filter((piece) => piece.typeId === type.id)
+    .map((piece) => piece.number);
   const numberId = useId();
   const free = firstFreeNumber(numbers);
   const [number, setNumber] = useState(String(free));
@@ -49,7 +56,7 @@ export function AddUnitForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (parsed === null || taken) return;
+    if (parsed === null || invalid) return;
     setFailure(null);
     try {
       await change.mutateAsync({
@@ -115,7 +122,7 @@ export function AddUnitForm({
           type="submit"
           size="lg"
           busy={change.isPending}
-          disabled={parsed === null || taken}
+          disabled={parsed === null || invalid}
         >
           Agregar
         </Button>
