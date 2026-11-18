@@ -10753,8 +10753,8 @@ C. **Compact cards at 420 px.** **Comentarios**: each card is the comment in
    bold, «Valeria Prueba · Otro · 17/11/2026 · 17:24» under it, and on the
    right «• Nuevo» (a dot and the word) or a plain grey «Revisado». The
    same for **Clientas** (name, «8 clases · 7 de 8 + 1 · 04/12/2026»,
-   «Activo»), **Pagos**, **Personal**, **Congelamientos** (with Aprobar and
-   Rechazar under the card), **Caja**, **Gastos**, **Movimientos**, **Sueldos
+   «Activo»), **Pagos**, **Personal**, **Congelamientos** (the decision, or
+   «Decidido por …», under the card), **Caja**, **Gastos**, **Movimientos**, **Sueldos
    pagados**, **Planes**, **Tipos de clase**, **Sucursales**, **Evaluaciones**
    and **Referidos**. No card shows uppercase column labels. At 1440 px the
    tables are unchanged.
