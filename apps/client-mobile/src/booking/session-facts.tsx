@@ -134,7 +134,7 @@ export function SessionFacts({
   return (
     <View>
       <SectionTitle>La clase</SectionTitle>
-      <IconRowGroup testID="session-facts">
+      <IconRowGroup plain testID="session-facts">
         <TrainerRow
           gender={detail.trainerGender}
           name={detail.trainerName}

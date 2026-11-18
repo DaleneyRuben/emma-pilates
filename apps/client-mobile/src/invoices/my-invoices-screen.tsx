@@ -39,8 +39,9 @@ function InvoiceRow({ invoice, onPress }: { invoice: ClientInvoiceDto; onPress: 
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
-      <View style={styles.disc}>
-        <Glyph name="receipt" size={18} strokeWidth={1.5} />
+      {/* FIX-082: the glyph alone, no tinted disc. */}
+      <View testID="invoice-row-glyph">
+        <Glyph color={colors.textMuted} name="receipt" size={18} strokeWidth={1.5} />
       </View>
       <View style={styles.text}>
         <Text style={styles.title}>{invoice.purchaseLabel}</Text>
@@ -84,12 +85,13 @@ export function MyInvoicesScreen() {
       {items.length === 0 ? (
         <EmptyState
           icon="receipt"
+          plainIcon
           message="Cuando pidas factura al pagar, el estudio la sube aquí y te avisamos."
           title="Aún no tienes facturas"
         />
       ) : (
         <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-          <IconRowGroup>
+          <IconRowGroup plain>
             {items.map((invoice) => (
               <InvoiceRow
                 invoice={invoice}
@@ -112,14 +114,6 @@ export function MyInvoicesScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xl, paddingTop: spacing.md },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
   muted: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
