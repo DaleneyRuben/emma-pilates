@@ -149,7 +149,10 @@ describe("Client overview cash action", () => {
         }),
     });
 
-    await waitFor(() => expect(screen.getByText("2 clases disponibles")).toBeOnTheScreen());
+    await waitFor(() =>
+      expect(screen.getByText("0 del plan + 2 extra · vence el 12 de octubre")).toBeOnTheScreen(),
+    );
+    expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
   });
 
