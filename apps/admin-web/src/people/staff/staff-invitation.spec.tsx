@@ -214,7 +214,7 @@ describe("AW24 Nuevo miembro with a known email", () => {
 
     expect(
       await screen.findByText(
-        "Valentina Soria ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol y sus sucursales no cambiaron.",
+        "Valentina Soria ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol, su género y sus sucursales no cambiaron.",
       ),
     ).toBeVisible();
   });

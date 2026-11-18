@@ -68,7 +68,7 @@ describe('createStaffMember', () => {
       impersonationId: null,
       targetAccountId: 'id-1',
       correlationId: 'id-3',
-      metadata: { role: 'trainer', branchIds: ['centro'] },
+      metadata: { role: 'trainer', gender: 'female', branchIds: ['centro'] },
       occurredAt: now,
     });
     expect(created).toMatchObject({ id: 'id-2', status: 'pending' });
