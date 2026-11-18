@@ -151,8 +151,20 @@ export const createStudioOperations = (deps: {
           kpis: (input, principal) => operations.kpis(input, principal, prisma),
           recommendations: (input, principal) =>
             operations.list(input, principal, prisma),
-          recomputeRecommendations: (input, principal) =>
-            operations.recomputeRecommendations(input, principal, prisma),
+          // «Recalcular» (walkthrough finding 107) refreshes the facts first,
+          // so the findings read today's Bookings, not last night's.
+          recomputeRecommendations: async (input, principal) => {
+            requireStudioAdministrator(principal);
+            await recomputeStudioFacts(prisma, {
+              month: monthDate(input.month),
+              now: () => new Date(),
+            });
+            return operations.recomputeRecommendations(
+              input,
+              principal,
+              prisma,
+            );
+          },
           dismissRecommendation: (input, principal) =>
             operations.dismiss(input, principal, prisma),
           narrative: (input, principal) =>
@@ -167,7 +179,8 @@ export const createStudioOperations = (deps: {
 export class StudioModule {}
 
 // The worker's daily run: the current month, and the previous one until it
-// is final (recompute-months.ts).
+// is final (recompute-months.ts). Each month's recommendations follow its
+// facts, so Informes never waits for a recompute by hand (finding 107).
 export const recomputeCurrentStudioMonth = async (
   prisma: PrismaClient,
   now: Date = new Date(),
@@ -184,6 +197,7 @@ export const recomputeCurrentStudioMonth = async (
       });
       total.sessions += result.sessions;
       total.clientMonths += result.clientMonths;
+      await recomputeRecommendations(prisma, { month, today: now });
     } catch (error) {
       failure ??= error instanceof Error ? error : new Error(String(error));
     }
