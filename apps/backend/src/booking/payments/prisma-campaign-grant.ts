@@ -101,11 +101,21 @@ const findWithoutPlan = async (
 const findPastCampaigns = async (
   prisma: PrismaClient,
 ): Promise<PastCampaign[]> => {
+  // A Plan that later collects an owed class records another campaign
+  // adjustment; that is not a grant, so its day must not count.
+  const collected = await prisma.owedCampaignClass.findMany({
+    where: { allowanceAdjustmentId: { not: null } },
+    select: { allowanceAdjustmentId: true },
+  });
+  const collectedIds = collected.flatMap(({ allowanceAdjustmentId }) =>
+    allowanceAdjustmentId === null ? [] : [allowanceAdjustmentId],
+  );
   const [granted, owed] = await Promise.all([
     prisma.auditRecord.findMany({
       where: {
         actionCode: 'allowance_adjustment.recorded',
         metadata: { path: ['reason'], equals: 'campaign' },
+        targetId: { notIn: collectedIds },
       },
       distinct: ['correlationId'],
       select: { metadata: true, occurredAt: true },
