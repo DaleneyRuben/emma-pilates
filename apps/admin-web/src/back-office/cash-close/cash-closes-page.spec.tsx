@@ -277,7 +277,7 @@ describe("AW151 Cierres de caja on a narrow browser", () => {
     const short = await rowOf("vie 23/10");
     const card = compactCard(short);
     expect(card).toMatchObject({ compact: true, labels: 0 });
-    expect(card.detail).toContain("Bs 510,00");
-    expect(card.detail).toContain("−Bs 10,00");
+    expect(card.detail).toContain("Contado Bs 510,00");
+    expect(card.detail).toContain("Diferencia −Bs 10,00");
   });
 });
