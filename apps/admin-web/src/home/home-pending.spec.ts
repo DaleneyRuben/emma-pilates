@@ -11,7 +11,7 @@ const none = {
 
 // P01: «Por resolver», each row with the tab that settles it.
 describe("the Inicio pending list", () => {
-  it("names each waiting thing in the board's order with its tab", () => {
+  it("names each waiting thing, the pay to approve first, with its tab", () => {
     expect(
       pendingRows(
         {
@@ -25,6 +25,7 @@ describe("the Inicio pending list", () => {
         { branchName: "Centro", monthLabel: "noviembre de 2026" },
       ).map((row) => [row.title, row.note, row.to]),
     ).toEqual([
+      ["3 sueldos por aprobar", "noviembre de 2026", "/dinero/sueldos"],
       ["1 pago por revisar", "Transferencias y QR", "/dinero/pagos"],
       [
         "1 congelamiento por decidir",
@@ -38,7 +39,6 @@ describe("the Inicio pending list", () => {
       ],
       ["2 comentarios nuevos", "Desde las apps", "/comentarios"],
       ["1 insumo con stock bajo", "Sucursal Centro", "/estudio/insumos"],
-      ["3 sueldos por aprobar", "noviembre de 2026", "/dinero/sueldos"],
     ]);
   });
 

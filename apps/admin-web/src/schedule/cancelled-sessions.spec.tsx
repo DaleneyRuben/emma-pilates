@@ -73,17 +73,19 @@ describe("FIX-042 cancelled classes stay in the Horario", () => {
       name: "Mat Pilates, 16:00, Daniela Ortiz, Cancelada · mínimo no alcanzado",
     });
     expect(asked?.get("includeCancelled")).toBe("true");
-    expect(minimum).toHaveTextContent("Cancelada · mínimo");
+    // FIX-084 (Horario A): a faint dashed outline that reads «cancelada · mínimo».
+    expect(minimum).toHaveTextContent("cancelada · mínimo");
+    expect(minimum).toHaveClass("border-dashed");
     expect(
       screen.getByRole("button", {
         name: "Reformer Pilates, 18:30, Valeria Peña, Cancelada por el estudio",
       }),
-    ).toHaveTextContent("Cancelada · estudio");
+    ).toHaveTextContent("cancelada · estudio");
     expect(
       screen.getByRole("button", {
         name: "Reformer Pilates, 10:00, Valeria Peña, Serie en pausa",
       }),
-    ).toHaveTextContent("Serie en pausa");
+    ).toHaveTextContent("serie en pausa");
   });
 
   it("opens a class the minimum check cancelled read-only, with when and how many it had", async () => {

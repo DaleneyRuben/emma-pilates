@@ -8,14 +8,15 @@ type Cause = SessionCancellationSummaryDto["cause"];
 
 // FIX-042 (follow-ups 243–245, decisiones §20.24): a cancelled class stays
 // in the Horario, muted, saying why. The block is narrow, so it carries a
-// short form; the panel and screen readers get the whole cause.
+// short form; the panel and screen readers get the whole cause. FIX-084
+// (Horario A): the short form reads as a quiet note, «cancelada · mínimo».
 const causes: Record<Cause, { label: string; short: string }> = {
   minimum_not_met: {
     label: "Cancelada · mínimo no alcanzado",
-    short: "Cancelada · mínimo",
+    short: "cancelada · mínimo",
   },
-  studio: { label: "Cancelada por el estudio", short: "Cancelada · estudio" },
-  schedule_paused: { label: "Serie en pausa", short: "Serie en pausa" },
+  studio: { label: "Cancelada por el estudio", short: "cancelada · estudio" },
+  schedule_paused: { label: "Serie en pausa", short: "serie en pausa" },
 };
 
 export const cancellationOf = (
