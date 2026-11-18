@@ -42,7 +42,7 @@ const movementAction = (
 });
 
 const rowLink =
-  "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
+  "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco disabled:text-deshabilitado-texto";
 
 const supplyColumns =
   (branchId: string, managesCatalog: boolean) =>
@@ -90,6 +90,10 @@ const supplyColumns =
               key={kind}
               type="button"
               aria-label={`${kind === "withdrawal" ? "Registrar retiro" : "Registrar reposición"} de ${row.original.name}`}
+              // Nothing to withdraw from an empty Supply.
+              disabled={
+                kind === "withdrawal" && row.original.quantityOnHand <= 0
+              }
               className={rowLink}
               onClick={(event) => {
                 event.stopPropagation();
