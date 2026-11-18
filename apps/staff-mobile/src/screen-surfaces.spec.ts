@@ -26,6 +26,8 @@ describe("screen surfaces", () => {
     const onOtherSurfaces = [
       "assistant/front-desk-receipt-card.tsx",
       "assistant/invitation-menu.tsx",
+      // Finding 113: the reasons inset in S28's sheet and the WhatsApp ring on a Lino row.
+      "coordinator/contact-list-parts.tsx",
       "trainer/trainer-roster-screen.tsx",
     ];
     const offenders = sourceFiles(__dirname)
