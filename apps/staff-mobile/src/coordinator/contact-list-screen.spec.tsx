@@ -1,10 +1,10 @@
 import type { ContactAlertItemDto } from "@pilates/api-contracts";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Linking } from "react-native";
 
 import App from "../../App";
-import { assistantRoutes } from "../assistant/assistant-fixtures";
+import { assistantRoutes, overview } from "../assistant/assistant-fixtures";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
@@ -66,28 +66,89 @@ describe("S28 Para contactar", () => {
     clearMobileQueryCache();
   });
 
-  it("lists clientas with reasons, WhatsApp, and no money", async () => {
+  // Walkthrough finding 113 (proposal A): one quiet list, no reason chips.
+  it("lists clientas as quiet rows, most reasons first, and no money", async () => {
     const { screen } = await openContactList();
 
-    expect(screen.getByText("Valeria Quiroga")).toBeOnTheScreen();
-    expect(screen.getByText("🇧🇴 +591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
-    expect(screen.getAllByText("7 días sin reservar").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Abrir WhatsApp" })).toBeOnTheScreen();
+    expect(screen.getByText("2 clientas")).toBeOnTheScreen();
+    const rows = screen.getAllByTestId(/^contact-row-/);
+    expect(rows.map((row) => row.props.testID)).toEqual([
+      "contact-row-client-daniela",
+      "contact-row-client-valeria",
+    ]);
 
     expect(screen.getByText("Daniela Rojas")).toBeOnTheScreen();
-    expect(screen.getByText(/^Sin teléfono · empezó el /)).toBeOnTheScreen();
-    expect(screen.getByText("Menos de 2 clases a los 15 días")).toBeOnTheScreen();
-    expect(screen.getAllByRole("button", { name: "Abrir WhatsApp" })).toHaveLength(1);
+    expect(
+      screen.getByText("7 días sin reservar · menos de 2 clases a los 15 días"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Sin teléfono · empezó el 5 de octubre")).toBeOnTheScreen();
+
+    expect(screen.getByText("Valeria Quiroga")).toBeOnTheScreen();
+    expect(screen.getByText("Empezó el 2 de octubre")).toBeOnTheScreen();
+    expect(screen.queryByText("Menos de 2 clases a los 15 días")).toBeNull();
+
+    expect(
+      screen.getAllByRole("button", { name: "Abrir WhatsApp a Valeria Quiroga" }),
+    ).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: /Abrir WhatsApp a Daniela/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Marcar contactada" })).toBeNull();
     expect(screen.queryByText(/Bs/)).toBeNull();
   });
 
-  it("opens WhatsApp with the Client's number", async () => {
+  it("opens WhatsApp with the Client's number straight from her row", async () => {
     const { screen } = await openContactList();
-    await fireEvent.press(screen.getByRole("button", { name: "Abrir WhatsApp" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Abrir WhatsApp a Valeria Quiroga" }));
     expect(Linking.openURL).toHaveBeenCalledWith("https://wa.me/59170011005");
   });
 
-  it("marks a Client contacted and removes her card", async () => {
+  it("opens her detail sheet with the reasons and «Escribir por WhatsApp»", async () => {
+    const { screen } = await openContactList();
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Por qué está aquí")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("🇧🇴 +591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Escribir por WhatsApp" }));
+    expect(Linking.openURL).toHaveBeenCalledWith("https://wa.me/59170011005");
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.queryByText("Por qué está aquí")).toBeNull();
+    });
+  });
+
+  it("explains a missing phone and opens her file instead", async () => {
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "/api/v1/assistant/clients/client-daniela": () =>
+          jsonResponse({
+            ...overview,
+            client: { ...overview.client, id: "client-daniela", name: "Daniela Rojas" },
+          }),
+      }),
+    );
+    await fireEvent.press(screen.getByTestId("contact-row-client-daniela"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "No tiene teléfono registrado, así que no se puede abrir WhatsApp. Háblale en el estudio o revisa su ficha.",
+        ),
+      ).toBeOnTheScreen();
+    });
+    expect(screen.queryByRole("button", { name: "Escribir por WhatsApp" })).toBeNull();
+    const sheet = within(screen.getByTestId("contact-sheet"));
+    expect(sheet.getByText("7 días sin reservar")).toBeOnTheScreen();
+    expect(sheet.getByText("Menos de 2 clases a los 15 días")).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Abrir su ficha" }));
+    await waitFor(() => {
+      expect(screen.getByRole("header", { name: "Daniela Rojas" })).toBeOnTheScreen();
+    });
+  });
+
+  it("marks a Client contacted from her sheet and removes her row", async () => {
     let items = [valeria, daniela];
     const { screen } = await openContactList(
       coordinatorRoutes({
@@ -99,15 +160,84 @@ describe("S28 Para contactar", () => {
       }),
     );
 
-    await fireEvent.press(screen.getAllByRole("button", { name: "Marcar contactada" })[0]!);
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
     // v2 S28: the brand toast that stays until closed, with her first name.
     await waitFor(() => {
       expect(screen.getByText("Valeria, contactada")).toBeOnTheScreen();
     });
     expect(screen.getByText("Sale de la lista y queda registrado a tu nombre")).toBeOnTheScreen();
+    expect(screen.queryByText("Por qué está aquí")).toBeNull();
     await waitFor(() => {
       expect(screen.queryByText("Valeria Quiroga")).toBeNull();
     });
+    expect(screen.getByText("1 clienta")).toBeOnTheScreen();
+  });
+
+  it("keeps the sheet open and says so when marking fails", async () => {
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "POST /api/v1/administrator/contact-alerts/client-valeria/contacted": () =>
+          jsonResponse({ message: "boom" }, 500),
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
+    await waitFor(() => {
+      expect(
+        screen.getByText("No pudimos marcar a Valeria Quiroga. Inténtalo de nuevo."),
+      ).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Por qué está aquí")).toBeOnTheScreen();
+  });
+
+  // Review of finding 113: nothing else in the sheet reacts while she is marked.
+  it("locks the sheet while «Marcar contactada» is in flight", async () => {
+    let release: (response: Response) => void = () => undefined;
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "POST /api/v1/administrator/contact-alerts/client-valeria/contacted": () =>
+          new Promise<Response>((resolve) => {
+            release = resolve;
+          }) as unknown as Response,
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Volver" })).toBeDisabled();
+    });
+    expect(screen.getByRole("button", { name: "Escribir por WhatsApp" })).toBeDisabled();
+
+    release(new Response(null, { status: 204 }));
+    await waitFor(() => {
+      expect(screen.getByText("Valeria, contactada")).toBeOnTheScreen();
+    });
+  });
+
+  it("refreshes after a refusal and closes the sheet of a Client who left the list", async () => {
+    let items = [valeria, daniela];
+    const { screen } = await openContactList(
+      coordinatorRoutes({
+        "/api/v1/administrator/contact-alerts": () => list(items),
+        "POST /api/v1/administrator/contact-alerts/client-valeria/contacted": () => {
+          // She booked in the meantime, so the alert is gone.
+          items = [daniela];
+          return jsonResponse({ code: "not_found", status: 404 }, 404);
+        },
+      }),
+    );
+
+    await fireEvent.press(screen.getByTestId("contact-row-client-valeria"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Marcar contactada" }));
+    await waitFor(() => {
+      expect(screen.queryByText("Valeria Quiroga")).toBeNull();
+    });
+    expect(screen.queryByText("Por qué está aquí")).toBeNull();
+    expect(screen.queryByText("Valeria, contactada")).toBeNull();
+    expect(screen.getByText("1 clienta")).toBeOnTheScreen();
   });
 
   it("shows the empty state", async () => {
