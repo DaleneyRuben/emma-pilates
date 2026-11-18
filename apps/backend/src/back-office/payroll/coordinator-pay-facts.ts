@@ -61,6 +61,8 @@ export const coordinatorMonthFacts = async (
         durationDays: first.durationDays,
         classAllowance: first.classAllowance,
         broughtByTrainer: broughtByTrainer.has(first.clientId),
+        clientName: first.clientName,
+        planName: first.planName,
       })),
     renewalRatePercent: renewalRateOf(renewals),
     renewalTargetPercent: renewalTargetPercent(

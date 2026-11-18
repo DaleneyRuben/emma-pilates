@@ -1,10 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import {
-  addCivilDays,
-  boliviaDate,
-  boliviaInstant,
-} from '../../time/bolivia-time';
+import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
 import {
   BackOfficeError,
   requireAdministrator,
@@ -12,40 +8,32 @@ import {
   type BackOfficeActor,
 } from '../back-office-errors';
 import { recordBackOfficeAudit } from '../prisma-audit';
-import { coordinatorPay } from './coordinator-pay';
+import { coordinatorPay, type CoordinatorNewClient } from './coordinator-pay';
 import { isWholeMonth, monthPeriod, type PayPeriod } from './pay-period';
 import {
   replaceDraft,
   withdrawStaleDrafts,
   type DraftMode,
 } from './pay-statement-drafts';
-import { statementSelect, toView, type DraftLine } from './pay-statement-rows';
+import {
+  approvableOn,
+  statementSelect,
+  toView,
+  type DraftLine,
+} from './pay-statement-rows';
 import { trainerPay } from './trainer-pay';
 import type { TrainerMonthFacts } from './trainer-pay-facts';
 export type CoordinatorMonthFacts = {
   staffMemberIds: string[];
-  newClients: {
-    durationDays: number;
-    classAllowance: number;
-    broughtByTrainer: boolean;
-  }[];
+  newClients: CoordinatorNewClient[];
   renewalRatePercent: number | null;
   renewalTargetPercent: number;
 };
 
-// A period's pay is approved once it is over in Bolivia. The Coordinator's
-// renewal bonus counts purchases up to 7 days after the month's last Plans
-// end, so hers waits those 7 days too.
 const approvableFrom = (statement: {
   periodEnd: Date;
   staffMember: { role: string };
-}): Date =>
-  boliviaInstant(
-    statement.staffMember.role === 'COORDINATOR'
-      ? addCivilDays(statement.periodEnd, 7)
-      : statement.periodEnd,
-    0,
-  );
+}): Date => boliviaInstant(approvableOn(statement), 0);
 
 const windowOf = (query: { month: Date } | PayPeriod): PayPeriod =>
   'month' in query ? monthPeriod(query.month) : query;

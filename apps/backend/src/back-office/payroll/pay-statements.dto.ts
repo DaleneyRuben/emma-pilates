@@ -38,6 +38,12 @@ export class PayStatementDto {
     description: 'BKO-009: the day after the last day paid (exclusive)',
   })
   periodEnd!: string;
+  @ApiProperty({
+    format: 'date',
+    description:
+      'Finding 105: the first Bolivia day the statement can be approved (a Trainer the day after the period, the Coordinator seven days later)',
+  })
+  approvableOn!: string;
   @ApiProperty({ enum: ['draft', 'approved'] })
   state!: 'draft' | 'approved';
   @ApiProperty({ description: 'BOB centavos' }) totalCentavos!: number;

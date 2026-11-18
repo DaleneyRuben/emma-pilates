@@ -1,0 +1,80 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-18T16:00:00Z"
+ },
+ "title": "Propuestas Sueldos",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 105 · Rediseño de Sueldos (léeme)"
+  },
+  "Selector.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 1100,
+   "title": "A · Resumen que se despliega · 1440 (recomendada)",
+   "is_interactive": true
+  },
+  "OpcionA420.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 420,
+   "h": 1100,
+   "title": "A · Resumen que se despliega · 420",
+   "is_interactive": true
+  },
+  "OpcionB.dc.html": {
+   "x": 0,
+   "y": 2240,
+   "w": 1440,
+   "h": 1100,
+   "title": "B · Lista y panel de revisión · 1440",
+   "is_interactive": true
+  },
+  "OpcionB420.dc.html": {
+   "x": 1520,
+   "y": 2240,
+   "w": 420,
+   "h": 1100,
+   "title": "B · Lista y panel de revisión · 420",
+   "is_interactive": true
+  },
+  "OpcionC.dc.html": {
+   "x": 0,
+   "y": 3460,
+   "w": 1440,
+   "h": 1100,
+   "title": "C · Tarjetas y revisión antes de aprobar · 1440",
+   "is_interactive": true
+  },
+  "OpcionC420.dc.html": {
+   "x": 1520,
+   "y": 3460,
+   "w": 420,
+   "h": 1100,
+   "title": "C · Tarjetas y revisión antes de aprobar · 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Selector.dc.html",
+  "OpcionA420.dc.html",
+  "OpcionB.dc.html",
+  "OpcionB420.dc.html",
+  "OpcionC.dc.html",
+  "OpcionC420.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}

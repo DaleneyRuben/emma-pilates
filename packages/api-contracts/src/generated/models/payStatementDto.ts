@@ -17,6 +17,8 @@ export interface PayStatementDto {
   periodStart: string;
   /** BKO-009: the day after the last day paid (exclusive) */
   periodEnd: string;
+  /** Finding 105: the first Bolivia day the statement can be approved (a Trainer the day after the period, the Coordinator seven days later) */
+  approvableOn: string;
   state: PayStatementDtoState;
   /** BOB centavos */
   totalCentavos: number;
