@@ -10,6 +10,13 @@ import type { EquipmentDtoStatus } from "./equipmentDtoStatus";
 export interface EquipmentDto {
   id: string;
   branchId: string;
+  typeId: string;
+  typeName: string;
+  /**
+   * Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName
+   * @deprecated
+   * @nullable
+   */
   kind: EquipmentDtoKind;
   /**
    * @minimum 1
