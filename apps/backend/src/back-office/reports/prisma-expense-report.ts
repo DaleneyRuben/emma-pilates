@@ -27,6 +27,7 @@ export const createPrismaExpenseReport = (
       prisma.expense.findMany({
         where: {
           incurredOn: dates,
+          voidedAt: null,
           ...(query.branchId === undefined ? {} : { branchId: query.branchId }),
         },
         select: {
