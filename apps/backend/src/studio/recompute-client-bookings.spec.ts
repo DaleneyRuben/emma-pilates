@@ -86,4 +86,23 @@ describe('a client month counts the bookings the studio cancelled', () => {
 
     expect(row?.classesBooked).toBe(0);
   });
+
+  it('leaves out a booking released in another month', () => {
+    const row = monthOf([
+      session('s1', {
+        startsAt: new Date('2026-10-28T20:00:00.000Z'),
+        endsAt: new Date('2026-10-28T20:50:00.000Z'),
+        bookings: [
+          {
+            clientId: lucia,
+            state: 'cancelled',
+            outcome: null,
+            cancelledWithSession: true,
+          },
+        ],
+      }),
+    ]);
+
+    expect(row?.classesBooked).toBe(0);
+  });
 });

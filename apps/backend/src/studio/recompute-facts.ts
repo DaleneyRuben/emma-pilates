@@ -52,6 +52,8 @@ export type ClientMonthFact = {
   clientId: string;
   month: Date;
   planDays: number;
+  // Live Bookings plus those the studio released by cancelling the class
+  // (finding 108); the inactive-client rule is its only reader.
   classesBooked: number;
   classesAttended: number;
   renewed: boolean;
