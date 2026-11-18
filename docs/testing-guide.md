@@ -7808,19 +7808,20 @@ and cannot list the statements. Log in as Test 24 describes.
 
 1. **Calculate the month.** In the admin web open **Dinero › Sueldos ›
    Por aprobar**. The picker opens on **Mes**; its stepper cannot go past
-   the current month. Press **Calcular**. Each Trainer with a line appears
-   as a card: her name, the period («Octubre de 2026») and «Borrador», the
-   total (`Bs 322,00`, never centavos), and a table of Concepto, Detalle,
-   and Monto. Día, Semana, and Rango are Test 127.
-2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
-   Nómina gains one Salary Payment for that total. Pressing again, or
-   calculating the month again, does not add a second payment.
+   the current month. Press **Volver a calcular**. Each Trainer with a line
+   appears as a card: her name, the period («Octubre de 2026») and
+   «Borrador», the total (`Bs 322,00`, never centavos), and one row per
+   concept with its subtotal (Test 164 has the layout). Día, Semana, and
+   Rango are Test 127.
+2. **Approve once.** Press **Aprobar pago** on one card and confirm. It
+   reads «Aprobado» and Nómina gains one Salary Payment for that total.
+   Calculating the month again does not add a second payment.
 3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
    Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
    minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
    if she buys again.
-4. **Narrow browser.** At 420 px the cards stack and the line table becomes
-   labelled cards. The sidebar opens from **Abrir menú**.
+4. **Narrow browser.** At 420 px the cards stack and each concept keeps its
+   rate under its name. The sidebar opens from **Abrir menú**.
 5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
    only Emma's statements. As Daniela it does not include Emma's. As Camila
    it answers `403` `back_office_access_denied`, and so does approval.
@@ -7834,7 +7835,9 @@ and cannot list the statements. Log in as Test 24 describes.
    total with centavos (`Bs 322,00`), and one row per concept: «Clases
    dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
    says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
-   clase** lists each line («Clase», «6 alumnas, 2 extra», `Bs 81,00`);
+   clase** lists each line («Clase», «lun 5 oct · 10:00 · Centro · Reformer
+   Pilates · 6 alumnas, 2 extra», `Bs 81,00`; a statement approved before
+   FIX-070 keeps «6 alumnas, 2 extra»);
    **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
    Payment of hers from Nómina shows its amount and date («1 de octubre de
    2026»). A payment with a receipt (Test 28 step 7) shows its thumbnail
@@ -7877,9 +7880,9 @@ it. Carolina, the Coordinator, does not, not even her own. Log in as Test
    «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
    Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
    pago calculado.» There is no Calcular mes: the worker drafts it.
-2. **Approve once.** Press **Aprobar**. The card reads «Aprobado» and
-   Nómina gains one Salary Payment for that total. Pressing again does not
-   add a second payment.
+2. **Approve once.** Press **Aprobar pago** (from the 8th of the next
+   month) and confirm. The card reads «Aprobado» and Nómina gains one Salary
+   Payment for that total. It is not offered again.
 3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
    60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
    Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
@@ -8673,20 +8676,21 @@ the database itself, since approving creates Salary Payments. Log in as Paola
    **Semana** reads «Semana del 2 – 8 de noviembre de 2026» and steps a
    week. **Rango** shows **Desde** and **Hasta** as `dd/mm/aaaa`, both days
    included; a Hasta before Desde says «La fecha final no puede ser anterior
-   a la inicial.» and disables **Calcular**. Reloading keeps the period.
+   a la inicial.» and disables **Volver a calcular**. Reloading keeps the period.
 2. **A day.** On **Día**, pick a past day Emma taught and press
-   **Calcular**. Her card names that day (`03/11/2026`) with only that day's
+   **Volver a calcular**. Her card names that day (`03/11/2026`) with only that day's
    classes. Carolina's card is not there: she shows only on **Mes**.
-3. **Approve the day.** Press **Aprobar** after the day is over in Bolivia
-   (before midnight it answers `409` `pay_statement_month_open`). Nómina
+3. **Approve the day.** Press **Aprobar pago** and confirm; it is offered
+   only once the day is over in Bolivia (the card says «Se aprueba desde el
+   …» until then, and the API answers `409` `pay_statement_month_open`). Nómina
    gains one Salary Payment.
 4. **The month leaves it alone.** Go to **Mes** for that month and press
-   **Calcular**. Emma's approved day is listed and no month draft for Emma
+   **Volver a calcular**. Emma's approved day is listed and no month draft for Emma
    appears; Daniela and the rest get their month. The hourly worker skips
    Emma for that month too. Pay her other days with **Rango**.
 5. **A draft is replaced.** For a month where Emma has only the worker's
    month draft, calculate one **Semana**: on **Mes** the month draft is gone
-   and the week draft shows. **Calcular** on **Mes** again turns it back
+   and the week draft shows. **Volver a calcular** on **Mes** again turns it back
    into one month draft.
 6. **The API.** `GET /api/v1/administrator/pay-statements?from=2026-11-03&until=2026-11-04`
    lists every statement that touches the day, each with `periodStart` and
@@ -9995,3 +9999,50 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
    work the same.
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
+
+## Test 164: Sueldos you can check before paying (FIX-070)
+
+Walkthrough finding 105: Dinero › Sueldos showed a full-width «Aprobar» that
+approved on one click, offered it in a month still open (409
+`pay_statement_month_open`), and listed 54 identical «Mínimo no alcanzado»
+rows. The owner chose design option A (follow-ups 273 and 274). No
+migration: each new line stores its own detail, and the statement gains
+`approvableOn` (additive).
+
+1. Use a copy of the database (surface-verification skill) and run the API
+   and the admin web on your own ports. Log in as Paola and open **Dinero ›
+   Sueldos** on the current month.
+2. **The month is open.** Expected: a card «Noviembre todavía no terminó:
+   cierra el 30. Desde el 1 de diciembre puedes aprobar a las instructoras,
+   y a la coordinadora siete días después…» with **Pagar por Rango** (not on
+   the 1st of a month). No card offers **Aprobar pago**; each says «Se
+   aprueba desde el 1 de diciembre» (a Trainer) or «… el 8 de diciembre»
+   (the Coordinator). `GET /api/v1/administrator/pay-statements` returns
+   `approvableOn` for each.
+3. **Pagar por Rango.** Expected: Rango from the 1st to yesterday; a Trainer
+   with work in it shows **Aprobar pago**; the Coordinator is not listed.
+4. **Concepts.** Each card lists, in this order and only when present,
+   «Clases dictadas», «Canceladas por mínimo», «Comisiones de primer plan»,
+   «Base», «Clientas nuevas», «Bono de renovación», each with its rate
+   («54 × Bs 25,00», «2 comisiones», «4 × Bs 50,00 · 1 × Bs 80,00») and
+   subtotal, then «Total». **Ver las 54** opens the lines in place, in a box
+   that scrolls: «lun 2 nov · 07:00 · Sopocachi · Reformer» for a class
+   cancelled for the minimum, «… · Reformer · 1 alumna» for a class (never
+   «1 alumnas»), «Lucía Mendoza · Paquete de 8 clases · 10 % de Bs 480» for a
+   commission, «Camila Rojas · Mensual 8 clases · 30 días» for a new Client
+   of the Coordinator. **Ocultar** folds it. Base and the bonus do not open.
+   A statement approved before FIX-070 shows its old lines
+   («Mínimo no alcanzado») grouped the same way.
+5. **Approve.** **Aprobar pago** (a small button by the total) opens
+   «¿Aprobar Bs 1.534,90 a Daniela Ortiz del 01/11/2026 al 17/11/2026?» with
+   the period, the number of lines and «Pago de sueldo con fecha de hoy».
+   **Volver** approves nothing; **Aprobar Bs 1.534,90** approves once and
+   says «Aprobamos Bs 1.534,90 a Daniela Ortiz. Quedó en Pagados; ahí puedes
+   subir el comprobante.» The card reads «Aprobado». If the API still
+   refuses with 409 the dialog explains it instead of «No pudimos aprobar
+   el pago.».
+6. **Volver a calcular.** It shows it is busy, then «Recalculamos noviembre
+   de 2026 a las hh:mm. Ningún sueldo cambió.» or «Cambió 1 sueldo: Paula
+   Vargas pasó de Bs 3.780,00 a Bs 3.830,00.».
+7. Check at 1440 px and 420 px (at 420 the rate sits under the concept and
+   the header wraps; nothing scrolls sideways), then drop the copy.
