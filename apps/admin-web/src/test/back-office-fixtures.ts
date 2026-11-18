@@ -91,12 +91,16 @@ export const withdrawalRow = (
   supply: AdminSupplyDto,
   quantity: number,
   recordedAt: string,
+  extra: Partial<WithdrawalDto> = {},
 ): WithdrawalDto => ({
   id: `6a000000-0000-5000-8000-0000000000${suffix}`,
+  kind: "withdrawal",
   supplyId: supply.id,
   supplyName: supply.name,
   quantity,
   recordedAt,
+  recordedByName: "Paola Mendoza",
+  ...extra,
 });
 
 export const withdrawalPage = (

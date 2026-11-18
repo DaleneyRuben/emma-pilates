@@ -72,12 +72,19 @@ export class SupplyMovementDto {
   quantityOnHand!: number;
 }
 
+export const supplyMovementKinds = ['withdrawal', 'restock'] as const;
+export const supplyMovementFilters = [...supplyMovementKinds, 'all'] as const;
+
+// One Withdrawal or, when the list asks for them, one Restock (finding 102).
 export class WithdrawalDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty({ enum: supplyMovementKinds }) kind!: 'withdrawal' | 'restock';
   @ApiProperty({ format: 'uuid' }) supplyId!: string;
   @ApiProperty() supplyName!: string;
   @ApiProperty() quantity!: number;
   @ApiProperty({ format: 'date-time' }) recordedAt!: Date;
+  @ApiProperty({ description: 'Who recorded the movement' })
+  recordedByName!: string;
 }
 
 export class WithdrawalTotalDto {
@@ -133,6 +140,7 @@ export const parseWithdrawalQuery = (value: unknown) =>
       branchId: uuid,
       month,
       supplyId: uuid.optional(),
+      kind: z.enum(supplyMovementFilters).optional(),
       ...paging,
     })
     .safeParse(value);

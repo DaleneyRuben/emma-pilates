@@ -30,22 +30,57 @@ import {
 } from "./supply-queries";
 import type { WithdrawalSearch } from "./supply-search";
 
+type MovementKind = WithdrawalDto["kind"];
+
+// Each filter's noun, singular and plural: the summary, the pager and the
+// empty state all name what the filter shows.
+const nouns: Record<MovementKind | "all", [string, string]> = {
+  all: ["movimiento", "movimientos"],
+  withdrawal: ["retiro", "retiros"],
+  restock: ["reposición", "reposiciones"],
+};
+const counted = (count: number, kind: MovementKind | "all") =>
+  nouns[kind][count === 1 ? 0 : 1];
+
+const kindLabels: Record<MovementKind, string> = {
+  withdrawal: "Retiro",
+  restock: "Reposición",
+};
+
+const kindOptions = [
+  { value: "all", label: "Todos" },
+  { value: "withdrawal", label: "Retiros" },
+  { value: "restock", label: "Reposiciones" },
+] as const;
+
 const columns = createColumnHelper<WithdrawalDto>();
 
-const withdrawalColumns = [
+const movementColumns = [
   columns.accessor("supplyName", {
     header: "Insumo",
     cell: ({ getValue }) => (
       <span className="font-medium text-texto">{getValue()}</span>
     ),
   }),
+  columns.accessor("kind", {
+    header: "Movimiento",
+    cell: ({ getValue }) => (
+      <span className="text-texto">{kindLabels[getValue()]}</span>
+    ),
+  }),
   columns.accessor("quantity", {
-    header: "Cantidad retirada",
+    header: "Cantidad",
     meta: { align: "right" },
     cell: ({ getValue }) => (
       <span className="text-texto tabular">
         {countFormat.format(getValue())}
       </span>
+    ),
+  }),
+  columns.accessor("recordedByName", {
+    header: "Registró",
+    cell: ({ getValue }) => (
+      <span className="text-texto-secundario">{getValue()}</span>
     ),
   }),
   columns.accessor("recordedAt", {
@@ -68,15 +103,22 @@ const supplyOptions = (supplies: AdminSupplyDto[]) => [
   })),
 ];
 
-const summary = (count: number, month: string, supplyName?: string) =>
-  `${countFormat.format(count)} ${count === 1 ? "retiro" : "retiros"}${
+const summary = (
+  count: number,
+  kind: MovementKind | "all",
+  month: string,
+  supplyName?: string,
+) =>
+  `${countFormat.format(count)} ${counted(count, kind)}${
     supplyName === undefined ? "" : ` de ${supplyName}`
   } en ${formatMonth(month)}.`;
 
-function EmptyHistory() {
+function EmptyHistory({ kind }: { kind: MovementKind | "all" }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">Sin retiros en este rango.</span>
+      <span className="text-texto-secundario">
+        Sin {nouns[kind][1]} en este rango.
+      </span>
       <span className="text-nota text-texto-tenue">
         Prueba con otro mes o con todos los insumos.
       </span>
@@ -95,6 +137,7 @@ function BranchWithdrawals({
 }) {
   const latest = boliviaMonth();
   const month = search.month ?? latest;
+  const kind = search.kind ?? "all";
   const query = useQuery(
     withdrawalHistoryQueryOptions(branch.id, month, search),
   );
@@ -117,7 +160,7 @@ function BranchWithdrawals({
         Volver a Insumos
       </Link>
       <PageHeader
-        title="Retiros e insumos consumidos"
+        title="Movimientos de insumos"
         subtitle={`Sucursal ${branch.name}`}
       />
       <div className="flex flex-wrap items-center gap-3">
@@ -137,27 +180,38 @@ function BranchWithdrawals({
             })
           }
         />
+        <ListFilter
+          label="Movimiento"
+          value={kind}
+          options={kindOptions}
+          onChange={(value) =>
+            onSearchChange({
+              kind: value === "all" ? undefined : value,
+              page: 1,
+            })
+          }
+        />
       </div>
       {query.isPending ? (
-        <LoadingNotice>Cargando retiros…</LoadingNotice>
+        <LoadingNotice>Cargando movimientos…</LoadingNotice>
       ) : query.isError ? (
         <QueryFailure
           error={query.error}
-          what="los retiros"
+          what="los movimientos"
           onRetry={() => void query.refetch()}
         />
       ) : (
         <>
           {query.data.totalItems === 0 ? null : (
             <p className="text-nota text-texto-secundario">
-              {summary(query.data.totalItems, month, supplyName)}
+              {summary(query.data.totalItems, kind, month, supplyName)}
             </p>
           )}
           <DataTable
-            columns={withdrawalColumns}
+            columns={movementColumns}
             rows={query.data.items}
             rowId={(row) => row.id}
-            emptyMessage={<EmptyHistory />}
+            emptyMessage={<EmptyHistory kind={kind} />}
             pagination={{
               page: search.page,
               pageSize: search.pageSize,
@@ -166,7 +220,7 @@ function BranchWithdrawals({
               rangeLabel: (window) =>
                 window.totalItems === 0
                   ? pageRangeLabel(window)
-                  : `${pageRangeLabel(window)} ${window.totalItems === 1 ? "retiro" : "retiros"}`,
+                  : `${pageRangeLabel(window)} ${counted(window.totalItems, kind)}`,
             }}
           />
           {query.data.totals.length === 0 ? null : (
@@ -191,8 +245,9 @@ function BranchWithdrawals({
 }
 
 // AW31: the monthly consumption record (back-office/CONTEXT.md, Withdrawal),
-// reached only from AW08's link (invariant 6). Nothing here is editable:
-// Withdrawals are immutable once logged.
+// reached only from AW08's link (invariant 6), with the Restocks beside the
+// Withdrawals and who recorded each (walkthrough finding 102). Nothing here
+// is editable: movements are immutable once logged.
 export function WithdrawalsPage({
   search,
   onSearchChange,
@@ -204,9 +259,9 @@ export function WithdrawalsPage({
   if (selectedBranch === undefined) {
     return (
       <NoBranchPage
-        title="Retiros e insumos consumidos"
+        title="Movimientos de insumos"
         pending={status === "pending"}
-        loadingMessage="Cargando retiros…"
+        loadingMessage="Cargando movimientos…"
         emptyMessage="Todavía no hay sucursales activas."
       />
     );

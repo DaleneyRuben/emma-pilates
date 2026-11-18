@@ -53,6 +53,7 @@ import {
   parseExpenseReportQuery,
   parseExpenseVoid,
   parseWithdrawalQuery,
+  supplyMovementFilters,
   WithdrawalPageDto,
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
@@ -87,6 +88,12 @@ export class AdministratorWithdrawalsController extends BackOfficeController {
   @ApiQuery({ name: 'branchId', required: true, schema: { format: 'uuid' } })
   @ApiQuery({ name: 'month', required: true, example: '2026-09' })
   @ApiQuery({ name: 'supplyId', required: false, schema: { format: 'uuid' } })
+  @ApiQuery({
+    name: 'kind',
+    required: false,
+    enum: supplyMovementFilters,
+    description: 'Withdrawals when absent',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiOkResponse({ type: WithdrawalPageDto })

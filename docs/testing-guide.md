@@ -102,7 +102,7 @@ can be found by its design name.
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
-| AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
+| AW08–AW10 Insumos, AW31 Movimientos de insumos (was Retiros e insumos consumidos) | 28, 72, 162 |
 | AW37 Equipos | 82 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112, 163 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114, 163 |
@@ -2694,7 +2694,7 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    **Sueldos** has a second row of views (**Por aprobar · Pagados**: every
    statement of the month, the Coordinator's included, then the payments
    made), Gastos has **Editar categorías** opening the categories in a
-   panel, and Estudio › **Insumos** has **Stock · Retiros del mes**.
+   panel, and Estudio › **Insumos** has **Stock · Movimientos**.
    The other destinations: Horario (Clases · Nutrición), Clientas (Todas ·
    Para contactar · Congelamientos), Promociones (Carrusel ·
    Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
@@ -3230,7 +3230,7 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    rail shows the same count on **Estudio** (and the Insumos tab), on every page;
    choosing another Branch in the top bar changes both. The header has
    **+ Nuevo insumo**, **Registrar retiro**, **Registrar reposición**, and the
-   **Ver historial de retiros** link, in that order.
+   **Ver historial de movimientos** link, in that order.
 2. **Nuevo insumo.** The side panel asks for **Nombre**, **Cantidad en stock**
    (typed only now), and **Umbral de alerta**; **Guardar** with empty fields
    marks each one. A name another active Supply of the Branch already has is
@@ -3239,8 +3239,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    «Registrar retiro» y «Registrar reposición»."); the name and threshold can
    change. **Archivar insumo** asks first ("¿Archivar este insumo?", with
    **Volver** and **Archivar**) and the
-   Supply leaves Insumos and Registrar retiro; its Withdrawals stay in the
-   history. There is no delete.
+   Supply leaves Insumos and Registrar retiro; its Withdrawals and Restocks
+   stay in the history. There is no delete.
 4. **Registrar retiro.** Choose an Insumo (each option shows its stock, "(6
    unid.)") and a quantity. More than the stock marks the field ("Solo hay 6
    unid. en stock.") and disables **Registrar**. After recording, the page
@@ -3251,15 +3251,19 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    for an over-recorded one with a Reposición.
 5. **Registrar reposición.** The same panel with **Cantidad repuesta** and no
    maximum; afterwards "Reposición registrada: ahora hay N unid. de …".
-6. **Retiros e insumos consumidos.** **Ver historial de retiros** (the only way
-   in) opens the Branch's Withdrawals for the current month, newest first,
-   with **Insumo**, **Cantidad retirada**, and the date and time; "N retiros
-   en septiembre de 2026." above them and the units per Supply under
-   **Consumo del mes**. The arrows move between months (not past the current
-   one) and **Insumo** filters by one Supply, archived ones included as
-   "(archivado)"; both stay in the address (`?month=2026-08&supplyId=…`). A
-   month without Withdrawals says "Sin retiros en este rango.". **Insumos**
-   stays highlighted in the sidebar and **Volver a Insumos** goes back.
+6. **Movimientos de insumos.** **Ver historial de movimientos** (the only
+   way in) opens the Branch's Withdrawals and Restocks for the current month,
+   newest first, with **Insumo**, **Movimiento** (Retiro or Reposición),
+   **Cantidad**, **Registró** (who recorded it), and the date and time; "N
+   movimientos en septiembre de 2026." above them and the units withdrawn
+   per Supply under **Consumo del mes** (Withdrawals only). The arrows move
+   between months (not past the current one), **Insumo** filters by one
+   Supply, archived ones included as "(archivado)", and **Movimiento** by
+   Todos, Retiros or Reposiciones; all three stay in the address
+   (`?month=2026-08&supplyId=…&kind=restock`). A month without movements
+   says "Sin movimientos en este rango." ("Sin retiros…", "Sin
+   reposiciones…" under those filters). **Insumos** stays highlighted in the
+   sidebar and **Volver a Insumos** goes back (Test 162).
 7. **Nómina.** Back Office → **Nómina** lists every Salary Payment of the
    studio (the Branch selector says the page is not filtered by Branch), with
    **Empleado**, **Monto**, and **Fecha**, and an **Empleado** filter.
@@ -6147,7 +6151,7 @@ and 420 px in a real browser (Test 23).
      Sucursales para armar su horario."; **Insumos**: "… para llevar sus
      insumos."; **Gastos**: "… para registrar sus gastos."; **Evaluaciones
      nutricionales**: "Todavía no hay sucursales activas. Las evaluaciones
-     se ven por sucursal."; **Retiros e insumos consumidos**: the bare
+     se ven por sucursal."; **Movimientos de insumos**: the bare
      line.
    - **Clientes**: "Todavía no hay clientas."; **Pagos**: "Todavía no hay
      transferencias." under **Todos**, "Todavía no hay pagos confirmados."
@@ -7070,7 +7074,7 @@ password, holding every Branch.
    «Quitar contacto» included. In **Comentarios** she filters, exports and
    triages. In **Estudio › Insumos** there is no «Nuevo insumo» and a row's
    name does not open it, but **Registrar retiro** and **Registrar
-   reposición** work and «Retiros del mes» lists the month; **Equipos**
+   reposición** work and «Movimientos» lists the month; **Equipos**
    works as for the Administrator. **Horario › Nutrición** lists the
    Evaluations. **Ajustes › Reglas del estudio** shows «Reglas
    configurables» as text with «Solo administración las cambia.», no
@@ -10002,6 +10006,37 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
    work the same.
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
+
+## Test 162: Movimientos de insumos names who recorded each one and shows the Restocks (FIX-068)
+
+Walkthrough finding 102: the Withdrawals history did not say who took the
+units, and Restocks showed nowhere but in the stock. AW31 is now
+**Movimientos de insumos**. No migration; the API change is additive:
+`GET /api/v1/administrator/withdrawals` takes `kind` (`withdrawal`, the
+default older admin builds get, `restock` or `all`) and every row carries
+`kind` and `recordedByName`.
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix068_dev`), and run the API and the admin web on your own ports
+   (surface-verification skill).
+2. Log in as Paola, open **Insumos** (Sucursal Centro), **+ Nuevo insumo**
+   «Toallas» with 20 and threshold 5. **Registrar retiro** 16 Toallas
+   (Expected: **Stock bajo**), then log in as Carolina (Coordinación) in a
+   private window and **Registrar reposición** 20 Toallas (24 now).
+3. As Paola, **Ver historial de movimientos** (or the **Movimientos** view
+   beside **Stock**). Expected: the title «Movimientos de insumos», filters **Insumo** and **Movimiento** (Todos,
+   Retiros, Reposiciones), and two rows newest first: Toallas · Reposición ·
+   20 · Carolina Rivas, then Toallas · Retiro · 16 · Paola Mendoza, with
+   «2 movimientos en <mes>.», «Mostrando 1–2 de 2 movimientos» and
+   **Consumo del mes** «Toallas: 16 unid.».
+4. **Movimiento › Reposiciones**. Expected: only Carolina's row, «1
+   reposición en <mes>.», `kind=restock` in the address; Consumo del mes
+   unchanged. **Retiros** shows only Paola's; choosing **Insumo › Toallas**
+   too keeps both filters in the address.
+5. Step back a month without movements. Expected: «Sin retiros en este
+   rango.» under Retiros, «Sin movimientos en este rango.» under Todos.
+6. Check at 1440 px and 420 px (at 420 each movement is a card with
+   Movimiento, Cantidad, Registró and Fecha labelled), then drop the copy.
 
 ## Test 163: eliminate an Expense, and the row's «Editar» (FIX-069)
 
