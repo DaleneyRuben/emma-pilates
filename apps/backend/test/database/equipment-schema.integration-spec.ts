@@ -16,7 +16,23 @@ describe('equipment migration', () => {
     await context?.stop();
   });
 
-  it('protects equipment numbers and the issue history', async () => {
+  it('seeds the three kinds as unit types, in their old order', async () => {
+    const { rows } = await context.pool.query<{
+      name: string;
+      tracking: string;
+      legacy_kind: string;
+    }>(
+      `SELECT name, tracking, legacy_kind FROM back_office.equipment_types
+       ORDER BY legacy_kind`,
+    );
+    expect(rows).toEqual([
+      { name: 'Reformer', tracking: 'unit', legacy_kind: 'reformer' },
+      { name: 'Cadillac', tracking: 'unit', legacy_kind: 'cadillac' },
+      { name: 'Mat', tracking: 'unit', legacy_kind: 'mat' },
+    ]);
+  });
+
+  it('protects equipment numbers, types, stocks, and the issue history', async () => {
     const client = await context.pool.connect();
     try {
       await client.query('BEGIN');
@@ -25,7 +41,7 @@ describe('equipment migration', () => {
         'utf8',
       );
       expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(
-        18,
+        49,
       );
       await expect(client.query(assertions)).resolves.toBeDefined();
     } finally {
