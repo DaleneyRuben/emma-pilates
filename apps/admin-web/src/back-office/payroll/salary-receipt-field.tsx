@@ -28,16 +28,20 @@ type Status =
 const acceptedTypes = "image/jpeg,image/png,image/webp";
 
 /**
- * AW12 with follow-up 224: an optional photo of the transfer. It goes through
- * the transfer-receipt upload (ADR-0072, 10 MB, no minimum size) and the
- * Trainer sees it in «Mis pagos». Changing it keeps the old one on record.
+ * AW12 with follow-up 224: the photo of the transfer. It goes through the
+ * transfer-receipt upload (ADR-0072, 10 MB, no minimum size) and the Trainer
+ * sees it in «Mis pagos». Changing it keeps the old one on record. Finding
+ * 112: every payment needs one, so the form's action waits for it.
  */
 export function SalaryReceiptField({
   value,
   onChange,
+  action,
 }: {
   value: SalaryReceipt | null;
   onChange: (receipt: SalaryReceipt) => void;
+  /** What waits for the photo: «guardar» a payment or «aprobar» it. */
+  action: "guardar" | "aprobar";
 }) {
   const hintId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -84,7 +88,7 @@ export function SalaryReceiptField({
         <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
           Comprobante
         </span>
-        <span className="text-ayuda text-texto-tenue">Opcional</span>
+        <span className="text-ayuda text-texto-tenue">Obligatorio</span>
       </span>
       <input
         ref={input}
@@ -160,9 +164,11 @@ export function SalaryReceiptField({
         </p>
       ) : (
         <p id={hintId} className="text-ayuda text-texto-tenue">
-          {value?.kind === "attached"
-            ? "Cambiarlo guarda el anterior en el registro."
-            : "JPG, PNG o WebP, hasta 10 MB. La entrenadora lo ve en su app."}
+          {value === null
+            ? `Sin comprobante no se puede ${action} el pago. JPG, PNG o WebP, hasta 10 MB.`
+            : value.kind === "attached"
+              ? "Cambiarlo guarda el anterior en el registro."
+              : "La entrenadora lo ve en su app."}
         </p>
       )}
     </div>

@@ -1,10 +1,12 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { isApiError } from "../../api/problem";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { formatBolivianos } from "../../lib/money";
 import { PayoutQrSlot } from "./payout-qr/payout-qr-slot";
 import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
+import { SalaryReceiptField, type SalaryReceipt } from "./salary-receipt-field";
 import {
   approvePayStatementRequest,
   payStatementsQueryOptions,
@@ -25,13 +27,14 @@ const failureOf = (error: unknown): string =>
     ? "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular."
     : "No pudimos aprobar el pago.";
 
-/** What Sueldos says after approving, and whose receipt it leads to. */
-export type ApprovedNotice = { text: string; receiptFor?: string };
+/** What Sueldos says after approving. */
+export type ApprovedNotice = { text: string };
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 
 // Finding 105: approving creates the Salary Payment, so it always names the
-// amount, the person and the period first.
+// amount, the person and the period first. Finding 112: it also carries the
+// photo of the transfer, so it waits for one.
 export function ApproveStatementDialog({
   statement,
   period,
@@ -46,18 +49,20 @@ export function ApproveStatementDialog({
   onApproved: (notice: ApprovedNotice) => void;
 }) {
   const queryClient = useQueryClient();
+  const [receipt, setReceipt] = useState<SalaryReceipt | null>(null);
   const total = formatBolivianos(statement.totalCentavos);
   const periodText = formatPayPeriod(
     statement.periodStart,
     statement.periodEnd,
   );
   const approve = useMutation({
-    mutationFn: () => approvePayStatementRequest(statement.id),
+    mutationFn: (receiptImageAssetId: string) =>
+      approvePayStatementRequest(statement.id, receiptImageAssetId),
     onSuccess: async () => {
       onOpenChange(false);
+      setReceipt(null);
       onApproved({
-        text: `Aprobamos ${total} a ${statement.staffMemberName}. Quedó en Pagados. ¿Ya le transferiste? Sube el comprobante y ${firstName(statement.staffMemberName)} lo verá en su app.`,
-        receiptFor: statement.staffMemberId,
+        text: `Aprobamos ${total} a ${statement.staffMemberName} con su comprobante. Quedó en Pagados y ${firstName(statement.staffMemberName)} lo verá en su app.`,
       });
       await queryClient.invalidateQueries({
         queryKey: payStatementsQueryOptions(period).queryKey,
@@ -77,7 +82,10 @@ export function ApproveStatementDialog({
       tone="primary"
       wide
       busy={approve.isPending}
-      onConfirm={() => approve.mutate()}
+      pending={receipt?.kind !== "uploaded"}
+      onConfirm={() => {
+        if (receipt?.kind === "uploaded") approve.mutate(receipt.imageAssetId);
+      }}
     >
       <div className="grid gap-6 min-[640px]:grid-cols-[280px_minmax(0,1fr)]">
         {/* FIX-072 (follow-up 276): the QR she is paid by, or why there is none. */}
@@ -94,10 +102,12 @@ export function ApproveStatementDialog({
             <dt className="text-texto-tenue">Se registra</dt>
             <dd>Pago de sueldo con fecha de hoy</dd>
           </dl>
-          <p>
-            Después de aprobarlo ya no cambia aunque vuelvas a calcular. Puedes
-            subir el comprobante desde Pagados.
-          </p>
+          <p>Después de aprobarlo ya no cambia aunque vuelvas a calcular.</p>
+          <SalaryReceiptField
+            value={receipt}
+            onChange={setReceipt}
+            action="aprobar"
+          />
         </div>
       </div>
       {approve.isError ? (

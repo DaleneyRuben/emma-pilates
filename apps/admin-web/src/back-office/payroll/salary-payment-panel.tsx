@@ -197,7 +197,11 @@ export function SalaryPaymentPanelForm({
               </FormItem>
             )}
           />
-          <SalaryReceiptField value={receipt} onChange={setReceipt} />
+          <SalaryReceiptField
+            value={receipt}
+            onChange={setReceipt}
+            action="guardar"
+          />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}
@@ -205,7 +209,12 @@ export function SalaryPaymentPanelForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" busy={change.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            busy={change.isPending}
+            disabled={receipt === null}
+          >
             Guardar
           </Button>
         </SidePanelFooter>
