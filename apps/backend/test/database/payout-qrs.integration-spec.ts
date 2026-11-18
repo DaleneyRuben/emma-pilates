@@ -157,6 +157,33 @@ describe('staff payout QRs (PostgreSQL)', () => {
     ]);
   });
 
+  it('keeps one current QR when two first uploads race', async () => {
+    const daniela = await staffMember();
+    const [a, b] = await Promise.all([
+      qrUpload(daniela.accountId),
+      qrUpload(daniela.accountId),
+    ]);
+
+    const results = await Promise.all(
+      [a, b].map((asset) =>
+        gateway.replace({
+          ...daniela,
+          imageAssetId: asset.id,
+          validUntil: civil('2026-12-15'),
+          actor: actorOf(daniela.accountId),
+          now,
+        }),
+      ),
+    );
+
+    expect(results).toHaveLength(2);
+    await expect(
+      prisma.staffPayoutQr.count({
+        where: { staffMemberId: daniela.staffMemberId, replacedAt: null },
+      }),
+    ).resolves.toBe(1);
+  });
+
   it('refuses a second current QR for the same person in the database', async () => {
     const daniela = await staffMember();
     const qr = await qrUpload(daniela.accountId);

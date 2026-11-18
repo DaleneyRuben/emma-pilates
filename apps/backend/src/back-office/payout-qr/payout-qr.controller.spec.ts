@@ -92,6 +92,21 @@ describe('payout QR controllers (FIX-072)', () => {
     ).rejects.toMatchObject({ status: 400 });
   });
 
+  it('refuses replacing her QR while the Administrator sees the app as her', async () => {
+    resolvePrincipal.mockResolvedValue({
+      ...principal,
+      impersonation: { id: 'imp-1', administratorAccountId: 'admin-1' },
+    });
+
+    await expect(
+      own.set(bearer, { imageAssetId: staffId, validUntil: '2027-01-15' }),
+    ).rejects.toMatchObject({
+      response: { code: 'impersonation_forbidden' },
+      status: 403,
+    });
+    expect(payoutQrs.setOwn).not.toHaveBeenCalled();
+  });
+
   it('maps a refused last day to its problem', async () => {
     payoutQrs.setOwn.mockRejectedValue(
       new BackOfficeError('payout_qr_valid_until_invalid'),

@@ -24,7 +24,7 @@ describe("PayoutQrCard", () => {
     expect(screen.queryByText("Vence pronto")).not.toBeInTheDocument();
     const save = screen.getByRole("link", { name: "Guardar QR" });
     expect(save).toHaveAttribute("href", `${imageUrl}?variant=readable`);
-    expect(save).toHaveAttribute("download", "qr-cobro-daniela-ortiz");
+    expect(save).toHaveAttribute("download", "qr-cobro-daniela-ortiz.jpg");
 
     await user.click(screen.getByRole("button", { name: "Ampliar" }));
     expect(

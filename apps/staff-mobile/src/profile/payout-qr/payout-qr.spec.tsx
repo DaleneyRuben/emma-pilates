@@ -201,6 +201,15 @@ describe("Mi QR de cobro", () => {
     );
     expect(await screen.findByText(`Guardamos tu QR. Vale hasta el ${shown}.`)).toBeOnTheScreen();
     expect(await screen.findByTestId("payout-qr-change")).toBeOnTheScreen();
+
+    // Review finding: a new photo asks for its own day, never the last one.
+    pickedQr();
+    await fireEvent.press(screen.getByTestId("payout-qr-change"));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
+    expect(await screen.findByText("¿Hasta cuándo vale?")).toBeOnTheScreen();
+    expect(screen.queryByText(/Te avisaremos 7 días antes/)).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId("payout-qr-save"));
+    expect(await screen.findByText("Elige el último día que vale tu QR.")).toBeOnTheScreen();
   });
 
   it("says when saving failed", async () => {
