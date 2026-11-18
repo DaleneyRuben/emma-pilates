@@ -2737,10 +2737,11 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    page. The choice also survives a full reload and a typed address
    (finding 121): with Urubó chosen, reload **Dinero › Caja** or type
    `/horario` in the address bar and the cell still reads **Sucursal
-   Urubó**. The browser remembers it per account, so signing in as another
-   person starts from Centro; if the remembered Branch was archived the cell
-   falls back to the first active one, and a private window that refuses
-   storage still lets you switch (it just forgets on reload). On Informes ›
+   Urubó**. The browser remembers it per account, so another person signing
+   in here gets their own last Branch (Centro if they never chose one); if
+   the remembered Branch was archived the cell falls back to the first
+   active one, and a browser that blocks site data still lets you switch (it
+   just forgets on reload). On Informes ›
    **Dinero** the cell is replaced by "El reporte usa su
    propio filtro de sucursal" (Test 30). Press Tab on a fresh page and the
    first thing focused is a **Saltar al contenido** link that jumps past
