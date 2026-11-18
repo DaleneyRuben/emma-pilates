@@ -16,7 +16,14 @@ import * as ImagePicker from "expo-image-picker";
 // poll until the worker has rebuilt the image (ADR-0072, ADR-0073). These
 // modules are native, so screens reach this file only through
 // `load-image-upload` (PAY-006).
-export type PickedImage = { uri: string; bytes: Uint8Array<ArrayBuffer> };
+// A photo is always re-encoded as a JPEG; FIX-049's invoice PDF keeps its
+// type and the name she sees in her files.
+export type PickedImage = {
+  uri: string;
+  bytes: Uint8Array<ArrayBuffer>;
+  mediaType?: "image/jpeg" | "application/pdf";
+  fileName?: string;
+};
 
 const pollMilliseconds = 700;
 const pollAttempts = 40;
@@ -58,19 +65,20 @@ function downscaleActions({ width = 0, height = 0 }: { width?: number; height?: 
     : [{ resize: { height: uploadMaxEdge } }];
 }
 
-/** Uploads the JPEG and resolves with its asset id once it is READY. */
+/** Uploads the JPEG (or the invoice PDF) and resolves with its asset id once it is READY. */
 export async function uploadImage(
   image: PickedImage,
   purpose: CreatePendingUploadDtoPurpose,
   fetcher: typeof globalThis.fetch,
 ): Promise<string> {
   const { bytes } = image;
+  const mediaType = image.mediaType ?? "image/jpeg";
   // expo-crypto's native digest only accepts typed arrays, never a bare buffer.
   const digest = await Crypto.digest(Crypto.CryptoDigestAlgorithm.SHA256, bytes);
   const declared = await createPendingUpload(
     {
       purpose,
-      mediaType: "image/jpeg",
+      mediaType,
       byteSize: bytes.byteLength,
       checksum: encodeBase64(new Uint8Array(digest)),
     },
@@ -82,7 +90,7 @@ export async function uploadImage(
 
   const stored = await fetcher(getPutPendingUploadObjectUrl(imageAssetId), {
     method: "PUT",
-    headers: { "Content-Type": "image/jpeg" },
+    headers: { "Content-Type": mediaType },
     body: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
   });
   if (!stored.ok) throw new Error("upload_failed");

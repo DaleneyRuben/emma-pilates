@@ -92,7 +92,9 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
   const list = useListCurrentClientInvoices({ fetcher });
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [saved, setSaved] = useState(false);
+  // FIX-049: where the file went, for the toast: Descargas, or the folder
+  // she picked.
+  const [saved, setSaved] = useState<string | null>(null);
   const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Factura" />;
 
   if (list.isPending) {
@@ -134,7 +136,7 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
   const download = async () => {
     setBusy(true);
     setFailed(false);
-    setSaved(false);
+    setSaved(null);
     try {
       const outcome = await downloadInvoice({
         fetcher,
@@ -142,7 +144,13 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
         fileName: file.fileName,
         mediaType: file.mediaType,
       });
-      setSaved(outcome === "saved");
+      setSaved(
+        outcome === "downloads"
+          ? "Guardada en Descargas"
+          : outcome === "saved"
+            ? "Factura guardada"
+            : null,
+      );
     } catch {
       setFailed(true);
     } finally {
@@ -173,9 +181,9 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
         <Preview footer={downloadButton} invoice={invoice} />
         <Details invoice={invoice} />
       </FormScrollView>
-      {saved ? (
-        <BrandToast onClose={() => setSaved(false)} style={styles.toast} title="Factura guardada" />
-      ) : null}
+      {saved === null ? null : (
+        <BrandToast onClose={() => setSaved(null)} style={styles.toast} title={saved} />
+      )}
     </Screen>
   );
 }
