@@ -47,6 +47,17 @@ describe("staffNotificationDestination", () => {
     ]);
   });
 
+  // FIX-072: a payout QR reminder opens «Mi QR de cobro» over Perfil.
+  it.each(["trainer", "assistant", "nutritionist", "coordinator", "administrator"] as const)(
+    "opens Mi QR de cobro for the %s",
+    (role) => {
+      expect(staffNotificationDestination(role, "payout_qr", paymentId)).toEqual([
+        "ProfileTab",
+        { screen: "PayoutQr", initial: false },
+      ]);
+    },
+  );
+
   it.each([
     ["assistant", "payment"],
     ["trainer", "nutritionist_agenda"],
