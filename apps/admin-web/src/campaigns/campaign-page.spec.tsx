@@ -9,6 +9,7 @@ import { signedInHandlers } from "../test/session-handlers";
 const campaignPath = "/api/v1/administrator/campaigns";
 const previewPath = "/api/v1/administrator/campaigns/preview";
 const submitted: unknown[] = [];
+const keys: (string | null)[] = [];
 
 const campaignHandlers = () => [
   http.get(apiUrl(previewPath), () =>
@@ -25,6 +26,7 @@ const campaignHandlers = () => [
   ),
   http.post(apiUrl(campaignPath), async ({ request }) => {
     submitted.push(await request.json());
+    keys.push(request.headers.get("Idempotency-Key"));
     return jsonResponse(
       {
         name: "Inicio de año",
@@ -46,6 +48,7 @@ describe("AW21 Campaña", () => {
   useMockServer();
   beforeEach(() => {
     submitted.length = 0;
+    keys.length = 0;
     server.use(
       ...signedInHandlers(),
       ...emptyPageHandlers(),
@@ -103,6 +106,33 @@ describe("AW21 Campaña", () => {
     // Walkthrough finding 92: the form empties so a second click gives nothing.
     expect(screen.getByLabelText("Nombre de la campaña")).toHaveValue("");
     expect(screen.getByLabelText("Clases extra")).toHaveValue("1");
+  });
+
+  // Review of walkthrough finding 92: a campaign given again on purpose is a
+  // new grant, not a replay of the first answer under the same key.
+  it("sends a campaign given twice with a new key each time", async () => {
+    const { user } = renderAdmin("/promociones/clases-de-campana");
+    const give = async () => {
+      await user.type(
+        await screen.findByLabelText("Nombre de la campaña"),
+        "Inicio de año",
+      );
+      await user.click(screen.getByRole("button", { name: "Dar las clases" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Confirmar campaña" }),
+      );
+    };
+
+    await give();
+    await waitFor(() => expect(submitted).toHaveLength(1));
+    await waitFor(() =>
+      expect(screen.getByLabelText("Nombre de la campaña")).toHaveValue(""),
+    );
+    await give();
+    await waitFor(() => expect(submitted).toHaveLength(2));
+
+    expect(keys[0]).not.toBeNull();
+    expect(keys[1]).not.toBe(keys[0]);
   });
 
   it("warns when a campaign with the same name was already given", async () => {
