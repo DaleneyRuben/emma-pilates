@@ -1808,9 +1808,9 @@ count and "Bs 560 en total", then one card per transfer, oldest first: the
 Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
-19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen reads "No hay
-pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
-transferencia nueva.".
+19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen shows one small
+card: a green check, «Todo al día» and «No hay pagos por confirmar» (Test 176
+E).
 
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
 with `Bs 560`, the **Pendiente** badge, "Transferencia · enviado el 22 de
@@ -7119,8 +7119,8 @@ password, holding every Branch.
 
 1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. Her
    tabs are **Clientes · Para contactar · Horario · Perfil**; **Clientes**
-   opens on **Buscar cliente** with the Rosa tinte **Nuevo cliente** button
-   under the search (FIX-040), and **Horario** has the **Cancelar una clase**
+   opens on **Buscar cliente** with the «¿No está? Crear cliente nuevo» link
+   under the results (FIX-040, Test 176 F), and **Horario** has the **Cancelar una clase**
    row, which opens the Administrator's cancellation screens (Test 10 D).
 2. **Nuevo cliente** opens the Assistant's form (Test 11 E, with the required
    «Celular» of Test 132): create a Client with a fresh email. Her file
@@ -8519,9 +8519,11 @@ C. **Entrenadora.** Mi agenda (S02) opens on today, with «Entrenadora · Lunes
    as a text action, and «Pagos recibidos»; empty, «Todavía no tienes pagos»
    with **Ver mi agenda**.
 D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search field
-   with a clear ×, the Rosa tinte **Nuevo cliente** button, results as person
+   with a clear ×, results as person
    rows (a **Pendiente** pill for a pending Account). No result reads «No
-   encontramos a nadie» with **Nuevo cliente**. Nuevo cliente (S05): «Datos»
+   encontramos a nadie» with **Nuevo cliente**; otherwise the quiet link
+   «¿No está? Crear cliente nuevo» sits under the results (Test 176 F).
+   Nuevo cliente (S05): «Datos»
    as one Lino group, «¿Cómo nos conoció?» as a two-column grid, the referral
    field only for «Una instructora» («Código de la instructora») or
    «Recomendación de una amiga» («Código de la amiga»), and **Crear cuenta**
@@ -8572,9 +8574,11 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    once closed, «Caja
    cerrada · La cerró … a las …» with the four rows and **Ir a Clientes**.
 E. **Administración.** Pagos pendientes (S11): «Por confirmar · N» with the
-   total, person rows with the amount in Lora, and «Accesos»: **Cancelar una
-   clase**, **Congelamientos** («N por revisar») and **Cerrar caja**. With no
-   payments, «Todo al día» and **Ver el horario**. Revisar pago (S12): the
+   total, person rows with the amount in Lora, and «Accesos» as plain rows
+   without icons: **Facturas por subir** (count), **Cancelar una clase**,
+   **Congelamientos** («N por revisar») and **Cerrar caja**. With no
+   payments, one small card «Todo al día · No hay pagos por confirmar»
+   (Test 176 E). Revisar pago (S12): the
    amount on the Rosa profundo card, Transferencia and «Enviado el …» rows,
    the receipt with **Ampliar**, **Confirmar pago** and **Rechazar** in Error;
    rejecting shows the person row, «Motivo del rechazo», the warning row «El
@@ -8601,7 +8605,7 @@ F. **Nutricionista.** Mi agenda (S15): «Nutricionista · …», days as section
    «Aún no publicaste horarios». Nuevo/Editar horario (S17): a fixed Branch
    with one Branch, the turnos as a row, **Guardar** fixed with **Eliminar
    horario** as an Error text button.
-G. **Coordinación.** Buscar cliente has **Nuevo cliente** like the Assistant's
+G. **Coordinación.** Buscar cliente has «¿No está? Crear cliente nuevo» like the Assistant's
    (FIX-040), with no cash sale on the Client's file; Horario has a
    **Cancelar una clase** row and «Solo lectura. Para reservar, abre la ficha
    de una clienta.»; Para contactar (S28) shows each Client with her reasons
@@ -10683,9 +10687,11 @@ Use the walkthrough database (`emma_vacia`, password «Password»): `ana@`
 
 A. **Notificaciones (pick A, grouped).** As Ana, Perfil → **Notificaciones**.
    One Lino list, no «Sin leer»/«Anteriores» headings and no pink rows.
-   Notices of the same kind collapse into one row: «20 comentarios nuevos»,
-   «9 comprobantes por revisar», «2 congelamientos por revisar», each with the
-   newest one's time and a Palo de rosa dot while any is unread. Tapping a
+   Notices of the same kind collapse into one row: «20 comentarios»,
+   «9 comprobantes por revisar», «2 congelamientos por revisar», each with
+   «N sin leer · » and the newest one's time, and a Palo de rosa dot while any
+   is unread (a screen reader hears «…, N sin leer»; a lone unread notice
+   «…, sin leer»). Tapping a
    group opens it in place (the chevron turns up) and lists each notice,
    indented; tapping one marks it read and opens its destination as before
    (a comprobante opens **Revisar pago**). A lone notice is its own row.
@@ -10701,7 +10707,9 @@ B. **Ficha de la clienta (pick A, clear card).** As Camila, **Clientes** →
    one is queued. Then one solid **Reservar clase** (or **Registrar pago**
    when she cannot book but can buy), then plain rows without icons:
    **Reservas** (her next class on the right), **Historial de clases**, and
-   **Registrar pago** when she can buy. The design's «Pagos» and
+   **Registrar pago** when she can buy. With only extra classes left
+   («0 del plan + 2 extra») **Reservar clase** is still offered; an expired
+   plan's leftovers read «clases sin usar», never «disponibles». The design's «Pagos» and
    «Evaluaciones» rows need Staff endpoints that do not exist yet (see the
    backlog).
 C. **Cerrar caja (picks A and C).** As Camila, **Caja**:
@@ -10731,5 +10739,18 @@ D. **Horario (pick A, cancellations at the end).** As Camila (and as Ana),
    Trainer» after her face, «50 min» (plus «· N en espera» when any). The
    cancelled classes fold into one line at the end, «3 canceladas por
    mínimo» with **Ver ▾**; it opens the dashed cancelled rows with their
-   cause. Mixed causes read «3 canceladas».
-E. Check on the iPhone 16 Pro and the Android emulator.
+   cause. Mixed causes read «3 canceladas». A day where every class was
+   cancelled reads «Hoy todas las clases están canceladas» over the fold.
+E. **Pagos (Ronda 2 pick A, one line a day).** As Ana with nothing to
+   review: one small Lino card with a green check, «Todo al día» and «No hay
+   pagos por confirmar» (no big disc, no «Ver el horario»). With pending
+   payments the list shows there as before. «Accesos» is a plain list with no
+   icon discs: **Facturas por subir** (count), **Cancelar una clase**,
+   **Congelamientos**, **Cerrar caja**, each with ›.
+F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
+   Coordinator), **Clientes**: the search field first, **Facturas por subir**
+   as a plain row before searching, and no big «Nuevo cliente» button. Under
+   the hint (or under the results once she searches) a quiet link «¿No está?
+   Crear cliente nuevo» opens **Nuevo cliente**. No match still reads «No
+   encontramos a nadie» with **Nuevo cliente** as the next step.
+G. Check on the iPhone 16 Pro and the Android emulator.
