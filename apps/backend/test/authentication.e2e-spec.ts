@@ -141,6 +141,7 @@ describe('authentication (e2e)', () => {
         id: 'impersonation-id',
         administratorAccountId: 'administrator-account-id',
         staffMemberName: 'Camila Rojas',
+        staffMemberGender: 'male',
         expiresAt: new Date('2026-10-22T15:30:00.000Z'),
       },
     });
@@ -162,6 +163,7 @@ describe('authentication (e2e)', () => {
           staffMemberId: 'trainer-staff-member-id',
           staffMemberName: 'Camila Rojas',
           role: 'trainer',
+          gender: 'male',
           expiresAt: '2026-10-22T15:30:00.000Z',
         },
       });
