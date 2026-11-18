@@ -100,21 +100,31 @@ export const branchIssuesQueryOptions = (
 };
 
 // A change moves the lists, the faults, and Horario's flags of its Branch;
-// a type's change also moves the studio's type list.
-const refreshBranchEquipment = (queryClient: QueryClient, branchId: string) =>
-  Promise.all([
+// renaming or removing a type moves them in every Branch, and any type
+// change moves the studio's type list.
+const refreshEquipment = (
+  queryClient: QueryClient,
+  branchId: string,
+  change: EquipmentChange,
+) => {
+  const studioWide =
+    change.kind === "rename-type" || change.kind === "archive-type";
+  return Promise.all([
     ...[
       getListEquipmentQueryKey()[0],
       getListEquipmentStocksQueryKey()[0],
       getListEquipmentIssuesQueryKey()[0],
       getListEquipmentFlaggedSessionsQueryKey()[0],
     ].map((path) =>
-      queryClient.invalidateQueries({
-        predicate: isBranchScopedKey(path, branchId),
-      }),
+      queryClient.invalidateQueries(
+        studioWide
+          ? { queryKey: [path] }
+          : { predicate: isBranchScopedKey(path, branchId) },
+      ),
     ),
     queryClient.invalidateQueries({ queryKey: [typesPath] }),
   ]);
+};
 
 export type EquipmentChange =
   | { kind: "create"; input: EquipmentInputDto }
@@ -174,6 +184,7 @@ export function useEquipmentChange(branchId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: send,
-    onSettled: () => refreshBranchEquipment(queryClient, branchId),
+    onSettled: (_data, _error, change) =>
+      refreshEquipment(queryClient, branchId, change),
   });
 }
