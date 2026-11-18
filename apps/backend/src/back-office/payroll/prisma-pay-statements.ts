@@ -156,7 +156,7 @@ export const createPrismaPayStatements = (
     },
 
     approveStatement: async (
-      input: { statementId: string },
+      input: { statementId: string; receiptImageAssetId?: string },
       principal: AuthenticatedPrincipal,
     ) => {
       const actor: BackOfficeActor = requireAdministrator(principal);
