@@ -78,6 +78,24 @@ describe("Mi plan, option A", () => {
     expect(screen.queryByRole("progressbar", hidden)).toBeNull();
   });
 
+  it("names every origin of the extra classes", async () => {
+    const base = view();
+    const screen = await openMiPlan({
+      ...base,
+      subscription: {
+        ...base.subscription,
+        extraClasses: 2,
+        extraClassesLine: "Clases extra: 2 · 1 de invitación · 1 de campaña",
+      },
+    });
+
+    expect(
+      screen.getByText(
+        `24 del plan + 2 de regalo (1 de invitación, 1 de campaña) · vence el ${formatCivilDate(endsOn)}`,
+      ),
+    ).toBeOnTheScreen();
+  });
+
   it("puts «Renovar mi plan» right under the card with the discount line", async () => {
     const screen = await openMiPlan(view());
 
