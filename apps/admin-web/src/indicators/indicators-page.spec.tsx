@@ -266,4 +266,38 @@ describe("AW39 Indicadores", () => {
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeVisible();
   });
+
+  // Walkthrough finding 107: «Recalcular» refreshes the facts, so the tiles
+  // read again with the recommendations.
+  it("reads the tiles again after Recalcular", async () => {
+    let recomputed = false;
+    server.use(
+      http.get(apiUrl(kpisPath), ({ request }) =>
+        jsonResponse({
+          ...counts,
+          ...amounts,
+          occupancyPercent: recomputed ? 41 : 0,
+          month: new URL(request.url).searchParams.get("month"),
+        }),
+      ),
+      http.post(
+        apiUrl("/api/v1/administrator/recommendations/recompute"),
+        () => {
+          recomputed = true;
+          return jsonResponse({ month: "2026-11", written: 0 });
+        },
+      ),
+    );
+    const { user } = renderAdmin("/informes");
+    const occupancy = await screen.findByRole("region", { name: "Ocupación" });
+    expect(occupancy).toHaveTextContent("0 %");
+
+    await user.click(screen.getByRole("button", { name: "Recalcular" }));
+
+    expect(
+      await within(
+        await screen.findByRole("region", { name: "Ocupación" }),
+      ).findByText("41 %"),
+    ).toBeVisible();
+  });
 });

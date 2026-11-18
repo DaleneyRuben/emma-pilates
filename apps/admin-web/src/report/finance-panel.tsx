@@ -188,11 +188,21 @@ export function FinancePanel({
               figure={formatSignedBolivianos(result.resultCentavos)}
               line="Ingresos en caja menos impuesto, gastos, sueldos y nutricionista"
             />
+            {/* Finding 107 (h): without a budget the break-even is only the
+                Nutritionist's cost, a number that would pass for a real one. */}
             <Figure
               name="Punto de equilibrio"
               rule="border-t-texto"
-              figure={formatBolivianos(result.breakEvenCentavos)}
-              line="Ingreso en caja que cubre el presupuesto y la nutricionista"
+              figure={
+                result.lines.length === 0
+                  ? "—"
+                  : formatBolivianos(result.breakEvenCentavos)
+              }
+              line={
+                result.lines.length === 0
+                  ? "Carga tu presupuesto para calcularlo"
+                  : "Ingreso en caja que cubre el presupuesto y la nutricionista"
+              }
             />
           </div>
           <p className="text-nota text-texto-tenue tabular">

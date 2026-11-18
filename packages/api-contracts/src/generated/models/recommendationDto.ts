@@ -14,4 +14,12 @@ export interface RecommendationDto {
   period: string;
   detail: string;
   state: RecommendationDtoState;
+  /** The Client an inactive_client finding is about */
+  clientId?: string;
+  /** That Client, by name */
+  clientName?: string;
+  /** The Trainer of a weak_schedule finding, by name */
+  trainerName?: string;
+  /** ISO weekday of a weak_schedule finding, 1 = Monday */
+  weekday?: number;
 }

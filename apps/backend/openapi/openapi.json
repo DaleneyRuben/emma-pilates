@@ -19472,6 +19472,22 @@
               "dismissed",
               "resolved"
             ]
+          },
+          "clientId": {
+            "type": "string",
+            "description": "The Client an inactive_client finding is about"
+          },
+          "clientName": {
+            "type": "string",
+            "description": "That Client, by name"
+          },
+          "trainerName": {
+            "type": "string",
+            "description": "The Trainer of a weak_schedule finding, by name"
+          },
+          "weekday": {
+            "type": "number",
+            "description": "ISO weekday of a weak_schedule finding, 1 = Monday"
           }
         },
         "required": [

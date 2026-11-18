@@ -13,6 +13,12 @@ export type StoredRecommendation = {
   period: string;
   detail: string;
   state: 'new' | 'seen' | 'dismissed' | 'resolved';
+  // Walkthrough finding 107: who a finding is about, read when listed for
+  // the page and never stored or handed to the narrative (STU-007).
+  clientId?: string;
+  clientName?: string;
+  trainerName?: string;
+  weekday?: number;
 };
 
 type FactSessionRow = {
@@ -36,6 +42,8 @@ type RecommendationRow = {
   period: Date;
   detail: string;
   state: string;
+  client_name?: string | null;
+  trainer_name?: string | null;
 };
 
 const monthStart = (month: Date) =>
@@ -62,14 +70,34 @@ const asState = (state: string): StoredRecommendation['state'] => {
   throw new Error(`unknown recommendation state ${state}`);
 };
 
-const toStored = (row: RecommendationRow): StoredRecommendation => ({
-  id: row.id,
-  rule: asRule(row.rule),
-  subject: row.subject,
-  period: row.period.toISOString().slice(0, 10),
-  detail: row.detail,
-  state: asState(row.state),
-});
+const subjectOf = (
+  rule: RecommendationRule,
+  row: RecommendationRow,
+): Partial<StoredRecommendation> => {
+  if (rule === 'inactive_client') {
+    return row.client_name == null
+      ? { clientId: row.subject }
+      : { clientId: row.subject, clientName: row.client_name };
+  }
+  const weekday = Number(row.subject.split(':')[1]);
+  return {
+    ...(Number.isInteger(weekday) ? { weekday } : {}),
+    ...(row.trainer_name == null ? {} : { trainerName: row.trainer_name }),
+  };
+};
+
+const toStored = (row: RecommendationRow): StoredRecommendation => {
+  const rule = asRule(row.rule);
+  return {
+    id: row.id,
+    rule,
+    subject: row.subject,
+    period: row.period.toISOString().slice(0, 10),
+    detail: row.detail,
+    state: asState(row.state),
+    ...subjectOf(rule, row),
+  };
+};
 
 export const readRecommendations = async (
   prisma: PrismaClient,
@@ -77,11 +105,17 @@ export const readRecommendations = async (
 ): Promise<StoredRecommendation[]> => {
   const month = monthStart(input.month);
   const rows = await prisma.$queryRaw<RecommendationRow[]>`
-    SELECT id, rule, subject, period, detail, state
-    FROM studio.recommendations
-    WHERE deleted_at IS NULL
-      AND period = ${month}::date
-    ORDER BY rule, subject
+    SELECT r.id, r.rule, r.subject, r.period, r.detail, r.state,
+           c.name AS client_name, s.name AS trainer_name
+    FROM studio.recommendations r
+    LEFT JOIN booking.clients c
+      ON r.rule = 'inactive_client' AND c.id::text = r.subject
+    LEFT JOIN booking.staff_members s
+      ON r.rule = 'weak_schedule'
+      AND s.id::text = split_part(r.subject, ':', 1)
+    WHERE r.deleted_at IS NULL
+      AND r.period = ${month}::date
+    ORDER BY r.rule, r.subject
   `;
   return rows.map(toStored);
 };
@@ -156,14 +190,31 @@ export const recomputeRecommendations = async (
         `;
         continue;
       }
+      // A finding that holds again after it was resolved is new again; a
+      // dismissed one stays dismissed.
       await transaction.$executeRaw`
         UPDATE studio.recommendations
-        SET detail = ${finding.detail}, updated_at = ${now}
+        SET detail = ${finding.detail},
+            state = CASE WHEN state = 'resolved' THEN 'new' ELSE state END,
+            updated_at = ${now}
         WHERE id = ${existing.id}::uuid
           AND deleted_at IS NULL
-          AND detail IS DISTINCT FROM ${finding.detail}
+          AND (detail IS DISTINCT FROM ${finding.detail} OR state = 'resolved')
       `;
     }
+    // A finding the facts no longer support (she booked, the schedule
+    // filled) is resolved, so the month's list stays true.
+    const found = findings.map(
+      (finding) => `${finding.rule}|${finding.subject}`,
+    );
+    await transaction.$executeRaw`
+      UPDATE studio.recommendations
+      SET state = 'resolved', updated_at = ${now}
+      WHERE deleted_at IS NULL
+        AND period = ${month}::date
+        AND state IN ('new', 'seen')
+        AND NOT (rule || '|' || subject = ANY(${found}::text[]))
+    `;
   });
   return { written: findings.length };
 };

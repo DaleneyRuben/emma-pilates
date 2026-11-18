@@ -1184,13 +1184,16 @@ lista en **Por resolver**.
    estudio: aparece en todas las sedes, no dentro de una sola. Más abajo
    están las finanzas del mes: resultado, impuesto, punto de equilibrio y el
    presupuesto frente a lo gastado.
-2. **Informes › El mes**. Pide recalcular si el mes todavía no tiene cifras.
+2. **Informes › El mes**. Las cifras se recalculan cada noche; para verlas al
+   momento, pulsa **Recalcular** en «Recomendaciones del mes».
    Son cantidades y montos del estudio: ocupación, clientas nuevas,
    renovación, ingreso cobrado e ingreso devengado por los días de vigencia.
    La coordinadora, cuando entre, ve las cantidades y no los montos.
 3. Más abajo en **El mes** están las **Recomendaciones**, que también se
    ven en **Inicio**. Son reglas sobre el mes ya calculado: una clase
-   que no llena, un horario flojo, un gasto por encima del presupuesto. Con
+   que no llena, un horario flojo, un gasto por encima del presupuesto. Cada
+   una dice de quién es: el nombre de la clienta abre su ficha, y un horario
+   flojo dice la instructora y el día. Con
    pocos días de datos la lista puede estar vacía. Eso es un mes joven, no
    un fallo.
 4. **Informes › Simulador**. No lee la sede ni las ventas. Cambias precios, metas

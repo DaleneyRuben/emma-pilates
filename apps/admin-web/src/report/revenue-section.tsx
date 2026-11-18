@@ -26,7 +26,14 @@ function Figure({ name, figure }: { name: string; figure: string }) {
 
 // STU-002: cash, accrued by validity days, and deferred, beside the cash
 // report. Classes still owed are today's remaining allowance, not a month.
-export function RevenueSection({ active = true }: { active?: boolean }) {
+// It is studio-wide: beside one Branch's report it says so (finding 107).
+export function RevenueSection({
+  active = true,
+  branchName,
+}: {
+  active?: boolean;
+  branchName?: string;
+}) {
   const latest = boliviaMonth();
   const [month, setMonth] = useState(latest);
   const revenue = useQuery({
@@ -46,6 +53,13 @@ export function RevenueSection({ active = true }: { active?: boolean }) {
         </h2>
         <MonthStepper month={month} latest={latest} onChange={setMonth} />
       </div>
+      {branchName === undefined ? null : (
+        <p className="text-nota text-texto-tenue">
+          {branchName === ""
+            ? "Todo el estudio: no se separa por sucursal."
+            : `Todo el estudio, no solo ${branchName}: no se separa por sucursal.`}
+        </p>
+      )}
       {revenue.isError ? (
         <QueryFailure
           error={revenue.error}
