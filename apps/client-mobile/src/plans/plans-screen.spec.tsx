@@ -63,7 +63,8 @@ describe("Client Plans", () => {
     expect(screen.getByText("Válido por 30 días")).toBeOnTheScreen();
     // Without a discount there is no launch banner.
     expect(screen.queryByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeNull();
-    expect(screen.getByText("90 días · hasta 4 por semana")).toBeOnTheScreen();
+    // FIX-082: every Plan starts its terms the same way.
+    expect(screen.getByText("Válido por 90 días · hasta 4 por semana")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
@@ -124,7 +125,7 @@ describe("Client Plans", () => {
     // Walkthrough n.º 13: the launch banner, never «fundadora».
     expect(screen.getByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeOnTheScreen();
     expect(screen.queryByText(/fundadora/i)).toBeNull();
-    expect(screen.getByText("Válida por 90 días")).toBeOnTheScreen();
+    expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
     await waitFor(() => {
