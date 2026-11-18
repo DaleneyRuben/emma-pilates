@@ -4,6 +4,8 @@ import { Lock, UserPlus } from "lucide-react";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
+import { useEquipmentFlag } from "./equipment-flag-data";
+import { EquipmentFlagNote } from "./equipment-flags";
 import { SessionEditForm } from "./session-edit-form";
 import { SessionRoster } from "./session-roster";
 import { hasStarted, seatsTaken } from "./session-seats";
@@ -29,6 +31,7 @@ export function SessionDetail({
 }) {
   const roster = useQuery(sessionRosterQueryOptions(session.id));
   const past = hasStarted(session);
+  const flag = useEquipmentFlag(session.id);
   const full =
     seatsTaken(session, roster.data?.bookings.length) >= session.capacity;
 
@@ -50,6 +53,7 @@ export function SessionDetail({
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-5 px-7 py-4">
         {notice === null ? null : <PageNotice>{notice}</PageNotice>}
+        {flag === undefined ? null : <EquipmentFlagNote flag={flag} />}
         {past ? (
           <p className="flex items-center gap-2 rounded-tarjeta bg-lino px-4 py-3 text-celda text-texto-secundario">
             <Lock size={16} aria-hidden="true" className="text-rosa-profundo" />

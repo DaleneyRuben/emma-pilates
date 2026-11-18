@@ -7,7 +7,7 @@ import {
   useEquipmentFlag,
   type EquipmentFlag,
 } from "./equipment-flag-data";
-import { EquipmentFlagLine } from "./equipment-flags";
+import { EquipmentDot } from "./equipment-flags";
 import {
   cancellationOf,
   causeLabel,
@@ -35,7 +35,8 @@ const occupancy = (session: Session): string =>
       : "Llena"
     : `${session.bookedCount}/${session.capacity}`;
 
-// FIX-042: a cancelled class keeps its place, muted, with its cause.
+// FIX-042: a cancelled class keeps its place, with its cause. FIX-084
+// (Horario A): a faint grey dashed outline, the type, the time and the cause.
 function CancelledBlock({
   session,
   onOpen,
@@ -49,7 +50,6 @@ function CancelledBlock({
 }) {
   const cause = cancellationOf(session)?.cause ?? "studio";
   const start = boliviaParts(session.startsAt).time;
-  const end = boliviaParts(session.endsAt).time;
   return (
     <button
       type="button"
@@ -62,18 +62,15 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] border-dashed border-texto-muy-tenue/60 bg-superficie px-2 py-1 text-left text-texto-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full flex-col items-start justify-start gap-0.5 overflow-hidden rounded-control border border-dashed border-borde bg-transparent px-2 py-1 text-left text-texto-muy-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         className,
       )}
     >
-      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto xl:text-[12.5px]">
+      <span className="w-full text-ayuda leading-tight break-words xl:text-[12.5px]">
         {session.classTypeName}
       </span>
-      <span className="w-full text-[11px] leading-tight whitespace-nowrap tabular lg:text-ayuda">
-        {start} – {end} · {session.trainerName}
-      </span>
-      <span className="w-full shrink-0 truncate text-ayuda leading-tight font-medium">
-        {causeShortLabel(cause)}
+      <span className="w-full text-ayuda leading-tight tabular">
+        {start} · {causeShortLabel(cause)}
       </span>
     </button>
   );
@@ -113,6 +110,9 @@ export function SessionBlock({
   );
 }
 
+// FIX-084 (Horario A): every standing block is white with a thin border,
+// one accent at most: the amber dot of a class short of Equipment. The
+// trainer has a line of her own, so her name is never cut off.
 function StandingBlock({
   session,
   onOpen,
@@ -124,7 +124,6 @@ function StandingBlock({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const full = session.bookedCount >= session.capacity;
   const flag = useEquipmentFlag(session.id);
   const start = boliviaParts(session.startsAt).time;
   const end = boliviaParts(session.endsAt).time;
@@ -136,40 +135,32 @@ function StandingBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:bg-primario-tinte/40 focus-visible:shadow-foco lg:px-1.5 xl:px-2",
-        full
-          ? "border-advertencia bg-advertencia/12"
-          : "border-primario bg-primario-tinte",
-        flag === undefined ? null : "border-advertencia",
+        "flex w-full flex-col items-start justify-start gap-px overflow-hidden rounded-control border border-borde bg-blanco px-2 py-1 text-left text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         className,
       )}
     >
-      <span className="w-full text-ayuda leading-tight font-medium whitespace-nowrap text-texto xl:text-[12.5px]">
+      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium break-words xl:text-[12.5px]">
+        {flag === undefined ? null : <EquipmentDot />}
         {session.classTypeName}
       </span>
-      <span className="w-full text-[11px] leading-tight whitespace-nowrap text-texto-secundario tabular lg:text-ayuda">
+      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto-secundario tabular">
         {start} – {end}
-        <span className="text-texto-tenue"> · </span>
-        {/* Follow-up 242: her 20 px photo leads her name, when she has one. */}
+      </span>
+      <span className="flex w-full items-center text-ayuda leading-tight break-words text-texto-secundario">
+        {/* Follow-up 242: her photo leads her name, when she has one. */}
         {session.trainerPhoto === null ? null : (
           <StaffPhoto
             name={session.trainerName}
             photo={session.trainerPhoto}
             size={20}
-            className="mr-1 align-middle"
+            className="mr-1 shrink-0"
           />
         )}
-        <span className="text-texto-tenue">{session.trainerName}</span>
+        <span className="min-w-0">{session.trainerName}</span>
       </span>
-      <span
-        className={cn(
-          "text-ayuda leading-tight tabular",
-          full ? "text-advertencia-texto" : "text-primario-profundo",
-        )}
-      >
+      <span className="text-ayuda leading-tight text-texto-tenue tabular">
         {occupancy(session)}
       </span>
-      {flag === undefined ? null : <EquipmentFlagLine flag={flag} />}
     </button>
   );
 }

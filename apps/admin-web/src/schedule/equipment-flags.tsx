@@ -1,44 +1,68 @@
 import { Link } from "@tanstack/react-router";
-import { TriangleAlert } from "lucide-react";
 import { typeEquipment, type EquipmentFlag } from "./equipment-flag-data";
 
-/** Follow-up 170 §1: the warning line inside a flagged Session block. */
-export function EquipmentFlagLine({ flag }: { flag: EquipmentFlag }) {
+/**
+ * FIX-084 (Horario A): a class with more places than working Equipment
+ * carries only this small amber dot; the panel explains it.
+ */
+export function EquipmentDot() {
   return (
-    <span className="flex w-full items-center gap-1 truncate text-ayuda text-advertencia-texto tabular">
-      <TriangleAlert size={12} strokeWidth={1.8} aria-hidden="true" />
-      <span>Faltan equipos</span>
-      <span>{` · ${flag.workingCount} de ${flag.capacity}`}</span>
-    </span>
+    <span
+      aria-hidden="true"
+      data-testid="equipment-dot"
+      className="size-[7px] shrink-0 rounded-full bg-advertencia"
+    />
   );
 }
 
-/** Follow-up 170 §2: how many of the week's Sessions are short. */
+/** FIX-084: the panel's sentence for a class short of Equipment. */
+export function EquipmentFlagNote({ flag }: { flag: EquipmentFlag }) {
+  return (
+    <p className="flex items-start gap-2 rounded-tarjeta bg-lino px-4 py-3 text-celda text-texto-secundario">
+      <span className="mt-[7px] flex">
+        <EquipmentDot />
+      </span>
+      <span>
+        {`Faltan equipos: ${flag.workingCount} ${typeEquipment(flag)} funcionando para ${flag.capacity} lugares. Baja su capacidad o revisa `}
+        <Link
+          to="/estudio/equipos"
+          className="font-medium text-primario-profundo underline-offset-2 hover:underline"
+        >
+          Equipos
+        </Link>
+        .
+      </span>
+    </p>
+  );
+}
+
+/** Follow-up 170 §2, FIX-084: how many of the week's classes are short, in one quiet line. */
 export function EquipmentFlagsNotice({
   flags,
 }: {
   flags: readonly EquipmentFlag[];
 }) {
   if (flags.length === 0) return null;
-  const types = new Set(flags.map((flag) => flag.typeId));
-  const what = types.size === 1 ? typeEquipment(flags[0]!) : "equipos";
-  const count =
+  const text =
     flags.length === 1
-      ? "1 sesión de esta semana tiene"
-      : `${flags.length} sesiones de esta semana tienen`;
+      ? "1 clase con más lugares que equipos"
+      : `${flags.length} clases con más lugares que equipos`;
   return (
     <p
       role="status"
-      className="rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2 text-nota text-advertencia-texto"
+      aria-label={text}
+      className="flex items-center gap-2 text-nota text-texto-secundario"
     >
-      {`${count} más lugares que ${what} funcionando. Baja su capacidad o revisa `}
-      <Link
-        to="/estudio/equipos"
-        className="font-medium text-primario-profundo underline-offset-2 hover:underline"
-      >
-        Equipos
-      </Link>
-      .
+      <EquipmentDot />
+      <span>
+        {`${text} · `}
+        <Link
+          to="/estudio/equipos"
+          className="font-medium text-primario-profundo underline-offset-2 hover:underline"
+        >
+          Revisar
+        </Link>
+      </span>
     </p>
   );
 }
