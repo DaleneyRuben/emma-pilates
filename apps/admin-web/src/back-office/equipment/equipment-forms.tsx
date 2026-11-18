@@ -1,5 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
 import { useId, useState, type FormEvent } from "react";
-import { ChoiceChips } from "../../components/form/choice-chips";
 import {
   SidePanelBody,
   SidePanelFooter,
@@ -9,16 +9,15 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { backOfficeProblem } from "../back-office-problems";
+import { firstFreeNumber, unitName } from "./equipment-format";
 import {
-  equipmentKinds,
-  equipmentName,
-  type EquipmentKind,
-} from "./equipment-format";
-import { useEquipmentChange } from "./equipment-queries";
+  branchEquipmentQueryOptions,
+  useEquipmentChange,
+} from "./equipment-queries";
 
-const fieldError = "text-ayuda text-error-texto";
+export const fieldError = "text-ayuda text-error-texto";
 
-function Failure({ message }: { message: string | null }) {
+export function Failure({ message }: { message: string | null }) {
   return message === null ? null : (
     <p role="alert" className="text-nota text-error-texto">
       {message}
@@ -26,99 +25,113 @@ function Failure({ message }: { message: string | null }) {
   );
 }
 
-// AW37 «Nuevo equipo»: a kind and a number from 1 to 99, unique per Branch
-// and kind among the pieces not retired.
-export function NewEquipmentForm({
+// AW37 «Agregar» (follow-up 270): the type's first free number filled in,
+// a number its units already use warned while typing, and the server's
+// refusal kept for a number taken meanwhile, whose refresh then names the
+// unit that took it.
+export function AddUnitForm({
   branchId,
+  type,
   onDone,
 }: {
   branchId: string;
+  type: { id: string; name: string };
   onDone: (notice: string) => void;
 }) {
   const change = useEquipmentChange(branchId);
+  const units = useQuery(branchEquipmentQueryOptions(branchId));
+  const numbers = (units.data ?? [])
+    .filter((piece) => piece.typeId === type.id)
+    .map((piece) => piece.number);
   const numberId = useId();
-  const [kind, setKind] = useState<EquipmentKind>("reformer");
-  const [number, setNumber] = useState("");
-  const [numberError, setNumberError] = useState<string | null>(null);
+  const free = firstFreeNumber(numbers);
+  const [number, setNumber] = useState(String(free));
+  const [takenMeanwhile, setTakenMeanwhile] = useState<number | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-  const parsed = /^\d{1,2}$/.test(number) ? Number(number) : null;
-  const valid = parsed !== null && parsed >= 1;
+  const parsed =
+    /^\d{1,2}$/.test(number) && Number(number) >= 1 ? Number(number) : null;
+  const taken = parsed !== null && numbers.includes(parsed);
+  const refused = parsed !== null && parsed === takenMeanwhile;
+  const invalid = taken || refused;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (parsed === null || invalid) return;
     setFailure(null);
-    if (!valid) {
-      setNumberError("Escribe un número del 1 al 99.");
-      return;
-    }
-    setNumberError(null);
-    const name = equipmentName(kind, parsed);
     try {
       await change.mutateAsync({
         kind: "create",
-        input: { branchId, kind, number: parsed },
+        input: { branchId, typeId: type.id, number: parsed },
       });
-      onDone(`Agregamos ${name}.`);
+      onDone(`Agregamos ${unitName(type.name, parsed)}.`);
     } catch (error) {
       const problem = backOfficeProblem(error);
       if (problem.code === "equipment_number_taken") {
-        setNumberError(`Ya hay un ${name} en esta sucursal.`);
+        setTakenMeanwhile(parsed);
       } else {
         setFailure(problem.message);
       }
     }
   };
 
+  const help = taken
+    ? `Ya hay un ${unitName(type.name, parsed)} en esta sucursal. El primer número libre es el ${free}.`
+    : refused
+      ? `Ya hay un ${unitName(type.name, parsed)} en esta sucursal.`
+      : parsed === null
+        ? "Del 1 al 99, único por tipo en esta sucursal."
+        : `Se mostrará como ${unitName(type.name, parsed)}.`;
+
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
-        <div className="flex flex-col gap-1.5">
-          <p className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-            Tipo
-          </p>
-          <ChoiceChips
-            legend="Tipo"
-            name="equipment-kind"
-            value={kind}
-            options={equipmentKinds}
-            onChange={setKind}
-          />
-        </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={numberId}>Número</Label>
           <Input
             id={numberId}
             inputMode="numeric"
-            placeholder="9"
-            className="w-[120px]"
+            className="w-[140px]"
             value={number}
-            aria-invalid={numberError !== null}
+            aria-invalid={invalid}
             aria-describedby={`${numberId}-help`}
             onChange={(event) => setNumber(event.target.value.trim())}
           />
-          <p id={`${numberId}-help`} className="text-ayuda text-texto-tenue">
-            {valid
-              ? `Se mostrará como ${equipmentName(kind, parsed)}.`
-              : "Del 1 al 99, único por tipo en esta sucursal."}
-          </p>
-          {numberError === null ? null : (
-            <p role="alert" className={fieldError}>
-              {numberError}
+          {invalid ? (
+            <p
+              key="taken"
+              id={`${numberId}-help`}
+              role="alert"
+              className={fieldError}
+            >
+              {help}
+            </p>
+          ) : (
+            <p
+              key="help"
+              id={`${numberId}-help`}
+              className="text-ayuda text-texto-tenue"
+            >
+              {help}
             </p>
           )}
         </div>
         <Failure message={failure} />
       </SidePanelBody>
       <SidePanelFooter>
-        <Button type="submit" size="lg" busy={change.isPending}>
-          Guardar
+        <Button
+          type="submit"
+          size="lg"
+          busy={change.isPending}
+          disabled={parsed === null || invalid}
+        >
+          Agregar
         </Button>
       </SidePanelFooter>
     </form>
   );
 }
 
-// AW37 «Registrar falla»: what happened and whether the piece can be used.
+// AW37 «Registrar falla»: what happened and whether the unit can be used.
 export function ReportIssueForm({
   branchId,
   equipment,
@@ -161,22 +174,13 @@ export function ReportIssueForm({
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor={descriptionId}>¿Qué pasó?</Label>
-          <Textarea
-            id={descriptionId}
-            maxLength={500}
-            placeholder="Ej.: el resorte rojo se soltó"
-            value={description}
-            aria-invalid={descriptionError !== null}
-            onChange={(event) => setDescription(event.target.value)}
-          />
-          {descriptionError === null ? null : (
-            <p role="alert" className={fieldError}>
-              {descriptionError}
-            </p>
-          )}
-        </div>
+        <DescriptionField
+          id={descriptionId}
+          placeholder="Ej.: el resorte rojo se soltó"
+          value={description}
+          error={descriptionError}
+          onChange={setDescription}
+        />
         <div className="flex items-start gap-2.5">
           <input
             id={outId}
@@ -203,5 +207,39 @@ export function ReportIssueForm({
         </Button>
       </SidePanelFooter>
     </form>
+  );
+}
+
+/** «¿Qué pasó?», shared by a unit's fault and a stock's damage. */
+export function DescriptionField({
+  id,
+  placeholder,
+  value,
+  error,
+  onChange,
+}: {
+  id: string;
+  placeholder: string;
+  value: string;
+  error: string | null;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>¿Qué pasó?</Label>
+      <Textarea
+        id={id}
+        maxLength={500}
+        placeholder={placeholder}
+        value={value}
+        aria-invalid={error !== null}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      {error === null ? null : (
+        <p role="alert" className={fieldError}>
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

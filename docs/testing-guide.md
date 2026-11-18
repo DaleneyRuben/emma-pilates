@@ -69,13 +69,13 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115, 142 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126, 160 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
-| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158 |
-| 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158, 160 |
+| 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -85,7 +85,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71, 142 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89, 160 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
 | S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
@@ -104,12 +104,12 @@ can be found by its design name.
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
 | AW08–AW10 Insumos, AW31 Movimientos de insumos (was Retiros e insumos consumidos) | 28, 72, 162 |
-| AW37 Equipos | 82 |
+| AW37 Equipos | 82, 161 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112, 163 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114, 163 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones (Clientas › Cuenta cerrada since FIX-065) | 31, 33, 59, 60, 72, 111, 155, 159 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158, 160 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
@@ -2204,7 +2204,7 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    Nutricionista · Branch» and the chip «Gratis con tu plan», then «Puedes
    cancelarla hasta 3 horas antes.» and **Cancelar evaluación** (outlined,
    Error). Below come «Reserva otra evaluación» with the plan line and the
-   turnos, and «Anteriores» at the foot (rows with «Realizada» or
+   turnos (hidden while a released slot waits for its new time, Test 160), and «Anteriores» at the foot (rows with «Realizada» or
    «Incluida»). Tap **Cancelar evaluación** and confirm: the sheet says the
    turno is freed and "Podrás reservar otra evaluación para este mes." (or
    "para noviembre" when the Evaluation is next month's), and the screen goes
@@ -6585,6 +6585,8 @@ so the phone has a profile to keep: «Hola, Lucía» and her plan card.
    reads «Sin conexión. Mostrando tus datos de la última vez.» The banner
    also appears when only one of the two refreshes fails (profile or
    subscription) while the other still has cached data on screen (FIX-011).
+   Since FIX-066 (Test 160) Inicio asks the server again every 15 seconds and
+   when the app returns to the foreground while the line shows.
    The banner of Test 71 still sits above the screen; this line is Inicio's
    own.
 2. **Nothing saved.** Sign out, cut the network before the next sign-in,
@@ -7502,6 +7504,9 @@ E. **Who decides.** The Administrator and the Coordinator decide
    `403` on the decision.
 
 ## Test 82: equipment, its faults, and the capacity flags (BKO-004)
+
+**Since FIX-067 (Test 161)** the kinds are studio-defined types: «Nuevo
+equipo» is each type's «Agregar», and quantity types sit beside them.
 
 The studio registers each reformer, cadillac, and mat per Branch; a Trainer
 reports a fault from a Session of her agenda; an Administrator resolves it;
@@ -9956,7 +9961,8 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    with or without a Plan, and a quieter line «M sin plan: se les suma en su
    próximo plan (Sofía Guzmán)» names the ones without a current Plan. No line
    mentions founders. `GET /api/v1/administrator/campaigns/preview` answers
-   `recipientCount`, `owed` (id and name), and an empty, deprecated `skipped`.
+   `recipientCount`, `owed` (id and name), an empty, deprecated `skipped`,
+   and since FIX-066 `pastCampaigns` (Test 160).
 3. Write «Inicio de año», **Clases extra** 1, **Dar las clases**. The dialog
    reads «Cada clienta activa recibe las clases: en su plan vigente o, si no
    tiene uno, en su próximo plan. Ningún precio cambia.» **Confirmar
@@ -10022,6 +10028,136 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
    work the same.
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
+
+## Test 160: walkthrough findings 92–100 (FIX-066)
+
+Nine small fixes from the 2026-11-17 verification walk. No migration; the
+API change is additive (`pastCampaigns` on the campaign preview). Use a copy
+of the fixtures (`createdb -T pilates_golden pilates_fix066_dev`) and run the
+API, the worker, both apps and the admin web on your own ports
+(surface-verification skill).
+
+1. **Campaña twice (n.º 92).** As Paola, **Promociones › Clases de campaña**,
+   give «Fin de año» with 1 class (Test 158 step 3). Expected: after «N
+   clientas recibieron 1 clase extra.» the name is empty, **Clases extra**
+   reads 1, and «Dar las clases» needs a name again. Type «fin de año» (any
+   case or spacing): an amber line under the name reads «Ya diste la campaña
+   «Fin de año» el {día de mes}. Si la das otra vez, cada clienta recibe las
+   clases de nuevo.» (with the year when it was another year); a new name
+   clears it. A campaign only owed (every Client without a Plan) counts too;
+   a later Plan collecting an owed class does not move its day. Giving the
+   same campaign again on purpose sends a new Idempotency-Key, so it really
+   gives the classes again.
+   `GET /api/v1/administrator/campaigns/preview` lists `pastCampaigns` (name
+   and its latest `grantedAt`, latest first). Check at 1440 and 420 px.
+2. **Every origin named (n.º 93).** Give Lucía an invitation class (a friend
+   she invited buys her first Plan, Test 86) and the campaign above.
+   Expected: her file on the admin web and **Mi plan** in the Client app read «Clases extra: 2 · 1 de invitación · 1 de
+   campaña»; a single origin keeps «Clases extra: N · Campaña»; once one is
+   spent the line names the origins without counts («Clases extra: 1 ·
+   Invitación · Campaña»). The campaign's name is not in the line: it lives
+   only in the audit.
+3. **Congelamientos (n.º 94).** In the Staff app as Paola, **Pagos ›
+   Congelamientos**: «Pausan el plan de la clienta. Los días congelados se
+   suman a su vencimiento.» sits under the title, above «No hay solicitudes
+   por revisar» or «Por revisar · N», never between the sections.
+4. **Staff client file (n.º 95).** Open a Client whose stored phone fits no
+   mobile (`7000004`, or none; on a copy set `booking.clients.phone` with
+   `psql`). Expected: under her name, «Celular incompleto» in amber · her
+   email, as on the admin web (Test 157). A pending Client whose activation
+   link lapsed reads «El enlace venció el …» (a live one «El enlace vence el
+   …»), with **Reenviar enlace**.
+5. **Enviar comentarios (n.º 96).** In the Client app, **Perfil › Enviar
+   comentarios**, tap the field: with the keyboard up the form scrolls so
+   «Mínimo 10 caracteres.» and «n / 2000» show whole under the field. A long
+   comment scrolls inside the field once it is 240 pt tall.
+6. **Released Evaluation (n.º 97).** As Valeria with a paid Evaluation whose
+   slot the Nutritionist released (Test 149): **Evaluación nutricional**
+   shows «El estudio liberó tu turno» with **Elegir turno** and no «Reserva
+   otra evaluación» section, so no turno there charges Bs 70 again.
+   **Elegir turno** still lists the turnos to move it.
+7. **Mi plan with the next Plan paid (n.º 98).** As a founder with a next
+   Plan already bought (Test 88), **Mi plan** shows «Tu plan siguiente
+   empieza el … · ya está pagado.» and no «Renueva antes del …» notice.
+8. **Back from a server outage (n.º 99).** As Lucía open **Inicio**, stop the
+   API (keep the phone's network), pull to refresh: «Sin conexión. Mostrando
+   tus datos de la última vez.» Start the API again and wait: within about
+   15 seconds the line goes without a pull. Sending the app to the
+   background and back retries at once.
+9. **Free only from a later Plan (n.º 100).** As Isabel, sell her (as Camila)
+   a cash «Trimestral» starting the day after her current Plan ends, then
+   open **Evaluación nutricional**. Expected: «Desde el {día}, tu primera
+   evaluación del trimestre es gratis. Antes cuesta Bs 70.», and each turno
+   shows «Bs 70» or «Gratis» under its time (VoiceOver/TalkBack read «Turno
+   15:00 · Bs 70»). With only free or only paid turnos, no price shows on
+   the turnos and the line is the old one.
+
+## Test 161: studio-defined equipment types, by unit or by quantity (FIX-067)
+
+Walkthrough findings 101 and 103. The owner chose «tipos propios» and design
+option A (follow-ups 269–271). Migration `20261118120000_equipment_types`
+(approved by the owner on 2026-11-18): `back_office.equipment_types` (Reformer,
+Cadillac and Mat seeded as per-unit types with every existing machine),
+`equipment.type_id`, `back_office.equipment_stocks`, and quantity damage on
+`equipment_issues`. Nothing is ever deleted.
+
+1. Use a copy of the fixtures (`createdb -T pilates_dev_sim
+   pilates_fix067_dev`), run `prisma migrate deploy` on it, and run the API
+   and the admin web on your own ports (export `ADMIN_WEB_TRUSTED_ORIGINS` in
+   the shell for your Vite port). Log in as Paola and open **Estudio ›
+   Equipos**. Expected: «Sucursal Centro · 3 tipos de equipo · N fallas
+   abiertas», **Fallas abiertas** on top, then one section per type
+   (Reformer, Cadillac, Mat) with «· N unidades», the «Con número» pill,
+   **Agregar** and **Editar tipo**; an empty one reads «Sin unidades en esta
+   sucursal.». Existing machines keep their faults.
+2. **Nuevo tipo** → Nombre «Balones», «Por cantidad», «Cantidad en Sucursal
+   Centro» 12 → **Crear tipo**. Expected: «Creamos el tipo Balones.» and a
+   «Balones · 12 en total» section with the «Por cantidad» pill, «12 en esta
+   sucursal», «12 se pueden usar», **Registrar daño** and **Cambiar
+   cantidad**. Creating «balones» again shows «Ya hay un tipo con ese
+   nombre.» (`409 equipment_type_name_taken`). The type shows in every
+   Branch, with «0 en esta sucursal» elsewhere.
+3. **Registrar daño** → «¿Cuántos?» 1 (the stepper stops at the usable
+   count, «De 12 que se pueden usar.»), «¿Qué pasó?» → register. Expected:
+   «1 dañado» on the card, «11 se pueden usar», and «Balones · 1 dañado» in
+   Fallas abiertas with **Dar de baja** and **Marcar resuelta**. **Dar de
+   baja** and confirm: «Dimos de baja 1 dañado de Balones.», the total 11,
+   the damage under Resueltas («Dada de baja por …»). **Marcar resuelta** on
+   another damage returns it to usable without changing the total.
+4. **Cambiar cantidad** to 14. Expected: «14 en esta sucursal»; a number
+   below the open damage is refused with «No puede ser menor que los dañados
+   (N).». Each change writes an audit record `equipment.quantity_changed`
+   (`previousQuantity`, `quantity`, `cause` `set` or `write_off`).
+5. **Nuevo tipo** «Sillas», «Por unidad, con número». Its section offers
+   **Agregar**: «Agregar Sillas» with only «Número», prefilled with the first
+   free number. Finding 103: on **Agregar Reformer** type a number already
+   used. Expected, as you type: «Ya hay un Reformer 1 en esta sucursal. El
+   primer número libre es el N.» in red, no «Se mostrará como…» line, and
+   **Agregar** disabled; a free number reads «Se mostrará como Reformer N.».
+6. **Editar tipo** renames a type. **Quitar tipo** is disabled with «Primero
+   da de baja sus unidades en todas las sucursales.» while this Branch has
+   units or a quantity; units in another Branch answer `409
+   equipment_type_in_use` with the same text (for a quantity type «Primero
+   deja su cantidad en 0 en todas las sucursales.»). A type nobody uses goes
+   away after «¿Quitar el tipo X?» → **Quitar tipo** with «Quitamos el tipo
+   X.» (its row keeps `archived_at`). As Carolina
+   (Coordinación) the sections, Agregar, damage and quantities work, without
+   Nuevo tipo or Editar tipo.
+7. **Horario**: a class still matches the per-unit type whose name is a word
+   of its class type («Reformer Pilates» → Reformer); the flag's accessible
+   name says «… equipos Reformer funcionando para N lugares».
+8. Staff app as `emma.vargas@example.com`: from a Reformer Pilates Session,
+   **Reportar una falla**. Expected: the types as chips that scroll
+   sideways, Reformer first and chosen; only types the Branch has. A unit
+   type shows its numbered tiles and «No se puede usar». **Balones** shows
+   «Hay N que se pueden usar», «¿Cuántos se dañaron?» with − and + (1 to the
+   usable count) and no switch; sending it shows «Gracias por avisar» and the
+   damage appears in the admin web's Fallas abiertas. With 0 usable it says
+   «No hay ninguno que se pueda usar: ya están todos reportados.». Check on
+   the iPhone, the iPad and the Android emulator. Older app builds keep
+   working: `items` and `kind` still list only Reformer, Cadillac and Mat.
+9. Check Equipos at 1440 px and 420 px (stacked unit rows at 420), then drop
+   the copy.
 
 ## Test 162: Movimientos de insumos names who recorded each one and shows the Restocks (FIX-068)
 
@@ -10215,8 +10351,13 @@ one. Design option A (follow-ups 275 and 276). The migration
 
 ## Test 167: Informes recommendations and figures that add up (FIX-073)
 
-Walkthrough finding 107. No migration; the API change is additive
-(`clientId`, `clientName`, `trainerName`, `weekday` on each recommendation).
+Walkthrough finding 107. The API changes are additive (`clientId`,
+`clientName`, `trainerName`, `weekday` on each recommendation;
+`minimumCancellations` on the month KPIs). Steps 8 to 10 need the migration
+`20261118120000_cancelled_session_facts` (the owner approved option A on
+2026-11-18): the table `studio.cancelled_session_facts` keeps every class the
+worker cancelled for low demand (`minimum_not_met` or `zero_bookings`) with
+the Bookings it held, written by the same recompute as the session facts.
 
 1. Use a copy of the fixtures (`createdb -T pilates_golden
    pilates_fix073_dev`; the fixtures' November classes have ended, so the
@@ -10253,4 +10394,23 @@ Walkthrough finding 107. No migration; the API change is additive
 7. **Finanzas without a budget.** On a month with no budget, «Punto de
    equilibrio» reads «—» and «Carga tu presupuesto para calcularlo». After
    «Cargar presupuesto de apertura» it shows the amount again.
-8. Check at 1440 px and 420 px, then drop the copy.
+8. **Minimum cancellations in the facts.** Let the worker cancel a class for
+   the minimum (or use a database where it did), then press **Recalcular**.
+   Expected: one live row per such class in `studio.cancelled_session_facts`
+   (cause and `bookings_held`, the window-close snapshot or the Bookings the
+   cancellation released); a class cancelled by hand («Sin reemplazo»,
+   «Cambio de horario») is not there, and a class that is reopened leaves it.
+9. **Weak schedule.** A Trainer and weekday with at least three classes,
+   taught or cancelled for the minimum, averaging below 3 Bookings reads
+   «Revisa el horario del martes: de 15 clases, 14 se cancelaron por mínimo;
+   promedia 0,1 alumnas.» (one cancellation: «1 se canceló»). Without
+   cancellations the sentence stays «… promedia N alumnas en N clases.».
+10. **Pregunta sobre el mes.** «¿Por qué hubo tantas clases canceladas?»
+    answers «Se cancelaron 54 clases por no llegar al mínimo de reservas, y
+    se dictaron 35.»; a month without them «Ninguna clase se canceló por no
+    llegar al mínimo de reservas.». The refusal now reads «… Pregunta por la
+    ocupación, las clientas activas o las clases canceladas.». «Informe del
+    mes» adds «Se cancelaron N clases por no llegar al mínimo de reservas.»
+    when there were any. `GET administrator/reports/kpis` returns
+    `minimumCancellations` (a count, also for the Coordinator).
+11. Check at 1440 px and 420 px, then drop the copy.

@@ -9,6 +9,8 @@ import {
 } from './back-office.controller';
 import { createPrismaCashCloses } from './cash-close/prisma-cash-closes';
 import { createPrismaEquipment } from './equipment/prisma-equipment';
+import { createPrismaEquipmentStocks } from './equipment/prisma-equipment-stocks';
+import { createPrismaEquipmentTypes } from './equipment/prisma-equipment-types';
 import { createPrismaSessionEquipment } from './equipment/prisma-session-equipment';
 import { createPrismaExpenses } from './expenses/prisma-expenses';
 import { createPrismaVoidExpense } from './expenses/prisma-void-expense';
@@ -55,6 +57,8 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
             ofMonth: (from, until) => monthFacts(prisma, from, until),
           }),
           equipment: createPrismaEquipment(prisma, { now }),
+          equipmentTypes: createPrismaEquipmentTypes(prisma, { now }),
+          equipmentStocks: createPrismaEquipmentStocks(prisma, { now }),
           sessionEquipment: createPrismaSessionEquipment(prisma, { now }),
           cashCloses: createPrismaCashCloses(prisma, { now }),
           payoutQrs: createPayoutQrs({

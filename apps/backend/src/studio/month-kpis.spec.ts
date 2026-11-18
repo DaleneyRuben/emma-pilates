@@ -94,4 +94,19 @@ describe('month kpis', () => {
     expect(result.renewalPercent).toBe(0);
     expect(result.newClients).toBe(0);
   });
+
+  // Walkthrough finding 107: classes cancelled for low demand are an
+  // indicator of their own; they never enter occupancy or held classes.
+  it('counts the classes cancelled for the minimum apart from the held ones', () => {
+    const result = monthKpis({
+      sessions: [session({ capacity: 8, bookingsAtWindowClose: 1 })],
+      clientMonths: [],
+      earlierActiveClientIds: [],
+      minimumCancellations: 54,
+    });
+
+    expect(result.sessionsHeld).toBe(1);
+    expect(result.minimumCancellations).toBe(54);
+    expect(result.occupancyPercent).toBe(13);
+  });
 });

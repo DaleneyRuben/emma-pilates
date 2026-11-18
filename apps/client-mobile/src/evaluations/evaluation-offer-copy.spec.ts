@@ -1,7 +1,7 @@
 import type { EvaluationAvailabilityDto } from "@pilates/api-contracts";
 
 import { planOfferLine } from "./evaluation-offer-copy";
-import { firstDay, slot } from "./evaluation-test-support";
+import { boliviaInstant, firstDay, secondDay, slot } from "./evaluation-test-support";
 
 // Review of FIX-056: the line follows the slots on screen, and an older
 // backend that sends no price never makes it say «Bs 0».
@@ -39,5 +39,34 @@ describe("planOfferLine", () => {
 
   it("says nothing when an older backend gives no price", () => {
     expect(planOfferLine(availability([]))).toBeNull();
+  });
+
+  // Walkthrough finding 100: a paid Plan starting later includes the
+  // Evaluation, so the first slots cost Bs 70 and later ones are free.
+  it("says from when it is free when the first slots still cost", () => {
+    const mixed = {
+      days: [
+        {
+          date: firstDay,
+          slots: [slot("slot-1", firstDay, "09:00", { included: false, priceCentavos: 7_000 })],
+        },
+        {
+          date: secondDay,
+          slots: [slot("slot-2", secondDay, "09:00", { included: true, priceCentavos: 0 })],
+        },
+      ],
+      months: [],
+      includedEvaluation: "none",
+      priceCentavos: 7_000,
+    } as unknown as EvaluationAvailabilityDto;
+    const freeFrom = new Intl.DateTimeFormat("es-BO", {
+      day: "numeric",
+      month: "long",
+      timeZone: "America/La_Paz",
+    }).format(new Date(boliviaInstant(secondDay, "09:00")));
+
+    expect(planOfferLine(mixed)).toBe(
+      `Desde el ${freeFrom}, tu primera evaluación del trimestre es gratis. Antes cuesta Bs 70.`,
+    );
   });
 });

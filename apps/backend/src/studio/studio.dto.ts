@@ -29,6 +29,11 @@ export class MonthKpisDto {
   @ApiProperty() newClients!: number;
   @ApiProperty() renewedClients!: number;
   @ApiProperty() renewalPercent!: number;
+  @ApiProperty({
+    description:
+      'Classes cancelled for low demand (minimum not met or no booking)',
+  })
+  minimumCancellations!: number;
   @ApiProperty({ required: false }) cashCentavos?: number;
   @ApiProperty({ required: false }) accruedCentavos?: number;
   @ApiProperty({ required: false }) deferredCentavos?: number;

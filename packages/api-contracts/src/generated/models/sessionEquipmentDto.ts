@@ -4,8 +4,9 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import type { EquipmentDto } from "./equipmentDto";
 import type { SessionEquipmentDtoKind } from "./sessionEquipmentDtoKind";
+import type { SessionEquipmentItemDto } from "./sessionEquipmentItemDto";
+import type { SessionEquipmentTypeDto } from "./sessionEquipmentTypeDto";
 
 export interface SessionEquipmentDto {
   sessionId: string;
@@ -14,5 +15,13 @@ export interface SessionEquipmentDto {
    * @nullable
    */
   kind: SessionEquipmentDtoKind;
-  items: EquipmentDto[];
+  /**
+   * The unit type its Class Type uses (FIX-067); null when none
+   * @nullable
+   */
+  typeId: string | null;
+  /** Units of the three seeded types only, for old builds; read types */
+  items: SessionEquipmentItemDto[];
+  /** Every type not archived, the Session’s first */
+  types: SessionEquipmentTypeDto[];
 }

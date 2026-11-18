@@ -8,6 +8,14 @@
 export interface SessionEquipmentIssueInputDto {
   /** @maxLength 500 */
   description: string;
-  outOfService: boolean;
-  equipmentId: string;
+  equipmentId?: string;
+  /** With equipmentId */
+  outOfService?: boolean;
+  /** A quantity type, with quantity */
+  typeId?: string;
+  /**
+   * @minimum 1
+   * @maximum 9999
+   */
+  quantity?: number;
 }

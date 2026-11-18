@@ -8425,6 +8425,43 @@
         ]
       }
     },
+    "/api/v1/administrator/equipment-issues/{issueId}/write-off": {
+      "post": {
+        "operationId": "writeOffEquipmentIssue",
+        "parameters": [
+          {
+            "name": "issueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentIssues"
+        ]
+      }
+    },
     "/api/v1/administrator/equipment-flags": {
       "get": {
         "operationId": "listEquipmentFlaggedSessions",
@@ -8477,6 +8514,260 @@
         "summary": "",
         "tags": [
           "AdministratorEquipmentFlags"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-types": {
+      "get": {
+        "operationId": "listEquipmentTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentTypeListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentTypes"
+        ]
+      },
+      "post": {
+        "operationId": "createEquipmentType",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentTypeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-types/{typeId}": {
+      "patch": {
+        "operationId": "renameEquipmentType",
+        "parameters": [
+          {
+            "name": "typeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentTypeRenameDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-types/{typeId}/archive": {
+      "post": {
+        "operationId": "archiveEquipmentType",
+        "parameters": [
+          {
+            "name": "typeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-stocks": {
+      "get": {
+        "operationId": "listEquipmentStocks",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentStockListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentStocks"
+        ]
+      },
+      "put": {
+        "operationId": "setEquipmentStockQuantity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentStockInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentStockDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentStocks"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-stocks/damage": {
+      "post": {
+        "operationId": "reportEquipmentStockDamage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentDamageInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentStocks"
         ]
       }
     },
@@ -16085,6 +16376,23 @@
           "reason"
         ]
       },
+      "PastCampaignDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "grantedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Its latest grant"
+          }
+        },
+        "required": [
+          "name",
+          "grantedAt"
+        ]
+      },
       "CampaignPreviewDto": {
         "type": "object",
         "properties": {
@@ -16105,12 +16413,20 @@
             "items": {
               "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
+          },
+          "pastCampaigns": {
+            "description": "Each campaign name already given, latest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PastCampaignDto"
+            }
           }
         },
         "required": [
           "recipientCount",
           "owed",
-          "skipped"
+          "skipped",
+          "pastCampaigns"
         ]
       },
       "GrantCampaignDto": {
@@ -18151,13 +18467,23 @@
             "type": "string",
             "format": "uuid"
           },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeName": {
+            "type": "string"
+          },
           "kind": {
             "type": "string",
             "enum": [
               "reformer",
               "cadillac",
               "mat"
-            ]
+            ],
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName"
           },
           "number": {
             "type": "number",
@@ -18185,6 +18511,8 @@
         "required": [
           "id",
           "branchId",
+          "typeId",
+          "typeName",
           "kind",
           "number",
           "status",
@@ -18213,13 +18541,20 @@
             "type": "string",
             "format": "uuid"
           },
+          "typeId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A unit type; send it or kind, not both"
+          },
           "kind": {
             "type": "string",
             "enum": [
               "reformer",
               "cadillac",
               "mat"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (FIX-067): one of the seeded types; send typeId"
           },
           "number": {
             "type": "number",
@@ -18229,7 +18564,6 @@
         },
         "required": [
           "branchId",
-          "kind",
           "number"
         ]
       },
@@ -18258,7 +18592,8 @@
           },
           "equipmentId": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "nullable": true
           },
           "equipmentKind": {
             "type": "string",
@@ -18266,10 +18601,30 @@
               "reformer",
               "cadillac",
               "mat"
-            ]
+            ],
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName"
           },
           "equipmentNumber": {
-            "type": "number"
+            "type": "number",
+            "nullable": true
+          },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "nullable": true,
+            "description": "How many are damaged; null for a numbered unit"
+          },
+          "writtenOff": {
+            "type": "boolean",
+            "description": "Resolved by writing the damaged units off the stock"
           },
           "description": {
             "type": "string"
@@ -18299,6 +18654,10 @@
           "equipmentId",
           "equipmentKind",
           "equipmentNumber",
+          "typeId",
+          "typeName",
+          "quantity",
+          "writtenOff",
           "description",
           "outOfService",
           "reportedAt",
@@ -18340,27 +18699,342 @@
             "type": "string",
             "format": "uuid"
           },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeName": {
+            "type": "string"
+          },
           "kind": {
             "type": "string",
             "enum": [
               "reformer",
               "cadillac",
               "mat"
-            ]
+            ],
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName"
           },
           "capacity": {
             "type": "number"
           },
           "workingCount": {
             "type": "number",
-            "description": "Working Equipment of the kind at the Branch"
+            "description": "Working Equipment of the type at the Branch"
           }
         },
         "required": [
           "sessionId",
+          "typeId",
+          "typeName",
           "kind",
           "capacity",
           "workingCount"
+        ]
+      },
+      "EquipmentTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "tracking": {
+            "type": "string",
+            "enum": [
+              "unit",
+              "quantity"
+            ],
+            "description": "unit: numbered units; quantity: a count per Branch"
+          },
+          "legacyKind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ],
+            "nullable": true,
+            "description": "Set on the three seeded types only"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tracking",
+          "legacyKind"
+        ]
+      },
+      "EquipmentTypeListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentTypeDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "EquipmentTypeInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "tracking": {
+            "type": "string",
+            "enum": [
+              "unit",
+              "quantity"
+            ]
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "With quantity, on a quantity type: that Branch’s count"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "name",
+          "tracking"
+        ]
+      },
+      "EquipmentTypeRenameDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "EquipmentStockDto": {
+        "type": "object",
+        "properties": {
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999
+          },
+          "damaged": {
+            "type": "number",
+            "description": "The open damage, summed"
+          },
+          "usable": {
+            "type": "number",
+            "description": "quantity less damaged"
+          }
+        },
+        "required": [
+          "typeId",
+          "typeName",
+          "branchId",
+          "quantity",
+          "damaged",
+          "usable"
+        ]
+      },
+      "EquipmentStockListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentStockDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "EquipmentStockInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "branchId",
+          "typeId",
+          "quantity"
+        ]
+      },
+      "EquipmentDamageInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 9999
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "branchId",
+          "typeId",
+          "quantity",
+          "description"
+        ]
+      },
+      "SessionEquipmentItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ],
+            "nullable": false,
+            "deprecated": false,
+            "description": "The seeded type’s kind; never null here"
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "working",
+              "faulty",
+              "out_of_service"
+            ],
+            "description": "out_of_service with an open Issue that takes it out of service, faulty with only other open Issues"
+          },
+          "openIssueCount": {
+            "type": "number"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "typeId",
+          "typeName",
+          "kind",
+          "number",
+          "status",
+          "openIssueCount",
+          "archivedAt"
+        ]
+      },
+      "SessionEquipmentTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tracking": {
+            "type": "string",
+            "enum": [
+              "unit",
+              "quantity"
+            ]
+          },
+          "units": {
+            "description": "The Branch’s units; empty for a quantity type",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentDto"
+            }
+          },
+          "usable": {
+            "type": "number",
+            "description": "The Branch’s count less its open damage; 0 for a unit type"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The Branch’s count; 0 for a unit type"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "tracking",
+          "units",
+          "usable",
+          "quantity"
         ]
       },
       "SessionEquipmentDto": {
@@ -18380,17 +19054,33 @@
             "nullable": true,
             "description": "The kind its Class Type uses; null when it uses none"
           },
+          "typeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The unit type its Class Type uses (FIX-067); null when none"
+          },
           "items": {
+            "description": "Units of the three seeded types only, for old builds; read types",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EquipmentDto"
+              "$ref": "#/components/schemas/SessionEquipmentItemDto"
+            }
+          },
+          "types": {
+            "description": "Every type not archived, the Session’s first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionEquipmentTypeDto"
             }
           }
         },
         "required": [
           "sessionId",
           "kind",
-          "items"
+          "typeId",
+          "items",
+          "types"
         ]
       },
       "SessionEquipmentIssueInputDto": {
@@ -18400,18 +19090,27 @@
             "type": "string",
             "maxLength": 500
           },
-          "outOfService": {
-            "type": "boolean"
-          },
           "equipmentId": {
             "type": "string",
             "format": "uuid"
+          },
+          "outOfService": {
+            "type": "boolean",
+            "description": "With equipmentId"
+          },
+          "typeId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A quantity type, with quantity"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 9999
           }
         },
         "required": [
-          "description",
-          "outOfService",
-          "equipmentId"
+          "description"
         ]
       },
       "AdminSupplyDto": {
@@ -19706,6 +20405,10 @@
           "renewalPercent": {
             "type": "number"
           },
+          "minimumCancellations": {
+            "type": "number",
+            "description": "Classes cancelled for low demand (minimum not met or no booking)"
+          },
           "cashCentavos": {
             "type": "number"
           },
@@ -19729,7 +20432,8 @@
           "activeClients",
           "newClients",
           "renewedClients",
-          "renewalPercent"
+          "renewalPercent",
+          "minimumCancellations"
         ]
       },
       "RecommendationDto": {

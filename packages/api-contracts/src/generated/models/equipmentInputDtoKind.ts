@@ -5,6 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Deprecated (FIX-067): one of the seeded types; send typeId
+ * @deprecated
+ */
 export type EquipmentInputDtoKind =
   (typeof EquipmentInputDtoKind)[keyof typeof EquipmentInputDtoKind];
 

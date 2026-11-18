@@ -3,6 +3,7 @@ import {
   BodyText,
   colors,
   dayChipLabel,
+  formatBolivianos,
   fontFamilies,
   initials,
   radii,
@@ -57,11 +58,17 @@ export function EvaluationSlotPicker({
   const openSlots = days.flatMap((day) => day.slots);
   const nutritionists = new Set(openSlots.map((slot) => slot.nutritionistName));
   const branches = new Set(openSlots.map((slot) => slot.branchId));
+  // Walkthrough finding 100: with free and paid slots open, each says which.
+  const mixedPrices =
+    openSlots.some((slot) => slot.included) && openSlots.some((slot) => !slot.included);
+  const priceLabel = (slot: EvaluationSlotDto) =>
+    slot.included ? "Gratis" : formatBolivianos(slot.priceCentavos);
   const slotLabel = (slot: EvaluationSlotDto) =>
     [
       clockTime(slot.startsAt),
       ...(branches.size > 1 ? [slot.branchName] : []),
       ...(nutritionists.size > 1 ? [slot.nutritionistName] : []),
+      ...(mixedPrices ? [priceLabel(slot)] : []),
     ].join(" · ");
 
   return (
@@ -125,6 +132,7 @@ export function EvaluationSlotPicker({
                 {nutritionists.size > 1 ? (
                   <Text style={styles.slotCaption}>{slot.nutritionistName}</Text>
                 ) : null}
+                {mixedPrices ? <Text style={styles.slotCaption}>{priceLabel(slot)}</Text> : null}
               </Pressable>
             ))}
           </View>

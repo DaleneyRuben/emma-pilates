@@ -5,8 +5,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName
+ * @deprecated
+ * @nullable
+ */
 export type EquipmentIssueDtoEquipmentKind =
-  (typeof EquipmentIssueDtoEquipmentKind)[keyof typeof EquipmentIssueDtoEquipmentKind];
+  | (typeof EquipmentIssueDtoEquipmentKind)[keyof typeof EquipmentIssueDtoEquipmentKind]
+  | null;
 
 export const EquipmentIssueDtoEquipmentKind = {
   reformer: "reformer",

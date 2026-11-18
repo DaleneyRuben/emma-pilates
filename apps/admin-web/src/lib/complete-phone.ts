@@ -8,7 +8,8 @@ const withCode = /^\+(\d{1,3})[\s-]+(\d[\d\s-]*)$/;
  * that fit no mobile (`7000004`). Numbers saved before FIX-037 with spaces or
  * dashes, or a Bolivian mobile without +591, still count, as
  * `parseStoredPhone` reads them. A code outside the web's list needs 6 to 14
- * digits, as the backend's `isStorableMobile`.
+ * digits, as the backend's `isStorableMobile`. The Staff app decides it with
+ * `packages/mobile-core/src/account/complete-phone.ts`: change both together.
  */
 export const isCompletePhone = (stored: string | null): boolean => {
   const trimmed = stored?.trim() ?? "";

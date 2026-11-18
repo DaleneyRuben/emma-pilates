@@ -38,6 +38,7 @@ import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
 import { ActivePlanCard, GuestPassCard, PurchasePlanCard } from "./home-plan-card";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
+import { useRetryCachedHome } from "./retry-cached-home";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
 import { PhonePrompt } from "./phone-prompt";
 import { PromotionsCarousel } from "./promotions-carousel";
@@ -115,6 +116,7 @@ export function HomeScreen() {
     (profile.isError || subscription.isError) &&
     loadedProfile !== undefined &&
     loadedSubscription !== undefined;
+  useRetryCachedHome(showingCachedHome, queryKeys);
 
   // Follow-up 246: the hero waits for the Payment too, so a Client whose
   // receipt is in review never sees «Comprar un plan» flash first.

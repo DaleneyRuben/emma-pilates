@@ -117,6 +117,7 @@ beyond what the table below names.
 | `expense.updated` | Back Office | An Administrator corrects an Expense (the Branch never changes) | Administrator | `expense` | Expense Branch | previous and new `expenseCategoryId`, `amountCentavos`, `incurredOn` (only those changed) |
 | `expense.voided` | Back Office | An Administrator eliminates an Expense (finding 104): it stays listed and counts for nothing | Administrator | `expense` | Expense Branch | `amountCentavos`, and `reason` when one was written |
 | `cash_close.recorded` | Back Office | An Assistant (at her Branch) or an Administrator makes the day's Cash Close; it is never edited afterwards (BKO-003) | Staff Account and Role (the Administrator, with the Impersonation, while she sees the app as an Assistant) | `cash_close` | Cash Close Branch | `businessDate`, `expectedCentavos`, `countedCentavos`, `differenceCentavos` |
+| `equipment.quantity_changed` | Back Office | An Administrator or Coordinator sets a Branch's count of a quantity Equipment Type (including a new type's first count), or writes damage off, which lowers it (FIX-067); an unchanged count writes nothing | Staff Account and Role | `equipment_stock` | Stock Branch | `typeId`, `previousQuantity`, `quantity`, `cause` (`set` / `write_off`), `issueId` on a write-off |
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 

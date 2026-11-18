@@ -118,6 +118,7 @@ import type {
   EmailChangeCompletionResultDto,
   EmailChangeRequestResultDto,
   EmailChangeResendResultDto,
+  EquipmentDamageInputDto,
   EquipmentDto,
   EquipmentFlaggedSessionDto,
   EquipmentInputDto,
@@ -125,6 +126,13 @@ import type {
   EquipmentIssueInputDto,
   EquipmentIssuePageDto,
   EquipmentListDto,
+  EquipmentStockDto,
+  EquipmentStockInputDto,
+  EquipmentStockListDto,
+  EquipmentTypeDto,
+  EquipmentTypeInputDto,
+  EquipmentTypeListDto,
+  EquipmentTypeRenameDto,
   EvaluationAvailabilityDto,
   EvaluationSlotDto,
   ExpenseCategoryInputDto,
@@ -182,6 +190,7 @@ import type {
   ListEquipmentFlaggedSessionsParams,
   ListEquipmentIssuesParams,
   ListEquipmentParams,
+  ListEquipmentStocksParams,
   ListEvaluationSlotsParams,
   ListEvaluationsParams,
   ListNotificationsParams,
@@ -32688,6 +32697,118 @@ export const useResolveEquipmentIssue = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type writeOffEquipmentIssueResponse200 = {
+  data: EquipmentIssueDto;
+  status: 200;
+};
+
+export type writeOffEquipmentIssueResponseSuccess =
+  writeOffEquipmentIssueResponse200 & {
+    headers: Headers;
+  };
+export type writeOffEquipmentIssueResponse =
+  writeOffEquipmentIssueResponseSuccess;
+
+export const getWriteOffEquipmentIssueUrl = (issueId: string) => {
+  return `/api/v1/administrator/equipment-issues/${issueId}/write-off`;
+};
+
+export const writeOffEquipmentIssue = async (
+  issueId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<writeOffEquipmentIssueResponse> => {
+  const res = await (fetchFn ?? fetch)(getWriteOffEquipmentIssueUrl(issueId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: writeOffEquipmentIssueResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as writeOffEquipmentIssueResponse;
+};
+
+export const getWriteOffEquipmentIssueMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof writeOffEquipmentIssue>>,
+    TError,
+    WriteOffEquipmentIssueMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof writeOffEquipmentIssue>>,
+  TError,
+  WriteOffEquipmentIssueMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["writeOffEquipmentIssue"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof writeOffEquipmentIssue>>,
+    WriteOffEquipmentIssueMutationVariables
+  > = (props) => {
+    const { issueId } = props ?? {};
+
+    return writeOffEquipmentIssue(issueId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WriteOffEquipmentIssueMutationResult = NonNullable<
+  Awaited<ReturnType<typeof writeOffEquipmentIssue>>
+>;
+
+export type WriteOffEquipmentIssueMutationError = unknown;
+export type WriteOffEquipmentIssueMutationVariables = { issueId: string };
+
+export const useWriteOffEquipmentIssue = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof writeOffEquipmentIssue>>,
+      TError,
+      WriteOffEquipmentIssueMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof writeOffEquipmentIssue>>,
+  TError,
+  WriteOffEquipmentIssueMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getWriteOffEquipmentIssueMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type listEquipmentFlaggedSessionsResponse200 = {
   data: EquipmentFlaggedSessionDto[];
   status: 200;
@@ -32908,6 +33029,1021 @@ export function useListEquipmentFlaggedSessions<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type listEquipmentTypesResponse200 = {
+  data: EquipmentTypeListDto;
+  status: 200;
+};
+
+export type listEquipmentTypesResponseSuccess =
+  listEquipmentTypesResponse200 & {
+    headers: Headers;
+  };
+export type listEquipmentTypesResponse = listEquipmentTypesResponseSuccess;
+
+export const getListEquipmentTypesUrl = () => {
+  return `/api/v1/administrator/equipment-types`;
+};
+
+export const listEquipmentTypes = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listEquipmentTypesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListEquipmentTypesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listEquipmentTypesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listEquipmentTypesResponse;
+};
+
+export const getListEquipmentTypesQueryKey = () => {
+  return [`/api/v1/administrator/equipment-types`] as const;
+};
+
+export const getListEquipmentTypesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEquipmentTypes>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listEquipmentTypes>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListEquipmentTypesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listEquipmentTypes>>
+  > = ({ signal }) =>
+    listEquipmentTypes({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEquipmentTypes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListEquipmentTypesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEquipmentTypes>>
+>;
+export type ListEquipmentTypesQueryError = unknown;
+
+export function useListEquipmentTypes<
+  TData = Awaited<ReturnType<typeof listEquipmentTypes>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentTypes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEquipmentTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listEquipmentTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEquipmentTypes<
+  TData = Awaited<ReturnType<typeof listEquipmentTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentTypes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEquipmentTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listEquipmentTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEquipmentTypes<
+  TData = Awaited<ReturnType<typeof listEquipmentTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentTypes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListEquipmentTypes<
+  TData = Awaited<ReturnType<typeof listEquipmentTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentTypes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListEquipmentTypesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createEquipmentTypeResponse201 = {
+  data: EquipmentTypeDto;
+  status: 201;
+};
+
+export type createEquipmentTypeResponseSuccess =
+  createEquipmentTypeResponse201 & {
+    headers: Headers;
+  };
+export type createEquipmentTypeResponse = createEquipmentTypeResponseSuccess;
+
+export const getCreateEquipmentTypeUrl = () => {
+  return `/api/v1/administrator/equipment-types`;
+};
+
+export const createEquipmentType = async (
+  equipmentTypeInputDto: EquipmentTypeInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createEquipmentTypeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateEquipmentTypeUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(equipmentTypeInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createEquipmentTypeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createEquipmentTypeResponse;
+};
+
+export const getCreateEquipmentTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEquipmentType>>,
+    TError,
+    CreateEquipmentTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEquipmentType>>,
+  TError,
+  CreateEquipmentTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createEquipmentType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEquipmentType>>,
+    CreateEquipmentTypeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createEquipmentType(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEquipmentTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createEquipmentType>>
+>;
+export type CreateEquipmentTypeMutationBody = EquipmentTypeInputDto;
+export type CreateEquipmentTypeMutationError = unknown;
+export type CreateEquipmentTypeMutationVariables = {
+  data: EquipmentTypeInputDto;
+};
+
+export const useCreateEquipmentType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createEquipmentType>>,
+      TError,
+      CreateEquipmentTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createEquipmentType>>,
+  TError,
+  CreateEquipmentTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateEquipmentTypeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type renameEquipmentTypeResponse200 = {
+  data: EquipmentTypeDto;
+  status: 200;
+};
+
+export type renameEquipmentTypeResponseSuccess =
+  renameEquipmentTypeResponse200 & {
+    headers: Headers;
+  };
+export type renameEquipmentTypeResponse = renameEquipmentTypeResponseSuccess;
+
+export const getRenameEquipmentTypeUrl = (typeId: string) => {
+  return `/api/v1/administrator/equipment-types/${typeId}`;
+};
+
+export const renameEquipmentType = async (
+  typeId: string,
+  equipmentTypeRenameDto: EquipmentTypeRenameDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<renameEquipmentTypeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRenameEquipmentTypeUrl(typeId), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(equipmentTypeRenameDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: renameEquipmentTypeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as renameEquipmentTypeResponse;
+};
+
+export const getRenameEquipmentTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof renameEquipmentType>>,
+    TError,
+    RenameEquipmentTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof renameEquipmentType>>,
+  TError,
+  RenameEquipmentTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["renameEquipmentType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof renameEquipmentType>>,
+    RenameEquipmentTypeMutationVariables
+  > = (props) => {
+    const { typeId, data } = props ?? {};
+
+    return renameEquipmentType(typeId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RenameEquipmentTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof renameEquipmentType>>
+>;
+export type RenameEquipmentTypeMutationBody = EquipmentTypeRenameDto;
+export type RenameEquipmentTypeMutationError = unknown;
+export type RenameEquipmentTypeMutationVariables = {
+  typeId: string;
+  data: EquipmentTypeRenameDto;
+};
+
+export const useRenameEquipmentType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof renameEquipmentType>>,
+      TError,
+      RenameEquipmentTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof renameEquipmentType>>,
+  TError,
+  RenameEquipmentTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRenameEquipmentTypeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type archiveEquipmentTypeResponse200 = {
+  data: EquipmentTypeDto;
+  status: 200;
+};
+
+export type archiveEquipmentTypeResponseSuccess =
+  archiveEquipmentTypeResponse200 & {
+    headers: Headers;
+  };
+export type archiveEquipmentTypeResponse = archiveEquipmentTypeResponseSuccess;
+
+export const getArchiveEquipmentTypeUrl = (typeId: string) => {
+  return `/api/v1/administrator/equipment-types/${typeId}/archive`;
+};
+
+export const archiveEquipmentType = async (
+  typeId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<archiveEquipmentTypeResponse> => {
+  const res = await (fetchFn ?? fetch)(getArchiveEquipmentTypeUrl(typeId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: archiveEquipmentTypeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as archiveEquipmentTypeResponse;
+};
+
+export const getArchiveEquipmentTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof archiveEquipmentType>>,
+    TError,
+    ArchiveEquipmentTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof archiveEquipmentType>>,
+  TError,
+  ArchiveEquipmentTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["archiveEquipmentType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof archiveEquipmentType>>,
+    ArchiveEquipmentTypeMutationVariables
+  > = (props) => {
+    const { typeId } = props ?? {};
+
+    return archiveEquipmentType(typeId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ArchiveEquipmentTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof archiveEquipmentType>>
+>;
+
+export type ArchiveEquipmentTypeMutationError = unknown;
+export type ArchiveEquipmentTypeMutationVariables = { typeId: string };
+
+export const useArchiveEquipmentType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof archiveEquipmentType>>,
+      TError,
+      ArchiveEquipmentTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof archiveEquipmentType>>,
+  TError,
+  ArchiveEquipmentTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getArchiveEquipmentTypeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listEquipmentStocksResponse200 = {
+  data: EquipmentStockListDto;
+  status: 200;
+};
+
+export type listEquipmentStocksResponseSuccess =
+  listEquipmentStocksResponse200 & {
+    headers: Headers;
+  };
+export type listEquipmentStocksResponse = listEquipmentStocksResponseSuccess;
+
+export const getListEquipmentStocksUrl = (
+  params: ListEquipmentStocksParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/equipment-stocks?${stringifiedParams}`
+    : `/api/v1/administrator/equipment-stocks`;
+};
+
+export const listEquipmentStocks = async (
+  params: ListEquipmentStocksParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listEquipmentStocksResponse> => {
+  const res = await (fetchFn ?? fetch)(getListEquipmentStocksUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listEquipmentStocksResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listEquipmentStocksResponse;
+};
+
+export const getListEquipmentStocksQueryKey = (
+  params?: ListEquipmentStocksParams,
+) => {
+  return [
+    `/api/v1/administrator/equipment-stocks`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListEquipmentStocksQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEquipmentStocks>>,
+  TError = unknown,
+>(
+  params: ListEquipmentStocksParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentStocks>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListEquipmentStocksQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listEquipmentStocks>>
+  > = ({ signal }) =>
+    listEquipmentStocks(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEquipmentStocks>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListEquipmentStocksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEquipmentStocks>>
+>;
+export type ListEquipmentStocksQueryError = unknown;
+
+export function useListEquipmentStocks<
+  TData = Awaited<ReturnType<typeof listEquipmentStocks>>,
+  TError = unknown,
+>(
+  params: ListEquipmentStocksParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentStocks>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEquipmentStocks>>,
+          TError,
+          Awaited<ReturnType<typeof listEquipmentStocks>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEquipmentStocks<
+  TData = Awaited<ReturnType<typeof listEquipmentStocks>>,
+  TError = unknown,
+>(
+  params: ListEquipmentStocksParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentStocks>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEquipmentStocks>>,
+          TError,
+          Awaited<ReturnType<typeof listEquipmentStocks>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEquipmentStocks<
+  TData = Awaited<ReturnType<typeof listEquipmentStocks>>,
+  TError = unknown,
+>(
+  params: ListEquipmentStocksParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentStocks>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListEquipmentStocks<
+  TData = Awaited<ReturnType<typeof listEquipmentStocks>>,
+  TError = unknown,
+>(
+  params: ListEquipmentStocksParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEquipmentStocks>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListEquipmentStocksQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setEquipmentStockQuantityResponse200 = {
+  data: EquipmentStockDto;
+  status: 200;
+};
+
+export type setEquipmentStockQuantityResponseSuccess =
+  setEquipmentStockQuantityResponse200 & {
+    headers: Headers;
+  };
+export type setEquipmentStockQuantityResponse =
+  setEquipmentStockQuantityResponseSuccess;
+
+export const getSetEquipmentStockQuantityUrl = () => {
+  return `/api/v1/administrator/equipment-stocks`;
+};
+
+export const setEquipmentStockQuantity = async (
+  equipmentStockInputDto: EquipmentStockInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setEquipmentStockQuantityResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSetEquipmentStockQuantityUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(equipmentStockInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setEquipmentStockQuantityResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setEquipmentStockQuantityResponse;
+};
+
+export const getSetEquipmentStockQuantityMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setEquipmentStockQuantity>>,
+    TError,
+    SetEquipmentStockQuantityMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setEquipmentStockQuantity>>,
+  TError,
+  SetEquipmentStockQuantityMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setEquipmentStockQuantity"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setEquipmentStockQuantity>>,
+    SetEquipmentStockQuantityMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setEquipmentStockQuantity(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetEquipmentStockQuantityMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setEquipmentStockQuantity>>
+>;
+export type SetEquipmentStockQuantityMutationBody = EquipmentStockInputDto;
+export type SetEquipmentStockQuantityMutationError = unknown;
+export type SetEquipmentStockQuantityMutationVariables = {
+  data: EquipmentStockInputDto;
+};
+
+export const useSetEquipmentStockQuantity = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setEquipmentStockQuantity>>,
+      TError,
+      SetEquipmentStockQuantityMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setEquipmentStockQuantity>>,
+  TError,
+  SetEquipmentStockQuantityMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetEquipmentStockQuantityMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type reportEquipmentStockDamageResponse201 = {
+  data: EquipmentIssueDto;
+  status: 201;
+};
+
+export type reportEquipmentStockDamageResponseSuccess =
+  reportEquipmentStockDamageResponse201 & {
+    headers: Headers;
+  };
+export type reportEquipmentStockDamageResponse =
+  reportEquipmentStockDamageResponseSuccess;
+
+export const getReportEquipmentStockDamageUrl = () => {
+  return `/api/v1/administrator/equipment-stocks/damage`;
+};
+
+export const reportEquipmentStockDamage = async (
+  equipmentDamageInputDto: EquipmentDamageInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<reportEquipmentStockDamageResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getReportEquipmentStockDamageUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(equipmentDamageInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: reportEquipmentStockDamageResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as reportEquipmentStockDamageResponse;
+};
+
+export const getReportEquipmentStockDamageMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof reportEquipmentStockDamage>>,
+    TError,
+    ReportEquipmentStockDamageMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof reportEquipmentStockDamage>>,
+  TError,
+  ReportEquipmentStockDamageMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["reportEquipmentStockDamage"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof reportEquipmentStockDamage>>,
+    ReportEquipmentStockDamageMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return reportEquipmentStockDamage(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ReportEquipmentStockDamageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof reportEquipmentStockDamage>>
+>;
+export type ReportEquipmentStockDamageMutationBody = EquipmentDamageInputDto;
+export type ReportEquipmentStockDamageMutationError = unknown;
+export type ReportEquipmentStockDamageMutationVariables = {
+  data: EquipmentDamageInputDto;
+};
+
+export const useReportEquipmentStockDamage = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof reportEquipmentStockDamage>>,
+      TError,
+      ReportEquipmentStockDamageMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof reportEquipmentStockDamage>>,
+  TError,
+  ReportEquipmentStockDamageMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getReportEquipmentStockDamageMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type listTrainerSessionEquipmentResponse200 = {
   data: SessionEquipmentDto;

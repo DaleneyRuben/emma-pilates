@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { TriangleAlert } from "lucide-react";
-import { kindPlurals, type EquipmentFlag } from "./equipment-flag-data";
+import { typeEquipment, type EquipmentFlag } from "./equipment-flag-data";
 
 /** Follow-up 170 §1: the warning line inside a flagged Session block. */
 export function EquipmentFlagLine({ flag }: { flag: EquipmentFlag }) {
@@ -20,8 +20,8 @@ export function EquipmentFlagsNotice({
   flags: readonly EquipmentFlag[];
 }) {
   if (flags.length === 0) return null;
-  const kinds = new Set(flags.map((flag) => flag.kind));
-  const what = kinds.size === 1 ? kindPlurals[flags[0]!.kind] : "equipos";
+  const types = new Set(flags.map((flag) => flag.typeId));
+  const what = types.size === 1 ? typeEquipment(flags[0]!) : "equipos";
   const count =
     flags.length === 1
       ? "1 sesión de esta semana tiene"

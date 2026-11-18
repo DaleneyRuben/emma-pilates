@@ -8,7 +8,13 @@ import type { EquipmentInputDtoKind } from "./equipmentInputDtoKind";
 
 export interface EquipmentInputDto {
   branchId: string;
-  kind: EquipmentInputDtoKind;
+  /** A unit type; send it or kind, not both */
+  typeId?: string;
+  /**
+   * Deprecated (FIX-067): one of the seeded types; send typeId
+   * @deprecated
+   */
+  kind?: EquipmentInputDtoKind;
   /**
    * @minimum 1
    * @maximum 99

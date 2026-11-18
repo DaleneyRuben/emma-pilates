@@ -395,7 +395,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByText("Cuenta pendiente de activación")).toBeOnTheScreen();
     });
-    expect(screen.getByText("El enlace vence el 29 de septiembre de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("El enlace venció el 29 de septiembre de 2026")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cambiar correo" })).toBeNull();
 
