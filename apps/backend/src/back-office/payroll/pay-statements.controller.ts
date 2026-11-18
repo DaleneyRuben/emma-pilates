@@ -153,12 +153,20 @@ export class AdministratorPayStatementsController extends BackOfficeController {
     @Body() body: unknown,
   ): Promise<PayStatementDto> {
     const id = requireId(statementId, 'Invalid Pay Statement identifier');
-    parsed(parsePayStatementApproval(body), 'Invalid Pay Statement approval');
+    const { receiptImageAssetId } = parsed(
+      parsePayStatementApproval(body),
+      'Invalid Pay Statement approval',
+    );
     const principal = await this.authenticate(authorization);
     return toDto(
       await run(() =>
         this.operations.payStatements.approveStatement(
-          { statementId: id },
+          {
+            statementId: id,
+            ...(receiptImageAssetId === undefined
+              ? {}
+              : { receiptImageAssetId }),
+          },
           principal,
         ),
       ),
