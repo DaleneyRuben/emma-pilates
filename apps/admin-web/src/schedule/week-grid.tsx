@@ -9,7 +9,7 @@ import { dayItems, hourLabel, sessionSpan } from "./week-slots";
 type Session = AdministratorSessionAvailabilityDto;
 
 // FIX-084: tall enough for four short lines (type, time, trainer, places).
-const hourHeight = 72;
+const hourHeight = 80;
 
 /** The hours the grid spans: 06:00–22:00, widened to fit every Session. */
 function hourRange(sessions: readonly Session[]) {
