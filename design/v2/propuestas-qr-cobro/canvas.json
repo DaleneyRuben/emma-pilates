@@ -1,0 +1,107 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-18T18:00:00Z"
+ },
+ "title": "Propuestas QR de cobro",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Hallazgo 106 · QR de cobro del equipo (léeme)"
+  },
+  "Telefono.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 390,
+   "h": 960,
+   "title": "A · Una fila y su pantalla · app del equipo (recomendada)",
+   "is_interactive": true
+  },
+  "Web.dc.html": {
+   "x": 470,
+   "y": 1020,
+   "w": 1440,
+   "h": 1000,
+   "title": "A · Una fila y su pantalla · web 1440",
+   "is_interactive": true
+  },
+  "WebA420.dc.html": {
+   "x": 1990,
+   "y": 1020,
+   "w": 420,
+   "h": 1000,
+   "title": "A · Una fila y su pantalla · web 420",
+   "is_interactive": true
+  },
+  "TelB.dc.html": {
+   "x": 0,
+   "y": 2140,
+   "w": 390,
+   "h": 960,
+   "title": "B · Tarjeta en Perfil · app del equipo",
+   "is_interactive": true
+  },
+  "WebB.dc.html": {
+   "x": 470,
+   "y": 2140,
+   "w": 1440,
+   "h": 1000,
+   "title": "B · Tarjeta en Perfil · web 1440",
+   "is_interactive": true
+  },
+  "WebB420.dc.html": {
+   "x": 1990,
+   "y": 2140,
+   "w": 420,
+   "h": 1000,
+   "title": "B · Tarjeta en Perfil · web 420",
+   "is_interactive": true
+  },
+  "TelC.dc.html": {
+   "x": 0,
+   "y": 3260,
+   "w": 390,
+   "h": 960,
+   "title": "C · En Mis pagos, pago en pasos · app del equipo",
+   "is_interactive": true
+  },
+  "WebC.dc.html": {
+   "x": 470,
+   "y": 3260,
+   "w": 1440,
+   "h": 1000,
+   "title": "C · En Mis pagos, pago en pasos · web 1440",
+   "is_interactive": true
+  },
+  "WebC420.dc.html": {
+   "x": 1990,
+   "y": 3260,
+   "w": 420,
+   "h": 1000,
+   "title": "C · En Mis pagos, pago en pasos · web 420",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Telefono.dc.html",
+  "Web.dc.html",
+  "WebA420.dc.html",
+  "TelB.dc.html",
+  "WebB.dc.html",
+  "WebB420.dc.html",
+  "TelC.dc.html",
+  "WebC.dc.html",
+  "WebC420.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}
