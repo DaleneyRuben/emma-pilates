@@ -105,7 +105,10 @@ describe("Inicio and Mi plan plan cards", () => {
 
     const hero = within(screen.getByTestId("subscription-hero"));
     expect(hero.getByText("13")).toBeOnTheScreen();
-    expect(hero.getByText("12 del plan + 1 de regalo")).toBeOnTheScreen();
+    // FIX-082 (Mi plan option A): the origin joins the card's one line.
+    expect(
+      hero.getByText("12 del plan + 1 de regalo (invitación) · vence el 30 de noviembre"),
+    ).toBeOnTheScreen();
   });
 
   it("names no deadline for a Guest Pass that expired unused", async () => {

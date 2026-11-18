@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -44,6 +44,11 @@ async function openMiPlan(routes: Parameters<typeof routeFetcher>[0]) {
   return screen;
 }
 
+// FIX-082 (Mi plan option A): the Freeze is one row; its detail opens on tap.
+async function openFreezeRow(screen: Awaited<ReturnType<typeof openMiPlan>>) {
+  await fireEvent.press(within(screen.getByTestId("freeze-card")).getAllByRole("button")[0]!);
+}
+
 describe("Mi plan with a Freeze", () => {
   afterEach(async () => {
     await cleanup();
@@ -69,8 +74,9 @@ describe("Mi plan with a Freeze", () => {
       },
     });
 
-    expect(screen.getByText("En revisión")).toBeOnTheScreen();
+    expect(screen.getByText("En revisión · te avisamos cuando respondan")).toBeOnTheScreen();
     expect(screen.getByText(freezeRange(start, end))).toBeOnTheScreen();
+    await openFreezeRow(screen);
     expect(screen.getByText("Tu plan vencería el")).toBeOnTheScreen();
     expect(screen.getByText(weekdayDayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
     expect(screen.queryByText("Tu solicitud de congelamiento está en revisión.")).toBeNull();
@@ -97,7 +103,7 @@ describe("Mi plan with a Freeze", () => {
     });
     expect(screen.getByText("Retiramos tu solicitud")).toBeOnTheScreen();
     expect(withdrawn).toEqual(["freeze-1"]);
-    expect(screen.queryByText("En revisión")).toBeNull();
+    expect(screen.queryByText(/^En revisión/)).toBeNull();
   });
 
   it("says «Congelado del … al …» before an approved Freeze starts", async () => {
@@ -114,10 +120,11 @@ describe("Mi plan with a Freeze", () => {
         ),
     });
 
-    expect(screen.getByText("Aprobado")).toBeOnTheScreen();
+    expect(screen.getByText("Aprobado · esos días no puedes reservar")).toBeOnTheScreen();
     expect(
       screen.getByText(`Congelado ${freezeRange(start, end).toLowerCase()}`),
     ).toBeOnTheScreen();
+    await openFreezeRow(screen);
     expect(screen.getByText("Ahora vence el")).toBeOnTheScreen();
     expect(screen.queryByText(/está congelado hasta/)).toBeNull();
   });
@@ -135,8 +142,13 @@ describe("Mi plan with a Freeze", () => {
         ),
     });
 
-    expect(screen.getByText("Congelado")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        `Congelado · vuelves a reservar el ${weekdayDayMonth(addCivilDays(end, 1))}`,
+      ),
+    ).toBeOnTheScreen();
     expect(screen.getByText(`Congelado hasta el ${weekdayDayMonth(end)}`)).toBeOnTheScreen();
+    await openFreezeRow(screen);
     expect(screen.getByText(weekdayDayMonth(addCivilDays(end, 1)))).toBeOnTheScreen();
   });
 
@@ -156,7 +168,7 @@ describe("Mi plan with a Freeze", () => {
         ),
     });
 
-    expect(screen.getByText("No aprobado")).toBeOnTheScreen();
+    expect(screen.getByText("No aprobado · puedes pedir otro")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: /^Pedir otro congelamiento/ })).toBeOnTheScreen();
   });
 
@@ -174,7 +186,7 @@ describe("Mi plan with a Freeze", () => {
     expect(screen.queryByRole("button", { name: /^Congelar plan/ })).toBeNull();
   });
 
-  it("keeps one focus: notices without a fill and no bottom booking button", async () => {
+  it("keeps one focus: the discount under Renovar and no bottom booking button", async () => {
     const screen = await openMiPlan({
       "/api/v1/clients/current/subscription": () =>
         jsonResponse(view({ founderRenewalDeadline: addCivilDays(termEndsOn, 8) })),
@@ -182,12 +194,10 @@ describe("Mi plan with a Freeze", () => {
 
     expect(
       screen.getByText(
-        `Renueva antes del ${dayMonth(addCivilDays(termEndsOn, 8))} para mantener tu 15 % de descuento.`,
+        `Renueva antes del ${dayMonth(addCivilDays(termEndsOn, 8))} y mantienes tu 15 % de descuento.`,
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByTestId("subscription-notices")).not.toHaveStyle({
-      backgroundColor: "#F2E4E1",
-    });
+    expect(screen.queryByTestId("subscription-notices")).toBeNull();
     expect(screen.queryByRole("button", { name: "Reservar una clase" })).toBeNull();
   });
 
@@ -229,7 +239,7 @@ describe("Mi plan with a Freeze", () => {
     await fireEvent.press(confirm[confirm.length - 1]);
 
     await waitFor(() => {
-      expect(screen.getByText("Aprobado")).toBeOnTheScreen();
+      expect(screen.getByText("Aprobado · esos días no puedes reservar")).toBeOnTheScreen();
     });
     expect(
       screen.getByText("La administración ya decidió tu solicitud. Mira cómo quedó."),

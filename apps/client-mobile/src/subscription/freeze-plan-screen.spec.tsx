@@ -107,7 +107,7 @@ describe("Congelar plan", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));
 
     await waitFor(() => {
-      expect(screen.getByText("En revisión")).toBeOnTheScreen();
+      expect(screen.getByText(/^En revisión · /)).toBeOnTheScreen();
     });
     expect(requests).toEqual([
       { subscriptionId: "subscription-1", startsOn: start, endsOn: end, reason: "Viaje familiar" },
