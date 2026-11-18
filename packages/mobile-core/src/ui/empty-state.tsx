@@ -11,6 +11,8 @@ export type EmptyStateProps =
   | {
       icon: IconName;
       message: string;
+      /** The glyph alone, without its disc (FIX-082). */
+      plainIcon?: boolean;
       title: string;
       /** `framed` stands in a list on Lino; `panel` is the bare tablet panel. */
       variant?: "framed" | "panel";
@@ -31,10 +33,12 @@ const layouts = { framed: "card", panel: "inList", plain: "centred" } as const;
 export function EmptyState(props: EmptyStateProps) {
   const { icon, message, title, variant = "framed" } = props;
   const action = props.variant === "plain" ? props.action : undefined;
+  const plainIcon = props.variant === "plain" ? false : props.plainIcon;
   return (
     <StateScreen
       icon={icon}
       layout={layouts[variant]}
+      plainIcon={plainIcon}
       note={message}
       testIDPrefix="empty-state"
       title={title}

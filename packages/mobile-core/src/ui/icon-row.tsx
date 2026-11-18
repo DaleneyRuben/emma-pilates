@@ -1,10 +1,21 @@
-import { Children, Fragment, isValidElement, type ReactNode } from "react";
+import {
+  Children,
+  createContext,
+  Fragment,
+  isValidElement,
+  type ReactNode,
+  useContext,
+} from "react";
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Chevron } from "./chevron";
 import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
 import { colors, radii, spacing, typography } from "./tokens";
+
+// FIX-082 (design audit 2026-11-18): a plain group draws each glyph alone, no
+// tinted disc. Opt-in, so a screen changes only when its own pass says so.
+const PlainContext = createContext(false);
 
 export type IconRowProps = {
   /** A quiet chevron at the end, for a row that opens something. */
@@ -36,16 +47,24 @@ export function IconRow({
   value,
 }: IconRowProps) {
   const error = tone === "error";
+  const plain = useContext(PlainContext);
+  const glyph = (
+    <Glyph
+      color={error ? colors.error : plain ? colors.textMuted : colors.primary}
+      name={icon}
+      size={18}
+      strokeWidth={1.5}
+    />
+  );
   const content = (
     <>
-      <View style={[styles.disc, error && styles.errorDisc]} testID="icon-row-disc">
-        <Glyph
-          color={error ? colors.error : colors.primary}
-          name={icon}
-          size={18}
-          strokeWidth={1.5}
-        />
-      </View>
+      {plain ? (
+        glyph
+      ) : (
+        <View style={[styles.disc, error && styles.errorDisc]} testID="icon-row-disc">
+          {glyph}
+        </View>
+      )}
       <Text
         style={[styles.label, value === undefined && styles.labelAlone, error && styles.errorLabel]}
       >
@@ -78,23 +97,33 @@ export function IconRow({
 /** Lino rows at radius 16 with an Arena hairline inset 64 between them (follow-up 225 §2). */
 export function IconRowGroup({
   children,
+  plain = false,
   style,
   testID,
 }: {
   children: ReactNode;
+  /** Each glyph alone, without its tinted disc (FIX-082). */
+  plain?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
   const rows = Children.toArray(children).filter(isValidElement);
   return (
-    <View style={[styles.group, style]} testID={testID}>
-      {rows.map((row, index) => (
-        <Fragment key={row.key ?? index}>
-          {index === 0 ? null : <View style={styles.hairline} testID="icon-row-hairline" />}
-          {row}
-        </Fragment>
-      ))}
-    </View>
+    <PlainContext.Provider value={plain}>
+      <View style={[styles.group, style]} testID={testID}>
+        {rows.map((row, index) => (
+          <Fragment key={row.key ?? index}>
+            {index === 0 ? null : (
+              <View
+                style={[styles.hairline, plain && styles.hairlinePlain]}
+                testID="icon-row-hairline"
+              />
+            )}
+            {row}
+          </Fragment>
+        ))}
+      </View>
+    </PlainContext.Provider>
   );
 }
 
@@ -112,6 +141,8 @@ const styles = StyleSheet.create({
   group: { backgroundColor: colors.card, borderRadius: radii.card },
   // 16 side padding + 36 disc + 12 gap.
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  // 16 side padding + 18 glyph + 12 gap.
+  hairlinePlain: { marginLeft: 46 },
   // The label keeps its width; a long value wraps under itself instead.
   label: {
     color: colors.text,
