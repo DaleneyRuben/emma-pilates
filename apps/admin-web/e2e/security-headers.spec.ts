@@ -38,9 +38,10 @@ test("serves the security headers and stays within its policy", async ({
       .click();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   }
-  await page.getByRole("link", { name: "Contactos para promociones" }).click();
+  // FIX-065: the former Contactos page is Clientas' «Cuenta cerrada» chip.
+  await page.goto("/clientas?filter=closed");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Contactos para promociones" }),
+    page.getByRole("heading", { level: 1, name: "Clientes" }),
   ).toBeVisible();
 
   // WEB-037: the overlays lock the page behind them without the <style>

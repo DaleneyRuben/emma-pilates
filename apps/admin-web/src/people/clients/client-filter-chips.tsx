@@ -7,6 +7,8 @@ const chips: readonly { value: ClientFilter | undefined; label: string }[] = [
   { value: "none", label: "Sin plan" },
   { value: "expired", label: "Expirado" },
   { value: "founder", label: "Fundadora" },
+  // FIX-065 (walkthrough finding 91, follow-up 268).
+  { value: "closed", label: "Cuenta cerrada" },
 ];
 
 // P03 / P11: Clientas › Todas's chips, one at a time, as the destination

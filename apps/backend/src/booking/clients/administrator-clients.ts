@@ -6,6 +6,7 @@ import { boliviaDate } from '../../time/bolivia-time';
 import {
   AdministrationError,
   requireOperations,
+  type AdministratorActor,
 } from '../administration/administration-errors';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
 import {
@@ -46,6 +47,8 @@ export type AdministratorClientRow = {
   founderNumber: number | null;
   /** «Invitada por»: the Client or Trainer whose code she used. */
   invitedByName: string | null;
+  /** Bolivia civil date she joined: the CSV's «Desde» (FIX-065). */
+  clientSince: Date;
 };
 
 export type AdministratorClientPage = {
@@ -117,6 +120,13 @@ export interface AdministratorClientDirectory {
   saveProfile: (
     input: ClientProfileCorrection,
   ) => Promise<AdministratorClientRecord>;
+  /** Audits Clientas › «Exportar CSV» (FIX-065). */
+  recordExport: (input: {
+    actor: AdministratorActor;
+    clientCount: number;
+    filter?: ClientDirectoryFilter;
+    occurredAt: Date;
+  }) => Promise<void>;
 }
 
 export type ClientProfileCorrection = {
@@ -158,6 +168,42 @@ export const listAdministratorClients = async (
     ...(command.filter === undefined ? {} : { filter: command.filter }),
     today: boliviaDate(now()),
   });
+};
+
+const exportPageSize = 100;
+
+// FIX-065 (walkthrough finding 91): Clientas › «Exportar CSV» downloads what
+// the chip and the search show, every page of it, read through the same
+// directory as the table so the CSV's «Estado» is the row's. Exporting hands
+// personal data out of the system, so it is audited.
+export const exportAdministratorClients = async (
+  command: Omit<ClientDirectoryQuery, 'page' | 'pageSize'>,
+  principal: AuthenticatedPrincipal,
+  { directory, now }: Dependencies,
+): Promise<AdministratorClientRow[]> => {
+  const { accountId, staffMemberId, audit } = requireOperations(principal);
+  const query = command.query?.trim() ?? '';
+  const rows: AdministratorClientRow[] = [];
+  const today = boliviaDate(now());
+  for (let page = 1; ; page += 1) {
+    const result = await directory.list({
+      page,
+      pageSize: exportPageSize,
+      ...(query === '' ? {} : { query }),
+      ...(command.filter === undefined ? {} : { filter: command.filter }),
+      today,
+    });
+    rows.push(...result.items);
+    if (result.items.length < exportPageSize) break;
+    if (rows.length >= result.totalItems) break;
+  }
+  await directory.recordExport({
+    actor: { accountId, staffMemberId, audit },
+    clientCount: rows.length,
+    ...(command.filter === undefined ? {} : { filter: command.filter }),
+    occurredAt: now(),
+  });
+  return rows;
 };
 
 export const readAdministratorClient = async (

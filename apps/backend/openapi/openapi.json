@@ -4893,6 +4893,58 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/export": {
+      "get": {
+        "description": "Every Client the chip and search match; audited",
+        "operationId": "exportAdminClients",
+        "parameters": [
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "description": "One chip of Clientas › Todas, as the list takes it",
+            "schema": {
+              "enum": [
+                "all",
+                "active",
+                "expired",
+                "none",
+                "founder"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, email, or phone fragment, accents and case ignored",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
+      }
+    },
     "/api/v1/administrator/clients/{clientId}": {
       "get": {
         "operationId": "getAdminClient",
@@ -5766,6 +5818,19 @@
         "operationId": "listAdminPromotionContacts",
         "parameters": [
           {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "description": "Only live Clients or only former Clients; both when absent (FIX-065: Clientas › Cuenta cerrada asks for former_client)",
+            "schema": {
+              "enum": [
+                "client",
+                "former_client"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "q",
             "required": false,
             "in": "query",
@@ -5814,9 +5879,30 @@
     },
     "/api/v1/administrator/promotion-contacts/export": {
       "get": {
-        "description": "Every contact not withdrawn; audited",
+        "description": "Every contact not withdrawn matching the search and kind; audited",
         "operationId": "exportAdminPromotionContacts",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "description": "Only live Clients or only former Clients; both when absent (FIX-065: Clientas › Cuenta cerrada asks for former_client)",
+            "schema": {
+              "enum": [
+                "client",
+                "former_client"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, email, or phone fragment, accents and case ignored",
+            "schema": {}
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -15130,6 +15216,11 @@
             "type": "string",
             "nullable": true,
             "description": "The Client or Trainer whose Referral Code she used"
+          },
+          "clientSince": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)"
           }
         },
         "required": [
@@ -15145,7 +15236,8 @@
           "originalClassAllowance",
           "planEndsOn",
           "founderNumber",
-          "invitedByName"
+          "invitedByName",
+          "clientSince"
         ]
       },
       "AdminClientPageDto": {
@@ -15195,6 +15287,62 @@
           "studioClientCount",
           "activePlanClientCount",
           "founderClientCount"
+        ]
+      },
+      "AdminClientExportRowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subscriptionStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "expired",
+              "none"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "clientSince": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date she joined"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "subscriptionStatus",
+          "email",
+          "phone",
+          "clientSince"
+        ]
+      },
+      "AdminClientExportDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Every Client the chip and search match, in the table order",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminClientExportRowDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "AdminClientClosureOutlookDto": {

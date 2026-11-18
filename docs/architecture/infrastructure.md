@@ -438,11 +438,13 @@ Values never go in the repository or a chat. «Mac» means the user's own
   secrets); an advisory whose fix is not published yet is ignored in
   `pnpm-workspace.yaml` (`auditConfig.ignoreGhsas`, one comment each) and
   reviewed when the next run or Dependabot names it. The ignored advisories
-  today are `GHSA-vfj7-8cjw-p6xm` (braces), `GHSA-2883-xcg3-v3hh` (js-yaml), and `GHSA-qr28-fpjm-wq7f`
+  today are `GHSA-vfj7-8cjw-p6xm` (braces), `GHSA-2883-xcg3-v3hh` (js-yaml), `GHSA-qr28-fpjm-wq7f`
   (decode-uri-component 0.2.2, through `@react-navigation/core` and
   `query-string` 7: the fixed 0.5.1 is ESM-only, and `query-string` 7 loads it
   with `require`, so an override would break the apps' link parsing; it
-  goes when React Navigation moves to a `query-string` that takes 0.5.1). `GHSA-q7qp-rjg7-q26m`
+  goes when React Navigation moves to a `query-string` that takes 0.5.1), and
+  `GHSA-fc5q-39xc-vjpf` (picomatch <=4.0.7: no patched release exists as of
+  2026-11-17, so it goes as soon as picomatch publishes one). `GHSA-q7qp-rjg7-q26m`
   (multer) and `GHSA-27r3-jxmh-p828` (body-parser) are pinned in
   `pnpm-workspace.yaml` (`multer` 2.5.0, `body-parser` 2.4.0) because
   `@nestjs/platform-express` and Express 5.2.1 still resolve the vulnerable

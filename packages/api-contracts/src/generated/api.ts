@@ -28,6 +28,7 @@ import type {
   AdminClassTypeDto,
   AdminClassTypePageDto,
   AdminClientDetailDto,
+  AdminClientExportDto,
   AdminClientPageDto,
   AdminEvaluationPageDto,
   AdminExpenseCategoryDto,
@@ -130,6 +131,8 @@ import type {
   ExpenseChangeDto,
   ExpenseInputDto,
   ExpenseReportDto,
+  ExportAdminClientsParams,
+  ExportAdminPromotionContactsParams,
   FeedbackReceiptDto,
   FinalizedUploadDto,
   FounderMembershipPageDto,
@@ -18739,6 +18742,215 @@ export function useListAdminClients<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type exportAdminClientsResponse200 = {
+  data: AdminClientExportDto;
+  status: 200;
+};
+
+export type exportAdminClientsResponseSuccess =
+  exportAdminClientsResponse200 & {
+    headers: Headers;
+  };
+export type exportAdminClientsResponse = exportAdminClientsResponseSuccess;
+
+export const getExportAdminClientsUrl = (params?: ExportAdminClientsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/clients/export?${stringifiedParams}`
+    : `/api/v1/administrator/clients/export`;
+};
+
+/**
+ * Every Client the chip and search match; audited
+ */
+export const exportAdminClients = async (
+  params?: ExportAdminClientsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<exportAdminClientsResponse> => {
+  const res = await (fetchFn ?? fetch)(getExportAdminClientsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: exportAdminClientsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as exportAdminClientsResponse;
+};
+
+export const getExportAdminClientsQueryKey = (
+  params?: ExportAdminClientsParams,
+) => {
+  return [
+    `/api/v1/administrator/clients/export`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getExportAdminClientsQueryOptions = <
+  TData = Awaited<ReturnType<typeof exportAdminClients>>,
+  TError = unknown,
+>(
+  params?: ExportAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getExportAdminClientsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof exportAdminClients>>
+  > = ({ signal }) =>
+    exportAdminClients(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof exportAdminClients>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ExportAdminClientsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof exportAdminClients>>
+>;
+export type ExportAdminClientsQueryError = unknown;
+
+export function useExportAdminClients<
+  TData = Awaited<ReturnType<typeof exportAdminClients>>,
+  TError = unknown,
+>(
+  params: undefined | ExportAdminClientsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminClients>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdminClients>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdminClients>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useExportAdminClients<
+  TData = Awaited<ReturnType<typeof exportAdminClients>>,
+  TError = unknown,
+>(
+  params?: ExportAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminClients>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdminClients>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdminClients>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useExportAdminClients<
+  TData = Awaited<ReturnType<typeof exportAdminClients>>,
+  TError = unknown,
+>(
+  params?: ExportAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useExportAdminClients<
+  TData = Awaited<ReturnType<typeof exportAdminClients>>,
+  TError = unknown,
+>(
+  params?: ExportAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getExportAdminClientsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type getAdminClientResponse200 = {
   data: AdminClientDetailDto;
   status: 200;
@@ -21896,21 +22108,39 @@ export type exportAdminPromotionContactsResponseSuccess =
 export type exportAdminPromotionContactsResponse =
   exportAdminPromotionContactsResponseSuccess;
 
-export const getExportAdminPromotionContactsUrl = () => {
-  return `/api/v1/administrator/promotion-contacts/export`;
+export const getExportAdminPromotionContactsUrl = (
+  params?: ExportAdminPromotionContactsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/promotion-contacts/export?${stringifiedParams}`
+    : `/api/v1/administrator/promotion-contacts/export`;
 };
 
 /**
- * Every contact not withdrawn; audited
+ * Every contact not withdrawn matching the search and kind; audited
  */
 export const exportAdminPromotionContacts = async (
+  params?: ExportAdminPromotionContactsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<exportAdminPromotionContactsResponse> => {
-  const res = await (fetchFn ?? fetch)(getExportAdminPromotionContactsUrl(), {
-    ...options,
-    method: "GET",
-  });
+  const res = await (fetchFn ?? fetch)(
+    getExportAdminPromotionContactsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
@@ -21924,24 +22154,32 @@ export const exportAdminPromotionContacts = async (
   } as exportAdminPromotionContactsResponse;
 };
 
-export const getExportAdminPromotionContactsQueryKey = () => {
-  return [`/api/v1/administrator/promotion-contacts/export`] as const;
+export const getExportAdminPromotionContactsQueryKey = (
+  params?: ExportAdminPromotionContactsParams,
+) => {
+  return [
+    `/api/v1/administrator/promotion-contacts/export`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getExportAdminPromotionContactsQueryOptions = <
   TData = Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<
-      Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
-      TError,
-      TData
-    >
-  >;
-  fetch?: RequestInit;
-  fetcher?: typeof globalThis.fetch;
-}) => {
+>(
+  params?: ExportAdminPromotionContactsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
   const {
     query: queryOptions,
     fetch: fetchOptions,
@@ -21949,12 +22187,16 @@ export const getExportAdminPromotionContactsQueryOptions = <
   } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ?? getExportAdminPromotionContactsQueryKey();
+    queryOptions?.queryKey ?? getExportAdminPromotionContactsQueryKey(params);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof exportAdminPromotionContacts>>
   > = ({ signal }) =>
-    exportAdminPromotionContacts({ signal, ...fetchOptions }, fetcherFn);
+    exportAdminPromotionContacts(
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
@@ -21972,6 +22214,7 @@ export function useExportAdminPromotionContacts<
   TData = Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
   TError = unknown,
 >(
+  params: undefined | ExportAdminPromotionContactsParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -21999,6 +22242,7 @@ export function useExportAdminPromotionContacts<
   TData = Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
   TError = unknown,
 >(
+  params?: ExportAdminPromotionContactsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -22026,6 +22270,7 @@ export function useExportAdminPromotionContacts<
   TData = Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
   TError = unknown,
 >(
+  params?: ExportAdminPromotionContactsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -22046,6 +22291,7 @@ export function useExportAdminPromotionContacts<
   TData = Awaited<ReturnType<typeof exportAdminPromotionContacts>>,
   TError = unknown,
 >(
+  params?: ExportAdminPromotionContactsParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -22061,7 +22307,10 @@ export function useExportAdminPromotionContacts<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getExportAdminPromotionContactsQueryOptions(options);
+  const queryOptions = getExportAdminPromotionContactsQueryOptions(
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

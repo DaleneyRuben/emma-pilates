@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdministratorClients } from '../../src/booking/clients/prisma-administrator-clients';
+import { boliviaDate } from '../../src/time/bolivia-time';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -190,5 +191,58 @@ describe('Administrator Client directory chips and columns (PostgreSQL)', () => 
     });
     // A lost place no longer makes her a Fundadora.
     expect(byName.get('Paula Lora')).toMatchObject({ founderNumber: null });
+  });
+
+  // FIX-065 (walkthrough finding 91): the CSV's «Desde» and the audit of
+  // Clientas › «Exportar CSV».
+  it('reads the day she joined and audits an export', async () => {
+    const { items } = await directory().list({ page: 1, pageSize: 20, today });
+    const isabel = await prisma.client.findUniqueOrThrow({
+      where: { id: ids.activa },
+      select: { createdAt: true },
+    });
+    expect(items.find((item) => item.id === ids.activa)?.clientSince).toEqual(
+      boliviaDate(isabel.createdAt),
+    );
+
+    const accountId = randomUUID();
+    const staff = await prisma.staffMember.create({
+      data: {
+        name: 'Paola Mendoza',
+        role: 'ADMINISTRATOR',
+        account: { create: { id: accountId, email: 'paola-091@example.com' } },
+      },
+    });
+    const occurredAt = new Date('2026-11-17T14:00:00.000Z');
+    await directory().recordExport({
+      actor: {
+        accountId,
+        staffMemberId: staff.id,
+        audit: { accountId, role: 'ADMINISTRATOR', impersonationId: null },
+      },
+      clientCount: 3,
+      filter: 'active',
+      occurredAt,
+    });
+    await expect(
+      prisma.auditRecord.findFirst({
+        where: { actionCode: 'client.exported' },
+        select: {
+          outcome: true,
+          actorAccountId: true,
+          targetType: true,
+          targetId: true,
+          metadata: true,
+          occurredAt: true,
+        },
+      }),
+    ).resolves.toEqual({
+      outcome: 'SUCCEEDED',
+      actorAccountId: accountId,
+      targetType: 'client',
+      targetId: null,
+      metadata: { clientCount: 3, filter: 'active' },
+      occurredAt,
+    });
   });
 });

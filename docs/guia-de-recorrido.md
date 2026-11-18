@@ -1027,8 +1027,8 @@ Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
    cuando ya no necesites a Lucía. Después de cerrarla no puede entrar, y su
    correo queda libre para un registro nuevo. El historial de clases no se
    borra. La casilla **Quiero seguir recibiendo promociones…**
-   es lo único que guarda su nombre, correo y teléfono para **Promociones ›
-   Contactos**.
+   es lo único que guarda su nombre, correo y teléfono para **Clientas ›
+   Cuenta cerrada**.
 
 **Cerrar sesión** abre la hoja **¿Cerrar sesión?**. **Cancelar** se queda.
 **Cerrar sesión** vuelve al acceso.
@@ -1052,14 +1052,20 @@ En la web, como Ana.
    **Finalizada** cuando ya pasó su **Fecha de fin**. **Eliminar promoción**
    (el enlace bajo los botones) pide confirmación, la archiva y la quita de
    la lista.
-5. **Promociones › Contactos**: todas las clientas activas, hayan aceptado o
-   no, con **Nombre**, **Tipo** («Activa»), **Correo**, **Teléfono** y
-   **Desde**, el día en que se registró. La app ya no tiene el interruptor
-   **Recibir promociones** en **Perfil**. También están las que cerraron su
-   cuenta y marcaron **Quiero seguir recibiendo promociones…**, como
-   «Cuenta cerrada» y con el día en que la cerraron. Solo esas filas tienen
-   **Dejar de enviar**, que borra el contacto. **Exportar CSV** descarga la
-   lista entera.
+5. Promociones ya no tiene **Contactos** ni el botón **Contactos para
+   promociones**: todas las clientas activas reciben promociones y ya están
+   en **Clientas**. La app tampoco tiene el interruptor **Recibir
+   promociones** en **Perfil**.
+6. **Clientas › Todas › Cuenta cerrada** (el sexto filtro): las que cerraron
+   su cuenta y marcaron **Quiero seguir recibiendo promociones…**, con
+   **Nombre**, **Contacto**, **Recibe promociones desde** (el día en que la
+   cerraron) y **Dejar de enviar**, que pide confirmar y borra el contacto.
+   No tienen ficha, y nunca aparecen en los otros filtros. Si alguien abre la
+   dirección vieja de Contactos, llega aquí.
+7. **Exportar CSV**, junto al título de Clientas, descarga lo que muestran el
+   filtro y la búsqueda: **Nombre**, **Estado**, **Correo**, **Teléfono** y
+   **Desde**. El archivo lleva el nombre del filtro
+   (`clientas-con-plan-…csv`) y la página dice cuántas descargó.
 
 ### Referidos
 
@@ -1309,12 +1315,12 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 | Horario › Clases | Publicar, mover y cancelar clases; quién reservó; reservar a una clienta | 5 |
 | Horario › Nutrición | Lectura de las consultas | 12 |
 | Clientas › Todas | Ficha con pestañas, filtro Fundadora, «Invitada por», cortesía, acceso de prueba | 10, 11 |
+| Clientas › Cuenta cerrada | Las cuentas cerradas que pidieron promociones, «Dejar de enviar», «Exportar CSV» | 14 |
 | Clientas › Para contactar | Seguimiento de los primeros 90 días | 16 |
 | Clientas › Congelamientos | Aprobar el congelamiento de un trimestral | 11 |
 | Promociones › Carrusel | Borrador, publicar, dejar de publicar, eliminar | 14 |
 | Promociones › Clases de campaña | Clases extra para todas las clientas activas | 14 |
 | Promociones › Referidos | Quién invitó a quién, si la invitada compró y la clase de premio | 14 |
-| Promociones › Contactos | Todas las clientas activas y las cuentas cerradas que pidieron promociones | 14 |
 | Comentarios | Lo que llega de las apps | 14 |
 | Dinero › Pagos | Confirmar, rechazar, anular, subir la factura | 7 |
 | Dinero › Caja | Historial del cierre diario por sede | 9 |

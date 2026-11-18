@@ -26,6 +26,7 @@ import {
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { parsed, requireId, run } from '../administration/administration-http';
 import type {
+  PromotionContactFilter,
   PromotionContactPage,
   PromotionContactRow,
 } from './promotion-contacts';
@@ -33,17 +34,22 @@ import {
   AdminPromotionContactDto,
   AdminPromotionContactExportDto,
   AdminPromotionContactPageDto,
+  parsePromotionContactExportQuery,
   parsePromotionContactQuery,
+  promotionContactKinds,
 } from './promotion-contacts.dto';
 
 export const promotionContactOperations = Symbol('promotionContactOperations');
 
 export type PromotionContactOperations = {
   list: (
-    query: { page: number; pageSize: number; query?: string },
+    query: { page: number; pageSize: number } & PromotionContactFilter,
     principal: AuthenticatedPrincipal,
   ) => Promise<PromotionContactPage>;
-  export: (principal: AuthenticatedPrincipal) => Promise<PromotionContactRow[]>;
+  export: (
+    filter: PromotionContactFilter,
+    principal: AuthenticatedPrincipal,
+  ) => Promise<PromotionContactRow[]>;
   withdraw: (
     command: { contactId: string },
     principal: AuthenticatedPrincipal,
@@ -81,6 +87,13 @@ export class AdministratorPromotionContactsController {
     required: false,
     description: 'Name, email, or phone fragment, accents and case ignored',
   })
+  @ApiQuery({
+    name: 'kind',
+    required: false,
+    enum: promotionContactKinds,
+    description:
+      'Only live Clients or only former Clients; both when absent (FIX-065: Clientas › Cuenta cerrada asks for former_client)',
+  })
   @ApiOkResponse({ type: AdminPromotionContactPageDto })
   @Header('Cache-Control', 'no-store')
   async list(
@@ -96,15 +109,33 @@ export class AdministratorPromotionContactsController {
   @Get('export')
   @ApiOperation({
     operationId: 'exportAdminPromotionContacts',
-    description: 'Every contact not withdrawn; audited',
+    description:
+      'Every contact not withdrawn matching the search and kind; audited',
+  })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: 'Name, email, or phone fragment, accents and case ignored',
+  })
+  @ApiQuery({
+    name: 'kind',
+    required: false,
+    enum: promotionContactKinds,
+    description:
+      'Only live Clients or only former Clients; both when absent (FIX-065: Clientas › Cuenta cerrada asks for former_client)',
   })
   @ApiOkResponse({ type: AdminPromotionContactExportDto })
   @Header('Cache-Control', 'no-store')
   async export(
     @Headers('authorization') authorization: string | undefined,
+    @Query() query: unknown,
   ): Promise<AdminPromotionContactExportDto> {
+    const filter = parsed(
+      parsePromotionContactExportQuery(query),
+      'Invalid filters',
+    );
     const principal = await this.authenticate(authorization);
-    const rows = await run(() => this.operations.export(principal));
+    const rows = await run(() => this.operations.export(filter, principal));
     return { items: rows.map(toDto) };
   }
 

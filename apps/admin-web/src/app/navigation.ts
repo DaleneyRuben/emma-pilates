@@ -16,7 +16,6 @@ export type AdminPath =
   | "/promociones"
   | "/promociones/clases-de-campana"
   | "/promociones/referidos"
-  | "/promociones/contactos"
   | "/comentarios"
   | "/dinero/pagos"
   | "/dinero/caja"
@@ -149,12 +148,6 @@ export const destinations: readonly Destination[] = [
         label: "Referidos",
         to: "/promociones/referidos",
         list: true,
-        studioWide: true,
-        coordinator: true,
-      },
-      {
-        label: "Contactos",
-        to: "/promociones/contactos",
         studioWide: true,
         coordinator: true,
       },
@@ -354,6 +347,8 @@ export const movedPaths: Readonly<
   // WEB-040: Fundadora is a chip on Todas, no longer a page.
   "/back-office/fundadoras": "/clientas?filter=founder",
   "/clientas/fundadoras": "/clientas?filter=founder",
+  // FIX-065 (walkthrough finding 91): AW35 is Clientas' «Cuenta cerrada».
+  "/promociones/contactos": "/clientas?filter=closed",
   "/back-office/congelamientos": "/clientas/congelamientos",
   "/back-office/pagos": "/dinero/pagos",
   "/back-office/caja": "/dinero/caja",

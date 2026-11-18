@@ -1,12 +1,13 @@
 import type { AdminPromotionContactDto } from "@pilates/api-contracts";
 import { useState } from "react";
-import { Button } from "../../components/ui/button";
-import { ConfirmDialog } from "../../components/ui/confirm-dialog";
-import { useWithdrawPromotionContact } from "./contact-queries";
+import { Button } from "../../../components/ui/button";
+import { ConfirmDialog } from "../../../components/ui/confirm-dialog";
+import { useWithdrawPromotionContact } from "./closed-account-queries";
 
 // BE-022: a «stop» request erases a former Client's contact for good
 // (ADR-0097), so the Administrator confirms first (AW35's dialog, the AW22
-// convention). Since FIX-060 only former Clients' rows offer it.
+// convention). Since FIX-060 only former Clients' rows offer it, and since
+// FIX-065 they live in Clientas › Cuenta cerrada.
 export function WithdrawContactAction({
   contact,
   onWithdrawn,

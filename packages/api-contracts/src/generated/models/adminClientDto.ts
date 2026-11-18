@@ -66,4 +66,6 @@ export interface AdminClientDto {
    * @nullable
    */
   invitedByName: string | null;
+  /** Bolivia civil date she joined (FIX-065: the CSV’s «Desde») */
+  clientSince: string;
 }

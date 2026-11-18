@@ -32,7 +32,7 @@ describe("admin navigation", () => {
       },
       {
         label: "Promociones",
-        tabs: ["Carrusel", "Clases de campaña", "Referidos", "Contactos"],
+        tabs: ["Carrusel", "Clases de campaña", "Referidos"],
       },
       { label: "Comentarios", tabs: ["Comentarios"] },
       { label: "Dinero", tabs: ["Pagos", "Caja", "Sueldos", "Gastos"] },
@@ -92,7 +92,6 @@ describe("admin navigation", () => {
       "/promociones",
       "/promociones/clases-de-campana",
       "/promociones/referidos",
-      "/promociones/contactos",
       "/comentarios",
       "/dinero/pagos",
       "/dinero/sueldos",
@@ -122,7 +121,7 @@ describe("admin navigation", () => {
         label: "Clientas",
         tabs: ["Todas", "Para contactar", "Congelamientos"],
       },
-      { label: "Promociones", tabs: ["Carrusel", "Referidos", "Contactos"] },
+      { label: "Promociones", tabs: ["Carrusel", "Referidos"] },
       { label: "Comentarios", tabs: ["Comentarios"] },
       { label: "Estudio", tabs: ["Personal", "Insumos", "Equipos"] },
       { label: "Informes", tabs: ["El mes"] },
@@ -142,6 +141,8 @@ describe("admin navigation", () => {
       // WEB-040: Fundadora is a chip on Todas, no longer a page.
       "/back-office/fundadoras": "/clientas?filter=founder",
       "/clientas/fundadoras": "/clientas?filter=founder",
+      // FIX-065: AW35 is Clientas' «Cuenta cerrada» chip.
+      "/promociones/contactos": "/clientas?filter=closed",
       "/back-office/congelamientos": "/clientas/congelamientos",
       "/back-office/pagos": "/dinero/pagos",
       "/back-office/caja": "/dinero/caja",

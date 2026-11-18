@@ -31,12 +31,12 @@ numbered tests.
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the nine-destination rail and its tabs, the old addresses that still work, the global search, the Branch cell, and the narrow-browser menu (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation, who booked a class and its waitlist, booking a Client into it) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients with the plan and Fundadora chips, «Le quedan», «Vence» and «Invitada por», open the Client file's Resumen, Reservas, Pagos, and Evaluaciones tabs, and create, change (name, phone, Role, Branches), and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt, then mark invoices issued, filter the unbilled sales, and export the accountant's CSV (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 82); read the Evaluation and Referral lists (Test 29); read the income and expense report for every Branch or one, and the accrued, cash, and deferred figures (Tests 30 and 99); read the month's indicators (Test 100), its narrated report (Test 103), and its recommendations (Test 102); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66); give a tester «Acceso de prueba» from the Client detail (Test 78); void a confirmed sale with a reason from Pagos (Test 89); grant campaign extra classes from Clientes (Test 90); type dates as `dd/mm/aaaa` and times as `09:00` on the Session, payroll, expense, promotion, and report forms (Test 111); tell an expired Plan from a Client who never bought one on Clientes (Test 113); read Horario and the report at 1024 px (Test 114) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
-| Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| Promotion Contacts           | Open Clientas › Cuenta cerrada (AW35 until FIX-065), search, export the CSV, and erase a contact on a copy of the fixtures (Tests 59, 159) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | One Evaluación nutricional   | Perfil has one evaluation row; the screen puts the next Evaluation on top with its state (gratis, pago en revisión, pagada, turno liberado) and actions, the turnos below, «Anteriores» at the foot, and reschedules on the same screen (Test 151, FIX-057) | Walkthrough finding 70, the owner's option A (design follow-up 264) |
 | Cash Close                   | Close the day's cash from the Staff app (S25) as the Assistant or the Administrator, and review the history with differences and unclosed days on AW151 (Test 76) | One close a day per Branch and never undone, so use a copy of the fixtures; a sale voided after the close lowers the day's «Ajuste» (Test 89) |
 | Founder membership           | The first 40 Clients get 15 % off from the first Plan except the single class, rounded to the nearest whole boliviano (Test 123 A), a renewal deadline on Mi plan, and a Fundadoras list (Test 88) | The nightly loss needs the worker; a gap of exactly 7 uncovered days keeps the membership |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
-| Promotion Contacts           | AW35 lists every active Client as «Activa» whether or not she agreed, Perfil has no «Recibir promociones» switch, and closing the Account with the box ticked keeps a «Cuenta cerrada» contact (Test 155, FIX-060; Test 60 for app builds before it) | The owner's decision on walkthrough finding 85; the closure part is permanent, so use a copy of the fixtures |
+| Promotion Contacts           | Every active Client is a promotions contact (Clientas lists her; AW35 did until FIX-065) whether or not she agreed, Perfil has no «Recibir promociones» switch, and closing the Account with the box ticked keeps a «Cuenta cerrada» contact (Test 155, FIX-060; Test 60 for app builds before it) | The owner's decision on walkthrough finding 85; the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
@@ -107,7 +107,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
 | AW42 Simulador | 97, 101 |
-| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72, 111, 155 |
+| AW17–AW18 Promociones, AW35 Contactos para promociones (Clientas › Cuenta cerrada since FIX-065) | 31, 33, 59, 60, 72, 111, 155, 159 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
@@ -3508,12 +3508,16 @@ take about a minute:
     its Expenses with the Nómina row gone, a start after the end keeps the
     last report, and January 2020 says «Sin ingresos ni gastos en este
     rango.».
-13. **Promotion Contacts (AW35).** Valeria closes her own Account through
-    the API keeping promotions; AW35 lists her as Cuenta cerrada with her
-    phone and today's date, the search narrows and empties, «Exportar CSV»
-    downloads `contactos-promociones-aaaa-mm-dd.csv` with the BOM header and
-    her row, and «Dejar de enviar a Valeria Quiroga» → «Borrar contacto»
-    leaves «Todavía no hay contactos.» with the export disabled.
+13. **Clientas › Cuenta cerrada (FIX-065, Test 159).** Valeria closes her
+    own Account through the API keeping promotions; the old
+    `/promociones/contactos` opens Clientas with the «Cuenta cerrada» chip,
+    which lists her with her phone and today's date and never Mariana; the
+    search narrows and empties; «Exportar CSV» downloads
+    `clientas-cuenta-cerrada-aaaa-mm-dd.csv` with the BOM header and her row;
+    under «Todas» she is gone and the export
+    (`clientas-todas-aaaa-mm-dd.csv`) holds Mariana but not her; and «Dejar
+    de enviar a Valeria Quiroga» → «Borrar contacto» leaves «Nadie cerró su
+    cuenta pidiendo seguir recibiendo promociones.».
 14. **Security headers (WEB-030, WEB-037).** Every response carries the
     policy of Test 62 and the overlays lock the page behind them; that test
     reads the journey.
@@ -5453,6 +5457,11 @@ folder (ADR-0096):
 
 ## Test 59: the Promotion Contacts on AW35 (BE-022)
 
+**Since FIX-065 (Test 159)** AW35 is gone: its former Clients are Clientas ›
+«Cuenta cerrada», `/promociones/contactos` opens that chip, and «Exportar
+CSV» is Clientas'. Steps 4, 6, and 7 hold there; steps 3 and 5 read as Test
+159 says.
+
 A Client who closes her own Account with «Quiero seguir recibiendo
 promociones de Emma Pilates» ticked leaves a Promotion Contact (Test 35,
 ADR-0097). An Administrator sees, exports, and erases them on AW35.
@@ -6141,8 +6150,8 @@ and 420 px in a real browser (Test 23).
      "Todavía no hay categorías. Agrega la primera abajo."; **Referidos**:
      "Todavía no hay referidos." under the subtitle "Todavía no hay
      referidos en el estudio"; **Promociones**: "Todavía no hay
-     promociones." (Test 33); **Contactos para promociones**: "Todavía no
-     hay contactos." (Test 59); **Personal** lists the Administrator alone.
+     promociones." (Test 33); **Clientas › Cuenta cerrada**: "Nadie cerró
+     su cuenta pidiendo seguir recibiendo promociones." (Test 159); **Personal** lists the Administrator alone.
    - Create a Branch (Test 25, step 5): the selector and Horario wake up,
      and **Insumos** reads "Todavía no hay insumos en esta sucursal.",
      **Gastos** "Todavía no hay gastos en esta sucursal.", and **Nuevo
@@ -6291,7 +6300,7 @@ touching production.
    [`personal-data-request.sql`](./runbooks/personal-data-request.sql) with
    `psql` to collect her data, and read the «Deletion requests» and «Stop
    promotions» sections, which point at the closure of Test 35 and the
-   AW35 actions of Tests 59 and 60.
+   «Dejar de enviar» of Tests 59 and 159 (Clientas › Cuenta cerrada).
 4. **An incident** ([runbook](./runbooks/incident-response.md)). Rehearse
    the first two steps without an incident: pick the severity from the
    table, open a row in the incident log, and freeze deploys with
@@ -9774,6 +9783,10 @@ F. **Released slot (n.º 68).** When Gabriela cancels a paid one (Test 149
 
 ## Test 155: every active Client is a promotions contact (FIX-060)
 
+**Since FIX-065 (Test 159)** steps 2 to 4 read in Clientas: the active
+Clients are its rows, the closed accounts its «Cuenta cerrada» chip, and the
+Contactos page is gone.
+
 Walkthrough finding 85: the owner decided that **Promociones › Contactos**
 (AW35) lists every active Client, whether or not she agreed, and that Perfil
 no longer asks. The «Quiero seguir recibiendo promociones…» box of «Cerrar mi
@@ -9941,3 +9954,44 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    line names ten and ends «y N más». On an empty database **Dar las clases** is
    disabled («0 clientas la recibirán.»).
 7. Check the admin web at 1440 px and 420 px, then drop the copy.
+
+## Test 159: Promociones › Contactos lives in Clientas (FIX-065)
+
+Walkthrough finding 91: since FIX-060 the Contactos page repeated Clientas.
+The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
+267 and 268). No migration; the API changes are additive.
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix065_dev`), and run the API and the admin web on your own ports
+   (surface-verification skill). Close Valeria's Account with «Quiero seguir
+   recibiendo promociones…» ticked (Test 35, or `POST
+   /api/v1/accounts/current/closure` as Valeria with `keepPromotions: true`).
+2. Log in as Paola and open **Promociones**. Expected: tabs Carrusel, Clases
+   de campaña, Referidos (no Contactos) and no «Contactos para promociones»
+   button. Open `/promociones/contactos?q=val`. Expected: Clientas with the
+   «Cuenta cerrada» chip pressed and the search kept.
+3. **Clientas › Todas**. Expected: six chips, Todas, Con plan, Sin plan,
+   Expirado, Fundadora, **Cuenta cerrada**; Valeria under none of the first
+   five, and the subtitle counting live Clients only.
+4. Press **Cuenta cerrada**. Expected: «Exclientas que cerraron su cuenta y
+   pidieron seguir recibiendo promociones. No tienen ficha.», a table with
+   Nombre, Contacto, Recibe promociones desde (the Bolivia day she closed),
+   Estado «Cuenta cerrada» and **Dejar de enviar**; the row opens nothing;
+   «Mostrando 1 de 1 exclienta». `GET
+   /api/v1/administrator/promotion-contacts?kind=former_client` is what it
+   reads.
+5. Press **Exportar CSV** on each chip, with and without a search. Expected:
+   `clientas-<chip>-aaaa-mm-dd.csv` (`todas`, `con-plan`, `sin-plan`,
+   `expirado`, `fundadora`, `cuenta-cerrada`) with Nombre, Estado, Correo,
+   Teléfono, Desde, only the rows that chip and search show (every page), and
+   «Descargamos … con N clientas.» (or «exclientas»). Each export writes an
+   audit record: `client.exported` with `clientCount` and `filter` (`GET
+   /api/v1/administrator/clients/export`), or `promotion_contact.exported`
+   with `kind: former_client`. The button is disabled on an empty list.
+6. **Dejar de enviar** on Valeria → **Borrar contacto**. Expected: «Borramos
+   el contacto de Valeria Quiroga.» and the empty line «Nadie cerró su cuenta
+   pidiendo seguir recibiendo promociones.».
+7. As Carolina (Coordinación) the chip, the export and **Dejar de enviar**
+   work the same.
+8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
+   drop the copy.

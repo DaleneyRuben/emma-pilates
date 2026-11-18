@@ -32,6 +32,7 @@ const row = {
   planEndsOn: new Date('2026-09-30T00:00:00.000Z'),
   founderNumber: 3,
   invitedByName: 'Sofía Guzmán',
+  clientSince: new Date('2025-07-02T00:00:00.000Z'),
 };
 const directoryPage = {
   items: [row],
@@ -88,7 +89,11 @@ describe('administrator Client endpoints (e2e)', () => {
         meaningfulActivity: boolean,
       ) => Promise<AuthenticatedPrincipal>
     >();
-  const operations = { list: operation(), read: operation() };
+  const operations = {
+    list: operation(),
+    read: operation(),
+    export: operation(),
+  };
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue({
@@ -103,6 +108,7 @@ describe('administrator Client endpoints (e2e)', () => {
     });
     operations.list.mockResolvedValue(directoryPage);
     operations.read.mockResolvedValue(detail);
+    operations.export.mockResolvedValue([row]);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AdministratorClientsController],
@@ -132,7 +138,9 @@ describe('administrator Client endpoints (e2e)', () => {
       .expect(({ body }) =>
         expect(body).toEqual({
           ...directoryPage,
-          items: [{ ...row, planEndsOn: '2026-09-30' }],
+          items: [
+            { ...row, planEndsOn: '2026-09-30', clientSince: '2025-07-02' },
+          ],
         }),
       );
     expect(operations.list).toHaveBeenCalledWith(
@@ -168,6 +176,43 @@ describe('administrator Client endpoints (e2e)', () => {
       { page: 1, pageSize: 20 },
       expect.anything(),
     );
+  });
+
+  // FIX-065 (walkthrough finding 91): «Exportar CSV» downloads what the chip
+  // and the search show.
+  it('exports the chip and search with the CSV columns and never caches it', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/clients/export?filter=active&q=lu')
+      .set('authorization', bearer)
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }) =>
+        expect(body).toEqual({
+          items: [
+            {
+              id: clientId,
+              name: 'Lucía Fernández',
+              subscriptionStatus: 'active',
+              email: 'lucia@example.com',
+              phone: '+591 70011001',
+              clientSince: '2025-07-02',
+            },
+          ],
+        }),
+      );
+    expect(operations.export).toHaveBeenCalledWith(
+      { query: 'lu', filter: 'active' },
+      expect.objectContaining({ accountId: 'admin-account' }),
+    );
+    expect(operations.read).not.toHaveBeenCalled();
+  });
+
+  it('refuses paging on the export', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/clients/export?page=2')
+      .set('authorization', bearer)
+      .expect(400);
+    expect(operations.export).not.toHaveBeenCalled();
   });
 
   it.each([

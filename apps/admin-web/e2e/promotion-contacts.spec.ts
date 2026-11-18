@@ -4,58 +4,82 @@ import { closeOwnAccount } from "./support/api";
 import { boliviaToday, formatCivilDate } from "./support/bolivia";
 import { signIn } from "./support/session";
 
-// AW35 through the real backend: every active Client is listed whether or not
-// she agreed to promotions (FIX-060), beside a Client who closed her own
-// Account and asked to keep hearing from the studio (ADR-0097), who is
-// searched, exported, and erased.
-test("lists every active client, exports, and withdraws a Promotion Contact", async ({
+// FIX-065 (walkthrough finding 91, follow-up 268) through the real backend.
+// The file keeps AW35's name so it still runs after the journeys that need
+// Valeria's open Account (clients, horario-booking):
+// a Client who closed her own Account and asked to keep hearing from the
+// studio (ADR-0097) is Clientas › «Cuenta cerrada», never under the other
+// chips; she is searched, exported, and erased there, and «Exportar CSV»
+// downloads what each chip shows.
+test("lists a closed account under Cuenta cerrada, exports, and withdraws it", async ({
   page,
 }) => {
   await closeOwnAccount("valeria@example.com", { keepPromotions: true });
-  await signIn(page, "/promociones");
-  await page.getByRole("link", { name: "Contactos para promociones" }).click();
-
-  await expect(page).toHaveURL(/\/promociones\/contactos/);
-  await expect(page.getByRole("link", { name: "← Promociones" })).toBeVisible();
-  // The fixtures' Mariana never agreed to promotions.
-  const mariana = page.getByRole("row", { name: /Mariana Peña/ });
-  await expect(mariana.getByRole("cell", { name: "Activa" })).toBeVisible();
+  // The old Contactos address opens the chip.
+  await signIn(page, "/promociones/contactos");
+  await expect(page).toHaveURL(/\/clientas\?.*filter=closed/);
+  const chips = page.getByRole("group", { name: "Filtrar clientas" });
   await expect(
-    mariana.getByRole("cell", { name: "mariana@example.com" }),
-  ).toBeVisible();
-  await expect(mariana.getByRole("button")).toHaveCount(0);
+    chips.getByRole("button", { name: "Cuenta cerrada" }),
+  ).toHaveAttribute("aria-pressed", "true");
+
   const row = page.getByRole("row", { name: /Valeria Quiroga/ });
   await expect(row.getByRole("cell", { name: "Cuenta cerrada" })).toBeVisible();
-  await expect(
-    row.getByRole("cell", { name: "valeria@example.com" }),
-  ).toBeVisible();
+  await expect(row.getByText("valeria@example.com")).toBeVisible();
   await expect(row.getByText("+591 70011002")).toBeVisible();
   await expect(row.getByText(formatCivilDate(boliviaToday()))).toBeVisible();
+  // Live Clients are never here.
+  await expect(page.getByRole("row", { name: /Mariana Peña/ })).toHaveCount(0);
 
   const search = page.getByRole("searchbox");
   await search.fill("quiroga");
   await expect(page).toHaveURL(/q=quiroga/);
   await expect(row).toBeVisible();
-  await expect(mariana).toHaveCount(0);
   await search.fill("nadie");
-  await expect(page.getByText("No se encontró ningún contacto.")).toBeVisible();
+  await expect(
+    page.getByText("No se encontró ninguna exclienta."),
+  ).toBeVisible();
   await search.fill("");
   await expect(row).toBeVisible();
 
-  const download = page.waitForEvent("download");
+  const closedDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Exportar CSV" }).click();
-  const file = await download;
-  expect(file.suggestedFilename()).toMatch(
-    /^contactos-promociones-\d{4}-\d{2}-\d{2}\.csv$/,
+  const closedFile = await closedDownload;
+  expect(closedFile.suggestedFilename()).toMatch(
+    /^clientas-cuenta-cerrada-\d{4}-\d{2}-\d{2}\.csv$/,
   );
-  const path = await file.path();
-  const csv = readFileSync(path, "utf8");
-  expect(csv.startsWith("﻿Nombre,Tipo,Correo,Teléfono,Desde\r\n")).toBe(true);
-  expect(csv).toContain(
+  const closedCsv = readFileSync(await closedFile.path(), "utf8");
+  expect(closedCsv.startsWith("﻿Nombre,Estado,Correo,Teléfono,Desde\r\n")).toBe(
+    true,
+  );
+  expect(closedCsv).toContain(
     `Valeria Quiroga,Cuenta cerrada,valeria@example.com,+591 70011002,${formatCivilDate(boliviaToday())}\r\n`,
   );
-  expect(csv).toContain("\r\nMariana Peña,Activa,mariana@example.com,");
+  expect(closedCsv).not.toContain("Mariana Peña");
+  await expect(
+    page.getByText(/^Descargamos clientas-cuenta-cerrada-/),
+  ).toBeVisible();
 
+  // Under «Todas» she is gone, and the export holds the live Clients only.
+  await chips.getByRole("button", { name: "Todas" }).click();
+  await expect(page.getByRole("row", { name: /Mariana Peña/ })).toBeVisible();
+  await expect(page.getByRole("row", { name: /Valeria Quiroga/ })).toHaveCount(
+    0,
+  );
+  const allDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Exportar CSV" }).click();
+  const allFile = await allDownload;
+  expect(allFile.suggestedFilename()).toMatch(
+    /^clientas-todas-\d{4}-\d{2}-\d{2}\.csv$/,
+  );
+  const allCsv = readFileSync(await allFile.path(), "utf8");
+  // Earlier journeys may have sold Mariana a Plan: her state varies.
+  expect(allCsv).toMatch(
+    /\r\nMariana Peña,(Activo|Sin plan|Expirado),mariana@example\.com,/,
+  );
+  expect(allCsv).not.toContain("Valeria Quiroga");
+
+  await chips.getByRole("button", { name: "Cuenta cerrada" }).click();
   await row
     .getByRole("button", { name: "Dejar de enviar a Valeria Quiroga" })
     .click();
@@ -71,5 +95,9 @@ test("lists every active client, exports, and withdraws a Promotion Contact", as
     page.getByText("Borramos el contacto de Valeria Quiroga."),
   ).toBeVisible();
   await expect(row).toHaveCount(0);
-  await expect(mariana).toBeVisible();
+  await expect(
+    page.getByText(
+      "Nadie cerró su cuenta pidiendo seguir recibiendo promociones.",
+    ),
+  ).toBeVisible();
 });
