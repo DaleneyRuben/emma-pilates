@@ -28,7 +28,15 @@ export type BackOfficeErrorCode =
   | 'equipment_number_taken'
   | 'equipment_archived'
   | 'equipment_issue_not_found'
-  | 'equipment_issue_resolved';
+  | 'equipment_issue_resolved'
+  | 'equipment_issue_not_stock'
+  | 'equipment_type_not_found'
+  | 'equipment_type_name_taken'
+  | 'equipment_type_in_use'
+  | 'equipment_type_not_unit'
+  | 'equipment_type_not_quantity'
+  | 'equipment_quantity_below_damaged'
+  | 'equipment_damage_exceeds_usable';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
   back_office_access_denied: 403,
@@ -59,6 +67,14 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   equipment_archived: 409,
   equipment_issue_not_found: 404,
   equipment_issue_resolved: 409,
+  equipment_issue_not_stock: 409,
+  equipment_type_not_found: 404,
+  equipment_type_name_taken: 409,
+  equipment_type_in_use: 409,
+  equipment_type_not_unit: 409,
+  equipment_type_not_quantity: 409,
+  equipment_quantity_below_damaged: 409,
+  equipment_damage_exceeds_usable: 409,
 };
 
 export class BackOfficeError extends Error {
