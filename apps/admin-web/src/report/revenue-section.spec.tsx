@@ -11,7 +11,7 @@ const renderSection = (branchName?: string) => {
   });
   render(
     <QueryClientProvider client={queryClient}>
-      <RevenueSection branchName={branchName} />
+      <RevenueSection month="2026-10" branchName={branchName} />
     </QueryClientProvider>,
   );
 };
@@ -39,6 +39,25 @@ describe("STU-002 Ingreso devengado beside one Branch", () => {
         "Todo el estudio, no solo Achumani: no se separa por sucursal.",
       ),
     ).toBeVisible();
+  });
+
+  it("reads the month the report's Hasta falls in, with no stepper of its own (FIX-088)", async () => {
+    const asked: string[] = [];
+    server.use(
+      http.get(apiUrl(revenueReportPath), ({ request }) => {
+        asked.push(new URL(request.url).searchParams.get("month") ?? "");
+        return jsonResponse(emptyRevenueReport);
+      }),
+    );
+    renderSection();
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Ingreso devengado · octubre de 2026",
+      }),
+    ).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Mes anterior" })).toBeNull();
+    expect(asked).toEqual(["2026-10"]);
   });
 
   it("adds no label for every Branch", async () => {
