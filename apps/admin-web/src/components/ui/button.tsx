@@ -5,8 +5,8 @@ import { cn } from "../../lib/cn";
 
 // Follow-up 225 §4 (the admin boards' .btn): Primary in Palo de rosa,
 // Secondary on Rosa tinte with a Rosa enlace label, Text with no underline,
-// Destructive on its pale ground; no borders and no shadows. One solid
-// (primary) button per view.
+// Destructive on its pale ground; no shadows, and no borders but the
+// outline variant's hairline (FIX-084). One solid (primary) button per view.
 export const buttonVariants = cva(
   "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton font-semibold transition-colors focus-visible:shadow-foco disabled:pointer-events-none disabled:bg-deshabilitado disabled:text-deshabilitado-texto disabled:shadow-none [&_svg]:shrink-0",
   {
