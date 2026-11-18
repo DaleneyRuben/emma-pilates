@@ -103,23 +103,9 @@ export function SubscriptionScreen() {
   if (nextSubscription)
     details.push(["Siguiente plan", formatCivilDate(nextSubscription.startsOn)]);
 
+  // FIX-082 (Mi plan option A): the end is said once, on the card and in the
+  // details; the discount sits under «Renovar mi plan».
   const notices: PlanNotice[] = [];
-  // Walkthrough finding 98: a paid next Plan already kept the discount.
-  if (founderRenewalDeadline != null && !nextSubscription) {
-    // Finding 49: say why, never «fundadora».
-    notices.push({
-      icon: "tag",
-      text: `Renueva antes del ${formatCivilDate(founderRenewalDeadline)} para mantener tu 15 % de descuento.`,
-      note: "Tu plan nuevo puede empezar más tarde: lo que cuenta es la fecha de compra.",
-    });
-  }
-  if (status === "expiring_soon" && guestPass === null) {
-    notices.push({
-      icon: "clock",
-      text: `Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`,
-      note: "Renueva cuando quieras y elige tu fecha de inicio.",
-    });
-  }
   if (nextSubscription) {
     notices.push({
       icon: "calendar",
@@ -136,6 +122,13 @@ export function SubscriptionScreen() {
     queuedPlanStartsOn: data.queuedPlanStartsOn ?? null,
   });
   const canFreeze = !expired && data.canRequestFreeze === true;
+  const canRenew = !expired && guestPass === null && nextSubscription == null;
+  // Walkthrough finding 98: a paid next Plan already kept the discount.
+  // Finding 49: say why, never «fundadora».
+  const renewNote =
+    founderRenewalDeadline != null
+      ? `Renueva antes del ${formatCivilDate(founderRenewalDeadline)} y mantienes tu 15 % de descuento.`
+      : `Eliges cuándo empieza el nuevo: entre el ${formatCivilDate(renewalStartsOn)} y el ${formatCivilDate(addCivilDays(renewalStartsOn, nextPlanStartWindowDays - 1))}.`;
   const refused = freeze?.state === "refused";
 
   return (
@@ -153,6 +146,12 @@ export function SubscriptionScreen() {
             />
           </View>
         )}
+        {canRenew ? (
+          <View style={styles.renew}>
+            <PrimaryButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
+            <BodyText style={styles.renewNote}>{renewNote}</BodyText>
+          </View>
+        ) : null}
         {notices.length === 0 ? null : <NoticeList notices={notices} />}
         {freeze == null || cardState === null ? null : (
           <FreezeCard
@@ -166,9 +165,6 @@ export function SubscriptionScreen() {
           />
         )}
         <DetailRows rows={details} title="Detalles" />
-        {subscription.extraClassesLine && guestPass === null ? (
-          <BodyText style={styles.note}>{subscription.extraClassesLine}</BodyText>
-        ) : null}
         {expired || (guestPass !== null && nextSubscription == null) ? (
           <View style={styles.section}>
             <SectionTitle>Elige tu próximo plan</SectionTitle>
@@ -177,19 +173,11 @@ export function SubscriptionScreen() {
             </BodyText>
             <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
           </View>
-        ) : guestPass !== null ? null : nextSubscription == null || canFreeze ? (
+        ) : guestPass === null && canFreeze ? (
           <View>
             <SectionTitle>Tu plan</SectionTitle>
             <ActionRows>
-              {nextSubscription == null ? (
-                <ActionRow
-                  icon="refresh"
-                  label="Renovar mi plan"
-                  note={`Eliges cuándo empieza el nuevo: entre el ${formatCivilDate(renewalStartsOn)}, al día siguiente de que venza este, y el ${formatCivilDate(addCivilDays(renewalStartsOn, nextPlanStartWindowDays - 1))}.`}
-                  onPress={() => navigation.navigate("Plans")}
-                />
-              ) : null}
-              {!canFreeze ? null : window.available ? (
+              {window.available ? (
                 <ActionRow
                   icon="sun"
                   label={refused ? "Pedir otro congelamiento" : "Congelar plan"}
@@ -220,6 +208,8 @@ function purchaseNote(fromCentavos: number | null | undefined): string {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.lg },
   note: { color: colors.textMuted, fontSize: typography.note },
+  renew: { gap: spacing.smd },
+  renewNote: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.lg },
   section: { gap: spacing.md },
 });

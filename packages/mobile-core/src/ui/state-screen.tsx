@@ -27,6 +27,8 @@ export type StateScreenProps = {
   testIDPrefix?: string;
   textAction?: Action;
   title: string;
+  /** The glyph alone in Texto tenue, without its disc (FIX-082). */
+  plainIcon?: boolean;
   /** `error` puts the glyph in Error on #F7E5E0. */
   tone?: "brand" | "error";
 };
@@ -37,6 +39,7 @@ export function StateScreen({
   icon,
   layout = "centred",
   note,
+  plainIcon = false,
   primaryAction,
   testID,
   testIDPrefix = "state-screen",
@@ -48,7 +51,15 @@ export function StateScreen({
   const hasActions = primaryAction !== undefined || textAction !== undefined;
   return (
     <View style={[styles.block, layouts[layout]]} testID={testID}>
-      {icon === undefined ? null : (
+      {icon === undefined ? null : plainIcon ? (
+        <Glyph
+          color={error ? colors.error : colors.textMuted}
+          name={icon}
+          size={32}
+          strokeWidth={1.5}
+          testID={`${testIDPrefix}-icon-${icon}`}
+        />
+      ) : (
         <View style={[styles.disc, error && styles.errorDisc]} testID={`${testIDPrefix}-disc`}>
           <Glyph
             color={error ? colors.error : colors.emphasis}

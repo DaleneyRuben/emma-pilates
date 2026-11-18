@@ -3,7 +3,6 @@ import {
   fontFamilies,
   Glyph,
   type GlyphName,
-  radii,
   SectionTitle,
   spacing,
   surfaces,
@@ -12,8 +11,9 @@ import {
 import type { PropsWithChildren } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-// 02's «Accesos rápidos» on v2 (follow-up 225 §10): Lino tiles with a 36 pt
-// Rosa tinte disc each; without a Plan, the booking row is locked at 60 %.
+// 02's «Accesos rápidos» on v2 (follow-up 225 §10): Lino tiles; without a
+// Plan, the booking row is locked at 60 %. FIX-082 (design audit 2026-11-18):
+// no tinted disc behind the icon, which takes the muted text colour.
 export function ShortcutSection({ children }: PropsWithChildren) {
   return (
     <View>
@@ -31,12 +31,8 @@ export function ShortcutTiles({ children }: PropsWithChildren) {
   );
 }
 
-function Disc({ icon }: { icon: GlyphName }) {
-  return (
-    <View style={styles.disc} testID="shortcut-disc">
-      <Glyph name={icon} size={18} strokeWidth={1.5} />
-    </View>
-  );
+function TileIcon({ icon }: { icon: GlyphName }) {
+  return <Glyph color={colors.textMuted} name={icon} size={18} strokeWidth={1.5} />;
 }
 
 /** The locked «Reservar una clase» row without a Plan: a note and the lock. */
@@ -51,7 +47,7 @@ export function LockedShortcutRow({ label, note }: { label: string; note: string
       disabled
       style={[styles.row, styles.locked]}
     >
-      <Disc icon="calendar" />
+      <TileIcon icon="calendar" />
       <View style={styles.rowBody}>
         <Text style={styles.rowTitle}>{label}</Text>
         <Text style={styles.note}>{note}</Text>
@@ -68,7 +64,7 @@ export function LockedShortcutRow({ label, note }: { label: string; note: string
 }
 
 /**
- * A tile: the disc and the label, and a note only when the board draws one
+ * A tile: the icon and the label, and a note only when the board draws one
  * (without a Plan). `hint` carries the live summary for screen readers.
  */
 export function ShortcutTile({
@@ -93,7 +89,7 @@ export function ShortcutTile({
       onPress={onPress}
       style={({ pressed }) => [styles.tile, wide && styles.tileWide, pressed && styles.pressed]}
     >
-      <Disc icon={icon} />
+      <TileIcon icon={icon} />
       <Text style={wide ? styles.rowTitle : styles.tileTitle}>{label}</Text>
       {wide ? <Text style={styles.note}>{note}</Text> : null}
     </Pressable>
@@ -101,14 +97,6 @@ export function ShortcutTile({
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
   locked: { opacity: 0.6 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },

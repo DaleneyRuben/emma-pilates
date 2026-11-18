@@ -1,4 +1,8 @@
-import { useListPlans, type PlanDto } from "@pilates/api-contracts";
+import {
+  useGetCurrentClientSubscription,
+  useListPlans,
+  type PlanDto,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   Chevron,
@@ -31,14 +35,17 @@ type PlansNavigation = {
   replace: (screen: "PaymentStatus") => void;
 };
 
-/** C08's terms line: «Válido por 30 días», or «60 días · hasta 3 por semana». */
-export function planRowTerms(
-  plan: Pick<PlanDto, "classAllowance" | "durationDays" | "weeklyClassCap">,
-) {
+/** «Válido por 30 días»: the Plan is valid, whatever its classes (FIX-082). */
+export function planValidity(plan: Pick<PlanDto, "durationDays">): string {
+  return `Válido por ${plan.durationDays} días`;
+}
+
+/** C08's terms line: «Válido por 30 días», or «Válido por 60 días · hasta 3 por semana». */
+export function planRowTerms(plan: Pick<PlanDto, "durationDays" | "weeklyClassCap">) {
   if (plan.weeklyClassCap !== null) {
-    return `${plan.durationDays} días · hasta ${plan.weeklyClassCap} por semana`;
+    return `${planValidity(plan)} · hasta ${plan.weeklyClassCap} por semana`;
   }
-  return `${plan.classAllowance === 1 ? "Válida" : "Válido"} por ${plan.durationDays} días`;
+  return planValidity(plan);
 }
 
 /** The places left the API sends (BKM-019) only while 10 or fewer remain. */
@@ -80,10 +87,20 @@ function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
   );
 }
 
-function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
+function PlanRow({
+  current,
+  plan,
+  onPress,
+}: {
+  current: boolean;
+  plan: PlanDto;
+  onPress: () => void;
+}) {
   return (
     <Pressable
-      accessibilityLabel={describePlanCardLabel(plan)}
+      accessibilityLabel={
+        current ? `${describePlanCardLabel(plan)}, tu plan actual` : describePlanCardLabel(plan)
+      }
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
@@ -92,6 +109,7 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
       <View style={styles.rowBody}>
         <Text style={styles.planName}>{plan.name}</Text>
         <Text style={styles.terms}>{planRowTerms(plan)}</Text>
+        {current ? <Text style={styles.current}>Tu plan actual</Text> : null}
       </View>
       <View style={styles.prices}>
         <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
@@ -119,6 +137,14 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
   // the payment must not replace itself when the payment turns pending.
   const focused = useIsFocused();
   const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
+  // FIX-082: the Plan she has now is marked; the summary names it by its
+  // snapshot, so the match is by name.
+  const subscription = useGetCurrentClientSubscription({ fetcher });
+  const view = subscription.data?.status === 200 ? subscription.data.data : null;
+  const currentPlanName =
+    view !== null && (view.status === "active" || view.status === "expiring_soon")
+      ? (view.subscription?.planName ?? null)
+      : null;
   const blocked =
     standing.kind === "in_review" ||
     (standing.kind === "rejected" && route?.params?.rejectedPlanGone !== true);
@@ -145,6 +171,7 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
               <Fragment key={plan.id}>
                 {index === 0 ? null : <View style={styles.hairline} />}
                 <PlanRow
+                  current={plan.name === currentPlanName}
                   onPress={() => navigation.navigate("PlanDetail", { planId: plan.id })}
                   plan={plan}
                 />
@@ -176,6 +203,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bannerTextStrong: { color: colors.white },
+  current: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.note,
+    fontWeight: "500",
+  },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },

@@ -7,7 +7,7 @@ import {
   type NotificationDto,
 } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
@@ -56,6 +56,43 @@ function DeniedNotice() {
   );
 }
 
+const isoDayFormatter = new Intl.DateTimeFormat("es-BO", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
+
+/**
+ * FIX-082: notices stored before the backend formatted its dates still hold
+ * «2026-11-15»; they read «15 de noviembre» like the rest.
+ */
+export function readableNotificationMessage(message: string): string {
+  return message.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (iso) =>
+    isoDayFormatter.format(new Date(`${iso}T00:00:00.000Z`)),
+  );
+}
+
+function NotificationList({
+  items,
+  now,
+  onOpen,
+}: {
+  items: readonly NotificationDto[];
+  now: Date;
+  onOpen: (notification: NotificationDto) => void;
+}) {
+  return (
+    <>
+      {items.map((item, index) => (
+        <Fragment key={item.id}>
+          {index === 0 ? null : <View style={styles.divider} testID="notification-divider" />}
+          <NotificationRow notification={item} now={now} onPress={() => onOpen(item)} />
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 function NotificationRow({
   notification,
   now,
@@ -66,16 +103,17 @@ function NotificationRow({
   onPress: () => void;
 }) {
   const unread = !notification.readAt;
+  const message = readableNotificationMessage(notification.message);
   return (
     <Pressable
-      accessibilityLabel={notification.message}
+      accessibilityLabel={message}
       accessibilityRole="button"
       onPress={onPress}
       style={[styles.row, unread && styles.rowUnread]}
     >
       {unread ? <View style={styles.dot} /> : <View style={styles.dotSpace} />}
       <View style={styles.rowBody}>
-        <Text style={[styles.message, !unread && styles.messageRead]}>{notification.message}</Text>
+        <Text style={[styles.message, !unread && styles.messageRead]}>{message}</Text>
         <BodyText style={styles.time}>
           {formatNotificationTime(notification.createdAt, now)}
         </BodyText>
@@ -196,27 +234,13 @@ export function NotificationsScreen({
         {unread.length > 0 ? (
           <>
             <Text style={styles.sectionTitle}>Sin leer</Text>
-            {unread.map((item) => (
-              <NotificationRow
-                key={item.id}
-                notification={item}
-                now={currentTime}
-                onPress={() => open(item)}
-              />
-            ))}
+            <NotificationList items={unread} now={currentTime} onOpen={open} />
           </>
         ) : null}
         {earlier.length > 0 ? (
           <>
             <Text style={styles.sectionTitle}>Anteriores</Text>
-            {earlier.map((item) => (
-              <NotificationRow
-                key={item.id}
-                notification={item}
-                now={currentTime}
-                onPress={() => open(item)}
-              />
-            ))}
+            <NotificationList items={earlier} now={currentTime} onOpen={open} />
           </>
         ) : null}
       </ScrollView>
@@ -233,6 +257,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.smd,
     width: 8,
   },
+  divider: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.xl + spacing.lg },
   dotSpace: { width: 8 },
   message: { color: colors.text, fontSize: typography.body, lineHeight: 22 },
   messageRead: { color: colors.textSecondary },

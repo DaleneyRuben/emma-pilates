@@ -45,15 +45,17 @@ async function openHome(subscription: unknown) {
   return screen;
 }
 
-// Follow-up 225 §10: «Accesos rápidos» as three Lino tiles, each with a 36 pt
-// Rosa tinte disc; without a Plan the booking row is locked at 60 % opacity.
+// Follow-up 225 §10: «Accesos rápidos» as Lino tiles; without a Plan the
+// booking row is locked at 60 % opacity. FIX-082 (Inicio option A): with a
+// Plan, «Reservar una clase» left the tiles for the solid button, and no
+// icon sits on a tinted disc.
 describe("Client Home shortcut tiles", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("draws three Lino tiles with an icon disc each", async () => {
+  it("draws two Lino tiles with a plain muted icon each", async () => {
     const screen = await openHome(active);
 
     expect(screen.getByText("Accesos rápidos")).toHaveStyle({
@@ -61,20 +63,15 @@ describe("Client Home shortcut tiles", () => {
       fontSize: 12,
       textTransform: "uppercase",
     });
-    for (const label of ["Reservar una clase", "Evaluación nutricional", "Invita a una amiga"]) {
+    for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
       expect(screen.getByRole("button", { name: label })).toHaveStyle({
         backgroundColor: "#F5EFE9",
         borderRadius: 16,
       });
       expect(screen.getByText(label)).toHaveStyle({ fontSize: 14 });
     }
-    expect(screen.getAllByTestId("shortcut-disc")).toHaveLength(3);
-    expect(screen.getAllByTestId("shortcut-disc")[0]).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      height: 36,
-      width: 36,
-    });
-    expect(screen.getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#B78380");
+    expect(screen.queryByTestId("shortcut-disc")).toBeNull();
+    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#6F6662");
     expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("width", 18);
     expect(screen.getByTestId("glyph-personAdd", hidden)).toHaveProp("width", 18);
     expect(screen.getByTestId("shortcut-tiles")).toHaveStyle({ flexDirection: "row", gap: 12 });

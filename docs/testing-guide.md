@@ -45,7 +45,7 @@ numbered tests.
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Accessibility                | The code audit of Dynamic Type, reading order, Reduce Motion, and admin keyboard order (Test 115) | The device pass was not run: VoiceOver, TalkBack, and the largest text size are still unread |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); the mobile release workflows refuse to publish without the owner secret (Test 108); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
-| Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | The «Te quedan N clases esta semana» line on Reservar is follow-up 203 and is still pending; the mobile screens were not walked on a device |
+| Weekly cap                   | Book up to the cap snapshotted on a Plan, see `classesLeftThisWeek` count down, and get `409 weekly_cap_reached` on the next Booking or Waitlist join unless an extra class remains (Test 91) | Reservar says «Te quedan N clases esta semana» once above the days and Inicio's plan row says «Esta semana te quedan N» (Test 176, FIX-082) |
 | Money format                 | Whole bolivianos in both apps («Bs 560») and centavos on the admin web («Bs 560,00») (Test 112) | A leftover fraction of a boliviano is not in the fixtures; the unit tests cover the rounding. Credit is retired (PAY-005), so no screen shows a credit line |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 83) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 | Trainer pay periods          | Calculate and approve a Trainer's pay by month or by «Otro período» (a range of days; a day or a week by its address) in Sueldos › Por aprobar, see an approved day keep the month from paying it again, and read the period in «Mis pagos» (Test 127) | The Coordinator stays monthly; the worker drafts whole months only, so a Trainer already paid by day or week that month is drafted by hand |
@@ -622,13 +622,15 @@ with no tagline (follow-up 227). The app should open **Inicio** (MOB-074,
 board `C02`): today's date in small capitals over "Hola, Lucía", and on the
 right a Lino bell (with the unread count in a Rosa profundo pill; it opens
 **Notificaciones** with a back arrow) and her avatar (it opens **Perfil**).
-The plan is the Rosa profundo hero card: «Tu plan · Paquete de 8 clases» with
-an **Activo** pill (**Por vencer** near the end), «5 clases restantes» with
-the number in large Lora, a white bar, «Vence el …» and the white **Mi plan**
-pill (no underlined «Ver detalle»). With a booked class, «Tu próxima clase»
-shows its day tile, the class, and «08:00 · Trainer · Branch», and opens
-**Mis reservas**. «Accesos rápidos» are three Lino tiles (Reservar una clase,
-Evaluación nutricional, Invita a una amiga). Log in as `mariana@example.com`
+Under the promotion (Test 18), the solid **Reservar una clase** button is the
+screen's one strong action, and under it the plan is a light Lino row,
+tappable as a whole with a «›» (Test 176, FIX-082): «Paquete de 8 clases ·
+**5 restantes**» over «Vence el …» (with a weekly cap, «Esta semana te quedan
+N · vence el …»; **Por vencer** in amber text near the end). There is no
+**Mi plan** pill and no **Activo** pill. With a booked class, «Tu próxima
+clase» shows its day tile, the class, and «08:00 · Trainer · Branch», and
+opens **Mis reservas**. «Accesos rápidos» are two Lino tiles with a plain
+grey icon (Evaluación nutricional, Invita a una amiga). Log in as `mariana@example.com`
 to see the no-plan hero instead: a «Desde Bs …» pill, «Elige tu plan y
 empieza a moverte», «Mat y Reformer · paga por QR o en el estudio», and the
 white **Comprar un plan** pill; the booking row is locked at 60 % with «Necesitas
@@ -652,11 +654,13 @@ and Class Type (past Sessions of today are hidden). With one Branch it shows
 «Sucursal **Centro**» fixed, without a chevron; from the second Branch the
 **Sucursal:** pill opens «Elige una sucursal» (walkthrough n.º 7). The day
 chips are 48 × 60 Lino tiles (today reads «Hoy»; the chosen day is Palo de
-rosa) and the Class Type chips are Lino pills (the chosen one Rosa profundo).
-The list starts with the day in small capitals and «N clases», then one Lino
-row per Session: the start in Lora 20, the Class Type over «Trainer · 50 min»,
-the seat pill («N cupos» on Rosa tinte; **Lleno** on Arena, never red) and a
-quiet chevron. Empty states have actions (walkthrough n.º 6): a Class Type
+rosa, the screen's one accent) and the Class Types are tabs over a hairline
+(the chosen one underlined in Palo de rosa). With a weekly cap, one notice
+above the days says «Te quedan N clases esta semana» (Test 176). The list
+starts with the day in small capitals and «N clases», then one Lino card
+with a row per Session split by hairlines: the start in Lora 20, the Class
+Type over «Trainer · 50 min», and the seats as grey text («N cupos»,
+**Lleno**; «Quedan 2» or «Queda 1» in amber), no pill and no chevron. Empty states have actions (walkthrough n.º 6): a Class Type
 with nothing that day reads «Hoy no hay {tipo}» (or «El martes no hay …»)
 with **Ver todas las clases** (clears the filter) and, when that type has a
 class later in the week, **Ver el jueves 5**; a day with no classes at all
@@ -1738,15 +1742,16 @@ Log in as `sofia@example.com` and open **Perfil** (`C18`). Under «Tu plan y
 tus clases» the rows read **Mi plan**, **Evaluación nutricional**, **Mis
 evaluaciones**, and **Invita a una amiga**; there is no **Mi crédito**.
 
-Tap **Invita a una amiga** (`C16`). «Tu código» shows `REF-SOFIA` large and
-spaced (long-press it to copy; there is no **Copiar** button yet), then
-**Compartir**, which opens the system share sheet with a message that contains
-the code. «Cómo funciona» lists three numbered steps («Compartes tu código»,
-«Tu amiga toma una clase gratis», «Compra su primer plan y tú ganas una
-clase») over «Una amiga por mes. La clase gratis es una sola vez para ella.».
-«Tus invitadas» lists each friend with her initials and status; with none it
-reads «Aún no invitaste a nadie» with **Compartir tu código**. Nothing
-mentions Credit (PAY-005). Mariana sees the same screen with `REF-MARIANA`.
+Tap **Invita a una amiga** (`C16`, Test 176 D). One Lino card holds «Tu
+código» with `REF-SOFIA` large in Lora and an outlined copy icon («Copiar
+código»), the solid **Compartir tu código** under it (the system share sheet,
+with a message that contains the code) and **Editar código** centred below.
+«Cómo funciona» is three plain lines («1. Compartes tu código.», «2. Tu amiga
+toma una clase gratis.», «3. Si compra su primer plan, tú ganas una clase.»)
+over «Una amiga por mes. La clase gratis es una sola vez para ella.». «Tus
+invitadas» lists each friend with her initials and status; with none it reads
+«Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.» as
+plain text. Nothing mentions Credit (PAY-005). Mariana sees the same screen with `REF-MARIANA`.
 
 ### B. Buy a Plan with a bank transfer
 
@@ -2304,9 +2309,9 @@ last active Administrator (`409 last_administrator`). Other Roles get `403`.
 
 In the Client app as `lucia@example.com`:
 
-0. **Novedades del estudio.** With the two Promotions of Test 33 published
+0. **The promotions.** With the two Promotions of Test 33 published
    (the fixtures ship none), **Inicio** shows the carousel under the
-   greeting: one card per published Promotion in the admin web's order, the
+   greeting, with no section label and the headline in Lora 20 (FIX-082): one card per published Promotion in the admin web's order, the
    image at 16:9 (the portrait one is centre-cropped), the headline, and the
    description; swipe sideways to page one card at a time and watch the dots
    under the cards follow ("Promoción 1 de 2" for VoiceOver). A card does
@@ -2316,21 +2321,22 @@ In the Client app as `lucia@example.com`:
    admin web (Test 33, **Dejar de publicar**) and pull Inicio down to
    refresh: the section is gone. On an iPad the card stops at 720 pt and the
    next one peeks on the right.
-1. **Inicio** shows the shortcuts under «Accesos rápidos» (`C02`): three
-   Lino tiles with a Rosa tinte icon disc each, **Reservar una clase**,
+1. **Inicio** shows the solid **Reservar una clase** button under the
+   carousel and the shortcuts under «Accesos rápidos» (`C02`, FIX-082): two
+   Lino tiles with a plain grey icon,
    **Evaluación nutricional** (it opens the one evaluation screen, with the
    booked one on top when there is one; VoiceOver reads «Próxima: …» as its
    hint) and
    **Invita a una amiga**. Without an active Plan the booking shortcut is a
    full-width row at 60 % with «Necesitas un plan activo» and a lock, over
    two tiles with «Agenda tu cita» and «Su primera clase es gratis».
-2. The hero's **Mi plan** pill opens **Mi plan** (`C12`): the Rosa profundo
-   hero («Tu plan · …», **Activo**, the classes left in large Lora «de N
-   clases restantes», «Vence el …»), «Detalles» as rows (Empezó, Vence,
-   Siguiente plan when there is one), «Renovación anticipada» with **Renovar
-   mi plan** (it opens Elige tu plan) and «El nuevo empieza el …, al día
-   siguiente de que venza este», and **Reservar una clase** at the bottom;
-   while expiring, a Rosa tinte notice; once expired, «Último plan · …»,
+2. Tapping the plan row anywhere opens **Mi plan** (`C12`, Test 176 E): a
+   Lino card with the plan name and an «Activo» dot, the classes left in
+   large Lora «de N clases restantes» and «Vence el …»; the solid **Renovar
+   mi plan** right under it (it opens Elige tu plan) over «Eliges cuándo
+   empieza el nuevo: entre el … y el …» (or the founder discount line);
+   «Detalles» as rows (Empezó, Vence, Siguiente plan when there is one); no
+   **Reservar una clase** at the bottom; once expired, «Último plan · …»,
    **Vencido**, «0 clases disponibles», «Venció el …», and «Elige tu próximo
    plan» with **Comprar un plan**. As `isabel@example.com` (no classes left)
    the hero reads «0 de N clases restantes». Mi plan
@@ -8642,7 +8648,8 @@ B. **New people.** Register a Client from the app, invite one from Nuevo
    Assistant's role to Trainer gives her one. Spec:
    `readable-referral-codes-creation.integration-spec.ts`.
 C. **Editing her own code, client app.** As Lucía, **Perfil** → **Invita a
-   una amiga**: the Rosa profundo card shows `LUCIA` with **Copiar**. Copiar
+   una amiga**: the Lino card shows `LUCIA` with the copy icon (Test 176 D).
+   «Copiar código»
    shows the toast «Código copiado» and the code pastes elsewhere. **Editar
    código** opens the sheet; typing `sofia` turns `SOFIA` and, after a
    moment, «Ya está en uso» (Sofía's code) with **Guardar código** off;
@@ -9565,10 +9572,10 @@ A. **Founder deadline says why (n.º 49).** As Lucía (founder), **Mi plan**:
 B. **One branch (n.º 50).** With only Achumani active, **Comprar un plan ›
    Trimestral 24 clases**: «Qué incluye» says «24 clases». Activate a second
    branch in the admin web and reopen: «24 clases en cualquier sucursal».
-C. **Mi plan, one focus (n.º 54).** As Carla, **Mi plan**: the plan card is
-   the only coloured block; notices (founder, ending soon, next plan) are
-   rows with an icon and no fill; **Tu plan** holds **Renovar mi plan** and
-   **Congelar plan** as rows; there is no **Reservar una clase** button at
+C. **Mi plan, one focus (n.º 54).** As Carla, **Mi plan**: the light plan
+   card, then **Renovar mi plan** with the founder discount line under it
+   (Test 176 E); the next plan, when there is one, is a row with an icon and
+   no fill; **Tu plan** holds **Congelar plan** as a row; there is no **Reservar una clase** button at
    the bottom (Reservar is on the tab bar).
 D. **Congelar plan (n.º 51).** **Mi plan › Congelar plan** opens a task
    screen: «Puedes congelar hasta 15 días», a month calendar (Monday
@@ -9610,16 +9617,20 @@ H. **Admin web (n.º 52, 53d).** **Clientas › Congelamientos**: **Vista ›
    and «Decidido por … · 8 nov 10:15». Check 1440 and 420 px.
 I. **After approval, the Client (n.º 53).** Carla's notification reads
    «Aprobamos tu congelamiento del 9 al 15 de noviembre. Tu plan ahora vence
-   el 12 de febrero.» (no ISO date). **Mi plan** before the start: the
-   **Aprobado** card «Congelado del lun 9 al dom 15 de noviembre», «Ahora
-   vence el …»; while it runs: **Congelado**, «Congelado hasta el …»,
-   «Vuelves a reservar …». A refused request shows **No aprobado** and the
-   row **Pedir otro congelamiento**.
+   el 12 de febrero.» (no ISO date). **Mi plan** shows the Freeze as one row
+   that opens its detail on tap (Test 176 E). Before the start: «Congelado
+   del lun 9 al dom 15 de noviembre» over «Aprobado · esos días no puedes
+   reservar», and on tap «Ahora vence el …»; while it runs: «Congelado hasta
+   el …» over «Congelado · vuelves a reservar el …». A refused request reads
+   «No aprobado · puedes pedir otro» and the row **Pedir otro
+   congelamiento**.
 J. **No booking on a frozen day (n.º 53c).** Open a class inside the
-   approved freeze: «Tu plan está congelado ese día (del … al …).» with
-   **Reservar** off and no «Se descuenta 1 clase de tu plan»; a full class
-   on that day offers no waitlist. A class outside the freeze books as
-   usual.
+   approved freeze: the button itself reads **No disponible durante el
+   congelamiento**, off, over «Tu plan está congelado del vie 20 al dom 22
+   de noviembre.» and «Podrás reservar desde el lunes 23 de noviembre.», with
+   **Elegir otro día** under it (Test 176, FIX-082); no «Se descuenta 1
+   clase de tu plan»; a full class on that day offers no waitlist. A class
+   outside the freeze books as usual.
 
 ## Test 147: walkthrough findings 55–79 — Perfil after a notification, the Guest Pass and extra classes, the offline banner, evaluations, staff payments, account screens (FIX-054)
 
@@ -10015,8 +10026,8 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    tiene uno, en su próximo plan. Ningún precio cambia.» **Confirmar
    campaña**. Expected: «N clientas recibieron 1 clase extra. M sin plan: se
    les suma en su próximo plan (…).» No price or Payment changes.
-4. In the Client app, as Mariana (a founder with a Plan), **Mi plan** shows
-   «Clases extra: 1 · Campaña». On the iPhone, the iPad, and Android;
+4. In the Client app, as Mariana (a founder with a Plan), **Mi plan**'s card
+   reads «N del plan + 1 de regalo (campaña) · vence el …» (FIX-082). On the iPhone, the iPad, and Android;
    `.maestro/campaign-extra-class.yaml` seeds a campaign and checks Lucía's
    line the same way.
 5. As Camila, sell Sofía (no Plan) a cash Plan. Expected: as Sofía, **Mi
@@ -10679,6 +10690,81 @@ C. **Client app, Android.** As Mariana: **Perfil › Mis facturas** → a ready
    second download of the same name gets Android's « (1)» suffix). Android 9
    and older still open the folder picker. On iPhone and iPad **Descargar**
    still opens the share sheet.
+
+## Test 176: a calmer Inicio, Reservar, frozen class, Invita and Mi plan in the Client app (FIX-082)
+
+The owner's picks from the 2026-11-18 design audit: Inicio option A,
+Reservar option A, option B for a class on a frozen day, and from round 2
+Invita a una amiga option A and Mi plan option A, plus small fixes to Elige
+tu plan, Notificaciones and the icon discs. One accent per
+screen, no tinted disc behind an icon, a pill only for an exception. JavaScript
+only: a Metro reload is enough, no new build. Use a copy of the walkthrough
+database as Carla (Trimestral 24 clases, a weekly cap of 3, and a freeze
+from Friday 20 to Sunday 22 November), on the iPhone 16 Pro, the iPad and
+Android.
+
+A. **Inicio.** The promotion leads, with no «Novedades del estudio» label
+   and its headline in Lora 20; dots under it with two or more. Under it the
+   solid **Reservar una clase** button, the only strong element; it opens
+   the Reservar tab. Then the plan as a light Lino row with a «›»:
+   «Trimestral 24 clases · **25 restantes**» over «Esta semana te quedan 3 ·
+   24 del plan + 1 de regalo · vence el 8 de febrero». Tap anywhere on the
+   row: **Mi plan** opens. There is no **Mi plan** pill, no **Activo** pill,
+   and no Rosa profundo card; near the end **Por vencer** shows in amber
+   text on the row. «Accesos rápidos» keeps **Evaluación nutricional** and
+   **Invita a una amiga** with plain grey icons. A plan without a weekly
+   cap leaves the week out; a used-up week reads «Ya usaste tus clases de
+   esta semana». On the iPad the button and the row line up with the
+   promotion at the left, 720 pt wide. Without a plan, a payment in review
+   or a Guest Pass, Inicio keeps its Rosa profundo card (also at the left),
+   and a Guest Pass shows no extra **Reservar una clase** button.
+B. **Reservar.** One quiet notice above the days, «Te quedan 3 clases esta
+   semana» («Ya usaste tus clases de esta semana» at 0; a day in a later
+   week says «Esa semana te quedan N clases»), and no repeat under each
+   class. A day without classes keeps the week's last count, so the strip
+   does not jump. The chosen day is the only filled Palo de rosa; the
+   Class Types are tabs with a Palo de rosa underline; «Otra» (a booking
+   window over seven days) is a plain Lino day. The classes share one Lino
+   card split by hairlines, the seats in grey («8 cupos», **Lleno**) and in
+   amber only when two or fewer are left («Quedan 2 cupos»). No seat pill, no
+   chevron.
+C. **A class on a frozen day.** Pick **vie 20** and open a class: the header
+   is a Lino card (date, class, time, «8 de 8 cupos libres») instead of the
+   Rosa profundo one, with no «Cancela sin costo hasta …» row and no «Te
+   quedan N clases esta semana». At the bottom, «Tu plan está congelado del
+   vie 20 al dom 22 de noviembre.» in bold, «Podrás reservar desde el lunes
+   23 de noviembre.», the grey button **No disponible durante el
+   congelamiento**, and **Elegir otro día**, which goes back to the list. A
+   class on Thursday 19 books as usual.
+D. **Invita a una amiga.** **Perfil › Invita a una amiga**: one Lino card
+   with «TU CÓDIGO», `CARLA` in large Lora and a 44 pt outlined copy icon
+   (VoiceOver «Copiar código»; the toast «Código copiado»), the solid
+   **Compartir tu código** right under it, and **Editar código** centred
+   below. No Rosa profundo block, no second share button. «Cómo funciona»
+   is three plain lines and «Una amiga por mes…»; «Tus invitadas» with none
+   is one line of plain text.
+E. **Mi plan.** Tap Inicio's plan row: a Lino card with «Trimestral 24
+   clases» and a green «Activo» dot («Por vencer» amber, «Vencido» grey),
+   «25 clases restantes» in large Lora, and one line «24 del plan + 1 de
+   regalo (campaña) · vence el 8 de febrero»; no loose «Clases extra» line
+   and no bar. Right under it the solid **Renovar mi plan** with «Renueva
+   antes del … y mantienes tu 15 % de descuento.» (without a founder
+   deadline, «Eliges cuándo empieza el nuevo: entre el … y el …»). The
+   freeze is one row, «Congelado del vie 20 al dom 22 de noviembre» over
+   «Aprobado · esos días no puedes reservar» with «›»; a tap opens its days,
+   the new end and the note. Then **Detalles** (Empezó, Vence). The end is
+   said nowhere else: no «Tu plan vence el …» notice, no **Renovar mi plan**
+   row with a pink disc.
+F. **Elige tu plan.** From **Renovar mi plan**: «Trimestral 24 clases» shows
+   «Tu plan actual» under its terms. Every Plan reads «Válido por N días»
+   (a capped one «Válido por 90 días · hasta 3 por semana»); none says
+   «Válida».
+G. **Notificaciones.** An old notice stored as «Tu plan está congelado hasta
+   el 2026-11-15.» reads «… hasta el 15 de noviembre.»; a hairline splits
+   the notices of «Sin leer» and of «Anteriores».
+H. **No discs behind icons.** **Perfil**'s rows, **Mis facturas** (its rows
+   and «Aún no tienes facturas»), and the class detail's «La clase» rows draw
+   their icon alone, in grey. The Staff app keeps its rows for now.
 
 ## Test 177: a calmer Staff app (FIX-083)
 

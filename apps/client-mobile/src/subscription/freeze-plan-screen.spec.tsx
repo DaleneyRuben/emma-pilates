@@ -43,9 +43,9 @@ async function openFreeze(routes: Parameters<typeof routeFetcher>[0]) {
   });
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: /^Congelar plan/ })).toBeOnTheScreen();
   });
@@ -107,7 +107,7 @@ describe("Congelar plan", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));
 
     await waitFor(() => {
-      expect(screen.getByText("En revisión")).toBeOnTheScreen();
+      expect(screen.getByText(/^En revisión · /)).toBeOnTheScreen();
     });
     expect(requests).toEqual([
       { subscriptionId: "subscription-1", startsOn: start, endsOn: end, reason: "Viaje familiar" },

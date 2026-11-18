@@ -114,6 +114,36 @@ describe("NotificationsScreen", () => {
     expect(screen.getByRole("button", { name: "Marcar leídas" })).toBeOnTheScreen();
   });
 
+  // FIX-082: notices written before the backend formatted its dates still
+  // hold an ISO date; the inbox reads it like the others.
+  it("writes a stored ISO date as day and month", async () => {
+    const stale = notification(
+      "n5",
+      "Tu plan está congelado hasta el 2026-11-15.",
+      "2026-09-19T12:00:00.000Z",
+      "2026-09-19T13:00:00.000Z",
+    );
+    const screen = await renderScreen(
+      createFetcher([{ items: [...items, stale], hasMore: false, nextCursor: null }]),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Tu plan está congelado hasta el 15 de noviembre."),
+      ).toBeOnTheScreen();
+    });
+    expect(screen.queryByText(/2026-11-15/)).toBeNull();
+  });
+
+  // FIX-082: a hairline between the notices of a section.
+  it("splits the notices of a section with a hairline", async () => {
+    const screen = await renderScreen(createFetcher([{ items, hasMore: false, nextCursor: null }]));
+
+    await waitFor(() => expect(screen.getByText("Anteriores")).toBeOnTheScreen());
+    // Two unread and two earlier notices: one hairline inside each section.
+    expect(screen.getAllByTestId("notification-divider")).toHaveLength(2);
+  });
+
   it("refetches the inbox on a pull (UX-004)", async () => {
     const screen = await renderScreen(
       createFetcher([

@@ -1,14 +1,17 @@
-import { cleanup } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
+import { weekdayDayMonth } from "../subscription/freeze-window";
 import { jsonResponse } from "../test-support";
-import { openDetail, startsAt, subscription } from "./session-detail-test-support";
+import { detail, openDetail, startsAt, subscription } from "./session-detail-test-support";
 
 jest.setTimeout(20_000);
 
 // Walkthrough finding 53 (owner 2026-11-08): on a day the Client's plan is
-// frozen, the class detail turns Reservar off and says so before she taps,
-// like «Necesitas un plan para reservar.»; the waitlist too.
+// frozen, the class detail turns Reservar off and says so before she taps;
+// the waitlist too. FIX-082 (design audit 2026-11-18, option B): the button
+// itself says why, over the frozen days and the first day she can book,
+// under a neutral header without the cancellation line.
 const classDay = boliviaCivilDate(startsAt);
 const frozen = (startsOn: string, endsOn: string) => ({
   "/api/v1/clients/current/subscription": () =>
@@ -25,20 +28,67 @@ describe("Client Session detail on a frozen day", () => {
     clearMobileQueryCache();
   });
 
-  it("turns Reservar off and names the frozen days", async () => {
-    const { screen } = await openDetail(
-      frozen(addCivilDays(classDay, -1), addCivilDays(classDay, 2)),
-    );
+  it("lets the off button say why, with the frozen days and the next day to book", async () => {
+    const endsOn = addCivilDays(classDay, 2);
+    const { screen } = await openDetail(frozen(addCivilDays(classDay, -1), endsOn));
 
-    expect(screen.getByText(/^Tu plan está congelado ese día/)).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    const button = screen.getByRole("button", { name: "No disponible durante el congelamiento" });
+    expect(button).toBeDisabled();
+    expect(button).toHaveStyle({ backgroundColor: "#E7DCD8" });
+    expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
+    expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
+    // Review of FIX-082: the whole weekday in a sentence, «lunes 23».
+    const reopens = weekdayDayMonth(addCivilDays(endsOn, 1)).split(" ");
+    const longDay = {
+      dom: "domingo",
+      lun: "lunes",
+      mar: "martes",
+      mié: "miércoles",
+      jue: "jueves",
+      vie: "viernes",
+      sáb: "sábado",
+    }[reopens[0]!];
+    expect(
+      screen.getByText(`Podrás reservar desde el ${longDay} ${reopens.slice(1).join(" ")}.`),
+    ).toBeOnTheScreen();
     expect(screen.queryByText("Se descuenta 1 clase de tu plan")).toBeNull();
+  });
+
+  it("draws a neutral header and drops the free cancellation line", async () => {
+    const { screen } = await openDetail(frozen(classDay, classDay));
+
+    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByText("3 de 12 cupos libres")).toBeOnTheScreen();
+    expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
+    // FIX-082: the facts' icons stand alone, no tinted disc.
+    expect(screen.queryByTestId("icon-row-disc", { includeHiddenElements: true })).toBeNull();
+  });
+
+  it("leaves out the classes left this week, which a frozen day cannot use", async () => {
+    const { screen } = await openDetail({
+      ...frozen(classDay, classDay),
+      "/api/v1/sessions/session-1": () => jsonResponse(detail(3, 2)),
+    });
+
+    expect(screen.queryByText(/clases? esta semana/)).toBeNull();
+  });
+
+  it("offers another day, back on the class list", async () => {
+    const { screen } = await openDetail(frozen(classDay, classDay));
+
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir otro día" }));
+
+    await waitFor(() => expect(screen.queryByText("Sobre la clase")).toBeNull());
+    expect(screen.getByTestId("browse-day-strip")).toBeOnTheScreen();
   });
 
   it("closes the waitlist of a full class on a frozen day", async () => {
     const { screen } = await openDetail(frozen(classDay, classDay), 5, 0);
 
-    expect(screen.getByText(/^Tu plan está congelado ese día/)).toBeOnTheScreen();
+    expect(screen.getByText(/^Tu plan está congelado el /)).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "No disponible durante el congelamiento" }),
+    ).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Unirme a la lista de espera" })).toBeNull();
   });
 

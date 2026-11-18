@@ -13,11 +13,11 @@ env:
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
     visible:
-      id: "home-plan-detail"
+      id: "home-plan-card"
     timeout: 30000
 - tapOn:
-    id: "home-plan-detail"
+    id: "home-plan-card"
 - extendedWaitUntil:
-    visible: "Clases extra: .*"
+    visible: ".* de regalo \\(.*\\) · vence .*"
     timeout: 15000
 - takeScreenshot: fix064-mi-plan-clases-extra

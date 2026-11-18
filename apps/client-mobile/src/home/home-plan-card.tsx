@@ -1,81 +1,10 @@
 import type { ClientSubscriptionDto } from "@pilates/api-contracts";
-import {
-  colors,
-  EmphasisCard,
-  fontFamilies,
-  formatBolivianos,
-  OnEmphasisButton,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { EmphasisCard, formatBolivianos, spacing, surfaces } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
 import { guestPassCopy } from "./guest-pass-copy";
-import { planClasses } from "./plan-classes";
-import { formatCivilDate } from "./home-format";
 import { promotionCardMaxWidth } from "./promotion-image";
-
-type ActiveSubscription = NonNullable<ClientSubscriptionDto["subscription"]>;
-
-const statusPill = { active: "Activo", expiring_soon: "Por vencer" } as const;
-
-function Eyebrow({ children }: { children: string }) {
-  return <Text style={styles.eyebrow}>{children}</Text>;
-}
-
-function Pill({ children }: { children: string }) {
-  return (
-    <View style={styles.pill}>
-      <Text style={styles.pillLabel}>{children}</Text>
-    </View>
-  );
-}
-
-/** 02's hero with a Plan (follow-up 225 §5): classes left in Lora 40 and a white bar. */
-export function ActivePlanCard({
-  onDetail,
-  status,
-  subscription,
-}: {
-  onDetail: () => void;
-  status: keyof typeof statusPill;
-  subscription: ActiveSubscription;
-}) {
-  const remaining = subscription.remainingClassAllowance;
-  const original = subscription.originalClassAllowance;
-  const progress = original === 0 ? 0 : Math.min(1, remaining / original);
-  const { left, breakdown } = planClasses(subscription);
-
-  return (
-    <View style={[styles.card, styles.capped]} testID="home-plan-card">
-      <View style={styles.between}>
-        <Eyebrow>{`Tu plan · ${subscription.planName}`}</Eyebrow>
-        <Pill>{statusPill[status]}</Pill>
-      </View>
-      <View style={styles.count}>
-        <Text style={styles.bigNumber}>{String(left)}</Text>
-        <Text style={styles.countLabel}>{left === 1 ? "clase restante" : "clases restantes"}</Text>
-      </View>
-      {breakdown === null ? null : <Text style={styles.note}>{breakdown}</Text>}
-      <View
-        accessibilityLabel={`${remaining} de ${original} clases`}
-        accessibilityRole="progressbar"
-        accessibilityValue={{ max: original, min: 0, now: remaining }}
-        style={styles.track}
-      >
-        <View style={[styles.fill, { flex: progress }]} />
-        <View style={{ flex: 1 - progress }} />
-      </View>
-      <View style={styles.between}>
-        <Text style={styles.note}>{`Vence el ${formatCivilDate(subscription.endsOn)}`}</Text>
-        <OnEmphasisButton label="Mi plan" onPress={onDetail} testID="home-plan-detail" />
-      </View>
-    </View>
-  );
-}
 
 /** The hero for a Guest Pass (walkthrough n.º 56, 60): its free class, then a Plan. */
 export function GuestPassCard({
@@ -155,63 +84,10 @@ export function PurchasePlanCard({
 }
 
 const styles = StyleSheet.create({
-  between: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    justifyContent: "space-between",
-  },
-  bigNumber: {
-    color: colors.white,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    lineHeight: 44,
-  },
-  // UX-012: the tablet carousel stops at 720 px; the hero takes the same cap.
-  capped: { alignSelf: "center", maxWidth: promotionCardMaxWidth, width: "100%" },
-  card: { ...surfaces.emphasis, gap: spacing.md, padding: spacing.xlSm },
-  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
-  countLabel: {
-    color: "rgba(255,255,255,0.85)",
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-  },
-  eyebrow: {
-    color: "rgba(255,255,255,0.75)",
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
-  fill: { backgroundColor: colors.white, borderRadius: radii.pill },
+  // UX-012: the tablet carousel stops at 720 px; the hero takes the same cap
+  // and lines up with it at the left (review of FIX-082).
+  capped: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   illustration: { alignSelf: "flex-end", marginBottom: spacing.xlSm, marginRight: spacing.xlSm },
-  note: {
-    color: "rgba(255,255,255,0.85)",
-    flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-  },
-  pill: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  pillLabel: {
-    color: colors.white,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
   purchase: { ...surfaces.emphasis, flexDirection: "row" },
   purchaseBody: { flex: 1 },
-  track: {
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    height: 6,
-    overflow: "hidden",
-  },
 });

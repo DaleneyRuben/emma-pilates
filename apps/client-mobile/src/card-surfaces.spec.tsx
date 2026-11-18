@@ -32,8 +32,9 @@ describe("Client card surfaces (MOB-039)", () => {
     clearMobileQueryCache();
   });
 
-  // Follow-up 225 §5: Inicio's plan card is the screen's one emphasis surface.
-  it("draws Inicio's plan card on Rosa profundo at radius 20", async () => {
+  // FIX-082 (design audit 2026-11-18, Inicio option A): the Plan is a light
+  // Lino row; «Reservar una clase» is Inicio's one strong element.
+  it("draws Inicio's plan as a Lino card at radius 16", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
@@ -44,8 +45,8 @@ describe("Client card surfaces (MOB-039)", () => {
       expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("home-plan-card")).toHaveStyle({
-      backgroundColor: "#93615D",
-      borderRadius: 20,
+      backgroundColor: "#F5EFE9",
+      borderRadius: 16,
     });
   });
 });

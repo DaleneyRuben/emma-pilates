@@ -115,7 +115,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
         </View>
         <View>
           <SectionTitle>Tu plan y tus clases</SectionTitle>
-          <IconRowGroup>
+          <IconRowGroup plain>
             <IconRow
               chevron
               icon="card"
@@ -145,7 +145,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
         </View>
         <View>
           <SectionTitle>Preferencias</SectionTitle>
-          <IconRowGroup>
+          <IconRowGroup plain>
             <IconRow
               chevron
               icon="bell"
@@ -161,7 +161,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
         </View>
         <View>
           <SectionTitle>Cuenta</SectionTitle>
-          <IconRowGroup>
+          <IconRowGroup plain>
             <IconRow
               chevron
               icon="password"

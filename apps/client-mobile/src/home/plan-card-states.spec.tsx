@@ -95,16 +95,20 @@ describe("Inicio and Mi plan plan cards", () => {
     );
 
     const card = within(screen.getByTestId("home-plan-card"));
-    expect(card.getByText("13")).toBeOnTheScreen();
-    expect(card.getByText("clases restantes")).toBeOnTheScreen();
-    expect(card.getByText("12 del plan + 1 de regalo")).toBeOnTheScreen();
+    expect(card.getByText("12 clases · 13 restantes")).toBeOnTheScreen();
+    expect(
+      card.getByText("12 del plan + 1 de regalo · vence el 30 de noviembre"),
+    ).toBeOnTheScreen();
 
-    await fireEvent.press(card.getByRole("button", { name: "Mi plan" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Mi plan, 12 clases/ }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
 
     const hero = within(screen.getByTestId("subscription-hero"));
     expect(hero.getByText("13")).toBeOnTheScreen();
-    expect(hero.getByText("12 del plan + 1 de regalo")).toBeOnTheScreen();
+    // FIX-082 (Mi plan option A): the origin joins the card's one line.
+    expect(
+      hero.getByText("12 del plan + 1 de regalo (invitación) · vence el 30 de noviembre"),
+    ).toBeOnTheScreen();
   });
 
   it("names no deadline for a Guest Pass that expired unused", async () => {

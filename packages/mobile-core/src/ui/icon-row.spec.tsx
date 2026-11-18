@@ -114,3 +114,22 @@ describe("IconRowGroup", () => {
     expect(screen.queryByTestId("chevron", hidden)).toBeNull();
   });
 });
+
+// FIX-082 (design audit 2026-11-18): no tinted disc behind an icon. A plain
+// group draws the glyph alone in Texto tenue, opt-in so the Staff app keeps
+// its rows until its own pass.
+describe("IconRowGroup plain", () => {
+  it("draws each glyph without a disc and insets the hairline to the label", async () => {
+    const screen = await render(
+      <IconRowGroup plain>
+        <IconRow icon="pin" label="Sucursal" value="Achumani" />
+        <IconRow icon="logout" label="Cerrar sesión" onPress={jest.fn()} tone="error" />
+      </IconRowGroup>,
+    );
+
+    expect(screen.queryByTestId("icon-row-disc", hidden)).toBeNull();
+    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-logout", hidden)).toHaveProp("stroke", "#A04E3E");
+    expect(screen.getByTestId("icon-row-hairline")).toHaveStyle({ marginLeft: 46 });
+  });
+});

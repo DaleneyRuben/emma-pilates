@@ -37,9 +37,9 @@ async function openSubscription(view: unknown) {
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
 
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
   await waitFor(() => {
     expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen();
   });
@@ -56,9 +56,10 @@ describe("Client Subscription detail", () => {
   it("shows the active Plan with allowance and dates", async () => {
     const screen = await openSubscription(subscription("active", 5));
 
-    // C12: the hero card, then «Detalles» as rows.
-    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(screen.getByText("Tu plan · Paquete de 12 clases")).toBeOnTheScreen();
+    // C12: the plan card, then «Detalles» as rows. FIX-082 (Mi plan option A):
+    // a light Lino card with the name and a status dot.
+    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByText("Paquete de 12 clases")).toBeOnTheScreen();
     expect(screen.getByText("Activo")).toBeOnTheScreen();
     expect(screen.getByText("5")).toBeOnTheScreen();
     expect(screen.getByText("de 12 clases restantes")).toBeOnTheScreen();
@@ -75,19 +76,32 @@ describe("Client Subscription detail", () => {
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
   });
 
+  // FIX-082: the origin joins the card's line instead of a loose line.
   it("shows the gift class with its origin", async () => {
-    const screen = await openSubscription(
-      subscription("active", 5, "Clases extra: 1 · Regalo de bienvenida"),
-    );
+    const screen = await openSubscription({
+      ...subscription("active", 5, "Clases extra: 1 · Regalo de bienvenida"),
+      subscription: {
+        ...subscription("active", 5).subscription,
+        extraClasses: 1,
+        extraClassesLine: "Clases extra: 1 · Regalo de bienvenida",
+      },
+    });
 
-    expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "5 del plan + 1 de regalo (regalo de bienvenida) · vence el 24 de septiembre",
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
   });
 
   it("warns about the paid-through date when expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
     expect(screen.getByText("Por vencer")).toBeOnTheScreen();
-    expect(screen.getByText("Tu plan vence el 24 de septiembre.")).toBeOnTheScreen();
+    // FIX-082: the end is said once, on the card and in the details.
+    expect(screen.getByText("Vence el 24 de septiembre")).toBeOnTheScreen();
+    expect(screen.queryByText("Tu plan vence el 24 de septiembre.")).toBeNull();
   });
 
   it("tells the Client when no classes remain", async () => {
@@ -105,15 +119,14 @@ describe("Refreshed Mi plan (Client 12)", () => {
   });
 
   // The owner flagged «Podrás comprar otro plan cuando este termine» as wrong:
-  // Mi plan offers an early renewal (follow-up 227), now a row under «Tu plan»
-  // (follow-up 259 A).
+  // Mi plan offers an early renewal (follow-up 227); FIX-082 (Mi plan option
+  // A) makes it the solid button under the card with one line under it.
   it("offers an early renewal that starts the day after this Plan ends", async () => {
     const screen = await openSubscription(subscription("active", 5));
 
-    expect(screen.getByText("Tu plan")).toBeOnTheScreen();
     expect(
       screen.getByText(
-        "Eliges cuándo empieza el nuevo: entre el 25 de septiembre, al día siguiente de que venza este, y el 22 de octubre.",
+        "Eliges cuándo empieza el nuevo: entre el 25 de septiembre y el 22 de octubre.",
       ),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Renovar mi plan" }));
@@ -166,7 +179,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
 
     // Walkthrough finding 49: the deadline says why, without «fundadora».
     expect(
-      screen.getByText("Renueva antes del 1 de octubre para mantener tu 15 % de descuento."),
+      screen.getByText("Renueva antes del 1 de octubre y mantienes tu 15 % de descuento."),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/fundadora/i)).toBeNull();
   });
@@ -174,10 +187,8 @@ describe("Refreshed Mi plan (Client 12)", () => {
   it("invites renewal while expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
-    expect(
-      screen.getByText("Renueva cuando quieras y elige tu fecha de inicio."),
-    ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Renovar mi plan" })).toBeOnTheScreen();
+    expect(screen.getByText(/^Eliges cuándo empieza el nuevo/)).toBeOnTheScreen();
   });
 
   it("shows the last Plan as expired with its end date and the only purchase action", async () => {

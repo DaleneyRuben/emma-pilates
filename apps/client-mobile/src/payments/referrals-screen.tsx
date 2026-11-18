@@ -3,17 +3,15 @@ import {
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
 import {
+  BodyText,
   BrandToast,
-  EditReferralCode,
+  colors,
   LoadingState,
-  PrimaryButton,
   QueryFailure,
-  ReferralCodeCard,
   Screen,
   ScreenTopBar,
   SectionTitle,
   spacing,
-  StateScreen,
   usePullToRefresh,
   useRefetchOnFocus,
   useTransientNotice,
@@ -23,6 +21,7 @@ import { useState } from "react";
 import { ScrollView, Share, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { ReferralCodeCard } from "./referral-code-card";
 import { HowItWorks, ReferredList } from "./referral-parts";
 
 const noticeMilliseconds = 3000;
@@ -74,27 +73,24 @@ export function ReferralsScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        <View style={styles.codeBlock}>
-          <ReferralCodeCard code={referralCode} onCopied={() => setNotice("Código copiado")} />
-          <EditReferralCode
-            fetcher={fetcher}
-            onChanged={() => {
-              setNotice("Código actualizado");
-              void referrals.refetch();
-            }}
-          />
-        </View>
-        {referred.length === 0 ? null : <PrimaryButton label="Compartir" onPress={share} />}
+        <ReferralCodeCard
+          code={referralCode}
+          fetcher={fetcher}
+          onChanged={() => {
+            setNotice("Código actualizado");
+            void referrals.refetch();
+          }}
+          onCopied={() => setNotice("Código copiado")}
+          onShare={share}
+        />
         <HowItWorks />
         <View>
           <SectionTitle>Tus invitadas</SectionTitle>
           {referred.length === 0 ? (
-            <StateScreen
-              layout="card"
-              note="Cuando una amiga use tu código, la verás aquí."
-              primaryAction={{ label: "Compartir tu código", onPress: share }}
-              title="Aún no invitaste a nadie"
-            />
+            // FIX-082 (Invita option A): plain text; sharing is on the card.
+            <BodyText style={styles.empty}>
+              Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
+            </BodyText>
           ) : (
             <ReferredList referred={referred} />
           )}
@@ -106,7 +102,7 @@ export function ReferralsScreen() {
 }
 
 const styles = StyleSheet.create({
-  codeBlock: { gap: spacing.sm },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  empty: { color: colors.textMuted },
   screen: { gap: spacing.lg },
 });

@@ -16,13 +16,14 @@ import {
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatBolivianos } from "./plan-format";
+import { planValidity } from "./plans-screen";
 
 /** C09's hero: the Plan, its validity, the price in Lora 32, and the struck list price. */
 export function PlanHero({ plan }: { plan: PlanDto }) {
   const percent = discountPercent(plan);
   return (
     <EmphasisCard
-      note={`${plan.classAllowance === 1 ? "Válida" : "Válido"} por ${plan.durationDays} días`}
+      note={planValidity(plan)}
       pill={percent === null ? undefined : `${percent} % de descuento`}
       testID="plan-hero"
       title={plan.name}
