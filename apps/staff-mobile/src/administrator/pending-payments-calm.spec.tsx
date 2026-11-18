@@ -44,6 +44,7 @@ describe("Pagos pendientes, one line a day (FIX-083, Ronda 2 pick A)", () => {
     const screen = await openPayments([]);
 
     const card = screen.getByTestId("pending-payments-all-clear");
+    expect(card).toHaveProp("accessible", true);
     expect(within(card).getByText("Todo al día")).toBeOnTheScreen();
     expect(within(card).getByText("No hay pagos por confirmar")).toBeOnTheScreen();
     expect(screen.queryByText("Ver el horario")).toBeNull();

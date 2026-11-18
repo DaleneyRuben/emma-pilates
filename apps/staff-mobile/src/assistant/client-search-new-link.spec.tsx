@@ -36,4 +36,17 @@ describe("Buscar cliente, new as a link (FIX-083, Ronda 2 pick A)", () => {
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen());
   });
+
+  it("keeps the link when the search fails", async () => {
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients?query=luc": () => {
+        throw new TypeError("Network request failed");
+      },
+    });
+
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
+    await waitFor(() => expect(screen.getByText("No pudimos buscar clientes.")).toBeOnTheScreen());
+    expect(screen.getByRole("button", { name: linkLabel })).toBeOnTheScreen();
+  });
 });
