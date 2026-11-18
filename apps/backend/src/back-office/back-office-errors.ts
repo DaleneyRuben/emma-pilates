@@ -28,7 +28,11 @@ export type BackOfficeErrorCode =
   | 'equipment_number_taken'
   | 'equipment_archived'
   | 'equipment_issue_not_found'
-  | 'equipment_issue_resolved';
+  | 'equipment_issue_resolved'
+  | 'payout_qr_not_ready'
+  | 'payout_qr_not_found'
+  | 'payout_qr_expired'
+  | 'payout_qr_valid_until_invalid';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
   back_office_access_denied: 403,
@@ -59,6 +63,10 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   equipment_archived: 409,
   equipment_issue_not_found: 404,
   equipment_issue_resolved: 409,
+  payout_qr_not_ready: 409,
+  payout_qr_not_found: 404,
+  payout_qr_expired: 409,
+  payout_qr_valid_until_invalid: 400,
 };
 
 export class BackOfficeError extends Error {

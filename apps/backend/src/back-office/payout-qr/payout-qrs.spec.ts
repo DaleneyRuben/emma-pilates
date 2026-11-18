@@ -93,7 +93,9 @@ describe('payout QRs', () => {
 
   it('says the photo is not ready when its upload cannot be attached', async () => {
     const gateway = gatewayWith(null);
-    gateway.replace.mockRejectedValue(new ImageAssetNotAttachableError());
+    gateway.replace.mockRejectedValue(
+      new ImageAssetNotAttachableError('not_ready'),
+    );
 
     await expect(
       operations(gateway).setOwn(
