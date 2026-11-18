@@ -42,6 +42,7 @@ import { NutritionistAgendaScreen } from "../nutritionist/nutritionist-agenda-sc
 import { StaffChangePasswordScreen } from "../profile/staff-change-password-screen";
 import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
+import { PayoutQrScreen } from "../profile/payout-qr/payout-qr-screen";
 import { StaffReferralCodeScreen } from "../profile/staff-referral-code-screen";
 import { StaffPayScreen } from "../profile/staff-pay-screen";
 import { StaffProfileScreen } from "../profile/staff-profile-screen";
@@ -73,6 +74,7 @@ const taskRoutes: ReadonlySet<string> = new Set([
   "ChangePassword",
   "Feedback",
   "ReferralCode",
+  "PayoutQr",
   "ReportFault",
   "AvailabilityBlockForm",
   "ViewAs",
@@ -106,6 +108,8 @@ const profileScreens = {
   ChangePassword: StaffChangePasswordScreen,
   Feedback: StaffFeedbackScreen,
   ReferralCode: StaffReferralCodeScreen,
+  // FIX-072: «Mi QR de cobro», for every role.
+  PayoutQr: PayoutQrScreen,
 };
 
 // A Client's file and everything reached from it (S05–S10, S21, S22). The

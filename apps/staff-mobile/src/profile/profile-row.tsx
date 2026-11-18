@@ -22,6 +22,7 @@ export function ProfileRow({
   testID,
   tone = "default",
   value,
+  valueTone,
 }: {
   badge?: number;
   icon: GlyphName;
@@ -31,6 +32,11 @@ export function ProfileRow({
   tone?: "default" | "error";
   /** A short value before the chevron, such as the Trainer's code. */
   value?: string;
+  /**
+   * FIX-072: a payout QR's standing, in plain spacing (not a code), amber when
+   * it expires soon and Error once expired.
+   */
+  valueTone?: "muted" | "warning" | "error";
 }) {
   const error = tone === "error";
   return (
@@ -61,7 +67,18 @@ export function ProfileRow({
           <Text style={styles.badgeLabel}>{badge > 9 ? "9+" : String(badge)}</Text>
         </View>
       ) : null}
-      {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
+      {value === undefined ? null : (
+        <Text
+          style={[
+            styles.value,
+            valueTone !== undefined && styles.plainValue,
+            valueTone === "warning" && styles.warningValue,
+            valueTone === "error" && styles.errorValue,
+          ]}
+        >
+          {value}
+        </Text>
+      )}
       {error ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
     </Pressable>
   );
@@ -102,6 +119,9 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingHorizontal: spacing.lg,
   },
+  errorValue: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  plainValue: { letterSpacing: 0 },
+  warningValue: { color: colors.warningText, fontFamily: fontFamilies.bodyMedium },
   value: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
