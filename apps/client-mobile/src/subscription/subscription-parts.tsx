@@ -14,30 +14,52 @@ import { StyleSheet, Text, View } from "react-native";
 import { formatCivilDate } from "../home/home-format";
 import { planClasses } from "../home/plan-classes";
 
-const pills = { active: "Activo", expiring_soon: "Por vencer", expired: "Vencido" } as const;
+const statusDots = {
+  active: { label: "Activo", dot: colors.success, text: colors.successText },
+  expiring_soon: { label: "Por vencer", dot: colors.warning, text: colors.warningText },
+  expired: { label: "Vencido", dot: colors.iconQuiet, text: colors.textMuted },
+} as const;
 
-/** C12's hero: classes left in Lora 40, the white bar, and the end date. */
+/** «Clases extra: 1 · Campaña» → «campaña», the extra classes' origin. */
+function extraOrigin(line: string | null | undefined): string | null {
+  const origin = line?.split(" · ")[1];
+  return origin === undefined ? null : origin.toLowerCase();
+}
+
+/**
+ * C12's plan card. FIX-082 (design audit 2026-11-18, Mi plan option A): a
+ * light Lino card like Inicio's plan row: the name and a status dot, the
+ * classes left in Lora, and one line with where they come from and the end.
+ */
 export function SubscriptionHero({
   status,
   subscription,
 }: {
-  status: keyof typeof pills;
+  status: keyof typeof statusDots;
   subscription: ClientSubscriptionSummaryDto;
 }) {
   const expired = status === "expired";
-  const remaining = expired ? 0 : subscription.remainingClassAllowance;
-  const original = subscription.originalClassAllowance;
-  const progress = original === 0 ? 0 : Math.min(1, remaining / original);
   // Walkthrough n.º 61: live extra classes count with the Plan's own.
   const { left, breakdown } = expired ? { left: 0, breakdown: null } : planClasses(subscription);
+  const origin = extraOrigin(subscription.extraClassesLine);
+  const end = `${expired ? "venció" : "vence"} el ${formatCivilDate(subscription.endsOn)}`;
+  const detail =
+    breakdown === null
+      ? end.charAt(0).toUpperCase() + end.slice(1)
+      : `${breakdown}${origin === null ? "" : ` (${origin})`} · ${end}`;
+  const dot = statusDots[status];
   return (
     <View style={styles.hero} testID="subscription-hero">
       <View style={styles.between}>
-        <Text style={styles.eyebrow}>
-          {`${expired ? "Último plan" : "Tu plan"} · ${subscription.planName}`}
+        <Text style={styles.name}>
+          {expired ? `Último plan · ${subscription.planName}` : subscription.planName}
         </Text>
-        <View style={styles.pill}>
-          <Text style={styles.pillLabel}>{pills[status]}</Text>
+        <View style={styles.status}>
+          <View
+            style={[styles.dot, { backgroundColor: dot.dot }]}
+            testID="subscription-status-dot"
+          />
+          <Text style={[styles.statusLabel, { color: dot.text }]}>{dot.label}</Text>
         </View>
       </View>
       <View style={styles.count}>
@@ -46,24 +68,11 @@ export function SubscriptionHero({
           {expired
             ? "clases disponibles"
             : breakdown === null
-              ? `de ${original} clases restantes`
+              ? `de ${subscription.originalClassAllowance} clases restantes`
               : "clases restantes"}
         </Text>
       </View>
-      {breakdown === null ? null : <Text style={styles.note}>{breakdown}</Text>}
-      {expired ? null : (
-        <View
-          accessibilityRole="progressbar"
-          accessibilityValue={{ max: original, min: 0, now: remaining }}
-          style={styles.track}
-        >
-          <View style={[styles.fill, { flex: progress }]} />
-          <View style={{ flex: 1 - progress }} />
-        </View>
-      )}
-      <Text style={styles.note}>
-        {`${expired ? "Venció" : "Vence"} el ${formatCivilDate(subscription.endsOn)}`}
-      </Text>
+      <Text style={styles.note}>{detail}</Text>
     </View>
   );
 }
@@ -94,8 +103,6 @@ export function DetailRows({
   );
 }
 
-const white85 = "rgba(255,255,255,0.85)";
-
 const styles = StyleSheet.create({
   between: {
     alignItems: "center",
@@ -104,35 +111,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
-  countLabel: { color: white85, fontFamily: fontFamilies.body, fontSize: typography.body },
-  eyebrow: {
-    color: "rgba(255,255,255,0.75)",
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
-  fill: { backgroundColor: colors.white, borderRadius: radii.pill },
+  countLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  dot: { borderRadius: radii.pill, height: 7, width: 7 },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
-  hero: { ...surfaces.emphasis, gap: spacing.md, padding: spacing.xlSm },
+  hero: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lgXl },
   label: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
-  note: { color: white85, fontFamily: fontFamilies.body, fontSize: 14 },
-  number: { color: colors.white, fontFamily: fontFamilies.display, fontSize: 40 },
-  pill: {
-    backgroundColor: "rgba(255,255,255,0.18)",
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
+  name: {
+    color: colors.text,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
   },
-  pillLabel: {
-    color: colors.white,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  number: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.display },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -141,13 +133,8 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  track: {
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    height: 6,
-    overflow: "hidden",
-  },
+  status: { alignItems: "center", flexDirection: "row", gap: spacing.smd },
+  statusLabel: { fontFamily: fontFamilies.body, fontSize: typography.note },
   value: {
     color: colors.text,
     flexShrink: 1,

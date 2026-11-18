@@ -1,10 +1,10 @@
 import { withdrawFreeze, type ClientFreezeDto } from "@pilates/api-contracts";
 import {
   addCivilDays,
+  Chevron,
   colors,
   ConfirmationSheet,
   fontFamilies,
-  radii,
   spacing,
   surfaces,
   typography,
@@ -17,11 +17,11 @@ import { dayMonth, freezeRange, freezeSummary, weekdayDayMonth } from "./freeze-
 
 type CardState = "requested" | "approved" | "running" | "refused";
 
-const pills: Record<CardState, { label: string; background: string; color: string }> = {
-  requested: { label: "En revisión", background: colors.warningTint, color: colors.warningTitle },
-  approved: { label: "Aprobado", background: colors.successTint, color: colors.successText },
-  running: { label: "Congelado", background: colors.neutralPill, color: colors.text },
-  refused: { label: "No aprobado", background: colors.errorPill, color: colors.errorText },
+const pills: Record<CardState, { label: string }> = {
+  requested: { label: "En revisión" },
+  approved: { label: "Aprobado" },
+  running: { label: "Congelado" },
+  refused: { label: "No aprobado" },
 };
 
 /**
@@ -58,6 +58,7 @@ export function FreezeCard({
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const summary = freezeSummary(planEndsOn, freeze.startsOn, freeze.endsOn);
   const range = freezeRange(freeze.startsOn, freeze.endsOn);
   const pill = pills[state];
@@ -100,6 +101,7 @@ export function FreezeCard({
         ["Tu plan vencería el", summary.newEnd],
       ],
       note: "Te avisamos cuando la administración responda.",
+      line: "te avisamos cuando respondan",
     },
     approved: {
       title:
@@ -111,6 +113,7 @@ export function FreezeCard({
         ["Ahora vence el", weekdayDayMonth(planEndsOn)],
       ],
       note: "Esos días no puedes reservar. Tus reservas de esos días se cancelaron y las clases volvieron a tu plan.",
+      line: "esos días no puedes reservar",
     },
     running: {
       title: `Congelado hasta el ${weekdayDayMonth(freeze.endsOn)}`,
@@ -119,31 +122,44 @@ export function FreezeCard({
         ["Ahora vence el", weekdayDayMonth(planEndsOn)],
       ],
       note: "Tus clases y tus días quedan guardados mientras tanto.",
+      line: `vuelves a reservar el ${weekdayDayMonth(addCivilDays(freeze.endsOn, 1))}`,
     },
     refused: {
       title: range,
       rows: [["Días", summary.days]],
       note: "La administración no aprobó este congelamiento. Tu plan sigue igual y puedes pedir otro.",
+      line: "puedes pedir otro",
     },
   }[state];
 
   return (
     <View style={styles.block}>
+      {/* FIX-082 (Mi plan option A): one row; its detail opens on tap. */}
       <View style={styles.card} testID="freeze-card">
-        <View style={styles.header}>
-          <Text style={styles.eyebrow}>Congelamiento</Text>
-          <View style={[styles.pill, { backgroundColor: pill.background }]}>
-            <Text style={[styles.pillLabel, { color: pill.color }]}>{pill.label}</Text>
+        <Pressable
+          accessibilityLabel={`${content.title}. ${pill.label} · ${content.line}`}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: open }}
+          onPress={() => setOpen((shown) => !shown)}
+          style={({ pressed }) => [styles.summary, pressed && styles.pressed]}
+        >
+          <View style={styles.summaryBody}>
+            <Text style={styles.summaryTitle}>{content.title}</Text>
+            <Text style={styles.note}>{`${pill.label} · ${content.line}`}</Text>
           </View>
-        </View>
-        <Text style={styles.title}>{content.title}</Text>
-        {content.rows.map(([label, value]) => (
-          <View key={label} style={styles.row}>
-            <Text style={styles.rowLabel}>{label}</Text>
-            <Text style={styles.rowValue}>{value}</Text>
+          <Chevron direction={open ? "up" : "right"} size={16} strokeWidth={1.5} tone="muted" />
+        </Pressable>
+        {open ? (
+          <View style={styles.detail}>
+            {content.rows.map(([label, value]) => (
+              <View key={label} style={styles.row}>
+                <Text style={styles.rowLabel}>{label}</Text>
+                <Text style={styles.rowValue}>{value}</Text>
+              </View>
+            ))}
+            <Text style={styles.note}>{content.note}</Text>
           </View>
-        ))}
-        <Text style={styles.note}>{content.note}</Text>
+        ) : null}
       </View>
       {/* Owner 2026-11-08: a discreet link under the card, like «Cerrar mi
           cuenta» on Perfil, not a button. */}
@@ -178,19 +194,16 @@ export function FreezeCard({
 
 const styles = StyleSheet.create({
   block: { gap: spacing.sm },
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
-  eyebrow: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
+  card: { ...surfaces.card },
+  detail: {
+    borderTopColor: colors.hairline,
+    borderTopWidth: 1,
+    gap: spacing.md,
+    padding: spacing.lg,
   },
-  header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13, lineHeight: 18 },
-  pill: { borderRadius: radii.pill, paddingHorizontal: spacing.smLg, paddingVertical: spacing.xs },
-  pillLabel: { fontFamily: fontFamilies.bodyStrong, fontSize: typography.label },
+  pressed: { opacity: 0.7 },
   row: { flexDirection: "row", gap: spacing.md, justifyContent: "space-between" },
   rowLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   rowValue: {
@@ -200,12 +213,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "right",
   },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSmall,
-    lineHeight: 25,
+  summary: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
+  summaryBody: { flex: 1, gap: spacing.xxs },
+  summaryTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   withdraw: { alignSelf: "center", paddingVertical: spacing.xs },
   withdrawLabel: {
     color: colors.textMuted,

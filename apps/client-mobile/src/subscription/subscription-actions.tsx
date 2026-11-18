@@ -4,7 +4,6 @@ import {
   fontFamilies,
   Glyph,
   type GlyphName,
-  radii,
   spacing,
   surfaces,
   typography,
@@ -65,9 +64,8 @@ export function ActionRow({
 }) {
   const content = (
     <>
-      <View style={styles.disc}>
-        <Glyph color={colors.primary} name={icon} size={18} strokeWidth={1.5} />
-      </View>
+      {/* FIX-082: a plain muted icon, no tinted disc. */}
+      <Glyph color={colors.textMuted} name={icon} size={18} strokeWidth={1.5} />
       <View style={styles.rowBody}>
         <Text style={[styles.rowLabel, onPress === undefined && styles.rowLabelOff]}>{label}</Text>
         <Text style={styles.rowNote}>{note}</Text>
@@ -96,16 +94,8 @@ export function ActionRow({
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
   group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 46 },
   notice: {
     alignItems: "flex-start",
     flexDirection: "row",
