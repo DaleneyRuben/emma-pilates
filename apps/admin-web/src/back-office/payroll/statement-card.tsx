@@ -1,4 +1,8 @@
-import type { PayStatementDto } from "@pilates/api-contracts";
+import {
+  staffRoleLabel,
+  type PayStatementDto,
+  type StaffMemberDto,
+} from "@pilates/api-contracts";
 import { useId, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { boliviaToday, formatDayMonth } from "../../lib/bolivia-time";
@@ -10,25 +14,20 @@ import {
 import { formatPayPeriod, type PayPeriodQuery } from "./pay-period-search";
 import { ConceptRows, StatementLines } from "./statement-concepts";
 
-// A Coordinator's statement pays a base and a renewal bonus (BKO-007); her
-// approval waits for the renewals, a Trainer's for the period to end.
-const isCoordinatorPay = (statement: PayStatementDto) =>
-  statement.lines.some((line) => line.kind === "base" || line.kind === "bonus");
-
 // FIX-084 (Sueldos B): one card per person still to approve, with her total,
 // what it pays, every line on demand, and one solid «Aprobar Bs X». Until it
 // can be approved the button stays grey with the date it opens.
 export function StatementCard({
   statement,
   period,
-  role,
+  member,
   onApproved,
   today = boliviaToday(),
 }: {
   statement: PayStatementDto;
   period: PayPeriodQuery;
-  /** Her Role as the staff list names it; left out while unknown. */
-  role?: string;
+  /** Her staff record, for her Role; left out while unknown. */
+  member?: Pick<StaffMemberDto, "role" | "gender">;
   onApproved: (notice: ApprovedNotice) => void;
   today?: string;
 }) {
@@ -37,6 +36,10 @@ export function StatementCard({
   const [confirming, setConfirming] = useState(false);
   const [showLines, setShowLines] = useState(false);
   const waits = statement.approvableOn > today;
+  const role =
+    member === undefined
+      ? undefined
+      : staffRoleLabel(member.role, member.gender);
   const total = formatBolivianos(statement.totalCentavos);
   const count = statement.lines.length;
   const periodText = formatPayPeriod(
@@ -51,7 +54,7 @@ export function StatementCard({
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h2 id={headingId} className="font-serif text-[20px] text-texto">
+          <h2 id={headingId} className="font-serif text-titulo-2 text-texto">
             {statement.staffMemberName}
           </h2>
           <p className="text-nota text-texto-tenue">
@@ -86,7 +89,8 @@ export function StatementCard({
         )}
         {waits ? (
           <span className="flex flex-wrap items-center justify-end gap-3">
-            {isCoordinatorPay(statement) ? (
+            {/* BKO-007: her approval waits for the renewals. */}
+            {member?.role === "coordinator" ? (
               <span className="text-nota text-texto-tenue">
                 Su bono espera las renovaciones
               </span>

@@ -1,4 +1,4 @@
-import { staffRoleLabel, type PayStatementDto } from "@pilates/api-contracts";
+import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, RefreshCw } from "lucide-react";
@@ -9,15 +9,10 @@ import {
 } from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
 import { Button } from "../../components/ui/button";
-import {
-  addDays,
-  addMonths,
-  boliviaMonth,
-  boliviaToday,
-  formatMonth,
-} from "../../lib/bolivia-time";
+import { boliviaMonth, boliviaToday } from "../../lib/bolivia-time";
 import { PayPeriodPicker } from "./pay-period-picker";
 import {
+  monthOpenLine,
   windowOf,
   type PayPeriodQuery,
   type PayStatementsSearch,
@@ -33,17 +28,6 @@ import { StatementCard } from "./statement-card";
 
 // Never sent: the query is disabled while a Rango ends before it starts.
 const noPeriod: PayPeriodQuery = { month: "" };
-
-const capitalized = (text: string) =>
-  text.charAt(0).toLocaleUpperCase("es") + text.slice(1);
-
-// Finding 105, FIX-084 (Sueldos B): one line instead of a banner while the
-// month being paid is still open.
-const monthOpenLine = (month: string) => {
-  const monthName = formatMonth(month).split(" ")[0] ?? "";
-  const lastDay = Number(addDays(`${addMonths(month, 1)}-01`, -1).slice(8));
-  return `${capitalized(monthName)} cierra el ${lastDay}. Para pagarle antes a una instructora, elige «Otro período».`;
-};
 
 // Finding 112: the receipt goes with the approval, so the notice only says
 // what happened.
@@ -103,12 +87,8 @@ export function PayStatementsPage({
   );
   const approvedCount = (query.data?.length ?? 0) - (statements?.length ?? 0);
   const staff = useQuery(payrollStaffQueryOptions());
-  const roleOf = (staffMemberId: string) => {
-    const member = staff.data?.find((one) => one.id === staffMemberId);
-    return member === undefined
-      ? undefined
-      : staffRoleLabel(member.role, member.gender);
-  };
+  const memberOf = (staffMemberId: string) =>
+    staff.data?.find((one) => one.id === staffMemberId);
   const change = (next: PayStatementsSearch) => {
     draft.reset();
     setNotice(null);
@@ -148,7 +128,7 @@ export function PayStatementsPage({
       {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
         <p className="text-celda text-texto-secundario">
-          {monthOpenLine(search.month)}
+          {monthOpenLine(search.month, today)}
         </p>
       ) : null}
       {period === null ? null : query.isError ? (
@@ -183,7 +163,7 @@ export function PayStatementsPage({
               key={statement.id}
               statement={statement}
               period={period}
-              role={roleOf(statement.staffMemberId)}
+              member={memberOf(statement.staffMemberId)}
               today={today}
               onApproved={setNotice}
             />

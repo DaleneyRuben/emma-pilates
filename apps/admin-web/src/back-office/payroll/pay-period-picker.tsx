@@ -10,6 +10,7 @@ import {
   weekStartOf,
 } from "../../lib/bolivia-time";
 import {
+  otherPeriodSearch,
   searchFor,
   windowOf,
   type PayStatementsSearch,
@@ -98,23 +99,7 @@ export function PayPeriodPicker({
     const range = { from: shown.from, to: shown.to, [end]: value };
     onChange({ month: range.from.slice(0, 7), period: "range", ...range });
   };
-  // Finding 105: inside the open month, a Trainer is paid up to yesterday.
-  const otherPeriod = () => {
-    const open =
-      shown.kind === "month" &&
-      search.month === boliviaMonth() &&
-      !today.endsWith("-01");
-    onChange(
-      open
-        ? {
-            month: search.month,
-            period: "range",
-            from: `${search.month}-01`,
-            to: addDays(today, -1),
-          }
-        : searchFor("range", search, today),
-    );
-  };
+  const otherPeriod = () => onChange(otherPeriodSearch(search, today));
   const linkButton =
     "h-9 rounded-control px-1 text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
 

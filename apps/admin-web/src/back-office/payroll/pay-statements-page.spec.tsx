@@ -214,7 +214,7 @@ describe("Sueldos por aprobar", () => {
     expect(
       screen.getByText(
         new RegExp(
-          `^${monthName} cierra el \\d+\\. Para pagarle antes a una instructora, elige «Otro período»\\.$`,
+          `^${monthName} cierra el \\d+\\.( Para pagarle antes a una instructora, elige «Otro período»\\.)?$`,
           "i",
         ),
       ),
