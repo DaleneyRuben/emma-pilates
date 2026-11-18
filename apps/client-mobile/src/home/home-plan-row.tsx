@@ -16,7 +16,7 @@ function weekLine(classesLeftThisWeek: number | null | undefined): string | null
 }
 
 /**
- * The Plan row's lines (FIX-082): «Trimestral · 25 clases», then the
+ * The Plan row's lines (FIX-082): «Trimestral · 25 restantes», then the
  * weekly cap (so 25 never reads against Reservar's 3), the gift classes and
  * the expiry.
  */
@@ -26,7 +26,9 @@ export function planRowLines(subscription: ActiveSubscription): {
   spoken: string;
 } {
   const { left, breakdown } = planClasses(subscription);
-  const classes = left === 1 ? "1 clase" : `${left} clases`;
+  // Plan names often carry their own count («Trimestral 24 clases»), so the
+  // count left says «restantes» rather than a second «clases».
+  const classes = left === 1 ? "1 restante" : `${left} restantes`;
   const parts = [
     weekLine(subscription.classesLeftThisWeek),
     breakdown,
@@ -36,7 +38,7 @@ export function planRowLines(subscription: ActiveSubscription): {
   return {
     classes,
     detail: detail.charAt(0).toUpperCase() + detail.slice(1),
-    spoken: `Mi plan, ${subscription.planName}, ${classes}, ${parts.join(", ")}`,
+    spoken: `Mi plan, ${subscription.planName}, ${left === 1 ? "1 clase restante" : `${left} clases restantes`}, ${parts.join(", ")}`,
   };
 }
 
