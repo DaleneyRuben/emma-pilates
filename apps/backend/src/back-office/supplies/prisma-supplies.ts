@@ -1,6 +1,5 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaInstant } from '../../time/bolivia-time';
 import {
   BackOfficeError,
   databaseCause,
@@ -9,6 +8,10 @@ import {
 } from '../back-office-errors';
 import { requireActiveBranch } from '../booking-references';
 import { runIdempotent } from '../prisma-idempotency';
+import {
+  listSupplyMovements,
+  type SupplyMovementQuery,
+} from './prisma-supply-movements';
 
 type Transaction = Prisma.TransactionClient;
 type Paging = { page: number; pageSize: number };
@@ -70,15 +73,6 @@ const translate = (error: unknown): never => {
     throw new BackOfficeError('invalid_back_office_value');
   }
   throw error;
-};
-
-// Bolivia month "YYYY-MM" as the instants [start, end).
-const monthRange = (month: string) => {
-  const [year, monthNumber] = month.split('-').map(Number);
-  return {
-    start: boliviaInstant(new Date(Date.UTC(year, monthNumber - 1, 1)), 0),
-    end: boliviaInstant(new Date(Date.UTC(year, monthNumber, 1)), 0),
-  };
 };
 
 const movementCommands = {
@@ -282,70 +276,12 @@ export const createPrismaSupplies = (
       idempotencyKey: string,
     ) => recordMovement('restock', input, principal, idempotencyKey),
 
-    // AW31: a Branch's Withdrawals in one Bolivia month, newest first, with the
-    // month's total per Supply (the consumption report).
     listWithdrawals: async (
-      query: Paging & { branchId: string; month: string; supplyId?: string },
+      query: SupplyMovementQuery,
       principal: AuthenticatedPrincipal,
     ) => {
       requireSupplyKeeper(principal);
-      const { start, end } = monthRange(query.month);
-      const where: Prisma.WithdrawalWhereInput = {
-        recordedAt: { gte: start, lt: end },
-        supply: { branchId: query.branchId },
-        ...(query.supplyId === undefined ? {} : { supplyId: query.supplyId }),
-      };
-      const [rows, totalItems, sums] = await Promise.all([
-        prisma.withdrawal.findMany({
-          where,
-          orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
-          skip: (query.page - 1) * query.pageSize,
-          take: query.pageSize,
-          select: {
-            id: true,
-            supplyId: true,
-            quantity: true,
-            recordedAt: true,
-            supply: { select: { name: true } },
-          },
-        }),
-        prisma.withdrawal.count({ where }),
-        prisma.withdrawal.groupBy({
-          by: ['supplyId'],
-          where,
-          _sum: { quantity: true },
-        }),
-      ]);
-      const names = new Map(
-        (
-          await prisma.supply.findMany({
-            where: { id: { in: sums.map((sum) => sum.supplyId) } },
-            select: { id: true, name: true },
-          })
-        ).map((supply) => [supply.id, supply.name]),
-      );
-      return {
-        month: query.month,
-        page: query.page,
-        pageSize: query.pageSize,
-        totalItems,
-        items: rows.map((row) => ({
-          id: row.id,
-          supplyId: row.supplyId,
-          supplyName: row.supply.name,
-          quantity: row.quantity,
-          recordedAt: row.recordedAt,
-        })),
-        totals: sums
-          .map((sum) => ({
-            supplyId: sum.supplyId,
-            supplyName: names.get(sum.supplyId) ?? '',
-            quantity: sum._sum.quantity ?? 0,
-          }))
-          .sort((left, right) =>
-            left.supplyName.localeCompare(right.supplyName, 'es'),
-          ),
-      };
+      return listSupplyMovements(prisma, query);
     },
   };
 };
