@@ -145,7 +145,6 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const waitlistOpen =
     studioRules !== undefined &&
     !isInsideCancellationWindow(detail.startsAt, new Date(), studioRules.cancellationWindowMinutes);
-  const classesLeftLine = weeklyClassesLeftLine(detail.classesLeftThisWeek);
   // Walkthrough finding 53 (owner 2026-11-08): the server refuses a Booking
   // or a waitlist entry inside an approved Freeze, so say it before the tap.
   const classDay = boliviaCivilDate(new Date(detail.startsAt));
@@ -153,6 +152,10 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     view?.freeze?.state === "approved" &&
     classDay >= view.freeze.startsOn &&
     classDay <= view.freeze.endsOn;
+  // A frozen day books nothing, so the week's count says nothing (FIX-082).
+  const classesLeftLine = frozenOnClassDay
+    ? null
+    : weeklyClassesLeftLine(detail.classesLeftThisWeek);
 
   const book = async () => {
     setSubmitting(true);
