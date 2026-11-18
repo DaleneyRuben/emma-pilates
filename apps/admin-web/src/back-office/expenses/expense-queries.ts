@@ -7,11 +7,13 @@ import {
   listAdminExpenses,
   recordExpense,
   updateExpense,
+  voidExpense,
   type AdminExpenseCategoryDto,
   type AdminExpenseDto,
   type AdminExpensePageDto,
   type ExpenseChangeDto,
   type ExpenseInputDto,
+  type ExpenseVoidDto,
   type ListAdminExpensesParams,
 } from "@pilates/api-contracts";
 import {
@@ -84,6 +86,21 @@ export function useExpenseChange(branchId: string) {
             adminFetch,
           )
       ).data as AdminExpenseDto,
+    onSuccess: () => refreshAfterExpense(queryClient, { branchId }),
+  });
+}
+
+// Finding 104: «Eliminar gasto» voids the Expense; the list keeps it, marked.
+export function useExpenseVoid(branchId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (change: {
+      expenseId: string;
+      input: ExpenseVoidDto;
+    }): Promise<AdminExpenseDto> =>
+      (await voidExpense(change.expenseId, change.input, undefined, adminFetch))
+        .data as AdminExpenseDto,
     onSuccess: () => refreshAfterExpense(queryClient, { branchId }),
   });
 }

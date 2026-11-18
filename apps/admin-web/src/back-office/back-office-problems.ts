@@ -62,6 +62,10 @@ const problems: Record<string, Omit<BackOfficeProblem, "code">> = {
     message:
       "Este gasto ya no existe. Cierra el panel y vuelve a abrir la lista.",
   },
+  expense_voided: {
+    message:
+      "Este gasto ya fue eliminado. Cierra el panel y vuelve a abrir la lista.",
+  },
   expense_category_not_found: {
     field: "expenseCategoryId",
     message: "Esa categoría ya no existe. Elige otra.",
