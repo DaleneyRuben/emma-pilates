@@ -61,6 +61,11 @@ export const signedInHandlers = () => [
   studioSettingsHandler(),
   ...homeHandlers(),
   ...clientFileHandlers({ payments: true }),
+  // FIX-072: Sueldos reads the chosen person's payout QR; none by default.
+  http.get(
+    apiUrl("/api/v1/administrator/staff-members/:staffMemberId/payout-qr"),
+    () => jsonResponse({ payoutQr: null }),
+  ),
 ];
 
 // IDN-009: Carolina Rivas, the Coordinator (ADR-0102, ADR-0108). Her shell

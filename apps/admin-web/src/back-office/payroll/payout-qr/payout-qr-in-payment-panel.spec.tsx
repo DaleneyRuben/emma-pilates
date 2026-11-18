@@ -26,6 +26,9 @@ describe("payout QR in AW12's Registrar pago", () => {
       http.get(apiUrl(salaryPaymentsPath), () =>
         jsonResponse(salaryPage([emmaSeptember])),
       ),
+    );
+    // After the signed-in defaults, so these answers win.
+    server.use(
       http.get(apiUrl(qrPath(emma.id)), () =>
         jsonResponse({
           payoutQr: {
