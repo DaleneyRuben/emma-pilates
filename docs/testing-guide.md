@@ -3812,8 +3812,8 @@ The following are not ready for manual product testing:
   plans that expired this month: the fact table cannot see those;
 - client no-shows, a renewal gap, and the other twelve diagnosis rules are
   not findings yet (Test 102): the fact tables cannot support them, or the
-  tables they need are not on this branch. The nightly recommendation pass
-  is not a worker job;
+  tables they need are not on this branch. Since FIX-073 the worker's daily
+  studio run recomputes them (Test 167);
 - a model-written report (Test 103): no model is called and no key is
   configured. The sentences are the pure function over the month's counts;
 - Dynamic Type, VoiceOver, and TalkBack on a device (Test 115): the audit
@@ -6752,6 +6752,12 @@ and never an amount. Use a disposable database.
 
 ## Test 102: read the month's recommendations
 
+**Since FIX-073 (Test 167)** each card names who it is about (the Client's
+name opens her file; a weak schedule reads «Trainer · día»), the details
+end with the number of classes («promedia 1,7 alumnas en 3 clases.»), the
+section has «Recalcular», and the worker's daily facts run recomputes the
+recommendations too. A finding the facts no longer support turns «Resuelta».
+
 Recomendaciones sits in the sidebar after Indicadores. It lists the month's
 findings from the studio facts. v1 has two rules, both counts: a weak
 schedule and an inactive client. Neither names a Client. The page shows the
@@ -6792,6 +6798,11 @@ Spanish sentence and the state. Use a disposable database.
    have. The nightly pass waits; the recompute endpoint is the trigger.
 
 ## Test 103: read the month's narrated report
+
+**Since FIX-073 (Test 167)** «Porque:» is the fact behind the action, not
+the action again; inactive Clients make one action; the report counts every
+recommendation that is not discarded; and one class or one Client reads in
+the singular.
 
 Indicadores, below the chart, shows «Informe del mes» for the Administrator.
 The text comes from the month's counts and the recommendation sentences. It
@@ -10030,3 +10041,45 @@ default older admin builds get, `restock` or `all`) and every row carries
    rango.» under Retiros, «Sin movimientos en este rango.» under Todos.
 6. Check at 1440 px and 420 px (at 420 each movement is a card with
    Movimiento, Cantidad, Registró and Fecha labelled), then drop the copy.
+
+## Test 167: Informes recommendations and figures that add up (FIX-073)
+
+Walkthrough finding 107. No migration; the API change is additive
+(`clientId`, `clientName`, `trainerName`, `weekday` on each recommendation).
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix073_dev`; the fixtures' November classes have ended, so the
+   month has taught classes) and run the API and the admin web on your own
+   ports (surface-verification skill). Log in as Paola and open **Informes ›
+   El mes**.
+2. **Recalcular.** Under «Recomendaciones del mes», press **Recalcular**.
+   Expected: the facts and the findings are recomputed (`POST
+   /api/v1/administrator/recommendations/recompute` now refreshes the studio
+   facts first), the tiles, «Informe del mes» and the list read again. A
+   failure says «No pudimos recalcular las recomendaciones.». Carolina
+   (read only) has no «Recalcular». The worker's daily studio run also
+   recomputes the current month's recommendations (and the previous month's
+   until it is final), so the list no longer waits for a recompute by hand.
+3. **Who each one is about.** An inactive Client's card starts with her name
+   as a link («Valeria Quiroga»); it opens Clientes with her file. A weak
+   schedule starts with «Daniela Ortiz · martes». The sentence follows:
+   «Contacta a la clienta: tiene un plan vigente y no reservó este mes.» or
+   «Revisa el horario del martes: promedia 0 alumnas en 6 clases.».
+4. **Resolved.** Book a class for a listed Client and press **Recalcular**.
+   Expected: her card reads «Resuelta». If she cancels and you recalculate
+   again, it reads «Nueva». A discarded card stays «Descartada».
+5. **Informe del mes.** With 3 inactive Clients and 3 weak schedules it
+   reads «Hay 6 recomendaciones para revisar. Estas son las principales,
+   cada una con el dato que la sostiene.», then «Contacta a las 3 clientas
+   que no reservaron este mes.» with «Porque: Tienen un plan vigente y no
+   reservaron ninguna clase este mes.» and «Revisa el horario del martes.»
+   with «Porque: Promedia 0 alumnas en 3 clases.» (three actions at most).
+   One held class reads «se dictó 1 clase»; one active Client «Había 1
+   clienta activa.».
+6. **Dinero with one Branch.** Choose «Centro» in Sucursal. Expected: under
+   «Ingreso devengado», «Todo el estudio, no solo Centro: no se separa por
+   sucursal.» With «Todas las sucursales» the line is absent.
+7. **Finanzas without a budget.** On a month with no budget, «Punto de
+   equilibrio» reads «—» and «Carga tu presupuesto para calcularlo». After
+   «Cargar presupuesto de apertura» it shows the amount again.
+8. Check at 1440 px and 420 px, then drop the copy.
