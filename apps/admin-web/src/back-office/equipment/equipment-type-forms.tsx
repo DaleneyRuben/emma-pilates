@@ -5,6 +5,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { cn } from "../../lib/cn";
@@ -209,6 +210,7 @@ export function EditTypeForm({
   const [name, setName] = useState(type.name);
   const [nameError, setNameError] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -239,45 +241,58 @@ export function EditTypeForm({
       await change.mutateAsync({ kind: "archive-type", typeId: type.id });
       onDone(`Quitamos el tipo ${type.name}.`);
     } catch (error) {
+      setConfirming(false);
       setFailure(backOfficeProblem(error).message);
     }
   };
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
-      <SidePanelBody>
-        <NameField
-          id={nameId}
-          value={name}
-          error={nameError}
-          onChange={setName}
-        />
-        <p className="text-ayuda text-texto-tenue">
-          {`${trackingLong[type.tracking]} No se puede cambiar.`}
-        </p>
-        <div className="flex flex-col items-start gap-1.5 border-t border-divisor pt-4">
-          <Button
-            type="button"
-            variant="link"
-            className="h-auto px-0 text-error hover:text-error-texto disabled:bg-transparent"
-            disabled={!removable}
-            onClick={() => void remove()}
-          >
-            Quitar tipo
-          </Button>
+    <>
+      <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
+        <SidePanelBody>
+          <NameField
+            id={nameId}
+            value={name}
+            error={nameError}
+            onChange={setName}
+          />
           <p className="text-ayuda text-texto-tenue">
-            {removable
-              ? "Deja de aparecer en todas las sucursales. Su historial queda."
-              : "Primero da de baja sus unidades en todas las sucursales."}
+            {`${trackingLong[type.tracking]} No se puede cambiar.`}
           </p>
-        </div>
-        <Failure message={failure} />
-      </SidePanelBody>
-      <SidePanelFooter>
-        <Button type="submit" size="lg" busy={change.isPending}>
-          Guardar
-        </Button>
-      </SidePanelFooter>
-    </form>
+          <div className="flex flex-col items-start gap-1.5 border-t border-divisor pt-4">
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto px-0 text-error hover:text-error-texto disabled:bg-transparent"
+              disabled={!removable}
+              onClick={() => setConfirming(true)}
+            >
+              Quitar tipo
+            </Button>
+            <p className="text-ayuda text-texto-tenue">
+              {removable
+                ? "Deja de aparecer en todas las sucursales. Su historial queda."
+                : "Primero da de baja sus unidades en todas las sucursales."}
+            </p>
+          </div>
+          <Failure message={failure} />
+        </SidePanelBody>
+        <SidePanelFooter>
+          <Button type="submit" size="lg" busy={change.isPending}>
+            Guardar
+          </Button>
+        </SidePanelFooter>
+      </form>
+      <ConfirmDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        title={`¿Quitar el tipo ${type.name}?`}
+        confirmLabel="Quitar tipo"
+        busy={change.isPending}
+        onConfirm={() => void remove()}
+      >
+        <p>Deja de aparecer en todas las sucursales. Su historial queda.</p>
+      </ConfirmDialog>
+    </>
   );
 }
