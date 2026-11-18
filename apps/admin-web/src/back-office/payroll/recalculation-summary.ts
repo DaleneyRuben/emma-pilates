@@ -5,20 +5,34 @@ import { formatBolivianos } from "../../lib/money";
 const lower = (text: string) =>
   text.charAt(0).toLocaleLowerCase("es") + text.slice(1);
 
+type Owed = { name: string; totalCentavos: number };
+
+// A person can hold several statements in the window (two week drafts that a
+// month draft replaces), so what each is owed adds up her statements.
+const owedByPerson = (statements: PayStatementDto[]): Map<string, Owed> => {
+  const owed = new Map<string, Owed>();
+  for (const statement of statements) {
+    const current = owed.get(statement.staffMemberId);
+    owed.set(statement.staffMemberId, {
+      name: statement.staffMemberName,
+      totalCentavos: (current?.totalCentavos ?? 0) + statement.totalCentavos,
+    });
+  }
+  return owed;
+};
+
 const changeOf = (
-  before: PayStatementDto | undefined,
-  after: PayStatementDto | undefined,
+  before: Owed | undefined,
+  after: Owed | undefined,
 ): string | null => {
   if (after === undefined) {
-    return before === undefined
-      ? null
-      : `${before.staffMemberName} ya no tiene sueldo`;
+    return before === undefined ? null : `${before.name} ya no tiene sueldo`;
   }
   if (before === undefined) {
-    return `${after.staffMemberName}, nuevo: ${formatBolivianos(after.totalCentavos)}`;
+    return `${after.name}, nuevo: ${formatBolivianos(after.totalCentavos)}`;
   }
   if (before.totalCentavos === after.totalCentavos) return null;
-  return `${after.staffMemberName} pasó de ${formatBolivianos(before.totalCentavos)} a ${formatBolivianos(after.totalCentavos)}`;
+  return `${after.name} pasó de ${formatBolivianos(before.totalCentavos)} a ${formatBolivianos(after.totalCentavos)}`;
 };
 
 // Finding 105: «Volver a calcular» says when it ran and whose pay changed,
@@ -29,13 +43,11 @@ export function recalculationSummary(
   after: PayStatementDto[],
   now: Date = new Date(),
 ): string {
-  const people = new Set(
-    [...before, ...after].map((statement) => statement.staffMemberId),
-  );
-  const byPerson = (list: PayStatementDto[], id: string) =>
-    list.find((statement) => statement.staffMemberId === id);
+  const owedBefore = owedByPerson(before);
+  const owedAfter = owedByPerson(after);
+  const people = new Set([...owedBefore.keys(), ...owedAfter.keys()]);
   const changes = [...people].flatMap((id) => {
-    const change = changeOf(byPerson(before, id), byPerson(after, id));
+    const change = changeOf(owedBefore.get(id), owedAfter.get(id));
     return change === null ? [] : [change];
   });
   const head = `Recalculamos ${lower(periodLabel)} a las ${boliviaParts(now).time}.`;
