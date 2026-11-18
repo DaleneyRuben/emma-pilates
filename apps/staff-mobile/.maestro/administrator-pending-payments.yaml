@@ -11,7 +11,7 @@ env:
 - runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
-      text: "Por confirmar.*|Todo al día"
+      text: "Por confirmar.*|Todo al día.*"
     timeout: 20000
 - takeScreenshot: staff-admin-payments
 - tapOn:

@@ -30,6 +30,13 @@ export function describeDifference(centavos: number): DifferenceTone {
     : { label: "Sobra efectivo", text: colors.warningText, tint: colors.warningTint };
 }
 
+// «Cuadra», «Falta Bs 10,00», «Sobra Bs 5,50»: the difference as Cerrar caja reads it (FIX-083).
+export function differenceValue(centavos: number): string {
+  if (centavos === 0) return "Cuadra";
+  const amount = formatCashCloseBolivianos(Math.abs(centavos));
+  return centavos < 0 ? `Falta ${amount}` : `Sobra ${amount}`;
+}
+
 export function describeCashSales(count: number, branchName: string): string {
   if (count === 0) return "Todavía no hay ventas en efectivo hoy.";
   return `${count} ${count === 1 ? "venta" : "ventas"} en efectivo hoy en ${branchName}`;

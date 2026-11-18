@@ -13,7 +13,7 @@ numbered tests.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment with the invoice data, Mi plan, the referral code, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18); the Trainer credential, the tablet no-plan card, and the cancel-sheet sentence (Test 113) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); read her statements and payments in «Mis pagos» (Test 95); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash with the invoice data for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); read her statements and payments in «Mis pagos» (Test 95); report an equipment fault from a Session as a Trainer (Test 82); the bare Branch on S13, the S14 commas, and the receipt's own ratio (Test 113); the calmer Notificaciones, Client file, Cerrar caja and Horario (Test 177) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -205,7 +205,8 @@ Notificaciones, Editar perfil, Cambiar contraseña, a Plan, and the rest) opens
 under the same top bar, the chevron (read as "Volver") and the screen's title
 over a thin rule. A Plan's bar shows the Plan's name, a class opened from
 Reservar shows a small grey "Reservar una clase" instead of a title, and
-Notificaciones keeps **Marcar leídas** at the end of the bar. In the Staff
+Notificaciones keeps **Marcar leídas** at the end of the bar (**Marcar todo
+leído** in the Staff app, Test 177). In the Staff
 app, the Assistant's client overview, the class list, the class detail, the
 plan picker, the cash payment, and the Trainer's attendance list keep their
 large title under a chevron; the other pushed screens (Notificaciones,
@@ -1814,9 +1815,9 @@ count and "Bs 560 en total", then one card per transfer, oldest first: the
 Client's first letter in a tinted circle, her name in Lora over the Plan, a
 Palo de rosa chevron on the right, and under a thin rule the amount in Lora
 and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
-19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen reads "No hay
-pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
-transferencia nueva.".
+19:40"; "hace un momento" under a minute, FIX-063) (MOB-042). With nothing to review the screen shows one small
+card: a green check, «Todo al día» and «No hay pagos por confirmar» (Test 177
+E).
 
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
 with `Bs 560`, the **Pendiente** badge, "Transferencia · enviado el 22 de
@@ -1902,16 +1903,16 @@ reads «No encontramos a nadie» with «Revisa cómo lo escribiste o crea una
 ficha nueva.» and **Nuevo cliente** as the next step. Screen titles stay «cliente» («Buscar cliente», «Nuevo
 cliente», «Ver cliente», «Selecciona un cliente…»); prose
 about the person says «clienta» (UX-005). Tap Lucía: the overview shows her
-Plan card (Test 124 D), **Reservar clase** and, only when she can buy,
-**Registrar pago**, then «Reservas» with **Próximas reservas**
-(her next class on the right) and **Historial de clases**. A Client without a
+Plan card (Test 177 B), **Reservar clase** and one plain group of rows:
+**Reservas** (her next class on the right), **Historial de clases** and, only
+when she can buy, **Registrar pago**. A Client without a
 Plan reads «Sin plan activo» under a card icon, with «Registra un pago para
 activar un plan y poder reservarle clases.» and **Registrar pago en
 efectivo**, and no **Reservar clase**.
 
 ### B. Bookings, cancellation, and history
 
-**Próximas reservas** opens **Reservas de la clienta** under the banner "Viendo
+**Reservas** opens **Reservas de la clienta** under the banner "Viendo
 reservas de: Lucía Fernández". Cards mirror the Client app: **Cancelar** for a
 reservation outside the 2 h 30 window, **No cancelable** plus **Reprogramar**
 inside it, **En lista de espera** plus **Salir de la lista de espera**.
@@ -7007,21 +7008,28 @@ Branch, up to the moment of the close.
    and 23).
 2. Log in to the Staff app as `camila.rojas@example.com` and sell a Plan in
    cash at Centro to a Client without one (Mariana or Sofía, Test 19).
-3. Open the **Caja** tab (S25). Expected: «Viernes 23 de octubre · Centro»
-   (today) over the title **Cerrar caja**, «Efectivo esperado» with the
-   sale's amount in two decimals (for example «Bs 520,00»), «1 venta en
-   efectivo hoy en Centro», «Hay un solo cierre por día y no se corrige
-   después.», and **Cerrar caja** disabled until «Efectivo contado» is typed. If the profile
+3. Open the **Caja** tab (S25, Test 177 C). Expected: «Viernes 23 de octubre · Centro»
+   (today) over the title **Cerrar caja**, «¿Cuánto efectivo hay en la
+   caja?» over one large «Bs» field, «Cuenta los billetes antes de mirar el
+   total esperado.», then a Lino group «Esperado según los pagos» with the
+   sale's amount in two decimals (for example «Bs 520,00») and «Diferencia —»,
+   «1 venta en efectivo hoy en Centro», and **Cerrar caja** disabled until an
+   amount is typed, with «Te pediremos confirmar: un cierre no se puede
+   deshacer.» under it. A day without cash sales opens on «Hoy no hubo pagos
+   en efectivo» instead (Test 177 C). If the profile
    or Branch list fails to load, the screen shows «No pudimos cargar la caja
    de hoy.» with **Reintentar**, not an endless «Cargando la caja de hoy»
    (FIX-011).
 4. Type the expected amount, then less, then more (including centavos such as
-   «525,50» against «520,00»). Expected: «Diferencia · Bs 0,00 · Cuadra» on
-   green, «−Bs 10,00 · Falta efectivo» on red, «+Bs 5,50 · Sobra efectivo» on
-   amber; «12,345» is not read and keeps the button off. Cash-close amounts
+   «525,50» against «520,00»). Expected: «Diferencia» reads «Cuadra» in
+   green, «Falta Bs 10,00» in red, «Sobra Bs 5,50» in amber, as plain text
+   with no disc; «12,345» is not read and keeps the button off. Cash-close amounts
    always show two decimals (es-BO); the rest of the Staff app still rounds
    to whole bolivianos.
-5. Add a «Nota (opcional)» and press **Cerrar caja**. Expected: «Caja
+5. With a difference, «Nota (opcional)» appears; add one and press
+   **Cerrar caja**, then **Cerrar caja** again on the sheet «¿Cerrar la caja
+   de hoy?» («Contaste Bs … en Centro (falta efectivo). Un cierre no se
+   puede deshacer.»). Expected: «Caja
    cerrada» with «La cerró Camila Rojas a las hh:mm.», the «Efectivo
    esperado», «Efectivo contado», «Diferencia» and «Nota» rows (still with
    two decimals), and **Ir a Clientes**, and in `psql` one
@@ -7121,8 +7129,8 @@ password, holding every Branch.
 
 1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. Her
    tabs are **Clientes · Para contactar · Horario · Perfil**; **Clientes**
-   opens on **Buscar cliente** with the Rosa tinte **Nuevo cliente** button
-   under the search (FIX-040), and **Horario** has the **Cancelar una clase**
+   opens on **Buscar cliente** with the «¿No está? Crear cliente nuevo» link
+   under the results (FIX-040, Test 177 F), and **Horario** has the **Cancelar una clase**
    row, which opens the Administrator's cancellation screens (Test 10 D).
 2. **Nuevo cliente** opens the Assistant's form (Test 11 E, with the required
    «Celular» of Test 132): create a Client with a fresh email. Her file
@@ -7136,7 +7144,7 @@ password, holding every Branch.
    («No encontramos a nadie») offers **Nuevo cliente** too. The invitation
    endpoints (`/api/v1/assistant/client-invitations…`) answer her; the cash
    ones (`plan-quotes`, cash payments) still answer `403` (step C).
-3. Search `luc` and open Lucía: **Reservar clase**, **Próximas reservas** and
+3. Search `luc` and open Lucía: **Reservar clase**, **Reservas** and
    **Historial de clases** work as for the Assistant (Test 11 B and C) at
    any Branch, but there is no **Registrar pago**.
 4. Perfil reads «Coordinación» and «Todas las sucursales».
@@ -8522,20 +8530,22 @@ C. **Entrenadora.** Mi agenda (S02) opens on today, with «Entrenadora · Lunes
    as a text action, and «Pagos recibidos»; empty, «Todavía no tienes pagos»
    with **Ver mi agenda**.
 D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search field
-   with a clear ×, the Rosa tinte **Nuevo cliente** button, results as person
+   with a clear ×, results as person
    rows (a **Pendiente** pill for a pending Account). No result reads «No
-   encontramos a nadie» with **Nuevo cliente**. Nuevo cliente (S05): «Datos»
+   encontramos a nadie» with **Nuevo cliente**; otherwise the quiet link
+   «¿No está? Crear cliente nuevo» sits under the results (Test 177 F).
+   Nuevo cliente (S05): «Datos»
    as one Lino group, «¿Cómo nos conoció?» as a two-column grid, the referral
    field only for «Una instructora» («Código de la instructora») or
    «Recomendación de una amiga» («Código de la amiga»), and **Crear cuenta**
    fixed at the bottom under «Le enviaremos un enlace de activación al correo.
    Vence en 7 días.» The Client file (S06): initials, name, contact; the Plan
-   as the Rosa profundo card (classes left in large Lora, a white bar, «Vence
-   el …», **Activo**/**Vencido**); one primary **Reservar clase**;
-   **Registrar pago** only when she can buy (never with a Plan
-   already queued, which shows «Su próximo plan ya está pagado (<plan>, desde
-   el <día>). Podrás registrar otro pago cuando empiece.»); «Reservas» rows
-   **Próximas reservas** and **Historial de clases**. Without a Plan, a Lino
+   as one Lino card (Test 177 B: the plan name and a small «● Activo», the
+   classes she can book in Lora 40, «N de M del plan · vence el …», and
+   «Próximo plan ya pagado: <plan>, desde el <día>. Podrás registrar otro
+   pago cuando empiece.» when one is queued); one primary **Reservar clase**;
+   plain rows **Reservas**, **Historial de clases** and, only when she can
+   buy, **Registrar pago**. Without a Plan, a Lino
    card «Sin plan activo» with **Registrar pago** and no
    **Reservar clase**. A pending Account (Sofía) shows one Lino line «Cuenta
    pendiente de activación · El enlace vence el …», a ⋯ menu («Invitación de
@@ -8565,18 +8575,21 @@ D. **Asistente.** Buscar cliente (S04): «Asistente · Centro», the search fiel
    day tile and the action as a right-aligned text button under a hairline
    (**Cancelar reserva** in Error, **Reprogramar** inside the window, **Salir
    de la lista**); the sheet asks «¿Cancelar esta reserva de …?» with **Sí,
-   cancelar la reserva** and **No, volver**. Horario (HOR): the week for her
-   Branch, read-only rows «Trainer · N de M reservados» with «N cupos», a
-   cancelled class kept in place, muted, with its cause (Test 145), and
-   **Reservar para una clienta** (opens Clientes). Caja (S25): «Cerrar caja»
-   with the expected cash on the Rosa profundo card, «Efectivo contado», the
-   live difference row («Falta efectivo −Bs 2»), the note with its counter,
-   «Hay un solo cierre por día y no se corrige después.»; once closed, «Caja
+   cancelar la reserva** and **No, volver**. Horario (HOR, Test 177 D): the
+   week for her Branch, «N clases hoy», one plain card per class («08:00»,
+   «4 de 6 lugares» in grey, «Reformer · Daniela», «50 min»), the cancelled
+   classes folded at the end («2 canceladas por mínimo · Ver»), and
+   **Reservar para una clienta** (opens Clientes). Caja (S25, Test 177 C):
+   «¿Cuánto efectivo hay en la caja?» first, the expected cash and
+   «Cuadra»/«Falta Bs …» quietly under it, a confirmation before closing;
+   once closed, «Caja
    cerrada · La cerró … a las …» with the four rows and **Ir a Clientes**.
 E. **Administración.** Pagos pendientes (S11): «Por confirmar · N» with the
-   total, person rows with the amount in Lora, and «Accesos»: **Cancelar una
-   clase**, **Congelamientos** («N por revisar») and **Cerrar caja**. With no
-   payments, «Todo al día» and **Ver el horario**. Revisar pago (S12): the
+   total, person rows with the amount in Lora, and «Accesos» as plain rows
+   without icons: **Facturas por subir** (count), **Cancelar una clase**,
+   **Congelamientos** («N por revisar») and **Cerrar caja**. With no
+   payments, one small card «Todo al día · No hay pagos por confirmar»
+   (Test 177 E). Revisar pago (S12): the
    amount on the Rosa profundo card, Transferencia and «Enviado el …» rows,
    the receipt with **Ampliar**, **Confirmar pago** and **Rechazar** in Error;
    rejecting shows the person row, «Motivo del rechazo», the warning row «El
@@ -8603,7 +8616,7 @@ F. **Nutricionista.** Mi agenda (S15): «Nutricionista · …», days as section
    «Aún no publicaste horarios». Nuevo/Editar horario (S17): a fixed Branch
    with one Branch, the turnos as a row, **Guardar** fixed with **Eliminar
    horario** as an Error text button.
-G. **Coordinación.** Buscar cliente has **Nuevo cliente** like the Assistant's
+G. **Coordinación.** Buscar cliente has «¿No está? Crear cliente nuevo» like the Assistant's
    (FIX-040), with no cash sale on the Client's file; Horario has a
    **Cancelar una clase** row and «Solo lectura. Para reservar, abre la ficha
    de una clienta.»; Para contactar (S28) shows each Client with her reasons
@@ -10752,6 +10765,89 @@ G. **Notificaciones.** An old notice stored as «Tu plan está congelado hasta
 H. **No discs behind icons.** **Perfil**'s rows, **Mis facturas** (its rows
    and «Aún no tienes facturas»), and the class detail's «La clase» rows draw
    their icon alone, in grey. The Staff app keeps its rows for now.
+
+## Test 177: a calmer Staff app (FIX-083)
+
+The 2026-11-18 design audit's picks for the Staff app
+(`DECISIONES-DISENO-2026-11-18.md`, «App del equipo»): Notificaciones A,
+Ficha A, Cerrar caja A + C, Horario A. JavaScript only: no migration, no API
+change, no new build. Every screen keeps one accent (the solid button or the
+unread dot), no tinted discs behind icons, and pills only for exceptions.
+Use the walkthrough database (`emma_vacia`, password «Password»): `ana@`
+(Administrator), `camila@` (Assistant, Achumani), `daniela@` (Trainer).
+
+A. **Notificaciones (pick A, grouped).** As Ana, Perfil → **Notificaciones**.
+   One Lino list, no «Sin leer»/«Anteriores» headings and no pink rows.
+   Notices of the same kind collapse into one row: «20 comentarios»,
+   «9 comprobantes por revisar», «2 congelamientos por revisar», each with
+   «N sin leer · » and the newest one's time, and a Palo de rosa dot while any
+   is unread (a screen reader hears «…, N sin leer»; a lone unread notice
+   «…, sin leer»). Tapping a
+   group opens it in place (the chevron turns up) and lists each notice,
+   indented; tapping one marks it read and opens its destination as before
+   (a comprobante opens **Revisar pago**). A lone notice is its own row.
+   **Marcar todo leído** sits at the end of the bar while anything is unread.
+   As Daniela, «N clases canceladas» groups her cancellations the same way.
+B. **Ficha de la clienta (pick A, clear card).** As Camila, **Clientes** →
+   Lucía: her photo or initials, her name, «phone · email»; one Lino card
+   with the plan name and «● Activo» («● Vencido» in grey once it ends), the
+   classes she can book in Lora 40 over «clases disponibles» (the plan's
+   classes plus any extra ones), «5 de 8 del plan · vence el 12 de octubre»
+   («5 del plan + 2 extra · …» with extra classes), the extra classes' origin
+   when there is one, and under a hairline «Próximo plan ya pagado: …» when
+   one is queued. Then one solid **Reservar clase** (or **Registrar pago**
+   when she cannot book but can buy), then plain rows without icons:
+   **Reservas** (her next class on the right), **Historial de clases**, and
+   **Registrar pago** when she can buy. With only extra classes left
+   («0 del plan + 2 extra») **Reservar clase** is still offered, and the
+   class she picks reads «Reservando para … · 2 clases disponibles» with
+   **Reservar para …** enabled; an expired
+   plan's leftovers read «clases sin usar», never «disponibles». The design's «Pagos» and
+   «Evaluaciones» rows need Staff endpoints that do not exist yet (see the
+   backlog).
+C. **Cerrar caja (picks A and C).** As Camila, **Caja**:
+   1. On a day without cash Payments: one Lino card «Hoy no hubo pagos en
+      efectivo» / «Puedes cerrar la caja en cero.», a solid **Cerrar caja sin
+      efectivo** and a quiet **Sí hay efectivo en la caja**. The first asks
+      «¿Cerrar la caja de hoy?» («Cerrarás la caja de Achumani en Bs 0,00. Un
+      cierre no se puede deshacer.») and records a close of Bs 0,00. The
+      second opens the count below.
+   2. With cash Payments (sell a Plan in cash first, Test 11): «¿Cuánto
+      efectivo hay en la caja?» over a large «Bs» field (its border turns
+      Palo de rosa while typing), «Cuenta los billetes antes de mirar el total
+      esperado.», then «Esperado según los pagos», «Ventas anuladas (efectivo
+      en caja)» when any, and «Diferencia» («—», then «Cuadra» in green,
+      «Falta Bs …» in red, «Sobra Bs …» in amber). «Nota (opcional)» appears
+      only when the count differs. **Cerrar caja** says «Te pediremos
+      confirmar: un cierre no se puede deshacer.» and opens the same sheet
+      before recording. The design's link to the day's cash Payments is a
+      plain line («N ventas en efectivo hoy en …»): the Staff app has no list
+      of them yet.
+   3. As Ana from **Pagos** → **Cerrar caja**, switch to a Branch without cash
+      today: the same calm empty state.
+D. **Horario (pick A, cancellations at the end).** As Camila (and as Ana),
+   **Horario** on today: «1 clase hoy» (another day reads «Jueves 19 de
+   noviembre · 6 clases»), one plain Lino card per class for every role: the
+   start in Lora, «N de M lugares» or «M de M · lleno» in grey, «class ·
+   Trainer» after her face, «50 min» (plus «· N en espera» when any). The
+   cancelled classes fold into one line at the end, «3 canceladas por
+   mínimo» with **Ver ▾**; it opens the dashed cancelled rows with their
+   cause. Mixed causes read «3 canceladas». A day where every class was
+   cancelled reads «Hoy todas las clases están canceladas» over the fold.
+E. **Pagos (Ronda 2 pick A, one line a day).** As Ana with nothing to
+   review: one small Lino card with a green check, «Todo al día» and «No hay
+   pagos por confirmar» (no big disc, no «Ver el horario»). With pending
+   payments the list shows there as before. «Accesos» is a plain list with no
+   icon discs: **Facturas por subir** (count), **Cancelar una clase**,
+   **Congelamientos**, **Cerrar caja**, each with ›.
+F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
+   Coordinator), **Clientes**: the search field first, **Facturas por subir**
+   as a plain row before searching, and no big «Nuevo cliente» button. Under
+   the hint (or under the results once she searches) a quiet link «¿No está?
+   Crear cliente nuevo» opens **Nuevo cliente** (it stays under «No pudimos
+   buscar clientes.» when the search fails). No match still reads «No
+   encontramos a nadie» with **Nuevo cliente** as the next step.
+G. Check on the iPhone 16 Pro and the Android emulator.
 
 ## Test 178: calmer Horario, Inicio and Sueldos on the admin web (FIX-084)
 

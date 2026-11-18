@@ -1,27 +1,22 @@
 import {
   getListSessionAvailabilityQueryKey,
   useListSessionAvailability,
-  type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   civilDateRange,
   colors,
   fontFamilies,
-  IconRow,
-  IconRowGroup,
   LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
   SectionTitle,
   spacing,
-  StaffFace,
   StateScreen,
-  typography,
   upcomingCivilDates,
   usePullToRefresh,
-  formatTimeRange,
+  typography,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -31,14 +26,13 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
-import { agendaHeading, causeLabel } from "../trainer/agenda-cancellations";
 import { BranchField } from "../ui/branch-field";
 import { useCashBranches } from "../ui/branch-chips";
-import { CancelledSessionRow } from "../ui/cancelled-session-row";
 import { DayStrip } from "../ui/day-strip";
+import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
-import { SessionRow } from "../ui/session-row";
-import { countLabel, dayHeading, minutesLabel, startTime } from "../ui/session-time";
+import { countLabel, dayHeading } from "../ui/session-time";
+import { CancelledFold, ScheduleClassCard } from "./schedule-class-card";
 
 type ScheduleNavigation = {
   navigate: {
@@ -47,16 +41,15 @@ type ScheduleNavigation = {
   };
 };
 
-function seats(session: SessionAvailabilityDto): string {
-  return session.availableSeats === 0
-    ? "Completa"
-    : countLabel(session.availableSeats, "cupo", "cupos");
-}
-
-function booked(session: SessionAvailabilityDto): string {
-  return session.bookedCount === 0
-    ? `${session.trainerName} · sin reservas`
-    : `${session.trainerName} · ${session.bookedCount} de ${session.capacity} reservados`;
+// «3 clases hoy», or «Martes 3 de noviembre · 3 clases» on another day (FIX-083).
+function dayCount(date: string, today: string, count: number, cancelled: number): string {
+  if (count === 0 && cancelled > 0) {
+    return date === today
+      ? "Hoy todas las clases están canceladas"
+      : `${dayHeading(date)} · todas canceladas`;
+  }
+  const classes = countLabel(count, "clase", "clases");
+  return date === today ? `${classes} hoy` : `${dayHeading(date)} · ${classes}`;
 }
 
 /**
@@ -105,21 +98,21 @@ export function ScheduleScreen() {
     );
   }
   const list = sessions.data?.status === 200 ? sessions.data.data : [];
+  const standing = list.filter((session) => (session.cancellation ?? null) === null);
+  const cancelled = list.filter((session) => (session.cancellation ?? null) !== null);
 
   return (
     <Screen style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {header}
         {selling ? null : (
-          <IconRowGroup>
-            <IconRow
-              chevron
-              icon="calendar"
+          <PlainRowGroup>
+            <PlainRow
               label="Cancelar una clase"
               onPress={() => navigation.navigate("CancelClass")}
               testID="schedule-cancel-class"
             />
-          </IconRowGroup>
+          </PlainRowGroup>
         )}
         {several ? (
           <BranchField
@@ -151,46 +144,14 @@ export function ScheduleScreen() {
             title="Este día no hay clases"
           />
         ) : (
-          <View>
-            <SectionTitle>{agendaHeading(dayHeading(selectedDate), list)}</SectionTitle>
-            <View style={styles.list}>
-              {list.map((session) => {
-                const cancellation = session.cancellation ?? null;
-                if (cancellation !== null) {
-                  const cause = causeLabel(cancellation.cause);
-                  return (
-                    <CancelledSessionRow
-                      accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
-                      cause={cause}
-                      duration={minutesLabel(session.startsAt, session.endsAt)}
-                      key={session.id}
-                      testID={`schedule-cancelled-${session.id}`}
-                      time={startTime(session.startsAt, session.endsAt)}
-                      title={session.classTypeName}
-                    />
-                  );
-                }
-                return (
-                  <SessionRow
-                    key={session.id}
-                    pill={selling ? seats(session) : undefined}
-                    pillTone={session.availableSeats === 0 ? "neutral" : "tint"}
-                    subtitle={booked(session)}
-                    subtitleLead={
-                      <StaffFace
-                        fetcher={fetcher}
-                        name={session.trainerName}
-                        photo={session.trainerPhoto}
-                        size={20}
-                      />
-                    }
-                    testID={`schedule-session-${session.id}`}
-                    time={startTime(session.startsAt, session.endsAt)}
-                    title={session.classTypeName}
-                  />
-                );
-              })}
-            </View>
+          <View style={styles.list}>
+            <SectionTitle>
+              {dayCount(selectedDate, today, standing.length, cancelled.length)}
+            </SectionTitle>
+            {standing.map((session) => (
+              <ScheduleClassCard fetcher={fetcher} key={session.id} session={session} />
+            ))}
+            <CancelledFold key={selectedDate} sessions={cancelled} />
           </View>
         )}
         {selling ? null : (

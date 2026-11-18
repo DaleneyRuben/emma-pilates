@@ -36,6 +36,7 @@ import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { formatCivilDate } from "./assistant-format";
+import { bookableClasses, canBookFor } from "./bookable-classes";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
 import { useShowClientBookings } from "./show-client-bookings";
@@ -90,7 +91,7 @@ export function AssistantSessionDetailScreen({
   const firstName = clientName.trim().split(/\s+/)[0] ?? clientName;
   const left =
     overview.data?.status === 200
-      ? overview.data.data.subscription.subscription?.remainingClassAllowance
+      ? bookableClasses(overview.data.data.subscription.subscription)
       : undefined;
   const header = (
     <>
@@ -100,7 +101,9 @@ export function AssistantSessionDetailScreen({
         clientName={clientName}
         clientPhoto={clientPhoto}
         detail={
-          left === undefined ? undefined : `${left} ${left === 1 ? "clase" : "clases"} en su plan`
+          left === undefined
+            ? undefined
+            : `${left} ${left === 1 ? "clase disponible" : "clases disponibles"}`
         }
       />
     </>
@@ -125,10 +128,7 @@ export function AssistantSessionDetailScreen({
 
   const detail = session.data.data;
   const view = overview.data?.status === 200 ? overview.data.data.subscription : null;
-  const hasAllowance =
-    view !== null &&
-    (view.status === "active" || view.status === "expiring_soon") &&
-    (view.subscription?.remainingClassAllowance ?? 0) > 0;
+  const hasAllowance = canBookFor(view);
   const full = forcedFull || detail.availableSeats === 0;
   const booked = bookedSessionIds.has(detail.id);
 

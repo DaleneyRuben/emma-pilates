@@ -6,17 +6,12 @@ import {
   dayChipLabel,
   fontFamilies,
   formatTimeRange,
-  IconRow,
-  IconRowGroup,
   isCompletePhone,
   LoadingState,
-  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -24,11 +19,13 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
+import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { useInClientPanel } from "./assistant-workspace";
-import { PlanHero } from "./plan-hero";
+import { canBookFor } from "./bookable-classes";
+import { ClientPlanCard } from "./client-plan-card";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
-import { describeContact, formatCivilDayMonth } from "./assistant-format";
+import { describeContact } from "./assistant-format";
 
 /** Whose behalf the Assistant acts on, carried from her file to each step. */
 export type ClientContext = {
@@ -106,7 +103,7 @@ export function ClientOverviewScreen({
   const active =
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
   const subscription = data.subscription.subscription ?? null;
-  const canBook = active && (subscription?.remainingClassAllowance ?? 0) > 0;
+  const canBook = canBookFor(data.subscription);
   // The API's subscription_not_expired rule: a queued Plan blocks a new one
   // (BKM-006), so the cash action is only offered when she can buy (UX-003).
   const futurePlan = data.subscription.nextSubscription ?? null;
@@ -166,62 +163,54 @@ export function ClientOverviewScreen({
           />
         ) : (
           <>
-            <PlanHero active={active} subscription={subscription} />
-            <View style={styles.actions}>
-              {canBook ? (
-                <PrimaryButton
-                  label="Reservar clase"
-                  onPress={() => navigation.navigate("BrowseSessions", context)}
-                  testID="client-overview-book"
-                />
-              ) : null}
-              {canBuy ? canBook ? <OutlinedButton {...cash} /> : <PrimaryButton {...cash} /> : null}
-              {sells && futurePlan !== null ? (
-                // Walkthrough finding 117: why there is no «Registrar pago».
-                <Text style={styles.note}>
-                  {`Su próximo plan ya está pagado (${futurePlan.planName}, desde el ${formatCivilDayMonth(futurePlan.startsOn)}). Podrás registrar otro pago cuando empiece.`}
-                </Text>
-              ) : null}
-            </View>
+            <ClientPlanCard
+              active={active}
+              nextPlan={futurePlan}
+              sells={sells}
+              subscription={subscription}
+            />
+            {canBook ? (
+              <PrimaryButton
+                label="Reservar clase"
+                onPress={() => navigation.navigate("BrowseSessions", context)}
+                testID="client-overview-book"
+              />
+            ) : canBuy ? (
+              <PrimaryButton {...cash} />
+            ) : null}
           </>
         )}
-        <View>
-          <SectionTitle>Reservas</SectionTitle>
-          <IconRowGroup>
-            <IconRow
-              chevron
-              icon="calendar"
-              label="Próximas reservas"
-              onPress={() => navigation.navigate("ClientBookings", context)}
-              testID="client-overview-bookings"
-              value={
-                data.nextBooking
-                  ? nextLabel(data.nextBooking.startsAt, data.nextBooking.endsAt)
-                  : undefined
-              }
-            />
-            <IconRow
-              chevron
-              icon="clock"
-              label="Historial de clases"
-              onPress={() => navigation.navigate("ClientHistory", context)}
-              testID="client-overview-history"
-            />
-          </IconRowGroup>
-        </View>
+        <PlainRowGroup testID="client-overview-rows">
+          <PlainRow
+            label="Reservas"
+            onPress={() => navigation.navigate("ClientBookings", context)}
+            testID="client-overview-bookings"
+            value={
+              data.nextBooking
+                ? `Próxima: ${nextLabel(data.nextBooking.startsAt, data.nextBooking.endsAt)}`
+                : undefined
+            }
+          />
+          <PlainRow
+            label="Historial de clases"
+            onPress={() => navigation.navigate("ClientHistory", context)}
+            testID="client-overview-history"
+          />
+          {subscription !== null && canBook && canBuy ? (
+            <PlainRow label={cash.label} onPress={cash.onPress} testID={cash.testID} />
+          ) : null}
+        </PlainRowGroup>
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm },
   contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   identity: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
   identityBody: { flex: 1, gap: spacing.xxs },
   incompletePhone: { color: colors.warningText },
   name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });

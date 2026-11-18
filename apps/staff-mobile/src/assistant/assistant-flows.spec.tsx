@@ -45,13 +45,14 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
-    // v2 S06: the Plan is the hero, with one primary «Reservar clase».
+    // FIX-083 (Ficha pick A): one clear Lino plan card, then «Reservar clase».
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("5")).toHaveStyle({ fontSize: 32 });
-    expect(screen.getByText("clases restantes de 8")).toBeOnTheScreen();
+    expect(screen.getByText("5")).toHaveStyle({ fontSize: 40 });
+    expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
+    expect(screen.getByText("5 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    expect(screen.getByText("Vence el 12 de octubre de 2026")).toBeOnTheScreen();
     expect(screen.getByText("Activo")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#F5EFE9" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
@@ -64,6 +65,22 @@ describe("Assistant Client flows", () => {
       "/api/v1/assistant/clients/client-lucia": () => jsonResponse(giftedOverview),
     });
     expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
+  });
+
+  it("adds the extra classes to the available count and says where they come from", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () =>
+        jsonResponse({
+          ...giftedOverview,
+          subscription: {
+            ...giftedOverview.subscription,
+            subscription: { ...giftedOverview.subscription.subscription, extraClasses: 2 },
+          },
+        }),
+    });
+    expect(screen.getByText("7")).toBeOnTheScreen();
+    expect(screen.getByText("5 del plan + 2 extra · vence el 12 de octubre")).toBeOnTheScreen();
   });
 
   it("lists the Client's Bookings in their three states, cancels one after confirming, and shows the history by month", async () => {
