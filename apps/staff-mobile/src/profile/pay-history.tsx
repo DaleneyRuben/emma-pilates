@@ -43,7 +43,7 @@ export function PayHistory({
           const tone = statusTone[status.kind];
           return (
             <Pressable
-              accessibilityLabel={label}
+              accessibilityLabel={`${label}, ${statusLine(status)}, ${formatExactBolivianos(statement.totalCentavos)}`}
               accessibilityRole="button"
               key={statement.id}
               onPress={() => onOpen(statement.id)}

@@ -40,10 +40,12 @@ describe("Staff Mis pagos", () => {
     ).toBeOnTheScreen();
 
     expect(screen.getByText("Historial")).toBeOnTheScreen();
-    const november = within(screen.getByRole("button", { name: "Liquidación de noviembre 2026" }));
+    const november = within(
+      screen.getByRole("button", { name: /^Liquidación de noviembre 2026,/ }),
+    );
     expect(november.getByText("Noviembre 2026")).toBeOnTheScreen();
     expect(november.getByText("En curso · puede cambiar")).toBeOnTheScreen();
-    const october = within(screen.getByRole("button", { name: "Liquidación de octubre 2026" }));
+    const october = within(screen.getByRole("button", { name: /^Liquidación de octubre 2026,/ }));
     expect(october.getByText("Octubre 2026")).toBeOnTheScreen();
     expect(october.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
     expect(october.getByText("Bs 322,00")).toBeOnTheScreen();
@@ -65,7 +67,7 @@ describe("Staff Mis pagos", () => {
     expect(
       summary.getByText("Liquidación de octubre 2026, ya aprobada. Falta el pago."),
     ).toBeOnTheScreen();
-    const october = within(screen.getByRole("button", { name: "Liquidación de octubre 2026" }));
+    const october = within(screen.getByRole("button", { name: /^Liquidación de octubre 2026,/ }));
     expect(october.getByText("Aprobado · por pagar")).toBeOnTheScreen();
   });
 
@@ -166,7 +168,7 @@ describe("Staff Mis pagos", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await fireEvent.press(
-      await waitFor(() => screen.getByRole("button", { name: "Liquidación de noviembre 2026" })),
+      await waitFor(() => screen.getByRole("button", { name: /^Liquidación de noviembre 2026,/ })),
     );
     const november = within(await waitFor(() => screen.getByTestId("pay-statement")));
     expect(november.getByText("Periodo en curso")).toBeOnTheScreen();
@@ -218,7 +220,7 @@ describe("Staff Mis pagos", () => {
     });
     expect(screen.getByText("20 de octubre de 2026")).toBeOnTheScreen();
     expect(
-      screen.getByRole("button", { name: "Liquidación del 20 de octubre de 2026" }),
+      screen.getByRole("button", { name: /^Liquidación del 20 de octubre de 2026,/ }),
     ).toBeOnTheScreen();
   });
 

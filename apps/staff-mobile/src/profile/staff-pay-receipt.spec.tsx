@@ -116,7 +116,7 @@ describe("Staff Mis pagos receipts", () => {
 
     const others = within(await waitFor(() => screen.getByLabelText("Otros pagos")));
     const row = others.getByRole("button", {
-      name: "Ver el comprobante del pago del 15 de octubre de 2026",
+      name: "Ver el comprobante del pago del 15 de octubre de 2026, Bs 150,50",
     });
     expect(within(row).getByText(/ · ver comprobante$/)).toBeOnTheScreen();
     await fireEvent.press(row);

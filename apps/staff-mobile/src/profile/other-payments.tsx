@@ -49,7 +49,7 @@ export function OtherPayments({ payments }: { payments: OwnSalaryPaymentDto[] })
           }
           return (
             <Pressable
-              accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}`}
+              accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}, ${formatExactBolivianos(payment.amountCentavos)}`}
               accessibilityRole="button"
               key={payment.id}
               onPress={() => receipts.show(payment)}
