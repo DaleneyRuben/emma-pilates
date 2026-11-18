@@ -1,8 +1,4 @@
-import {
-  payoutQrBanner,
-  payoutQrRowValue,
-  payoutQrStateLine,
-} from "./payout-qr-copy";
+import { payoutQrBanner, payoutQrRowValue, payoutQrStateLine } from "./payout-qr-copy";
 
 const valid = { standing: "valid", validUntil: "2026-12-15" } as const;
 const expiring = { standing: "expiring", validUntil: "2026-12-05" } as const;
