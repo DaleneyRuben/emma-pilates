@@ -52,7 +52,7 @@ describe("Gastos: editing and eliminating an Expense", () => {
     const { user } = renderAdmin("/dinero/gastos");
     const row = await rowOf("Reparación");
     const edit = within(row).getByRole("button", {
-      name: "Editar el gasto de Reparación del 15/09/2026",
+      name: "Editar el gasto de Reparación",
     });
     expect(edit).toHaveTextContent("Editar");
     edit.focus();
@@ -148,6 +148,38 @@ describe("Gastos: editing and eliminating an Expense", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByText("Mostrando 1–2 de 2 gastos")).toBeVisible();
   });
+
+  it("starts the reason empty each time the confirmation opens", async () => {
+    const { user } = renderAdmin("/dinero/gastos");
+    await user.click(await screen.findByRole("button", { name: "Reparación" }));
+    const panel = await screen.findByRole("dialog", { name: "Editar gasto" });
+    await user.click(
+      within(panel).getByRole("button", { name: "Eliminar gasto" }),
+    );
+    await user.type(
+      within(await screen.findByRole("alertdialog")).getByLabelText(
+        "Motivo (opcional)",
+      ),
+      "Borrador",
+    );
+    await user.click(screen.getByRole("button", { name: "Volver" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Eliminar gasto" }),
+    );
+    expect(
+      within(await screen.findByRole("alertdialog")).getByLabelText(
+        "Motivo (opcional)",
+      ),
+    ).toHaveValue("");
+  });
+
+  it("leaves out «por» when the Account that eliminated it has no name", async () => {
+    items = [{ ...voidedRepair, voidedByName: "", voidReason: null }];
+    renderAdmin("/dinero/gastos");
+    expect(
+      await screen.findByText("Eliminado · 18/11/2026 · 14:30"),
+    ).toBeVisible();
+  });
 });
 
 describe("Gastos on a narrow browser: the row actions", () => {
@@ -167,7 +199,7 @@ describe("Gastos on a narrow browser: the row actions", () => {
     renderAdmin("/dinero/gastos");
     expect(
       await screen.findByRole("button", {
-        name: "Editar el gasto de Mantenimiento del 02/09/2026",
+        name: "Editar el gasto de Mantenimiento",
       }),
     ).toBeVisible();
     expect(screen.getByText("Eliminado")).toBeVisible();
