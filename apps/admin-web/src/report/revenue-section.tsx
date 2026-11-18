@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
-import { MonthStepper } from "../components/table/month-stepper";
 import { formatBolivianos } from "../lib/money";
-import { boliviaMonth } from "../lib/bolivia-time";
+import { formatMonth } from "../lib/bolivia-time";
 import { revenueReportQueryOptions } from "./report-queries";
-import { useState } from "react";
 
 const countFormat = new Intl.NumberFormat("es-BO");
 
@@ -27,15 +25,17 @@ function Figure({ name, figure }: { name: string; figure: string }) {
 // STU-002: cash, accrued by validity days, and deferred, beside the cash
 // report. Classes still owed are today's remaining allowance, not a month.
 // It is studio-wide: beside one Branch's report it says so (finding 107).
+// FIX-088: the page has one date filter, so it reads the month the report's
+// Hasta falls in instead of stepping months of its own.
 export function RevenueSection({
+  month,
   active = true,
   branchName,
 }: {
+  month: string;
   active?: boolean;
   branchName?: string;
 }) {
-  const latest = boliviaMonth();
-  const [month, setMonth] = useState(latest);
   const revenue = useQuery({
     ...revenueReportQueryOptions(month),
     enabled: active,
@@ -47,12 +47,9 @@ export function RevenueSection({
 
   return (
     <section aria-label="Ingreso devengado" className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-serif text-seccion text-texto">
-          Ingreso devengado
-        </h2>
-        <MonthStepper month={month} latest={latest} onChange={setMonth} />
-      </div>
+      <h2 className="font-serif text-seccion text-texto">
+        {`Ingreso devengado · ${formatMonth(month)}`}
+      </h2>
       {branchName === undefined ? null : (
         <p className="text-nota text-texto-tenue">
           {branchName === ""

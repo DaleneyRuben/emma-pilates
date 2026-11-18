@@ -245,6 +245,7 @@ export function ReportPage({
         </p>
       )}
       <RevenueSection
+        month={range.to.slice(0, 7)}
         active={search.vista !== undefined && !finance}
         branchName={branchId === undefined ? undefined : (branch?.name ?? "")}
       />
