@@ -40,8 +40,10 @@ const finding: StoredRecommendation = {
   rule: 'weak_schedule',
   subject: 'trainer:2',
   period: '2026-10-01',
-  detail: 'Revisa el horario del martes: promedia 1,7 alumnas.',
+  detail: 'Revisa el horario del martes: promedia 1,7 alumnas en 3 clases.',
   state: 'new',
+  trainerName: 'Daniela Rojas',
+  weekday: 2,
 };
 
 describe('recommendations endpoint (e2e)', () => {
