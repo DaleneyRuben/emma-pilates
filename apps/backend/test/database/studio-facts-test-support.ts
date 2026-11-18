@@ -142,6 +142,8 @@ export const insertSession = async (
     startsAt: string;
     state?: 'scheduled' | 'cancelled';
     bookingsAtWindowClose?: number;
+    // The worker's causes carry no account; the others need one.
+    cause?: 'schedule_changed' | 'minimum_not_met' | 'zero_bookings';
   },
 ): Promise<string> => {
   const sessionId = randomUUID();
@@ -153,9 +155,9 @@ export const insertSession = async (
         cancelled_by_account_id, bookings_at_window_close, updated_at)
      VALUES ($1, $2, $3, $4, $5, $5::timestamptz + interval '50 minutes', 8,
         $6::booking."SessionState",
-        CASE WHEN $7 THEN 'schedule_changed'::booking."SessionCancellationCause" END,
+        CASE WHEN $7 THEN $10::booking."SessionCancellationCause" END,
         CASE WHEN $7 THEN $5::timestamptz - interval '1 day' END,
-        CASE WHEN $7 THEN $8::uuid END,
+        CASE WHEN $7 AND $10 = 'schedule_changed' THEN $8::uuid END,
         $9, CURRENT_TIMESTAMP)`,
     [
       sessionId,
@@ -167,6 +169,7 @@ export const insertSession = async (
       cancelled,
       world.accountId,
       input.bookingsAtWindowClose ?? null,
+      input.cause ?? 'schedule_changed',
     ],
   );
   return sessionId;

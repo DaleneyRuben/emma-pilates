@@ -17,9 +17,11 @@ type SourceRow = {
   ends_at: Date;
   capacity: number;
   state: string;
+  cancellation_cause: string | null;
   bookings_at_window_close: number | null;
   client_id: string | null;
   booking_state: string | null;
+  booking_cancellation_cause: string | null;
   outcome: string | null;
 };
 
@@ -44,8 +46,11 @@ const readSource = async (
   const rows = await prisma.$queryRaw<SourceRow[]>`
     SELECT s.id AS session_id, s.branch_id, s.class_type_id, s.trainer_staff_member_id,
            s.starts_at, s.ends_at, s.capacity, s.state::text AS state,
+           s.cancellation_cause::text AS cancellation_cause,
            s.bookings_at_window_close,
-           b.client_id, b.state::text AS booking_state, a.outcome::text AS outcome
+           b.client_id, b.state::text AS booking_state,
+           b.cancellation_cause::text AS booking_cancellation_cause,
+           a.outcome::text AS outcome
     FROM booking.sessions s
     LEFT JOIN booking.bookings b ON b.session_id = s.id
     LEFT JOIN booking.attendance_records a ON a.booking_id = b.id
@@ -92,6 +97,7 @@ const readSource = async (
       endsAt: row.ends_at,
       capacity: row.capacity,
       state: row.state === 'cancelled' ? 'cancelled' : 'scheduled',
+      cancellationCause: row.cancellation_cause,
       bookingsAtWindowClose:
         row.bookings_at_window_close === null
           ? null
@@ -106,6 +112,8 @@ const readSource = async (
           row.outcome === 'attended' || row.outcome === 'no_show'
             ? row.outcome
             : null,
+        cancelledWithSession:
+          row.booking_cancellation_cause === 'session_cancelled',
       };
       session.bookings.push(booking);
     }
@@ -168,6 +176,12 @@ export const recomputeStudioFacts = async (
   await prisma.$transaction(async (transaction) => {
     await writeSessionFacts(transaction, facts.sessions, month, now);
     await writeClientMonthFacts(transaction, facts.clientMonths, month, now);
+    await writeCancelledSessionFacts(
+      transaction,
+      facts.cancelledSessions,
+      month,
+      now,
+    );
   });
   return {
     sessions: facts.sessions.length,
@@ -241,6 +255,47 @@ const writeClientMonthFacts = async (
     }
     await transaction.clientMonthFact.upsert({
       where: { clientId_month: { clientId: row.clientId, month } },
+      create: { ...row, updatedAt: now },
+      update: { ...row, deletedAt: null, updatedAt: now },
+    });
+  }
+};
+
+// Finding 107: the month's low-demand cancellations, written like the session
+// facts; one that no longer is (reopened, another cause) is soft deleted.
+const writeCancelledSessionFacts = async (
+  transaction: Prisma.TransactionClient,
+  cancelled: ReturnType<typeof recomputeFacts>['cancelledSessions'],
+  month: Date,
+  now: Date,
+): Promise<void> => {
+  const live = await transaction.cancelledSessionFact.findMany({
+    where: {
+      deletedAt: null,
+      sessionDate: { gte: month, lt: monthEnd(month) },
+    },
+  });
+  const wanted = new Set(cancelled.map((row) => row.sessionId));
+  for (const existing of live) {
+    if (wanted.has(existing.sessionId)) continue;
+    await transaction.cancelledSessionFact.update({
+      where: { sessionId: existing.sessionId },
+      data: { deletedAt: now },
+    });
+  }
+  for (const row of cancelled) {
+    const existing = live.find((item) => item.sessionId === row.sessionId);
+    if (
+      existing &&
+      existing.cause === row.cause &&
+      existing.bookingsHeld === row.bookingsHeld &&
+      existing.trainerStaffMemberId === row.trainerStaffMemberId &&
+      existing.sessionDate.getTime() === row.sessionDate.getTime()
+    ) {
+      continue;
+    }
+    await transaction.cancelledSessionFact.upsert({
+      where: { sessionId: row.sessionId },
       create: { ...row, updatedAt: now },
       update: { ...row, deletedAt: null, updatedAt: now },
     });

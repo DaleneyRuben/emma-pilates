@@ -54,6 +54,24 @@ describe('month kpi reader', () => {
          ($2, '2026-09-01', 30, 4, 4, false, CURRENT_TIMESTAMP)`,
       [ana, bea, luz],
     );
+    // Finding 107: two low-demand cancellations in October, one deleted.
+    await context.pool.query(
+      `INSERT INTO studio.cancelled_session_facts
+         (session_id, session_date, branch_id, class_type_id,
+          trainer_staff_member_id, cause, bookings_held, updated_at, deleted_at)
+       VALUES
+         ($1, '2026-10-07', $4, $5, $6, 'minimum_not_met', 1, CURRENT_TIMESTAMP, NULL),
+         ($2, '2026-10-08', $4, $5, $6, 'zero_bookings', 0, CURRENT_TIMESTAMP, NULL),
+         ($3, '2026-10-09', $4, $5, $6, 'minimum_not_met', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      [
+        randomUUID(),
+        randomUUID(),
+        randomUUID(),
+        branchId,
+        classTypeId,
+        trainerId,
+      ],
+    );
 
     const october = await readMonthKpis(prisma, {
       month: new Date('2026-10-01T00:00:00.000Z'),
@@ -74,6 +92,7 @@ describe('month kpi reader', () => {
       // decision 5); these fact rows carry no sale, so nothing ended.
       renewedClients: 0,
       renewalPercent: 0,
+      minimumCancellations: 2,
     });
   });
 });

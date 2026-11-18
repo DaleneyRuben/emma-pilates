@@ -18,6 +18,8 @@ export interface MonthKpisDto {
   newClients: number;
   renewedClients: number;
   renewalPercent: number;
+  /** Classes cancelled for low demand (minimum not met or no booking) */
+  minimumCancellations: number;
   cashCentavos?: number;
   accruedCentavos?: number;
   deferredCentavos?: number;

@@ -45,12 +45,20 @@ export const readMonthKpis = async (
       AND plan_days > 0
       AND month < ${month}::date
   `;
+  const cancelled = await prisma.$queryRaw<{ count: number }[]>`
+    SELECT count(*)::int AS count
+    FROM studio.cancelled_session_facts
+    WHERE deleted_at IS NULL
+      AND session_date >= ${month}::date
+      AND session_date < (${month}::date + INTERVAL '1 month')
+  `;
   const renewals = await readPlanRenewals(
     prisma,
     month,
     new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 1)),
   );
   return monthKpis({
+    minimumCancellations: Number(cancelled[0]?.count ?? 0),
     planRenewals: {
       ending: renewals.length,
       renewed: renewals.filter((plan) => plan.renewed).length,

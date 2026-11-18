@@ -19440,6 +19440,10 @@
           "renewalPercent": {
             "type": "number"
           },
+          "minimumCancellations": {
+            "type": "number",
+            "description": "Classes cancelled for low demand (minimum not met or no booking)"
+          },
           "cashCentavos": {
             "type": "number"
           },
@@ -19463,7 +19467,8 @@
           "activeClients",
           "newClients",
           "renewedClients",
-          "renewalPercent"
+          "renewalPercent",
+          "minimumCancellations"
         ]
       },
       "RecommendationDto": {

@@ -27,6 +27,12 @@ type FactSessionRow = {
   bookings_at_window_close: number;
 };
 
+type FactCancelledRow = {
+  trainer_staff_member_id: string;
+  session_date: Date;
+  bookings_held: number;
+};
+
 type FactClientRow = {
   client_id: string;
   plan_days: number;
@@ -132,6 +138,13 @@ const readFindings = async (
       AND session_date >= ${month}::date
       AND session_date < (${month}::date + INTERVAL '1 month')
   `;
+  const cancelled = await prisma.$queryRaw<FactCancelledRow[]>`
+    SELECT trainer_staff_member_id, session_date, bookings_held
+    FROM studio.cancelled_session_facts
+    WHERE deleted_at IS NULL
+      AND session_date >= ${month}::date
+      AND session_date < (${month}::date + INTERVAL '1 month')
+  `;
   const clientMonths = await prisma.$queryRaw<FactClientRow[]>`
     SELECT client_id, plan_days, classes_booked, classes_attended, renewed
     FROM studio.client_month_facts
@@ -139,11 +152,20 @@ const readFindings = async (
       AND month = ${month}::date
   `;
   return recommendFromFacts({
-    sessions: sessions.map((row) => ({
-      trainerStaffMemberId: row.trainer_staff_member_id,
-      sessionDate: row.session_date,
-      bookingsAtWindowClose: Number(row.bookings_at_window_close),
-    })),
+    sessions: [
+      ...sessions.map((row) => ({
+        trainerStaffMemberId: row.trainer_staff_member_id,
+        sessionDate: row.session_date,
+        bookingsAtWindowClose: Number(row.bookings_at_window_close),
+      })),
+      // Finding 107: a class cancelled for low demand counts too.
+      ...cancelled.map((row) => ({
+        trainerStaffMemberId: row.trainer_staff_member_id,
+        sessionDate: row.session_date,
+        bookingsAtWindowClose: Number(row.bookings_held),
+        cancelledForMinimum: true,
+      })),
+    ],
     clientMonths: clientMonths.map((row) => ({
       clientId: row.client_id,
       month: monthKey(month),

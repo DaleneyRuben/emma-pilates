@@ -37,7 +37,12 @@ const normalize = (value: string) =>
   value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 const refusal =
-  'Solo puedo responder sobre los indicadores del mes. Pregunta por la ocupación o por las clientas activas.';
+  'Solo puedo responder sobre los indicadores del mes. Pregunta por la ocupación, las clientas activas o las clases canceladas.';
+
+const cancelledLine = (count: number) =>
+  count === 1
+    ? 'Se canceló 1 clase por no llegar al mínimo de reservas'
+    : `Se cancelaron ${count} clases por no llegar al mínimo de reservas`;
 
 type NarratedRecommendation = { rule: string; detail: string; state?: string };
 
@@ -114,6 +119,9 @@ export const narrateMonth = (input: {
     `En ${label} ${held}, con una ocupación del ${occupancyPercent} %. ${active}`,
     `La renovación del mes fue del ${renewalPercent} %.`,
   ];
+  if (input.kpis.minimumCancellations > 0) {
+    paragraphs.push(`${cancelledLine(input.kpis.minimumCancellations)}.`);
+  }
   // A discarded or resolved finding is no longer something to review.
   const open = input.recommendations.filter(
     (item) => item.state !== 'dismissed' && item.state !== 'resolved',
@@ -142,12 +150,24 @@ export const narrativeFromReads = (input: {
 
 export const questionFromCounts = (
   question: string,
-  kpis: Pick<MonthKpiCounts, 'occupancyPercent' | 'activeClients'>,
+  kpis: Pick<
+    MonthKpiCounts,
+    | 'occupancyPercent'
+    | 'activeClients'
+    | 'minimumCancellations'
+    | 'sessionsHeld'
+  >,
 ) => answerQuestion(question, kpis);
 
 export const answerQuestion = (
   question: string,
-  aggregates: Pick<MonthKpiCounts, 'occupancyPercent' | 'activeClients'>,
+  aggregates: Pick<
+    MonthKpiCounts,
+    | 'occupancyPercent'
+    | 'activeClients'
+    | 'minimumCancellations'
+    | 'sessionsHeld'
+  >,
 ): QuestionAnswer => {
   const normalized = normalize(question);
   if (normalized.includes('ocupacion')) {
@@ -160,6 +180,31 @@ export const answerQuestion = (
     return {
       refused: false,
       answer: `Había ${aggregates.activeClients} clientas activas.`,
+    };
+  }
+  // Finding 107 (e): «cancel» covers cancelada, cancelaciones, canceló.
+  // A Client's own cancellations are not this indicator.
+  if (
+    normalized.includes('cancel') &&
+    !normalized.includes('reserva') &&
+    !normalized.includes('clienta')
+  ) {
+    const { minimumCancellations: count, sessionsHeld } = aggregates;
+    if (count === 0) {
+      return {
+        refused: false,
+        answer: 'Ninguna clase se canceló por no llegar al mínimo de reservas.',
+      };
+    }
+    const held =
+      sessionsHeld === 0
+        ? 'no se dictó ninguna'
+        : sessionsHeld === 1
+          ? 'se dictó 1'
+          : `se dictaron ${sessionsHeld}`;
+    return {
+      refused: false,
+      answer: `${cancelledLine(count)}, y ${held}.`,
     };
   }
   return { refused: true, answer: refusal };
