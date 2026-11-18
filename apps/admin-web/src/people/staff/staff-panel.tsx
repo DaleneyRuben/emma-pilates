@@ -76,7 +76,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
       });
       onDone(
         created.invitationReopened === true
-          ? `${created.name} ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol y sus sucursales no cambiaron.`
+          ? `${created.name} ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol, su género y sus sucursales no cambiaron.`
           : `Invitación enviada a ${values.email}: tiene 7 días para activar su cuenta.`,
       );
     } catch (error) {

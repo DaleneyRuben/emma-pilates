@@ -66,6 +66,7 @@ export const createStaffMember = async (
     await requireActivationEmailRoom(transaction, { email, now });
     const accountId = dependencies.newId();
     const staffMemberId = dependencies.newId();
+    const gender = command.gender ?? 'female';
     await transaction.createPendingStaffMember({
       accountId,
       staffMemberId,
@@ -73,7 +74,7 @@ export const createStaffMember = async (
       email,
       phone,
       role: command.role,
-      gender: command.gender ?? 'female',
+      gender,
       branchIds,
       ...activationWindow(now),
     });
@@ -81,7 +82,7 @@ export const createStaffMember = async (
       audit(dependencies, actor, {
         actionCode: 'staff_member.created',
         targetAccountId: accountId,
-        metadata: { role: command.role, branchIds },
+        metadata: { role: command.role, gender, branchIds },
         occurredAt: now,
       }),
     );
