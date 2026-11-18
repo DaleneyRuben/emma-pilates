@@ -37,15 +37,11 @@ const quiet = <span className="text-texto-tenue">—</span>;
 export const cashDayRowProps = (day: CashDayDto): ComponentProps<"tr"> => {
   const difference = day.close?.differenceCentavos ?? 0;
   if (difference === 0) return {};
-  return difference < 0
-    ? ({
-        "data-difference": "short",
-        className: "bg-error/[0.06] max-md:bg-error/[0.06]",
-      } as ComponentProps<"tr">)
-    : ({
-        "data-difference": "over",
-        className: "bg-advertencia/[0.08] max-md:bg-advertencia/[0.08]",
-      } as ComponentProps<"tr">);
+  // FIX-088: every row keeps the same ground; the Diferencia figure carries
+  // the color.
+  return {
+    "data-difference": difference < 0 ? "short" : "over",
+  } as ComponentProps<"tr">;
 };
 
 export const cashDayColumns = [

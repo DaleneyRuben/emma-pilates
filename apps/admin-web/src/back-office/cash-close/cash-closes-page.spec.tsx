@@ -101,8 +101,7 @@ const october = {
   ],
 };
 
-const heading = () =>
-  screen.findByRole("heading", { level: 1, name: "Caja" });
+const heading = () => screen.findByRole("heading", { level: 1, name: "Caja" });
 const rowOf = async (date: string) =>
   (await screen.findByRole("cell", { name: date }))
     .parentElement as HTMLElement;
