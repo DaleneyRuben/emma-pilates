@@ -68,14 +68,14 @@ describe("Client Inicio, option A", () => {
     const row = screen.getByTestId("home-plan-card");
     expect(row).toHaveStyle({ backgroundColor: "#F5EFE9" });
     const inRow = within(row);
-    expect(inRow.getByText("Trimestral · 25 clases")).toBeOnTheScreen();
+    expect(inRow.getByText("Trimestral · 25 restantes")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te quedan 3 · vence el 5 de febrero")).toBeOnTheScreen();
     expect(inRow.getByTestId("chevron", hidden)).toBeOnTheScreen();
     expect(screen.queryByText("Activo")).toBeNull();
     expect(screen.queryByRole("button", { name: "Mi plan" })).toBeNull();
     expect(
       screen.getByRole("button", {
-        name: "Mi plan, Trimestral, 25 clases, esta semana te quedan 3, vence el 5 de febrero",
+        name: "Mi plan, Trimestral, 25 clases restantes, esta semana te quedan 3, vence el 5 de febrero",
       }),
     ).toBeOnTheScreen();
   });
@@ -95,7 +95,7 @@ describe("Client Inicio, option A", () => {
     });
 
     const inRow = within(screen.getByTestId("home-plan-card"));
-    expect(inRow.getByText("Trimestral · 26 clases")).toBeOnTheScreen();
+    expect(inRow.getByText("Trimestral · 26 restantes")).toBeOnTheScreen();
     expect(inRow.getByText("25 del plan + 1 de regalo · vence el 5 de febrero")).toBeOnTheScreen();
     expect(screen.queryByText(/esta semana/i)).toBeNull();
   });
@@ -107,7 +107,7 @@ describe("Client Inicio, option A", () => {
     });
 
     const inRow = within(screen.getByTestId("home-plan-card"));
-    expect(inRow.getByText("Trimestral · 1 clase")).toBeOnTheScreen();
+    expect(inRow.getByText("Trimestral · 1 restante")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te queda 1 · vence el 5 de febrero")).toBeOnTheScreen();
     expect(inRow.getByText("Por vencer")).toHaveStyle({ color: "#9A7434" });
   });
