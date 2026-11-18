@@ -33,7 +33,8 @@ export function ContactAlertActions({
           size="sm"
           disabled
           title={missing}
-          className="max-md:flex-1"
+          // FIX-088: quieter than the enabled one, never a grey block.
+          className="max-md:flex-1 disabled:bg-transparent"
         >
           <MessageSquare size={14} strokeWidth={1.8} aria-hidden="true" />
           Abrir WhatsApp
