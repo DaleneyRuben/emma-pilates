@@ -17,6 +17,7 @@ import {
   colors,
   Heading,
   LoadingState,
+  PrimaryButton,
   QueryFailure,
   useIsOnline,
   radii,
@@ -36,11 +37,13 @@ import { useResendReceipt } from "../payments/use-resend-receipt";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
-import { ActivePlanCard, GuestPassCard, PurchasePlanCard } from "./home-plan-card";
+import { GuestPassCard, PurchasePlanCard } from "./home-plan-card";
+import { PlanRow } from "./home-plan-row";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { useRetryCachedHome } from "./retry-cached-home";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
 import { PhonePrompt } from "./phone-prompt";
+import { promotionCardMaxWidth } from "./promotion-image";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
@@ -185,6 +188,16 @@ export function HomeScreen() {
           onImageMissing={() => void promotions.refetch()}
           promotions={promotions.data?.status === 200 ? promotions.data.data : []}
         />
+        {hasActivePlan ? (
+          // FIX-082 (Inicio option A): the one solid action, under the promotion.
+          <View style={styles.capped}>
+            <PrimaryButton
+              label="Reservar una clase"
+              onPress={() => navigation.navigate("Booking")}
+              testID="home-book"
+            />
+          </View>
+        ) : null}
         {hasActivePlan && view.subscription?.guestPass !== undefined ? (
           <GuestPassCard
             onDetail={() => navigation.navigate("Subscription")}
@@ -192,9 +205,9 @@ export function HomeScreen() {
             view={view}
           />
         ) : hasActivePlan ? (
-          <ActivePlanCard
-            onDetail={() => navigation.navigate("Subscription")}
-            status={view.status as "active" | "expiring_soon"}
+          <PlanRow
+            expiringSoon={view.status === "expiring_soon"}
+            onPress={() => navigation.navigate("Subscription")}
             subscription={view.subscription!}
           />
         ) : standing.kind === "in_review" ? (
@@ -221,11 +234,6 @@ export function HomeScreen() {
         <ShortcutSection>
           {hasActivePlan ? (
             <ShortcutTiles>
-              <ShortcutTile
-                icon="calendar"
-                label="Reservar una clase"
-                onPress={() => navigation.navigate("Booking")}
-              />
               <ShortcutTile {...evaluationTile} />
               <ShortcutTile {...referralTile} />
             </ShortcutTiles>
@@ -256,6 +264,7 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  capped: { alignSelf: "center", maxWidth: promotionCardMaxWidth, width: "100%" },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   offlineBanner: {

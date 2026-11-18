@@ -16,7 +16,6 @@ import {
   PixelRatio,
   ScrollView,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -33,10 +32,6 @@ type PromotionsCarouselProps = {
   // the list was read (ADR-0077); Home reads the list again.
   onImageMissing: () => void;
 };
-
-function SectionLabel() {
-  return <Text style={styles.sectionLabel}>Novedades del estudio</Text>;
-}
 
 function Dots({ count, current }: { count: number; current: number }) {
   return (
@@ -66,7 +61,6 @@ export function PromotionsCarousel({
   if (loading) {
     return (
       <View style={styles.section}>
-        <SectionLabel />
         <View accessibilityLabel="Cargando promociones" style={[styles.card, { width: cardWidth }]}>
           <View style={styles.imagePlaceholder} />
           <View style={styles.copy}>
@@ -108,7 +102,6 @@ export function PromotionsCarousel({
 
   return (
     <View style={styles.section}>
-      <SectionLabel />
       <ScrollView
         contentContainerStyle={styles.track}
         decelerationRate="fast"
@@ -169,7 +162,9 @@ const styles = StyleSheet.create({
     gap: spacing.smd,
     minHeight: spacing.md,
   },
-  headline: { fontSize: 18 },
+  // FIX-082 (Inicio option A): the promotion leads Inicio, so no section
+  // label above it and its headline in the card title size.
+  headline: { fontSize: typography.titleCard },
   headlinePlaceholder: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.control,
@@ -180,12 +175,5 @@ const styles = StyleSheet.create({
   imagePlaceholder: { aspectRatio: 16 / 9, backgroundColor: colors.primaryTint },
   scroller: { flexGrow: 0, marginHorizontal: -spacing.lg },
   section: { gap: spacing.md },
-  sectionLabel: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: 1.9,
-    textTransform: "uppercase",
-  },
   track: { gap: cardGap, paddingHorizontal: spacing.lg },
 });
