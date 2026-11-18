@@ -9999,9 +9999,9 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
 
-## Test 160: walkthrough findings 92–99 (FIX-066)
+## Test 160: walkthrough findings 92–100 (FIX-066)
 
-Eight small fixes from the 2026-11-17 verification walk. No migration; the
+Nine small fixes from the 2026-11-17 verification walk. No migration; the
 API change is additive (`pastCampaigns` on the campaign preview). Use a copy
 of the fixtures (`createdb -T pilates_golden pilates_fix066_dev`) and run the
 API, the worker, both apps and the admin web on your own ports
@@ -10014,7 +10014,10 @@ API, the worker, both apps and the admin web on your own ports
    case or spacing): an amber line under the name reads «Ya diste la campaña
    «Fin de año» el {día de mes}. Si la das otra vez, cada clienta recibe las
    clases de nuevo.» (with the year when it was another year); a new name
-   clears it. A campaign only owed (every Client without a Plan) counts too.
+   clears it. A campaign only owed (every Client without a Plan) counts too;
+   a later Plan collecting an owed class does not move its day. Giving the
+   same campaign again on purpose sends a new Idempotency-Key, so it really
+   gives the classes again.
    `GET /api/v1/administrator/campaigns/preview` lists `pastCampaigns` (name
    and its latest `grantedAt`, latest first). Check at 1440 and 420 px.
 2. **Every origin named (n.º 93).** Give Lucía an invitation class (a friend
@@ -10051,3 +10054,10 @@ API, the worker, both apps and the admin web on your own ports
    tus datos de la última vez.» Start the API again and wait: within about
    15 seconds the line goes without a pull. Sending the app to the
    background and back retries at once.
+9. **Free only from a later Plan (n.º 100).** As Isabel, sell her (as Camila)
+   a cash «Trimestral» starting the day after her current Plan ends, then
+   open **Evaluación nutricional**. Expected: «Desde el {día}, tu primera
+   evaluación del trimestre es gratis. Antes cuesta Bs 70.», and each turno
+   shows «Bs 70» or «Gratis» under its time (VoiceOver/TalkBack read «Turno
+   15:00 · Bs 70»). With only free or only paid turnos, no price shows on
+   the turnos and the line is the old one.
