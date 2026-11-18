@@ -190,7 +190,7 @@ export function HomeScreen() {
         />
         {hasActivePlan ? (
           // FIX-082 (Inicio option A): the one solid action, under the promotion.
-          <View style={styles.capped}>
+          <View style={styles.underPromotion} testID="home-book-frame">
             <PrimaryButton
               label="Reservar una clase"
               onPress={() => navigation.navigate("Booking")}
@@ -264,7 +264,8 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  capped: { alignSelf: "center", maxWidth: promotionCardMaxWidth, width: "100%" },
+  // On a tablet it lines up with the carousel, which starts at the left edge.
+  underPromotion: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   offlineBanner: {

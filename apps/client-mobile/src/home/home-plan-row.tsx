@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
   row: {
     ...surfaces.card,
     alignItems: "center",
-    alignSelf: "center",
+    // Lined up with the carousel and the button above it on a tablet.
+    alignSelf: "flex-start",
     flexDirection: "row",
     gap: spacing.md,
     maxWidth: promotionCardMaxWidth,
