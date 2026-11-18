@@ -54,6 +54,12 @@ const problems: Record<string, Omit<BackOfficeProblem, "code">> = {
     field: "staffMemberId",
     message: "Esta persona ya no está en el personal. Elige otra.",
   },
+  salary_receipt_not_ready: {
+    message: "No pudimos usar ese comprobante. Súbelo de nuevo.",
+  },
+  salary_receipt_required: {
+    message: "Sube el comprobante del pago para guardarlo.",
+  },
   salary_payment_not_found: {
     message:
       "Este pago ya no existe. Cierra el panel y vuelve a abrir la lista.",

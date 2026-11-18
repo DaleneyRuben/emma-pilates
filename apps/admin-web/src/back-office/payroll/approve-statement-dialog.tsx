@@ -1,6 +1,6 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { isApiError } from "../../api/problem";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { formatBolivianos } from "../../lib/money";
@@ -22,10 +22,16 @@ const forPeriod = (periodText: string) => {
   return `por ${lower(periodText)}`;
 };
 
+const failures: Record<string, string> = {
+  pay_statement_month_open:
+    "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular.",
+  salary_receipt_not_ready: "No pudimos usar ese comprobante. Súbelo de nuevo.",
+  salary_receipt_required: "Sube el comprobante para aprobar el pago.",
+};
+
 const failureOf = (error: unknown): string =>
-  isApiError(error) && error.code === "pay_statement_month_open"
-    ? "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular."
-    : "No pudimos aprobar el pago.";
+  (isApiError(error) ? failures[error.code] : undefined) ??
+  "No pudimos aprobar el pago.";
 
 /** What Sueldos says after approving. */
 export type ApprovedNotice = { text: string };
@@ -50,6 +56,8 @@ export function ApproveStatementDialog({
 }) {
   const queryClient = useQueryClient();
   const [receipt, setReceipt] = useState<SalaryReceipt | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const receiptHintId = useId();
   const total = formatBolivianos(statement.totalCentavos);
   const periodText = formatPayPeriod(
     statement.periodStart,
@@ -68,13 +76,21 @@ export function ApproveStatementDialog({
         queryKey: payStatementsQueryOptions(period).queryKey,
       });
     },
+    onError: (error) => {
+      if (isApiError(error) && error.code === "salary_receipt_not_ready") {
+        setReceipt(null);
+      }
+    },
   });
   const lines = statement.lines.length;
   return (
     <ConfirmDialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) approve.reset();
+        if (!next) {
+          approve.reset();
+          setReceipt(null);
+        }
         onOpenChange(next);
       }}
       title={`¿Aprobar ${total} a ${statement.staffMemberName} ${forPeriod(periodText)}?`}
@@ -82,7 +98,8 @@ export function ApproveStatementDialog({
       tone="primary"
       wide
       busy={approve.isPending}
-      pending={receipt?.kind !== "uploaded"}
+      pending={receipt?.kind !== "uploaded" || uploading}
+      confirmDescribedBy={receipt === null ? receiptHintId : undefined}
       onConfirm={() => {
         if (receipt?.kind === "uploaded") approve.mutate(receipt.imageAssetId);
       }}
@@ -107,6 +124,8 @@ export function ApproveStatementDialog({
             value={receipt}
             onChange={setReceipt}
             action="aprobar"
+            hintId={receiptHintId}
+            onUploadingChange={setUploading}
           />
         </div>
       </div>

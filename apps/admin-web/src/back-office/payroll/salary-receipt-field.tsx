@@ -1,5 +1,5 @@
 import { ImagePlus } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import {
   checkImage,
@@ -37,19 +37,25 @@ export function SalaryReceiptField({
   value,
   onChange,
   action,
+  hintId,
+  onUploadingChange,
 }: {
   value: SalaryReceipt | null;
   onChange: (receipt: SalaryReceipt) => void;
   /** What waits for the photo: «guardar» a payment or «aprobar» it. */
   action: "guardar" | "aprobar";
+  /** The hint's id, so the grey button it explains can point at it. */
+  hintId: string;
+  /** A photo in flight is not the one to send yet (finding 112). */
+  onUploadingChange: (uploading: boolean) => void;
 }) {
-  const hintId = useId();
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [enlarged, setEnlarged] = useState(false);
 
   const choose = async (file: File) => {
     setStatus({ kind: "uploading" });
+    onUploadingChange(true);
     const previewUrl = URL.createObjectURL(file);
     try {
       const refusal = checkImage("transfer_receipt", {
@@ -66,7 +72,9 @@ export function SalaryReceiptField({
       );
       onChange({ kind: "uploaded", imageAssetId, previewUrl, name: file.name });
       setStatus({ kind: "idle" });
+      onUploadingChange(false);
     } catch (error) {
+      onUploadingChange(false);
       URL.revokeObjectURL(previewUrl);
       setStatus({
         kind: "failed",
