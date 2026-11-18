@@ -270,6 +270,37 @@ describe("Inicio for the Administrator", () => {
     );
     await waitFor(() => expect(dismissed.sort()).toEqual(["w1", "w2"]));
   });
+
+  it("says how many of a grouped row it could not discard", async () => {
+    server.use(
+      http.get(apiUrl(recommendationsPath), () =>
+        jsonResponse({
+          month: "2026-11",
+          recommendations: [
+            weakSchedule("w1", "Daniela Ortiz", 1),
+            weakSchedule("w2", "Daniela Ortiz", 2),
+          ],
+        }),
+      ),
+      http.post(apiUrl(`${recommendationsPath}/:id/dismiss`), ({ params }) =>
+        params.id === "w2"
+          ? new Response(null, { status: 500 })
+          : jsonResponse(weakSchedule("w1", "Daniela Ortiz", 1, "dismissed")),
+      ),
+    );
+    const { user } = renderAdmin("/");
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: "Descartar: Revisa el horario de Daniela Ortiz",
+      }),
+    );
+    expect(
+      await screen.findByText(
+        "No pudimos descartar 1 de las 2 recomendaciones.",
+      ),
+    ).toBeVisible();
+  });
 });
 
 describe("Inicio for the Coordinator", () => {

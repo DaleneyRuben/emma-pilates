@@ -18,7 +18,7 @@ import {
   attachSalaryReceipt,
   salaryReceiptHandlers,
 } from "../../test/salary-receipt-upload";
-import { emma } from "../../test/people-fixtures";
+import { emma, staffPage } from "../../test/people-fixtures";
 import { payrollStaffHandler } from "../../test/payroll-fixtures";
 import { signedInHandlers } from "../../test/session-handlers";
 
@@ -243,9 +243,8 @@ describe("Sueldos por aprobar", () => {
             staffMemberId: "carolina",
             staffMemberName: "Carolina Rivas",
             approvableOn: "2999-12-08",
-            totalCentavos: 378_000,
+            totalCentavos: 28_000,
             lines: [
-              { kind: "base", detail: "Base mensual", amountCentavos: 350_000 },
               {
                 kind: "new_client",
                 detail: "Nora Pay",
@@ -256,13 +255,30 @@ describe("Sueldos por aprobar", () => {
         ]),
       ),
     );
+    server.use(
+      http.get(apiUrl("/api/v1/administrator/staff-members"), () =>
+        jsonResponse({
+          ...staffPage([
+            {
+              ...emma,
+              id: "carolina",
+              name: "Carolina Rivas",
+              role: "coordinator",
+            },
+          ]),
+          pageSize: 100,
+        }),
+      ),
+    );
     renderAdmin("/dinero/sueldos?month=2026-09");
 
     const card = await screen.findByRole("article", { name: "Carolina Rivas" });
     expect(
+      await within(card).findByText("Coordinadora · Septiembre de 2026"),
+    ).toBeInTheDocument();
+    expect(
       within(card).getByText("Su bono espera las renovaciones"),
     ).toBeInTheDocument();
-    expect(within(card).getByText("Base mensual")).toBeInTheDocument();
     expect(
       within(card).getByRole("button", { name: /^Se aprueba desde el 8 de / }),
     ).toBeDisabled();
