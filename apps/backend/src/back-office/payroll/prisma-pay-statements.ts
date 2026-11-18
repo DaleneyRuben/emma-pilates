@@ -21,6 +21,10 @@ import {
   toView,
   type DraftLine,
 } from './pay-statement-rows';
+import {
+  attachSalaryReceipt,
+  requireSalaryReceipt,
+} from './salary-receipt-attachment';
 import { trainerPay } from './trainer-pay';
 import type { TrainerMonthFacts } from './trainer-pay-facts';
 export type CoordinatorMonthFacts = {
@@ -156,7 +160,7 @@ export const createPrismaPayStatements = (
     },
 
     approveStatement: async (
-      input: { statementId: string },
+      input: { statementId: string; receiptImageAssetId?: string },
       principal: AuthenticatedPrincipal,
     ) => {
       const actor: BackOfficeActor = requireAdministrator(principal);
@@ -177,12 +181,18 @@ export const createPrismaPayStatements = (
         if (now < approvableFrom(statement)) {
           throw new BackOfficeError('pay_statement_month_open');
         }
+        // Finding 112: approving pays her, so it carries the transfer's photo.
+        const receiptImageAssetId = requireSalaryReceipt(
+          input.receiptImageAssetId,
+        );
+        await attachSalaryReceipt(transaction, actor, receiptImageAssetId, now);
         const paidOn = boliviaDate(now);
         const payment = await transaction.salaryPayment.create({
           data: {
             staffMemberId: statement.staffMemberId,
             amountCentavos: statement.totalCentavos,
             paidOn,
+            receiptImageAssetId,
             recordedByAccountId: actor.accountId,
             createdAt: now,
             updatedAt: now,
@@ -209,6 +219,7 @@ export const createPrismaPayStatements = (
             salaryPaymentId: payment.id,
             amountCentavos: approved.totalCentavos,
             paidOn: paidOn.toISOString().slice(0, 10),
+            receiptImageAssetId,
           },
           occurredAt: now,
         });

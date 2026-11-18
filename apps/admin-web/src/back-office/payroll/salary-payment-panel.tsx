@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AdminSalaryPaymentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useIdempotencyKey } from "../../api/idempotency-key";
@@ -61,6 +61,8 @@ export function SalaryPaymentPanelForm({
   const change = useSalaryPaymentChange();
   const keyFor = useIdempotencyKey();
   const [failure, setFailure] = useState<string | null>(null);
+  const receiptHintId = useId();
+  const [uploading, setUploading] = useState(false);
   const [receipt, setReceipt] = useState<SalaryReceipt | null>(
     payment?.receiptUrl == null
       ? null
@@ -122,6 +124,7 @@ export function SalaryPaymentPanelForm({
       onDone(`Guardamos la corrección del pago de ${name}.`);
     } catch (error) {
       const problem = backOfficeProblem(error);
+      if (problem.code === "salary_receipt_not_ready") setReceipt(null);
       if (problem.field === "staffMemberId" || problem.field === "date") {
         form.setError(problem.field, { message: problem.message });
       } else {
@@ -197,7 +200,13 @@ export function SalaryPaymentPanelForm({
               </FormItem>
             )}
           />
-          <SalaryReceiptField value={receipt} onChange={setReceipt} />
+          <SalaryReceiptField
+            value={receipt}
+            onChange={setReceipt}
+            action="guardar"
+            hintId={receiptHintId}
+            onUploadingChange={setUploading}
+          />
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}
@@ -205,7 +214,13 @@ export function SalaryPaymentPanelForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" busy={change.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            busy={change.isPending}
+            disabled={receipt === null || uploading}
+            aria-describedby={receipt === null ? receiptHintId : undefined}
+          >
             Guardar
           </Button>
         </SidePanelFooter>

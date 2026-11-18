@@ -2,7 +2,7 @@ import type { EquipmentDto } from "@pilates/api-contracts";
 import { colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
-// S26's pieces (FIX-067): the numbered tiles and the switch of a per-unit
+// S26's pieces (FIX-067, FIX-076): the labelled numbered tiles and the switch of a per-unit
 // type, and the damage counter of a by-quantity type.
 
 export const unitName = (piece: EquipmentDto) => `${piece.typeName} ${piece.number}`;
@@ -19,29 +19,67 @@ export function UnitTiles({
   units: EquipmentDto[];
 }) {
   return (
-    <View accessibilityLabel={label} style={styles.tiles}>
-      {units.map((piece) => {
-        const selected = piece.id === chosenId;
-        const out = piece.status === "out_of_service";
-        return (
-          <Pressable
-            accessibilityLabel={out ? `${unitName(piece)}, fuera de servicio` : unitName(piece)}
-            accessibilityRole="button"
-            accessibilityState={{ selected }}
-            key={piece.id}
-            onPress={() => onChoose(piece)}
-            style={[styles.tile, selected && styles.tileSelected]}
-          >
-            <Text style={[styles.tileNumber, selected && styles.onSelected]}>
-              {String(piece.number)}
-            </Text>
-            {out ? (
-              <Text style={[styles.tileOut, selected && styles.onSelected]}>fuera de servicio</Text>
-            ) : null}
-          </Pressable>
-        );
-      })}
+    <View style={styles.unitGroup}>
+      <Text accessibilityRole="header" style={styles.unitHeading}>
+        Número del equipo
+      </Text>
+      <View accessibilityLabel={label} style={styles.tiles}>
+        {units.map((piece) => {
+          const selected = piece.id === chosenId;
+          const out = piece.status === "out_of_service";
+          return (
+            <Pressable
+              accessibilityLabel={out ? `${unitName(piece)}, fuera de servicio` : unitName(piece)}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              key={piece.id}
+              onPress={() => onChoose(piece)}
+              style={[styles.tile, out && styles.tileWithNote, selected && styles.tileSelected]}
+            >
+              <Text style={[styles.tileNumber, selected && styles.tileNumberSelected]}>
+                {`N.º ${piece.number}`}
+              </Text>
+              {out ? (
+                <Text style={[styles.tileOut, selected && styles.onSelected]}>
+                  fuera de servicio
+                </Text>
+              ) : null}
+            </Pressable>
+          );
+        })}
+      </View>
+      {units.length === 1 ? <Text style={styles.helper}>Es el único de esta sucursal.</Text> : null}
     </View>
+  );
+}
+
+// FIX-076: what the disabled «Enviar reporte» still needs, or null when ready.
+export function missingStep({
+  described,
+  hasUnit,
+  typeName,
+  usable,
+}: {
+  described: boolean;
+  hasUnit: boolean | null;
+  typeName: string;
+  usable: number;
+}) {
+  if (hasUnit === null) {
+    if (usable === 0) return "No hay ninguno que se pueda usar.";
+    return described ? null : "Para enviarlo, cuenta qué pasó.";
+  }
+  if (!hasUnit && !described) return "Para enviarlo, elige el número y cuenta qué pasó.";
+  if (!hasUnit) return `Para enviarlo, elige el número del ${typeName}.`;
+  return described ? null : "Para enviarlo, cuenta qué pasó.";
+}
+
+export function MissingStep({ message }: { message: string | null }) {
+  if (message === null) return null;
+  return (
+    <Text accessibilityLiveRegion="polite" style={styles.missing} testID="report-fault-missing">
+      {message}
+    </Text>
   );
 }
 
@@ -188,16 +226,37 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   switchText: { flex: 1, gap: spacing.xxs },
+  missing: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   tile: {
     alignItems: "center",
     backgroundColor: colors.card,
-    borderRadius: 14,
-    height: 60,
+    borderRadius: radii.inset,
+    height: 44,
     justifyContent: "center",
-    width: "23%",
+    minWidth: 72,
+    paddingHorizontal: spacing.mdLg,
   },
-  tileNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  tileOut: { color: colors.error, fontFamily: fontFamilies.body, fontSize: 10 },
+  tileNumber: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.body,
+  },
+  tileNumberSelected: { color: colors.white, fontFamily: fontFamilies.bodyStrong },
+  tileOut: { color: colors.error, fontFamily: fontFamilies.body, fontSize: 11 },
   tileSelected: { backgroundColor: colors.primary },
+  tileWithNote: { height: 52 },
   tiles: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  unitGroup: { gap: spacing.sm },
+  unitHeading: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: 11,
+    letterSpacing: 1.54,
+    textTransform: "uppercase",
+  },
 });

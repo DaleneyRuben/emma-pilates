@@ -7605,7 +7605,7 @@ on day 90, and she appears on **Para contactar** when she stops booking.
 
 Log in as `carolina.rivas@example.com` (Test 9 E). **Para contactar** is
 her second tab, with the count of Clients waiting on it. It opens the same
-list as quiet rows (Test 172 since finding 113): the Client with her photo
+list as quiet rows (Test 172 since FIX-079): the Client with her photo
 or initials, her reasons as one line, a WhatsApp ring when her phone works;
 the row opens a sheet with **Escribir por WhatsApp** and **Marcar
 contactada**; marking one shows the toast «…, contactada · Sale de la lista y queda registrado a tu
@@ -10439,7 +10439,67 @@ recommendation reads that count.
 3. A Booking she cancelled herself still does not count: a Client whose only
    Booking she cancelled keeps the card.
 
-## Test 172: a calm «Para contactar» in the Staff app (finding 113)
+
+## Test 169: «Reportar una falla» says which unit and what is missing (FIX-076)
+
+Walkthrough finding 110, option A of follow-ups 278/279. Staff app only; no
+migration, no API change.
+
+1. Log in to the staff app as a Trainer (Daniela Ortiz, `daniela@example.com`)
+   and open **Agenda › a class › Reportar una falla** at a Branch with a
+   single Reformer (Achumani in the walkthrough database). Expected: under
+   the chips, the label «NÚMERO DEL EQUIPO» and one small tile «N.º 1»
+   already selected (with «fuera de servicio» under it if it is), the line
+   «Es el único de esta sucursal.», and above the disabled **Enviar
+   reporte** «Para enviarlo, cuenta qué pasó.».
+2. Type in **¿Qué pasó?**. Expected: the line goes away and the button is
+   enabled; sending reports that unit.
+3. At a Branch with several units of a type, open the screen again.
+   Expected: no tile selected and «Para enviarlo, elige el número y cuenta
+   qué pasó.»; after typing, «Para enviarlo, elige el número del Reformer.»;
+   after choosing a tile the line goes away.
+4. Choose a quantity type (Balones). Expected: the stepper card as before,
+   and «Para enviarlo, cuenta qué pasó.» above the button; when none is
+   usable, «No hay ninguno que se pueda usar.».
+
+## Test 171: every staff payment carries its receipt (FIX-078)
+
+Walkthrough finding 112. No migration. The API refuses a Salary Payment
+without the photo of its transfer: `POST administrator/salary-payments`
+without `receiptImageAssetId`, `POST administrator/pay-statements/{id}/approve`
+without `{ "receiptImageAssetId": … }` (the body is new), and
+`PUT administrator/salary-payments/{id}` on a payment that has none unless the
+call attaches one all answer 400 `salary_receipt_required`. A correction of a
+payment that already has a receipt keeps it without sending it again. Payments
+recorded before (Daniela's Bs 1.534,90 of 18/11) are kept as they are.
+
+1. Sign in to the admin web as the Administrator (`ana@example.com`).
+2. **Registrar pago.** Open **Dinero › Sueldos › Pagados** and press
+   **Registrar pago**. Expected: «Comprobante» is marked «Obligatorio», the
+   hint reads «Sin comprobante no se puede guardar el pago. JPG, PNG o WebP,
+   hasta 10 MB.», and **Guardar** stays grey even with Empleado, Monto and
+   Fecha filled. Upload a photo: «Comprobante adjunto», the hint becomes «La
+   entrenadora lo ve en su app.» and **Guardar** records the payment.
+3. **Aprobar pago.** In **Sueldos › Por aprobar**, press **Aprobar pago** on a
+   statement that can be paid. Expected: under the details, the same
+   «Comprobante» field with «Sin comprobante no se puede aprobar el pago. JPG,
+   PNG o WebP, hasta 10 MB.»; **Aprobar Bs …** stays grey until the photo is
+   uploaded. After approving, the notice reads «Aprobamos Bs … a … con su
+   comprobante. Quedó en Pagados y … lo verá en su app.», with no «Subir
+   comprobante» button, and the payment in Pagados shows **Ver**.
+4. **A payment without a receipt.** In Pagados, a payment recorded before
+   (Daniela's Bs 1.534,90 of 18/11) shows **Adjuntar** in the Comprobante
+   column. Press it: «Editar pago» opens with **Guardar** grey until a photo is
+   uploaded; saving attaches it, the row shows **Ver**, and the staff app's
+   «Mis pagos › Pagos recibidos» shows the receipt instead of «sin
+   comprobante».
+5. **API.** With the Administrator's token, `POST
+   /api/v1/administrator/salary-payments` with only `staffMemberId`,
+   `amountCentavos` and `paidOn` answers 400 with code
+   `salary_receipt_required`, and no payment is recorded.
+6. Check at 1440 px and 420 px.
+
+## Test 172: a calm «Para contactar» in the Staff app (FIX-079)
 
 Walkthrough finding 113, proposal A of the «Para contactar» canvas. No
 migration; no API change. Log in to the Staff app as the Coordinator
