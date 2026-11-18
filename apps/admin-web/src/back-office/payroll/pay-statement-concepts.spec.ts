@@ -59,7 +59,7 @@ describe("pay statement concepts", () => {
       line("new_client", 5_000),
     ]);
 
-    expect(newClients.rate).toBe("2 × Bs 50,00 · 1 × Bs 80,00");
+    expect(newClients?.rate).toBe("2 × Bs 50,00 · 1 × Bs 80,00");
   });
 
   it("keeps a kind a newer API adds, under «Otros», so the total adds up", () => {
