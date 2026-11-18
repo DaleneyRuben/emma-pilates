@@ -10713,7 +10713,9 @@ B. **Ficha de la clienta (pick A, clear card).** As Camila, **Clientes** →
    when she cannot book but can buy), then plain rows without icons:
    **Reservas** (her next class on the right), **Historial de clases**, and
    **Registrar pago** when she can buy. With only extra classes left
-   («0 del plan + 2 extra») **Reservar clase** is still offered; an expired
+   («0 del plan + 2 extra») **Reservar clase** is still offered, and the
+   class she picks reads «Reservando para … · 2 clases disponibles» with
+   **Reservar para …** enabled; an expired
    plan's leftovers read «clases sin usar», never «disponibles». The design's «Pagos» and
    «Evaluaciones» rows need Staff endpoints that do not exist yet (see the
    backlog).
@@ -10756,7 +10758,8 @@ F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
    Coordinator), **Clientes**: the search field first, **Facturas por subir**
    as a plain row before searching, and no big «Nuevo cliente» button. Under
    the hint (or under the results once she searches) a quiet link «¿No está?
-   Crear cliente nuevo» opens **Nuevo cliente**. No match still reads «No
+   Crear cliente nuevo» opens **Nuevo cliente** (it stays under «No pudimos
+   buscar clientes.» when the search fails). No match still reads «No
    encontramos a nadie» with **Nuevo cliente** as the next step.
 G. Check on the iPhone 16 Pro and the Android emulator.
 
