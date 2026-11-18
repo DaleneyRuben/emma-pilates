@@ -1,3 +1,4 @@
+import type { StaffGenderName } from './staff-gender';
 import {
   authenticationSessionLifetimes,
   type AuthenticationSurface,
@@ -22,6 +23,7 @@ export type ImpersonationPrincipalRecord = {
   staffMember: StaffMemberRecord & {
     accountId: string;
     name: string;
+    gender: StaffGenderName;
     accountDisabledAt: Date | null;
     deletedAt: Date | null;
   };
@@ -57,6 +59,8 @@ export type AuthenticatedPrincipal = {
     id: string;
     administratorAccountId: string;
     staffMemberName: string;
+    /** FIX-081: how the banner names her Role. */
+    staffMemberGender?: StaffGenderName;
     expiresAt: Date;
   };
 };
@@ -176,6 +180,7 @@ export const resolveAuthenticatedPrincipal = async (
           id: impersonation.id,
           administratorAccountId: session.accountId,
           staffMemberName: impersonation.staffMember.name,
+          staffMemberGender: impersonation.staffMember.gender,
           expiresAt: impersonation.expiresAt,
         },
       };

@@ -1,3 +1,7 @@
+import {
+  staffGenders,
+  type StaffGenderName,
+} from '../../system-identity/authentication/staff-gender';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import { StaffPhotoDto } from '../staff/photo/staff-photo.dto';
@@ -299,6 +303,12 @@ export class SessionDetailDto {
       'The Trainer photo (FIX-041), null while her initials stand in',
   })
   trainerPhoto!: StaffPhotoDto | null;
+
+  @ApiProperty({
+    enum: staffGenders,
+    description: 'How the Trainer’s Role reads (FIX-081)',
+  })
+  trainerGender!: StaffGenderName;
 
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;

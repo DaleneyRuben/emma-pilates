@@ -6,6 +6,7 @@
  */
 import type { StaffBranchDto } from "./staffBranchDto";
 import type { StaffPhotoDto } from "./staffPhotoDto";
+import type { StaffProfileDtoGender } from "./staffProfileDtoGender";
 import type { StaffProfileDtoRole } from "./staffProfileDtoRole";
 
 export interface StaffProfileDto {
@@ -15,6 +16,8 @@ export interface StaffProfileDto {
   /** @nullable */
   phone?: string | null;
   role: StaffProfileDtoRole;
+  /** How her Role reads (FIX-081) */
+  gender: StaffProfileDtoGender;
   branches: StaffBranchDto[];
   /**
    * Her profile photo (FIX-041), null while her initials stand in

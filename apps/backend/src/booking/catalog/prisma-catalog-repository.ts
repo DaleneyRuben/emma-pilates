@@ -1,3 +1,4 @@
+import { staffGenderOf } from '../../system-identity/authentication/staff-gender';
 import { staffPhotoOf } from '../staff/photo/staff-photo-of';
 import type { Prisma } from '../../generated/prisma/client';
 import { extraClassesLine } from '../payments/allowance-adjustment-copy';
@@ -175,7 +176,9 @@ export function createCatalogRepository(
                 description: true,
               },
             },
-            trainer: { select: { name: true, profileImageAssetId: true } },
+            trainer: {
+              select: { name: true, profileImageAssetId: true, gender: true },
+            },
             _count: {
               select: {
                 bookings: { where: { state: 'BOOKED' } },
@@ -198,6 +201,7 @@ export function createCatalogRepository(
                 },
                 trainerName: session.trainer.name,
                 trainerPhoto: staffPhotoOf(session.trainer.profileImageAssetId),
+                trainerGender: staffGenderOf(session.trainer.gender),
                 startsAt: session.startsAt,
                 endsAt: session.endsAt,
                 capacity: session.capacity,

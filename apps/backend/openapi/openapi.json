@@ -11496,6 +11496,14 @@
               "coordinator"
             ]
           },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "description": "How the Role reads"
+          },
           "expiresAt": {
             "type": "string",
             "format": "date-time",
@@ -11507,6 +11515,7 @@
           "staffMemberId",
           "staffMemberName",
           "role",
+          "gender",
           "expiresAt"
         ]
       },
@@ -12711,6 +12720,14 @@
               }
             ]
           },
+          "trainerGender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "description": "How the Trainer’s Role reads (FIX-081)"
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -12748,6 +12765,7 @@
           "classType",
           "trainerName",
           "trainerPhoto",
+          "trainerGender",
           "startsAt",
           "endsAt",
           "capacity",
@@ -12866,6 +12884,14 @@
               "coordinator"
             ]
           },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "description": "How her Role reads (FIX-081)"
+          },
           "branches": {
             "type": "array",
             "items": {
@@ -12888,6 +12914,7 @@
           "name",
           "email",
           "role",
+          "gender",
           "branches",
           "photo"
         ]
@@ -12941,6 +12968,14 @@
               "administrator",
               "coordinator"
             ]
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "description": "How her Role reads: «Coordinadora» or «Coordinador» (FIX-081)"
           },
           "branchIds": {
             "description": "Empty for Administrators, who hold every Branch implicitly",
@@ -12996,6 +13031,7 @@
           "email",
           "phone",
           "role",
+          "gender",
           "branchIds",
           "status",
           "activationExpiresAt",
@@ -13058,6 +13094,15 @@
               "administrator",
               "coordinator"
             ]
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "default": "female",
+            "description": "How her Role reads (FIX-081)"
           },
           "branchIds": {
             "type": "array",
@@ -13124,6 +13169,14 @@
             "type": "string",
             "nullable": true,
             "maxLength": 40
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "description": "FIX-081: kept as it is when not sent"
           }
         },
         "required": [
@@ -20880,6 +20933,15 @@
             "nullable": true,
             "description": "The Client who sent it, for a link to her file; null for Staff"
           },
+          "senderGender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male"
+            ],
+            "nullable": true,
+            "description": "How a Staff sender’s Role reads (FIX-081); null for a Client"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -20905,6 +20967,7 @@
           "senderEmail",
           "senderName",
           "senderClientId",
+          "senderGender",
           "createdAt",
           "triagedAt"
         ]

@@ -1,3 +1,4 @@
+import type { StaffGenderName } from '../authentication/staff-gender';
 import type { AuthenticationSurface } from '../authentication/create-authentication-session';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 
@@ -29,6 +30,8 @@ export type ImpersonationStaffMember = {
   accountId: string;
   name: string;
   role: ImpersonableRole | 'administrator';
+  /** FIX-081: the banner reads «Entrenadora» or «Entrenador». */
+  gender: StaffGenderName;
   status: 'pending' | 'active' | 'deactivated';
 };
 
@@ -37,6 +40,7 @@ export type ImpersonationView = {
   staffMemberId: string;
   staffMemberName: string;
   role: ImpersonableRole;
+  gender: StaffGenderName;
   expiresAt: Date;
 };
 
@@ -121,6 +125,7 @@ export const startImpersonation = async (
     staffMemberId: member.id,
     staffMemberName: member.name,
     role: member.role,
+    gender: member.gender,
     expiresAt,
   };
 };

@@ -1,3 +1,4 @@
+import type { StaffGenderName } from '../authentication/staff-gender';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 
 // REL-012: «Enviar comentarios» from either app, triaged on the admin web
@@ -73,6 +74,8 @@ export type FeedbackRow = FeedbackMessage & {
   senderName: string;
   /** Her Client id when a Client sent it, for the link to her file. */
   senderClientId: string | null;
+  /** FIX-081: how a Staff sender's Role reads; null for a Client. */
+  senderGender: StaffGenderName | null;
   createdAt: Date;
   triagedAt: Date | null;
 };

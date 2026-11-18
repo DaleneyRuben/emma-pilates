@@ -20,6 +20,7 @@ import {
   type StaffStatus,
 } from './staff-management-model';
 import { reopenStaffInvitation } from './staff-invitations';
+import type { StaffGenderName } from '../../system-identity/authentication/staff-gender';
 
 export * from './staff-management-model';
 
@@ -29,6 +30,7 @@ export const createStaffMember = async (
     email: string;
     phone: string | null;
     role: StaffRoleName;
+    gender?: StaffGenderName;
     branchIds: string[];
   },
   principal: AuthenticatedPrincipal,
@@ -71,6 +73,7 @@ export const createStaffMember = async (
       email,
       phone,
       role: command.role,
+      gender: command.gender ?? 'female',
       branchIds,
       ...activationWindow(now),
     });

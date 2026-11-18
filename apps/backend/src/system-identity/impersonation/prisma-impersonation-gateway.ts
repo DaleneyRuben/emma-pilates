@@ -1,3 +1,4 @@
+import { staffGenderOf } from '../authentication/staff-gender';
 import {
   AuditActorKind,
   AuditOutcome,
@@ -118,6 +119,7 @@ export class PrismaImpersonationGateway implements ImpersonationGateway {
         id: true,
         name: true,
         role: true,
+        gender: true,
         account: {
           select: { id: true, activatedAt: true, disabledAt: true },
         },
@@ -129,6 +131,7 @@ export class PrismaImpersonationGateway implements ImpersonationGateway {
       accountId: member.account.id,
       name: member.name,
       role: member.role.toLowerCase() as ImpersonationStaffMember['role'],
+      gender: staffGenderOf(member.gender),
       status:
         member.account.disabledAt !== null
           ? 'deactivated'
