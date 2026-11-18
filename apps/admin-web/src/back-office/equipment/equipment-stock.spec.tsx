@@ -3,10 +3,12 @@ import { http } from "msw";
 import { centro } from "../../test/booking-handlers";
 import {
   ballsType,
+  branchStocks,
   equipmentHandlers,
   equipmentIssuesPath,
   equipmentStocksPath,
   flatBall,
+  ringsType,
   stock,
 } from "../../test/equipment-fixtures";
 import {
@@ -145,12 +147,17 @@ describe("AW37 equipment kept by quantity", () => {
     ]);
   });
 
-  it("explains the server's refusal for a quantity below the damaged", async () => {
+  it("explains the server's refusal for a quantity below the damaged with the fresh count", async () => {
+    let stocks = branchStocks;
     server.use(
-      ...equipmentHandlers(),
-      recordPut(equipmentStocksPath, () =>
-        problemResponse(409, "equipment_quantity_below_damaged"),
+      http.get(apiUrl(equipmentStocksPath), () =>
+        jsonResponse({ items: stocks }),
       ),
+      ...equipmentHandlers(),
+      recordPut(equipmentStocksPath, () => {
+        stocks = [stock(ringsType, 0), stock(ballsType, 12, 3)];
+        return problemResponse(409, "equipment_quantity_below_damaged");
+      }),
     );
     const { user, panel } = await openOnBalls(
       "Cambiar cantidad",
@@ -158,8 +165,39 @@ describe("AW37 equipment kept by quantity", () => {
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(await within(panel).findByRole("alert")).toHaveTextContent(
-      "No puede ser menor que los dañados (1).",
+      "No puede ser menor que los dañados (3).",
     );
+  });
+
+  it("explains the damage refusal with the fresh usable count", async () => {
+    let stocks = branchStocks;
+    server.use(
+      http.get(apiUrl(equipmentStocksPath), () =>
+        jsonResponse({ items: stocks }),
+      ),
+      ...equipmentHandlers(),
+      recordPost(`${equipmentStocksPath}/damage`, () => {
+        stocks = [stock(ringsType, 0), stock(ballsType, 12, 8)];
+        return problemResponse(409, "equipment_damage_exceeds_usable");
+      }),
+    );
+    const { user, panel } = await openOnBalls(
+      "Registrar daño",
+      "Registrar daño · Balones",
+    );
+    await user.type(
+      within(panel).getByLabelText("¿Qué pasó?"),
+      "Se pincharon.",
+    );
+    await user.click(
+      within(panel).getByRole("button", { name: "Registrar daño" }),
+    );
+    expect(await within(panel).findByRole("alert")).toHaveTextContent(
+      "Solo hay 4 que se pueden usar.",
+    );
+    expect(
+      within(panel).getByText("De 4 que se pueden usar."),
+    ).toBeInTheDocument();
   });
 
   it("writes damaged units off the total after asking", async () => {
