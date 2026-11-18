@@ -56,6 +56,7 @@ const staffColumns =
     }),
     columns.accessor("email", {
       header: "Contacto",
+      meta: { card: "hidden" },
       cell: ({ row }) => (
         <span className="flex flex-col text-nota text-texto-secundario">
           <span>{row.original.email}</span>

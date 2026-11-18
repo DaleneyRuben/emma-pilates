@@ -70,6 +70,7 @@ const columns = createColumnHelper<AdminFeedbackDto>();
 const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
   columns.accessor("createdAt", {
     header: "Fecha",
+    meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
       <span className="whitespace-nowrap text-texto-secundario tabular">
         {formatCivilMoment(getValue())}
@@ -78,6 +79,7 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
   }),
   columns.accessor("senderName", {
     header: "Enviado por",
+    meta: { card: "detail", cardOrder: 1 },
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-texto-secundario">
         <FeedbackSender feedback={row.original} />
@@ -86,12 +88,14 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
   }),
   columns.accessor("type", {
     header: "Tipo",
+    meta: { card: "detail", cardOrder: 2 },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{typeLabels[getValue()]}</span>
     ),
   }),
   columns.accessor("text", {
     header: "Comentario",
+    meta: { card: "title" },
     cell: ({ row }) => (
       <span className="line-clamp-2 max-w-[420px]">
         <RowOpener
@@ -103,6 +107,7 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
   }),
   columns.accessor("app", {
     header: "App",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => (
       <span className="whitespace-nowrap text-texto-secundario">
         {appLabels[getValue()]}
@@ -112,6 +117,7 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
   columns.display({
     id: "version",
     header: "Versión",
+    meta: { card: "hidden" },
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-texto-secundario tabular">
         {deviceLabel(row.original)}

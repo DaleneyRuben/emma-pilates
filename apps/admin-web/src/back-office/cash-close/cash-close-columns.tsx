@@ -67,7 +67,7 @@ export const cashDayColumns = [
   columns.display({
     id: "expected",
     header: "Esperado",
-    meta: { align: "right" },
+    meta: { card: "hidden", align: "right" },
     cell: ({ row }) => (
       <>
         {row.original.close === null ? (
@@ -86,7 +86,7 @@ export const cashDayColumns = [
   columns.display({
     id: "counted",
     header: "Contado",
-    meta: { align: "right" },
+    meta: { card: "detail", cardOrder: 1, align: "right" },
     cell: ({ row }) =>
       row.original.close === null ? (
         quiet
@@ -99,7 +99,7 @@ export const cashDayColumns = [
   columns.display({
     id: "difference",
     header: "Diferencia",
-    meta: { align: "right" },
+    meta: { card: "detail", cardOrder: 2, align: "right" },
     cell: ({ row }) => {
       const close = row.original.close;
       if (close === null) return quiet;
@@ -119,7 +119,7 @@ export const cashDayColumns = [
   columns.display({
     id: "adjustment",
     header: "Ajuste",
-    meta: { align: "right" },
+    meta: { card: "hidden", align: "right" },
     cell: ({ row }) => {
       const adjustment = row.original.close?.adjustmentCentavos ?? 0;
       if (adjustment === 0) return null;
@@ -137,6 +137,7 @@ export const cashDayColumns = [
   columns.display({
     id: "closedBy",
     header: "Cerró",
+    meta: { card: "hidden" },
     cell: ({ row }) =>
       row.original.close === null ? (
         quiet
@@ -149,6 +150,7 @@ export const cashDayColumns = [
   columns.display({
     id: "note",
     header: "Nota",
+    meta: { card: "hidden" },
     cell: ({ row }) => {
       const note = row.original.close?.note ?? null;
       return note === null ? null : (

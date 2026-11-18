@@ -39,6 +39,7 @@ export const closedAccountColumns = (onWithdrawn: (notice: string) => void) => [
   }),
   columns.accessor("since", {
     header: "Recibe promociones desde",
+    meta: { card: "hidden" },
     cell: ({ row }) => (
       <span className="text-texto-secundario tabular">
         {sinceDate(row.original)}

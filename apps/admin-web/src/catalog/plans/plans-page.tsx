@@ -35,6 +35,7 @@ const planColumns = (open: (row: AdminPlanDto) => void) => [
   }),
   columns.accessor("weeklyClassCap", {
     header: "Tope semanal",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => {
       const cap = getValue();
       return cap === null ? (
