@@ -42,6 +42,9 @@ describe('worker entrypoint occurrence jobs', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
@@ -119,6 +122,9 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
@@ -208,6 +214,9 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
@@ -310,6 +319,9 @@ describe('worker entrypoint occurrence jobs', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
@@ -382,6 +394,9 @@ describe('worker entrypoint occurrence jobs', () => {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
       subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      payoutQrReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {

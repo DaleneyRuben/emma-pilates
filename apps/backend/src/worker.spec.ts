@@ -45,6 +45,9 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
@@ -192,6 +195,9 @@ describe('worker entrypoint', () => {
           .mockResolvedValueOnce({ reminded: 0 })
           .mockRejectedValueOnce(new Error('sensitive database failure')),
       },
+      payoutQrReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       founderMemberships: {
         execute: jest.fn().mockResolvedValue({ ended: 0 }),
       },
@@ -248,6 +254,9 @@ describe('worker entrypoint', () => {
         process: jest.fn(),
       },
       subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      payoutQrReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
@@ -310,6 +319,9 @@ describe('worker entrypoint', () => {
         process: jest.fn(),
       },
       subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      payoutQrReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       founderMemberships: {
