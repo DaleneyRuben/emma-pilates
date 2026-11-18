@@ -188,8 +188,9 @@ export function HomeScreen() {
           onImageMissing={() => void promotions.refetch()}
           promotions={promotions.data?.status === 200 ? promotions.data.data : []}
         />
-        {hasActivePlan ? (
-          // FIX-082 (Inicio option A): the one solid action, under the promotion.
+        {hasActivePlan && view.subscription?.guestPass === undefined ? (
+          // FIX-082 (Inicio option A): the one solid action, under the promotion;
+          // a Guest Pass card carries its own.
           <View style={styles.underPromotion} testID="home-book-frame">
             <PrimaryButton
               label="Reservar una clase"

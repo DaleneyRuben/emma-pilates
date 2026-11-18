@@ -8,7 +8,14 @@ import {
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-import { freezeRange, weekdayDayMonth } from "../subscription/freeze-window";
+import { dayMonth, freezeRange } from "../subscription/freeze-window";
+
+const weekdays = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+/** «lunes 23 de noviembre»: a sentence spells the weekday out (review of FIX-082). */
+function longWeekdayDayMonth(civil: string): string {
+  return `${weekdays[new Date(`${civil}T12:00:00.000Z`).getUTCDay()]} ${dayMonth(civil)}`;
+}
 
 /**
  * Class detail on a frozen day (FIX-082, design audit 2026-11-18, option B):
@@ -32,7 +39,7 @@ export function FrozenBookingFooter({
           {`Tu plan está congelado ${range.charAt(0).toLowerCase()}${range.slice(1)}.`}
         </Text>
         <Text style={styles.note}>
-          {`Podrás reservar desde el ${weekdayDayMonth(addCivilDays(endsOn, 1))}.`}
+          {`Podrás reservar desde el ${longWeekdayDayMonth(addCivilDays(endsOn, 1))}.`}
         </Text>
       </View>
       <PrimaryButton disabled label="No disponible durante el congelamiento" />

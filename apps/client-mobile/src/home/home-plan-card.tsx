@@ -84,8 +84,9 @@ export function PurchasePlanCard({
 }
 
 const styles = StyleSheet.create({
-  // UX-012: the tablet carousel stops at 720 px; the hero takes the same cap.
-  capped: { alignSelf: "center", maxWidth: promotionCardMaxWidth, width: "100%" },
+  // UX-012: the tablet carousel stops at 720 px; the hero takes the same cap
+  // and lines up with it at the left (review of FIX-082).
+  capped: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   illustration: { alignSelf: "flex-end", marginBottom: spacing.xlSm, marginRight: spacing.xlSm },
   purchase: { ...surfaces.emphasis, flexDirection: "row" },
   purchaseBody: { flex: 1 },

@@ -39,7 +39,7 @@ import { useClientFetcher } from "../client-fetcher";
 import { BrowseEmptyState } from "./browse-empty-state";
 import { BranchLine, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
 import { SessionRow, seatsTag } from "./session-row";
-import { WeekNotice } from "./browse-week-notice";
+import { WeekNotice, weekOf } from "./browse-week-notice";
 
 type BrowseNavigation = {
   navigate: (screen: "SessionDetail", params: { sessionId: string }) => void;
@@ -103,8 +103,17 @@ export function BrowseSessionsScreen() {
     (sessions.data !== undefined && sessions.data.status !== 200);
   const loading = branches.isPending || (branchId !== undefined && sessions.isPending);
   // Every Session of one day falls in the same week, so the first says it.
-  const classesLeftThisWeek =
+  // A day without classes, or still loading, keeps its week's last count so
+  // the strip does not jump (review of FIX-082).
+  const counted =
     sessions.data?.status === 200 ? sessions.data.data[0]?.classesLeftThisWeek : undefined;
+  const [lastCount, setLastCount] = useState<{ week: string; left: number | null } | null>(null);
+  const week = weekOf(selectedDate);
+  if (counted !== undefined && (lastCount?.week !== week || lastCount.left !== counted)) {
+    setLastCount({ week, left: counted });
+  }
+  const classesLeft =
+    counted !== undefined ? counted : lastCount?.week === week ? lastCount.left : undefined;
 
   return (
     <Screen style={styles.screen}>
@@ -145,7 +154,7 @@ export function BrowseSessionsScreen() {
           ))}
         </View>
       ) : null}
-      <WeekNotice classesLeftThisWeek={classesLeftThisWeek} />
+      <WeekNotice classesLeft={classesLeft} selectedDate={selectedDate} today={today} />
       <DayStrip
         dates={strip}
         onSelect={setSelectedDate}

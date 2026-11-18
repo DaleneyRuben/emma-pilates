@@ -19,8 +19,8 @@ export function SeatsText({ availableSeats }: { availableSeats: number }) {
   const label = !few
     ? seatsTag(availableSeats)
     : availableSeats === 1
-      ? "Queda 1"
-      : `Quedan ${availableSeats}`;
+      ? "Queda 1 cupo"
+      : `Quedan ${availableSeats} cupos`;
   return <Text style={[styles.seats, few && styles.seatsFew]}>{label}</Text>;
 }
 

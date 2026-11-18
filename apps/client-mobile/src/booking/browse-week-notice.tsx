@@ -1,4 +1,5 @@
 import {
+  addCivilDays,
   colors,
   fontFamilies,
   Glyph,
@@ -8,10 +9,31 @@ import {
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-/** The notice's line, or none without a weekly cap. */
-export function weekNoticeLine(classesLeftThisWeek: number | null | undefined): string | null {
-  if (classesLeftThisWeek === 0) return "Ya usaste tus clases de esta semana";
-  return weeklyClassesLeftLine(classesLeftThisWeek);
+/** The Monday of a civil date's week, which the weekly cap counts from. */
+export function weekOf(civilDate: string): string {
+  const weekday = new Date(`${civilDate}T12:00:00.000Z`).getUTCDay();
+  return addCivilDays(civilDate, -((weekday + 6) % 7));
+}
+
+/**
+ * The notice's line, or none without a weekly cap. The API counts the chosen
+ * day's week, so a later week says «esa semana» (review of FIX-082).
+ */
+export function weekNoticeLine(
+  classesLeft: number | null | undefined,
+  selectedDate: string,
+  today: string,
+): string | null {
+  if (classesLeft === null || classesLeft === undefined) return null;
+  if (weekOf(selectedDate) === weekOf(today)) {
+    return classesLeft === 0
+      ? "Ya usaste tus clases de esta semana"
+      : weeklyClassesLeftLine(classesLeft);
+  }
+  if (classesLeft === 0) return "Ya usaste tus clases de esa semana";
+  return classesLeft === 1
+    ? "Esa semana te queda 1 clase"
+    : `Esa semana te quedan ${classesLeft} clases`;
 }
 
 /**
@@ -20,11 +42,15 @@ export function weekNoticeLine(classesLeftThisWeek: number | null | undefined): 
  * muted icon.
  */
 export function WeekNotice({
-  classesLeftThisWeek,
+  classesLeft,
+  selectedDate,
+  today,
 }: {
-  classesLeftThisWeek: number | null | undefined;
+  classesLeft: number | null | undefined;
+  selectedDate: string;
+  today: string;
 }) {
-  const line = weekNoticeLine(classesLeftThisWeek);
+  const line = weekNoticeLine(classesLeft, selectedDate, today);
   if (line === null) return null;
   return (
     <View style={styles.notice} testID="browse-week-notice">

@@ -10,6 +10,8 @@ type ActiveSubscription = NonNullable<ClientSubscriptionDto["subscription"]>;
 
 function weekLine(classesLeftThisWeek: number | null | undefined): string | null {
   if (classesLeftThisWeek === null || classesLeftThisWeek === undefined) return null;
+  // Said as Reservar's notice says it (review of FIX-082).
+  if (classesLeftThisWeek === 0) return "ya usaste tus clases de esta semana";
   return classesLeftThisWeek === 1
     ? "esta semana te queda 1"
     : `esta semana te quedan ${classesLeftThisWeek}`;
