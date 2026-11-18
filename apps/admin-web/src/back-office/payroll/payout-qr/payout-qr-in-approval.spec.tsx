@@ -3,6 +3,12 @@ import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../../../test/msw";
 import { renderAdmin } from "../../../test/render-admin";
 import { signedInHandlers } from "../../../test/session-handlers";
+import { imageFile } from "../../../test/image-stubs";
+import {
+  uploadedAssetId,
+  uploadHandlers,
+  type UploadSeen,
+} from "../../../test/upload-fixtures";
 
 const emmaId = "5f000000-0000-5000-8000-000000000002";
 const statement = {
@@ -28,29 +34,37 @@ const statementsPath = "/api/v1/administrator/pay-statements";
 const qrPath = `/api/v1/administrator/staff-members/${emmaId}/payout-qr`;
 
 // FIX-072, follow-up 276: «Aprobar pago» shows the person's payout QR, or
-// why there is none, and after approving leads to the receipt.
+// why there is none. Finding 112: approving waits for the transfer's photo.
 describe("payout QR in Sueldos' «Aprobar pago»", () => {
   useMockServer();
+  const seen: UploadSeen = { polls: 0 };
   beforeEach(() => {
+    seen.polls = 0;
     server.use(...signedInHandlers());
   });
 
-  it("shows her QR before approving and leads to her receipt after", async () => {
+  it("shows her QR and approves only with the transfer's photo", async () => {
     let approved = false;
+    const bodies: unknown[] = [];
     server.use(
+      ...uploadHandlers(seen),
       http.get(apiUrl(statementsPath), () =>
         jsonResponse([
           approved ? { ...statement, state: "approved" } : statement,
         ]),
       ),
-      http.post(apiUrl(`${statementsPath}/statement-1/approve`), () => {
-        approved = true;
-        return jsonResponse({
-          ...statement,
-          state: "approved",
-          salaryPaymentId: "pay-1",
-        });
-      }),
+      http.post(
+        apiUrl(`${statementsPath}/statement-1/approve`),
+        async ({ request }) => {
+          bodies.push(await request.json());
+          approved = true;
+          return jsonResponse({
+            ...statement,
+            state: "approved",
+            salaryPaymentId: "pay-1",
+          });
+        },
+      ),
       http.get(apiUrl(qrPath), () =>
         jsonResponse({
           payoutQr: {
@@ -74,22 +88,35 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
       }),
     ).toBeInTheDocument();
     expect(within(dialog).getByText("Vale hasta el 15/12/2026")).toBeVisible();
+    const confirm = within(dialog).getByRole("button", {
+      name: "Aprobar Bs 297,00",
+    });
+    expect(confirm).toBeDisabled();
+    expect(
+      within(dialog).getByText(
+        "Sin comprobante no se puede aprobar el pago. JPG, PNG o WebP, hasta 10 MB.",
+      ),
+    ).toBeVisible();
+    await user.upload(
+      within(dialog).getByLabelText("Archivo del comprobante"),
+      imageFile("transferencia.png"),
+    );
+    await within(dialog).findByText("Comprobante adjunto");
+    expect(confirm).toBeEnabled();
 
     await user.click(
       within(dialog).getByRole("button", { name: "Aprobar Bs 297,00" }),
     );
     await waitFor(() => expect(approved).toBe(true));
+    expect(bodies).toEqual([{ receiptImageAssetId: uploadedAssetId }]);
     expect(
       await screen.findByText(
-        "Aprobamos Bs 297,00 a Emma Vargas. Quedó en Pagados. ¿Ya le transferiste? Sube el comprobante y Emma lo verá en su app.",
+        "Aprobamos Bs 297,00 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Subir comprobante" }),
-    ).toHaveAttribute(
-      "href",
-      `/dinero/sueldos/pagados?staffMemberId=${emmaId}`,
-    );
+      screen.queryByRole("link", { name: "Subir comprobante" }),
+    ).not.toBeInTheDocument();
   });
 
   it("says when her QR has expired instead of showing it", async () => {

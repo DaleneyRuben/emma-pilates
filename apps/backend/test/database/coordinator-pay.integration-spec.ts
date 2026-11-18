@@ -8,6 +8,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 
 const codeOf = async (work: Promise<unknown>): Promise<string> => {
   try {
@@ -271,14 +272,15 @@ describe('coordinator pay statements', () => {
       }),
     ]);
 
+    const photoId = await readySalaryReceiptId(prisma, admin.accountId);
     const approved = await statements(afterDecember).approveStatement(
-      { statementId: listed[0].id },
+      { statementId: listed[0].id, receiptImageAssetId: photoId },
       admin,
     );
     expect(approved.state).toBe('approved');
     expect(approved.salaryPaymentId).not.toBeNull();
     const again = await statements(afterDecember).approveStatement(
-      { statementId: listed[0].id },
+      { statementId: listed[0].id, receiptImageAssetId: photoId },
       admin,
     );
     expect(again.salaryPaymentId).toBe(approved.salaryPaymentId);

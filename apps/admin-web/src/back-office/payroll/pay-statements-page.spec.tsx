@@ -14,6 +14,10 @@ import {
   useMockServer,
 } from "../../test/msw";
 import { renderAdmin } from "../../test/render-admin";
+import {
+  attachSalaryReceipt,
+  salaryReceiptHandlers,
+} from "../../test/salary-receipt-upload";
 import { signedInHandlers } from "../../test/session-handlers";
 
 const minimum = (time: string) => ({
@@ -106,6 +110,7 @@ describe("Sueldos por aprobar", () => {
   it("asks before approving and approves once", async () => {
     let approved = 0;
     server.use(
+      ...salaryReceiptHandlers(),
       http.get(apiUrl(statementsPath), () =>
         jsonResponse(
           approved === 0 ? [statement] : [{ ...statement, state: "approved" }],
@@ -133,15 +138,15 @@ describe("Sueldos por aprobar", () => {
     expect(approved).toBe(0);
 
     await user.click(screen.getByRole("button", { name: "Aprobar pago" }));
+    const confirming = await screen.findByRole("alertdialog");
+    await attachSalaryReceipt(user, confirming);
     await user.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: "Aprobar Bs 297,00",
-      }),
+      within(confirming).getByRole("button", { name: "Aprobar Bs 297,00" }),
     );
     await waitFor(() => expect(approved).toBe(1));
     expect(
       await screen.findByText(
-        "Aprobamos Bs 297,00 a Emma Vargas. Quedó en Pagados. ¿Ya le transferiste? Sube el comprobante y Emma lo verá en su app.",
+        "Aprobamos Bs 297,00 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
     expect(await screen.findByText("Aprobado")).toBeInTheDocument();
@@ -198,6 +203,7 @@ describe("Sueldos por aprobar", () => {
 
   it("explains a refused approval instead of a bare failure", async () => {
     server.use(
+      ...salaryReceiptHandlers(),
       http.get(apiUrl(statementsPath), () => jsonResponse([statement])),
       http.post(apiUrl(`${statementsPath}/statement-1/approve`), () =>
         problemResponse(409, "pay_statement_month_open"),
@@ -208,10 +214,10 @@ describe("Sueldos por aprobar", () => {
     await user.click(
       await screen.findByRole("button", { name: "Aprobar pago" }),
     );
+    const confirming = await screen.findByRole("alertdialog");
+    await attachSalaryReceipt(user, confirming);
     await user.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: "Aprobar Bs 297,00",
-      }),
+      within(confirming).getByRole("button", { name: "Aprobar Bs 297,00" }),
     );
     expect(
       await screen.findByText(

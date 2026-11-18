@@ -7,12 +7,12 @@ import {
   requireTrainer,
   type BackOfficeActor,
 } from '../back-office-errors';
-import {
-  attachImageAsset,
-  ImageAssetNotAttachableError,
-} from '../../uploads/image-asset-attachments';
 import { civilText, recordBackOfficeAudit } from '../prisma-audit';
 import { runIdempotent } from '../prisma-idempotency';
+import {
+  attachSalaryReceipt,
+  requireSalaryReceipt,
+} from './salary-receipt-attachment';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -20,7 +20,8 @@ export type SalaryPaymentInput = {
   staffMemberId: string;
   amountCentavos: number;
   paidOn: Date;
-  // BKO-008: a ready photo she uploaded; left out, the receipt is unchanged.
+  // BKO-008: a ready photo she uploaded. Required to record (finding 112);
+  // left out of a correction, the attached one stays.
   receiptImageAssetId?: string;
 };
 
@@ -74,27 +75,12 @@ export const createPrismaSalaryPayments = (
     }
   };
 
-  // BKO-008: the photo must be hers and ready; attaching takes it out of the
-  // abandoned-upload sweep.
-  const attachReceipt = async (
+  const attachReceipt = (
     transaction: Transaction,
     actor: BackOfficeActor,
     imageAssetId: string,
-  ) => {
-    try {
-      await attachImageAsset(transaction, {
-        imageAssetId,
-        ownerAccountId: actor.accountId,
-        purpose: 'transfer_receipt',
-        now: dependencies.now(),
-      });
-    } catch (error) {
-      if (error instanceof ImageAssetNotAttachableError) {
-        throw new BackOfficeError('salary_receipt_not_ready');
-      }
-      throw error;
-    }
-  };
+  ) =>
+    attachSalaryReceipt(transaction, actor, imageAssetId, dependencies.now());
 
   const audit = (
     transaction: Transaction,
@@ -176,6 +162,9 @@ export const createPrismaSalaryPayments = (
     ) => {
       const actor = requireAdministrator(principal);
       requireValues(input);
+      const receiptImageAssetId = requireSalaryReceipt(
+        input.receiptImageAssetId,
+      );
       const response = await runIdempotent(
         prisma,
         {
@@ -187,16 +176,14 @@ export const createPrismaSalaryPayments = (
         },
         async (transaction) => {
           await requireStaffMember(transaction, input.staffMemberId);
-          if (input.receiptImageAssetId !== undefined) {
-            await attachReceipt(transaction, actor, input.receiptImageAssetId);
-          }
+          await attachReceipt(transaction, actor, receiptImageAssetId);
           const now = dependencies.now();
           const payment = await transaction.salaryPayment.create({
             data: {
               staffMemberId: input.staffMemberId,
               amountCentavos: input.amountCentavos,
               paidOn: input.paidOn,
-              receiptImageAssetId: input.receiptImageAssetId ?? null,
+              receiptImageAssetId,
               recordedByAccountId: actor.accountId,
               createdAt: now,
               updatedAt: now,
@@ -235,6 +222,11 @@ export const createPrismaSalaryPayments = (
         });
         if (previous === null) {
           throw new BackOfficeError('salary_payment_not_found');
+        }
+        // Finding 112: a payment recorded before receipts were required is
+        // corrected only together with its photo.
+        if (previous.receiptImageAssetId === null) {
+          requireSalaryReceipt(input.receiptImageAssetId);
         }
         await requireStaffMember(transaction, input.staffMemberId);
         // A replaced receipt stays attached and named in the audit: nothing

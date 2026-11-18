@@ -9,6 +9,10 @@ import {
 } from "../../test/msw";
 import { renderAdmin } from "../../test/render-admin";
 import {
+  attachSalaryReceipt,
+  salaryReceiptHandlers,
+} from "../../test/salary-receipt-upload";
+import {
   coordinatorHandlers,
   signedInHandlers,
 } from "../../test/session-handlers";
@@ -46,6 +50,7 @@ describe("the Coordinator's pay statement", () => {
     // Its own statements answer before Inicio's empty default.
     server.use(...signedInHandlers());
     server.use(
+      ...salaryReceiptHandlers(),
       http.get(apiUrl(statementsPath), () =>
         jsonResponse(
           approved === 0
@@ -70,10 +75,10 @@ describe("the Coordinator's pay statement", () => {
     expect(screen.getAllByText("Bs 4.030,00")).not.toHaveLength(0);
     expect(screen.getByText("Bono de renovación")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Aprobar pago" }));
+    const dialog = await screen.findByRole("alertdialog");
+    await attachSalaryReceipt(user, dialog);
     await user.click(
-      within(await screen.findByRole("alertdialog")).getByRole("button", {
-        name: "Aprobar Bs 4.030,00",
-      }),
+      within(dialog).getByRole("button", { name: "Aprobar Bs 4.030,00" }),
     );
     await waitFor(() => expect(approved).toBe(1));
     expect(await screen.findByText("Aprobado")).toBeInTheDocument();

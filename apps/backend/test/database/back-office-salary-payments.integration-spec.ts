@@ -6,6 +6,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 
 const codeOf = async (work: Promise<unknown>): Promise<string> => {
   try {
@@ -47,6 +48,10 @@ describe('Prisma Back Office salary payments', () => {
       },
     });
 
+  // Finding 112: every Salary Payment carries the photo of its transfer.
+  const photoOf = (admin: { accountId: string }) =>
+    readySalaryReceiptId(world.prisma, admin.accountId);
+
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
   });
@@ -63,6 +68,7 @@ describe('Prisma Back Office salary payments', () => {
       staffMemberId: emma,
       amountCentavos: 350_000,
       paidOn: civil('2026-09-20'),
+      receiptImageAssetId: await photoOf(admin),
     };
     const payment = await payroll().recordSalaryPayment(input, admin, key);
     expect(payment).toMatchObject({
@@ -90,7 +96,11 @@ describe('Prisma Back Office salary payments', () => {
         actorRole: 'ADMINISTRATOR',
         targetType: 'salary_payment',
         branchId: null,
-        metadata: { amountCentavos: 350_000, paidOn: '2026-09-20' },
+        metadata: {
+          amountCentavos: 350_000,
+          paidOn: '2026-09-20',
+          receiptImageAssetId: input.receiptImageAssetId,
+        },
       },
     ]);
   });
@@ -111,6 +121,7 @@ describe('Prisma Back Office salary payments', () => {
             staffMemberId: emma,
             amountCentavos: 100_000,
             paidOn: civil('2026-09-21'),
+            receiptImageAssetId: await photoOf(await administrator()),
             ...input,
           },
           await principal,
@@ -144,6 +155,7 @@ describe('Prisma Back Office salary payments', () => {
         staffMemberId: emma,
         amountCentavos: 200_000,
         paidOn: civil('2026-09-01'),
+        receiptImageAssetId: await photoOf(admin),
       },
       admin,
       randomUUID(),
@@ -197,7 +209,12 @@ describe('Prisma Back Office salary payments', () => {
       ['2026-09-15', 92_000],
     ] as const) {
       await payroll().recordSalaryPayment(
-        { staffMemberId: andrea, amountCentavos, paidOn: civil(paidOn) },
+        {
+          staffMemberId: andrea,
+          amountCentavos,
+          paidOn: civil(paidOn),
+          receiptImageAssetId: await photoOf(admin),
+        },
         admin,
         randomUUID(),
       );
@@ -249,7 +266,12 @@ describe('Prisma Back Office salary payments', () => {
       [emma, '2026-09-02', 99_000],
     ] as const) {
       await payroll().recordSalaryPayment(
-        { staffMemberId, amountCentavos, paidOn: civil(paidOn) },
+        {
+          staffMemberId,
+          amountCentavos,
+          paidOn: civil(paidOn),
+          receiptImageAssetId: await photoOf(admin),
+        },
         admin,
         randomUUID(),
       );

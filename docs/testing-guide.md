@@ -10460,3 +10460,40 @@ migration, no API change.
 4. Choose a quantity type (Balones). Expected: the stepper card as before,
    and «Para enviarlo, cuenta qué pasó.» above the button; when none is
    usable, «No hay ninguno que se pueda usar.».
+
+## Test 171: every staff payment carries its receipt (FIX-078)
+
+Walkthrough finding 112. No migration. The API refuses a Salary Payment
+without the photo of its transfer: `POST administrator/salary-payments`
+without `receiptImageAssetId`, `POST administrator/pay-statements/{id}/approve`
+without `{ "receiptImageAssetId": … }` (the body is new), and
+`PUT administrator/salary-payments/{id}` on a payment that has none unless the
+call attaches one all answer 400 `salary_receipt_required`. A correction of a
+payment that already has a receipt keeps it without sending it again. Payments
+recorded before (Daniela's Bs 1.534,90 of 18/11) are kept as they are.
+
+1. Sign in to the admin web as the Administrator (`ana@example.com`).
+2. **Registrar pago.** Open **Dinero › Sueldos › Pagados** and press
+   **Registrar pago**. Expected: «Comprobante» is marked «Obligatorio», the
+   hint reads «Sin comprobante no se puede guardar el pago. JPG, PNG o WebP,
+   hasta 10 MB.», and **Guardar** stays grey even with Empleado, Monto and
+   Fecha filled. Upload a photo: «Comprobante adjunto», the hint becomes «La
+   entrenadora lo ve en su app.» and **Guardar** records the payment.
+3. **Aprobar pago.** In **Sueldos › Por aprobar**, press **Aprobar pago** on a
+   statement that can be paid. Expected: under the details, the same
+   «Comprobante» field with «Sin comprobante no se puede aprobar el pago. JPG,
+   PNG o WebP, hasta 10 MB.»; **Aprobar Bs …** stays grey until the photo is
+   uploaded. After approving, the notice reads «Aprobamos Bs … a … con su
+   comprobante. Quedó en Pagados y … lo verá en su app.», with no «Subir
+   comprobante» button, and the payment in Pagados shows **Ver**.
+4. **A payment without a receipt.** In Pagados, a payment recorded before
+   (Daniela's Bs 1.534,90 of 18/11) shows **Adjuntar** in the Comprobante
+   column. Press it: «Editar pago» opens with **Guardar** grey until a photo is
+   uploaded; saving attaches it, the row shows **Ver**, and the staff app's
+   «Mis pagos › Pagos recibidos» shows the receipt instead of «sin
+   comprobante».
+5. **API.** With the Administrator's token, `POST
+   /api/v1/administrator/salary-payments` with only `staffMemberId`,
+   `amountCentavos` and `paidOn` answers 400 with code
+   `salary_receipt_required`, and no payment is recorded.
+6. Check at 1440 px and 420 px.

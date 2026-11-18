@@ -22,7 +22,13 @@ export const draftPayStatementsRequest = (period: PayPeriodQuery) =>
     (response) => response.data,
   );
 
-export const approvePayStatementRequest = (statementId: string) =>
-  approvePayStatement(statementId, undefined, adminFetch).then(
-    (response) => response.data,
-  );
+export const approvePayStatementRequest = (
+  statementId: string,
+  receiptImageAssetId: string,
+) =>
+  approvePayStatement(
+    statementId,
+    { receiptImageAssetId },
+    undefined,
+    adminFetch,
+  ).then((response) => response.data);

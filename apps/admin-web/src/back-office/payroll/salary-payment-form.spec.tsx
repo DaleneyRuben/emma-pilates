@@ -17,10 +17,19 @@ import {
 } from "../../test/payroll-fixtures";
 import { camila, emma, rita } from "../../test/people-fixtures";
 import { renderAdmin } from "../../test/render-admin";
+import {
+  attachSalaryReceipt,
+  salaryReceiptHandlers,
+} from "../../test/salary-receipt-upload";
 import { signedInHandlers } from "../../test/session-handlers";
+import { uploadedAssetId } from "../../test/upload-fixtures";
 import { useNarrowViewport } from "../../test/viewport";
 
 const uuid = /^[0-9a-f-]{36}$/;
+const withReceipt = {
+  ...emmaSeptember,
+  receiptUrl: `${salaryPaymentsPath}/${emmaSeptember.id}/receipt`,
+};
 let tableReads = 0;
 const payrollTable = (rows = () => [emmaSeptember]) =>
   http.get(apiUrl(salaryPaymentsPath), () => {
@@ -35,6 +44,7 @@ const openCreate = async () => {
     screen.getByRole("button", { name: "Registrar pago" }),
   );
   const panel = await screen.findByRole("dialog", { name: "Registrar pago" });
+  await attachSalaryReceipt(rendered.user, panel);
   return { ...rendered, panel };
 };
 
@@ -57,7 +67,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     tableReads = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...salaryReceiptHandlers());
     server.use(payrollStaffHandler());
   });
 
@@ -117,6 +127,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
           staffMemberId: camila.id,
           amountCentavos: 150_000,
           paidOn: "2026-09-21",
+          receiptImageAssetId: uploadedAssetId,
         },
       },
     ]);
@@ -160,12 +171,12 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
   it("corrects a payment from its row and sends nothing when nothing changed", async () => {
     const puts: unknown[] = [];
     server.use(
-      payrollTable(),
+      payrollTable(() => [withReceipt]),
       http.put(
         apiUrl(`${salaryPaymentsPath}/${emmaSeptember.id}`),
         async ({ request }) => {
           puts.push(await request.json());
-          return jsonResponse({ ...emmaSeptember, amountCentavos: 360_000 });
+          return jsonResponse({ ...withReceipt, amountCentavos: 360_000 });
         },
       ),
     );
@@ -225,7 +236,7 @@ describe("AW12 Salary Payment form on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...salaryReceiptHandlers());
     server.use(payrollStaffHandler());
   });
 
