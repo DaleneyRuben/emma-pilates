@@ -1,17 +1,18 @@
 import type { AdminSupplyDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
-import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
+import {
+  CatalogPage,
+  RowOpener,
+  type PanelAction,
+} from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import {
   countFormat,
-  defaultPageSize,
   pageRangeLabel,
   type ListSearch,
 } from "../../components/table/pagination";
-import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { useAdminRole } from "../../session/admin-role";
 import type { Branch } from "../../shell/branch/branch-context";
@@ -24,8 +25,28 @@ const columns = createColumnHelper<AdminSupplyDto>();
 
 // The Coordinator records movements but never edits a Supply (ADR-0108), so
 // her rows name the Supply without opening it.
+const movementAction = (
+  branchId: string,
+  kind: "withdrawal" | "restock",
+  supply: AdminSupplyDto,
+): PanelAction => ({
+  label: kind === "withdrawal" ? "Registrar retiro" : "Registrar reposición",
+  render: (done) => (
+    <SupplyMovementForm
+      branchId={branchId}
+      kind={kind}
+      supplyId={supply.id}
+      onDone={done}
+    />
+  ),
+});
+
+const rowLink =
+  "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
+
 const supplyColumns =
-  (managesCatalog: boolean) => (open: (row: AdminSupplyDto) => void) => [
+  (branchId: string, managesCatalog: boolean) =>
+  (open: (row: AdminSupplyDto) => void, act: (action: PanelAction) => void) => [
     columns.accessor("name", {
       header: "Nombre",
       cell: ({ row }) =>
@@ -53,7 +74,33 @@ const supplyColumns =
       cell: ({ getValue }) =>
         getValue() ? (
           <StatusPill tone="advertencia">Stock bajo</StatusPill>
-        ) : null,
+        ) : (
+          <span className="text-texto-tenue">Suficiente</span>
+        ),
+    }),
+    // FIX-088 (Insumos B): each row logs its own Withdrawal or Restock.
+    columns.display({
+      id: "actions",
+      header: "",
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="inline-flex gap-4">
+          {(["withdrawal", "restock"] as const).map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              aria-label={`${kind === "withdrawal" ? "Registrar retiro" : "Registrar reposición"} de ${row.original.name}`}
+              className={rowLink}
+              onClick={(event) => {
+                event.stopPropagation();
+                act(movementAction(branchId, kind, row.original));
+              }}
+            >
+              {kind === "withdrawal" ? "Retiro" : "Reposición"}
+            </button>
+          ))}
+        </span>
+      ),
     }),
   ];
 
@@ -109,48 +156,17 @@ function BranchSupplies({
           : `${pageRangeLabel(window)} ${window.totalItems === 1 ? "insumo" : "insumos"}`
       }
       query={query}
-      columns={supplyColumns(managesCatalog)}
+      columns={supplyColumns(branch.id, managesCatalog)}
       canOpen={() => managesCatalog}
       renderForm={(supply, done) => (
         <SupplyPanelForm branchId={branch.id} supply={supply} onDone={done} />
       )}
-      panelActions={[
-        {
-          label: "Registrar retiro",
-          render: (done) => (
-            <SupplyMovementForm
-              branchId={branch.id}
-              kind="withdrawal"
-              onDone={done}
-            />
-          ),
-        },
-        {
-          label: "Registrar reposición",
-          render: (done) => (
-            <SupplyMovementForm
-              branchId={branch.id}
-              kind="restock"
-              onDone={done}
-            />
-          ),
-        },
-      ]}
-      links={
-        <Button asChild variant="link" className="px-2">
-          <Link
-            to="/estudio/insumos/retiros"
-            search={{ page: 1, pageSize: defaultPageSize }}
-          >
-            Ver historial de movimientos
-          </Link>
-        </Button>
-      }
     />
   );
 }
 
-// AW08 with follow-ups 07 and 48: the selected Branch's consumables. Stock
+// AW08 with follow-ups 07 and 48: the selected Branch's consumables. FIX-088
+// (Insumos B): only «Nuevo insumo» in the header; the history is Movimientos. Stock
 // changes only through Withdrawals and Restocks (back-office/CONTEXT.md).
 export function SuppliesPage({
   search,
