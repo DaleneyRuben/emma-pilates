@@ -18,6 +18,8 @@ export function ClientFace({
   size,
   variant = size >= 56 ? "display" : "thumbnail",
 }: {
+  /** Walkthrough finding 113: «neutral» draws initials without Rosa tinte. */
+  tone?: "brand" | "neutral";
   fetcher: typeof globalThis.fetch;
   name: string;
   photo: { imageAssetId: string } | null;

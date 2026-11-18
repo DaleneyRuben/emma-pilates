@@ -1,4 +1,4 @@
-import type { ContactAlertItemDtoReasonsItem } from "@pilates/api-contracts";
+import type { ContactAlertItemDto, ContactAlertItemDtoReasonsItem } from "@pilates/api-contracts";
 import { isCompletePhone, phoneWithFlag } from "@pilates/mobile-core";
 
 export const contactAlertReasons: Record<ContactAlertItemDtoReasonsItem, string> = {
@@ -34,3 +34,15 @@ export const contactPhoneLabel = (phone: string | null): string => {
 
 export const contactWhatsAppHref = (phone: string | null): string | null =>
   phone !== null && isCompletePhone(phone) ? whatsAppHref(phone) : null;
+
+// Walkthrough finding 113: stubs until the calm list lands.
+export const contactReasonLine = (reasons: readonly ContactAlertItemDtoReasonsItem[]): string =>
+  reasons.join(" ");
+
+export const contactRowMeta = (item: ContactAlertItemDto): string => item.name;
+
+export const contactMissingPhoneNote = (phone: string | null): string => phone ?? "";
+
+export const sortContactAlerts = (items: readonly ContactAlertItemDto[]): ContactAlertItemDto[] => [
+  ...items,
+];
