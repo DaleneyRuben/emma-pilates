@@ -86,7 +86,7 @@ describe("AW08 Insumos on a desktop browser", () => {
           "Nuevo insumo",
           "Registrar retiro",
           "Registrar reposición",
-          "Ver historial de retiros",
+          "Ver historial de movimientos",
         ].includes(label ?? ""),
       );
     // Follow-up 233: the one primary action sits last among the buttons.
@@ -94,10 +94,10 @@ describe("AW08 Insumos on a desktop browser", () => {
       "Registrar retiro",
       "Registrar reposición",
       "Nuevo insumo",
-      "Ver historial de retiros",
+      "Ver historial de movimientos",
     ]);
     expect(
-      screen.getByRole("link", { name: "Ver historial de retiros" }),
+      screen.getByRole("link", { name: "Ver historial de movimientos" }),
     ).toHaveAttribute("href", "/estudio/insumos/retiros?page=1&pageSize=20");
     expect(screen.getByText("Sucursal Centro · ningún insumo con stock bajo"));
   });
