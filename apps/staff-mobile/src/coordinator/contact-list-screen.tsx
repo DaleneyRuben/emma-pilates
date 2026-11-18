@@ -11,7 +11,6 @@ import {
   fontFamilies,
   LoadingState,
   NoticeRow,
-  phoneWithFlag,
   QueryFailure,
   Screen,
   spacing,
@@ -29,7 +28,12 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { StatusPill } from "../ui/session-row";
 import { useIsTablet } from "../ui/use-is-tablet";
-import { contactAlertReasons, startedOnLabel, whatsAppHref } from "./contact-list-copy";
+import {
+  contactAlertReasons,
+  contactPhoneLabel,
+  contactWhatsAppHref,
+  startedOnLabel,
+} from "./contact-list-copy";
 
 type Notice = { kind: "success" | "error"; name: string };
 
@@ -43,7 +47,7 @@ function ContactCard({
   onContacted: (item: ContactAlertItemDto) => void;
 }) {
   const fetcher = useStaffFetcher();
-  const href = item.phone === null ? null : whatsAppHref(item.phone);
+  const href = contactWhatsAppHref(item.phone);
   const started = startedOnLabel(item.startedOn);
   return (
     <View style={styles.card}>
@@ -52,7 +56,7 @@ function ContactCard({
         <View style={styles.identityBody}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.quiet}>
-            {`${item.phone === null ? "Sin teléfono" : phoneWithFlag(item.phone)} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
+            {`${contactPhoneLabel(item.phone)} · ${started.charAt(0).toLowerCase()}${started.slice(1)}`}
           </Text>
         </View>
       </View>
