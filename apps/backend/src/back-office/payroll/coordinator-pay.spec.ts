@@ -17,7 +17,13 @@ const client = (
   durationDays: number,
   classAllowance: number,
   broughtByTrainer = false,
-) => ({ durationDays, classAllowance, broughtByTrainer });
+) => ({
+  durationDays,
+  classAllowance,
+  broughtByTrainer,
+  clientName: 'Camila Rojas',
+  planName: `Plan de ${classAllowance} clases`,
+});
 
 describe('coordinator pay', () => {
   it('pays the Bs 3,500 base when nothing else is due', () => {
@@ -42,7 +48,7 @@ describe('coordinator pay', () => {
 
     expect(pay.lines).toContainEqual({
       kind: 'new_client',
-      detail: 'Clienta nueva',
+      detail: 'Camila Rojas · Plan de 8 clases · 30 días',
       amountCentavos: 5_000,
     });
     expect(pay.totalCentavos).toBe(355_000);
@@ -56,8 +62,16 @@ describe('coordinator pay', () => {
     });
 
     expect(pay.lines.filter((line) => line.kind === 'new_client')).toEqual([
-      { kind: 'new_client', detail: 'Clienta nueva', amountCentavos: 8_000 },
-      { kind: 'new_client', detail: 'Clienta nueva', amountCentavos: 8_000 },
+      {
+        kind: 'new_client',
+        detail: 'Camila Rojas · Plan de 16 clases · 60 días',
+        amountCentavos: 8_000,
+      },
+      {
+        kind: 'new_client',
+        detail: 'Camila Rojas · Plan de 24 clases · 90 días',
+        amountCentavos: 8_000,
+      },
     ]);
   });
 

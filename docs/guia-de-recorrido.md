@@ -1132,19 +1132,27 @@ lista en **Por resolver**.
 ### Sueldos
 
 1. **Dinero › Sueldos**, vista **Por aprobar**. Elige el período: **Día**,
-   **Semana**, **Rango** o **Mes**, y la fecha. **Calcular**. Un período no
+   **Semana**, **Rango** o **Mes**, y la fecha. **Volver a calcular**: dice a
+   qué hora calculó y qué sueldo cambió. Un período no
    se cruza con otro ya liquidado de la misma persona: una clase nunca se
    paga dos veces.
    Daniela aparece si ya dictó una clase cuyo cierre de ventana ya pasó, o
    si ya se confirmó el primer plan de Lucía.
-2. Lee las líneas. Una clase con hasta 4 reservas al cierre de la ventana
+2. Lee las líneas: cada tarjeta las agrupa por concepto con su subtotal
+   (54 × Bs 25 = Bs 1.350), y **Ver las 54** abre cada clase con su día,
+   hora, sucursal y tipo, y cada comisión o clienta nueva con su nombre y su
+   plan. Una clase con hasta 4 reservas al cierre de la ventana
    paga Bs 65. Desde la quinta reserva, suma Bs 8 por cada una. Quien no
    asistió cuenta igual, porque se cuenta la reserva, no la asistencia. Una
    clase cancelada por no llegar al mínimo de 2 paga Bs 25 a la instructora.
    El primer plan de Lucía paga el 10 % de lo que ella realmente pagó, una
    sola vez, en el mes en que se confirmó el pago.
-3. **Aprobar**. La tarjeta pasa a **Aprobado** y la vista **Pagados** gana
-   una fila por ese monto. Calcular el período otra vez no duplica el pago.
+3. **Aprobar pago** y confirma el monto en la ventana. La tarjeta pasa a
+   **Aprobado** y la vista **Pagados** gana una fila por ese monto. Calcular
+   el período otra vez no duplica el pago. Mientras el mes no terminó no se
+   ofrece aprobar: la tarjeta dice «Se aprueba desde el 1 de …» (la
+   coordinadora, desde el 8). Para pagarle antes a una instructora, **Pagar
+   por Rango** elige del 1 a ayer; después **Volver a calcular**.
 4. La coordinadora cobra por mes: su tarjeta aparece en **Por aprobar** solo
    con el período **Mes**. Sin coordinadora, el mes no tiene a quién
    liquidar. Cuando la invites, el cálculo es Bs 3.500 de base, más

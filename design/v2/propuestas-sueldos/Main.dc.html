@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Rediseño de Sueldos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&amp;family=Work+Sans:wght@400;500;600&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 64px 80px; background: #FAF7F2; font-family: 'Work Sans', sans-serif; color: #4A4A4A; display: flex; flex-direction: column; gap: 28px">
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #93615D; font-weight: 500">Hallazgo 105 · Administración web · Seguimiento 273</div>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 400; font-size: 44px">Sueldos, para revisar antes de pagar</h1>
+    <p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.6; color: #6E6663">Dinero › Sueldos cambia en las tres opciones de la misma forma: «Aprobar» deja de ser el botón más grande de la página y siempre pide confirmar el monto; en un mes que no terminó no se ofrece, y se explica cuándo se puede y cómo pagar antes por Rango; las líneas se agrupan por concepto con su subtotal (54 × Bs 25 = Bs 1.350) y cada grupo se abre clase por clase o clienta por clienta; «Volver a calcular» dice qué cambió. Cambia dónde se revisa el detalle.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="background: #F2E4E1; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #7D4F4B; font-weight: 600">A · Recomendada</div>
+      <div style="font-family: Lora, serif; font-size: 24px">Resumen que se despliega</div>
+      <p style="margin: 0; font-size: 15px; line-height: 1.55">Una tarjeta por persona, a lo ancho. Arriba el nombre, el estado, el total y a la derecha un botón normal «Aprobar pago». Debajo, una fila por concepto (cantidad × tarifa = subtotal); «Ver las 54» la abre ahí mismo, con fecha, hora, sucursal y clase.</p>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662; font-weight: 600">B</div>
+      <div style="font-family: Lora, serif; font-size: 24px">Lista y panel de revisión</div>
+      <p style="margin: 0; font-size: 15px; line-height: 1.55">Una tabla corta: persona, rol, estado y total. «Revisar» abre un panel a la derecha con los conceptos y su detalle; «Aprobar pago» vive solo al pie de ese panel, así nadie aprueba sin haber abierto el detalle. A 420 el panel ocupa la pantalla.</p>
+    </div>
+    <div style="background: #F5EFE9; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #6F6662; font-weight: 600">C</div>
+      <div style="font-family: Lora, serif; font-size: 24px">Tarjetas y revisión antes de aprobar</div>
+      <p style="margin: 0; font-size: 15px; line-height: 1.55">Tarjetas compactas en dos columnas, con los conceptos resumidos. «Revisar y aprobar» abre una ventana con el detalle por pestañas (una por concepto) y el monto a aprobar al pie; aprobar se hace desde ahí.</p>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.55; max-width: 1180px">
+    <div><b>Cómo usar el prototipo.</b> La franja oscura arriba de cada tablero no es parte del diseño: salta a «Hoy (18/11, mes abierto)», «1 de diciembre» (noviembre ya se puede aprobar), «Detalle abierto», «Confirmar», «Aprobado» y «Recalculado». Los botones de la página también funcionan.</div>
+    <div><b>Datos.</b> Los de tu recorrido: Daniela Ortiz Bs 1.534,90 (54 canceladas por mínimo, 1 clase, 2 comisiones de primer plan) y Paula Vargas Bs 3.780 (base y clientas nuevas). Las fechas, horas, sucursales y nombres del detalle son de ejemplo.</div>
+    <div><b>Igual en las tres.</b> La instructora se aprueba desde el 1 de diciembre; la coordinadora desde el 8, porque su bono espera las renovaciones. «1 alumna» en singular. Los montos no cambian: siguen las reglas de decisiones §8 y §9.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

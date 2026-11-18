@@ -155,6 +155,15 @@ describe('trainer pay statements', () => {
       state: 'draft',
       totalCentavos: handCheckedTotalCentavos,
     });
+    // Finding 105: each line names its class (Bolivia time) or its Client.
+    expect(emmaStatement!.lines.map((line) => line.detail)).toEqual([
+      'lun 7 sep · 10:00 · Centro · Reformer Pilates · 3 alumnas',
+      'lun 7 sep · 12:00 · Centro · Reformer Pilates · 6 alumnas, 2 extra',
+      'lun 7 sep · 16:00 · Centro · Reformer Pilates · 5 alumnas, 1 extra',
+      'lun 7 sep · 18:00 · Centro · Reformer Pilates',
+      'Nora Pay · Mensual · 10 % de Bs 780',
+    ]);
+    expect(emmaStatement!.approvableOn).toEqual(new Date('2026-10-01'));
 
     const approved = await statements(afterSeptember).approveStatement(
       { statementId: emmaStatement!.id },
@@ -228,6 +237,14 @@ describe('trainer pay statements', () => {
 
     expect(
       facts.trainers.find((row) => row.staffMemberId === emmaId)?.sessions,
-    ).toEqual([{ bookingsAtWindowClose: 3, cancellationCause: null }]);
+    ).toEqual([
+      {
+        bookingsAtWindowClose: 3,
+        cancellationCause: null,
+        startsAt: new Date('2026-08-05T14:00:00.000Z'),
+        branchName: 'Centro',
+        classTypeName: 'Reformer Pilates',
+      },
+    ]);
   });
 });
