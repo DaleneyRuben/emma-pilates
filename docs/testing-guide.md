@@ -7605,9 +7605,10 @@ on day 90, and she appears on **Para contactar** when she stops booking.
 
 Log in as `carolina.rivas@example.com` (Test 9 E). **Para contactar** is
 her second tab, with the count of Clients waiting on it. It opens the same
-list: the Client with her photo or initials, her phone with its flag, the
-reasons as pills, **Abrir WhatsApp** and **Marcar contactada**; marking one
-shows the toast «…, contactada · Sale de la lista y queda registrado a tu
+list as quiet rows (Test 172 since finding 113): the Client with her photo
+or initials, her reasons as one line, a WhatsApp ring when her phone works;
+the row opens a sheet with **Escribir por WhatsApp** and **Marcar
+contactada**; marking one shows the toast «…, contactada · Sale de la lista y queda registrado a tu
 nombre». With nobody to write to it reads «Nadie para contactar» with
 **Buscar una clienta** (Test 124 G).
 
@@ -10438,3 +10439,38 @@ recommendation reads that count.
 3. A Booking she cancelled herself still does not count: a Client whose only
    Booking she cancelled keeps the card.
 
+## Test 172: a calm «Para contactar» in the Staff app (finding 113)
+
+Walkthrough finding 113, proposal A of the «Para contactar» canvas. No
+migration; no API change. Log in to the Staff app as the Coordinator
+(`paula@example.com` on the walkthrough database, `carolina.rivas@example.com`
+on the fixtures) and open **Para contactar**.
+
+1. **One quiet list.** Under the title and «Clientas nuevas que conviene
+   escribir. Salen solas de la lista cuando reservan.» comes «N clientas»
+   and one Lino group with a row per Client: her photo or her initials on a
+   neutral (not pink) circle, her name, her reasons as one line («7 días sin
+   reservar · menos de 2 clases a los 15 días») and her start («Empezó el 2
+   de noviembre»). No pink chips, no tinted cards, no coloured links.
+2. **Order.** Clients with more reasons come first, then whoever started
+   earliest, then by name.
+3. **Phone.** A Client whose phone works has a ringed WhatsApp icon on her
+   row; it opens WhatsApp to her number. A short phone reads «Celular
+   incompleto · empezó el …» and no phone «Sin teléfono · empezó el …», with
+   no WhatsApp icon.
+4. **Sheet.** Tapping a row opens a sheet: her name, her phone with its flag
+   (or what is wrong with it) and start, «Por qué está aquí» with each
+   reason, then **Escribir por WhatsApp**, **Marcar contactada** and
+   **Volver**. Without a usable phone the sheet says «Su celular está
+   incompleto (7000004), así que no se puede abrir WhatsApp. Háblale en el
+   estudio o revisa su ficha.» (or «No tiene teléfono registrado, …») and
+   the main button is **Abrir su ficha**, which opens her file in
+   **Clientes** (back returns to the search).
+5. **Marcar contactada.** The sheet closes, the toast «Rocío, contactada ·
+   Sale de la lista y queda registrado a tu nombre» shows, her row leaves
+   and the count drops. If the request fails the sheet stays open with «No
+   pudimos marcar a … Inténtalo de nuevo.» (before, a failed request showed
+   the success toast).
+6. **Empty.** With nobody left it reads «Nadie para contactar» with
+   **Buscar una clienta**, as before.
+7. Check on the iPhone 16 Pro, then the iPad and the Android emulator.
