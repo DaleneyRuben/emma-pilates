@@ -36,3 +36,4 @@ executionOrder:
     - assistant-cash-close
     - trainer-attendance
     - staff-profile-photo
+    - staff-payout-qr

@@ -1,0 +1,82 @@
+# Critical journey (FIX-072): a Staff Member uploads her payout QR from
+# Perfil › Mi QR de cobro and says until when it is valid (follow-up 276).
+# Needs the worker running, an image in the device's photo library
+# (`xcrun simctl addmedia <udid> qr.png`, or `adb push` on Android), and
+# Camila without a current payout QR (the fixtures give her none; a rerun
+# needs a fresh fixtures database).
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+# The 15th of next month: the calendar's day id and the dates the app shows.
+# The row shows the month unpadded («15/1»), the sheet and the toast padded.
+- evalScript: ${var d = new Date(); d = new Date(d.getFullYear(), d.getMonth() + 1, 15); output.m = String(d.getMonth() + 1); output.mm = output.m.padStart(2, '0'); output.yyyy = String(d.getFullYear()); output.qrDay = output.yyyy + '-' + output.mm + '-15'}
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-profile"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+# The parked developer gear sits on the Perfil tab's right half; tap its left.
+- tapOn:
+    point: "78%,95%"
+- extendedWaitUntil:
+    visible:
+      id: "profile-payout-qr"
+    timeout: 15000
+# The row carries its own label: «Mi QR de cobro, <standing>».
+- assertVisible: "Mi QR de cobro, Sin subir"
+- takeScreenshot: fix072-1-perfil-sin-subir
+- tapOn:
+    id: "profile-payout-qr"
+- extendedWaitUntil:
+    visible: "Todavía no subiste tu QR de cobro"
+    timeout: 15000
+- assertVisible: "Administración lo usa para pagarte.*"
+- assertVisible:
+    id: "payout-qr-upload"
+- takeScreenshot: fix072-2-empty
+- tapOn:
+    id: "payout-qr-upload"
+- extendedWaitUntil:
+    visible: "Sube tu QR de cobro"
+    timeout: 10000
+- assertVisible: "Tomar foto"
+- takeScreenshot: fix072-3-source-sheet
+- tapOn: "Elegir de la galería"
+- runFlow: subflows/pick-first-photo.yaml
+# The phone's picker can swallow the first tap while its grid still loads:
+# tap the first cell again while the picker stays open.
+- runFlow:
+    when:
+      platform: iOS
+      visible: "Search your library.*|Buscar en tu fototeca.*"
+    commands:
+      - waitForAnimationToEnd
+      - tapOn:
+          point: "16%,28%"
+- extendedWaitUntil:
+    visible: "¿Hasta cuándo vale\\?"
+    timeout: 30000
+- assertVisible: "Lo dice tu banco al generar el QR."
+- tapOn: "Mes siguiente"
+- tapOn:
+    id: "calendar-day-${output.qrDay}"
+- assertVisible: "Vale hasta el 15/${output.mm}/${output.yyyy}. Te avisaremos 7 días antes y cuando venza."
+- takeScreenshot: fix072-4-date-sheet
+- tapOn:
+    id: "payout-qr-save"
+- extendedWaitUntil:
+    visible: "Guardamos tu QR. Vale hasta el 15/${output.mm}/${output.yyyy}."
+    timeout: 60000
+- assertVisible:
+    id: "payout-qr-change"
+- assertVisible: "Tu QR de cobro"
+- takeScreenshot: fix072-5-saved
+# The back bar («Perfil») is labelled «Volver».
+- tapOn:
+    id: "back-bar"
+- extendedWaitUntil:
+    visible: "Mi QR de cobro, Vale hasta 15/${output.m}"
+    timeout: 15000
+- takeScreenshot: fix072-6-perfil-vale-hasta
