@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import type { RecommendationDto } from "@pilates/api-contracts";
+import { narrativeQueryOptions } from "../indicators/narrative-queries";
 import {
   dismissRecommendationRequest,
   recommendationsQueryOptions,
@@ -101,9 +102,16 @@ export function RecommendationsSection({
     queryClient.invalidateQueries({
       queryKey: recommendationsQueryOptions(month).queryKey,
     });
+  // The month report counts the findings, so it reads them again too.
   const recompute = useMutation({
     mutationFn: () => recomputeRecommendationsRequest(month),
-    onSuccess: refresh,
+    onSuccess: () =>
+      Promise.all([
+        refresh(),
+        queryClient.invalidateQueries({
+          queryKey: narrativeQueryOptions(month).queryKey,
+        }),
+      ]),
   });
   const dismiss = useMutation({
     mutationFn: dismissRecommendationRequest,
