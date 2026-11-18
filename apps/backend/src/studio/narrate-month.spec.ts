@@ -214,6 +214,24 @@ describe('answer question', () => {
     );
   });
 
+  it('does not answer a client cancellation with the minimum count', () => {
+    expect(
+      answerQuestion('¿Cuántas clientas cancelaron sus reservas?', counts())
+        .refused,
+    ).toBe(true);
+  });
+
+  it('says no class was held beside the cancellations', () => {
+    expect(
+      answerQuestion(
+        'clases canceladas',
+        counts({ sessionsHeld: 0, minimumCancellations: 4 }),
+      ).answer,
+    ).toBe(
+      'Se cancelaron 4 clases por no llegar al mínimo de reservas, y no se dictó ninguna.',
+    );
+  });
+
   it('mentions the minimum cancellations in the month report', () => {
     const result = narrateMonth({
       month: '2026-11',

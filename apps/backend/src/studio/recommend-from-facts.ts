@@ -2,8 +2,9 @@ import { isoWeekday } from '../time/bolivia-time';
 
 // STU-006 rules the fact tables can support. Session facts have a date and
 // no start hour, so a weak schedule is trainer plus weekday, not a clock
-// time. Since finding 107 a class cancelled for low demand counts in it. Client no-shows and plan expiry are not on client_month_facts, so
-// those rules are not computed here. Inactive means the current month, a
+// time. Since finding 107 a class cancelled for low demand counts in it.
+// Client no-shows and plan expiry are not on client_month_facts, so those
+// rules are not computed here. Inactive means the current month, a
 // live plan, and no booking: the 7-day window needs a booking query this
 // item does not add.
 

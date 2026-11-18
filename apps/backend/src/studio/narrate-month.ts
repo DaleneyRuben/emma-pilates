@@ -119,10 +119,10 @@ export const narrateMonth = (input: {
     `En ${label} ${held}, con una ocupación del ${occupancyPercent} %. ${active}`,
     `La renovación del mes fue del ${renewalPercent} %.`,
   ];
-  // A discarded or resolved finding is no longer something to review.
   if (input.kpis.minimumCancellations > 0) {
     paragraphs.push(`${cancelledLine(input.kpis.minimumCancellations)}.`);
   }
+  // A discarded or resolved finding is no longer something to review.
   const open = input.recommendations.filter(
     (item) => item.state !== 'dismissed' && item.state !== 'resolved',
   );
@@ -183,7 +183,12 @@ export const answerQuestion = (
     };
   }
   // Finding 107 (e): «cancel» covers cancelada, cancelaciones, canceló.
-  if (normalized.includes('cancel')) {
+  // A Client's own cancellations are not this indicator.
+  if (
+    normalized.includes('cancel') &&
+    !normalized.includes('reserva') &&
+    !normalized.includes('clienta')
+  ) {
     const { minimumCancellations: count, sessionsHeld } = aggregates;
     if (count === 0) {
       return {
@@ -192,7 +197,11 @@ export const answerQuestion = (
       };
     }
     const held =
-      sessionsHeld === 1 ? 'se dictó 1' : `se dictaron ${sessionsHeld}`;
+      sessionsHeld === 0
+        ? 'no se dictó ninguna'
+        : sessionsHeld === 1
+          ? 'se dictó 1'
+          : `se dictaron ${sessionsHeld}`;
     return {
       refused: false,
       answer: `${cancelledLine(count)}, y ${held}.`,
