@@ -195,6 +195,17 @@ describe("AW37 equipment types", () => {
     await user.click(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
     );
+    const confirm = await screen.findByRole("alertdialog", {
+      name: "¿Quitar el tipo Aros?",
+    });
+    expect(
+      within(confirm).getByText(
+        "Deja de aparecer en todas las sucursales. Su historial queda.",
+      ),
+    ).toBeInTheDocument();
+    expect(bodies).toEqual([]);
+    const remove = within(confirm).getByRole("button", { name: "Quitar tipo" });
+    await user.dblClick(remove);
     expect(await screen.findByText("Quitamos el tipo Aros.")).toBeVisible();
     expect(bodies).toEqual([null]);
   });
@@ -209,6 +220,13 @@ describe("AW37 equipment types", () => {
     const { user, panel } = await openEdit(/^Mat ·/, "Editar tipo · Mat");
     await user.click(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
+    );
+    await user.click(
+      within(
+        await screen.findByRole("alertdialog", {
+          name: "¿Quitar el tipo Mat?",
+        }),
+      ).getByRole("button", { name: "Quitar tipo" }),
     );
     expect(await within(panel).findByRole("alert")).toHaveTextContent(
       "Primero da de baja sus unidades en todas las sucursales.",
