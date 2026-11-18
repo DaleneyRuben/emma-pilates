@@ -1,15 +1,5 @@
 import type { RecommendationDto } from "@pilates/api-contracts";
-
-const weekdays = [
-  "",
-  "lunes",
-  "martes",
-  "miércoles",
-  "jueves",
-  "viernes",
-  "sábado",
-  "domingo",
-];
+import { weekdayName } from "../lib/bolivia-time";
 
 export type RecommendationGroup = {
   key: string;
@@ -39,9 +29,9 @@ const scheduleGroup = (
 ): RecommendationGroup => {
   const days = [...new Set(items.map((item) => item.weekday ?? 0))]
     .sort((a, b) => a - b)
-    .map((day) => weekdays[day] ?? "")
+    .map(weekdayName)
     .filter((day) => day !== "");
-  const trainer = items[0]?.trainerName ?? "una instructora";
+  const trainer = items[0]?.trainerName ?? "una entrenadora";
   return {
     key: `schedule:${key}`,
     kind: "schedule",
