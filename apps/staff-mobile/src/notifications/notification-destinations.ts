@@ -10,7 +10,8 @@ export type StaffNotificationRoute =
   | readonly ["PaymentsTab", { screen: "Payments" }]
   | readonly ["PaymentsTab", { screen: "ReviewPayment"; params: { paymentId: string } }]
   | readonly ["PaymentsTab", { screen: "Freezes" }]
-  | readonly ["PaymentsTab", { screen: "ReviewFreeze"; params: { freezeId: string } }];
+  | readonly ["PaymentsTab", { screen: "ReviewFreeze"; params: { freezeId: string } }]
+  | readonly ["ProfileTab", { screen: "PayoutQr"; initial: false }];
 
 // The one map from a notification's destination to a Staff screen, shared by
 // the inbox and push taps (NOT-002). Mi agenda is the first tab of the Trainer
@@ -39,6 +40,10 @@ export function staffNotificationDestination(
     return destinationId === null
       ? ["PaymentsTab", { screen: "Freezes" }]
       : ["PaymentsTab", { screen: "ReviewFreeze", params: { freezeId: destinationId } }];
+  }
+  // FIX-072: every role keeps a payout QR; its reminder opens it over Perfil.
+  if (destinationType === "payout_qr") {
+    return ["ProfileTab", { screen: "PayoutQr", initial: false }];
   }
   return null;
 }
