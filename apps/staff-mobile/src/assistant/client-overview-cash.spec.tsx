@@ -133,4 +133,41 @@ describe("Client overview cash action", () => {
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
   });
+
+  // Review of FIX-083: extra classes alone still book (booking ADR-0013's
+  // spendable extras), so the card and the button agree.
+  it("offers «Reservar clase» when only extra classes are left", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () =>
+        jsonResponse({
+          ...overview,
+          subscription: {
+            status: "active",
+            subscription: { ...subscription, remainingClassAllowance: 0, extraClasses: 2 },
+          },
+        }),
+    });
+
+    await waitFor(() => expect(screen.getByText("2 clases disponibles")).toBeOnTheScreen());
+    expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
+  });
+
+  it("never calls an expired plan's leftover classes available", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () =>
+        jsonResponse({
+          ...overview,
+          subscription: {
+            status: "expired",
+            subscription: { ...subscription, endsOn: "2026-09-12" },
+          },
+        }),
+    });
+
+    await waitFor(() => expect(screen.getByText("Vencido")).toBeOnTheScreen());
+    expect(screen.getByText("clases sin usar")).toBeOnTheScreen();
+    expect(screen.queryByText(/disponible/)).toBeNull();
+  });
 });

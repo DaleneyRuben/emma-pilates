@@ -61,7 +61,7 @@ async function openNotifications() {
     expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
   );
   await fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
-  await waitFor(() => expect(screen.getByText("3 comentarios nuevos")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByText("3 comentarios")).toBeOnTheScreen());
   return { fetcher, screen };
 }
 
@@ -79,7 +79,7 @@ describe("Staff Notificaciones grouped (FIX-083, pick A)", () => {
     expect(screen.queryByText("Sin leer")).toBeNull();
     expect(screen.queryByText("Anteriores")).toBeNull();
     expect(screen.queryByText("Lucía escribió desde la app.")).toBeNull();
-    expect(screen.getByRole("button", { name: /3 comentarios nuevos, 2 sin leer/ })).toHaveProp(
+    expect(screen.getByRole("button", { name: /^3 comentarios, 2 sin leer/ })).toHaveProp(
       "accessibilityState",
       expect.objectContaining({ expanded: false }),
     );
@@ -88,13 +88,13 @@ describe("Staff Notificaciones grouped (FIX-083, pick A)", () => {
   it("opens a group to show each notice, and each one still opens its destination", async () => {
     const { screen } = await openNotifications();
 
-    await fireEvent.press(screen.getByText("3 comentarios nuevos"));
+    await fireEvent.press(screen.getByText("3 comentarios"));
 
     await waitFor(() => expect(screen.getByText("Lucía escribió desde la app.")).toBeOnTheScreen());
     expect(screen.getByText("Valeria escribió desde la app.")).toBeOnTheScreen();
     expect(screen.getByText("Ana escribió desde la app.")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByText("3 comentarios nuevos"));
+    await fireEvent.press(screen.getByText("3 comentarios"));
     await waitFor(() => expect(screen.queryByText("Lucía escribió desde la app.")).toBeNull());
   });
 
@@ -105,5 +105,30 @@ describe("Staff Notificaciones grouped (FIX-083, pick A)", () => {
     expect(screen.getByTestId("notification-row-p1")).not.toHaveStyle({
       backgroundColor: "#F6EDEB",
     });
+  });
+
+  it("tells a screen reader which single notices are unread", async () => {
+    const { screen } = await openNotifications();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Carla Prueba subió un comprobante de Bs 450., sin leer",
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText(/^2 sin leer · /)).toBeOnTheScreen();
+  });
+
+  it("marks a notice read when opened and everything with «Marcar todo leído»", async () => {
+    const { fetcher, screen } = await openNotifications();
+    const posts = () =>
+      (fetcher.mock.calls as [string, RequestInit | undefined][])
+        .filter(([, init]) => init?.method?.toUpperCase() === "POST")
+        .map(([path]) => path);
+
+    await fireEvent.press(screen.getByText("Marcar todo leído"));
+    await waitFor(() => expect(posts()).toContain("/api/v1/notifications/read-all"));
+
+    await fireEvent.press(screen.getByText("Carla Prueba subió un comprobante de Bs 450."));
+    await waitFor(() => expect(posts()).toContain("/api/v1/notifications/p1/read"));
   });
 });

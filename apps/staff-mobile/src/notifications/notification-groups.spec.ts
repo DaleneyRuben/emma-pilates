@@ -31,7 +31,7 @@ describe("groupNotifications", () => {
     expect(entries[0]).toMatchObject({
       kind: "group",
       key: "feedback_received",
-      label: "3 comentarios nuevos",
+      label: "3 comentarios",
       unreadCount: 2,
     });
     expect(entries[0]?.kind === "group" && entries[0].items.map((item) => item.id)).toEqual([
@@ -71,10 +71,11 @@ describe("groupNotifications", () => {
         notice("2", type, "2026-11-18T14:00:00.000Z"),
       ])[0];
 
+    expect(pair("feedback_received")).toMatchObject({ label: "2 comentarios" });
     expect(pair("payment_submitted")).toMatchObject({ label: "2 comprobantes por revisar" });
     expect(pair("freeze_requested")).toMatchObject({ label: "2 congelamientos por revisar" });
     expect(pair("session_cancelled")).toMatchObject({ label: "2 clases canceladas" });
-    expect(pair("session_assigned")).toMatchObject({ label: "2 clases nuevas asignadas" });
-    expect(pair("evaluation_booked")).toMatchObject({ label: "2 evaluaciones nuevas" });
+    expect(pair("session_assigned")).toMatchObject({ label: "2 clases asignadas" });
+    expect(pair("evaluation_booked")).toMatchObject({ label: "2 evaluaciones agendadas" });
   });
 });

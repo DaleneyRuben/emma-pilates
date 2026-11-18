@@ -160,6 +160,26 @@ describe("Cerrar caja (S25)", () => {
     });
   });
 
+  it("closes the sheet and says so when the close fails", async () => {
+    const screen = await openCashClose({
+      ...assistantRoutes(),
+      [centroToday]: () => jsonResponse(today),
+      "POST /api/v1/cash-closes": () => jsonResponse({ code: "boom", status: 500 }, 500),
+    });
+
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
+    await fireEvent.press(await screen.findByTestId("cash-close-confirm"));
+
+    await waitFor(() =>
+      expect(
+        screen.getByLabelText("No pudimos cerrar la caja. Inténtalo de nuevo."),
+      ).toBeOnTheScreen(),
+    );
+    expect(screen.queryByTestId("cash-close-confirm")).toBeNull();
+    expect(screen.queryByLabelText("Caja cerrada")).toBeNull();
+  });
+
   it("keeps the button off for a count it cannot read", async () => {
     const screen = await openCashClose({
       ...assistantRoutes(),

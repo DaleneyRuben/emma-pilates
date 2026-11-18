@@ -200,4 +200,50 @@ describe("Horario (v2 HOR boards)", () => {
     expect(screen.getByText("2 canceladas por mínimo")).toBeOnTheScreen();
     expect(screen.getByText("Ver")).toBeOnTheScreen();
   });
+
+  it("says when every class of the day was cancelled", async () => {
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            ...routes(coordinator),
+            [daySessions]: () =>
+              jsonResponse([
+                {
+                  ...session,
+                  cancellation: { cause: "minimum_not_met", cancelledAt: from, bookedCount: 1 },
+                },
+              ]),
+          }),
+          "coordinator",
+        )}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-schedule"));
+
+    expect(await screen.findByText("Hoy todas las clases están canceladas")).toBeOnTheScreen();
+    expect(screen.getByText("1 cancelada por mínimo")).toBeOnTheScreen();
+  });
+
+  it("reads the length and the waitlist to a screen reader", async () => {
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            ...routes(coordinator),
+            [daySessions]: () => jsonResponse([{ ...session, waitlistCount: 2 }]),
+          }),
+          "coordinator",
+        )}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-schedule"));
+
+    expect(await screen.findByTestId("schedule-session-session-1")).toHaveProp(
+      "accessibilityLabel",
+      expect.stringMatching(/, 50 min, 2 en espera$/),
+    );
+  });
 });
