@@ -1,3 +1,4 @@
+import type { NewNotification } from '../../notifications/prisma-notification-store';
 import { remindPayoutQrs } from './remind-payout-qrs';
 
 const civil = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -6,7 +7,9 @@ const occurredAt = new Date('2026-12-08T13:00:00.000Z');
 
 describe('remindPayoutQrs', () => {
   it('reminds each current QR that is due a reminder it has not had', async () => {
-    const record = jest.fn().mockResolvedValue(undefined);
+    const record = jest
+      .fn<Promise<void>, [NewNotification]>()
+      .mockResolvedValue(undefined);
     const findAlreadySent = jest
       .fn()
       .mockResolvedValue(['payout-qr-expired:qr-old']);
