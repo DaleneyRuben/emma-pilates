@@ -217,12 +217,16 @@ const styles = StyleSheet.create({
   amountFocused: { borderColor: colors.primary, borderWidth: 2 },
   centered: { textAlign: "center" },
   count: { gap: spacing.sm },
-  currency: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: 20 },
+  currency: {
+    color: colors.textSubtle,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.titleCard,
+  },
   differenceLabel: {
     color: colors.textMuted,
     flex: 1,
     fontFamily: fontFamilies.body,
-    fontSize: 15,
+    fontSize: typography.body,
   },
   differenceRow: {
     alignItems: "center",
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
   differenceValue: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 15,
+    fontSize: typography.body,
     fontVariant: ["tabular-nums"],
   },
   footer: { gap: spacing.sm },
@@ -241,11 +245,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.display,
-    fontSize: 30,
+    fontSize: typography.title,
     fontVariant: ["tabular-nums"],
     padding: 0,
   },
   note: { minHeight: 88, paddingTop: spacing.md, textAlignVertical: "top" },
-  question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
+  question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: typography.body },
   quiet: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

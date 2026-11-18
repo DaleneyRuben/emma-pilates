@@ -17,6 +17,12 @@ function allowanceLine(subscription: Subscription, active: boolean): string {
   return `${plan} · ${ends}`;
 }
 
+// An ended plan's leftovers cannot be booked, so they are not «disponibles».
+function unitLabel(count: number, active: boolean): string {
+  if (!active) return count === 1 ? "clase sin usar" : "clases sin usar";
+  return count === 1 ? "clase disponible" : "clases disponibles";
+}
+
 /**
  * FIX-083 (Ficha pick A): S06's Plan on one quiet Lino card: the name and a
  * small status dot, the classes she can still book in Lora 40, where they come
@@ -47,9 +53,7 @@ export function ClientPlanCard({
       </View>
       <View style={styles.count}>
         <Text style={styles.number}>{String(available)}</Text>
-        <Text style={styles.unit}>
-          {available === 1 ? "clase disponible" : "clases disponibles"}
-        </Text>
+        <Text style={styles.unit}>{unitLabel(available, active)}</Text>
       </View>
       <Text style={styles.quiet}>{allowanceLine(subscription, active)}</Text>
       {subscription.extraClassesLine ? (

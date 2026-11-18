@@ -55,7 +55,7 @@ export function ScheduleClassCard({
   const waitlist = session.waitlistCount > 0 ? ` · ${session.waitlistCount} en espera` : "";
   return (
     <View
-      accessibilityLabel={`${time}, ${session.classTypeName} con ${session.trainerName}, ${places}`}
+      accessibilityLabel={`${time}, ${session.classTypeName} con ${session.trainerName}, ${places}, ${minutesLabel(session.startsAt, session.endsAt)}${waitlist.replace(" ·", ",")}`}
       accessible
       style={styles.card}
       testID={`schedule-session-${session.id}`}
@@ -138,9 +138,14 @@ const styles = StyleSheet.create({
   time: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 20,
+    fontSize: typography.titleCard,
     fontVariant: ["tabular-nums"],
   },
-  title: { color: colors.text, flexShrink: 1, fontFamily: fontFamilies.body, fontSize: 15 },
+  title: {
+    color: colors.text,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+  },
   top: { alignItems: "baseline", flexDirection: "row", justifyContent: "space-between" },
 });

@@ -44,7 +44,7 @@ function NoticeRow({
   const unread = !notification.readAt;
   return (
     <PlainRow
-      accessibilityLabel={notification.message}
+      accessibilityLabel={unread ? `${notification.message}, sin leer` : notification.message}
       detail={formatNotificationTime(notification.createdAt, now)}
       dot={unread}
       indent={indent}
@@ -96,9 +96,12 @@ export function NotificationEntries({
             accessibilityLabel={`${entry.label}${unread}`}
             accessibilityState={{ expanded: open }}
             chevron={open ? "up" : "down"}
-            detail={
-              newest === undefined ? undefined : formatNotificationTime(newest.createdAt, now)
-            }
+            detail={[
+              entry.unreadCount > 0 ? `${entry.unreadCount} sin leer` : null,
+              newest === undefined ? null : formatNotificationTime(newest.createdAt, now),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
             dot={entry.unreadCount > 0}
             key={entry.key}
             label={entry.label}

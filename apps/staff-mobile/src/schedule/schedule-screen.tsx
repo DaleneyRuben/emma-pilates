@@ -43,7 +43,12 @@ type ScheduleNavigation = {
 };
 
 // «3 clases hoy», or «Martes 3 de noviembre · 3 clases» on another day (FIX-083).
-function dayCount(date: string, today: string, count: number): string {
+function dayCount(date: string, today: string, count: number, cancelled: number): string {
+  if (count === 0 && cancelled > 0) {
+    return date === today
+      ? "Hoy todas las clases están canceladas"
+      : `${dayHeading(date)} · todas canceladas`;
+  }
   const classes = countLabel(count, "clase", "clases");
   return date === today ? `${classes} hoy` : `${dayHeading(date)} · ${classes}`;
 }
@@ -143,7 +148,9 @@ export function ScheduleScreen() {
           />
         ) : (
           <View style={styles.list}>
-            <SectionTitle>{dayCount(selectedDate, today, standing.length)}</SectionTitle>
+            <SectionTitle>
+              {dayCount(selectedDate, today, standing.length, cancelled.length)}
+            </SectionTitle>
             {standing.map((session) => (
               <ScheduleClassCard fetcher={fetcher} key={session.id} session={session} />
             ))}

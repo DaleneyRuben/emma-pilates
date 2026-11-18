@@ -11,15 +11,16 @@ export type NotificationEntry =
     };
 
 // FIX-083 (Notificaciones, pick A): the plural line a group of each kind reads.
+// A group counts read notices too, so the copy never calls them «nuevos».
 const plurals: Record<string, string> = {
-  evaluation_booked: "evaluaciones nuevas",
+  evaluation_booked: "evaluaciones agendadas",
   evaluation_cancelled: "evaluaciones canceladas",
   evaluation_rescheduled: "evaluaciones reprogramadas",
-  feedback_received: "comentarios nuevos",
+  feedback_received: "comentarios",
   freeze_requested: "congelamientos por revisar",
   payment_confirmed: "pagos confirmados",
   payment_submitted: "comprobantes por revisar",
-  session_assigned: "clases nuevas asignadas",
+  session_assigned: "clases asignadas",
   session_cancelled: "clases canceladas",
 };
 

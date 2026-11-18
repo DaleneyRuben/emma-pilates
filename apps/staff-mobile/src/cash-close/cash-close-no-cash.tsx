@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 22,
+    fontSize: typography.titleSecondary,
     textAlign: "center",
   },
 });
