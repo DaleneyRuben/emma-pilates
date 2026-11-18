@@ -216,6 +216,7 @@ import type {
   OwnSalaryPaymentDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
+  PayStatementApprovalDto,
   PayStatementDraftDto,
   PayStatementDto,
   PaymentDto,
@@ -37940,12 +37941,26 @@ export const getApprovePayStatementUrl = (statementId: string) => {
 
 export const approvePayStatement = async (
   statementId: string,
+  payStatementApprovalDto: PayStatementApprovalDto,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<approvePayStatementResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
   const res = await (fetchFn ?? fetch)(getApprovePayStatementUrl(statementId), {
     ...options,
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(payStatementApprovalDto),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -37995,9 +38010,9 @@ export const getApprovePayStatementMutationOptions = <
     Awaited<ReturnType<typeof approvePayStatement>>,
     ApprovePayStatementMutationVariables
   > = (props) => {
-    const { statementId } = props ?? {};
+    const { statementId, data } = props ?? {};
 
-    return approvePayStatement(statementId, fetchOptions, fetcherFn);
+    return approvePayStatement(statementId, data, fetchOptions, fetcherFn);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -38006,9 +38021,12 @@ export const getApprovePayStatementMutationOptions = <
 export type ApprovePayStatementMutationResult = NonNullable<
   Awaited<ReturnType<typeof approvePayStatement>>
 >;
-
+export type ApprovePayStatementMutationBody = PayStatementApprovalDto;
 export type ApprovePayStatementMutationError = unknown;
-export type ApprovePayStatementMutationVariables = { statementId: string };
+export type ApprovePayStatementMutationVariables = {
+  statementId: string;
+  data: PayStatementApprovalDto;
+};
 
 export const useApprovePayStatement = <TError = unknown, TContext = unknown>(
   options?: {
