@@ -14,6 +14,7 @@ import {
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
+import { staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -29,6 +30,8 @@ type Detail = {
   startsAt: string;
   trainerName: string;
   trainerPhoto: { imageAssetId: string } | null;
+  /** FIX-081: «Entrenadora» or «Entrenador»; feminine from an older API. */
+  trainerGender?: StaffGenderCode;
 };
 
 function capitalized(text: string): string {
@@ -56,13 +59,21 @@ export function SessionHero({ detail, full }: { detail: Detail; full: boolean })
 }
 
 /** Her 36 px face (FIX-041, follow-up 242), or her initials while she has none. */
-function TrainerRow({ name, photo }: { name: string; photo: Detail["trainerPhoto"] }) {
+function TrainerRow({
+  name,
+  photo,
+  gender,
+}: {
+  name: string;
+  photo: Detail["trainerPhoto"];
+  gender: Detail["trainerGender"];
+}) {
   const fetcher = useClientFetcher();
   return (
     <View style={styles.row}>
       <StaffFace fetcher={fetcher} name={name} photo={photo} size={36} />
       <Text style={styles.label}>{name}</Text>
-      <Text style={styles.value}>Entrenadora</Text>
+      <Text style={styles.value}>{staffRoleLabel("trainer", gender)}</Text>
     </View>
   );
 }
@@ -97,7 +108,11 @@ export function SessionFacts({
     <View>
       <SectionTitle>La clase</SectionTitle>
       <IconRowGroup testID="session-facts">
-        <TrainerRow name={detail.trainerName} photo={detail.trainerPhoto} />
+        <TrainerRow
+          gender={detail.trainerGender}
+          name={detail.trainerName}
+          photo={detail.trainerPhoto}
+        />
         <IconRow icon="pin" label="Sucursal" value={detail.branch.name} />
         {lastRow === null ? null : <IconRow icon={lastRow.icon} label={lastRow.label} />}
       </IconRowGroup>

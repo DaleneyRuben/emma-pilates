@@ -27,6 +27,7 @@ import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { describeSale } from "./administrator-format";
+import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
 import { RootHeader } from "../ui/root-header";
@@ -54,6 +55,8 @@ export function PendingPaymentsScreen({
 }) {
   const navigation = useNavigation<PendingPaymentsNavigation>();
   const fetcher = useStaffFetcher();
+  // FIX-081: the person's Role, «Administradora» or «Administrador».
+  const roleLabel = useOwnRoleLabel();
   const pending = useListPendingPayments({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -84,7 +87,7 @@ export function PendingPaymentsScreen({
     );
 
   const header = (
-    <RootHeader bell eyebrow="Administración" label="Pagos pendientes" title="Pagos pendientes" />
+    <RootHeader bell eyebrow={roleLabel} label="Pagos pendientes" title="Pagos pendientes" />
   );
   // Owner, 2026-11-02: what used to sit in the header opens from Pagos.
   const shortcuts = (

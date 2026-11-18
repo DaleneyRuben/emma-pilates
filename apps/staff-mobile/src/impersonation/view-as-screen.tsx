@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { roleLabel } from "../profile/staff-labels";
+import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar, backBarScroll } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
@@ -132,7 +132,7 @@ export function ViewAsScreen() {
               {people.map((member) => (
                 <PersonRow
                   accessibilityLabel={member.name}
-                  detail={`${roleLabel(member.role)} · ${branchesOf(member)}`}
+                  detail={`${staffRoleLabel(member.role, member.gender)} · ${branchesOf(member)}`}
                   key={member.id}
                   name={member.name}
                   onPress={() => setConfirming(member)}

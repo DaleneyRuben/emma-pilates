@@ -28,7 +28,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { roleLabel } from "../profile/staff-labels";
+import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { agendaHeading, causeLabel } from "../trainer/agenda-cancellations";
@@ -84,8 +84,8 @@ export function ScheduleScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const several = branches.options.length > 1;
-  const eyebrow =
-    branch === null || several ? roleLabel(role) : `${roleLabel(role)} · ${branch.name}`;
+  const roleLabel = useOwnRoleLabel();
+  const eyebrow = branch === null || several ? roleLabel : `${roleLabel} · ${branch.name}`;
 
   const header = <RootHeader eyebrow={eyebrow} title="Horario" />;
   if (branches.isPending) {

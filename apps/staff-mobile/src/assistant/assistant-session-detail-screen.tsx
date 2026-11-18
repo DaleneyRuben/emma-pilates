@@ -3,6 +3,7 @@ import {
   getListAssistantClientBookingsQueryKey,
   useGetAssistantClientOverview,
   useGetSession,
+  staffRoleLabel,
 } from "@pilates/api-contracts";
 import {
   BodyText,
@@ -230,7 +231,7 @@ export function AssistantSessionDetailScreen({
               }
               label={detail.trainerName}
               testID="session-trainer-row"
-              value="Entrenadora"
+              value={staffRoleLabel("trainer", detail.trainerGender)}
             />
             <IconRow icon="pin" label={`Sucursal ${detail.branch.name}`} />
             <IconRow

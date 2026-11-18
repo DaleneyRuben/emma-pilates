@@ -3,6 +3,7 @@ import {
   listTrainerSchedule,
   useGetCurrentStaffMemberProfile,
   useListTrainerSchedule,
+  staffRoleLabel,
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
@@ -65,11 +66,12 @@ export function TrainerAgendaScreen() {
   const refreshControl = usePullToRefresh(queryKeys);
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
+  const gender = profile.data?.status === 200 ? profile.data.data.gender : undefined;
   const isToday = selectedDate === today;
   const header = (
     <RootHeader
       bell
-      eyebrow={`Entrenadora · ${dayHeading(today)}`}
+      eyebrow={`${staffRoleLabel("trainer", gender)} · ${dayHeading(today)}`}
       label="Mi agenda"
       title={firstName === undefined ? "Hola" : `Hola, ${firstName}`}
     />

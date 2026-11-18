@@ -27,7 +27,7 @@ import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } fr
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
-import { roleLabel } from "../profile/staff-labels";
+import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { PersonRow } from "../ui/person-row";
@@ -103,10 +103,9 @@ export function ClientSearchScreen() {
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
   const member = profile.data?.status === 200 ? profile.data.data : undefined;
   const role = useStaffRole();
+  const roleLabel = staffRoleLabel(role, member?.gender);
   const eyebrow =
-    member?.branches.length === 1
-      ? `${roleLabel(role)} · ${member.branches[0]?.name}`
-      : roleLabel(role);
+    member?.branches.length === 1 ? `${roleLabel} · ${member.branches[0]?.name}` : roleLabel;
 
   const search = (
     <>
