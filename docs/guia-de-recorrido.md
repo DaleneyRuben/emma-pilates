@@ -732,8 +732,8 @@ ficha se abre a la derecha, sin perder la lista.
    y programa el plan siguiente de Rocío, que empieza el …» y muestra
    **Empieza**. Una fundadora que compra así por adelantado conserva su
    lugar aunque el nuevo plan empiece más de 7 días después. Si ya tiene un
-   plan siguiente, el botón no está y la ficha dice «Ya tiene un plan
-   siguiente.».
+   plan siguiente, el botón no está y la ficha dice «Su próximo plan ya está
+   pagado (…, desde el …). Podrás registrar otro pago cuando empiece.».
 8. **Reservar clase** abre **Reservar una clase**, con la franja
    «Reservando para Lucía», la sede, los días (y **Otra** para una fecha más
    adelante) y los tipos de clase. Una clase que ya tiene dice **Ya
@@ -1215,13 +1215,16 @@ administración.»), cada una con su rol y sus sedes. Elige a Camila. La hoja
 «¿Ver la app como Camila Rojas?» dice «Durante 30 minutos verás sus clases»
 y «Lo que hagas queda registrado a tu nombre». Pulsa **Ver como Camila**. La
 app cambia a la barra de Camila y una franja arriba dice «Viendo como Camila
-Rojas · Asistente · Quedan N min», con **Salir**.
+Rojas · Asistente · Quedan N min», con **Salir**. Las pantallas empiezan
+justo debajo de la franja, sin un espacio en blanco en medio.
 
 Recorre **Clientes** y la ficha de Lucía, **Horario** y **Caja**. No
-confirmes un pago ni mandes un comentario desde ahí: un comentario se niega
-mientras ves la app como otra persona, y un pago en efectivo quedaría
-registrado a tu nombre. Sal con **Salir** en la franja, o espera los 30
-minutos. Repite con Daniela, para ver su **Agenda** con sus clases y **Mis
+confirmes un pago desde ahí: un pago en efectivo quedaría registrado a tu
+nombre. Su **Perfil** no ofrece **Cambiar foto**, **Cambiar contraseña**,
+**Enviar comentarios** ni **Cerrar sesión**: dice «Mientras ves la app como
+Camila, su foto, su contraseña, sus comentarios y su sesión son solo suyos.»,
+y la última fila es **Dejar de ver como Camila**. Sal con esa fila o con
+**Salir** en la franja, o espera los 30 minutos. Repite con Daniela, para ver su **Agenda** con sus clases y **Mis
 pagos**, y con Gabriela, para ver su **Agenda** y **Disponibilidad**.
 
 ### Como coordinadora
@@ -1252,10 +1255,13 @@ enlace** (y, en **⋯**, **Cambiar correo** y **Cancelar invitación**). No tien
 **Registrar pago**: el cobro sigue en recepción, y sin plan la
 ficha dice «La clienta necesita un plan activo para reservar.». **Horario**
 es la semana para leer, con **Cancelar una clase** arriba. **Para
-contactar** lista a quien el seguimiento de los primeros 90 días marcó: día
-2, semana 1, día 30, día 90, una alerta de 7 días sin venir, o menos de 4
-clases usadas. Con una sola clienta recién llegada, la
-lista puede tener una fila o ninguna, según el día.
+contactar** lista a las clientas en sus primeros 90 días (contados desde el
+inicio de su primer plan) que cumplen una de tres reglas, y cada fila dice
+cuál: «7 días sin reservar» (y sin una clase reservada por delante), «Menos
+de 2 clases a los 15 días» o «Menos de 4 clases en su primer mes» (a los 30
+días). Los mensajes del día 2, la semana 1, el día 30 y el día 90 le llegan a
+la clienta y no ponen a nadie en esta lista. Con una sola clienta recién
+llegada, la lista puede tener una fila o ninguna, según el día.
 
 ### Los primeros 90 días
 
