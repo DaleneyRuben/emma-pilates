@@ -215,7 +215,7 @@ describe("Sueldos por aprobar", () => {
     );
     expect(
       await screen.findByText(
-        "Todavía no se puede aprobar: el período no terminó. Para pagar antes a una instructora, usa Rango hasta ayer.",
+        "Todavía no se puede aprobar: el período no terminó. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular.",
       ),
     ).toBeInTheDocument();
   });
