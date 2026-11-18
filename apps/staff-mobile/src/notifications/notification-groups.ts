@@ -31,7 +31,7 @@ function groupLabel(type: string, items: NotificationDto[]): string {
 }
 
 /**
- * Notices of the same type collapse into one row («6 comentarios nuevos»);
+ * Notices of the same type collapse into one row («6 comentarios»);
  * a lone notice stays its own row. Entries keep the inbox's newest-first
  * order by their newest notice.
  */

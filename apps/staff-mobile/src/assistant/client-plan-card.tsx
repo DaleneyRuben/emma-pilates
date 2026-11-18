@@ -3,6 +3,7 @@ import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pil
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatCivilDayMonth } from "./assistant-format";
+import { bookableClasses } from "./bookable-classes";
 
 type Subscription = NonNullable<ClientOverviewDto["subscription"]["subscription"]>;
 
@@ -39,7 +40,7 @@ export function ClientPlanCard({
   sells: boolean;
   subscription: Subscription;
 }) {
-  const available = subscription.remainingClassAllowance + (subscription.extraClasses ?? 0);
+  const available = bookableClasses(subscription);
   return (
     <View style={styles.card} testID="client-plan-card">
       <View style={styles.top}>

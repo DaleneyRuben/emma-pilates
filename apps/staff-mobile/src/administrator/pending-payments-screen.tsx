@@ -158,6 +158,7 @@ export function PendingPaymentsScreen({
           // FIX-083 (Ronda 2 pick A): one small line, not half a screen.
           <View
             accessibilityLabel="Todo al día. No hay pagos por confirmar"
+            accessible
             style={styles.allClear}
             testID="pending-payments-all-clear"
           >

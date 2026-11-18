@@ -156,7 +156,13 @@ export function ClientSearchScreen() {
           Buscando…
         </Text>
       ) : results.isError || results.data.status !== 200 ? (
-        <QueryFailure label="No pudimos buscar clientes." onRetry={() => void results.refetch()} />
+        <>
+          <QueryFailure
+            label="No pudimos buscar clientes."
+            onRetry={() => void results.refetch()}
+          />
+          {newClientLink}
+        </>
       ) : clients.length === 0 ? (
         <StateScreen
           icon="person"

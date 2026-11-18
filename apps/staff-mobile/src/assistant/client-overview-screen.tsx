@@ -21,6 +21,7 @@ import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { useInClientPanel } from "./assistant-workspace";
+import { canBookFor } from "./bookable-classes";
 import { ClientPlanCard } from "./client-plan-card";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
@@ -102,9 +103,7 @@ export function ClientOverviewScreen({
   const active =
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
   const subscription = data.subscription.subscription ?? null;
-  // Extra classes book too once the plan's run out (booking ADR-0013).
-  const canBook =
-    active && (subscription?.remainingClassAllowance ?? 0) + (subscription?.extraClasses ?? 0) > 0;
+  const canBook = canBookFor(data.subscription);
   // The API's subscription_not_expired rule: a queued Plan blocks a new one
   // (BKM-006), so the cash action is only offered when she can buy (UX-003).
   const futurePlan = data.subscription.nextSubscription ?? null;
