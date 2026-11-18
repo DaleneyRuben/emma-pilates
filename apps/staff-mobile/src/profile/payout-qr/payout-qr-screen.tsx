@@ -116,6 +116,8 @@ export function PayoutQrScreen() {
         visible={upload.step === "source"}
       />
       <PayoutQrDateSheet
+        // A new photo starts with no day chosen (review finding).
+        key={upload.step === "date" ? upload.picked.uri : "none"}
         busy={upload.step === "date" && upload.saving}
         failure={upload.step === "date" ? upload.failure : null}
         onCancel={flow.cancel}
