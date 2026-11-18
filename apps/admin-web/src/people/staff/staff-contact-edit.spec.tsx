@@ -84,6 +84,33 @@ describe("AW24 Editar miembro contact", () => {
     ).toBeVisible();
   });
 
+  // FIX-081 (finding 118): «Género» is part of the contact command, sent
+  // only when it changes; the Roles relabel as soon as it is chosen.
+  it("corrects the gender so his Role reads in the masculine", async () => {
+    server.use(listOf(emma), contactSaved({ gender: "male" }, emma));
+    const { panel, user } = await openMember("Emma Vargas");
+    const genders = within(panel).getByRole("group", { name: "Género" });
+    expect(
+      within(genders).getByRole("radio", { name: "Femenino" }),
+    ).toBeChecked();
+
+    await user.click(within(genders).getByRole("radio", { name: "Masculino" }));
+    expect(
+      within(panel).getByRole("radio", { name: "Entrenador" }),
+    ).toBeChecked();
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() =>
+      expect(sent).toEqual([
+        {
+          method: "PUT",
+          path: `${memberPath(emma.id)}/contact`,
+          body: { name: "Emma Vargas", phone: emma.phone, gender: "male" },
+        },
+      ]),
+    );
+  });
+
   // FIX-037: «Celular» is required wherever it is a field; a stored phone
   // cannot be cleared.
   it("refuses to clear a stored phone", async () => {
@@ -135,7 +162,7 @@ describe("AW24 Editar miembro contact", () => {
     ).toBeVisible();
     expect(within(panel).getByLabelText("Celular")).toHaveValue("91155550000");
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -162,7 +189,7 @@ describe("AW24 Editar miembro contact", () => {
     const { panel, user } = await openMember("Emma Vargas");
 
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 

@@ -164,7 +164,7 @@ describe("AW24 Editar miembro", () => {
     const { panel, user } = await openMember("Emma Vargas");
 
     await user.click(
-      within(panel).getByRole("radio", { name: "Administración" }),
+      within(panel).getByRole("radio", { name: "Administradora" }),
     );
     expect(
       within(panel).getByText("Todas las sucursales (implícito por el rol)"),

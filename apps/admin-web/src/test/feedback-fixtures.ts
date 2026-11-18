@@ -20,6 +20,7 @@ export const problem: AdminFeedbackDto = {
   senderEmail: "valeria@example.com",
   senderName: "Valeria Quiroga",
   senderClientId: "c1000000-0000-5000-8000-000000000088",
+  senderGender: null,
   // 20:30 on 22 October in Bolivia, already the 23rd in UTC.
   createdAt: "2026-10-23T00:30:00.000Z",
   triagedAt: null,
@@ -40,6 +41,7 @@ export const suggestion: AdminFeedbackDto = {
   senderEmail: "emma.vargas@example.com",
   senderName: "Emma Vargas",
   senderClientId: null,
+  senderGender: "female",
   createdAt: "2026-10-21T14:00:00.000Z",
   triagedAt: "2026-10-22T14:00:00.000Z",
 };

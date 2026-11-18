@@ -11,6 +11,7 @@ import {
   allBranchesHandler,
   camila,
   emma,
+  member,
   paolaMember,
   rita,
   staffMembersPath,
@@ -69,7 +70,7 @@ describe("AW23 Personal on a desktop browser", () => {
 
     const paolaRow = await rowOf("Paola Mendoza");
     expect(
-      within(paolaRow).getByRole("cell", { name: "Administración" }),
+      within(paolaRow).getByRole("cell", { name: "Administradora" }),
     ).toBeInTheDocument();
     expect(
       within(paolaRow).getByRole("cell", { name: "Todas" }),
@@ -105,9 +106,9 @@ describe("AW23 Personal on a desktop browser", () => {
       "Todos",
       "Entrenadora",
       "Asistente",
-      "Administración",
+      "Administradora",
       "Nutricionista",
-      "Coordinador",
+      "Coordinadora",
     ]);
 
     await user.selectOptions(filter, "assistant");
@@ -136,6 +137,29 @@ describe("AW23 Personal on a desktop browser", () => {
         {},
         { timeout: 5_000 },
       ),
+    ).toBeInTheDocument();
+  });
+
+  // FIX-081 (finding 118): each Role reads in the member's gender.
+  it("names a man's Role in the masculine", async () => {
+    const diego = member("07", "Diego Paz", { gender: "male" });
+    const mario = member("08", "Mario Rojas", {
+      role: "coordinator",
+      gender: "male",
+      branchIds: [],
+    });
+    server.use(staffTable(() => jsonResponse(staffPage([diego, mario]))));
+    renderAdmin("/estudio/personal");
+
+    expect(
+      within(await rowOf("Diego Paz")).getByRole("cell", {
+        name: "Entrenador",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(await rowOf("Mario Rojas")).getByRole("cell", {
+        name: "Coordinador",
+      }),
     ).toBeInTheDocument();
   });
 

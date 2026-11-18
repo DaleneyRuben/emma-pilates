@@ -42,23 +42,33 @@ describe("the Coordinator Role in Personal", () => {
     const { user } = renderAdmin("/estudio/personal");
 
     const row = await screen.findByRole("row", { name: /Carolina Rivas/ });
-    expect(within(row).getByText("Coordinador")).toBeInTheDocument();
+    // FIX-081: her Role reads in her gender, «Coordinadora».
+    expect(within(row).getByText("Coordinadora")).toBeInTheDocument();
     expect(within(row).getByText("Todas")).toBeInTheDocument();
     expect(
       within(screen.getByLabelText("Rol")).getByRole("option", {
-        name: "Coordinador",
+        name: "Coordinadora",
       }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Nuevo miembro" }));
     const panel = await screen.findByRole("dialog", { name: "Nuevo miembro" });
-    await user.type(within(panel).getByLabelText("Nombre"), "Carolina Rivas");
+    await user.type(within(panel).getByLabelText("Nombre"), "Mario Rivas");
     await user.type(
       within(panel).getByLabelText("Correo electrónico"),
-      "carolina.rivas@example.com",
+      "mario.rivas@example.com",
     );
     await user.type(within(panel).getByLabelText("Celular"), "71234567");
     const roles = within(panel).getByRole("group", { name: "Rol" });
+    expect(
+      within(roles).getByRole("radio", { name: "Coordinadora" }),
+    ).toBeInTheDocument();
+    await user.click(
+      within(within(panel).getByRole("group", { name: "Género" })).getByRole(
+        "radio",
+        { name: "Masculino" },
+      ),
+    );
     await user.click(within(roles).getByRole("radio", { name: "Coordinador" }));
     expect(
       within(panel).getByText("Todas las sucursales (implícito por el rol)"),
@@ -67,7 +77,11 @@ describe("the Coordinator Role in Personal", () => {
 
     await screen.findByText(/Invitación enviada/);
     expect(created).toEqual([
-      expect.objectContaining({ role: "coordinator", branchIds: [] }),
+      expect.objectContaining({
+        role: "coordinator",
+        gender: "male",
+        branchIds: [],
+      }),
     ]);
   });
 

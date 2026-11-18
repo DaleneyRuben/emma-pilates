@@ -153,7 +153,7 @@ describe("the admin web for the Coordinator", () => {
     expect(
       within(
         await screen.findByRole("dialog", { name: "Tu cuenta" }),
-      ).getByText("Coordinación"),
+      ).getByText("Coordinadora"),
     ).toBeInTheDocument();
   });
 });

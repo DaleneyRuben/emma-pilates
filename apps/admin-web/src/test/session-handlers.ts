@@ -33,6 +33,7 @@ export const paolaProfile = {
   phone: null,
   photo: null,
   role: "administrator" as const,
+  gender: "female" as const,
   branches: [],
 };
 
@@ -88,6 +89,7 @@ export const carolinaProfile = {
   phone: null,
   photo: null,
   role: "coordinator" as const,
+  gender: "female" as const,
   branches: [],
 };
 
