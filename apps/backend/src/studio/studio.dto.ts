@@ -43,6 +43,23 @@ export class RecommendationDto {
   @ApiProperty() detail!: string;
   @ApiProperty({ enum: ['new', 'seen', 'dismissed', 'resolved'] })
   state!: string;
+  @ApiProperty({
+    required: false,
+    description: 'The Client an inactive_client finding is about',
+  })
+  clientId?: string;
+  @ApiProperty({ required: false, description: 'That Client, by name' })
+  clientName?: string;
+  @ApiProperty({
+    required: false,
+    description: 'The Trainer of a weak_schedule finding, by name',
+  })
+  trainerName?: string;
+  @ApiProperty({
+    required: false,
+    description: 'ISO weekday of a weak_schedule finding, 1 = Monday',
+  })
+  weekday?: number;
 }
 
 export class RecommendationListDto {

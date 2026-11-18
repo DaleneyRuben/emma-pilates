@@ -1,4 +1,5 @@
-import { fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { DeviceEventEmitter, ScrollView } from "react-native";
 
 import { FeedbackScreen } from "./feedback-screen";
 import { readFeedbackMetadata } from "./feedback-metadata";
@@ -50,6 +51,25 @@ describe("FeedbackScreen (REL-012)", () => {
     await fireEvent.changeText(screen.getByLabelText("Comentario"), comment);
     expect(screen.getByRole("button", { name: "Problema" })).toBeSelected();
     expect(sendButton(screen)).toBeEnabled();
+  });
+
+  // Walkthrough finding 96: with the keyboard up, the counter row under the
+  // field was cut in half. The field stops growing and scrolls inside, and
+  // the form scrolls to the row once the keyboard is up.
+  it("keeps the counter row in view above the keyboard", async () => {
+    const scrollToEnd = jest
+      .spyOn(ScrollView.prototype as { scrollToEnd: () => void }, "scrollToEnd")
+      .mockImplementation(() => undefined);
+    const screen = await renderScreen(jest.fn());
+
+    expect(screen.getByLabelText("Comentario")).toHaveStyle({ maxHeight: 240 });
+    await act(async () => {
+      DeviceEventEmitter.emit("keyboardDidShow", {
+        endCoordinates: { height: 300, screenX: 0, screenY: 500, width: 400 },
+      });
+    });
+    expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
+    scrollToEnd.mockRestore();
   });
 
   // Owner, 2026-11-03: the app version and device are technical; they travel

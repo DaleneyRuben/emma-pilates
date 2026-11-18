@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Sueldos por aprobar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&amp;display=swap">
+<style>
+body{margin:0;background:#FAF7F2}*{box-sizing:border-box}
+.ms{font-family:'Material Symbols Rounded';font-weight:300;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga'}
+.root{position:relative;background:#FAF7F2;font-family:'Work Sans',sans-serif;color:#4A4A4A;font-size:15px;overflow:hidden}
+.proto{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;background:#2E2724;color:#F5EFE9;font-size:13px}
+.proto b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:11px;margin-right:6px}
+.pc{height:30px;padding:0 12px;border:0;border-radius:999px;background:rgba(245,239,233,.12);color:#F5EFE9;font:500 13px 'Work Sans',sans-serif;cursor:pointer}
+.root{display:flex;flex-direction:column}
+.app{display:flex;flex:1;min-height:0}
+.rail{flex:0 0 96px;background:#F5EFE9;padding:20px 8px;display:flex;flex-direction:column;gap:4px}
+.n .rail{display:none}
+.mark{font-family:Lora,serif;font-size:24px;color:#93615D;text-align:center;padding-bottom:12px}
+.ri{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;color:#4A4A4A}.ri.on{color:#7D4F4B}
+.rp{width:56px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#B78380}.ri.on .rp{background:#93615D;color:#fff}
+.rl{font-size:12px;font-weight:500}
+.col{flex:1;min-width:0;display:flex;flex-direction:column;overflow-y:auto}
+.top{display:flex;align-items:center;gap:16px;padding:20px 40px}
+.n .top{padding:10px 12px;gap:8px;height:64px}
+.ib{width:44px;height:44px;border:0;border-radius:12px;background:#F5EFE9;color:#B78380;display:flex;align-items:center;justify-content:center}
+.wm{display:flex;align-items:baseline;gap:8px}.wm b{font-family:Lora,serif;font-weight:400;font-size:22px}.wm i{font-family:Lora,serif;font-style:normal;font-size:15px;color:#93615D}
+main{padding:8px 40px 40px;display:flex;flex-direction:column;gap:18px}
+.n main{padding:8px 16px 24px;gap:14px}
+h1{margin:0;font-family:Lora,serif;font-weight:400;font-size:32px}.n h1{font-size:30px}
+.sub{color:#6F6662}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #E6DBD0;overflow-x:auto}
+.tab{height:44px;padding:0 14px;border:0;background:transparent;font:400 15px 'Work Sans',sans-serif;margin-bottom:-1px;color:#6F6662;border-bottom:2px solid transparent;display:inline-flex;align-items:center;white-space:nowrap}
+.tab.on{color:#7D4F4B;font-weight:600;border-bottom-color:#93615D}
+.cnt{margin-left:6px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:999px;background:#93615D;color:#fff}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:flex;gap:2px;background:#F5EFE9;border-radius:12px;padding:3px}
+.seg button{height:38px;border:0;border-radius:10px;background:transparent;font:500 14px 'Work Sans',sans-serif;color:#6F6662;cursor:pointer;padding:0 14px}.seg button.on{background:#FAF7F2;color:#7D4F4B;font-weight:600}
+.n .seg button{padding:0 10px}
+.stepper{display:flex;align-items:center;gap:4px;background:#F5EFE9;border-radius:14px;padding:4px}
+.lora{font-family:Lora,serif}
+.btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;border:0;border-radius:14px;font:600 15px 'Work Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.btn.sm{height:36px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn:disabled{opacity:.6;cursor:default}
+.p{background:#93615D;color:#fff}.s{background:#F2E4E1;color:#7D4F4B}.t{background:transparent;color:#7D4F4B;padding:0 10px}
+.pill{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:rgba(124,148,115,.16);color:#4F6347}.wait{background:rgba(201,154,78,.16);color:#7C5D2A}.none{background:rgba(216,201,187,.34);color:#6F6662}
+.notice{display:flex;align-items:flex-start;gap:12px;background:#F5EFE9;border-radius:12px;padding:12px 16px;font-size:14px;line-height:1.5}
+.n .notice{flex-wrap:wrap}
+.explain{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:16px;background:#F2E4E1;font-size:14px;line-height:1.5}
+.n .explain{padding:14px 16px}
+.av{width:40px;height:40px;border-radius:999px;background:#F2E4E1;color:#7D4F4B;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.note{font-size:13px;color:#6F6662}
+.strong{font-weight:600}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.card{background:#F5EFE9;border-radius:16px}
+.shead{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:18px 20px}
+.n .shead{padding:16px}
+.total{font-family:Lora,serif;font-size:26px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.waitnote{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#7C5D2A}
+.concepts{border-top:1px solid #E6DBD0}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 220px 130px;align-items:center;gap:12px;padding:10px 20px;min-height:52px}
+.crow+.crow,.detail+.crow{border-top:1px solid #E6DBD0}
+.n .crow{grid-template-columns:minmax(0,1fr) auto;padding:10px 16px}
+.n .crate{display:none}
+.cname{display:flex;align-items:center;gap:6px;min-width:0}
+.tog{height:36px;display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:#7D4F4B;font:600 14px 'Work Sans',sans-serif;cursor:pointer;padding:0 8px;border-radius:10px;white-space:nowrap}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.detail{background:#FAF7F2;margin:0 12px 12px;border-radius:12px;max-height:340px;overflow-y:auto}
+.n .detail{margin:0 8px 10px}
+.dh,.dr{display:grid;grid-template-columns:150px 80px 130px minmax(0,1fr) 110px;gap:12px;padding:9px 16px;align-items:center}
+.dh{position:sticky;top:0;background:#FAF7F2;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662;border-bottom:1px solid #E6DBD0}
+.dr+.dr{border-top:1px solid #EFE6DC}
+.dr{font-size:14px}
+.nr{display:flex;align-items:center;gap:12px;padding:10px 12px;font-size:14px}.nr+.nr{border-top:1px solid #EFE6DC}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;padding:12px 20px;border-top:1px solid #E6DBD0}
+.n .foot{padding:12px 16px}
+.ptable{background:#F5EFE9;border-radius:16px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) 150px 170px 220px 140px;align-items:center;gap:12px;padding:12px 20px;min-height:64px}
+.prow+.prow{border-top:1px solid #E6DBD0}
+.prow.h{min-height:0;padding:14px 20px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#6F6662}
+.n .prow{grid-template-columns:minmax(0,1fr) auto;padding:12px 16px}
+.n .prow.h{display:none}
+.panel{position:absolute;top:0;right:0;bottom:0;width:600px;background:#FAF7F2;box-shadow:-8px 0 24px rgba(74,58,48,.16);z-index:4;display:flex;flex-direction:column}
+.n .panel{width:100%}
+.phead{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid #E6DBD0}
+.pbody{flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:14px}
+.n .pbody{padding:12px}
+.pfoot{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 24px;border-top:1px solid #E6DBD0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.n .grid2{grid-template-columns:minmax(0,1fr)}
+.sum{display:flex;justify-content:space-between;gap:12px;padding:6px 20px;font-size:14px}
+.n .sum{padding:6px 16px}
+.scrim{position:absolute;inset:0;background:rgba(74,58,48,.28);display:flex;align-items:center;justify-content:center;z-index:6;padding:24px}
+.n .scrim{align-items:flex-end;padding:0}
+.dlg{width:480px;max-width:100%;background:#FAF7F2;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(74,58,48,.16)}
+.dlg.wide{width:820px;max-height:900px}
+.n .dlg{width:100%;border-radius:20px 20px 0 0;padding:24px 20px 28px;max-height:1000px}
+.dlg h2{margin:0;font-family:Lora,serif;font-weight:400;font-size:22px;line-height:1.3}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;font-size:14px}
+.ctabs{display:flex;gap:6px;overflow-x:auto}
+.ct{height:36px;padding:0 12px;border-radius:999px;border:0;background:#F5EFE9;font:400 14px 'Work Sans',sans-serif;color:#4A4A4A;cursor:pointer;white-space:nowrap;flex:none}.ct.on{background:#F2E4E1;color:#7D4F4B;font-weight:600}
+</style>
+</helmet>
+<div class="{{rootCls}}" style="{{rootStyle}}">
+  <div class="proto" aria-label="Prototipo">
+    <b>Prototipo</b>
+    <sc-for list="{{proto}}" as="p" hint-placeholder-count="6"><button type="button" class="pc" onClick="{{p.go}}">{{p.label}}</button></sc-for>
+  </div>
+  <div class="app">
+    <nav class="rail" aria-label="Menú principal">
+      <span class="mark">E</span>
+      <sc-for list="{{rail}}" as="r" hint-placeholder-count="9"><span class="{{r.cls}}"><span class="rp"><span class="ms" style="font-size: 22px">{{r.icon}}</span></span><span class="rl">{{r.label}}</span></span></sc-for>
+    </nav>
+    <div class="col">
+      <sc-if value="{{wide}}" hint-placeholder-val="{{true}}">
+        <header class="top"><span class="wm"><b>Emma</b><i>Pilates Studio</i></span><span style="flex: 1"></span><span class="av">PM</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Paola Mendoza</span><span style="font-size: 12px; color: #6F6662">Administración</span></span></header>
+      </sc-if>
+      <sc-if value="{{narrow}}" hint-placeholder-val="{{false}}">
+        <header class="top"><span class="ib"><span class="ms" style="font-size: 24px">menu</span></span><span class="wm" style="flex: 1; padding-left: 4px"><b style="font-size: 20px">Emma</b><i style="font-size: 14px">Pilates Studio</i></span><span class="ib"><span class="ms" style="font-size: 22px">search</span></span></header>
+      </sc-if>
+      <main>
+        <div style="display: flex; flex-direction: column; gap: 4px"><h1>Dinero</h1><span class="sub">Sueldos: lo que corresponde pagar al equipo y lo ya pagado</span></div>
+        <div class="tabs"><span class="tab">Pagos</span><span class="tab">Caja</span><span class="tab on">Sueldos<span class="cnt">2</span></span><span class="tab">Gastos</span></div>
+        <div class="bar">
+          <div class="seg" role="tablist" aria-label="Período"><sc-for list="{{periods}}" as="q" hint-placeholder-count="4"><button type="button" class="{{q.cls}}" onClick="{{q.go}}">{{q.label}}</button></sc-for></div>
+          <div class="stepper"><button type="button" class="btn sm t" aria-label="Anterior"><span class="ms">chevron_left</span></button><span class="lora" style="font-size: 17px; padding: 0 6px">{{periodLabel}}</span><button type="button" class="btn sm t" aria-label="Siguiente"><span class="ms">chevron_right</span></button></div>
+          <span style="flex: 1"></span>
+          <div class="seg" role="tablist" aria-label="Vista"><button type="button" class="on">Por aprobar · {{pending}}</button><button type="button">Pagados</button></div>
+          <button type="button" class="btn sm s" disabled="{{recalcBusy}}" onClick="{{recalc}}"><span class="ms">refresh</span>{{recalcLabel}}</button>
+        </div>
+
+        <sc-if value="{{hasRecalc}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span><span style="flex: 1">Recalculamos {{periodLabel}} a las 14:32. Cambió 1 sueldo: Daniela Ortiz pasó de Bs 1.509,90 a Bs 1.534,90 (una cancelada por mínimo más). Paula Vargas, sin cambios.</span></div></sc-if>
+        <sc-if value="{{hasNotice}}" hint-placeholder-val="{{false}}"><div class="notice" role="status"><span class="ms" style="color: #4F6347">check_circle</span><span style="flex: 1">{{notice}}</span></div></sc-if>
+        <sc-if value="{{monthOpen}}" hint-placeholder-val="{{true}}">
+          <div class="explain"><span class="ms" style="color: #93615D">event</span><span style="flex: 1; min-width: 240px">Noviembre todavía no terminó: cierra el 30. Desde el 1 de diciembre puedes aprobar a las instructoras, y desde el 8 a la coordinadora, porque su bono espera las renovaciones. Para pagarle antes a una instructora, usa Rango hasta ayer.</span><button type="button" class="btn sm s" onClick="{{toRange}}"><span class="ms">date_range</span>Pagar por Rango</button></div>
+        </sc-if>
+        <sc-if value="{{inRange}}" hint-placeholder-val="{{false}}"><span class="note">Rango del 1 al 17 de noviembre. La coordinadora se paga solo por mes, así que no aparece aquí.</span></sc-if>
+
+        <sc-if value="{{isA}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <sc-for list="{{stmts}}" as="s" hint-placeholder-count="2">
+              <article class="card">
+                <div class="shead">
+                  <span class="av">{{s.ini}}</span>
+                  <span class="grow"><span class="strong">{{s.n}}</span><span class="note">{{s.role}} · {{s.lineCount}}</span></span>
+                  <span class="{{s.pillCls}}">{{s.pill}}</span>
+                  <span class="total">{{s.total}}</span>
+                  <sc-if value="{{s.canApprove}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm p" onClick="{{s.ask}}"><span class="ms">check</span>Aprobar pago</button></sc-if>
+                  <sc-if value="{{s.waits}}" hint-placeholder-val="{{false}}"><span class="waitnote"><span class="ms" style="font-size: 18px">schedule</span>{{s.waitText}}</span></sc-if>
+                </div>
+                <div class="concepts">
+                  <sc-for list="{{s.groups}}" as="g" hint-placeholder-count="3">
+                    <div class="crow">
+                      <span class="cname"><span class="strong">{{g.label}}</span><sc-if value="{{g.hasRows}}" hint-placeholder-val="{{true}}"><button type="button" class="tog" aria-expanded="{{g.isOpen}}" onClick="{{g.toggle}}"><span class="ms" style="font-size: 18px">{{g.chev}}</span>{{g.togLabel}}</button></sc-if></span>
+                      <span class="note crate">{{g.rate}}</span>
+                      <span class="num">{{g.sub}}</span>
+                    </div>
+                    <sc-if value="{{g.isOpen}}" hint-placeholder-val="{{false}}">
+                      <div class="detail">
+                        <sc-if value="{{wide}}" hint-placeholder-val="{{true}}">
+                          <div class="dh"><sc-for list="{{g.cols}}" as="h" hint-placeholder-count="5"><span class="{{h.cls}}">{{h.t}}</span></sc-for></div>
+                          <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4"><div class="dr"><span>{{r.a}}</span><span>{{r.b}}</span><span>{{r.c}}</span><span>{{r.d}}</span><span class="num">{{r.m}}</span></div></sc-for>
+                        </sc-if>
+                        <sc-if value="{{narrow}}" hint-placeholder-val="{{false}}">
+                          <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4"><div class="nr"><span class="grow"><span>{{r.l1}}</span><span class="note">{{r.l2}}</span></span><span class="num">{{r.m}}</span></div></sc-for>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                  </sc-for>
+                  <div class="crow"><span class="strong">Total</span><span class="crate"></span><span class="num strong">{{s.total}}</span></div>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isB}}" hint-placeholder-val="{{false}}">
+          <div class="ptable">
+            <div class="prow h"><span>Persona</span><span>Rol</span><span>Estado</span><span class="num">Total</span><span></span></div>
+            <sc-for list="{{stmts}}" as="s" hint-placeholder-count="2">
+              <div class="prow">
+                <span style="display: flex; align-items: center; gap: 12px; min-width: 0"><span class="av">{{s.ini}}</span><span class="grow"><span class="strong">{{s.n}}</span><span class="note">{{s.lineCount}}</span></span></span>
+                <sc-if value="{{wide}}" hint-placeholder-val="{{true}}"><span>{{s.role}}</span><span><span class="{{s.pillCls}}">{{s.pill}}</span></span><span class="num total" style="font-size: 20px">{{s.total}}</span></sc-if>
+                <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><sc-if value="{{narrow}}" hint-placeholder-val="{{false}}"><span class="num lora" style="font-size: 18px">{{s.total}}</span></sc-if><button type="button" class="btn sm s" onClick="{{s.openPanel}}">Revisar</button></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isC}}" hint-placeholder-val="{{false}}">
+          <div class="grid2">
+            <sc-for list="{{stmts}}" as="s" hint-placeholder-count="2">
+              <article class="card" style="display: flex; flex-direction: column">
+                <div class="shead">
+                  <span class="av">{{s.ini}}</span>
+                  <span class="grow"><span class="strong">{{s.n}}</span><span class="note">{{s.role}}</span></span>
+                  <span class="{{s.pillCls}}">{{s.pill}}</span>
+                </div>
+                <div style="padding: 0 0 8px">
+                  <sc-for list="{{s.groups}}" as="g" hint-placeholder-count="3"><div class="sum"><span>{{g.label}} <span class="note">· {{g.rate}}</span></span><span class="num">{{g.sub}}</span></div></sc-for>
+                </div>
+                <div class="foot" style="margin-top: auto; justify-content: space-between">
+                  <span class="total">{{s.total}}</span>
+                  <span style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end">
+                    <sc-if value="{{s.waits}}" hint-placeholder-val="{{false}}"><span class="waitnote"><span class="ms" style="font-size: 18px">schedule</span>{{s.waitText}}</span></sc-if>
+                    <sc-if value="{{s.notApproved}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm s" onClick="{{s.openReview}}">{{s.reviewLabel}}</button></sc-if>
+                  </span>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+      </main>
+    </div>
+  </div>
+
+  <sc-if value="{{panelOpen}}" hint-placeholder-val="{{false}}">
+    <aside class="panel" aria-label="Revisar sueldo">
+      <div class="phead"><span class="av">{{ps.ini}}</span><span class="grow"><span class="lora" style="font-size: 22px">{{ps.n}}</span><span class="note">{{ps.role}} · {{periodLabel}} · {{ps.lineCount}}</span></span><button type="button" class="ib" aria-label="Cerrar" onClick="{{closeAll}}"><span class="ms">close</span></button></div>
+      <div class="pbody">
+        <div class="card concepts" style="border-top: 0">
+          <sc-for list="{{ps.groups}}" as="g" hint-placeholder-count="3">
+            <div class="crow" style="grid-template-columns: minmax(0, 1fr) auto">
+              <span class="grow"><span class="cname"><span class="strong">{{g.label}}</span><sc-if value="{{g.hasRows}}" hint-placeholder-val="{{true}}"><button type="button" class="tog" aria-expanded="{{g.isOpen}}" onClick="{{g.toggle}}"><span class="ms" style="font-size: 18px">{{g.chev}}</span>{{g.togLabel}}</button></sc-if></span><span class="note">{{g.rate}}</span></span>
+              <span class="num">{{g.sub}}</span>
+            </div>
+            <sc-if value="{{g.isOpen}}" hint-placeholder-val="{{false}}">
+              <div class="detail"><sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4"><div class="nr"><span class="grow"><span>{{r.l1}}</span><span class="note">{{r.l2}}</span></span><span class="num">{{r.m}}</span></div></sc-for></div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <div class="pfoot">
+        <span class="grow"><span class="note">Total a pagar</span><span class="total">{{ps.total}}</span></span>
+        <sc-if value="{{ps.waits}}" hint-placeholder-val="{{false}}"><span class="waitnote"><span class="ms" style="font-size: 18px">schedule</span>{{ps.waitText}}</span></sc-if>
+        <sc-if value="{{ps.canApprove}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm p" onClick="{{ps.ask}}"><span class="ms">check</span>Aprobar pago</button></sc-if>
+        <sc-if value="{{ps.isApproved}}" hint-placeholder-val="{{false}}"><span class="pill ok">{{ps.pill}}</span></sc-if>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{reviewOpen}}" hint-placeholder-val="{{false}}">
+    <div class="scrim">
+      <div class="dlg wide" role="dialog" aria-label="Revisar sueldo">
+        <div style="display: flex; align-items: center; gap: 12px"><span class="av">{{ps.ini}}</span><span class="grow"><h2>{{ps.n}}</h2><span class="note">{{ps.role}} · {{periodLabel}} · {{ps.lineCount}}</span></span><button type="button" class="ib" aria-label="Cerrar" onClick="{{closeAll}}"><span class="ms">close</span></button></div>
+        <div class="ctabs"><sc-for list="{{ps.groups}}" as="g" hint-placeholder-count="3"><button type="button" class="{{g.tabCls}}" onClick="{{g.pickTab}}">{{g.label}} · {{g.sub}}</button></sc-for></div>
+        <div class="detail" style="margin: 0; max-height: 420px; background: #F5EFE9">
+          <sc-if value="{{tabHasRows}}" hint-placeholder-val="{{true}}">
+            <sc-if value="{{wide}}" hint-placeholder-val="{{true}}">
+              <div class="dh" style="background: #F5EFE9"><sc-for list="{{tabG.cols}}" as="h" hint-placeholder-count="5"><span class="{{h.cls}}">{{h.t}}</span></sc-for></div>
+              <sc-for list="{{tabG.rows}}" as="r" hint-placeholder-count="4"><div class="dr"><span>{{r.a}}</span><span>{{r.b}}</span><span>{{r.c}}</span><span>{{r.d}}</span><span class="num">{{r.m}}</span></div></sc-for>
+            </sc-if>
+            <sc-if value="{{narrow}}" hint-placeholder-val="{{false}}"><sc-for list="{{tabG.rows}}" as="r" hint-placeholder-count="4"><div class="nr"><span class="grow"><span>{{r.l1}}</span><span class="note">{{r.l2}}</span></span><span class="num">{{r.m}}</span></div></sc-for></sc-if>
+          </sc-if>
+          <sc-if value="{{tabNoRows}}" hint-placeholder-val="{{false}}"><div class="nr"><span class="grow">Sueldo base del mes</span><span class="num">{{tabG.sub}}</span></div></sc-if>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-top: 1px solid #E6DBD0; padding-top: 14px">
+          <span class="grow"><span class="note">Total a pagar</span><span class="total">{{ps.total}}</span></span>
+          <sc-if value="{{ps.waits}}" hint-placeholder-val="{{false}}"><span class="waitnote"><span class="ms" style="font-size: 18px">schedule</span>{{ps.waitText}}</span></sc-if>
+          <sc-if value="{{ps.canApprove}}" hint-placeholder-val="{{true}}"><button type="button" class="btn sm p" onClick="{{ps.ask}}"><span class="ms">check</span>Aprobar pago</button></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{confirmOpen}}" hint-placeholder-val="{{false}}">
+    <div class="scrim">
+      <div class="dlg" role="alertdialog" aria-label="Confirmar aprobación">
+        <h2>¿Aprobar {{cs.total}} a {{cs.n}} por {{cs.periodWord}}?</h2>
+        <div class="kv"><span class="note">Período</span><span>{{cs.periodText}}</span><span class="note">Líneas</span><span>{{cs.lineCount}}</span><span class="note">Se registra</span><span>Pago de sueldo con fecha de hoy, 1 de diciembre</span></div>
+        <span class="note">Después de aprobarlo ya no cambia aunque vuelvas a calcular. Puedes subir el comprobante desde Pagados.</span>
+        <div class="actions"><button type="button" class="btn sm t" onClick="{{cancelConfirm}}">Cancelar</button><button type="button" class="btn sm p" onClick="{{doApprove}}">Aprobar {{cs.total}}</button></div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"opcion":{"editor":"enum","options":["A","B","C"],"default":"A"},"estrecho":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1100}}'>
+var RAIL = [['ini','home','Inicio'],['hor','calendar_month','Horario'],['cli','group','Clientas'],['pro','campaign','Promociones'],['com','forum','Comentarios'],['din','payments','Dinero'],['est','storefront','Estudio'],['inf','bar_chart','Informes'],['aj','settings','Ajustes']];
+var DAYS = [['lun', 2], ['mar', 3], ['mié', 4], ['jue', 5], ['vie', 6], ['sáb', 7], ['lun', 9], ['mar', 10], ['mié', 11], ['jue', 12], ['vie', 13], ['sáb', 14], ['lun', 16], ['mar', 17]];
+var TIMES = ['07:00', '08:15', '18:00', '19:15'];
+var BRANCHES = ['Sopocachi', 'Calacoto'];
+var TYPES = ['Reformer', 'Mat', 'Barre', 'Reformer'];
+function row(a, b, c, d, m) { return { a: a, b: b, c: c, d: d, m: m, l1: a + ' · ' + b, l2: c + (d ? ' · ' + d : '') }; }
+function minRows() {
+  var out = [];
+  for (var i = 0; i < 54; i++) {
+    var day = DAYS[Math.floor(i / 4)];
+    out.push(row(day[0] + ' ' + day[1] + ' nov', TIMES[i % 4], BRANCHES[(i + Math.floor(i / 4)) % 2], TYPES[i % 4], 'Bs 25,00'));
+  }
+  return out;
+}
+var CLASS_COLS = ['Fecha', 'Hora', 'Sucursal', 'Clase', 'Monto'];
+var CLIENT_COLS = ['Clienta', 'Primer plan', 'Plan', 'Cálculo', 'Monto'];
+var STATEMENTS = [
+  { id: 'd', n: 'Daniela Ortiz', ini: 'DO', role: 'Instructora', total: 'Bs 1.534,90', lines: 57, opensDic: true, waitHoy: 'Se aprueba desde el 1 de diciembre', groups: [
+    { k: 'min', label: 'Canceladas por mínimo', rate: '54 × Bs 25,00', sub: 'Bs 1.350,00', count: 54, cols: CLASS_COLS, rows: minRows() },
+    { k: 'cls', label: 'Clases dictadas', rate: '1 × Bs 65,00', sub: 'Bs 65,00', count: 1, cols: CLASS_COLS, rows: [row('lun 2 nov', '10:45', 'Sopocachi', 'Reformer · 1 alumna', 'Bs 65,00')] },
+    { k: 'com', label: 'Comisiones de primer plan', rate: '2 × 10 % del plan', sub: 'Bs 119,90', count: 2, cols: CLIENT_COLS, rows: [row('Lucía Mendoza', '4 nov', 'Paquete de 8 clases', '10 % de Bs 480', 'Bs 48,00'), row('Andrea Salinas', '12 nov', 'Mensual 12 clases', '10 % de Bs 719', 'Bs 71,90')] }
+  ] },
+  { id: 'p', n: 'Paula Vargas', ini: 'PV', role: 'Coordinadora', total: 'Bs 3.780,00', lines: 6, coordinator: true, waitHoy: 'Se aprueba desde el 8 de diciembre', groups: [
+    { k: 'base', label: 'Base', rate: 'Mensual', sub: 'Bs 3.500,00', count: 0, cols: [], rows: [] },
+    { k: 'new', label: 'Clientas nuevas', rate: '4 × Bs 50 · 1 × Bs 80', sub: 'Bs 280,00', count: 5, cols: CLIENT_COLS, rows: [row('Camila Rojas', '3 nov', 'Mensual 8 clases', '30 días', 'Bs 50,00'), row('Mariana Peña', '6 nov', 'Mensual 8 clases', '30 días', 'Bs 50,00'), row('Valeria Quiroga', '9 nov', 'Mensual 12 clases', '30 días', 'Bs 50,00'), row('Sofía Guzmán', '11 nov', 'Mensual 16 clases', '30 días', 'Bs 50,00'), row('Isabel Arce', '15 nov', 'Bimestral 24 clases', '60 días', 'Bs 80,00')] }
+  ] }
+];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var op = this.props.opcion ?? 'A';
+    var narrow = !!(this.props.estrecho ?? false);
+    var today = st.today || 'hoy';
+    var range = !!st.range;
+    var open = st.open || {};
+    var approved = st.approved || {};
+    function set(o) { return function () { self.setState(o); }; }
+    var reset = { open: {}, approved: {}, confirm: null, panel: null, review: null, tab: null, recalc: false, busy: false, notice: '', range: false };
+    var periodWord = range ? 'del 1 al 17 de noviembre' : 'noviembre';
+    var periodLabel = range ? '1 – 17 de noviembre' : 'noviembre de 2026';
+    function view(s) {
+      var isApproved = !!approved[s.id];
+      var approvable = !isApproved && (range ? true : (today === 'dic' && !s.coordinator));
+      var waitText = today === 'dic' && s.coordinator ? 'Se aprueba desde el 8 de diciembre' : s.waitHoy;
+      var groups = s.groups.map(function (g) {
+        var key = s.id + g.k;
+        var isOpen = !!open[key];
+        var o = Object.assign({}, open); o[key] = !isOpen;
+        return {
+          label: g.label, rate: g.rate, sub: g.sub, cols: g.cols.map(function (t, i) { return { t: t, cls: i === 4 ? 'num' : '' }; }), rows: g.rows,
+          hasRows: g.rows.length > 0, isOpen: isOpen, chev: isOpen ? 'expand_less' : 'expand_more',
+          togLabel: isOpen ? 'Ocultar' : (g.count === 1 ? 'Ver la clase' : (g.cols === CLIENT_COLS ? 'Ver las ' + g.count + ' clientas' : 'Ver las ' + g.count)),
+          toggle: set({ open: o }),
+          tabCls: (st.tab || s.groups[0].k) === g.k ? 'ct on' : 'ct', pickTab: set({ tab: g.k })
+        };
+      });
+      return {
+        id: s.id, n: s.n, ini: s.ini, role: s.role, total: s.total, groups: groups,
+        lineCount: s.lines + (s.lines === 1 ? ' línea' : ' líneas'),
+        pill: isApproved ? 'Aprobado · 1 dic' : 'Borrador', pillCls: isApproved ? 'pill ok' : 'pill none',
+        canApprove: approvable, waits: !isApproved && !approvable, waitText: waitText, isApproved: isApproved, notApproved: !isApproved,
+        ask: set({ confirm: s.id }), openPanel: set({ panel: s.id }), openReview: set({ review: s.id, tab: null }),
+        reviewLabel: approvable ? 'Revisar y aprobar' : 'Revisar',
+        periodWord: periodWord, periodText: range ? '1 al 17 de noviembre (Rango)' : 'Noviembre de 2026 (Mes)'
+      };
+    }
+    var shown = STATEMENTS.filter(function (s) { return !(range && s.coordinator); }).map(view);
+    function find(id) { return shown.filter(function (s) { return s.id === id; })[0] || null; }
+    var cs = find(st.confirm) || shown[0];
+    var ps = find(st.panel || st.review) || shown[0];
+    var srcPs = STATEMENTS.filter(function (s) { return s.id === ps.id; })[0];
+    var tabK = st.tab || srcPs.groups[0].k;
+    var tabSrc = srcPs.groups.filter(function (g) { return g.k === tabK; })[0] || srcPs.groups[0];
+    var tabG = { cols: tabSrc.cols.map(function (t, i) { return { t: t, cls: i === 4 ? 'num' : '' }; }), rows: tabSrc.rows, sub: tabSrc.sub };
+    var doApprove = function () {
+      var a = Object.assign({}, approved); a[cs.id] = true;
+      self.setState({ approved: a, confirm: null, notice: 'Aprobamos ' + cs.total + ' a ' + cs.n + '. Quedó en Pagados con fecha 1 de diciembre; ahí puedes subir el comprobante.' });
+    };
+    var recalc = function () {
+      self.setState({ busy: true, recalc: false, notice: '' });
+      setTimeout(function () { self.setState({ busy: false, recalc: true }); }, 900);
+    };
+    var dOpen = {}; dOpen.dmin = true;
+    var proto = [
+      ['Hoy (18/11, mes abierto)', Object.assign({}, reset, { today: 'hoy' })],
+      ['1 de diciembre', Object.assign({}, reset, { today: 'dic' })],
+      ['Detalle abierto', Object.assign({}, reset, { today: 'dic', open: dOpen, panel: op === 'B' ? 'd' : null, review: op === 'C' ? 'd' : null })],
+      ['Confirmar', Object.assign({}, reset, { today: 'dic', confirm: 'd', panel: op === 'B' ? 'd' : null, review: op === 'C' ? 'd' : null })],
+      ['Aprobado', Object.assign({}, reset, { today: 'dic', approved: { d: true }, notice: 'Aprobamos Bs 1.534,90 a Daniela Ortiz. Quedó en Pagados con fecha 1 de diciembre; ahí puedes subir el comprobante.' })],
+      ['Recalculado', Object.assign({}, reset, { today: 'hoy', recalc: true })]
+    ].map(function (p) { return { label: p[0], go: set(p[1]) }; });
+    var pending = shown.filter(function (s) { return !s.isApproved; }).length;
+    return {
+      rootCls: narrow ? 'root n' : 'root',
+      rootStyle: narrow ? 'width: 420px; height: 1100px' : 'width: 1440px; height: 1100px',
+      proto: proto, wide: !narrow, narrow: narrow,
+      rail: RAIL.map(function (r) { return { icon: r[1], label: r[2], cls: 'ri' + (r[0] === 'din' ? ' on' : '') }; }),
+      periods: [['Día', false], ['Semana', false], ['Rango', range], ['Mes', !range]].map(function (q) { return { label: q[0], cls: q[1] ? 'on' : '', go: q[0] === 'Mes' ? set({ range: false, confirm: null, panel: null, review: null }) : (q[0] === 'Rango' ? set({ range: true, panel: null, review: null }) : function () {}) }; }),
+      periodLabel: periodLabel, pending: pending,
+      recalc: recalc, recalcBusy: !!st.busy, recalcLabel: st.busy ? 'Calculando…' : 'Volver a calcular',
+      hasRecalc: !!st.recalc && !st.busy, hasNotice: !!st.notice, notice: st.notice || '',
+      monthOpen: !range && today === 'hoy', inRange: range,
+      toRange: set({ range: true, recalc: false, notice: '' }),
+      isA: op === 'A', isB: op === 'B', isC: op === 'C',
+      stmts: shown,
+      panelOpen: op === 'B' && !!st.panel, reviewOpen: op === 'C' && !!st.review,
+      ps: ps, tabG: tabG, tabHasRows: tabSrc.rows.length > 0, tabNoRows: tabSrc.rows.length === 0,
+      closeAll: set({ panel: null, review: null }),
+      confirmOpen: !!st.confirm, cs: cs, cancelConfirm: set({ confirm: null }), doApprove: doApprove
+    };
+  }
+}
+</script>
+</body>
+</html>

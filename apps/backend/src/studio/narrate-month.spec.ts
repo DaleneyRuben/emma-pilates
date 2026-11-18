@@ -16,8 +16,8 @@ const counts = (overrides: Partial<MonthKpiCounts> = {}): MonthKpiCounts => ({
 });
 
 const finding = (
-  overrides: Partial<RecommendationFinding> = {},
-): RecommendationFinding => ({
+  overrides: Partial<RecommendationFinding> & { state?: string } = {},
+): RecommendationFinding & { state?: string } => ({
   rule: 'inactive_client',
   subject: '11111111-1111-4111-8111-111111111111',
   period: '2026-10-01',
@@ -56,27 +56,89 @@ describe('narrate month', () => {
     expect(result.paragraphs.length).toBeLessThanOrEqual(4);
   });
 
-  it('turns each recommendation detail into an action and caps them at 3', () => {
-    const details = [
-      'Revisa el horario del lunes: promedia 1,7 alumnas.',
-      'Revisa el horario del martes: promedia 2 alumnas.',
-      'Revisa el horario del miércoles: promedia 1 alumna.',
-      'Contacta a la clienta: tiene un plan vigente y no reservó este mes.',
-    ];
+  it('splits each schedule detail into the action and the fact behind it', () => {
     const result = narrateMonth({
       month: '2026-10',
       kpis: counts(),
-      recommendations: details.map((detail, index) =>
-        finding({ subject: `client-${index}`, detail }),
-      ),
-      subject: 'client-0',
+      recommendations: [
+        finding({
+          rule: 'weak_schedule',
+          subject: 'trainer:2',
+          detail:
+            'Revisa el horario del martes: promedia 1,7 alumnas en 4 clases.',
+        }),
+      ],
     });
 
-    expect(result.actions).toHaveLength(3);
-    expect(result.actions.map((action) => action.because)).toEqual(
-      details.slice(0, 3),
+    expect(result.actions).toEqual([
+      {
+        text: 'Revisa el horario del martes.',
+        because: 'Promedia 1,7 alumnas en 4 clases.',
+      },
+    ]);
+  });
+
+  it('groups inactive clients into one action and counts every recommendation', () => {
+    const schedules = ['lunes', 'martes', 'miércoles'].map((day, index) =>
+      finding({
+        rule: 'weak_schedule',
+        subject: `trainer:${index + 1}`,
+        detail: `Revisa el horario del ${day}: promedia 1 alumna en 3 clases.`,
+      }),
     );
-    expect(result.actions[0]?.text.length).toBeGreaterThan(0);
+    const result = narrateMonth({
+      month: '2026-10',
+      kpis: counts(),
+      recommendations: [
+        ...[1, 2, 3, 4, 5].map((index) => finding({ subject: `c-${index}` })),
+        ...schedules,
+      ],
+    });
+
+    expect(result.paragraphs).toContain(
+      'Hay 8 recomendaciones para revisar. Estas son las principales, cada una con el dato que la sostiene.',
+    );
+    expect(result.actions).toHaveLength(3);
+    expect(result.actions[0]).toEqual({
+      text: 'Contacta a las 5 clientas que no reservaron este mes.',
+      because: 'Tienen un plan vigente y no reservaron ninguna clase este mes.',
+    });
+    expect(result.actions[1]?.text).toBe('Revisa el horario del lunes.');
+  });
+
+  it('speaks of one recommendation and one client in the singular', () => {
+    const result = narrateMonth({
+      month: '2026-10',
+      kpis: counts({ sessionsHeld: 1, activeClients: 1 }),
+      recommendations: [finding()],
+    });
+
+    expect(result.paragraphs[0]).toBe(
+      'En octubre de 2026 se dictó 1 clase, con una ocupación del 59 %. Había 1 clienta activa.',
+    );
+    expect(result.paragraphs).toContain(
+      'Hay 1 recomendación para revisar, con el dato que la sostiene.',
+    );
+    expect(result.actions).toEqual([
+      {
+        text: 'Contacta a la clienta que no reservó este mes.',
+        because: 'Tiene un plan vigente y no reservó ninguna clase este mes.',
+      },
+    ]);
+  });
+
+  it('leaves dismissed and resolved recommendations out', () => {
+    const result = narrateMonth({
+      month: '2026-10',
+      kpis: counts(),
+      recommendations: [
+        finding({ state: 'dismissed' }),
+        finding({ subject: 'c-2', state: 'resolved' }),
+      ],
+    });
+
+    expect(result.actions).toEqual([]);
+    expect(result.paragraphs.join(' ')).not.toContain('recomendaci');
   });
 
   it('never interpolates a client id, a name, or an email from the subject', () => {

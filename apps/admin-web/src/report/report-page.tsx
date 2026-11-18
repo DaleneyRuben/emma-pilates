@@ -244,7 +244,10 @@ export function ReportPage({
           sucursales».
         </p>
       )}
-      <RevenueSection active={search.vista !== undefined && !finance} />
+      <RevenueSection
+        active={search.vista !== undefined && !finance}
+        branchName={branchId === undefined ? undefined : (branch?.name ?? "")}
+      />
       {finance ? null : failed !== null ? (
         <QueryFailure
           error={failed.error}

@@ -35,7 +35,8 @@ describe('recommend from facts', () => {
         rule: 'weak_schedule',
         subject: 'trainer-ana:2',
         period: '2026-10-01',
-        detail: 'Revisa el horario del martes: promedia 1,7 alumnas.',
+        detail:
+          'Revisa el horario del martes: promedia 1,7 alumnas en 3 clases.',
       },
     ]);
   });
@@ -77,7 +78,7 @@ describe('recommend from facts', () => {
       'trainer-bea:1',
     ]);
     expect(findings[0]?.detail).toBe(
-      'Revisa el horario del lunes: promedia 1 alumnas.',
+      'Revisa el horario del lunes: promedia 1 alumna en 3 clases.',
     );
     expect(findings.every((finding) => !finding.detail.includes('@'))).toBe(
       true,

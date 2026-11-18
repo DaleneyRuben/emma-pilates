@@ -242,8 +242,9 @@ describe('payroll and finance fixes', () => {
       civil('2027-05-01'),
     );
     const commissions = (facts: typeof inMarch) =>
-      facts.trainers.find((trainer) => trainer.staffMemberId === emmaId)
-        ?.firstPlanPaymentsCentavos ?? [];
+      facts.trainers
+        .find((trainer) => trainer.staffMemberId === emmaId)
+        ?.firstPlans.map((first) => first.amountDueCentavos) ?? [];
     expect(commissions(inMarch)).toEqual([]);
     expect(commissions(inApril)).toEqual([59_000]);
   });

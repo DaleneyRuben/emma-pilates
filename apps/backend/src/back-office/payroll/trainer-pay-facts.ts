@@ -1,14 +1,18 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { boliviaInstant } from '../../time/bolivia-time';
 import { readFirstPlans } from './first-plans';
-import type { TrainerPayRates, TrainerPaySession } from './trainer-pay';
+import type {
+  TrainerFirstPlan,
+  TrainerPayRates,
+  TrainerPaySession,
+} from './trainer-pay';
 
 export type TrainerMonthFacts = {
   rates: TrainerPayRates;
   trainers: {
     staffMemberId: string;
     sessions: TrainerPaySession[];
-    firstPlanPaymentsCentavos: number[];
+    firstPlans: TrainerFirstPlan[];
   }[];
 };
 
@@ -60,6 +64,9 @@ export const trainerMonthFacts = async (
         trainerStaffMemberId: true,
         bookingsAtWindowClose: true,
         cancellationCause: true,
+        startsAt: true,
+        branch: { select: { name: true } },
+        classType: { select: { name: true } },
       },
       orderBy: { startsAt: 'asc' },
     }),
@@ -82,12 +89,12 @@ export const trainerMonthFacts = async (
   );
   const byTrainer = new Map<
     string,
-    { sessions: TrainerPaySession[]; firstPlanPaymentsCentavos: number[] }
+    { sessions: TrainerPaySession[]; firstPlans: TrainerFirstPlan[] }
   >();
   const trainer = (id: string) => {
     const existing = byTrainer.get(id);
     if (existing !== undefined) return existing;
-    const created = { sessions: [], firstPlanPaymentsCentavos: [] };
+    const created = { sessions: [], firstPlans: [] };
     byTrainer.set(id, created);
     return created;
   };
@@ -95,6 +102,9 @@ export const trainerMonthFacts = async (
     trainer(session.trainerStaffMemberId).sessions.push({
       bookingsAtWindowClose: session.bookingsAtWindowClose,
       cancellationCause: cancellationCause(session.cancellationCause),
+      startsAt: session.startsAt,
+      branchName: session.branch.name,
+      classTypeName: session.classType.name,
     });
   }
   for (const [clientId, first] of firsts) {
@@ -103,9 +113,11 @@ export const trainerMonthFacts = async (
     }
     const staffMemberId = trainerOfClient.get(clientId);
     if (staffMemberId === undefined) continue;
-    trainer(staffMemberId).firstPlanPaymentsCentavos.push(
-      first.amountDueCentavos,
-    );
+    trainer(staffMemberId).firstPlans.push({
+      clientName: first.clientName,
+      planName: first.planName,
+      amountDueCentavos: first.amountDueCentavos,
+    });
   }
 
   return {

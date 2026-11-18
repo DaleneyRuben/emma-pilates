@@ -1,3 +1,10 @@
+import {
+  bolivianosText,
+  classPlaceText,
+  studentsText,
+  type ClassPlace,
+} from './pay-line-detail';
+
 // BKO-006 / decisions section 8. Money is centavos. The rates come from the
 // PayRateRule in force; this function never stores them.
 
@@ -9,9 +16,15 @@ export type TrainerPayRates = {
   commissionPercent: number;
 };
 
-export type TrainerPaySession = {
+export type TrainerPaySession = ClassPlace & {
   bookingsAtWindowClose: number | null;
   cancellationCause: string | null;
+};
+
+export type TrainerFirstPlan = {
+  clientName: string;
+  planName: string;
+  amountDueCentavos: number;
 };
 
 export type TrainerPayLine = {
@@ -22,8 +35,10 @@ export type TrainerPayLine = {
 
 const classLine = (
   rates: TrainerPayRates,
+  session: TrainerPaySession,
   students: number,
 ): TrainerPayLine => {
+  const place = classPlaceText(session);
   const extra = Math.max(0, students - rates.includedStudents);
   const amountCentavos =
     rates.classCentavos + extra * rates.extraStudentCentavos;
@@ -31,8 +46,8 @@ const classLine = (
     kind: 'class',
     detail:
       extra === 0
-        ? `${students} alumnas`
-        : `${students} alumnas, ${extra} extra`,
+        ? `${place} · ${studentsText(students)}`
+        : `${place} · ${studentsText(students)}, ${extra} extra`,
     amountCentavos,
   };
 };
@@ -41,7 +56,7 @@ export const trainerPay = (
   rates: TrainerPayRates,
   facts: {
     sessions: TrainerPaySession[];
-    firstPlanPaymentsCentavos: number[];
+    firstPlans: TrainerFirstPlan[];
   },
 ): { lines: TrainerPayLine[]; totalCentavos: number } => {
   const lines: TrainerPayLine[] = [
@@ -50,18 +65,20 @@ export const trainerPay = (
         return [
           {
             kind: 'minimum_not_met',
-            detail: 'Mínimo no alcanzado',
+            detail: classPlaceText(session),
             amountCentavos: rates.minimumNotMetCentavos,
           },
         ];
       }
       if (session.bookingsAtWindowClose === null) return [];
-      return [classLine(rates, session.bookingsAtWindowClose)];
+      return [classLine(rates, session, session.bookingsAtWindowClose)];
     }),
-    ...facts.firstPlanPaymentsCentavos.map((paid): TrainerPayLine => ({
+    ...facts.firstPlans.map((first): TrainerPayLine => ({
       kind: 'commission',
-      detail: 'Primer plan',
-      amountCentavos: Math.round((paid * rates.commissionPercent) / 100),
+      detail: `${first.clientName} · ${first.planName} · ${rates.commissionPercent} % de ${bolivianosText(first.amountDueCentavos)}`,
+      amountCentavos: Math.round(
+        (first.amountDueCentavos * rates.commissionPercent) / 100,
+      ),
     })),
   ];
   return {

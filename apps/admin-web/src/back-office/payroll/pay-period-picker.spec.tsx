@@ -13,6 +13,7 @@ const statement = {
   month: "2026-09-01",
   periodStart: "2026-09-07",
   periodEnd: "2026-09-14",
+  approvableOn: "2026-09-14",
   state: "draft",
   totalCentavos: 13_000,
   salaryPaymentId: null,
@@ -84,7 +85,7 @@ describe("the pay period picker", () => {
     await user.click(await screen.findByRole("radio", { name: "Semana" }));
     await user.click(screen.getByRole("button", { name: "Semana anterior" }));
     await user.click(screen.getByRole("button", { name: "Semana siguiente" }));
-    await user.click(screen.getByRole("button", { name: "Calcular" }));
+    await user.click(screen.getByRole("button", { name: "Volver a calcular" }));
 
     await waitFor(() => expect(drafted).toHaveLength(1));
     const week = Object.fromEntries(drafted[0] ?? []);
@@ -122,7 +123,9 @@ describe("the pay period picker", () => {
         "La fecha final no puede ser anterior a la inicial.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Calcular" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Volver a calcular" }),
+    ).toBeDisabled();
     await user.click(screen.getByRole("radio", { name: "Mes" }));
     await waitFor(() => expect(lastAsked()).toEqual({ month: "2026-09" }));
   });

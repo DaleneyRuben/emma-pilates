@@ -68,13 +68,13 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115, 142 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126, 160 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126 |
-| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158 |
-| 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151 |
+| 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158, 160 |
+| 13 Evaluación nutricional (with the booked ones since FIX-057), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -84,7 +84,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71, 142 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89, 160 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
 | S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
@@ -108,7 +108,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114, 163 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones (Clientas › Cuenta cerrada since FIX-065) | 31, 33, 59, 60, 72, 111, 155, 159 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158, 160 |
 | AW39 Para contactar | 84 |
 | AW40 Fundadoras (the Fundadora chip on Clientas since WEB-040) | 26, 88 |
 | AW41 Congelamientos | 92 |
@@ -2203,7 +2203,7 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    Nutricionista · Branch» and the chip «Gratis con tu plan», then «Puedes
    cancelarla hasta 3 horas antes.» and **Cancelar evaluación** (outlined,
    Error). Below come «Reserva otra evaluación» with the plan line and the
-   turnos, and «Anteriores» at the foot (rows with «Realizada» or
+   turnos (hidden while a released slot waits for its new time, Test 160), and «Anteriores» at the foot (rows with «Realizada» or
    «Incluida»). Tap **Cancelar evaluación** and confirm: the sheet says the
    turno is freed and "Podrás reservar otra evaluación para este mes." (or
    "para noviembre" when the Evaluation is next month's), and the screen goes
@@ -3819,8 +3819,8 @@ The following are not ready for manual product testing:
   plans that expired this month: the fact table cannot see those;
 - client no-shows, a renewal gap, and the other twelve diagnosis rules are
   not findings yet (Test 102): the fact tables cannot support them, or the
-  tables they need are not on this branch. The nightly recommendation pass
-  is not a worker job;
+  tables they need are not on this branch. Since FIX-073 the worker's daily
+  studio run recomputes them (Test 167);
 - a model-written report (Test 103): no model is called and no key is
   configured. The sentences are the pure function over the month's counts;
 - Dynamic Type, VoiceOver, and TalkBack on a device (Test 115): the audit
@@ -6584,6 +6584,8 @@ so the phone has a profile to keep: «Hola, Lucía» and her plan card.
    reads «Sin conexión. Mostrando tus datos de la última vez.» The banner
    also appears when only one of the two refreshes fails (profile or
    subscription) while the other still has cached data on screen (FIX-011).
+   Since FIX-066 (Test 160) Inicio asks the server again every 15 seconds and
+   when the app returns to the foreground while the line shows.
    The banner of Test 71 still sits above the screen; this line is Inicio's
    own.
 2. **Nothing saved.** Sign out, cut the network before the next sign-in,
@@ -6759,6 +6761,12 @@ and never an amount. Use a disposable database.
 
 ## Test 102: read the month's recommendations
 
+**Since FIX-073 (Test 167)** each card names who it is about (the Client's
+name opens her file; a weak schedule reads «Trainer · día»), the details
+end with the number of classes («promedia 1,7 alumnas en 3 clases.»), the
+section has «Recalcular», and the worker's daily facts run recomputes the
+recommendations too. A finding the facts no longer support turns «Resuelta».
+
 Recomendaciones sits in the sidebar after Indicadores. It lists the month's
 findings from the studio facts. v1 has two rules, both counts: a weak
 schedule and an inactive client. Neither names a Client. The page shows the
@@ -6799,6 +6807,11 @@ Spanish sentence and the state. Use a disposable database.
    have. The nightly pass waits; the recompute endpoint is the trigger.
 
 ## Test 103: read the month's narrated report
+
+**Since FIX-073 (Test 167)** «Porque:» is the fact behind the action, not
+the action again; inactive Clients make one action; the report counts every
+recommendation that is not discarded; and one class or one Client reads in
+the singular.
 
 Indicadores, below the chart, shows «Informe del mes» for the Administrator.
 The text comes from the month's counts and the recommendation sentences. It
@@ -7822,19 +7835,20 @@ and cannot list the statements. Log in as Test 24 describes.
 
 1. **Calculate the month.** In the admin web open **Dinero › Sueldos ›
    Por aprobar**. The picker opens on **Mes**; its stepper cannot go past
-   the current month. Press **Calcular**. Each Trainer with a line appears
-   as a card: her name, the period («Octubre de 2026») and «Borrador», the
-   total (`Bs 322,00`, never centavos), and a table of Concepto, Detalle,
-   and Monto. Día, Semana, and Rango are Test 127.
-2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
-   Nómina gains one Salary Payment for that total. Pressing again, or
-   calculating the month again, does not add a second payment.
+   the current month. Press **Volver a calcular**. Each Trainer with a line
+   appears as a card: her name, the period («Octubre de 2026») and
+   «Borrador», the total (`Bs 322,00`, never centavos), and one row per
+   concept with its subtotal (Test 164 has the layout). Día, Semana, and
+   Rango are Test 127.
+2. **Approve once.** Press **Aprobar pago** on one card and confirm. It
+   reads «Aprobado» and Nómina gains one Salary Payment for that total.
+   Calculating the month again does not add a second payment.
 3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
    Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
    minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
    if she buys again.
-4. **Narrow browser.** At 420 px the cards stack and the line table becomes
-   labelled cards. The sidebar opens from **Abrir menú**.
+4. **Narrow browser.** At 420 px the cards stack and each concept keeps its
+   rate under its name. The sidebar opens from **Abrir menú**.
 5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
    only Emma's statements. As Daniela it does not include Emma's. As Camila
    it answers `403` `back_office_access_denied`, and so does approval.
@@ -7848,7 +7862,9 @@ and cannot list the statements. Log in as Test 24 describes.
    total with centavos (`Bs 322,00`), and one row per concept: «Clases
    dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
    says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
-   clase** lists each line («Clase», «6 alumnas, 2 extra», `Bs 81,00`);
+   clase** lists each line («Clase», «lun 5 oct · 10:00 · Centro · Reformer
+   Pilates · 6 alumnas, 2 extra», `Bs 81,00`; a statement approved before
+   FIX-070 keeps «6 alumnas, 2 extra»);
    **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
    Payment of hers from Nómina shows its amount and date («1 de octubre de
    2026»). A payment with a receipt (Test 28 step 7) shows its thumbnail
@@ -7891,9 +7907,9 @@ it. Carolina, the Coordinator, does not, not even her own. Log in as Test
    «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
    Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
    pago calculado.» There is no Calcular mes: the worker drafts it.
-2. **Approve once.** Press **Aprobar**. The card reads «Aprobado» and
-   Nómina gains one Salary Payment for that total. Pressing again does not
-   add a second payment.
+2. **Approve once.** Press **Aprobar pago** (from the 8th of the next
+   month) and confirm. The card reads «Aprobado» and Nómina gains one Salary
+   Payment for that total. It is not offered again.
 3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
    60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
    Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
@@ -8687,20 +8703,21 @@ the database itself, since approving creates Salary Payments. Log in as Paola
    **Semana** reads «Semana del 2 – 8 de noviembre de 2026» and steps a
    week. **Rango** shows **Desde** and **Hasta** as `dd/mm/aaaa`, both days
    included; a Hasta before Desde says «La fecha final no puede ser anterior
-   a la inicial.» and disables **Calcular**. Reloading keeps the period.
+   a la inicial.» and disables **Volver a calcular**. Reloading keeps the period.
 2. **A day.** On **Día**, pick a past day Emma taught and press
-   **Calcular**. Her card names that day (`03/11/2026`) with only that day's
+   **Volver a calcular**. Her card names that day (`03/11/2026`) with only that day's
    classes. Carolina's card is not there: she shows only on **Mes**.
-3. **Approve the day.** Press **Aprobar** after the day is over in Bolivia
-   (before midnight it answers `409` `pay_statement_month_open`). Nómina
+3. **Approve the day.** Press **Aprobar pago** and confirm; it is offered
+   only once the day is over in Bolivia (the card says «Se aprueba desde el
+   …» until then, and the API answers `409` `pay_statement_month_open`). Nómina
    gains one Salary Payment.
 4. **The month leaves it alone.** Go to **Mes** for that month and press
-   **Calcular**. Emma's approved day is listed and no month draft for Emma
+   **Volver a calcular**. Emma's approved day is listed and no month draft for Emma
    appears; Daniela and the rest get their month. The hourly worker skips
    Emma for that month too. Pay her other days with **Rango**.
 5. **A draft is replaced.** For a month where Emma has only the worker's
    month draft, calculate one **Semana**: on **Mes** the month draft is gone
-   and the week draft shows. **Calcular** on **Mes** again turns it back
+   and the week draft shows. **Volver a calcular** on **Mes** again turns it back
    into one month draft.
 6. **The API.** `GET /api/v1/administrator/pay-statements?from=2026-11-03&until=2026-11-04`
    lists every statement that touches the day, each with `periodStart` and
@@ -9943,7 +9960,8 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    with or without a Plan, and a quieter line «M sin plan: se les suma en su
    próximo plan (Sofía Guzmán)» names the ones without a current Plan. No line
    mentions founders. `GET /api/v1/administrator/campaigns/preview` answers
-   `recipientCount`, `owed` (id and name), and an empty, deprecated `skipped`.
+   `recipientCount`, `owed` (id and name), an empty, deprecated `skipped`,
+   and since FIX-066 `pastCampaigns` (Test 160).
 3. Write «Inicio de año», **Clases extra** 1, **Dar las clases**. The dialog
    reads «Cada clienta activa recibe las clases: en su plan vigente o, si no
    tiene uno, en su próximo plan. Ningún precio cambia.» **Confirmar
@@ -10010,6 +10028,69 @@ The owner chose «Filtro + CSV en Clientas» and design option A (follow-ups
 8. Check at 1440 px and 420 px (the chips wrap onto two lines at 420), then
    drop the copy.
 
+## Test 160: walkthrough findings 92–100 (FIX-066)
+
+Nine small fixes from the 2026-11-17 verification walk. No migration; the
+API change is additive (`pastCampaigns` on the campaign preview). Use a copy
+of the fixtures (`createdb -T pilates_golden pilates_fix066_dev`) and run the
+API, the worker, both apps and the admin web on your own ports
+(surface-verification skill).
+
+1. **Campaña twice (n.º 92).** As Paola, **Promociones › Clases de campaña**,
+   give «Fin de año» with 1 class (Test 158 step 3). Expected: after «N
+   clientas recibieron 1 clase extra.» the name is empty, **Clases extra**
+   reads 1, and «Dar las clases» needs a name again. Type «fin de año» (any
+   case or spacing): an amber line under the name reads «Ya diste la campaña
+   «Fin de año» el {día de mes}. Si la das otra vez, cada clienta recibe las
+   clases de nuevo.» (with the year when it was another year); a new name
+   clears it. A campaign only owed (every Client without a Plan) counts too;
+   a later Plan collecting an owed class does not move its day. Giving the
+   same campaign again on purpose sends a new Idempotency-Key, so it really
+   gives the classes again.
+   `GET /api/v1/administrator/campaigns/preview` lists `pastCampaigns` (name
+   and its latest `grantedAt`, latest first). Check at 1440 and 420 px.
+2. **Every origin named (n.º 93).** Give Lucía an invitation class (a friend
+   she invited buys her first Plan, Test 86) and the campaign above.
+   Expected: her file on the admin web and **Mi plan** in the Client app read «Clases extra: 2 · 1 de invitación · 1 de
+   campaña»; a single origin keeps «Clases extra: N · Campaña»; once one is
+   spent the line names the origins without counts («Clases extra: 1 ·
+   Invitación · Campaña»). The campaign's name is not in the line: it lives
+   only in the audit.
+3. **Congelamientos (n.º 94).** In the Staff app as Paola, **Pagos ›
+   Congelamientos**: «Pausan el plan de la clienta. Los días congelados se
+   suman a su vencimiento.» sits under the title, above «No hay solicitudes
+   por revisar» or «Por revisar · N», never between the sections.
+4. **Staff client file (n.º 95).** Open a Client whose stored phone fits no
+   mobile (`7000004`, or none; on a copy set `booking.clients.phone` with
+   `psql`). Expected: under her name, «Celular incompleto» in amber · her
+   email, as on the admin web (Test 157). A pending Client whose activation
+   link lapsed reads «El enlace venció el …» (a live one «El enlace vence el
+   …»), with **Reenviar enlace**.
+5. **Enviar comentarios (n.º 96).** In the Client app, **Perfil › Enviar
+   comentarios**, tap the field: with the keyboard up the form scrolls so
+   «Mínimo 10 caracteres.» and «n / 2000» show whole under the field. A long
+   comment scrolls inside the field once it is 240 pt tall.
+6. **Released Evaluation (n.º 97).** As Valeria with a paid Evaluation whose
+   slot the Nutritionist released (Test 149): **Evaluación nutricional**
+   shows «El estudio liberó tu turno» with **Elegir turno** and no «Reserva
+   otra evaluación» section, so no turno there charges Bs 70 again.
+   **Elegir turno** still lists the turnos to move it.
+7. **Mi plan with the next Plan paid (n.º 98).** As a founder with a next
+   Plan already bought (Test 88), **Mi plan** shows «Tu plan siguiente
+   empieza el … · ya está pagado.» and no «Renueva antes del …» notice.
+8. **Back from a server outage (n.º 99).** As Lucía open **Inicio**, stop the
+   API (keep the phone's network), pull to refresh: «Sin conexión. Mostrando
+   tus datos de la última vez.» Start the API again and wait: within about
+   15 seconds the line goes without a pull. Sending the app to the
+   background and back retries at once.
+9. **Free only from a later Plan (n.º 100).** As Isabel, sell her (as Camila)
+   a cash «Trimestral» starting the day after her current Plan ends, then
+   open **Evaluación nutricional**. Expected: «Desde el {día}, tu primera
+   evaluación del trimestre es gratis. Antes cuesta Bs 70.», and each turno
+   shows «Bs 70» or «Gratis» under its time (VoiceOver/TalkBack read «Turno
+   15:00 · Bs 70»). With only free or only paid turnos, no price shows on
+   the turnos and the line is the old one.
+
 ## Test 161: studio-defined equipment types, by unit or by quantity (FIX-067)
 
 Walkthrough findings 101 and 103. The owner chose «tipos propios» and design
@@ -10055,8 +10136,10 @@ Cadillac and Mat seeded as per-unit types with every existing machine),
 6. **Editar tipo** renames a type. **Quitar tipo** is disabled with «Primero
    da de baja sus unidades en todas las sucursales.» while this Branch has
    units or a quantity; units in another Branch answer `409
-   equipment_type_in_use` with the same text. A type nobody uses goes away
-   with «Quitamos el tipo X.» (its row keeps `archived_at`). As Carolina
+   equipment_type_in_use` with the same text (for a quantity type «Primero
+   deja su cantidad en 0 en todas las sucursales.»). A type nobody uses goes
+   away after «¿Quitar el tipo X?» → **Quitar tipo** with «Quitamos el tipo
+   X.» (its row keeps `archived_at`). As Carolina
    (Coordinación) the sections, Agregar, damage and quantities work, without
    Nuevo tipo or Editar tipo.
 7. **Horario**: a class still matches the per-unit type whose name is a word
@@ -10074,6 +10157,7 @@ Cadillac and Mat seeded as per-unit types with every existing machine),
    working: `items` and `kind` still list only Reformer, Cadillac and Mat.
 9. Check Equipos at 1440 px and 420 px (stacked unit rows at 420), then drop
    the copy.
+
 ## Test 162: Movimientos de insumos names who recorded each one and shows the Restocks (FIX-068)
 
 Walkthrough finding 102: the Withdrawals history did not say who took the
@@ -10139,3 +10223,94 @@ Migration `20261118043255_expense_void` adds `voided_at`,
 5. At 420 px the active card ends with **Editar**, and the eliminated card
    shows the pill and the who-and-when line right-aligned like the other
    values; the confirmation fits the screen.
+
+## Test 164: Sueldos you can check before paying (FIX-070)
+
+Walkthrough finding 105: Dinero › Sueldos showed a full-width «Aprobar» that
+approved on one click, offered it in a month still open (409
+`pay_statement_month_open`), and listed 54 identical «Mínimo no alcanzado»
+rows. The owner chose design option A (follow-ups 273 and 274). No
+migration: each new line stores its own detail, and the statement gains
+`approvableOn` (additive).
+
+1. Use a copy of the database (surface-verification skill) and run the API
+   and the admin web on your own ports. Log in as Paola and open **Dinero ›
+   Sueldos** on the current month.
+2. **The month is open.** Expected: a card «Noviembre todavía no terminó:
+   cierra el 30. Desde el 1 de diciembre puedes aprobar a las instructoras,
+   y a la coordinadora siete días después…» with **Pagar por Rango** (not on
+   the 1st of a month). No card offers **Aprobar pago**; each says «Se
+   aprueba desde el 1 de diciembre» (a Trainer) or «… el 8 de diciembre»
+   (the Coordinator). `GET /api/v1/administrator/pay-statements` returns
+   `approvableOn` for each.
+3. **Pagar por Rango.** Expected: Rango from the 1st to yesterday, still
+   showing the month draft (it touches the range) until **Volver a
+   calcular**, which replaces it with the range's own draft; a Trainer with
+   work in it then shows **Aprobar pago**; the Coordinator is not listed.
+4. **Concepts.** Each card lists, in this order and only when present,
+   «Clases dictadas», «Canceladas por mínimo», «Comisiones de primer plan»,
+   «Base», «Clientas nuevas», «Bono de renovación», each with its rate
+   («54 × Bs 25,00», «2 comisiones», «4 × Bs 50,00 · 1 × Bs 80,00») and
+   subtotal, then «Total». **Ver las 54** opens the lines in place, in a box
+   that scrolls: «lun 2 nov · 07:00 · Sopocachi · Reformer» for a class
+   cancelled for the minimum, «… · Reformer · 1 alumna» for a class (never
+   «1 alumnas»), «Lucía Mendoza · Paquete de 8 clases · 10 % de Bs 480» for a
+   commission, «Camila Rojas · Mensual 8 clases · 30 días» for a new Client
+   of the Coordinator. **Ocultar** folds it. Base and the bonus do not open.
+   A statement approved before FIX-070 shows its old lines
+   («Mínimo no alcanzado») grouped the same way.
+5. **Approve.** **Aprobar pago** (a small button by the total) opens
+   «¿Aprobar Bs 1.534,90 a Daniela Ortiz del 01/11/2026 al 17/11/2026?» with
+   the period, the number of lines and «Pago de sueldo con fecha de hoy».
+   **Volver** approves nothing; **Aprobar Bs 1.534,90** approves once and
+   says «Aprobamos Bs 1.534,90 a Daniela Ortiz. Quedó en Pagados; ahí puedes
+   subir el comprobante.» The card reads «Aprobado». If the API still
+   refuses with 409 the dialog explains it instead of «No pudimos aprobar
+   el pago.».
+6. **Volver a calcular.** It shows it is busy, then «Recalculamos noviembre
+   de 2026 a las hh:mm. Ningún sueldo cambió.» or «Cambió 1 sueldo: Paula
+   Vargas pasó de Bs 3.780,00 a Bs 3.830,00.».
+7. Check at 1440 px and 420 px (at 420 the rate sits under the concept and
+   the header wraps; nothing scrolls sideways), then drop the copy.
+
+## Test 167: Informes recommendations and figures that add up (FIX-073)
+
+Walkthrough finding 107. No migration; the API change is additive
+(`clientId`, `clientName`, `trainerName`, `weekday` on each recommendation).
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix073_dev`; the fixtures' November classes have ended, so the
+   month has taught classes) and run the API and the admin web on your own
+   ports (surface-verification skill). Log in as Paola and open **Informes ›
+   El mes**.
+2. **Recalcular.** Under «Recomendaciones del mes», press **Recalcular**.
+   Expected: the facts and the findings are recomputed (`POST
+   /api/v1/administrator/recommendations/recompute` now refreshes the studio
+   facts first), the tiles, «Informe del mes» and the list read again. A
+   failure says «No pudimos recalcular las recomendaciones.». Carolina
+   (read only) has no «Recalcular». The worker's daily studio run also
+   recomputes the current month's recommendations (and the previous month's
+   until it is final), so the list no longer waits for a recompute by hand.
+3. **Who each one is about.** An inactive Client's card starts with her name
+   as a link («Valeria Quiroga»); it opens Clientes with her file. A weak
+   schedule starts with «Daniela Ortiz · martes». The sentence follows:
+   «Contacta a la clienta: tiene un plan vigente y no reservó este mes.» or
+   «Revisa el horario del martes: promedia 0 alumnas en 6 clases.».
+4. **Resolved.** Book a class for a listed Client and press **Recalcular**.
+   Expected: her card reads «Resuelta». If she cancels and you recalculate
+   again, it reads «Nueva». A discarded card stays «Descartada».
+5. **Informe del mes.** With 3 inactive Clients and 3 weak schedules it
+   reads «Hay 6 recomendaciones para revisar. Estas son las principales,
+   cada una con el dato que la sostiene.», then «Contacta a las 3 clientas
+   que no reservaron este mes.» with «Porque: Tienen un plan vigente y no
+   reservaron ninguna clase este mes.» and «Revisa el horario del martes.»
+   with «Porque: Promedia 0 alumnas en 3 clases.» (three actions at most).
+   One held class reads «se dictó 1 clase»; one active Client «Había 1
+   clienta activa.».
+6. **Dinero with one Branch.** Choose «Centro» in Sucursal. Expected: under
+   «Ingreso devengado», «Todo el estudio, no solo Centro: no se separa por
+   sucursal.» With «Todas las sucursales» the line is absent.
+7. **Finanzas without a budget.** On a month with no budget, «Punto de
+   equilibrio» reads «—» and «Carga tu presupuesto para calcularlo». After
+   «Cargar presupuesto de apertura» it shows the amount again.
+8. Check at 1440 px and 420 px, then drop the copy.

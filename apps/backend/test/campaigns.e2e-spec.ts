@@ -89,6 +89,12 @@ describe('campaign endpoint', () => {
                 },
               ],
               skipped: [],
+              pastCampaigns: [
+                {
+                  name: 'Fin de año',
+                  grantedAt: new Date('2026-11-17T14:00:00.000Z'),
+                },
+              ],
             }),
         },
         {
@@ -124,13 +130,21 @@ describe('campaign endpoint', () => {
         ({
           body,
         }: {
-          body: { recipientCount: number; owed: unknown[]; skipped: [] };
+          body: {
+            recipientCount: number;
+            owed: unknown[];
+            skipped: [];
+            pastCampaigns: unknown[];
+          };
         }) => {
           expect(body.recipientCount).toBe(2);
           expect(body.owed).toEqual([
             expect.objectContaining({ name: 'Sofía' }),
           ]);
           expect(body.skipped).toEqual([]);
+          expect(body.pastCampaigns).toEqual([
+            { name: 'Fin de año', grantedAt: '2026-11-17T14:00:00.000Z' },
+          ]);
         },
       );
     expect(record).not.toHaveBeenCalled();

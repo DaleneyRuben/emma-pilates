@@ -16153,6 +16153,23 @@
           "reason"
         ]
       },
+      "PastCampaignDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "grantedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Its latest grant"
+          }
+        },
+        "required": [
+          "name",
+          "grantedAt"
+        ]
+      },
       "CampaignPreviewDto": {
         "type": "object",
         "properties": {
@@ -16173,12 +16190,20 @@
             "items": {
               "$ref": "#/components/schemas/CampaignSkippedClientDto"
             }
+          },
+          "pastCampaigns": {
+            "description": "Each campaign name already given, latest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PastCampaignDto"
+            }
           }
         },
         "required": [
           "recipientCount",
           "owed",
-          "skipped"
+          "skipped",
+          "pastCampaigns"
         ]
       },
       "GrantCampaignDto": {
@@ -19653,6 +19678,11 @@
             "format": "date",
             "description": "BKO-009: the day after the last day paid (exclusive)"
           },
+          "approvableOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Finding 105: the first Bolivia day the statement can be approved (a Trainer the day after the period, the Coordinator seven days later)"
+          },
           "state": {
             "type": "string",
             "enum": [
@@ -19683,6 +19713,7 @@
           "month",
           "periodStart",
           "periodEnd",
+          "approvableOn",
           "state",
           "totalCentavos",
           "salaryPaymentId",
@@ -20140,6 +20171,22 @@
               "dismissed",
               "resolved"
             ]
+          },
+          "clientId": {
+            "type": "string",
+            "description": "The Client an inactive_client finding is about"
+          },
+          "clientName": {
+            "type": "string",
+            "description": "That Client, by name"
+          },
+          "trainerName": {
+            "type": "string",
+            "description": "The Trainer of a weak_schedule finding, by name"
+          },
+          "weekday": {
+            "type": "number",
+            "description": "ISO weekday of a weak_schedule finding, 1 = Monday"
           }
         },
         "required": [
