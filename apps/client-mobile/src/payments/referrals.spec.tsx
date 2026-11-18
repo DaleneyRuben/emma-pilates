@@ -84,9 +84,10 @@ describe("Invita a una amiga (BKM-014)", () => {
     // Walkthrough n.º 10: the code readable, «Cómo funciona» in three steps.
     expect(screen.getByText("LUCIA")).toHaveProp("selectable", true);
     expect(screen.getByText("Cómo funciona")).toBeOnTheScreen();
-    expect(screen.getByText("Compartes tu código")).toBeOnTheScreen();
-    expect(screen.getByText("Tu amiga toma una clase gratis")).toBeOnTheScreen();
-    expect(screen.getByText("Compra su primer plan y tú ganas una clase")).toBeOnTheScreen();
+    // FIX-082 (Invita option A): three plain lines, no numbered discs.
+    expect(screen.getByText("1. Compartes tu código.")).toBeOnTheScreen();
+    expect(screen.getByText("2. Tu amiga toma una clase gratis.")).toBeOnTheScreen();
+    expect(screen.getByText("3. Si compra su primer plan, tú ganas una clase.")).toBeOnTheScreen();
     expect(
       screen.getByText("Una amiga por mes. La clase gratis es una sola vez para ella."),
     ).toBeOnTheScreen();
@@ -99,18 +100,34 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("Mariana P.")).toBeOnTheScreen();
     expect(screen.getByText("Registrada")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Compartir tu código" }));
     expect(share).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("LUCIA") }),
     );
     share.mockRestore();
   });
 
-  // BKM-017: «Copiar» next to the code, and «Editar código» under the card.
-  it("copies the code with a notice and offers to edit it", async () => {
+  // BKM-017: copy next to the code, and «Editar código» on the card. FIX-082
+  // (Invita option A): one Lino card, the code in Lora, a 44 pt outlined copy
+  // icon, «Compartir tu código» right under it and «Editar código» centred.
+  it("holds the code, copy, share and edit on one light card", async () => {
     const screen = await openInvita(routeFetcher(routes([])));
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Copiar" }));
+    const card = await screen.findByTestId("referral-code-card");
+    expect(card).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByText("Tu código")).toBeOnTheScreen();
+    expect(screen.getByText("LUCIA")).toHaveStyle({
+      color: "#4A4A4A",
+      fontFamily: "Lora_400Regular",
+    });
+    const copy = screen.getByRole("button", { name: "Copiar código" });
+    expect(copy).toHaveStyle({ borderWidth: 1, height: 44, width: 44 });
+    expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Compartir tu código" })).toHaveStyle({
+      backgroundColor: "#B78380",
+    });
+
+    await fireEvent.press(copy);
     expect(await screen.findByText("Código copiado")).toBeOnTheScreen();
     expect(await screen.findByRole("button", { name: "Editar código" })).toBeOnTheScreen();
   });
@@ -121,9 +138,11 @@ describe("Invita a una amiga (BKM-014)", () => {
     await waitFor(() => {
       expect(screen.getByText("LUCIA")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Aún no invitaste a nadie")).toBeOnTheScreen();
-    expect(screen.getByText("Cuando una amiga use tu código, la verás aquí.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Compartir tu código" })).toBeOnTheScreen();
+    // FIX-082: plain text, not a card with its own button.
+    expect(
+      screen.getByText("Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí."),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Compartir" })).toBeNull();
   });
 });
