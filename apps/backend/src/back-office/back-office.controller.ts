@@ -253,7 +253,7 @@ export class AdministratorExpensesController extends BackOfficeController {
 
   // Finding 104: «Eliminar gasto» voids it; nothing is deleted (ADR-0086).
   @Post(':expenseId/void')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'voidExpense' })
   @ApiParam({ name: 'expenseId', format: 'uuid' })
   @ApiBody({ type: ExpenseVoidDto })
