@@ -56,7 +56,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Reporte de ingresos y gastos",
+        name: "Dinero",
       }),
     ).toBeVisible();
     expect(

@@ -79,6 +79,7 @@ const movementColumns = [
   }),
   columns.accessor("recordedByName", {
     header: "Registró",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),

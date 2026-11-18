@@ -16,7 +16,8 @@ export const buttonVariants = cva(
           "bg-primario text-blanco hover:bg-primario-hover focus-visible:shadow-foco-solido active:bg-primario-presionado",
         secondary:
           "bg-primario-tinte text-primario-profundo hover:bg-rosa-empolvado/40",
-        link: "h-auto px-0 text-primario-profundo hover:text-primario-presionado",
+        // FIX-088: a disabled text link stays text, never a grey block.
+        link: "h-auto px-0 text-primario-profundo hover:text-primario-presionado disabled:bg-transparent",
         neutral: "bg-lino text-texto hover:bg-primario-tinte",
         // FIX-084: the quiet companion of the one solid button in a list.
         outline: "border border-borde bg-blanco text-texto hover:bg-hover-fila",

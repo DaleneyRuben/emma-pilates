@@ -137,7 +137,7 @@ export function PayrollPage({
 
   return (
     <CatalogPage
-      title="Nómina"
+      title="Sueldos pagados"
       subtitle="Todo el estudio · solo registra que el pago se hizo, no cómo se calculó."
       createLabel="Registrar pago"
       loadingMessage="Cargando pagos…"

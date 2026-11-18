@@ -83,10 +83,13 @@ type MovementOutput = z.output<ReturnType<typeof movementSchema>>;
 export function SupplyMovementForm({
   branchId,
   kind,
+  supplyId: chosen = "",
   onDone,
 }: {
   branchId: string;
   kind: Kind;
+  /** FIX-088 (Insumos B): the row's Supply, already chosen. */
+  supplyId?: string;
   onDone: (notice: string) => void;
 }) {
   const queryClient = useQueryClient();
@@ -108,7 +111,7 @@ export function SupplyMovementForm({
   const form = useForm<MovementInput, unknown, MovementOutput>({
     resolver: zodResolver(schema),
     mode: "onChange",
-    defaultValues: { supplyId: "", quantity: "" },
+    defaultValues: { supplyId: chosen, quantity: "" },
   });
   const [supplyId, quantity] = useWatch({
     control: form.control,

@@ -60,7 +60,7 @@ test.describe("a 1024 px laptop", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Reporte de ingresos y gastos",
+        name: "Dinero",
       }),
     ).toBeVisible();
     await nowrapFigures(page);
@@ -99,7 +99,7 @@ test.describe("the drawn widths", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Reporte de ingresos y gastos",
+        name: "Dinero",
       }),
     ).toBeVisible();
     await nowrapFigures(page);

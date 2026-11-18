@@ -18,6 +18,7 @@ import {
   staffPage,
   valentina,
 } from "../../test/people-fixtures";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -185,9 +186,10 @@ describe("AW23 Personal on a narrow browser", () => {
     server.use(staffTable(() => jsonResponse(staffPage([emma]))));
     renderAdmin("/estudio/personal");
 
-    expect(
-      await screen.findByRole("cell", { name: "Centro, Equipetrol" }),
-    ).toHaveAttribute("data-label", "Sucursales");
+    const card = compactCard(
+      (await screen.findByText("Centro, Equipetrol")).closest("tr")!,
+    );
+    expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(screen.getByLabelText("Rol")).toBeVisible();
   });
 });

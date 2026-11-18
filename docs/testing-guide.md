@@ -60,6 +60,7 @@ numbered tests.
 | Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 | Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
+| Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 
 ## Where each designed screen is tested
 
@@ -3239,9 +3240,9 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    bajo** pill when the stock is at or below the Supply's alert threshold.
    The subtitle counts them ("Sucursal Centro · 1 con stock bajo") and the
    rail shows the same count on **Estudio** (and the Insumos tab), on every page;
-   choosing another Branch in the top bar changes both. The header has
-   **+ Nuevo insumo**, **Registrar retiro**, **Registrar reposición**, and the
-   **Ver historial de movimientos** link, in that order.
+   choosing another Branch in the top bar changes both. Since FIX-088 (Test
+   182) the header has only **+ Nuevo insumo**; each row has **Retiro** and
+   **Reposición**, which open the panels below with that Insumo chosen.
 2. **Nuevo insumo.** The side panel asks for **Nombre**, **Cantidad en stock**
    (typed only now), and **Umbral de alerta**; **Guardar** with empty fields
    marks each one. A name another active Supply of the Branch already has is
@@ -3262,8 +3263,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    for an over-recorded one with a Reposición.
 5. **Registrar reposición.** The same panel with **Cantidad repuesta** and no
    maximum; afterwards "Reposición registrada: ahora hay N unid. de …".
-6. **Movimientos de insumos.** **Ver historial de movimientos** (the only
-   way in) opens the Branch's Withdrawals and Restocks for the current month,
+6. **Movimientos de insumos.** The **Movimientos** view (beside **Stock**)
+   opens the Branch's Withdrawals and Restocks for the current month,
    newest first, with **Insumo**, **Movimiento** (Retiro or Reposición),
    **Cantidad**, **Registró** (who recorded it), and the date and time; "N
    movimientos en septiembre de 2026." above them and the units withdrawn
@@ -3275,7 +3276,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    says "Sin movimientos en este rango." ("Sin retiros…", "Sin
    reposiciones…" under those filters). **Insumos** stays highlighted in the
    sidebar and **Volver a Insumos** goes back (Test 162).
-7. **Nómina.** Back Office → **Nómina** lists every Salary Payment of the
+7. **Sueldos pagados.** **Dinero › Sueldos › Pagados** (titled «Sueldos
+   pagados» since FIX-088) lists every Salary Payment of the
    studio (the Branch selector says the page is not filtered by Branch), with
    **Empleado**, **Monto**, and **Fecha**, and an **Empleado** filter.
    **+ Registrar pago** asks for the Staff Member (a deactivated one is
@@ -3310,9 +3312,9 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    one is deleted after "¿Eliminar «…»?"; an eliminated Expense does not
    count as a use (Test 163). The row at the bottom adds one; a
    name that already exists (ignoring capitals) is refused.
-10. **Narrow browser.** At a phone width every table becomes one card per row
-    (a Supply without the amber pill shows no Estado line), the four Insumos
-    actions wrap under the title, every panel fills the screen, and the
+10. **Narrow browser.** At a phone width every table becomes one compact card
+    per row (FIX-088, Test 182), each Insumo card with its **Retiro** and
+    **Reposición** links, every panel fills the screen, and the
     drawer keeps the Insumos count.
 
 Supplies, Withdrawals, Restocks, Salary Payments, and Expenses are never
@@ -3360,8 +3362,8 @@ may have added more). Both pages are read-only: there is no
 5. **Studio-wide pages.** On Referidos the Branch selector says "Esta página
    no se filtra por sucursal — …" and switching Branch changes nothing on
    the page.
-6. **Narrow browser.** At a phone width each row becomes a labelled card and
-   the week stepper and the search stay above the cards.
+6. **Narrow browser.** At a phone width each row becomes a compact card
+   (Test 182) and the week stepper and the search stay above the cards.
 
 ## Test 30: read the income and expense report in the admin web
 
@@ -3486,8 +3488,8 @@ take about a minute:
    from `https://attacker.example` is refused with `403 untrusted_origin`
    while the session stays valid.
 6. **Narrow browser.** At 420 px the sidebar is behind **Abrir menú**, the
-   Branch selector opens as a bottom sheet, Personal shows one labelled card
-   per member, and nothing scrolls sideways.
+   Branch selector opens as a bottom sheet, Personal shows one compact card
+   per member (name, Role and Branches, status), and nothing scrolls sideways.
 7. **Promociones.** The empty carousel, two drafts saved without an image,
    the second dragged above the first by its handle (the "Soltar en posición
    1" line, the saved order surviving a reload), and one deleted after the
@@ -7038,19 +7040,20 @@ Branch, up to the moment of the close.
    «Accesos» on **Pagos** (Pagos pendientes), opens with **Pagos** as its
    back button, and offers every Branch under «Sucursal». Close another Branch.
 8. On the admin web, open Back Office › «Caja» (after Pagos). Expected: AW151
-   «Cierres de caja» for the selected Branch and the current month, one row
+   «Caja» (titled «Cierres de caja» before FIX-088) for the selected Branch and the current month, one row
    per day with cash sales or a close, newest first: «Cerrada», «Sin cierre»
    (a past day with cash sales and no close, also counted in the amber notice
    above the table), or «Abierta» (today, not closed yet). A short count reads
-   «−Bs …» in red on a tinted row, a surplus «+Bs …» in amber. Make a past
+   «−Bs …» in red, a surplus «+Bs …» in amber, on a row the same as the
+   others (FIX-088). Make a past
    unclosed day by recording a cash sale with the API's clock in the past (or
    wait a day) to see the notice.
 9. The «Ajuste» column shows how a closed day's cash sales moved after the
    close: a cash sale recorded later the same day raises it; a sale voided
    after the close (Test 89) lowers it. The close itself is
    never edited.
-10. Check AW151 at 1440 px and 420 px (the rows become cards that keep the
-    tint), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
+10. Check AW151 at 1440 px and 420 px (the rows become compact cards: the date,
+    «Contado · Diferencia», the status), and `GET /api/v1/administrator/cash-closes?branchId=…&month=…` as
     the Assistant answers `403`. Then `dropdb pilates_test_cash`.
 
 ## Test 77: work as the Coordinator (IDN-009)
@@ -10820,3 +10823,56 @@ G. **Approved people leave Por aprobar.** Approve one person (with the
    «Aprobamos …», and she is in **Pagados**. When everyone in the period is
    approved the page says «Noviembre de 2026: todos los sueldos están
    aprobados. Están en Pagados.»; no card ever reads «Aprobado» here.
+
+## Test 182: admin web round 2, row actions, compact phone cards and small fixes (FIX-088)
+
+The owner's round-2 picks (`DECISIONES-DISENO-2026-11-18.md`, «Ronda 2»):
+Insumos y Equipos B and Tablas en celular A, plus the audit's small fixes.
+Nothing changed in the API. Use a copy of the database, run the API, the
+worker and the admin web on your own ports, log in as the Administrator, and
+check each step at 1440 px and at 420 px.
+
+A. **Insumos.** **Estudio › Insumos › Stock**: the header has only **+ Nuevo
+   insumo**. Each row reads «Toallas · 24 · Suficiente» (or the amber «Stock
+   bajo» pill) with **Retiro** and **Reposición** on the right. **Retiro**
+   opens «Registrar retiro» with Toallas already chosen; register 2 and the
+   row reads 22. The history is the **Movimientos** view only. The
+   Coordinator has the same row links and no **+ Nuevo insumo**.
+B. **Equipos.** One primary **+ Nuevo tipo** in the header. **Agregar**,
+   **Editar**, **Registrar falla**, **Dar de baja**, **Registrar daño** and
+   **Cambiar cantidad** are text links on their rows; «Por unidad» is plain
+   text, and «Fuera de servicio» and «N dañados» keep their pills.
+C. **Compact cards at 420 px.** **Comentarios**: each card is the comment in
+   bold, «Valeria Prueba · Otro · 17/11/2026 · 17:24» under it, and on the
+   right «• Nuevo» (a dot and the word) or a plain grey «Revisado». The
+   same for **Clientas** (name, «8 clases · 7 de 8 + 1 · 04/12/2026»,
+   «Activo»), **Pagos**, **Personal**, **Congelamientos** (dates, reason and «Vence 5 feb → 12 feb» in the
+   line; **Aprobar** and **Rechazar**, or «Decidido por …», under the card), **Caja**, **Gastos**, **Movimientos**, **Sueldos
+   pagados**, **Planes**, **Tipos de clase**, **Sucursales**, **Evaluaciones**
+   and **Referidos**. No card shows uppercase column labels. At 1440 px the
+   tables are unchanged.
+D. **Pills only for exceptions.** Normal states read as grey text
+   («Confirmado», «Activo», «Visible», «Cerrada», «Revisado»); only waiting or
+   wrong states keep a pill («Pendiente», «Nuevo», «Stock bajo», «Rechazado»,
+   «Fuera de servicio»).
+E. **Titles match the menu.** **Clientas › Todas** is titled «Clientas»,
+   **Dinero › Caja** «Caja», **Dinero › Sueldos › Pagados** «Sueldos
+   pagados», **Informes › El mes** «Informes» (was «Indicadores»),
+   **Informes › Dinero** «Dinero» (was «Reporte de ingresos y gastos»),
+   **Horario › Nutrición** «Nutrición» (was «Evaluaciones nutricionales») and
+   **Promociones › Clases de campaña** «Clases de campaña» (was «Campaña»).
+   Every other page's title is its menu or tab name; the boards' names
+   (AW16, AW25, AW39) in older tests are the design references.
+F. **Caja.** Every row has the same ground; a short day's «−Bs …» is red and
+   a surplus amber, in the Diferencia figure only. At 420 px the card reads
+   «Contado Bs 240,00 · Diferencia −Bs 7,00». An empty Insumo's **Retiro** is
+   disabled.
+G. **Informes.** At 420 px **El mes** with classes draws «Clases dictadas»
+   inside the screen (nothing scrolls sideways). **Dinero** has one date
+   filter, **Desde · Hasta**: «Ingreso devengado · noviembre de 2026» follows
+   the month **Hasta** falls in, with no month arrows of its own.
+H. **Simulador.** Under the two figures: «(costos fijos Bs 21.175,00 + pago a
+   instructoras Bs 9.295,00) ÷ (1 − 16 % de impuesto) = Bs 36.273,81».
+I. **Para contactar.** A Client without a usable phone shows a grey, flat
+   **Abrir WhatsApp** (no filled block) that says «Sin teléfono» or «Celular
+   incompleto» on hover; an enabled one keeps its Lino button.

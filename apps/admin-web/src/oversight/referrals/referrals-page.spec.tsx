@@ -14,6 +14,7 @@ import {
   referralRow,
   referralsPath,
 } from "../../test/oversight-fixtures";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -280,10 +281,11 @@ describe("AW26 Referidos on a narrow browser", () => {
     );
     renderAdmin(path);
 
-    const referred = await screen.findByRole("cell", {
-      name: "Valeria Terceros",
-    });
-    expect(referred).toHaveAttribute("data-label", "Cliente referido");
+    const card = compactCard(
+      (await screen.findByText("Valeria Terceros")).closest("tr")!,
+    );
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("Valeria Terceros");
     expect(
       screen.getByRole("searchbox", { name: "Buscar por nombre de cliente" }),
     ).toBeVisible();

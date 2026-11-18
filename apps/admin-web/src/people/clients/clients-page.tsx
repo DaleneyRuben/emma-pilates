@@ -181,7 +181,7 @@ export function ClientsPage({
     </div>
   );
   const shared = {
-    title: "Clientes",
+    title: "Clientas",
     subtitle:
       query.data === undefined
         ? undefined
