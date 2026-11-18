@@ -1,6 +1,7 @@
-import type { PayStatementDto } from "@pilates/api-contracts";
+import { staffRoleLabel, type PayStatementDto } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarRange, CheckCircle2, RefreshCw } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import {
   LoadingNotice,
@@ -25,6 +26,7 @@ import {
   draftPayStatementsRequest,
   payStatementsQueryOptions,
 } from "./pay-statement-queries";
+import { payrollStaffQueryOptions } from "./payroll-queries";
 import { recalculationSummary } from "./recalculation-summary";
 import type { ApprovedNotice } from "./approve-statement-dialog";
 import { StatementCard } from "./statement-card";
@@ -35,37 +37,13 @@ const noPeriod: PayPeriodQuery = { month: "" };
 const capitalized = (text: string) =>
   text.charAt(0).toLocaleUpperCase("es") + text.slice(1);
 
-// Finding 105: the month being paid has not ended, so nothing in it can be
-// approved yet; a Trainer can still be paid up to yesterday by Rango.
-function MonthOpenNotice({
-  month,
-  today,
-  onPayByRange,
-}: {
-  month: string;
-  today: string;
-  onPayByRange: () => void;
-}) {
+// Finding 105, FIX-084 (Sueldos B): one line instead of a banner while the
+// month being paid is still open.
+const monthOpenLine = (month: string) => {
   const monthName = formatMonth(month).split(" ")[0] ?? "";
   const lastDay = Number(addDays(`${addMonths(month, 1)}-01`, -1).slice(8));
-  const nextMonthName = formatMonth(addMonths(month, 1)).split(" ")[0] ?? "";
-  return (
-    <section
-      aria-label="El mes no terminó"
-      className="flex flex-wrap items-start gap-3 rounded-marco bg-primario-tinte px-4 py-3.5 md:px-5"
-    >
-      <p className="min-w-[240px] flex-1 text-nota text-texto">
-        {`${capitalized(monthName)} todavía no terminó: cierra el ${lastDay}. Desde el 1 de ${nextMonthName} puedes aprobar a las instructoras, y a la coordinadora siete días después, porque su bono espera las renovaciones. Para pagarle antes a una instructora, elige Rango hasta ayer y vuelve a calcular.`}
-      </p>
-      {today.endsWith("-01") ? null : (
-        <Button variant="secondary" size="sm" onClick={onPayByRange}>
-          <CalendarRange size={16} aria-hidden="true" />
-          Pagar por Rango
-        </Button>
-      )}
-    </section>
-  );
-}
+  return `${capitalized(monthName)} cierra el ${lastDay}. Para pagarle antes a una instructora, elige «Otro período».`;
+};
 
 // Finding 112: the receipt goes with the approval, so the notice only says
 // what happened.
@@ -89,7 +67,8 @@ function DoneNotice({ notice }: { notice: ApprovedNotice }) {
 // Follow-up 232: Sueldos › Por aprobar holds every statement of the period.
 // BKO-009: a Trainer's pay covers a day, a week, a range or a month; the
 // Coordinator's (BKO-007) only a month, so the API lists hers on Mes alone.
-// Follow-up 274 (finding 105): option A.
+// Follow-up 274 (finding 105): option A. FIX-084: the owner's Sueldos B, one
+// card per person with its own «Aprobar».
 export function PayStatementsPage({
   search,
   onSearchChange,
@@ -118,7 +97,18 @@ export function PayStatementsPage({
     },
     onMutate: () => setNotice(null),
   });
-  const statements = query.data;
+  // FIX-084: an approved statement is already in Pagados, never here.
+  const statements = query.data?.filter(
+    (statement) => statement.state !== "approved",
+  );
+  const approvedCount = (query.data?.length ?? 0) - (statements?.length ?? 0);
+  const staff = useQuery(payrollStaffQueryOptions());
+  const roleOf = (staffMemberId: string) => {
+    const member = staff.data?.find((one) => one.id === staffMemberId);
+    return member === undefined
+      ? undefined
+      : staffRoleLabel(member.role, member.gender);
+  };
   const change = (next: PayStatementsSearch) => {
     draft.reset();
     setNotice(null);
@@ -157,18 +147,9 @@ export function PayStatementsPage({
       ) : null}
       {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
-        <MonthOpenNotice
-          month={search.month}
-          today={today}
-          onPayByRange={() =>
-            change({
-              month: search.month,
-              period: "range",
-              from: `${search.month}-01`,
-              to: addDays(today, -1),
-            })
-          }
-        />
+        <p className="text-celda text-texto-secundario">
+          {monthOpenLine(search.month)}
+        </p>
       ) : null}
       {period === null ? null : query.isError ? (
         <QueryFailure
@@ -180,15 +161,29 @@ export function PayStatementsPage({
         <LoadingNotice>Cargando los pagos…</LoadingNotice>
       ) : statements.length === 0 ? (
         <p className="text-cuerpo text-texto-secundario">
-          {shown.label}: sin pagos calculados.
+          {approvedCount === 0 ? (
+            `${shown.label}: sin pagos calculados.`
+          ) : (
+            <>
+              {`${shown.label}: todos los sueldos están aprobados. Están en `}
+              <Link
+                to="/dinero/sueldos/pagados"
+                className="font-medium text-primario-profundo underline-offset-2 hover:underline"
+              >
+                Pagados
+              </Link>
+              .
+            </>
+          )}
         </p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
           {statements.map((statement) => (
             <StatementCard
               key={statement.id}
               statement={statement}
               period={period}
+              role={roleOf(statement.staffMemberId)}
               today={today}
               onApproved={setNotice}
             />

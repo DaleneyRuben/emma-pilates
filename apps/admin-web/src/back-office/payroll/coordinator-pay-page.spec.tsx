@@ -7,6 +7,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { payrollStaffHandler } from "../../test/payroll-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import {
   attachSalaryReceipt,
@@ -48,7 +49,7 @@ describe("the Coordinator's pay statement", () => {
   it("shows the draft and approves it once", async () => {
     let approved = 0;
     // Its own statements answer before Inicio's empty default.
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), payrollStaffHandler());
     server.use(
       ...salaryReceiptHandlers(),
       http.get(apiUrl(statementsPath), () =>
@@ -74,14 +75,18 @@ describe("the Coordinator's pay statement", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText("Bs 4.030,00")).not.toHaveLength(0);
     expect(screen.getByText("Bono de renovación")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Aprobar pago" }));
+    await user.click(screen.getByRole("button", { name: /^Aprobar Bs/ }));
     const dialog = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, dialog);
     await user.click(
       within(dialog).getByRole("button", { name: "Aprobar Bs 4.030,00" }),
     );
     await waitFor(() => expect(approved).toBe(1));
-    expect(await screen.findByText("Aprobado")).toBeInTheDocument();
+    // FIX-084: once approved she leaves Por aprobar for Pagados.
+    expect(
+      await screen.findByText(/^Diciembre de 2025: todos los sueldos/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Aprobado")).not.toBeInTheDocument();
   });
 
   it("sends the Coordinator back to Horario", async () => {
@@ -101,7 +106,7 @@ describe("the Coordinator's pay statement", () => {
 
   it("refuses an Assistant", async () => {
     // Its own statements answer before Inicio's empty default.
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), payrollStaffHandler());
     server.use(
       http.get(apiUrl(statementsPath), () =>
         problemResponse(403, "back_office_access_denied"),

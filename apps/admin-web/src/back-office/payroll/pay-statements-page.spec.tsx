@@ -78,7 +78,7 @@ describe("Sueldos por aprobar", () => {
 
     const card = await screen.findByRole("article", { name: "Emma Vargas" });
     expect(
-      await within(card).findByText("Instructora · Septiembre de 2026"),
+      await within(card).findByText("Entrenadora · Septiembre de 2026"),
     ).toBeInTheDocument();
     expect(within(card).getByText("Bs 297,00")).toBeInTheDocument();
     const minimumRow = within(card).getByText(

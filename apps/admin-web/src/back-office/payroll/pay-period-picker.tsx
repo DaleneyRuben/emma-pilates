@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ChoiceChips } from "../../components/form/choice-chips";
 import { CivilDateInput } from "../../components/form/civil-date-input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
@@ -13,16 +12,8 @@ import {
 import {
   searchFor,
   windowOf,
-  type PayPeriodKind,
   type PayStatementsSearch,
 } from "./pay-period-search";
-
-const kinds = [
-  ["day", "Día"],
-  ["week", "Semana"],
-  ["range", "Rango"],
-  ["month", "Mes"],
-] as const;
 
 const stepNames = {
   day: ["Día anterior", "Día siguiente"],
@@ -71,8 +62,10 @@ function PeriodStepper({
 }
 
 /**
- * BKO-009: Día · Semana · Rango · Mes over Sueldos › Por aprobar. Día, Semana
- * and Mes step with arrows; Rango takes two `dd/mm/aaaa` dates, both included.
+ * BKO-009, FIX-084 (Sueldos B): one control, «‹ Noviembre de 2026 ›», with
+ * «Otro período» for a range of days (both included, typed `dd/mm/aaaa`).
+ * A day or a week opened by its address still steps with arrows; every
+ * other period goes back to its month with «Volver al mes».
  */
 export function PayPeriodPicker({
   search,
@@ -105,18 +98,29 @@ export function PayPeriodPicker({
     const range = { from: shown.from, to: shown.to, [end]: value };
     onChange({ month: range.from.slice(0, 7), period: "range", ...range });
   };
+  // Finding 105: inside the open month, a Trainer is paid up to yesterday.
+  const otherPeriod = () => {
+    const open =
+      shown.kind === "month" &&
+      search.month === boliviaMonth() &&
+      !today.endsWith("-01");
+    onChange(
+      open
+        ? {
+            month: search.month,
+            period: "range",
+            from: `${search.month}-01`,
+            to: addDays(today, -1),
+          }
+        : searchFor("range", search, today),
+    );
+  };
+  const linkButton =
+    "h-9 rounded-control px-1 text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <ChoiceChips<PayPeriodKind>
-          legend="Período"
-          name="pay-period"
-          value={shown.kind}
-          options={kinds}
-          onChange={(kind) => onChange(searchFor(kind, search, today))}
-          className="w-full sm:w-auto"
-        />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         {shown.kind === "range" ? null : (
           <PeriodStepper
             names={stepNames[shown.kind]}
@@ -124,6 +128,19 @@ export function PayPeriodPicker({
             atLatest={atLatest}
             onStep={step}
           />
+        )}
+        {shown.kind === "month" ? (
+          <button type="button" className={linkButton} onClick={otherPeriod}>
+            Otro período
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={linkButton}
+            onClick={() => onChange(searchFor("month", search, today))}
+          >
+            Volver al mes
+          </button>
         )}
       </div>
       {shown.kind === "range" ? (
