@@ -57,7 +57,7 @@ numbered tests.
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
-| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Pagados › Registrar pago shows it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; the QR inside «Aprobar pago» comes with FIX-070 |
+| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar pago» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
@@ -10205,9 +10205,14 @@ one. Design option A (follow-ups 275 and 276). The migration
 10. Check the admin web at 1440 px and 420 px and the Staff app on the
     iPhone 16 Pro, the iPad and the Android emulator, then drop the copy.
 
-The QR inside Sueldos › Por aprobar's «Aprobar pago» confirmation arrives
-with FIX-070's dialog (follow-up 274): until both are merged, step 6 is
-where the web shows it.
+11. **Sueldos › Por aprobar.** In a period that can be approved (Rango up to
+    yesterday, or a closed month), press **Aprobar pago** on Emma's card.
+    Expected: the confirmation, wider, with her QR (or «Sin QR de cobro», or
+    «QR vencido · pídele uno nuevo») on the left at 1440 and above the
+    details at 420. Approve. Expected: «Aprobamos Bs … a Emma Vargas. Quedó
+    en Pagados. ¿Ya le transferiste? Sube el comprobante y Emma lo verá en su
+    app.» and **Subir comprobante**, which opens Pagados on Emma, where the
+    row's panel takes the receipt (Test 95).
 
 ## Test 167: Informes recommendations and figures that add up (FIX-073)
 
