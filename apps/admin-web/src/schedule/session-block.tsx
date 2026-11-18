@@ -139,7 +139,7 @@ function StandingBlock({
         className,
       )}
     >
-      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium break-words xl:text-[12.5px]">
+      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium whitespace-nowrap xl:text-[12.5px]">
         {flag === undefined ? null : <EquipmentDot />}
         {session.classTypeName}
       </span>
