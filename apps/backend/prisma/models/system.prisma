@@ -225,6 +225,7 @@ model Account {
   uploadedPayoutQrs         StaffPayoutQr[]         @relation("StaffPayoutQrUploadedBy")
   approvedPayStatements     PayStatement[]          @relation("PayStatementApprovedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
+  voidedExpenses            Expense[]               @relation("ExpenseVoidedBy")
   allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
   owedCampaignClasses       OwedCampaignClass[]     @relation("OwedCampaignClassAuthor")
   contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")

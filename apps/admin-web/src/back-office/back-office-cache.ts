@@ -1,5 +1,6 @@
 import {
   getGetExpenseReportQueryKey,
+  getGetMonthResultQueryKey,
   getListAdminExpenseCategoriesQueryKey,
   getListAdminExpensesQueryKey,
   getListAdminSalaryPaymentsQueryKey,
@@ -89,6 +90,10 @@ export async function refreshAfterExpense(
       ),
     }),
     queryClient.invalidateQueries({ predicate: isExpenseReportKey(change) }),
+    // The month result's actual costs read the Expenses (finding 104).
+    queryClient.invalidateQueries({
+      queryKey: [getGetMonthResultQueryKey()[0]],
+    }),
     refreshAfterCategoryChange(queryClient),
   ]);
 }

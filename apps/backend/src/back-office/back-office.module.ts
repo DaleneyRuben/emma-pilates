@@ -11,6 +11,7 @@ import { createPrismaCashCloses } from './cash-close/prisma-cash-closes';
 import { createPrismaEquipment } from './equipment/prisma-equipment';
 import { createPrismaSessionEquipment } from './equipment/prisma-session-equipment';
 import { createPrismaExpenses } from './expenses/prisma-expenses';
+import { createPrismaVoidExpense } from './expenses/prisma-void-expense';
 import { createPrismaFinance } from './finance/prisma-finance';
 import { monthFacts } from './finance/month-facts';
 import { coordinatorMonthFacts } from './payroll/coordinator-pay-facts';
@@ -45,7 +46,10 @@ import { createPrismaSupplies } from './supplies/prisma-supplies';
             coordinatorFactsOfMonth: (from, until) =>
               coordinatorMonthFacts(prisma, from, until),
           }),
-          expenses: createPrismaExpenses(prisma, { now }),
+          expenses: {
+            ...createPrismaExpenses(prisma, { now }),
+            ...createPrismaVoidExpense(prisma, { now }),
+          },
           report: createPrismaExpenseReport(prisma, { now }),
           finance: createPrismaFinance(prisma, {
             ofMonth: (from, until) => monthFacts(prisma, from, until),

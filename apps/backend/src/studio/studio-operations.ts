@@ -34,6 +34,10 @@ export type RecommendationView = {
   period: string;
   detail: string;
   state: string;
+  clientId?: string;
+  clientName?: string;
+  trainerName?: string;
+  weekday?: number;
 };
 
 export type MonthNarrativeView = {

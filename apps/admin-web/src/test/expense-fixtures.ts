@@ -37,6 +37,9 @@ export const expenseRow = (
   expenseCategoryName: expenseCategory.name,
   amountCentavos,
   incurredOn,
+  voidedAt: null,
+  voidedByName: null,
+  voidReason: null,
 });
 
 export const repairSeptember = expenseRow("01", repair, 45_050, "2026-09-15");
@@ -46,6 +49,14 @@ export const maintenanceSeptember = expenseRow(
   120_000,
   "2026-09-02",
 );
+
+// Finding 104: the same Expense once «eliminado».
+export const voidedRepair: AdminExpenseDto = {
+  ...repairSeptember,
+  voidedAt: "2026-11-18T18:30:00.000Z",
+  voidedByName: "Paola Mendoza",
+  voidReason: "Cargado dos veces",
+};
 
 export const expensePage = (
   items: AdminExpenseDto[],

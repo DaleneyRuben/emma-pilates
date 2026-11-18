@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import {
   apiUrl,
@@ -17,15 +17,20 @@ const statement = {
   id: "statement-1",
   staffMemberId: "carolina",
   staffMemberName: "Carolina Rivas",
-  month: "2026-12-01",
-  periodStart: "2026-12-01",
-  periodEnd: "2027-01-01",
+  month: "2025-12-01",
+  periodStart: "2025-12-01",
+  periodEnd: "2026-01-01",
+  approvableOn: "2026-01-08",
   state: "draft",
   totalCentavos: 403_000,
   salaryPaymentId: null,
   lines: [
     { kind: "base", detail: "Base", amountCentavos: 350_000 },
-    { kind: "new_client", detail: "Clienta nueva", amountCentavos: 5_000 },
+    {
+      kind: "new_client",
+      detail: "Camila Rojas · Mensual 8 clases · 30 días",
+      amountCentavos: 5_000,
+    },
     { kind: "bonus", detail: "Bono de renovación", amountCentavos: 40_000 },
   ],
 };
@@ -57,21 +62,26 @@ describe("the Coordinator's pay statement", () => {
         });
       }),
     );
-    const { user } = renderAdmin("/dinero/sueldos?month=2026-12");
+    const { user } = renderAdmin("/dinero/sueldos?month=2025-12");
 
     expect(
       await screen.findByRole("heading", { name: "Carolina Rivas" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Bs 4.030,00")).toBeInTheDocument();
+    expect(screen.getAllByText("Bs 4.030,00")).not.toHaveLength(0);
     expect(screen.getByText("Bono de renovación")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Aprobar" }));
+    await user.click(screen.getByRole("button", { name: "Aprobar pago" }));
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Aprobar Bs 4.030,00",
+      }),
+    );
     await waitFor(() => expect(approved).toBe(1));
     expect(await screen.findByText("Aprobado")).toBeInTheDocument();
   });
 
   it("sends the Coordinator back to Horario", async () => {
     server.use(...coordinatorHandlers());
-    const { router } = renderAdmin("/dinero/sueldos?month=2026-12");
+    const { router } = renderAdmin("/dinero/sueldos?month=2025-12");
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Horario" }),
@@ -92,7 +102,7 @@ describe("the Coordinator's pay statement", () => {
         problemResponse(403, "back_office_access_denied"),
       ),
     );
-    renderAdmin("/dinero/sueldos?month=2026-12");
+    renderAdmin("/dinero/sueldos?month=2025-12");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

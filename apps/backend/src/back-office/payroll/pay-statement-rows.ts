@@ -1,4 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
+import { addCivilDays } from '../../time/bolivia-time';
 
 export const lineKinds = {
   class: 'CLASS',
@@ -42,6 +43,18 @@ export type StatementRow = Prisma.PayStatementGetPayload<{
   select: typeof statementSelect;
 }>;
 
+// A period's pay is approved once it is over in Bolivia. The Coordinator's
+// renewal bonus counts purchases up to 7 days after the month's last Plans
+// end, so hers waits those 7 days too. The civil day it opens is shown on the
+// admin web so «Aprobar» is never offered before it (finding 105).
+export const approvableOn = (statement: {
+  periodEnd: Date;
+  staffMember: { role: string };
+}): Date =>
+  statement.staffMember.role === 'COORDINATOR'
+    ? addCivilDays(statement.periodEnd, 7)
+    : statement.periodEnd;
+
 export const toView = (row: StatementRow) => ({
   id: row.id,
   staffMemberId: row.staffMemberId,
@@ -49,6 +62,7 @@ export const toView = (row: StatementRow) => ({
   month: row.month,
   periodStart: row.periodStart,
   periodEnd: row.periodEnd,
+  approvableOn: approvableOn(row),
   state: row.state === 'APPROVED' ? ('approved' as const) : ('draft' as const),
   totalCentavos: row.totalCentavos,
   salaryPaymentId: row.salaryPaymentId,

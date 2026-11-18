@@ -17,6 +17,7 @@ import { parseUuidValue } from './back-office.dto';
 import type { EquipmentOperations } from './equipment/prisma-equipment';
 import type { SessionEquipment } from './equipment/prisma-session-equipment';
 import type { Expenses } from './expenses/prisma-expenses';
+import type { VoidExpense } from './expenses/prisma-void-expense';
 import type { PayoutQrs } from './payout-qr/payout-qrs';
 import type { PayStatements } from './payroll/prisma-pay-statements';
 import type { SalaryPayments } from './payroll/prisma-salary-payments';
@@ -34,7 +35,7 @@ export type BackOfficeOperations = {
   salaryPayments: SalaryPayments;
   salaryReceipts: SalaryReceipts;
   payStatements: PayStatements;
-  expenses: Expenses;
+  expenses: Expenses & VoidExpense;
   report: ExpenseReport;
   finance: Finance;
   equipment: EquipmentOperations;

@@ -149,6 +149,14 @@ describe("AW16 Finanzas on a desktop browser", () => {
       "/informes/dinero?vista=finanzas&month=2026-10",
     );
     expect(await screen.findByText("Aún no hay presupuesto.")).toBeVisible();
+    // Walkthrough finding 107 (h): no budget, no break-even that looks real.
+    const breakEven = screen.getByRole("region", {
+      name: "Punto de equilibrio",
+    });
+    expect(
+      within(breakEven).getByText("Carga tu presupuesto para calcularlo"),
+    ).toBeVisible();
+    expect(breakEven).not.toHaveTextContent("Bs");
 
     await user.click(
       screen.getByRole("button", { name: "Cargar presupuesto de apertura" }),

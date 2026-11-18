@@ -2,6 +2,7 @@ import {
   dismissRecommendation,
   getListRecommendationsQueryKey,
   listRecommendations,
+  recomputeRecommendations,
   type RecommendationDto,
   type RecommendationListDto,
 } from "@pilates/api-contracts";
@@ -19,4 +20,9 @@ export const recommendationsQueryOptions = (month: string) =>
 export const dismissRecommendationRequest = (id: string) =>
   dismissRecommendation(id, undefined, adminFetch).then(
     (response) => response.data as RecommendationDto,
+  );
+
+export const recomputeRecommendationsRequest = (month: string) =>
+  recomputeRecommendations({ month }, undefined, adminFetch).then(
+    (response) => response.data,
   );

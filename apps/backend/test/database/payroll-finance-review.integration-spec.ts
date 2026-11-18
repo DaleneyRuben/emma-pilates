@@ -82,8 +82,9 @@ describe('payroll and finance review fixes', () => {
     );
 
     expect(
-      july.trainers.find((trainer) => trainer.staffMemberId === emmaId)
-        ?.firstPlanPaymentsCentavos,
+      july.trainers
+        .find((trainer) => trainer.staffMemberId === emmaId)
+        ?.firstPlans.map((first) => first.amountDueCentavos),
     ).toEqual([59_000]);
   });
 

@@ -131,6 +131,7 @@ import type {
   ExpenseChangeDto,
   ExpenseInputDto,
   ExpenseReportDto,
+  ExpenseVoidDto,
   ExportAdminClientsParams,
   ExportAdminPromotionContactsParams,
   FeedbackReceiptDto,
@@ -35847,6 +35848,128 @@ export const useUpdateExpense = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getUpdateExpenseMutationOptions(options), queryClient);
+};
+
+export type voidExpenseResponse200 = {
+  data: AdminExpenseDto;
+  status: 200;
+};
+
+export type voidExpenseResponseSuccess = voidExpenseResponse200 & {
+  headers: Headers;
+};
+export type voidExpenseResponse = voidExpenseResponseSuccess;
+
+export const getVoidExpenseUrl = (expenseId: string) => {
+  return `/api/v1/administrator/expenses/${expenseId}/void`;
+};
+
+export const voidExpense = async (
+  expenseId: string,
+  expenseVoidDto: ExpenseVoidDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<voidExpenseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getVoidExpenseUrl(expenseId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(expenseVoidDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: voidExpenseResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as voidExpenseResponse;
+};
+
+export const getVoidExpenseMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof voidExpense>>,
+    TError,
+    VoidExpenseMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof voidExpense>>,
+  TError,
+  VoidExpenseMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["voidExpense"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof voidExpense>>,
+    VoidExpenseMutationVariables
+  > = (props) => {
+    const { expenseId, data } = props ?? {};
+
+    return voidExpense(expenseId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VoidExpenseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof voidExpense>>
+>;
+export type VoidExpenseMutationBody = ExpenseVoidDto;
+export type VoidExpenseMutationError = unknown;
+export type VoidExpenseMutationVariables = {
+  expenseId: string;
+  data: ExpenseVoidDto;
+};
+
+export const useVoidExpense = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof voidExpense>>,
+      TError,
+      VoidExpenseMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof voidExpense>>,
+  TError,
+  VoidExpenseMutationVariables,
+  TContext
+> => {
+  return useMutation(getVoidExpenseMutationOptions(options), queryClient);
 };
 
 export type getExpenseReportResponse200 = {

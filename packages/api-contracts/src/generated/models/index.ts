@@ -205,6 +205,7 @@ export * from "./expenseChangeDto";
 export * from "./expenseInputDto";
 export * from "./expenseMonthDto";
 export * from "./expenseReportDto";
+export * from "./expenseVoidDto";
 export * from "./exportAdminClientsFilter";
 export * from "./exportAdminClientsParams";
 export * from "./exportAdminPromotionContactsKind";

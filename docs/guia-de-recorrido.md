@@ -1132,19 +1132,27 @@ lista en **Por resolver**.
 ### Sueldos
 
 1. **Dinero › Sueldos**, vista **Por aprobar**. Elige el período: **Día**,
-   **Semana**, **Rango** o **Mes**, y la fecha. **Calcular**. Un período no
+   **Semana**, **Rango** o **Mes**, y la fecha. **Volver a calcular**: dice a
+   qué hora calculó y qué sueldo cambió. Un período no
    se cruza con otro ya liquidado de la misma persona: una clase nunca se
    paga dos veces.
    Daniela aparece si ya dictó una clase cuyo cierre de ventana ya pasó, o
    si ya se confirmó el primer plan de Lucía.
-2. Lee las líneas. Una clase con hasta 4 reservas al cierre de la ventana
+2. Lee las líneas: cada tarjeta las agrupa por concepto con su subtotal
+   (54 × Bs 25 = Bs 1.350), y **Ver las 54** abre cada clase con su día,
+   hora, sucursal y tipo, y cada comisión o clienta nueva con su nombre y su
+   plan. Una clase con hasta 4 reservas al cierre de la ventana
    paga Bs 65. Desde la quinta reserva, suma Bs 8 por cada una. Quien no
    asistió cuenta igual, porque se cuenta la reserva, no la asistencia. Una
    clase cancelada por no llegar al mínimo de 2 paga Bs 25 a la instructora.
    El primer plan de Lucía paga el 10 % de lo que ella realmente pagó, una
    sola vez, en el mes en que se confirmó el pago.
-3. **Aprobar**. La tarjeta pasa a **Aprobado** y la vista **Pagados** gana
-   una fila por ese monto. Calcular el período otra vez no duplica el pago.
+3. **Aprobar pago** y confirma el monto en la ventana. La tarjeta pasa a
+   **Aprobado** y la vista **Pagados** gana una fila por ese monto. Calcular
+   el período otra vez no duplica el pago. Mientras el mes no terminó no se
+   ofrece aprobar: la tarjeta dice «Se aprueba desde el 1 de …» (la
+   coordinadora, desde el 8). Para pagarle antes a una instructora, **Pagar
+   por Rango** elige del 1 a ayer; después **Volver a calcular**.
 4. La coordinadora cobra por mes: su tarjeta aparece en **Por aprobar** solo
    con el período **Mes**. Sin coordinadora, el mes no tiene a quién
    liquidar. Cuando la invites, el cálculo es Bs 3.500 de base, más
@@ -1176,13 +1184,16 @@ lista en **Por resolver**.
    estudio: aparece en todas las sedes, no dentro de una sola. Más abajo
    están las finanzas del mes: resultado, impuesto, punto de equilibrio y el
    presupuesto frente a lo gastado.
-2. **Informes › El mes**. Pide recalcular si el mes todavía no tiene cifras.
+2. **Informes › El mes**. Las cifras se recalculan cada noche; para verlas al
+   momento, pulsa **Recalcular** en «Recomendaciones del mes».
    Son cantidades y montos del estudio: ocupación, clientas nuevas,
    renovación, ingreso cobrado e ingreso devengado por los días de vigencia.
    La coordinadora, cuando entre, ve las cantidades y no los montos.
 3. Más abajo en **El mes** están las **Recomendaciones**, que también se
    ven en **Inicio**. Son reglas sobre el mes ya calculado: una clase
-   que no llena, un horario flojo, un gasto por encima del presupuesto. Con
+   que no llena, un horario flojo, un gasto por encima del presupuesto. Cada
+   una dice de quién es: el nombre de la clienta abre su ficha, y un horario
+   flojo dice la instructora y el día. Con
    pocos días de datos la lista puede estar vacía. Eso es un mes joven, no
    un fallo.
 4. **Informes › Simulador**. No lee la sede ni las ventas. Cambias precios, metas

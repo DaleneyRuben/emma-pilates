@@ -87,15 +87,19 @@ const weakSchedules = (
         left.trainerId.localeCompare(right.trainerId) ||
         left.weekday - right.weekday,
     )
-    .map((group) => ({
-      rule: 'weak_schedule' as const,
-      subject: `${group.trainerId}:${group.weekday}`,
-      period,
-      detail: `Revisa el horario del ${weekdayNames[group.weekday % 7]}: promedia ${averageLabel(
+    .map((group) => {
+      const average = averageLabel(
         group.bookings.reduce((total, value) => total + value, 0),
         group.bookings.length,
-      )} alumnas.`,
-    }));
+      );
+      const students = average === '1' ? 'alumna' : 'alumnas';
+      return {
+        rule: 'weak_schedule' as const,
+        subject: `${group.trainerId}:${group.weekday}`,
+        period,
+        detail: `Revisa el horario del ${weekdayNames[group.weekday % 7]}: promedia ${average} ${students} en ${group.bookings.length} clases.`,
+      };
+    });
 };
 
 const inactiveClients = (
