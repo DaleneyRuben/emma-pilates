@@ -2,12 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { BackOfficeError } from '../../src/back-office/back-office-errors';
 import { createPrismaSalaryPayments } from '../../src/back-office/payroll/prisma-salary-payments';
 import { createPrismaSalaryReceipts } from '../../src/back-office/payroll/prisma-salary-receipts';
-import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import {
   fixtureNow,
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceipt } from './salary-receipt-test-support';
 
 const codeOf = async (work: Promise<unknown>): Promise<string> => {
   try {
@@ -37,42 +37,23 @@ describe('Salary Payment receipts', () => {
       })
     ).staffMemberId!;
 
-  const readyReceipt = async (
+  const readyReceipt = (
     ownerAccountId: string,
     state: 'READY' | 'PENDING' = 'READY',
-  ) => {
-    const created = new Date(fixtureNow.getTime() - 60 * 60 * 1_000);
-    return world.prisma.imageAsset.create({
+  ) => readySalaryReceipt(world.prisma, ownerAccountId, state);
+
+  // Finding 112: a payment recorded before receipts were required.
+  const legacyPayment = async () => {
+    const admin = await principalOf('paola.mendoza@example.com');
+    return world.prisma.salaryPayment.create({
       data: {
-        ownerAccountId,
-        purpose: 'TRANSFER_RECEIPT',
-        state,
-        pendingObjectKey: `pending/transfer_receipt/${randomUUID()}`,
-        declaredMediaType: 'JPEG',
-        declaredByteSize: 10,
-        declaredChecksum: toPrismaBytes(Buffer.alloc(32, 3)),
-        verifiedMediaType: 'JPEG',
-        verifiedByteSize: 10,
-        verifiedChecksum: toPrismaBytes(Buffer.alloc(32, 3)),
-        verifiedWidth: 1200,
-        verifiedHeight: 1600,
-        createdAt: created,
-        expiresAt: new Date(created.getTime() + 15 * 60 * 1_000),
-        finalizedAt: new Date(created.getTime() + 5 * 60 * 1_000),
-        deletionDueAt: new Date(created.getTime() + 24 * 60 * 60 * 1_000),
-        variants: {
-          create: (['READABLE', 'THUMBNAIL'] as const).map((kind) => ({
-            kind,
-            visibility: 'PRIVATE',
-            storageKey: `private/transfer_receipt/${randomUUID()}/${kind.toLowerCase()}`,
-            mediaType: 'WEBP',
-            byteSize: 3,
-            width: 600,
-            height: 800,
-          })),
-        },
+        staffMemberId: await staffIdOf('emma.vargas@example.com'),
+        amountCentavos: 153_490,
+        paidOn: civil('2026-09-18'),
+        recordedByAccountId: admin.accountId,
+        createdAt: fixtureNow,
+        updatedAt: fixtureNow,
       },
-      include: { variants: true },
     });
   };
 
@@ -118,8 +99,7 @@ describe('Salary Payment receipts', () => {
 
   it('attaches a receipt later and keeps the one it replaces', async () => {
     const admin = await principalOf('paola.mendoza@example.com');
-    const payment = await record();
-    expect(payment.receiptImageAssetId).toBeNull();
+    const payment = await legacyPayment();
     const first = await readyReceipt(admin.accountId);
     const second = await readyReceipt(admin.accountId);
     const edit = (receiptImageAssetId: string) =>
@@ -154,6 +134,42 @@ describe('Salary Payment receipts', () => {
     expect(audits.at(-1)?.metadata).toMatchObject({
       previousReceiptImageAssetId: first.id,
       receiptImageAssetId: second.id,
+    });
+  });
+
+  // Finding 112: every Salary Payment carries the photo of its transfer.
+  it('refuses a payment without a receipt and records nothing', async () => {
+    const before = await world.prisma.salaryPayment.count();
+
+    await expect(codeOf(record())).resolves.toBe('salary_receipt_required');
+
+    expect(await world.prisma.salaryPayment.count()).toBe(before);
+  });
+
+  it('refuses correcting a payment without a receipt unless one is attached', async () => {
+    const admin = await principalOf('paola.mendoza@example.com');
+    const legacy = await legacyPayment();
+    const correct = (receiptImageAssetId?: string) =>
+      payroll().updateSalaryPayment(
+        {
+          salaryPaymentId: legacy.id,
+          staffMemberId: legacy.staffMemberId,
+          amountCentavos: 153_000,
+          paidOn: legacy.paidOn,
+          ...(receiptImageAssetId === undefined ? {} : { receiptImageAssetId }),
+        },
+        admin,
+      );
+
+    await expect(codeOf(correct())).resolves.toBe('salary_receipt_required');
+    const photo = await readyReceipt(admin.accountId);
+    await expect(correct(photo.id)).resolves.toMatchObject({
+      amountCentavos: 153_000,
+      receiptImageAssetId: photo.id,
+    });
+    // Once it has one, a correction keeps it without sending it again.
+    await expect(correct()).resolves.toMatchObject({
+      receiptImageAssetId: photo.id,
     });
   });
 
@@ -223,7 +239,7 @@ describe('Salary Payment receipts', () => {
       );
     }
 
-    const bare = await record();
+    const bare = await legacyPayment();
     await expect(
       codeOf(
         receipts().readAnySalaryReceipt(

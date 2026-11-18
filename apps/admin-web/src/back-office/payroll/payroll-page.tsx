@@ -1,6 +1,6 @@
 import type { AdminSalaryPaymentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, ImagePlus } from "lucide-react";
 import { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
@@ -51,17 +51,49 @@ const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
     header: "Comprobante",
     meta: { align: "right" },
     cell: ({ row, getValue }) => (
-      <ReceiptCell url={getValue()} name={row.original.staffMemberName} />
+      <ReceiptCell
+        url={getValue()}
+        name={row.original.staffMemberName}
+        onAttach={() => open(row.original)}
+      />
     ),
   }),
 ];
 
-// Follow-up 224: «Ver» opens AW29's enlarged viewer; «—» when there is none.
-function ReceiptCell({ url, name }: { url: string | null; name: string }) {
+// Follow-up 224: «Ver» opens AW29's enlarged viewer. Finding 112: a payment
+// recorded before receipts were required offers «Adjuntar», which opens
+// AW12 on it, where saving waits for the photo.
+function ReceiptCell({
+  url,
+  name,
+  onAttach,
+}: {
+  url: string | null;
+  name: string;
+  onAttach: () => void;
+}) {
   const [open, setOpen] = useState(false);
-  if (url === null) return <span className="text-texto-muy-tenue">—</span>;
   // The row opens AW12 on a click, and React bubbles the dialog's portal
   // events through this cell, so neither may reach the row.
+  if (url === null) {
+    return (
+      <span
+        className="contents"
+        onClick={(event) => event.stopPropagation()}
+        onKeyDown={(event) => event.stopPropagation()}
+      >
+        <Button
+          variant="link"
+          size="sm"
+          aria-label={`Adjuntar comprobante de ${name}`}
+          onClick={onAttach}
+        >
+          <ImagePlus size={14} strokeWidth={1.7} aria-hidden="true" />
+          Adjuntar
+        </Button>
+      </span>
+    );
+  }
   return (
     <span
       className="contents"

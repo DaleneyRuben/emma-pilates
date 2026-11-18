@@ -34,8 +34,13 @@ describe('AdministratorPayStatementsController periods', () => {
   const resolvePrincipal = jest.fn();
   const listStatements = jest.fn();
   const draftPeriodAsAdministrator = jest.fn();
+  const approveStatement = jest.fn();
   const operations = {
-    payStatements: { listStatements, draftPeriodAsAdministrator },
+    payStatements: {
+      listStatements,
+      draftPeriodAsAdministrator,
+      approveStatement,
+    },
   } as unknown as BackOfficeOperations;
   const controller = new AdministratorPayStatementsController(
     operations,
@@ -116,5 +121,39 @@ describe('AdministratorPayStatementsController periods', () => {
       response: { code: 'pay_statement_period_overlaps' },
       status: 409,
     });
+  });
+
+  // Finding 112: approving pays her, so the body names the transfer's photo.
+  it('approves with the receipt the body names', async () => {
+    const statementId = '7b0f8f8e-4d7a-4c55-9a51-2d3c5f1e9a10';
+    const receiptImageAssetId = '1f2e3d4c-5b6a-4789-8abc-def012345678';
+    approveStatement.mockResolvedValue({ ...row, state: 'approved' });
+
+    await controller.approve(bearer, statementId, { receiptImageAssetId });
+
+    expect(approveStatement).toHaveBeenCalledWith(
+      { statementId, receiptImageAssetId },
+      principal,
+    );
+  });
+
+  it('leaves a missing receipt to the rule and refuses a malformed one', async () => {
+    const statementId = '7b0f8f8e-4d7a-4c55-9a51-2d3c5f1e9a10';
+    approveStatement.mockRejectedValue(
+      new BackOfficeError('salary_receipt_required'),
+    );
+
+    await expect(
+      controller.approve(bearer, statementId, undefined),
+    ).rejects.toMatchObject({
+      response: { code: 'salary_receipt_required' },
+      status: 400,
+    });
+    expect(approveStatement).toHaveBeenCalledWith({ statementId }, principal);
+    approveStatement.mockClear();
+    await expect(
+      controller.approve(bearer, statementId, { receiptImageAssetId: 'x' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(approveStatement).not.toHaveBeenCalled();
   });
 });

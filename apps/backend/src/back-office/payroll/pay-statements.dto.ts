@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { z } from 'zod';
 
 export class PayStatementLineDto {
   @ApiProperty({
@@ -52,6 +53,21 @@ export class PayStatementDto {
   @ApiProperty({ type: PayStatementLineDto, isArray: true })
   lines!: PayStatementLineDto[];
 }
+
+// Finding 112: approving records the Salary Payment, so it carries the photo
+// of the transfer. Left out, the rule answers salary_receipt_required.
+export class PayStatementApprovalDto {
+  @ApiProperty({
+    format: 'uuid',
+    description: 'A ready transfer_receipt upload of hers (finding 112)',
+  })
+  receiptImageAssetId!: string;
+}
+
+export const parsePayStatementApproval = (value: unknown) =>
+  z
+    .strictObject({ receiptImageAssetId: z.uuid().optional() })
+    .safeParse(value ?? {});
 
 export class PayStatementDraftDto {
   @ApiProperty() drafted!: number;

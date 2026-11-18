@@ -21,6 +21,7 @@ export function ConfirmDialog({
   busy = false,
   tone = "destructive",
   wide = false,
+  confirmDescribedBy,
   onConfirm,
 }: {
   open: boolean;
@@ -36,6 +37,8 @@ export function ConfirmDialog({
   tone?: "destructive" | "primary";
   /** Room for a picture beside the details (FIX-072's payout QR). */
   wide?: boolean;
+  /** The id of what explains a grey confirming button. */
+  confirmDescribedBy?: string;
   onConfirm: () => void;
 }) {
   return (
@@ -67,6 +70,7 @@ export function ConfirmDialog({
               variant={tone}
               busy={busy}
               disabled={pending}
+              aria-describedby={confirmDescribedBy}
               onClick={onConfirm}
             >
               {confirmLabel}

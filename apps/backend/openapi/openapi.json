@@ -10012,6 +10012,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayStatementApprovalDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -19952,6 +19962,19 @@
         },
         "required": [
           "drafted"
+        ]
+      },
+      "PayStatementApprovalDto": {
+        "type": "object",
+        "properties": {
+          "receiptImageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A ready transfer_receipt upload of hers (finding 112)"
+          }
+        },
+        "required": [
+          "receiptImageAssetId"
         ]
       },
       "OwnSalaryPaymentDto": {

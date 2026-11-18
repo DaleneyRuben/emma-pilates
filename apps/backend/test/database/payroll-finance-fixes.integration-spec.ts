@@ -12,6 +12,7 @@ import {
   startEvaluationTestWorld,
   type EvaluationTestWorld,
 } from './evaluation-test-support';
+import { readySalaryReceiptId } from './salary-receipt-test-support';
 
 const february = civil('2027-02-01');
 const march = civil('2027-03-01');
@@ -287,9 +288,16 @@ describe('payroll and finance fixes', () => {
     );
     const target = listed.find((row) => row.staffMemberId === carolinaId)!;
 
+    const approval = {
+      statementId: target.id,
+      receiptImageAssetId: await readySalaryReceiptId(
+        world.prisma,
+        admin.accountId,
+      ),
+    };
     await Promise.allSettled([
-      statements(after).approveStatement({ statementId: target.id }, admin),
-      statements(after).approveStatement({ statementId: target.id }, admin),
+      statements(after).approveStatement(approval, admin),
+      statements(after).approveStatement(approval, admin),
       statements(after).draftMonth(march),
     ]);
 
