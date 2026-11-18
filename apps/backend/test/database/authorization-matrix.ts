@@ -2,6 +2,7 @@ import { bookingOnBehalfAuthorizationRows } from './booking-on-behalf-authorizat
 import { campaignAuthorizationRows } from './campaign-authorization';
 import { catalogAuthorizationRows } from './catalog-authorization';
 import { evaluationAuthorizationRows } from './evaluation-authorization';
+import { payoutQrAuthorizationRows } from './payout-qr-authorization';
 import { payStatementAuthorizationRows } from './pay-statement-authorization';
 import { scheduleAuthorizationRows } from './schedule-authorization';
 import { studioFactsAuthorizationRows } from './studio-facts-authorization';
@@ -488,6 +489,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   ...campaignAuthorizationRows(),
   ...transferQrAuthorizationRows(),
   ...staffPhotoAuthorizationRows(),
+  ...payoutQrAuthorizationRows(),
 };
 
 /** A concrete address for a templated path. */
