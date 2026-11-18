@@ -18,6 +18,7 @@ import { createPushDeliveryRuntime } from './notifications/push/push-delivery-ru
 import { createClassReminderJob } from './notifications/class-reminder-job';
 import { createFirst90DaysJob } from './booking/first-90-days/prisma-first-90-days';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
+import { createPayoutQrReminderJob } from './back-office/payout-qr/payout-qr-reminder-job';
 import { createFounderMembershipJob } from './booking/payments/founder-membership-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
@@ -105,6 +106,11 @@ async function bootstrap(): Promise<void> {
       execute: () => cleanupAbandonedUploads({ ...uploadCleanupGateway, now }),
     },
     subscriptionReminders: createSubscriptionReminderJob(
+      prisma,
+      now,
+      recordNotification,
+    ),
+    payoutQrReminders: createPayoutQrReminderJob(
       prisma,
       now,
       recordNotification,
