@@ -29,6 +29,12 @@ afterAll(() => {
   expect(actWarnings).toEqual([]);
 });
 
+// Finding 121: the shell remembers the chosen Branch in localStorage, which
+// jsdom keeps for the whole spec file; every test starts in a fresh browser.
+afterEach(() => {
+  window.localStorage.clear();
+});
+
 // jsdom has no matchMedia; the shell treats a missing implementation as the
 // desktop layout, and narrow-width tests install their own stub.
 if (typeof window.matchMedia !== "function") {

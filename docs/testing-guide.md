@@ -2734,7 +2734,15 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    Promociones, Comentarios, Pagos, Sueldos, Personal, Informes except
    Dinero, and Ajustes) the cell reads **Todo el estudio** instead and
    cannot be opened; the Branch you chose is still there on the next Branch
-   page. On Informes › **Dinero** the cell is replaced by "El reporte usa su
+   page. The choice also survives a full reload and a typed address
+   (finding 121): with Urubó chosen, reload **Dinero › Caja** or type
+   `/horario` in the address bar and the cell still reads **Sucursal
+   Urubó**. The browser remembers it per account, so another person signing
+   in here gets their own last Branch (Centro if they never chose one); if
+   the remembered Branch was archived the cell falls back to the first
+   active one, and a browser that blocks site data still lets you switch (it
+   just forgets on reload). On Informes ›
+   **Dinero** the cell is replaced by "El reporte usa su
    propio filtro de sucursal" (Test 30). Press Tab on a fresh page and the
    first thing focused is a **Saltar al contenido** link that jumps past
    the rail; after any navigation focus lands on the new page's content.
