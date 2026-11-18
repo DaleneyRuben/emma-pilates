@@ -11,7 +11,7 @@ import { Label } from "../../components/ui/label";
 import { cn } from "../../lib/cn";
 import { backOfficeProblem } from "../back-office-problems";
 import { Failure, fieldError } from "./equipment-forms";
-import { parseQuantity, trackingLong } from "./equipment-format";
+import { parseQuantity, trackingLong, typeInUse } from "./equipment-format";
 import { useEquipmentChange } from "./equipment-queries";
 
 type Tracking = EquipmentTypeDto["tracking"];
@@ -242,7 +242,12 @@ export function EditTypeForm({
       onDone(`Quitamos el tipo ${type.name}.`);
     } catch (error) {
       setConfirming(false);
-      setFailure(backOfficeProblem(error).message);
+      const problem = backOfficeProblem(error);
+      setFailure(
+        problem.code === "equipment_type_in_use"
+          ? typeInUse[type.tracking]
+          : problem.message,
+      );
     }
   };
 
@@ -272,7 +277,7 @@ export function EditTypeForm({
             <p className="text-ayuda text-texto-tenue">
               {removable
                 ? "Deja de aparecer en todas las sucursales. Su historial queda."
-                : "Primero da de baja sus unidades en todas las sucursales."}
+                : typeInUse[type.tracking]}
             </p>
           </div>
           <Failure message={failure} />

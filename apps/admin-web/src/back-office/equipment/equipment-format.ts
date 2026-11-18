@@ -46,6 +46,12 @@ export const trackingLabel = {
   quantity: "Por cantidad",
 } as const satisfies Record<EquipmentTypeDto["tracking"], string>;
 
+/** Why Quitar tipo waits, and the server's refusal while any Branch holds it. */
+export const typeInUse = {
+  unit: "Primero da de baja sus unidades en todas las sucursales.",
+  quantity: "Primero deja su cantidad en 0 en todas las sucursales.",
+} as const satisfies Record<EquipmentTypeDto["tracking"], string>;
+
 export const trackingLong = {
   unit: "Se lleva por unidad, con número.",
   quantity: "Se lleva por cantidad.",
