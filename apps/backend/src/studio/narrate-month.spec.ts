@@ -127,11 +127,14 @@ describe('narrate month', () => {
     ]);
   });
 
-  it('leaves dismissed recommendations out', () => {
+  it('leaves dismissed and resolved recommendations out', () => {
     const result = narrateMonth({
       month: '2026-10',
       kpis: counts(),
-      recommendations: [finding({ state: 'dismissed' })],
+      recommendations: [
+        finding({ state: 'dismissed' }),
+        finding({ subject: 'c-2', state: 'resolved' }),
+      ],
     });
 
     expect(result.actions).toEqual([]);

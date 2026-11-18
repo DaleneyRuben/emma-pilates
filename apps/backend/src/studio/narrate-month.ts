@@ -114,8 +114,9 @@ export const narrateMonth = (input: {
     `En ${label} ${held}, con una ocupación del ${occupancyPercent} %. ${active}`,
     `La renovación del mes fue del ${renewalPercent} %.`,
   ];
+  // A discarded or resolved finding is no longer something to review.
   const open = input.recommendations.filter(
-    (item) => item.state !== 'dismissed',
+    (item) => item.state !== 'dismissed' && item.state !== 'resolved',
   );
   if (open.length > 0) paragraphs.push(countParagraph(open.length));
 
@@ -130,7 +131,12 @@ export const narrativeFromReads = (input: {
   narrateMonth({
     month: input.month,
     kpis: input.kpis,
-    recommendations: input.recommendations,
+    // The listed rows carry names for the page; only these fields go on.
+    recommendations: input.recommendations.map(({ rule, detail, state }) => ({
+      rule,
+      detail,
+      state,
+    })),
     subject: input.recommendations.map((item) => item.subject).join(' '),
   });
 
