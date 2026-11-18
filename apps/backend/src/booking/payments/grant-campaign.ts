@@ -33,27 +33,45 @@ export class CampaignError extends Error {
   }
 }
 
+export type PastCampaign = { name: string; grantedAt: Date };
+
 export type CampaignPreview = {
   /** Every active Client: with a current Plan, or owed. */
   recipientCount: number;
   owed: CampaignRecipient[];
   skipped: never[];
+  /** Walkthrough finding 92: each name once, at its latest grant, latest first. */
+  pastCampaigns: PastCampaign[];
+};
+
+const latestByName = (grants: readonly PastCampaign[]): PastCampaign[] => {
+  const latest = new Map<string, Date>();
+  grants.forEach(({ name, grantedAt }) => {
+    const seen = latest.get(name);
+    if (seen === undefined || seen < grantedAt) latest.set(name, grantedAt);
+  });
+  return [...latest]
+    .map(([name, grantedAt]) => ({ name, grantedAt }))
+    .sort((a, b) => b.grantedAt.getTime() - a.grantedAt.getTime());
 };
 
 export const previewCampaign = async (dependencies: {
   principal: AuthenticatedPrincipal;
   countWithPlan: () => Promise<number>;
   findWithoutPlan: () => Promise<readonly CampaignRecipient[]>;
+  findPastCampaigns: () => Promise<readonly PastCampaign[]>;
 }): Promise<CampaignPreview> => {
   requireAdministrator(dependencies.principal);
-  const [withPlan, owed] = await Promise.all([
+  const [withPlan, owed, past] = await Promise.all([
     dependencies.countWithPlan(),
     dependencies.findWithoutPlan(),
+    dependencies.findPastCampaigns(),
   ]);
   return {
     recipientCount: withPlan + owed.length,
     owed: [...owed],
     skipped: [],
+    pastCampaigns: latestByName(past),
   };
 };
 
