@@ -170,6 +170,7 @@ model Branch {
   supplies         Supply[]
   expenses         Expense[]
   equipment        Equipment[]
+  equipmentStocks  EquipmentStock[]
   cashCloses       CashClose[]
 
   @@map("branches")

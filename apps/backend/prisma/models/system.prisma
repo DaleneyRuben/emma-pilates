@@ -226,6 +226,7 @@ model Account {
   owedCampaignClasses       OwedCampaignClass[]     @relation("OwedCampaignClassAuthor")
   contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
   createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
+  createdEquipmentTypes     EquipmentType[]         @relation("EquipmentTypeCreatedBy")
   reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
   resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
   feedback                  Feedback[]
