@@ -138,7 +138,7 @@ export function MoneyCard({
               `QR ${wholeBolivianos(income.data.byMethod.transfer)}`,
               pendingPayments === 0
                 ? "ninguno por revisar"
-                : `${countFormat.format(pendingPayments)} por revisar`,
+                : `${countFormat.format(pendingPayments)} QR por revisar, aún no cuentan`,
             ].join(" · ")}
           </span>
         </>

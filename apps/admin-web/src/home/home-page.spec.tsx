@@ -177,7 +177,9 @@ describe("Inicio for the Administrator", () => {
     const money = await screen.findByRole("region", { name: "Cobrado hoy" });
     expect(await within(money).findByText("Bs 802")).toBeVisible();
     expect(
-      within(money).getByText("Efectivo Bs 502 · QR Bs 300 · 2 por revisar"),
+      within(money).getByText(
+        "Efectivo Bs 502 · QR Bs 300 · 2 QR por revisar, aún no cuentan",
+      ),
     ).toBeVisible();
     expect(
       within(money).getByRole("link", { name: "Ver pagos" }),

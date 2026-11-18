@@ -12,6 +12,22 @@ import {
 
 const shownGroups = 3;
 
+class DismissFailure extends Error {
+  readonly failed: number;
+  readonly total: number;
+
+  constructor(failed: number, total: number) {
+    super("dismiss failed");
+    this.failed = failed;
+    this.total = total;
+  }
+}
+
+const dismissFailureText = (error: unknown) =>
+  error instanceof DismissFailure && error.total > 1
+    ? `No pudimos descartar ${error.failed} de las ${error.total} recomendaciones.`
+    : "No pudimos descartar la recomendación.";
+
 const textLink =
   "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
 
@@ -70,9 +86,15 @@ export function HomeRecommendations({
 }) {
   const queryClient = useQueryClient();
   const query = useQuery(recommendationsQueryOptions(month));
+  // Each finding is its own request; the ones that fail are counted.
   const dismiss = useMutation({
-    mutationFn: (group: RecommendationGroup) =>
-      Promise.all(group.ids.map((id) => dismissRecommendationRequest(id))),
+    mutationFn: async (group: RecommendationGroup) => {
+      const results = await Promise.allSettled(
+        group.ids.map((id) => dismissRecommendationRequest(id)),
+      );
+      const failed = results.filter((r) => r.status === "rejected").length;
+      if (failed > 0) throw new DismissFailure(failed, group.ids.length);
+    },
     onSettled: () =>
       queryClient.invalidateQueries({
         queryKey: recommendationsQueryOptions(month).queryKey,
@@ -96,11 +118,15 @@ export function HomeRecommendations({
           <Link to="/informes" className={textLink}>
             {`Ver las ${open}`}
           </Link>
+        ) : shown.length === 0 ? (
+          <Link to="/informes" className={textLink}>
+            Ir a Informes
+          </Link>
         ) : null}
       </div>
       {dismiss.isError ? (
         <p role="alert" className="text-ayuda text-error-texto">
-          No pudimos descartar la recomendación.
+          {dismissFailureText(dismiss.error)}
         </p>
       ) : null}
       {query.isError ? (
