@@ -73,6 +73,11 @@ describe("AW31 Movimientos de insumos by kind", () => {
     ).toBeVisible();
     // The consumption report still counts Withdrawals only.
     expect(screen.getByText("Papel higiénico: 16 unid.")).toBeVisible();
+    // Insumos' second view is named after what it now lists.
+    expect(
+      screen.getByRole("link", { name: "Movimientos", current: "page" }),
+    ).toHaveAttribute("href", "/estudio/insumos/retiros");
+    expect(screen.queryByText("Retiros del mes")).not.toBeInTheDocument();
   });
 
   it("filters by kind in the address and names the kind in the summary", async () => {
