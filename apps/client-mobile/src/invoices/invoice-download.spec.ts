@@ -67,6 +67,40 @@ describe("downloadInvoice on Android", () => {
     expect(access.requestDirectoryPermissionsAsync).not.toHaveBeenCalled();
   });
 
+  // FIX-049 review: a MediaStore failure still leaves her the folder picker.
+  it("falls back to the folder picker when Descargas refuses the file", async () => {
+    downloadsFolder.mockReturnValueOnce({
+      saveAsync: jest.fn().mockRejectedValue(new Error("downloads_insert_failed")),
+    });
+    access.requestDirectoryPermissionsAsync.mockResolvedValue({
+      granted: true,
+      directoryUri: "content://root/Documents",
+    });
+
+    await expect(
+      downloadInvoice({
+        fetcher: pdf(),
+        paymentId: "payment-1",
+        fileName: "factura-000123.pdf",
+        mediaType: "application/pdf",
+      }),
+    ).resolves.toBe("saved");
+  });
+
+  it("keeps a saved file saved when the cache copy cannot be removed", async () => {
+    downloadsFolder.mockReturnValueOnce({ saveAsync: jest.fn().mockResolvedValue(true) });
+    (FileSystem.deleteAsync as jest.Mock).mockRejectedValueOnce(new Error("busy"));
+
+    await expect(
+      downloadInvoice({
+        fetcher: pdf(),
+        paymentId: "payment-1",
+        fileName: "factura-000123.pdf",
+        mediaType: "application/pdf",
+      }),
+    ).resolves.toBe("downloads");
+  });
+
   it("falls back to the folder picker on Android 9 and older", async () => {
     downloadsFolder.mockReturnValueOnce({ saveAsync: jest.fn().mockResolvedValue(false) });
     access.requestDirectoryPermissionsAsync.mockResolvedValue({
