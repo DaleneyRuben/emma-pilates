@@ -60,6 +60,8 @@ describe("AW39 Para contactar with an unusable phone", () => {
     });
     expect(whatsapp).toBeDisabled();
     expect(whatsapp).toHaveAttribute("title", "Celular incompleto");
+    // FIX-088: a disabled WhatsApp reads quieter than an enabled one.
+    expect(whatsapp).toHaveClass("disabled:bg-transparent");
   });
 
   it("keeps «Sin teléfono» for a Client with none", async () => {

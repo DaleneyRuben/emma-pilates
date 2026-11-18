@@ -50,7 +50,12 @@ describe("Simulador on a desktop browser", () => {
         screen.getByRole("region", { name: "Punto de equilibrio" }),
       ).getByText("Bs 36.273,81"),
     ).toBeVisible();
-    expect(screen.getByText("(21175 + 9295) / 0.84 = 36273.81")).toBeVisible();
+    // FIX-088: the derivation in words and bolivianos, not a raw formula.
+    expect(
+      screen.getByText(
+        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 9.295,00) ÷ (1 − 16 % de impuesto) = Bs 36.273,81",
+      ),
+    ).toBeVisible();
 
     const projection = screen.getByRole("region", { name: "Proyección" });
     expect(within(projection).getByRole("table")).toBeVisible();
@@ -94,7 +99,11 @@ describe("Simulador on a desktop browser", () => {
     await fill(user, "Alumnas por clase", "6");
 
     // Trainer pay is 143 × (Bs 65 + 2 × Bs 8) = Bs 11.583.
-    expect(screen.getByText("(21175 + 11583) / 0.84 = 38997.62")).toBeVisible();
+    expect(
+      screen.getByText(
+        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 11.583,00) ÷ (1 − 16 % de impuesto) = Bs 38.997,62",
+      ),
+    ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Resultado" })).getByText(
         "Bs 17.692,40",
