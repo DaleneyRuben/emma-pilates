@@ -11,7 +11,9 @@ env:
 - extendedWaitUntil:
     visible: ${PROMOTION_1}
     timeout: 30000
-- assertVisible: "Novedades del estudio"
+# FIX-082 (Inicio option A): the promotion leads Inicio with no section label,
+# and «Reservar una clase» is the solid button under it.
+- assertVisible: "Reservar una clase"
 - assertVisible: "Promoción 1 de 2"
 - takeScreenshot: client-home-1-inicio
 - swipe:
@@ -42,10 +44,10 @@ env:
 - tapOn: "Volver"
 - extendedWaitUntil:
     visible:
-      id: "home-plan-detail"
+      id: "home-plan-card"
     timeout: 10000
 - tapOn:
-    id: "home-plan-detail"
+    id: "home-plan-card"
 - extendedWaitUntil:
     visible: "Renovación anticipada"
     timeout: 10000
