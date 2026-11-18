@@ -25,11 +25,11 @@ export function InvoiceCell({
     file === null;
 
   return (
-    <span className="flex min-w-0 flex-col gap-1 max-md:items-end max-md:text-right">
+    <span className="flex min-w-0 flex-col gap-1">
       {payment.invoiceData === null ? (
         <span className="text-nota text-texto-tenue">Sin factura</span>
       ) : (
-        <span className="flex min-w-0 flex-col max-md:items-end">
+        <span className="flex min-w-0 flex-col">
           <span className="text-nota text-texto tabular">
             {payment.invoiceData.taxId}
           </span>
@@ -39,7 +39,7 @@ export function InvoiceCell({
         </span>
       )}
       {payment.invoiceData === null || payment.state === "pending" ? null : (
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 max-md:justify-end">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
           {issued === null ? (
             payment.state === "confirmed" ? (
               <StatusPill tone="advertencia">Por emitir</StatusPill>

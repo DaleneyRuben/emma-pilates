@@ -17,6 +17,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -72,33 +73,34 @@ describe("AW08 Insumos on a desktop browser", () => {
     expect(reads[0]?.get("page")).toBe("1");
   });
 
-  it("offers the four header actions of follow-ups 07 and 48", async () => {
+  it("keeps only Nuevo insumo in the header and logs movements per row (FIX-088)", async () => {
     server.use(supplyTable(() => jsonResponse(supplyPage([detergent]))));
-    renderAdmin("/estudio/insumos");
-    await rowOf("Detergente");
+    const { user } = renderAdmin("/estudio/insumos");
+    const row = await rowOf("Detergente");
 
-    const actions = screen
-      .getAllByRole("button")
-      .concat(screen.getAllByRole("link", { name: /historial/ }))
-      .map((element) => element.textContent)
-      .filter((label) =>
-        [
-          "Nuevo insumo",
-          "Registrar retiro",
-          "Registrar reposición",
-          "Ver historial de movimientos",
-        ].includes(label ?? ""),
-      );
-    // Follow-up 233: the one primary action sits last among the buttons.
-    expect(actions).toEqual([
+    expect(screen.getByRole("button", { name: "Nuevo insumo" })).toBeVisible();
+    for (const name of [
       "Registrar retiro",
       "Registrar reposición",
-      "Nuevo insumo",
       "Ver historial de movimientos",
-    ]);
+    ]) {
+      expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+      expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
+    }
     expect(
-      screen.getByRole("link", { name: "Ver historial de movimientos" }),
-    ).toHaveAttribute("href", "/estudio/insumos/retiros?page=1&pageSize=20");
+      within(row).getByRole("button", {
+        name: "Registrar retiro de Detergente",
+      }),
+    ).toHaveTextContent("Retiro");
+    await user.click(
+      within(row).getByRole("button", {
+        name: "Registrar reposición de Detergente",
+      }),
+    );
+    // Supply movements spec checks the chosen Supply inside the panel.
+    expect(
+      await screen.findByRole("dialog", { name: "Registrar reposición" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Sucursal Centro · ningún insumo con stock bajo"));
   });
 
@@ -167,13 +169,12 @@ describe("AW08 Insumos on a desktop browser", () => {
     expect(
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
-    for (const name of [
-      "Nuevo insumo",
-      "Registrar retiro",
-      "Registrar reposición",
-    ]) {
-      expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
-    }
+    expect(
+      screen.queryByRole("button", { name: "Nuevo insumo" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^Registrar/ }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -220,10 +221,13 @@ describe("AW08 Insumos on a narrow browser", () => {
     );
     const { user } = renderAdmin("/estudio/insumos");
     const row = await rowOf("Papel higiénico");
-    expect(within(row).getByText("Stock bajo").closest("td")).toHaveAttribute(
-      "data-label",
-      "Estado",
-    );
+    // FIX-088: the phone card, «Stock bajo» on its right.
+    expect(compactCard(row)).toMatchObject({
+      compact: true,
+      title: "Papel higiénico",
+      status: "Stock bajo",
+      labels: 0,
+    });
 
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
     expect(

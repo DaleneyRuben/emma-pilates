@@ -108,7 +108,7 @@ describe("admin shell", () => {
         ),
       );
       const { user } = renderShell("/dinero/sueldos/pagados");
-      await heading("Nómina");
+      await heading("Sueldos pagados");
 
       // The page header draws the views, so each look-up reads the current one.
       const views = () =>

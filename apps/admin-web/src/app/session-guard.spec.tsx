@@ -34,7 +34,7 @@ describe("admin session guard", () => {
     server.use(...signedInHandlers(), ...emptyPageHandlers());
     renderAdmin("/horario/nutricion");
 
-    expect(await heading("Evaluaciones nutricionales")).toBeInTheDocument();
+    expect(await heading("Nutrición")).toBeInTheDocument();
     expect(
       screen.getByRole("navigation", { name: "Secciones" }),
     ).toBeInTheDocument();

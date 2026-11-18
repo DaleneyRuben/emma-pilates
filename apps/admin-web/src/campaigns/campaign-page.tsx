@@ -113,7 +113,7 @@ export function CampaignPage() {
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title="Campaña"
+        title="Clases de campaña"
         subtitle="Clases extra para el inicio de año o las vacaciones. No cambia ningún precio."
       />
       {result === null ? null : (

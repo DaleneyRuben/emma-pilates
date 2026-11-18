@@ -50,7 +50,7 @@ describe("AW01 Login", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Evaluaciones nutricionales",
+        name: "Nutrición",
       }),
     ).toBeInTheDocument();
     expect(router.state.location.href).toBe(

@@ -22,6 +22,7 @@ import {
   veronica,
 } from "../../test/oversight-fixtures";
 import { staffMembersPath, staffPage } from "../../test/people-fixtures";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -47,7 +48,7 @@ const september21 = `${path}?week=2026-09-21`;
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Evaluaciones nutricionales",
+    name: "Nutrición",
   });
 
 describe("AW25 Evaluaciones nutricionales on a desktop browser", () => {
@@ -343,10 +344,10 @@ describe("AW25 Evaluaciones nutricionales on a narrow browser", () => {
     );
     renderAdmin(september21);
 
-    const moment = await screen.findByRole("cell", {
-      name: "lun 21/09 · 09:00",
-    });
-    expect(moment).toHaveAttribute("data-label", "Fecha y hora");
+    const card = compactCard(
+      (await screen.findByText("lun 21/09 · 09:00")).closest("tr")!,
+    );
+    expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(
       screen.getByRole("button", { name: "Semana anterior" }),
     ).toBeVisible();

@@ -8,6 +8,7 @@ import {
   withdrawalsPath,
 } from "../../test/back-office-fixtures";
 import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -123,9 +124,9 @@ describe("AW31 Movimientos de insumos on a narrow browser", () => {
 
   it("labels who recorded each card", async () => {
     renderAdmin("/estudio/insumos/retiros?month=2026-11");
-    const row = await rowAt("18/11/2026 · 10:00");
-    expect(
-      within(row).getByRole("cell", { name: "Paola Mendoza" }),
-    ).toHaveAttribute("data-label", "Registró");
+    // FIX-088: the phone card leaves out who recorded it.
+    const row = (await screen.findByText("18/11/2026 · 10:00")).closest("tr")!;
+    expect(compactCard(row)).toMatchObject({ compact: true, labels: 0 });
+    expect(row).not.toHaveTextContent("Paola Mendoza");
   });
 });

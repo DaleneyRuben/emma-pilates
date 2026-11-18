@@ -14,11 +14,16 @@ export function IndicatorChart({
   return (
     <figure
       aria-label="Clases dictadas"
-      className="m-0 flex flex-col gap-3 rounded-marco bg-lino px-5 py-4"
+      className="m-0 flex min-w-0 flex-col gap-3 rounded-marco bg-lino px-5 py-4"
     >
       <h2 className="text-titulo-panel text-texto">Clases dictadas</h2>
-      <div className="h-48">
-        <ResponsiveContainer width={480} height={192}>
+      {/* FIX-088: as wide as the card, never past a 420 px screen. */}
+      <div className="h-48 w-full max-w-[480px] min-w-0">
+        <ResponsiveContainer
+          width="100%"
+          height={192}
+          initialDimension={{ width: 480, height: 192 }}
+        >
           <BarChart
             data={points.map((point) => ({
               month: shortMonth(point.month),

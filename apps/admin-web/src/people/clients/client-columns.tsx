@@ -49,6 +49,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
   }),
   columns.accessor("email", {
     header: "Contacto",
+    meta: { card: "hidden" },
     cell: ({ row }) => (
       <span className="flex flex-col text-nota text-texto-secundario">
         <span>{row.original.email}</span>
@@ -119,6 +120,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
   }),
   columns.accessor("invitedByName", {
     header: "Invitada por",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => {
       const name = getValue();
       return name === null ? (

@@ -120,6 +120,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   }),
   columns.accessor("kind", {
     header: "Tipo",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">
         {getValue() === "evaluation" ? "Evaluación" : "Plan"}
@@ -128,12 +129,14 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   }),
   columns.accessor("planName", {
     header: "Plan",
+    meta: { card: "detail", cardOrder: 1 },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),
   }),
   columns.accessor("method", {
     header: "Método",
+    meta: { card: "hidden" },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{methodLabels[getValue()]}</span>
     ),
@@ -141,7 +144,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   // The amount paid (ADR-0082); Credit is retired (PAY-005).
   columns.accessor("amountDueCentavos", {
     header: "Monto",
-    meta: { align: "right" },
+    meta: { card: "detail", cardOrder: 2, align: "right" },
     cell: ({ getValue }) => (
       <span className="text-texto tabular">{formatBolivianos(getValue())}</span>
     ),
@@ -149,6 +152,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   columns.accessor((row) => row.decidedAt ?? row.submittedAt, {
     id: "fecha",
     header: "Fecha",
+    meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
         {formatCivilMoment(getValue())}
@@ -178,6 +182,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   columns.display({
     id: "invoice",
     header: "Factura",
+    meta: { card: "actions" },
     cell: ({ row }) => (
       <InvoiceCell payment={row.original} onOpen={() => open(row.original)} />
     ),
