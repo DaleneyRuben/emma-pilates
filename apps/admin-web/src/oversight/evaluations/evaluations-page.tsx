@@ -127,7 +127,7 @@ function BranchEvaluations({
 
   return (
     <CatalogPage
-      title="Evaluaciones nutricionales"
+      title="Nutrición"
       subtitle={
         query.data === undefined || (weekEmpty && next.isPending)
           ? `Sucursal ${branch.name}`
@@ -190,7 +190,7 @@ export function EvaluationsPage({
   if (selectedBranch === undefined) {
     return (
       <NoBranchPage
-        title="Evaluaciones nutricionales"
+        title="Nutrición"
         pending={status === "pending"}
         loadingMessage="Cargando evaluaciones…"
         emptyMessage="Todavía no hay sucursales activas. Las evaluaciones se ven por sucursal."

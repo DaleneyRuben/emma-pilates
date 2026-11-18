@@ -194,7 +194,7 @@ export function ReportPage({
   return (
     <article className="flex flex-col gap-5">
       <PageHeader
-        title="Reporte de ingresos y gastos"
+        title="Dinero"
         subtitle={
           finance
             ? "Caja del mes · Todas las sucursales"

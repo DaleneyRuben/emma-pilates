@@ -44,7 +44,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
   return (
     <article className="flex flex-col gap-6">
       <PageHeader
-        title="Indicadores"
+        title="Informes"
         subtitle="Asistencia, ocupación y clientas del mes"
         actions={
           <MonthStepper month={month} latest={latest} onChange={setMonth} />
