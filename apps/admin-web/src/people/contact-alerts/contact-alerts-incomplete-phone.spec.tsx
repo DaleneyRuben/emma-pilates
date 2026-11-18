@@ -67,7 +67,9 @@ describe("AW39 Para contactar with an unusable phone", () => {
 
     const row = await rowOf("Mariana Quiroga");
     expect(within(row).getByText("Sin teléfono")).toBeVisible();
-    expect(within(row).queryByText("Celular incompleto")).not.toBeInTheDocument();
+    expect(
+      within(row).queryByText("Celular incompleto"),
+    ).not.toBeInTheDocument();
     expect(
       within(row).getByRole("button", { name: "Abrir WhatsApp" }),
     ).toHaveAttribute("title", "Sin teléfono");

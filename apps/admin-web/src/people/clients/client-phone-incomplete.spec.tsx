@@ -59,11 +59,17 @@ describe("AW21/AW22 an incomplete phone", () => {
   it("marks it «Celular incompleto» on Sofia Paredes's file", async () => {
     server.use(
       http.get(apiUrl(`${clientsPath}/:clientId`), () =>
-        jsonResponse({ ...luciaDetail, name: "Sofia Paredes", phone: "7000004" }),
+        jsonResponse({
+          ...luciaDetail,
+          name: "Sofia Paredes",
+          phone: "7000004",
+        }),
       ),
     );
     const { user } = renderAdmin("/clientas");
-    await user.click(await screen.findByRole("button", { name: "Sofia Paredes" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Sofia Paredes" }),
+    );
     const panel = await screen.findByRole("dialog", { name: "Sofia Paredes" });
 
     expect(await within(panel).findByText("Celular incompleto")).toBeVisible();
@@ -81,7 +87,9 @@ describe("AW21/AW22 an incomplete phone", () => {
     await user.click(
       await screen.findByRole("button", { name: "Mariana Quiroga" }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Mariana Quiroga" });
+    const panel = await screen.findByRole("dialog", {
+      name: "Mariana Quiroga",
+    });
 
     expect(await within(panel).findByText("Sin teléfono")).toBeVisible();
     expect(
