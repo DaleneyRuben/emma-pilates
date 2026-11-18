@@ -6,22 +6,25 @@ import {
 import {
   BrandToast,
   ClientFace,
+  colors,
+  fontFamilies,
   formatBolivianos,
   formatNotificationTime,
-  IconRow,
+  Glyph,
   IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
   SectionTitle,
   spacing,
-  StateScreen,
+  surfaces,
+  typography,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
@@ -30,6 +33,7 @@ import { describeSale } from "./administrator-format";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
+import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { SectionHeader } from "../ui/section-header";
 
@@ -43,7 +47,6 @@ type PendingPaymentsNavigation = {
   navigate: {
     (screen: "ReviewPayment", params: { paymentId: string }): void;
     (screen: "CancelClass" | "CashClose" | "Freezes" | "Invoices"): void;
-    (screen: "ScheduleTab"): void;
   };
   setParams: (params: { notice?: PaymentsNotice }) => void;
 };
@@ -93,38 +96,31 @@ export function PendingPaymentsScreen({
   const shortcuts = (
     <View>
       <SectionTitle>Accesos</SectionTitle>
-      <IconRowGroup>
-        <IconRow
-          chevron
-          icon="receipt"
+      {/* FIX-083 (Ronda 2 pick A): plain rows, no icon discs. */}
+      <PlainRowGroup>
+        <PlainRow
           label="Facturas por subir"
           onPress={() => navigation.navigate("Invoices")}
           testID="pending-payments-invoices"
           value={invoiceCount > 0 ? String(invoiceCount) : undefined}
         />
-        <IconRow
-          chevron
-          icon="calendar"
+        <PlainRow
           label="Cancelar una clase"
           onPress={() => navigation.navigate("CancelClass")}
           testID="pending-payments-cancel-class"
         />
-        <IconRow
-          chevron
-          icon="hourglass"
+        <PlainRow
           label="Congelamientos"
           onPress={() => navigation.navigate("Freezes")}
           testID="pending-payments-freezes"
           value={freezeCount > 0 ? `${freezeCount} por revisar` : undefined}
         />
-        <IconRow
-          chevron
-          icon="credit"
+        <PlainRow
           label="Cerrar caja"
           onPress={() => navigation.navigate("CashClose")}
           testID="cash-close-entry"
         />
-      </IconRowGroup>
+      </PlainRowGroup>
     </View>
   );
 
@@ -159,16 +155,19 @@ export function PendingPaymentsScreen({
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {header}
         {payments.length === 0 ? (
-          <StateScreen
-            icon="check"
-            layout="inList"
-            note="No hay pagos por confirmar. Te avisamos cuando llegue una transferencia nueva."
-            textAction={{
-              label: "Ver el horario",
-              onPress: () => navigation.navigate("ScheduleTab"),
-            }}
-            title="Todo al día"
-          />
+          // FIX-083 (Ronda 2 pick A): one small line, not half a screen.
+          <View
+            accessibilityLabel="Todo al día. No hay pagos por confirmar"
+            accessible
+            style={styles.allClear}
+            testID="pending-payments-all-clear"
+          >
+            <Glyph color={colors.successText} name="check" size={20} strokeWidth={2} />
+            <View style={styles.allClearText}>
+              <Text style={styles.allClearTitle}>Todo al día</Text>
+              <Text style={styles.allClearNote}>No hay pagos por confirmar</Text>
+            </View>
+          </View>
         ) : (
           <View>
             <SectionHeader
@@ -206,6 +205,21 @@ export function PendingPaymentsScreen({
 }
 
 const styles = StyleSheet.create({
+  allClear: {
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  allClearNote: {
+    color: colors.textSubtle,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+  },
+  allClearText: { flex: 1, gap: spacing.xxs },
+  allClearTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   screen: { paddingHorizontal: spacing.xlSm },
 });

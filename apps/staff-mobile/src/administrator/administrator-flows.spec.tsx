@@ -276,11 +276,7 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Todo al día")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText(
-        "No hay pagos por confirmar. Te avisamos cuando llegue una transferencia nueva.",
-      ),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("No hay pagos por confirmar")).toBeOnTheScreen();
   });
 
   it("finds a Session by Branch, day, and Class Type and cancels it with a receipt of the consequences", async () => {
