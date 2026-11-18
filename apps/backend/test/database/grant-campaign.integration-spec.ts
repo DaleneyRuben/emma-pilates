@@ -133,11 +133,27 @@ describe('campaign extra classes', () => {
     await prisma.founderMembership.create({
       data: { clientId: live.clientId, number: 1, since: today },
     });
+    // Walkthrough finding 92: a campaign only owed counts as given too.
+    const earlier = new Date('2026-01-05T14:00:00.000Z');
+    await prisma.owedCampaignClass.create({
+      data: {
+        clientId: waiting.id,
+        classes: 1,
+        campaignName: 'Vacaciones',
+        authorAccountId: live.accountId,
+        correlationId: randomUUID(),
+        createdAt: earlier,
+      },
+    });
     await expect(grant.preview(administrator(live.accountId))).resolves.toEqual(
       {
         recipientCount: 2,
         owed: [{ clientId: waiting.id, name: 'Sofía' }],
         skipped: [],
+        pastCampaigns: [
+          { name: 'Inicio de año', grantedAt: today },
+          { name: 'Vacaciones', grantedAt: earlier },
+        ],
       },
     );
   });
