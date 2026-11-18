@@ -44,6 +44,7 @@ describe('soft delete schema', () => {
       'booking.promotion_contacts',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'studio.cancelled_session_facts',
       'studio.client_month_facts',
       'studio.recommendations',
       'studio.session_facts',
