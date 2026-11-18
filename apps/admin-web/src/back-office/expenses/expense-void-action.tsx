@@ -47,6 +47,7 @@ export function ExpenseVoidAction({
         className="self-center text-error hover:text-error-texto"
         onClick={() => {
           setFailure(null);
+          setReason("");
           setOpen(true);
         }}
       >

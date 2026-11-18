@@ -30,7 +30,9 @@ const isVoided = (expense: AdminExpenseDto) => expense.voidedAt !== null;
 // Finding 104: an eliminated Expense stays listed, muted, with who and when.
 const voidedLine = (expense: AdminExpenseDto) =>
   [
-    `Eliminado por ${expense.voidedByName ?? ""}`,
+    expense.voidedByName === null || expense.voidedByName === ""
+      ? "Eliminado"
+      : `Eliminado por ${expense.voidedByName}`,
     formatCivilMoment(expense.voidedAt ?? ""),
     ...(expense.voidReason === null ? [] : [expense.voidReason]),
   ].join(" · ");
@@ -92,7 +94,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
         <Button
           variant="ghost"
           size="sm"
-          aria-label={`Editar el gasto de ${row.original.expenseCategoryName} del ${formatCivilDate(row.original.incurredOn)}`}
+          aria-label={`Editar el gasto de ${row.original.expenseCategoryName}`}
           onClick={(event) => {
             event.stopPropagation();
             open(row.original);
