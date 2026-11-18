@@ -10044,8 +10044,13 @@ default older admin builds get, `restock` or `all`) and every row carries
 
 ## Test 167: Informes recommendations and figures that add up (FIX-073)
 
-Walkthrough finding 107. No migration; the API change is additive
-(`clientId`, `clientName`, `trainerName`, `weekday` on each recommendation).
+Walkthrough finding 107. The API changes are additive (`clientId`,
+`clientName`, `trainerName`, `weekday` on each recommendation;
+`minimumCancellations` on the month KPIs). Steps 8 to 10 need the migration
+`20261118120000_cancelled_session_facts` (the owner approved option A on
+2026-11-18): the table `studio.cancelled_session_facts` keeps every class the
+worker cancelled for low demand (`minimum_not_met` or `zero_bookings`) with
+the Bookings it held, written by the same recompute as the session facts.
 
 1. Use a copy of the fixtures (`createdb -T pilates_golden
    pilates_fix073_dev`; the fixtures' November classes have ended, so the
@@ -10082,4 +10087,23 @@ Walkthrough finding 107. No migration; the API change is additive
 7. **Finanzas without a budget.** On a month with no budget, «Punto de
    equilibrio» reads «—» and «Carga tu presupuesto para calcularlo». After
    «Cargar presupuesto de apertura» it shows the amount again.
-8. Check at 1440 px and 420 px, then drop the copy.
+8. **Minimum cancellations in the facts.** Let the worker cancel a class for
+   the minimum (or use a database where it did), then press **Recalcular**.
+   Expected: one live row per such class in `studio.cancelled_session_facts`
+   (cause and `bookings_held`, the window-close snapshot or the Bookings the
+   cancellation released); a class cancelled by hand («Sin reemplazo»,
+   «Cambio de horario») is not there, and a class that is reopened leaves it.
+9. **Weak schedule.** A Trainer and weekday with at least three classes,
+   taught or cancelled for the minimum, averaging below 3 Bookings reads
+   «Revisa el horario del martes: de 15 clases, 14 se cancelaron por mínimo;
+   promedia 0,1 alumnas.» (one cancellation: «1 se canceló»). Without
+   cancellations the sentence stays «… promedia N alumnas en N clases.».
+10. **Pregunta sobre el mes.** «¿Por qué hubo tantas clases canceladas?»
+    answers «Se cancelaron 54 clases por no llegar al mínimo de reservas, y
+    se dictaron 35.»; a month without them «Ninguna clase se canceló por no
+    llegar al mínimo de reservas.». The refusal now reads «… Pregunta por la
+    ocupación, las clientas activas o las clases canceladas.». «Informe del
+    mes» adds «Se cancelaron N clases por no llegar al mínimo de reservas.»
+    when there were any. `GET administrator/reports/kpis` returns
+    `minimumCancellations` (a count, also for the Coordinator).
+11. Check at 1440 px and 420 px, then drop the copy.
