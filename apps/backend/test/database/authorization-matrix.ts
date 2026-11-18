@@ -454,6 +454,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/expenses': administratorOnly(),
   'POST /api/v1/administrator/expenses': administratorOnly(),
   'PUT /api/v1/administrator/expenses/{expenseId}': administratorOnly(),
+  // Finding 104: «Eliminar gasto» voids it.
+  'POST /api/v1/administrator/expenses/{expenseId}/void': administratorOnly(),
   'GET /api/v1/administrator/reports/expenses': administratorOnly(),
 
   ...equipmentAuthorizationRows(),

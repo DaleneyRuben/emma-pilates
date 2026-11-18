@@ -142,7 +142,7 @@ function BranchSupplies({
             to="/estudio/insumos/retiros"
             search={{ page: 1, pageSize: defaultPageSize }}
           >
-            Ver historial de retiros
+            Ver historial de movimientos
           </Link>
         </Button>
       }

@@ -4,10 +4,15 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ListAdminWithdrawalsKind } from "./listAdminWithdrawalsKind";
 
 export type ListAdminWithdrawalsParams = {
   pageSize?: number;
   page?: number;
+  /**
+   * Withdrawals when absent
+   */
+  kind?: ListAdminWithdrawalsKind;
   supplyId?: unknown;
   month: unknown;
   branchId: unknown;
