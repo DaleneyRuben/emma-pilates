@@ -1,4 +1,5 @@
 import type { ContactAlertItemDtoReasonsItem } from "@pilates/api-contracts";
+import { isCompletePhone, phoneWithFlag } from "@pilates/mobile-core";
 
 export const contactAlertReasons: Record<ContactAlertItemDtoReasonsItem, string> = {
   no_booking_7_days: "7 días sin reservar",
@@ -23,3 +24,13 @@ export const whatsAppHref = (phone: string): string | null => {
     phone.trim().startsWith("+") || digits.startsWith("591") ? digits : `591${digits}`;
   return `https://wa.me/${withCountry}`;
 };
+
+// Walkthrough finding 109: the Para contactar card names an unusable phone, as
+// the client file does (finding 95), and does not open WhatsApp to it.
+export const contactPhoneLabel = (phone: string | null): string => {
+  if (phone === null || phone.trim() === "") return "Sin teléfono";
+  return isCompletePhone(phone) ? phoneWithFlag(phone) : "Celular incompleto";
+};
+
+export const contactWhatsAppHref = (phone: string | null): string | null =>
+  phone !== null && isCompletePhone(phone) ? whatsAppHref(phone) : null;

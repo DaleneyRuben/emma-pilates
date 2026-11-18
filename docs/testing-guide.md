@@ -10066,7 +10066,12 @@ API, the worker, both apps and the admin web on your own ports
    `psql`). Expected: under her name, «Celular incompleto» in amber · her
    email, as on the admin web (Test 157). A pending Client whose activation
    link lapsed reads «El enlace venció el …» (a live one «El enlace vence el
-   …»), with **Reenviar enlace**.
+   …»), with **Reenviar enlace**. Since FIX-075 (walkthrough 109) the
+   **Clientes** search results read «Celular incompleto · her email» too,
+   instead of the raw digits (a Client with no phone shows only her email),
+   and the coordinator's **Para contactar** card reads «Celular incompleto ·
+   empezó el …» with no **Abrir WhatsApp** button («Sin teléfono» when there
+   is none).
 5. **Enviar comentarios (n.º 96).** In the Client app, **Perfil › Enviar
    comentarios**, tap the field: with the keyboard up the form scrolls so
    «Mínimo 10 caracteres.» and «n / 2000» show whole under the field. A long
@@ -10414,3 +10419,22 @@ the Bookings it held, written by the same recompute as the session facts.
     when there were any. `GET administrator/reports/kpis` returns
     `minimumCancellations` (a count, also for the Coordinator).
 11. Check at 1440 px and 420 px, then drop the copy.
+
+## Test 168: a Client whose classes the studio cancelled is not inactive (FIX-074)
+
+Walkthrough finding 108. No migration; no API change. A Client's month now
+counts, besides her live Bookings, the Bookings the studio released by
+cancelling the class (cause `session_cancelled`: minimum not met, a
+cancellation by the studio, a paused series). Only the inactive-client
+recommendation reads that count.
+
+1. Use a database where the worker cancelled a class for the minimum with a
+   Client booked in it (the walkthrough database has Lucía Fernández and
+   Elena Prueba), and a Client with a Plan who booked nothing this month.
+2. Open **Informes › El mes** and press **Recalcular**. Expected: no
+   «Contacta a la clienta: tiene un plan vigente y no reservó este mes.» card
+   for the Client whose Bookings the studio cancelled (an earlier card for
+   her reads «Resuelta»); the Client who booked nothing keeps hers.
+3. A Booking she cancelled herself still does not count: a Client whose only
+   Booking she cancelled keeps the card.
+

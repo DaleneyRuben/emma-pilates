@@ -1,4 +1,4 @@
-import { phoneWithFlag } from "@pilates/mobile-core";
+import { isCompletePhone, phoneWithFlag } from "@pilates/mobile-core";
 
 const civilDateFormatter = new Intl.DateTimeFormat("es-BO", {
   day: "numeric",
@@ -38,8 +38,13 @@ export function describeClasses(count: number): string {
   return count === 1 ? "1 clase" : `${count} clases`;
 }
 
+// Walkthrough finding 109: digits that fit no mobile read «Celular incompleto»,
+// as the client file header does (finding 95).
 export function describeContact(phone: string | null | undefined, email: string): string {
-  return phone ? `${phoneWithFlag(phone)} · ${email}` : email;
+  if (!phone?.trim()) return email;
+  return isCompletePhone(phone)
+    ? `${phoneWithFlag(phone)} · ${email}`
+    : `Celular incompleto · ${email}`;
 }
 
 // S06 «Reenvío limitado»: the recipient lane is full; the current link still works.

@@ -52,6 +52,8 @@ export type ClientMonthFact = {
   clientId: string;
   month: Date;
   planDays: number;
+  // Live Bookings plus those the studio released by cancelling the class
+  // (finding 108); the inactive-client rule is its only reader.
   classesBooked: number;
   classesAttended: number;
   renewed: boolean;
@@ -179,11 +181,23 @@ export const recomputeFacts = (
               booking.clientId === client.id && booking.state === 'booked',
           ),
         );
+        // Finding 108: a Booking the studio released by cancelling its class
+        // (minimum not met, a studio cancellation, a paused series) still
+        // shows she wanted to come, so she is not an inactive Client.
+        const releasedByStudio = source.sessions
+          .filter((session) => inMonth(session.startsAt, month))
+          .flatMap((session) =>
+            session.bookings.filter(
+              (booking) =>
+                booking.clientId === client.id &&
+                booking.cancelledWithSession === true,
+            ),
+          );
         return {
           clientId: client.id,
           month,
           planDays: client.planDays,
-          classesBooked: bookings.length,
+          classesBooked: bookings.length + releasedByStudio.length,
           classesAttended: bookings.filter(
             (booking) => booking.outcome === 'attended',
           ).length,
