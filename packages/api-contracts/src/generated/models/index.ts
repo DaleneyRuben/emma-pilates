@@ -329,6 +329,7 @@ export * from "./passwordRecoveryRequestResultDto";
 export * from "./passwordRecoveryRequestResultDtoStatus";
 export * from "./passwordRecoveryResultDto";
 export * from "./passwordRecoveryResultDtoStatus";
+export * from "./pastCampaignDto";
 export * from "./paymentDto";
 export * from "./paymentDtoDurationDays";
 export * from "./paymentDtoDurationMonths";

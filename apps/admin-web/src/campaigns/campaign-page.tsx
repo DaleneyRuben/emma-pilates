@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { isApiError } from "../api/problem";
 import { wholeNumberField } from "../components/form/number-field";
@@ -20,7 +20,12 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
-import { grantedLine, owedLine, recipientLine } from "./campaign-copy";
+import {
+  grantedLine,
+  owedLine,
+  pastCampaignLine,
+  recipientLine,
+} from "./campaign-copy";
 import {
   campaignPreviewQueryOptions,
   useCampaignGrant,
@@ -52,6 +57,7 @@ const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
 // the classes. Never a discount.
 export function CampaignPage() {
   const preview = useQuery(campaignPreviewQueryOptions());
+  const queryClient = useQueryClient();
   const grant = useCampaignGrant();
   const [confirming, setConfirming] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
@@ -64,6 +70,8 @@ export function CampaignPage() {
     resolver: zodResolver(campaignSchema),
     defaultValues: { name: "", classes: "1" },
   });
+
+  const typedName = useWatch({ control: form.control, name: "name" });
 
   const submit = form.handleSubmit(() => {
     setFailure(null);
@@ -81,6 +89,12 @@ export function CampaignPage() {
         classes: granted.classes,
         owed: owedLine(owed),
       });
+      // Walkthrough finding 92: an empty form cannot give the classes twice,
+      // and the refreshed preview now names this campaign as given.
+      form.reset();
+      void queryClient.invalidateQueries({
+        queryKey: campaignPreviewQueryOptions().queryKey,
+      });
       setConfirming(false);
     } catch (error) {
       setFailure(failureMessage(error));
@@ -90,6 +104,11 @@ export function CampaignPage() {
 
   const owed =
     preview.data === undefined ? null : owedLine(preview.data.owed ?? []);
+  // An older backend answers without `pastCampaigns`.
+  const repeated = pastCampaignLine(
+    typedName,
+    preview.data?.pastCampaigns ?? [],
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -135,6 +154,14 @@ export function CampaignPage() {
                       <Input {...field} />
                     </FormControl>
                     <FormMessage />
+                    {repeated === null ? null : (
+                      <p
+                        role="status"
+                        className="rounded-tarjeta bg-advertencia/12 px-4 py-3 text-celda text-advertencia-texto"
+                      >
+                        {repeated}
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />

@@ -104,7 +104,8 @@ export function SubscriptionScreen() {
     details.push(["Siguiente plan", formatCivilDate(nextSubscription.startsOn)]);
 
   const notices: PlanNotice[] = [];
-  if (founderRenewalDeadline != null) {
+  // Walkthrough finding 98: a paid next Plan already kept the discount.
+  if (founderRenewalDeadline != null && !nextSubscription) {
     // Finding 49: say why, never «fundadora».
     notices.push({
       icon: "tag",

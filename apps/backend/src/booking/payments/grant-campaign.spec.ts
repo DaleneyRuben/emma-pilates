@@ -176,11 +176,36 @@ describe('grantCampaign', () => {
         countWithPlan: () => Promise.resolve(6),
         findWithoutPlan: () =>
           Promise.resolve([{ clientId: 'waiting-client', name: 'Sofía' }]),
+        findPastCampaigns: () => Promise.resolve([]),
       }),
     ).resolves.toEqual({
       recipientCount: 7,
       owed: [{ clientId: 'waiting-client', name: 'Sofía' }],
       skipped: [],
+      pastCampaigns: [],
     });
+  });
+
+  // Walkthrough finding 92: the page warns before a campaign is given twice.
+  it('names each campaign already given once, the latest first', async () => {
+    const preview = await previewCampaign({
+      principal: staff('administrator'),
+      countWithPlan: () => Promise.resolve(1),
+      findWithoutPlan: () => Promise.resolve([]),
+      findPastCampaigns: () =>
+        Promise.resolve([
+          { name: 'Fin de año', grantedAt: new Date('2026-11-17T14:00:00Z') },
+          {
+            name: 'Inicio de año',
+            grantedAt: new Date('2026-01-05T14:00:00Z'),
+          },
+          { name: 'Fin de año', grantedAt: new Date('2026-11-17T14:05:00Z') },
+        ]),
+    });
+
+    expect(preview.pastCampaigns).toEqual([
+      { name: 'Fin de año', grantedAt: new Date('2026-11-17T14:05:00Z') },
+      { name: 'Inicio de año', grantedAt: new Date('2026-01-05T14:00:00Z') },
+    ]);
   });
 });
