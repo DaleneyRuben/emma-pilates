@@ -10065,7 +10065,12 @@ API, the worker, both apps and the admin web on your own ports
    `psql`). Expected: under her name, «Celular incompleto» in amber · her
    email, as on the admin web (Test 157). A pending Client whose activation
    link lapsed reads «El enlace venció el …» (a live one «El enlace vence el
-   …»), with **Reenviar enlace**.
+   …»), with **Reenviar enlace**. Since FIX-075 (walkthrough 109) the
+   **Clientes** search results read «Celular incompleto · her email» too,
+   instead of the raw digits (a Client with no phone shows only her email),
+   and the coordinator's **Para contactar** card reads «Celular incompleto ·
+   empezó el …» with no **Abrir WhatsApp** button («Sin teléfono» when there
+   is none).
 5. **Enviar comentarios (n.º 96).** In the Client app, **Perfil › Enviar
    comentarios**, tap the field: with the keyboard up the form scrolls so
    «Mínimo 10 caracteres.» and «n / 2000» show whole under the field. A long

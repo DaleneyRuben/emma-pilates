@@ -1,5 +1,5 @@
 import { describeContact } from "../assistant/assistant-format";
-import { whatsAppHref } from "./contact-list-copy";
+import { contactPhoneLabel, contactWhatsAppHref, whatsAppHref } from "./contact-list-copy";
 
 // FIX-037: numbers read with their flag, and WhatsApp opens the number's own
 // country, not always Bolivia.
@@ -16,5 +16,25 @@ describe("phones with a country code in the Staff app", () => {
       "🇵🇪 +51 912345678 · vale@example.com",
     );
     expect(describeContact(null, "ana@example.com")).toBe("ana@example.com");
+  });
+
+  // Walkthrough finding 109: the search results and other staff lists say a
+  // stored phone is unusable, as the client file header does (finding 95).
+  it("says the phone is incomplete instead of showing unusable digits", () => {
+    expect(describeContact("7000004", "sofia@example.com")).toBe(
+      "Celular incompleto · sofia@example.com",
+    );
+    expect(describeContact("  ", "sofia@example.com")).toBe("sofia@example.com");
+  });
+
+  // Walkthrough finding 109, the coordinator's Para contactar card: an
+  // unusable phone is named and offers no WhatsApp button.
+  it("names an incomplete phone on the contact card and offers no WhatsApp", () => {
+    expect(contactPhoneLabel("7000004")).toBe("Celular incompleto");
+    expect(contactPhoneLabel(null)).toBe("Sin teléfono");
+    expect(contactPhoneLabel("+591 70000002")).toBe("🇧🇴 +591 70000002");
+    expect(contactWhatsAppHref("7000004")).toBeNull();
+    expect(contactWhatsAppHref(null)).toBeNull();
+    expect(contactWhatsAppHref("+591 70000002")).toBe("https://wa.me/59170000002");
   });
 });
