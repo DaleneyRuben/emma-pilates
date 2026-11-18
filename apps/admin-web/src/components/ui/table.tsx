@@ -3,7 +3,8 @@ import { cn } from "../../lib/cn";
 
 // Dense desktop table that reflows into one stacked card per row below the
 // md breakpoint (design system → Admin Desktop Web Responsiveness). Cells
-// carry `data-label` so the card shows each column name.
+// carry `data-label` so the card shows each column name; DataTable's lists
+// draw FIX-088's compact card instead (white, thin border, no labels).
 export function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div
@@ -48,7 +49,7 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-t border-divisor transition-colors hover:bg-hover-fila max-md:block max-md:rounded-marco max-md:border-0 max-md:bg-lino max-md:p-4",
+        "border-t border-divisor transition-colors hover:bg-hover-fila max-md:block max-md:rounded-tarjeta max-md:border max-md:border-borde max-md:bg-blanco max-md:px-3.5 max-md:py-3",
         className,
       )}
       {...props}

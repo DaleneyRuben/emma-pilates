@@ -15,6 +15,8 @@ import {
 } from "../ui/table";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../../lib/cn";
+import { useMediaQuery } from "../../shell/use-media-query";
+import { CompactRow } from "./compact-row";
 import type { PageWindow } from "./pagination";
 import { TablePagination, type RangeLabel } from "./table-pagination";
 
@@ -23,8 +25,21 @@ declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- the interface must keep TanStack's type parameters.
   interface ColumnMeta<TData extends RowData, TValue> {
     align?: "right";
+    /**
+     * FIX-088 (Tablas en celular A): the column's place in the phone card.
+     * By default the first column is the title, «Estado» the status, a
+     * column without a header the actions, and the rest the detail line.
+     */
+    card?: CardPart;
+    /** Order inside the detail line; column order by default. */
+    cardOrder?: number;
   }
 }
+
+export type CardPart = "title" | "detail" | "status" | "actions" | "hidden";
+
+/** Below md (a phone) a row is a compact card, not a stack of labels. */
+export const phoneViewportQuery = "(max-width: 767px)";
 
 type DataTableProps<Row> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TanStack's accessor columns carry their own value type per column.
@@ -73,6 +88,7 @@ export function DataTable<Row>({
     rowCount: pagination?.totalItems ?? rows.length,
   });
 
+  const phone = useMediaQuery(phoneViewportQuery);
   const headerLabel = (columnId: string): string => {
     const header = table.getColumn(columnId)?.columnDef.header;
     return typeof header === "string" ? header : "";
@@ -121,6 +137,19 @@ export function DataTable<Row>({
               const clickable =
                 onRowClick !== undefined && canClickRow(row.original);
               const extra = rowProps?.(row.original) ?? {};
+              if (phone) {
+                const clickRow = clickable
+                  ? () => onRowClick(row.original)
+                  : undefined;
+                return (
+                  <CompactRow
+                    key={row.id}
+                    row={row}
+                    extra={extra}
+                    onClick={clickRow}
+                  />
+                );
+              }
               return (
                 <TableRow
                   key={row.id}
