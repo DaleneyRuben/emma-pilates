@@ -39,8 +39,12 @@ describe("Horario (v2 HOR boards)", () => {
     const screen = await openSchedule("assistant", assistant);
 
     expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas · 6 de 12 reservados")).toBeOnTheScreen();
-    expect(screen.getByText("6 cupos")).toBeOnTheScreen();
+    // FIX-083 (Horario pick A): one plain card for every role, places in grey.
+    expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
+    expect(screen.getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen();
+    expect(screen.getByText("6 de 12 lugares")).toHaveStyle({ color: "#7A716D" });
+    expect(screen.getByText("50 min")).toBeOnTheScreen();
+    expect(screen.queryByText("6 cupos")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar para una clienta" }));
@@ -62,7 +66,7 @@ describe("Horario (v2 HOR boards)", () => {
     expect(
       screen.getByText("Solo lectura. Para reservar, abre la ficha de una clienta."),
     ).toBeOnTheScreen();
-    expect(screen.queryByText("6 cupos")).not.toBeOnTheScreen();
+    expect(screen.getByText("6 de 12 lugares")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar para una clienta" })).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
@@ -125,7 +129,7 @@ describe("Horario (v2 HOR boards)", () => {
         height: 20,
       }),
     );
-    expect(within(emma).getByText("Emma Vargas · 6 de 12 reservados")).toBeOnTheScreen();
+    expect(within(emma).getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen();
     expect(
       within(screen.getByTestId("schedule-session-session-2")).getByText("AS"),
     ).toBeOnTheScreen();
@@ -159,11 +163,41 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
+    // FIX-083 (Horario pick A): cancelled classes wait folded at the end.
+    const fold = await screen.findByRole("button", { name: /1 cancelada por el estudio/ });
+    expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
+    expect(screen.queryByTestId("schedule-cancelled-session-2")).toBeNull();
+    await fireEvent.press(fold);
     const row = await screen.findByTestId("schedule-cancelled-session-2");
     expect(within(row).getByText("Pilates Prenatal")).toBeOnTheScreen();
     expect(within(row).getByText("Cancelada por el estudio")).toBeOnTheScreen();
-    expect(screen.getByText(/ · 1 clase · 1 cancelada$/)).toBeOnTheScreen();
-    expect(screen.queryByText("12 cupos")).toBeNull();
+    expect(screen.queryByText("12 de 12 lugares")).toBeNull();
     expect(screen.queryByTestId("schedule-session-session-2")).toBeNull();
+  });
+
+  it("folds several cancellations of one cause into one line and reads a full class as full", async () => {
+    const cancelled = (id: string) => ({
+      ...session,
+      id,
+      cancellation: { cause: "minimum_not_met", cancelledAt: from, bookedCount: 1 },
+    });
+    const full = { ...session, bookedCount: 12, availableSeats: 0, cancellation: null };
+    const screen = await render(
+      <App
+        runtime={createStaffRuntime(
+          routeFetcher({
+            ...routes(coordinator),
+            [daySessions]: () => jsonResponse([cancelled("c1"), full, cancelled("c2")]),
+          }),
+          "coordinator",
+        )}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("tab-schedule"));
+
+    expect(await screen.findByText("12 de 12 · lleno")).toBeOnTheScreen();
+    expect(screen.getByText("2 canceladas por mínimo")).toBeOnTheScreen();
+    expect(screen.getByText("Ver")).toBeOnTheScreen();
   });
 });
