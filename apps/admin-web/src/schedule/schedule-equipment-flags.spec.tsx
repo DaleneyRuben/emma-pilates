@@ -25,12 +25,16 @@ const flags = (body: unknown[]) =>
 const reformerShort = [
   {
     sessionId: mondayReformer.id,
+    typeId: "e9000000-0000-5000-8000-000000000001",
+    typeName: "Reformer",
     kind: "reformer",
     capacity: 10,
     workingCount: 7,
   },
   {
     sessionId: saturdayEmpty.id,
+    typeId: "e9000000-0000-5000-8000-000000000001",
+    typeName: "Reformer",
     kind: "reformer",
     capacity: 10,
     workingCount: 7,
@@ -56,12 +60,12 @@ describe("AW02 equipment flags", () => {
     showWeek();
 
     const flagged = await screen.findByRole("button", {
-      name: "Reformer Pilates, 07:00, Valeria Peña, 4 de 10 lugares, faltan equipos: 7 reformers funcionando para 10 lugares",
+      name: "Reformer Pilates, 07:00, Valeria Peña, 4 de 10 lugares, faltan equipos: 7 equipos Reformer funcionando para 10 lugares",
     });
     expect(within(flagged).getByText("Faltan equipos")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "2 sesiones de esta semana tienen más lugares que reformers funcionando. Baja su capacidad o revisa",
+        "2 sesiones de esta semana tienen más lugares que equipos Reformer funcionando. Baja su capacidad o revisa",
         { exact: false },
       ),
     ).toBeInTheDocument();
@@ -84,7 +88,33 @@ describe("AW02 equipment flags", () => {
     showWeek();
     expect(
       await screen.findByText(
-        "1 sesión de esta semana tiene más lugares que reformers funcionando. Baja su capacidad o revisa",
+        "1 sesión de esta semana tiene más lugares que equipos Reformer funcionando. Baja su capacidad o revisa",
+        { exact: false },
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("names a studio type and says equipos when the week mixes types", async () => {
+    server.use(
+      flags([
+        reformerShort[0]!,
+        {
+          ...reformerShort[1]!,
+          typeId: "e9000000-0000-5000-8000-000000000077",
+          typeName: "Silla",
+          kind: null,
+        },
+      ]),
+    );
+    showWeek();
+    expect(
+      await screen.findByRole("button", {
+        name: /faltan equipos: 7 equipos Silla funcionando para 10 lugares$/,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "2 sesiones de esta semana tienen más lugares que equipos funcionando. Baja su capacidad o revisa",
         { exact: false },
       ),
     ).toBeInTheDocument();
