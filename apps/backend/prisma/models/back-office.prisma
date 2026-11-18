@@ -193,14 +193,20 @@ model Expense {
   recordedByAccountId String          @map("recorded_by_account_id") @db.Uuid
   createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  // Finding 104: «eliminar» voids the Expense (ADR-0086): who, when, and why.
+  voidedAt            DateTime?       @map("voided_at") @db.Timestamptz(3)
+  voidedByAccountId   String?         @map("voided_by_account_id") @db.Uuid
+  voidReason          String?         @map("void_reason")
   branch              Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
   expenseCategory     ExpenseCategory @relation(fields: [expenseCategoryId], references: [id], onDelete: Restrict)
   recordedByAccount   Account         @relation("ExpenseRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+  voidedByAccount     Account?        @relation("ExpenseVoidedBy", fields: [voidedByAccountId], references: [id], onDelete: Restrict)
 
   @@index([branchId, incurredOn])
   @@index([incurredOn])
   @@index([expenseCategoryId])
   @@index([recordedByAccountId])
+  @@index([voidedByAccountId])
   @@map("expenses")
   @@schema("back_office")
 }
