@@ -27,7 +27,7 @@ import { useIsTablet } from "../ui/use-is-tablet";
 import { sortContactAlerts } from "./contact-list-copy";
 import { ContactRow, ContactSheet } from "./contact-list-parts";
 
-type Notice = { kind: "success" | "error"; name: string };
+type Notice = { kind: "success" | "error"; clientId: string; name: string };
 
 type ContactNavigation = {
   navigate: (
@@ -50,8 +50,12 @@ export function ContactListScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const [open, setOpen] = useState<ContactAlertItemDto | null>(null);
+  // The open sheet follows the live list: she leaves it when she leaves the list.
+  const [openId, setOpenId] = useState<string | null>(null);
   const items = list.data?.status === 200 ? sortContactAlerts(list.data.data.items) : [];
+  const open = items.find((item) => item.clientId === openId) ?? null;
+  const failed = (item: ContactAlertItemDto) =>
+    setNotice({ kind: "error", clientId: item.clientId, name: item.name });
 
   const onContacted = (item: ContactAlertItemDto) => {
     setNotice(null);
@@ -60,24 +64,24 @@ export function ContactListScreen() {
       {
         onSuccess: (response) => {
           // The generated client resolves every status; only 204 marked her.
+          void list.refetch();
           if (response.status !== 204) {
-            setNotice({ kind: "error", name: item.name });
+            failed(item);
             return;
           }
-          setOpen(null);
-          void list.refetch();
-          setNotice({ kind: "success", name: item.name });
+          setOpenId(null);
+          setNotice({ kind: "success", clientId: item.clientId, name: item.name });
         },
-        onError: () => setNotice({ kind: "error", name: item.name }),
+        onError: () => failed(item),
       },
     );
   };
   const onClose = () => {
-    setOpen(null);
+    setOpenId(null);
     if (notice?.kind === "error") setNotice(null);
   };
   const onOpenFile = (item: ContactAlertItemDto) => {
-    setOpen(null);
+    setOpenId(null);
     navigation.navigate("ClientsTab", {
       screen: "ClientOverview",
       params: { clientId: item.clientId },
@@ -129,7 +133,7 @@ export function ContactListScreen() {
             <View style={styles.group}>
               {items.map((item, index) => (
                 <View key={item.clientId} style={index > 0 && styles.divided}>
-                  <ContactRow item={item} onOpen={setOpen} />
+                  <ContactRow item={item} onOpen={(row) => setOpenId(row.clientId)} />
                 </View>
               ))}
             </View>
@@ -137,9 +141,9 @@ export function ContactListScreen() {
         </ScrollView>
       )}
       <ContactSheet
-        failed={notice?.kind === "error" && notice.name === open?.name}
+        failed={notice?.kind === "error" && notice.clientId === openId}
         item={open}
-        marking={mark.isPending}
+        marking={mark.isPending && mark.variables?.clientId === openId}
         onClose={onClose}
         onContacted={onContacted}
         onOpenFile={onOpenFile}

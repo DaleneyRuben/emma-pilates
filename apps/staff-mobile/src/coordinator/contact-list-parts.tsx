@@ -45,7 +45,7 @@ export function ContactRow({
     <View style={styles.row}>
       <Pressable
         accessibilityHint="Abre el detalle"
-        accessibilityLabel={`${item.name}. ${reasons}`}
+        accessibilityLabel={`${item.name}. ${reasons}. ${contactRowMeta(item)}`}
         accessibilityRole="button"
         onPress={() => onOpen(item)}
         style={styles.rowMain}

@@ -49,8 +49,10 @@ export function ConfirmationSheet({
   tone = "destructive",
   visible,
 }: ConfirmationSheetProps) {
+  // Either action in flight locks the rest of the sheet, the way back included.
+  const locked = busy || secondaryAction?.busy === true;
   const dismiss = () => {
-    if (!busy) onDismiss();
+    if (!locked) onDismiss();
   };
   return (
     <Modal
@@ -67,6 +69,7 @@ export function ConfirmationSheet({
           {note === undefined ? null : <BodyText>{note}</BodyText>}
           <PrimaryButton
             busy={busy}
+            disabled={locked && !busy}
             label={confirmLabel}
             onPress={onConfirm}
             size="compact"
@@ -81,7 +84,7 @@ export function ConfirmationSheet({
               onPress={secondaryAction.onPress}
             />
           )}
-          <TextButton disabled={busy} label={dismissLabel} onPress={dismiss} />
+          <TextButton disabled={locked} label={dismissLabel} onPress={dismiss} />
         </View>
       </View>
     </Modal>
