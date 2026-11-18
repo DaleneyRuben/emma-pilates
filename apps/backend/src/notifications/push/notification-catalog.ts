@@ -82,6 +82,9 @@ const catalog: Record<string, PushPresentation> = {
   // FIX-044: names the purchase, never an amount.
   invoice_ready: { sound: false, lockScreen: 'entry' },
   subscription_expiring: { sound: false, lockScreen: 'entry' },
+  // FIX-072: names a date, never an account or an amount.
+  payout_qr_expiring: { sound: false, lockScreen: 'entry' },
+  payout_qr_expired: { sound: false, lockScreen: 'entry' },
   // REL-012: names only the type and the app, never the text or the sender.
   feedback_received: { sound: false, lockScreen: 'entry' },
 };
