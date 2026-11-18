@@ -15,6 +15,8 @@ import { useStaffFetcher } from "../staff-fetcher";
 
 // The receipt is a private, authenticated image read through her own route
 // (BKO-008); the thumbnail fits a row, `readable` the full screen.
+// A failed receipt is never refetched on its own (focus, reconnect): it
+// would open full screen without a tap. Only a second tap retries it.
 function useReceiptImage(url: string | null, variant: "thumbnail" | "readable") {
   const fetcher = useStaffFetcher();
   return useQuery({
@@ -25,6 +27,8 @@ function useReceiptImage(url: string | null, variant: "thumbnail" | "readable") 
       return loaded;
     },
     enabled: url !== null,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
     retry: false,
   });
 }
