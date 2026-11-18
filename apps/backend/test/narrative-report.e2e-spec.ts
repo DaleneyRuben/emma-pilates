@@ -133,7 +133,9 @@ describe('narrative report endpoint (e2e)', () => {
         expect(text).toContain('20');
         expect(text).toContain('59');
         expect(text).toContain('8');
-        expect(text).toContain(finding.detail);
+        expect(text).toContain(
+          'Contacta a la clienta que no reservó este mes.',
+        );
         expect(text).not.toContain(finding.subject);
         expect(text).not.toMatch(/[Cc]entavos/);
       });

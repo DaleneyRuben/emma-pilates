@@ -39,10 +39,57 @@ const normalize = (value: string) =>
 const refusal =
   'Solo puedo responder sobre los indicadores del mes. Pregunta por la ocupación o por las clientas activas.';
 
+type NarratedRecommendation = { rule: string; detail: string; state?: string };
+
+const capitalize = (text: string) =>
+  text.length === 0 ? text : `${text[0]?.toUpperCase()}${text.slice(1)}`;
+
+// A finding's detail reads «action: fact». The action is what to do and the
+// fact is why, so «Porque:» never repeats the action.
+const splitDetail = (detail: string) => {
+  const colon = detail.indexOf(': ');
+  if (colon < 0) return { text: detail, because: detail };
+  return {
+    text: `${detail.slice(0, colon)}.`,
+    because: capitalize(detail.slice(colon + 2)),
+  };
+};
+
+// Inactive clients make one action: five identical «Contacta a la clienta»
+// lines would say nothing the list below does not.
+const inactiveAction = (count: number) =>
+  count === 1
+    ? {
+        text: 'Contacta a la clienta que no reservó este mes.',
+        because: 'Tiene un plan vigente y no reservó ninguna clase este mes.',
+      }
+    : {
+        text: `Contacta a las ${count} clientas que no reservaron este mes.`,
+        because:
+          'Tienen un plan vigente y no reservaron ninguna clase este mes.',
+      };
+
+const actionsFrom = (recommendations: readonly NarratedRecommendation[]) => {
+  const inactive = recommendations.filter(
+    (item) => item.rule === 'inactive_client',
+  ).length;
+  return [
+    ...(inactive === 0 ? [] : [inactiveAction(inactive)]),
+    ...recommendations
+      .filter((item) => item.rule !== 'inactive_client')
+      .map((item) => splitDetail(item.detail)),
+  ].slice(0, 3);
+};
+
+const countParagraph = (count: number) =>
+  count === 1
+    ? 'Hay 1 recomendación para revisar, con el dato que la sostiene.'
+    : `Hay ${count} recomendaciones para revisar. Estas son las principales, cada una con el dato que la sostiene.`;
+
 export const narrateMonth = (input: {
   month: string;
   kpis: MonthKpiCounts;
-  recommendations: readonly { rule: string; detail: string }[];
+  recommendations: readonly NarratedRecommendation[];
   subject?: string;
 }): MonthNarrative => {
   const label = monthLabel(input.month);
@@ -55,29 +102,30 @@ export const narrateMonth = (input: {
 
   const { occupancyPercent, activeClients, renewalPercent, sessionsHeld } =
     input.kpis;
+  const held =
+    sessionsHeld === 1
+      ? 'se dictó 1 clase'
+      : `se dictaron ${sessionsHeld} clases`;
+  const active =
+    activeClients === 1
+      ? 'Había 1 clienta activa.'
+      : `Había ${activeClients} clientas activas.`;
   const paragraphs = [
-    `En ${label} se dictaron ${sessionsHeld} clases, con una ocupación del ${occupancyPercent} %. Había ${activeClients} clientas activas.`,
+    `En ${label} ${held}, con una ocupación del ${occupancyPercent} %. ${active}`,
     `La renovación del mes fue del ${renewalPercent} %.`,
   ];
-  if (input.recommendations.length > 0) {
-    paragraphs.push(
-      `Hay ${Math.min(input.recommendations.length, 3)} acciones para revisar, cada una con el dato que la sostiene.`,
-    );
-  }
+  const open = input.recommendations.filter(
+    (item) => item.state !== 'dismissed',
+  );
+  if (open.length > 0) paragraphs.push(countParagraph(open.length));
 
-  return {
-    paragraphs,
-    actions: input.recommendations.slice(0, 3).map((item) => ({
-      text: item.detail,
-      because: item.detail,
-    })),
-  };
+  return { paragraphs, actions: actionsFrom(open) };
 };
 
 export const narrativeFromReads = (input: {
   month: string;
   kpis: MonthKpiCounts;
-  recommendations: readonly { rule: string; detail: string; subject: string }[];
+  recommendations: readonly (NarratedRecommendation & { subject: string })[];
 }): MonthNarrative =>
   narrateMonth({
     month: input.month,
