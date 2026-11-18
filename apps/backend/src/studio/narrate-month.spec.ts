@@ -12,6 +12,7 @@ const counts = (overrides: Partial<MonthKpiCounts> = {}): MonthKpiCounts => ({
   newClients: 1,
   renewedClients: 4,
   renewalPercent: 50,
+  minimumCancellations: 0,
   ...overrides,
 });
 
@@ -181,7 +182,47 @@ describe('answer question', () => {
     expect(result).toEqual({
       refused: true,
       answer:
-        'Solo puedo responder sobre los indicadores del mes. Pregunta por la ocupación o por las clientas activas.',
+        'Solo puedo responder sobre los indicadores del mes. Pregunta por la ocupación, las clientas activas o las clases canceladas.',
     });
+  });
+
+  // Walkthrough finding 107 (e).
+  it('answers why so many classes were cancelled from the minimum count', () => {
+    const result = answerQuestion(
+      '¿Por qué hubo tantas clases canceladas?',
+      counts({ sessionsHeld: 35, minimumCancellations: 54 }),
+    );
+
+    expect(result).toEqual({
+      refused: false,
+      answer:
+        'Se cancelaron 54 clases por no llegar al mínimo de reservas, y se dictaron 35.',
+    });
+  });
+
+  it('answers a single cancellation and none in their own words', () => {
+    expect(
+      answerQuestion(
+        'cancelaciones',
+        counts({ sessionsHeld: 1, minimumCancellations: 1 }),
+      ).answer,
+    ).toBe(
+      'Se canceló 1 clase por no llegar al mínimo de reservas, y se dictó 1.',
+    );
+    expect(answerQuestion('¿Se canceló alguna?', counts()).answer).toBe(
+      'Ninguna clase se canceló por no llegar al mínimo de reservas.',
+    );
+  });
+
+  it('mentions the minimum cancellations in the month report', () => {
+    const result = narrateMonth({
+      month: '2026-11',
+      kpis: counts({ sessionsHeld: 35, minimumCancellations: 54 }),
+      recommendations: [],
+    });
+
+    expect(result.paragraphs).toContain(
+      'Se cancelaron 54 clases por no llegar al mínimo de reservas.',
+    );
   });
 });

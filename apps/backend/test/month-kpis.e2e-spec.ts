@@ -41,6 +41,7 @@ const counts = {
   newClients: 1,
   renewedClients: 1,
   renewalPercent: 50,
+  minimumCancellations: 0,
 };
 
 const amounts = {
