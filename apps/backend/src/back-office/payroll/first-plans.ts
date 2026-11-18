@@ -4,6 +4,8 @@ import { boliviaMonth } from '../../time/bolivia-time';
 
 export type FirstPlan = {
   clientId: string;
+  clientName: string;
+  planName: string;
   decidedAt: Date;
   amountDueCentavos: number;
   durationDays: number;
@@ -32,6 +34,8 @@ export const readFirstPlans = async (
     },
     select: {
       clientId: true,
+      client: { select: { name: true } },
+      planNameSnapshot: true,
       state: true,
       decidedAt: true,
       voidedAt: true,
@@ -53,6 +57,8 @@ export const readFirstPlans = async (
         ? null
         : {
             clientId: sale.clientId,
+            clientName: sale.client.name,
+            planName: sale.planNameSnapshot,
             decidedAt: sale.decidedAt as Date,
             amountDueCentavos: sale.amountDueCentavos,
             durationDays: sale.durationDaysSnapshot,

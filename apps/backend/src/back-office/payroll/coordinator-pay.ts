@@ -16,11 +16,15 @@ export type RenewalTargets = {
 const baseCentavos = 350_000;
 const bonusCentavos = 40_000;
 
-const commissionCentavos = (client: {
+export type CoordinatorNewClient = {
   durationDays: number;
   classAllowance: number;
   broughtByTrainer: boolean;
-}): number => {
+  clientName: string;
+  planName: string;
+};
+
+const commissionCentavos = (client: CoordinatorNewClient): number => {
   if (client.broughtByTrainer || client.classAllowance <= 1) return 0;
   if (client.durationDays === 30) return 5_000;
   if (client.durationDays === 60 || client.durationDays === 90) return 8_000;
@@ -28,11 +32,7 @@ const commissionCentavos = (client: {
 };
 
 export const coordinatorPay = (facts: {
-  newClients: {
-    durationDays: number;
-    classAllowance: number;
-    broughtByTrainer: boolean;
-  }[];
+  newClients: CoordinatorNewClient[];
   renewalRatePercent: number | null;
   renewalTargetPercent: number;
 }): { lines: CoordinatorPayLine[]; totalCentavos: number } => {
@@ -41,7 +41,13 @@ export const coordinatorPay = (facts: {
     ...facts.newClients.flatMap((client): CoordinatorPayLine[] => {
       const amountCentavos = commissionCentavos(client);
       if (amountCentavos === 0) return [];
-      return [{ kind: 'new_client', detail: 'Clienta nueva', amountCentavos }];
+      return [
+        {
+          kind: 'new_client',
+          detail: `${client.clientName} · ${client.planName} · ${client.durationDays} días`,
+          amountCentavos,
+        },
+      ];
     }),
   ];
   if (
