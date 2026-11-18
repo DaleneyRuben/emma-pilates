@@ -30,6 +30,7 @@ import {
 } from '../../uploads/private-image-object';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import type { PrincipalResolver } from '../../system-identity/authentication/bearer-principal';
+import { refuseWhileImpersonating } from '../../system-identity/authentication/refuse-while-impersonating';
 import {
   BackOfficeController,
   backOfficeOperations,
@@ -116,6 +117,8 @@ export class OwnPayoutQrController extends BackOfficeController {
   ): Promise<PayoutQrResultDto> {
     const command = parsed(parseSetPayoutQr(body), 'Invalid payout QR');
     const principal = await this.authenticate(authorization);
+    // Where her salary goes is hers to decide, never an impersonator's.
+    refuseWhileImpersonating(principal);
     const qr = await run(() =>
       this.operations.payoutQrs.setOwn(command, principal),
     );
