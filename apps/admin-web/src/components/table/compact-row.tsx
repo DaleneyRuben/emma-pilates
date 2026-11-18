@@ -90,7 +90,7 @@ export function CompactRow<Data>({
           data-part="detail"
           className={cn(
             cellBase,
-            "col-start-1 min-w-0 text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_']",
+            "col-start-1 min-w-0 text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline",
           )}
         >
           {details.map(({ cell }) => (
