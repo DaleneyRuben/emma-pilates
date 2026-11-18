@@ -26,6 +26,8 @@ const known = new Set<string>(concepts.map((concept) => concept.kind));
 // «54 × Bs 25,00», or each amount with its count when they differ. A
 // commission is a percentage of each Plan, so it only counts them.
 const rateOf = (kind: string, lines: PayStatementLineDto[]): string => {
+  if (kind === "base" && lines.length === 1) return "Mensual";
+  if (kind === "bonus" && lines.length === 1) return "Meta de renovación";
   if (kind === "commission") {
     return `${lines.length} ${lines.length === 1 ? "comisión" : "comisiones"}`;
   }
