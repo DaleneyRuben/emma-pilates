@@ -33,7 +33,12 @@ import { PayStatementDraftDto, PayStatementDto } from './pay-statements.dto';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
 
 const toDto = <
-  Statement extends { month: Date; periodStart: Date; periodEnd: Date },
+  Statement extends {
+    month: Date;
+    periodStart: Date;
+    periodEnd: Date;
+    approvableOn: Date;
+  },
 >(
   statement: Statement,
 ) => ({
@@ -41,6 +46,7 @@ const toDto = <
   month: civilText(statement.month),
   periodStart: civilText(statement.periodStart),
   periodEnd: civilText(statement.periodEnd),
+  approvableOn: civilText(statement.approvableOn),
 });
 
 const requirePeriod = (query: {

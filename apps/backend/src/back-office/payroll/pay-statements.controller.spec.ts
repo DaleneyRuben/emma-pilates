@@ -21,6 +21,7 @@ const row = {
   month: utc('2026-11-01'),
   periodStart: utc('2026-11-03'),
   periodEnd: utc('2026-11-04'),
+  approvableOn: utc('2026-11-04'),
   state: 'draft' as const,
   totalCentavos: 6_500,
   salaryPaymentId: null,
@@ -60,6 +61,7 @@ describe('AdministratorPayStatementsController periods', () => {
         month: '2026-11-01',
         periodStart: '2026-11-03',
         periodEnd: '2026-11-04',
+        approvableOn: '2026-11-04',
       }),
     ]);
   });
