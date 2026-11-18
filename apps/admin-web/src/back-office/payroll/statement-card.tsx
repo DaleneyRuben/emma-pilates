@@ -47,7 +47,7 @@ export function StatementCard({
         >
           {initials(statement.staffMemberName)}
         </span>
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-[180px] flex-1 flex-col">
           <h2 id={headingId} className="font-semibold text-texto">
             {statement.staffMemberName}
           </h2>
