@@ -161,7 +161,8 @@ END;
 $$;
 
 -- A numbered unit belongs to a unit type that is not archived; its kind is
--- that type's old kind (null for a studio type).
+-- that type's old kind (null for a studio type). During the release window
+-- the old API still inserts by kind alone, so the kind names its seeded type.
 CREATE FUNCTION "back_office"."check_equipment_type"()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -169,6 +170,11 @@ AS $$
 DECLARE
     equipment_type RECORD;
 BEGIN
+    IF NEW."type_id" IS NULL AND NEW."kind" IS NOT NULL THEN
+        SELECT "id" INTO NEW."type_id"
+        FROM "back_office"."equipment_types"
+        WHERE "legacy_kind" = NEW."kind";
+    END IF;
     SELECT "tracking", "legacy_kind", "archived_at" INTO equipment_type
     FROM "back_office"."equipment_types"
     WHERE "id" = NEW."type_id";
