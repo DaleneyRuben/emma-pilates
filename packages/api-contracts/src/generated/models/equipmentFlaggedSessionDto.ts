@@ -8,8 +8,15 @@ import type { EquipmentFlaggedSessionDtoKind } from "./equipmentFlaggedSessionDt
 
 export interface EquipmentFlaggedSessionDto {
   sessionId: string;
+  typeId: string;
+  typeName: string;
+  /**
+   * Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName
+   * @deprecated
+   * @nullable
+   */
   kind: EquipmentFlaggedSessionDtoKind;
   capacity: number;
-  /** Working Equipment of the kind at the Branch */
+  /** Working Equipment of the type at the Branch */
   workingCount: number;
 }

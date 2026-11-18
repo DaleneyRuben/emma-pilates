@@ -2,17 +2,35 @@ import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BackOfficeError } from '../back-office-errors';
 import { requireLeadingTrainer } from './equipment-access';
-import { equipmentKindOfClassType } from './equipment-kind';
+import { equipmentKindOfClassType, type EquipmentKind } from './equipment-kind';
 import {
-  equipmentOrder,
   equipmentSelect,
   recordIssue,
+  sortEquipment,
   toEquipmentView,
   translateEquipmentError,
+  type EquipmentView,
   type IssueReport,
 } from './equipment-records';
+import { recordStockDamage } from './equipment-stock-records';
+import {
+  equipmentTypeOfClassType,
+  type EquipmentTypeView,
+} from './equipment-types';
+import { listBranchStocks } from './prisma-equipment-stocks';
+import { listActiveTypes } from './prisma-equipment-types';
 
 type Database = Prisma.TransactionClient | PrismaClient;
+
+export type SessionEquipmentType = Omit<EquipmentTypeView, 'legacyKind'> & {
+  units: EquipmentView[];
+  usable: number;
+  quantity: number;
+};
+
+export type SessionIssueReport =
+  | (IssueReport & { equipmentId: string })
+  | { typeId: string; quantity: number; description: string };
 
 // Back Office reads the Session it reports from but never writes it (ADR-0011).
 const findLedSession = async (
@@ -33,13 +51,19 @@ const findLedSession = async (
   return { actor, session: session! };
 };
 
+const firstWhere = <Item>(items: Item[], first: (item: Item) => boolean) => [
+  ...items.filter(first),
+  ...items.filter((item) => !first(item)),
+];
+
 // BKO-004: a Trainer reports a fault from a Session of her agenda, choosing
-// among the Equipment of that Session's Branch.
+// among the Equipment of that Session's Branch. FIX-067: `items` keeps only
+// the seeded types' units for old Staff app builds; `types` has every type.
 export const createPrismaSessionEquipment = (
   prisma: PrismaClient,
   dependencies: { now: () => Date },
 ) => ({
-  // The Session's own kind comes first; the rest keep the usual order.
+  // The Session's own kind (and type) comes first; the rest keep type order.
   listSessionEquipment: async (
     input: { sessionId: string },
     principal: AuthenticatedPrincipal,
@@ -49,26 +73,44 @@ export const createPrismaSessionEquipment = (
       input.sessionId,
       principal,
     );
-    const kind = equipmentKindOfClassType(session.classType.name);
-    const items = (
-      await prisma.equipment.findMany({
+    const [types, rows, stocks] = await Promise.all([
+      listActiveTypes(prisma),
+      prisma.equipment.findMany({
         where: { branchId: session.branchId, archivedAt: null },
-        orderBy: equipmentOrder,
         select: equipmentSelect,
-      })
-    ).map(toEquipmentView);
+      }),
+      listBranchStocks(prisma, session.branchId),
+    ]);
+    const units = sortEquipment(rows).map(toEquipmentView);
+    const kind = equipmentKindOfClassType(session.classType.name);
+    const type = equipmentTypeOfClassType(session.classType.name, types);
+    const seeded = units.filter(
+      (unit): unit is EquipmentView & { kind: EquipmentKind } =>
+        unit.kind !== null,
+    );
     return {
       sessionId: session.id,
       kind,
-      items: [
-        ...items.filter((item) => item.kind === kind),
-        ...items.filter((item) => item.kind !== kind),
-      ],
+      typeId: type?.id ?? null,
+      items: firstWhere(seeded, (item) => item.kind === kind),
+      types: firstWhere(types, (item) => item.id === type?.id).map(
+        (item): SessionEquipmentType => {
+          const stock = stocks.find((entry) => entry.typeId === item.id);
+          return {
+            id: item.id,
+            name: item.name,
+            tracking: item.tracking,
+            units: units.filter((unit) => unit.typeId === item.id),
+            usable: stock?.usable ?? 0,
+            quantity: stock?.quantity ?? 0,
+          };
+        },
+      ),
     };
   },
 
   reportSessionIssue: async (
-    input: IssueReport & { sessionId: string; equipmentId: string },
+    input: SessionIssueReport & { sessionId: string },
     principal: AuthenticatedPrincipal,
   ) =>
     prisma
@@ -78,6 +120,14 @@ export const createPrismaSessionEquipment = (
           input.sessionId,
           principal,
         );
+        if ('typeId' in input) {
+          return recordStockDamage(
+            transaction,
+            { ...input, branchId: session.branchId },
+            actor,
+            dependencies.now(),
+          );
+        }
         const equipment = await transaction.equipment.findUnique({
           where: { id: input.equipmentId },
           select: { id: true, branchId: true, archivedAt: true },

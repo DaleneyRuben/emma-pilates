@@ -1,21 +1,24 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
+import { EquipmentTracking } from '../../generated/prisma/enums';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BackOfficeError } from '../back-office-errors';
 import { requireActiveBranch } from '../booking-references';
 import { requireEquipmentManager } from './equipment-access';
-import { equipmentKindOfClassType, type EquipmentKind } from './equipment-kind';
+import type { EquipmentKind } from './equipment-kind';
 import {
-  equipmentOrder,
   equipmentSelect,
   issueSelect,
   recordIssue,
+  sortEquipment,
   toEquipmentView,
   toIssueView,
-  toKind,
   toPrismaKind,
   translateEquipmentError,
   type IssueReport,
 } from './equipment-records';
+import { lockActiveType } from './equipment-stock-records';
+import { equipmentTypeOfClassType } from './equipment-types';
+import { listActiveTypes } from './prisma-equipment-types';
 
 export type {
   EquipmentIssueView,
@@ -27,10 +30,19 @@ export type EquipmentIssueStatus = 'open' | 'resolved';
 
 export type FlaggedSession = {
   sessionId: string;
-  kind: EquipmentKind;
+  typeId: string;
+  typeName: string;
+  /** Deprecated (FIX-067): null for a studio type. */
+  kind: EquipmentKind | null;
   capacity: number;
   workingCount: number;
 };
+
+// A unit is named by its type, or by the old kind (one of the seeded types).
+export type EquipmentInput = { branchId: string; number: number } & (
+  | { typeId: string; kind?: undefined }
+  | { kind: EquipmentKind; typeId?: undefined }
+);
 
 type Paging = { page: number; pageSize: number };
 
@@ -45,11 +57,34 @@ const issueOrders: Record<
 const isEquipmentNumber = (value: number) =>
   Number.isInteger(value) && value >= 1 && value <= 99;
 
-const count = (values: readonly EquipmentKind[]) =>
+const count = (values: readonly string[]) =>
   values.reduce(
-    (totals, kind) => totals.set(kind, (totals.get(kind) ?? 0) + 1),
-    new Map<EquipmentKind, number>(),
+    (totals, typeId) => totals.set(typeId, (totals.get(typeId) ?? 0) + 1),
+    new Map<string, number>(),
   );
+
+// The unit type a new unit belongs to, held against a concurrent archive.
+const lockUnitType = async (
+  transaction: Prisma.TransactionClient,
+  input: EquipmentInput,
+) => {
+  const typeId =
+    input.typeId ??
+    (
+      await transaction.equipmentType.findFirst({
+        where: { legacyKind: toPrismaKind(input.kind), archivedAt: null },
+        select: { id: true },
+      })
+    )?.id;
+  if (typeId === undefined) {
+    throw new BackOfficeError('equipment_type_not_found');
+  }
+  const type = await lockActiveType(transaction, typeId);
+  if (type.tracking !== EquipmentTracking.UNIT) {
+    throw new BackOfficeError('equipment_type_not_unit');
+  }
+  return type;
+};
 
 // BKO-004 (ADR-0106): the Administrator's Equipment list, its faults, and the
 // Sessions with more places than working Equipment of their kind.
@@ -77,14 +112,13 @@ export const createPrismaEquipment = (
       requireEquipmentManager(principal);
       const rows = await prisma.equipment.findMany({
         where: { branchId: query.branchId, archivedAt: null },
-        orderBy: equipmentOrder,
         select: equipmentSelect,
       });
-      return { items: rows.map(toEquipmentView) };
+      return { items: sortEquipment(rows).map(toEquipmentView) };
     },
 
     createEquipment: async (
-      input: { branchId: string; kind: EquipmentKind; number: number },
+      input: EquipmentInput,
       principal: AuthenticatedPrincipal,
     ) => {
       const actor = requireEquipmentManager(principal);
@@ -95,10 +129,12 @@ export const createPrismaEquipment = (
       return prisma
         .$transaction(async (transaction) => {
           await requireActiveBranch(transaction, input.branchId);
+          const type = await lockUnitType(transaction, input);
           return transaction.equipment.create({
             data: {
               branchId: input.branchId,
-              kind: toPrismaKind(input.kind),
+              typeId: type.id,
+              kind: type.legacyKind,
               number: input.number,
               createdByAccountId: actor.accountId,
               createdAt: now,
@@ -179,7 +215,8 @@ export const createPrismaEquipment = (
         .catch(translateEquipmentError);
     },
 
-    // A retired machine's open faults no longer need anyone's attention.
+    // A retired machine's open faults no longer need anyone's attention; open
+    // damage on the Branch's stock is listed with them (FIX-067).
     listIssues: async (
       query: Paging & { branchId: string; status: EquipmentIssueStatus },
       principal: AuthenticatedPrincipal,
@@ -189,11 +226,17 @@ export const createPrismaEquipment = (
         query.status === 'open'
           ? {
               resolvedAt: null,
-              equipment: { branchId: query.branchId, archivedAt: null },
+              OR: [
+                { equipment: { branchId: query.branchId, archivedAt: null } },
+                { stock: { branchId: query.branchId } },
+              ],
             }
           : {
               resolvedAt: { not: null },
-              equipment: { branchId: query.branchId },
+              OR: [
+                { equipment: { branchId: query.branchId } },
+                { stock: { branchId: query.branchId } },
+              ],
             };
       const [rows, totalItems] = await Promise.all([
         prisma.equipmentIssue.findMany({
@@ -214,18 +257,20 @@ export const createPrismaEquipment = (
     },
 
     // Future, scheduled Sessions in [from, until) whose capacity exceeds the
-    // working Equipment of their kind at the Branch. A kind the Branch has no
+    // working Equipment of their unit type at the Branch (FIX-067: the first
+    // unit type whose name is in the Class Type's). A type the Branch has no
     // Equipment of is not checked; the capacity is never changed here.
     listFlaggedSessions: async (
       query: { branchId: string; from: Date; until: Date },
       principal: AuthenticatedPrincipal,
     ): Promise<FlaggedSession[]> => {
       requireEquipmentManager(principal);
-      const [equipment, sessions] = await Promise.all([
+      const [types, equipment, sessions] = await Promise.all([
+        listActiveTypes(prisma),
         prisma.equipment.findMany({
           where: { branchId: query.branchId, archivedAt: null },
           select: {
-            kind: true,
+            typeId: true,
             issues: {
               where: { resolvedAt: null, outOfService: true },
               select: { id: true },
@@ -251,21 +296,23 @@ export const createPrismaEquipment = (
           },
         }),
       ]);
-      const registered = count(equipment.map((row) => toKind(row.kind)));
+      const registered = count(equipment.map((row) => row.typeId));
       const working = count(
         equipment
           .filter((row) => row.issues.length === 0)
-          .map((row) => toKind(row.kind)),
+          .map((row) => row.typeId),
       );
       return sessions.flatMap((session) => {
-        const kind = equipmentKindOfClassType(session.classType.name);
-        if (kind === null || !registered.has(kind)) return [];
-        const workingCount = working.get(kind) ?? 0;
+        const type = equipmentTypeOfClassType(session.classType.name, types);
+        if (type === null || !registered.has(type.id)) return [];
+        const workingCount = working.get(type.id) ?? 0;
         if (session.capacity <= workingCount) return [];
         return [
           {
             sessionId: session.id,
-            kind,
+            typeId: type.id,
+            typeName: type.name,
+            kind: type.legacyKind,
             capacity: session.capacity,
             workingCount,
           },

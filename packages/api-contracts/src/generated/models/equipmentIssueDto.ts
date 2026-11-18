@@ -8,9 +8,25 @@ import type { EquipmentIssueDtoEquipmentKind } from "./equipmentIssueDtoEquipmen
 
 export interface EquipmentIssueDto {
   id: string;
-  equipmentId: string;
+  /** @nullable */
+  equipmentId: string | null;
+  /**
+   * Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName
+   * @deprecated
+   * @nullable
+   */
   equipmentKind: EquipmentIssueDtoEquipmentKind;
-  equipmentNumber: number;
+  /** @nullable */
+  equipmentNumber: number | null;
+  typeId: string;
+  typeName: string;
+  /**
+   * How many are damaged; null for a numbered unit
+   * @nullable
+   */
+  quantity: number | null;
+  /** Resolved by writing the damaged units off the stock */
+  writtenOff: boolean;
   description: string;
   outOfService: boolean;
   reportedAt: string;

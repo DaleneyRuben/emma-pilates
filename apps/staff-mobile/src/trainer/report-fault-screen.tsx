@@ -3,72 +3,41 @@ import {
   useGetTrainerSessionRoster,
   useListTrainerSessionEquipment,
   type EquipmentDto,
+  type SessionEquipmentIssueInputDto,
+  type SessionEquipmentTypeDto,
 } from "@pilates/api-contracts";
 import {
-  colors,
   EmptyState,
   FormField,
   FormScrollView,
-  fontFamilies,
   formatTimeRange,
   LoadingState,
   NoticeRow,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   SectionTitle,
-  SegmentedTabs,
   spacing,
   StateScreen,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
+import { FilterChips } from "../ui/filter-chips";
 import { useIsTablet } from "../ui/use-is-tablet";
+import { DamageCounter, OutOfServiceSwitch, UnitTiles, unitName } from "./report-fault-pieces";
 
-type Kind = EquipmentDto["kind"];
+type SessionType = SessionEquipmentTypeDto;
 
-const singular: Record<Kind, string> = { reformer: "Reformer", cadillac: "Cadillac", mat: "Mat" };
-const plural: Record<Kind, string> = { reformer: "Reformers", cadillac: "Cadillacs", mat: "Mats" };
+// A type the Branch has: units, or a stock (even if all of it is damaged).
+const held = (type: SessionType) => type.units.length > 0 || type.quantity > 0;
 
-const nameOf = (piece: EquipmentDto) => `${singular[piece.kind]} ${piece.number}`;
-
-// The Session's own kind first, as the backend orders the pieces.
-function groupsOf(items: EquipmentDto[]): { kind: Kind; items: EquipmentDto[] }[] {
-  const kinds = [...new Set(items.map((piece) => piece.kind))];
-  return kinds.map((kind) => ({ kind, items: items.filter((piece) => piece.kind === kind) }));
-}
-
-function EquipmentTile({
-  piece,
-  selected,
-  onPress,
-}: {
-  piece: EquipmentDto;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const out = piece.status === "out_of_service";
-  return (
-    <Pressable
-      accessibilityLabel={out ? `${nameOf(piece)}, fuera de servicio` : nameOf(piece)}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[styles.tile, selected && styles.tileSelected]}
-    >
-      <Text style={[styles.tileNumber, selected && styles.onSelected]}>{String(piece.number)}</Text>
-      {out ? (
-        <Text style={[styles.tileOut, selected && styles.onSelected]}>fuera de servicio</Text>
-      ) : null}
-    </Pressable>
-  );
-}
+const isConflict = (response: { status: number; data: unknown }) =>
+  response.status === 409 &&
+  (response.data as { code?: unknown } | null)?.code === "equipment_damage_exceeds_usable";
 
 // S26 (BKO-004): a Trainer tells the studio a machine of her Session's Branch
 // is broken; the Administrator resolves it on the admin web (AW37).
@@ -82,12 +51,13 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const [kind, setKind] = useState<Kind | null>(null);
+  const [typeId, setTypeId] = useState<string | null>(null);
   const [chosen, setChosen] = useState<EquipmentDto | null>(null);
+  const [count, setCount] = useState(1);
   const [description, setDescription] = useState("");
   const [outOfService, setOutOfService] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [problem, setProblem] = useState<"failed" | "conflict" | null>(null);
   const [sent, setSent] = useState<string | null>(null);
 
   const session = roster.data?.status === 200 ? roster.data.data : undefined;
@@ -110,7 +80,7 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
       <Screen style={column}>
         <StateScreen
           icon="check"
-          note={`Administración ya puede ver la falla del ${sent} y lo marcará cuando esté resuelto.`}
+          note={`Administración ya puede ver ${sent} y lo marcará cuando esté resuelto.`}
           primaryAction={{ label: "Volver a la lista", onPress: () => navigation.goBack() }}
           title="Gracias por avisar"
         />
@@ -133,8 +103,13 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
       </Screen>
     );
 
-  const items = equipment.data.data.items;
-  if (items.length === 0)
+  const { types: all, typeId: sessionTypeId } = equipment.data.data;
+  const types = all.filter(held);
+  const shown =
+    types.find((type) => type.id === typeId) ??
+    types.find((type) => type.id === sessionTypeId) ??
+    types[0];
+  if (shown === undefined)
     return (
       <Screen style={column}>
         {header}
@@ -146,25 +121,40 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
       </Screen>
     );
 
-  const groups = groupsOf(items);
-  const shownKind = kind ?? groups[0]?.kind ?? "reformer";
-  const shown = groups.find((group) => group.kind === shownKind)?.items ?? [];
-  const ready = chosen !== null && description.trim() !== "";
+  const byQuantity = shown.tracking === "quantity";
+  const damaged = Math.max(1, Math.min(count, shown.usable));
+  const ready = description.trim() !== "" && (byQuantity ? shown.usable > 0 : chosen !== null);
+  const choose = (id: string) => {
+    setTypeId(id);
+    setChosen(null);
+    setCount(1);
+    setOutOfService(false);
+    setProblem(null);
+  };
   const send = async () => {
-    if (chosen === null) return;
+    const input: SessionEquipmentIssueInputDto | null = byQuantity
+      ? { typeId: shown.id, quantity: damaged, description: description.trim() }
+      : chosen === null
+        ? null
+        : { equipmentId: chosen.id, description: description.trim(), outOfService };
+    if (input === null) return;
     setBusy(true);
-    setFailed(false);
+    setProblem(null);
     try {
-      const response = await reportTrainerEquipmentIssue(
-        sessionId,
-        { equipmentId: chosen.id, description: description.trim(), outOfService },
-        undefined,
-        fetcher,
-      );
+      const response = await reportTrainerEquipmentIssue(sessionId, input, undefined, fetcher);
+      if (isConflict(response)) {
+        setProblem("conflict");
+        await equipment.refetch();
+        return;
+      }
       if (response.status !== 201) throw new Error("The fault report was refused");
-      setSent(nameOf(chosen));
+      setSent(
+        byQuantity || chosen === null
+          ? `el daño de ${shown.name} (${damaged})`
+          : `la falla del ${unitName(chosen)}`,
+      );
     } catch {
-      setFailed(true);
+      setProblem("failed");
     } finally {
       setBusy(false);
     }
@@ -176,8 +166,11 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
         contentContainerStyle={styles.form}
         footer={
           <View style={styles.footer}>
-            {failed ? (
+            {problem === "failed" ? (
               <NoticeRow message="No pudimos enviar el reporte. Inténtalo de nuevo." />
+            ) : null}
+            {problem === "conflict" ? (
+              <NoticeRow message={`Solo hay ${shown.usable} que se pueden usar.`} />
             ) : null}
             <PrimaryButton
               busy={busy}
@@ -192,55 +185,34 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
         {header}
         <View style={styles.group}>
           <SectionTitle>¿Qué equipo?</SectionTitle>
-          {groups.length > 1 ? (
-            <SegmentedTabs
-              accessibilityLabel="Tipo de equipo"
-              onSelect={setKind}
-              options={groups.map((group) => ({ key: group.kind, label: plural[group.kind] }))}
-              selected={shownKind}
+          <FilterChips
+            onSelect={choose}
+            options={types.map((type) => ({ id: type.id, label: type.name }))}
+            selected={shown.id}
+            testID="report-fault-types"
+          />
+          {byQuantity ? (
+            <DamageCounter count={damaged} onChange={setCount} usable={shown.usable} />
+          ) : (
+            <UnitTiles
+              chosenId={chosen?.id ?? null}
+              label={shown.name}
+              onChoose={setChosen}
+              units={shown.units}
             />
-          ) : null}
-          <View accessibilityLabel={plural[shownKind]} style={styles.tiles}>
-            {shown.map((piece) => (
-              <EquipmentTile
-                key={piece.id}
-                onPress={() => setChosen(piece)}
-                piece={piece}
-                selected={chosen?.id === piece.id}
-              />
-            ))}
-          </View>
+          )}
         </View>
         <FormField
           label="¿Qué pasó?"
           maxLength={500}
           multiline
           onChangeText={setDescription}
-          placeholder="Ej.: el resorte rojo se soltó"
+          placeholder={byQuantity ? "Ej.: uno se pinchó" : "Ej.: el resorte rojo se soltó"}
           style={styles.textArea}
           testID="report-fault-description"
           value={description}
         />
-        <Pressable
-          accessibilityLabel="No se puede usar"
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: outOfService }}
-          onPress={() => setOutOfService((value) => !value)}
-          style={styles.switchRow}
-        >
-          <View style={styles.switchText}>
-            <Text style={styles.switchLabel}>No se puede usar</Text>
-            <Text style={styles.helper}>Nadie debería usarlo hasta que lo arreglen.</Text>
-          </View>
-          <Switch
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            onValueChange={setOutOfService}
-            thumbColor={colors.white}
-            trackColor={{ false: colors.hairline, true: colors.primary }}
-            value={outOfService}
-          />
-        </Pressable>
+        {byQuantity ? null : <OutOfServiceSwitch onChange={setOutOfService} value={outOfService} />}
       </FormScrollView>
     </Screen>
   );
@@ -251,31 +223,7 @@ const styles = StyleSheet.create({
   footer: { gap: spacing.sm, paddingTop: spacing.sm },
   form: { gap: spacing.xl, paddingBottom: spacing.lg },
   group: { gap: spacing.md },
-  helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  onSelected: { color: colors.white },
   screen: { paddingHorizontal: spacing.xlSm },
-  switchLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
-  switchRow: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: radii.card,
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  switchText: { flex: 1, gap: spacing.xxs },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   textArea: { minHeight: 104, textAlignVertical: "top" },
-  tile: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    height: 60,
-    justifyContent: "center",
-    width: "23%",
-  },
-  tileNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  tileOut: { color: colors.error, fontFamily: fontFamilies.body, fontSize: 10 },
-  tileSelected: { backgroundColor: colors.primary },
-  tiles: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
 });

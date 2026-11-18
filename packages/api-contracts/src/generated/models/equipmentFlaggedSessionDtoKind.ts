@@ -5,8 +5,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Deprecated (FIX-067): the kind of the three seeded types, null for a studio type; read typeId and typeName
+ * @deprecated
+ * @nullable
+ */
 export type EquipmentFlaggedSessionDtoKind =
-  (typeof EquipmentFlaggedSessionDtoKind)[keyof typeof EquipmentFlaggedSessionDtoKind];
+  | (typeof EquipmentFlaggedSessionDtoKind)[keyof typeof EquipmentFlaggedSessionDtoKind]
+  | null;
 
 export const EquipmentFlaggedSessionDtoKind = {
   reformer: "reformer",

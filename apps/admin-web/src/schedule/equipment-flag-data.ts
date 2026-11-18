@@ -10,11 +10,9 @@ import { addDays, boliviaInstant } from "../lib/bolivia-time";
 
 export type EquipmentFlag = EquipmentFlaggedSessionDto;
 
-export const kindPlurals: Record<EquipmentFlag["kind"], string> = {
-  reformer: "reformers",
-  cadillac: "cadillacs",
-  mat: "mats",
-};
+/** FIX-067: «equipos Reformer», named by the studio's own type. */
+export const typeEquipment = (flag: EquipmentFlag) =>
+  `equipos ${flag.typeName}`;
 
 // ADR-0042: the key names the Branch and the week, like the week's Sessions.
 export const weekFlagsQueryOptions = (branchId: string, monday: string) => {
@@ -40,4 +38,4 @@ export const useEquipmentFlag = (sessionId: string) =>
   useContext(EquipmentFlagsContext).get(sessionId);
 
 export const flagLabel = (flag: EquipmentFlag) =>
-  `faltan equipos: ${flag.workingCount} ${kindPlurals[flag.kind]} funcionando para ${flag.capacity} lugares`;
+  `faltan equipos: ${flag.workingCount} ${typeEquipment(flag)} funcionando para ${flag.capacity} lugares`;

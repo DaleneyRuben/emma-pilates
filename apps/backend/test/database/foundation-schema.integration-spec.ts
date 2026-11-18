@@ -30,6 +30,8 @@ describe('foundation migration', () => {
       'back_office.cost_budget_lines',
       'back_office.equipment',
       'back_office.equipment_issues',
+      'back_office.equipment_stocks',
+      'back_office.equipment_types',
       'back_office.expense_categories',
       'back_office.expenses',
       'back_office.pay_rate_rules',
