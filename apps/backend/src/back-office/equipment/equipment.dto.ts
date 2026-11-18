@@ -51,7 +51,12 @@ export class EquipmentDto {
 
 // A seeded type's unit, as old Staff app builds read it: kind is never null.
 export class SessionEquipmentItemDto extends EquipmentDto {
-  @ApiProperty({ enum: equipmentKinds })
+  @ApiProperty({
+    enum: equipmentKinds,
+    nullable: false,
+    deprecated: false,
+    description: 'The seeded type’s kind; never null here',
+  })
   declare kind: (typeof equipmentKinds)[number];
 }
 
