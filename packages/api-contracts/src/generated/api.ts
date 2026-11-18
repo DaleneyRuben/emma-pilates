@@ -148,8 +148,10 @@ import type {
   GetMonthKpisParams,
   GetMonthResultParams,
   GetNarrativeReportParams,
+  GetOwnPayoutQrImageParams,
   GetOwnSalaryPaymentReceiptParams,
   GetPaymentReceiptParams,
+  GetPayoutQrImageParams,
   GetReferralCodeAvailabilityParams,
   GetRevenueReportParams,
   GetSalaryPaymentReceiptParams,
@@ -208,6 +210,7 @@ import type {
   PayStatementDto,
   PaymentDto,
   PaymentReviewDto,
+  PayoutQrResultDto,
   PendingClientRegistrationDto,
   PendingEmailChangeStateDto,
   PendingEmailCorrectionDto,
@@ -260,6 +263,7 @@ import type {
   SessionScheduleReplacementDto,
   SessionScheduleResumeDto,
   SetClientPhotoDto,
+  SetPayoutQrDto,
   SetPromotionsConsentDto,
   SetStaffPhotoDto,
   SetTrainerReferralCodeDto,
@@ -38089,6 +38093,984 @@ export function useListAdminCashCloses<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getListAdminCashClosesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getOwnPayoutQrResponse200 = {
+  data: PayoutQrResultDto;
+  status: 200;
+};
+
+export type getOwnPayoutQrResponseSuccess = getOwnPayoutQrResponse200 & {
+  headers: Headers;
+};
+export type getOwnPayoutQrResponse = getOwnPayoutQrResponseSuccess;
+
+export const getGetOwnPayoutQrUrl = () => {
+  return `/api/v1/staff-members/current/payout-qr`;
+};
+
+export const getOwnPayoutQr = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getOwnPayoutQrResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetOwnPayoutQrUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getOwnPayoutQrResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnPayoutQrResponse;
+};
+
+export const getGetOwnPayoutQrQueryKey = () => {
+  return [`/api/v1/staff-members/current/payout-qr`] as const;
+};
+
+export const getGetOwnPayoutQrQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOwnPayoutQr>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getOwnPayoutQr>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetOwnPayoutQrQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnPayoutQr>>> = ({
+    signal,
+  }) => getOwnPayoutQr({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOwnPayoutQr>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetOwnPayoutQrQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOwnPayoutQr>>
+>;
+export type GetOwnPayoutQrQueryError = unknown;
+
+export function useGetOwnPayoutQr<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQr>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOwnPayoutQr>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPayoutQr>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPayoutQr>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnPayoutQr<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOwnPayoutQr>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPayoutQr>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPayoutQr>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnPayoutQr<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOwnPayoutQr>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetOwnPayoutQr<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQr>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getOwnPayoutQr>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOwnPayoutQrQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setOwnPayoutQrResponse200 = {
+  data: PayoutQrResultDto;
+  status: 200;
+};
+
+export type setOwnPayoutQrResponseSuccess = setOwnPayoutQrResponse200 & {
+  headers: Headers;
+};
+export type setOwnPayoutQrResponse = setOwnPayoutQrResponseSuccess;
+
+export const getSetOwnPayoutQrUrl = () => {
+  return `/api/v1/staff-members/current/payout-qr`;
+};
+
+export const setOwnPayoutQr = async (
+  setPayoutQrDto: SetPayoutQrDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setOwnPayoutQrResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSetOwnPayoutQrUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setPayoutQrDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setOwnPayoutQrResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setOwnPayoutQrResponse;
+};
+
+export const getSetOwnPayoutQrMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setOwnPayoutQr>>,
+    TError,
+    SetOwnPayoutQrMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setOwnPayoutQr>>,
+  TError,
+  SetOwnPayoutQrMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setOwnPayoutQr"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setOwnPayoutQr>>,
+    SetOwnPayoutQrMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setOwnPayoutQr(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetOwnPayoutQrMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setOwnPayoutQr>>
+>;
+export type SetOwnPayoutQrMutationBody = SetPayoutQrDto;
+export type SetOwnPayoutQrMutationError = unknown;
+export type SetOwnPayoutQrMutationVariables = { data: SetPayoutQrDto };
+
+export const useSetOwnPayoutQr = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setOwnPayoutQr>>,
+      TError,
+      SetOwnPayoutQrMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setOwnPayoutQr>>,
+  TError,
+  SetOwnPayoutQrMutationVariables,
+  TContext
+> => {
+  return useMutation(getSetOwnPayoutQrMutationOptions(options), queryClient);
+};
+
+export type getOwnPayoutQrImageResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnPayoutQrImageResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnPayoutQrImageResponse200ImageWebp = {
+  data: Blob;
+  status: 200;
+};
+
+export type getOwnPayoutQrImageResponseSuccess = (
+  | getOwnPayoutQrImageResponse200ImageJpeg
+  | getOwnPayoutQrImageResponse200ImagePng
+  | getOwnPayoutQrImageResponse200ImageWebp
+) & {
+  headers: Headers;
+};
+export type getOwnPayoutQrImageResponse = getOwnPayoutQrImageResponseSuccess;
+
+export const getGetOwnPayoutQrImageUrl = (
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/staff-members/current/payout-qr/${payoutQrId}/image?${stringifiedParams}`
+    : `/api/v1/staff-members/current/payout-qr/${payoutQrId}/image`;
+};
+
+export const getOwnPayoutQrImage = async (
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getOwnPayoutQrImageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetOwnPayoutQrImageUrl(payoutQrId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getOwnPayoutQrImageResponse["data"] =
+    body as getOwnPayoutQrImageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnPayoutQrImageResponse;
+};
+
+export const getGetOwnPayoutQrImageQueryKey = (
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+) => {
+  return [
+    `/api/v1/staff-members/current/payout-qr/${payoutQrId}/image`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetOwnPayoutQrImageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetOwnPayoutQrImageQueryKey(payoutQrId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getOwnPayoutQrImage>>
+  > = ({ signal }) =>
+    getOwnPayoutQrImage(
+      payoutQrId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: payoutQrId !== null && payoutQrId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetOwnPayoutQrImageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOwnPayoutQrImage>>
+>;
+export type GetOwnPayoutQrImageQueryError = unknown;
+
+export function useGetOwnPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params: undefined | GetOwnPayoutQrImageParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPayoutQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPayoutQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetOwnPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetOwnPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetOwnPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getOwnPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetOwnPayoutQrImageQueryOptions(
+    payoutQrId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getStaffMemberPayoutQrResponse200 = {
+  data: PayoutQrResultDto;
+  status: 200;
+};
+
+export type getStaffMemberPayoutQrResponseSuccess =
+  getStaffMemberPayoutQrResponse200 & {
+    headers: Headers;
+  };
+export type getStaffMemberPayoutQrResponse =
+  getStaffMemberPayoutQrResponseSuccess;
+
+export const getGetStaffMemberPayoutQrUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/payout-qr`;
+};
+
+export const getStaffMemberPayoutQr = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffMemberPayoutQrResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffMemberPayoutQrUrl(staffMemberId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStaffMemberPayoutQrResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffMemberPayoutQrResponse;
+};
+
+export const getGetStaffMemberPayoutQrQueryKey = (staffMemberId: string) => {
+  return [
+    `/api/v1/administrator/staff-members/${staffMemberId}/payout-qr`,
+  ] as const;
+};
+
+export const getGetStaffMemberPayoutQrQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStaffMemberPayoutQrQueryKey(staffMemberId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffMemberPayoutQr>>
+  > = ({ signal }) =>
+    getStaffMemberPayoutQr(
+      staffMemberId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: staffMemberId !== null && staffMemberId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffMemberPayoutQrQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffMemberPayoutQr>>
+>;
+export type GetStaffMemberPayoutQrQueryError = unknown;
+
+export function useGetStaffMemberPayoutQr<
+  TData = Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMemberPayoutQr>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMemberPayoutQr<
+  TData = Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMemberPayoutQr>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMemberPayoutQr<
+  TData = Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffMemberPayoutQr<
+  TData = Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberPayoutQr>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffMemberPayoutQrQueryOptions(
+    staffMemberId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getPayoutQrImageResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getPayoutQrImageResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getPayoutQrImageResponse200ImageWebp = {
+  data: Blob;
+  status: 200;
+};
+
+export type getPayoutQrImageResponseSuccess = (
+  | getPayoutQrImageResponse200ImageJpeg
+  | getPayoutQrImageResponse200ImagePng
+  | getPayoutQrImageResponse200ImageWebp
+) & {
+  headers: Headers;
+};
+export type getPayoutQrImageResponse = getPayoutQrImageResponseSuccess;
+
+export const getGetPayoutQrImageUrl = (
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/payout-qrs/${payoutQrId}/image?${stringifiedParams}`
+    : `/api/v1/administrator/payout-qrs/${payoutQrId}/image`;
+};
+
+export const getPayoutQrImage = async (
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPayoutQrImageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetPayoutQrImageUrl(payoutQrId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getPayoutQrImageResponse["data"] =
+    body as getPayoutQrImageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getPayoutQrImageResponse;
+};
+
+export const getGetPayoutQrImageQueryKey = (
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+) => {
+  return [
+    `/api/v1/administrator/payout-qrs/${payoutQrId}/image`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetPayoutQrImageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetPayoutQrImageQueryKey(payoutQrId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getPayoutQrImage>>
+  > = ({ signal }) =>
+    getPayoutQrImage(
+      payoutQrId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: payoutQrId !== null && payoutQrId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPayoutQrImage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetPayoutQrImageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPayoutQrImage>>
+>;
+export type GetPayoutQrImageQueryError = unknown;
+
+export function useGetPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params: undefined | GetPayoutQrImageParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPayoutQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayoutQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getPayoutQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPayoutQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPayoutQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getPayoutQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetPayoutQrImage<
+  TData = Awaited<ReturnType<typeof getPayoutQrImage>>,
+  TError = unknown,
+>(
+  payoutQrId: string,
+  params?: GetPayoutQrImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPayoutQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetPayoutQrImageQueryOptions(
+    payoutQrId,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

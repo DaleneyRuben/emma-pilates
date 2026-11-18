@@ -13,4 +13,5 @@ export const CreatePendingUploadDtoPurpose = {
   transfer_receipt: "transfer_receipt",
   promotion: "promotion",
   invoice: "invoice",
+  payout_qr: "payout_qr",
 } as const;
