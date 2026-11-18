@@ -333,7 +333,12 @@ describe('administrator staff members (e2e)', () => {
       .send({ name: 'Rocío Paz', phone: null, gender: 'male' })
       .expect(200);
     expect(operations.changeContact).toHaveBeenLastCalledWith(
-      { staffMemberId: staffId, name: 'Rocío Paz', phone: null, gender: 'male' },
+      {
+        staffMemberId: staffId,
+        name: 'Rocío Paz',
+        phone: null,
+        gender: 'male',
+      },
       expect.anything(),
     );
 
