@@ -102,10 +102,10 @@ can be found by its design name.
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 82, 111, 114 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 81, 112 |
-| AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
+| AW08–AW10 Insumos, AW31 Movimientos de insumos (was Retiros e insumos consumidos) | 28, 72, 162 |
 | AW37 Equipos | 82 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112 |
-| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 95, 96, 111, 112, 163 |
+| AW16 Reporte de ingresos y gastos | 30, 31, 93, 94, 99, 111, 112, 114, 163 |
 | AW42 Simulador | 97, 101 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones (Clientas › Cuenta cerrada since FIX-065) | 31, 33, 59, 60, 72, 111, 155, 159 |
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78, 79, 85, 89, 90, 113, 115, 157, 158, 160 |
@@ -2619,7 +2619,10 @@ recording twice, and the same key with a different body answers
    (`409 expense_category_in_use`). `POST expenses` with a Branch, category,
    `amountCentavos`, and `incurredOn`; `PUT expenses/{id}` corrects the
    category, amount, or date (never the Branch); `GET expenses?branchId=…`
-   lists them.
+   lists them, eliminated ones included with `voidedAt`, `voidedByName`, and
+   `voidReason`. `POST expenses/{id}/void` with an optional `reason` (1–300
+   characters) eliminates one (FIX-069, Test 163): `409 expense_voided` the
+   second time, and a `PUT` on it answers the same.
 5. **Report**: `GET reports/expenses?from=…&until=…` (the same instants as
    `reports/income`) totals Expenses by category and by month plus every
    Salary Payment. Add `&branchId=…` and only that Branch's Expenses count:
@@ -2691,7 +2694,7 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    **Sueldos** has a second row of views (**Por aprobar · Pagados**: every
    statement of the month, the Coordinator's included, then the payments
    made), Gastos has **Editar categorías** opening the categories in a
-   panel, and Estudio › **Insumos** has **Stock · Retiros del mes**.
+   panel, and Estudio › **Insumos** has **Stock · Movimientos**.
    The other destinations: Horario (Clases · Nutrición), Clientas (Todas ·
    Para contactar · Congelamientos), Promociones (Carrusel ·
    Clases de campaña · Referidos · Contactos), Estudio (Personal · Insumos
@@ -3227,7 +3230,7 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    rail shows the same count on **Estudio** (and the Insumos tab), on every page;
    choosing another Branch in the top bar changes both. The header has
    **+ Nuevo insumo**, **Registrar retiro**, **Registrar reposición**, and the
-   **Ver historial de retiros** link, in that order.
+   **Ver historial de movimientos** link, in that order.
 2. **Nuevo insumo.** The side panel asks for **Nombre**, **Cantidad en stock**
    (typed only now), and **Umbral de alerta**; **Guardar** with empty fields
    marks each one. A name another active Supply of the Branch already has is
@@ -3236,8 +3239,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    «Registrar retiro» y «Registrar reposición»."); the name and threshold can
    change. **Archivar insumo** asks first ("¿Archivar este insumo?", with
    **Volver** and **Archivar**) and the
-   Supply leaves Insumos and Registrar retiro; its Withdrawals stay in the
-   history. There is no delete.
+   Supply leaves Insumos and Registrar retiro; its Withdrawals and Restocks
+   stay in the history. There is no delete.
 4. **Registrar retiro.** Choose an Insumo (each option shows its stock, "(6
    unid.)") and a quantity. More than the stock marks the field ("Solo hay 6
    unid. en stock.") and disables **Registrar**. After recording, the page
@@ -3248,15 +3251,19 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    for an over-recorded one with a Reposición.
 5. **Registrar reposición.** The same panel with **Cantidad repuesta** and no
    maximum; afterwards "Reposición registrada: ahora hay N unid. de …".
-6. **Retiros e insumos consumidos.** **Ver historial de retiros** (the only way
-   in) opens the Branch's Withdrawals for the current month, newest first,
-   with **Insumo**, **Cantidad retirada**, and the date and time; "N retiros
-   en septiembre de 2026." above them and the units per Supply under
-   **Consumo del mes**. The arrows move between months (not past the current
-   one) and **Insumo** filters by one Supply, archived ones included as
-   "(archivado)"; both stay in the address (`?month=2026-08&supplyId=…`). A
-   month without Withdrawals says "Sin retiros en este rango.". **Insumos**
-   stays highlighted in the sidebar and **Volver a Insumos** goes back.
+6. **Movimientos de insumos.** **Ver historial de movimientos** (the only
+   way in) opens the Branch's Withdrawals and Restocks for the current month,
+   newest first, with **Insumo**, **Movimiento** (Retiro or Reposición),
+   **Cantidad**, **Registró** (who recorded it), and the date and time; "N
+   movimientos en septiembre de 2026." above them and the units withdrawn
+   per Supply under **Consumo del mes** (Withdrawals only). The arrows move
+   between months (not past the current one), **Insumo** filters by one
+   Supply, archived ones included as "(archivado)", and **Movimiento** by
+   Todos, Retiros or Reposiciones; all three stay in the address
+   (`?month=2026-08&supplyId=…&kind=restock`). A month without movements
+   says "Sin movimientos en este rango." ("Sin retiros…", "Sin
+   reposiciones…" under those filters). **Insumos** stays highlighted in the
+   sidebar and **Volver a Insumos** goes back (Test 162).
 7. **Nómina.** Back Office → **Nómina** lists every Salary Payment of the
    studio (the Branch selector says the page is not filtered by Branch), with
    **Empleado**, **Monto**, and **Fecha**, and an **Empleado** filter.
@@ -3280,14 +3287,17 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
    categoría** opens a row to add a category without leaving the form; the
    date is typed as `dd/mm/aaaa` (Test 111). The
-   new one is chosen at once. A correction changes the category, amount, or
-   date, never the Branch. A pasted address naming a category (or, in
+   new one is chosen at once. Each row shows **Editar** on its right, which
+   opens «Editar gasto» like the category name does. A correction changes the
+   category, amount, or date, never the Branch; **Eliminar gasto** under
+   **Guardar** marks it eliminated after a confirmation (Test 163). A pasted address naming a category (or, in
    Nómina, a Staff Member) the studio does not have falls back to **Todas**
    / **Todos** once the list loads.
 9. **Categorías de gasto.** The studio's categories, the same for every
    Branch (the selector says the page is not filtered by Branch). A category
    an Expense uses shows "En uso" and its delete icon is disabled; an unused
-   one is deleted after "¿Eliminar «…»?". The row at the bottom adds one; a
+   one is deleted after "¿Eliminar «…»?"; an eliminated Expense does not
+   count as a use (Test 163). The row at the bottom adds one; a
    name that already exists (ignoring capitals) is refused.
 10. **Narrow browser.** At a phone width every table becomes one card per row
     (a Supply without the amber pill shows no Estado line), the four Insumos
@@ -3295,7 +3305,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
     drawer keeps the Insumos count.
 
 Supplies, Withdrawals, Restocks, Salary Payments, and Expenses are never
-deleted (Withdrawals and Restocks cannot even be edited), so what you create
+deleted (Withdrawals and Restocks cannot even be edited; an eliminated
+Expense stays listed and counts for nothing, Test 163), so what you create
 here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
 pickers follow the browser's language, as Test 25 notes.
 
@@ -6140,7 +6151,7 @@ and 420 px in a real browser (Test 23).
      Sucursales para armar su horario."; **Insumos**: "… para llevar sus
      insumos."; **Gastos**: "… para registrar sus gastos."; **Evaluaciones
      nutricionales**: "Todavía no hay sucursales activas. Las evaluaciones
-     se ven por sucursal."; **Retiros e insumos consumidos**: the bare
+     se ven por sucursal."; **Movimientos de insumos**: the bare
      line.
    - **Clientes**: "Todavía no hay clientas."; **Pagos**: "Todavía no hay
      transferencias." under **Todos**, "Todavía no hay pagos confirmados."
@@ -7065,7 +7076,7 @@ password, holding every Branch.
    «Quitar contacto» included. In **Comentarios** she filters, exports and
    triages. In **Estudio › Insumos** there is no «Nuevo insumo» and a row's
    name does not open it, but **Registrar retiro** and **Registrar
-   reposición** work and «Retiros del mes» lists the month; **Equipos**
+   reposición** work and «Movimientos» lists the month; **Equipos**
    works as for the Administrator. **Horario › Nutrición** lists the
    Evaluations. **Ajustes › Reglas del estudio** shows «Reglas
    configurables» as text with «Solo administración las cambia.», no
@@ -10061,3 +10072,69 @@ API, the worker, both apps and the admin web on your own ports
    shows «Bs 70» or «Gratis» under its time (VoiceOver/TalkBack read «Turno
    15:00 · Bs 70»). With only free or only paid turnos, no price shows on
    the turnos and the line is the old one.
+
+## Test 162: Movimientos de insumos names who recorded each one and shows the Restocks (FIX-068)
+
+Walkthrough finding 102: the Withdrawals history did not say who took the
+units, and Restocks showed nowhere but in the stock. AW31 is now
+**Movimientos de insumos**. No migration; the API change is additive:
+`GET /api/v1/administrator/withdrawals` takes `kind` (`withdrawal`, the
+default older admin builds get, `restock` or `all`) and every row carries
+`kind` and `recordedByName`.
+
+1. Use a copy of the fixtures (`createdb -T pilates_golden
+   pilates_fix068_dev`), and run the API and the admin web on your own ports
+   (surface-verification skill).
+2. Log in as Paola, open **Insumos** (Sucursal Centro), **+ Nuevo insumo**
+   «Toallas» with 20 and threshold 5. **Registrar retiro** 16 Toallas
+   (Expected: **Stock bajo**), then log in as Carolina (Coordinación) in a
+   private window and **Registrar reposición** 20 Toallas (24 now).
+3. As Paola, **Ver historial de movimientos** (or the **Movimientos** view
+   beside **Stock**). Expected: the title «Movimientos de insumos», filters **Insumo** and **Movimiento** (Todos,
+   Retiros, Reposiciones), and two rows newest first: Toallas · Reposición ·
+   20 · Carolina Rivas, then Toallas · Retiro · 16 · Paola Mendoza, with
+   «2 movimientos en <mes>.», «Mostrando 1–2 de 2 movimientos» and
+   **Consumo del mes** «Toallas: 16 unid.».
+4. **Movimiento › Reposiciones**. Expected: only Carolina's row, «1
+   reposición en <mes>.», `kind=restock` in the address; Consumo del mes
+   unchanged. **Retiros** shows only Paola's; choosing **Insumo › Toallas**
+   too keeps both filters in the address.
+5. Step back a month without movements. Expected: «Sin retiros en este
+   rango.» under Retiros, «Sin movimientos en este rango.» under Todos.
+6. Check at 1440 px and 420 px (at 420 each movement is a card with
+   Movimiento, Cantidad, Registró and Fecha labelled), then drop the copy.
+
+## Test 163: eliminate an Expense, and the row's «Editar» (FIX-069)
+
+Walkthrough finding 104: the owner wants to «eliminar» an Expense without it
+ever leaving the database, and the Gastos row did not look clickable.
+Migration `20261118043255_expense_void` adds `voided_at`,
+`voided_by_account_id`, and `void_reason` to `back_office.expenses`.
+
+1. Use a copy of the fixtures, run the API and the admin web on your own
+   ports (surface-verification skill), and log in as Paola. In **Dinero ›
+   Gastos** record «Luz» Bs 350,00 dated yesterday. Expected: the row shows
+   **Editar** with a pencil on its right; the pointer turns into a hand over
+   the row, and Tab reaches the category name and **Editar**. Enter on
+   **Editar** opens «Editar gasto».
+2. In «Editar gasto» press **Eliminar gasto** (under **Guardar**).
+   Expected: «¿Eliminar este gasto?», «Deja de contar en los totales y en
+   Informes › Dinero. Sigue en la lista de Gastos, marcado como eliminado,
+   con quién y cuándo, y ya no se puede editar.», an optional **Motivo
+   (opcional)**, **Volver** and **Eliminar**. **Volver** changes nothing.
+3. Write «Cargado dos veces» and press **Eliminar**. Expected: the panel
+   closes with «Eliminamos el gasto de Bs 350,00 en Luz.»; the row stays,
+   muted, with the pill **Eliminado**, the amount struck through, the line
+   «Eliminado por Paola Mendoza · dd/mm/aaaa · hh:mm · Cargado dos veces»,
+   no **Editar**, and clicking it opens nothing. Without a reason the line
+   ends at the time. An audit record `expense.voided` keeps the amount and
+   the reason.
+4. **Informes › Dinero** for that month and Branch (and Todas las
+   sucursales). Expected: Gastos, Neto, Gastos por categoría, and Totales
+   por mes leave the eliminated Expense out; **Finanzas** does not count it
+   in that category's actual cost.
+6. **Editar categorías.** A category only eliminated Expenses use is no
+   longer «En uso» and can be deleted; the eliminated rows keep its name.
+5. At 420 px the active card ends with **Editar**, and the eliminated card
+   shows the pill and the who-and-when line right-aligned like the other
+   values; the confirmation fits the screen.

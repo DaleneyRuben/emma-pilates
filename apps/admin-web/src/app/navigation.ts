@@ -220,7 +220,7 @@ export const destinations: readonly Destination[] = [
         coordinator: true,
         views: [
           {
-            label: "Retiros del mes",
+            label: "Movimientos",
             to: "/estudio/insumos/retiros",
             coordinator: true,
           },

@@ -51,12 +51,12 @@ const september = withdrawalPage(
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Retiros e insumos consumidos",
+    name: "Movimientos de insumos",
   });
 const rowOf = async (name: string) =>
   (await screen.findByRole("cell", { name })).parentElement as HTMLElement;
 
-describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
+describe("AW31 Movimientos de insumos on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     reads.length = 0;
@@ -69,9 +69,11 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     renderAdmin("/estudio/insumos/retiros");
     await heading();
 
-    expect(await screen.findByText("Sin retiros en este rango.")).toBeVisible();
-    // The empty state already says it; no "0 retiros en …" line above it.
-    expect(screen.queryByText(/^0 retiros/)).not.toBeInTheDocument();
+    expect(
+      await screen.findByText("Sin movimientos en este rango."),
+    ).toBeVisible();
+    // The empty state already says it; no "0 movimientos en …" line above it.
+    expect(screen.queryByText(/^0 movimientos/)).not.toBeInTheDocument();
     expect(
       screen.getByText("Prueba con otro mes o con todos los insumos."),
     ).toBeVisible();
@@ -94,22 +96,24 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("lists a month's Withdrawals newest first with the units per Supply", async () => {
+  it("lists a month's movements newest first with the units per Supply", async () => {
     server.use(history(() => jsonResponse(september)));
     renderAdmin("/estudio/insumos/retiros?month=2026-09");
 
     const paperRow = await rowOf("Papel higiénico");
     const quantity = within(paperRow).getByRole("cell", { name: "2" });
-    expect(quantity).toHaveAttribute("data-label", "Cantidad retirada");
+    expect(quantity).toHaveAttribute("data-label", "Cantidad");
     expect(quantity).toHaveClass("md:text-right");
     expect(
       within(paperRow).getByRole("cell", { name: "21/09/2026 · 18:30" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("2 retiros en septiembre de 2026.")).toBeVisible();
+    expect(
+      screen.getByText("2 movimientos en septiembre de 2026."),
+    ).toBeVisible();
     expect(
       screen.getByText("Detergente: 5 unid. · Papel higiénico: 2 unid."),
     ).toBeVisible();
-    expect(screen.getByText("Mostrando 1–2 de 2 retiros")).toBeVisible();
+    expect(screen.getByText("Mostrando 1–2 de 2 movimientos")).toBeVisible();
     expect(reads[0]?.get("month")).toBe("2026-09");
   });
 
@@ -150,7 +154,9 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     await user.selectOptions(filter, detergent.id);
 
     expect(
-      await screen.findByText("1 retiro de Detergente en septiembre de 2026."),
+      await screen.findByText(
+        "1 movimiento de Detergente en septiembre de 2026.",
+      ),
     ).toBeVisible();
     expect(reads.at(-1)?.get("supplyId")).toBe(detergent.id);
     expect(router.state.matches.at(-1)?.search).toEqual({
@@ -228,7 +234,7 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     renderAdmin("/estudio/insumos/retiros");
     expect(
       await screen.findByText(
-        "No pudimos cargar los retiros.",
+        "No pudimos cargar los movimientos.",
         {},
         { timeout: 5_000 },
       ),

@@ -4,11 +4,15 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { WithdrawalDtoKind } from "./withdrawalDtoKind";
 
 export interface WithdrawalDto {
   id: string;
+  kind: WithdrawalDtoKind;
   supplyId: string;
   supplyName: string;
   quantity: number;
   recordedAt: string;
+  /** Who recorded the movement */
+  recordedByName: string;
 }

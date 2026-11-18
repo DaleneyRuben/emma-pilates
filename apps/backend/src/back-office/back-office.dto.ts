@@ -72,12 +72,19 @@ export class SupplyMovementDto {
   quantityOnHand!: number;
 }
 
+export const supplyMovementKinds = ['withdrawal', 'restock'] as const;
+export const supplyMovementFilters = [...supplyMovementKinds, 'all'] as const;
+
+// One Withdrawal or, when the list asks for them, one Restock (finding 102).
 export class WithdrawalDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty({ enum: supplyMovementKinds }) kind!: 'withdrawal' | 'restock';
   @ApiProperty({ format: 'uuid' }) supplyId!: string;
   @ApiProperty() supplyName!: string;
   @ApiProperty() quantity!: number;
   @ApiProperty({ format: 'date-time' }) recordedAt!: Date;
+  @ApiProperty({ description: 'Who recorded the movement' })
+  recordedByName!: string;
 }
 
 export class WithdrawalTotalDto {
@@ -133,6 +140,7 @@ export const parseWithdrawalQuery = (value: unknown) =>
       branchId: uuid,
       month,
       supplyId: uuid.optional(),
+      kind: z.enum(supplyMovementFilters).optional(),
       ...paging,
     })
     .safeParse(value);
@@ -213,7 +221,26 @@ export class AdminExpenseDto {
   @ApiProperty({ description: 'BOB centavos' }) amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Bolivia civil date' })
   incurredOn!: string;
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description:
+      'Set once the Expense is eliminated; it then counts for nothing',
+  })
+  voidedAt!: Date | null;
+  @ApiProperty({ type: String, nullable: true }) voidedByName!: string | null;
+  @ApiProperty({ type: String, nullable: true }) voidReason!: string | null;
 }
+
+export class ExpenseVoidDto {
+  @ApiProperty({ required: false, maxLength: 300 }) reason?: string;
+}
+
+export const parseExpenseVoid = (value: unknown) =>
+  z
+    .strictObject({ reason: z.string().trim().max(300).optional() })
+    .safeParse(value);
 
 export class AdminExpensePageDto {
   @ApiProperty({ type: AdminExpenseDto, isArray: true })

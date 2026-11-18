@@ -45,12 +45,15 @@ import {
   ExpenseChangeDto,
   ExpenseInputDto,
   ExpenseReportDto,
+  ExpenseVoidDto,
   parseExpenseCategoryInput,
   parseExpenseChange,
   parseExpenseInput,
   parseExpenseQuery,
   parseExpenseReportQuery,
+  parseExpenseVoid,
   parseWithdrawalQuery,
+  supplyMovementFilters,
   WithdrawalPageDto,
 } from './back-office.dto';
 import { cashCloseControllers } from './cash-close/cash-close.controller';
@@ -85,6 +88,12 @@ export class AdministratorWithdrawalsController extends BackOfficeController {
   @ApiQuery({ name: 'branchId', required: true, schema: { format: 'uuid' } })
   @ApiQuery({ name: 'month', required: true, example: '2026-09' })
   @ApiQuery({ name: 'supplyId', required: false, schema: { format: 'uuid' } })
+  @ApiQuery({
+    name: 'kind',
+    required: false,
+    enum: supplyMovementFilters,
+    description: 'Withdrawals when absent',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiOkResponse({ type: WithdrawalPageDto })
@@ -243,6 +252,32 @@ export class AdministratorExpensesController extends BackOfficeController {
       await run(() =>
         this.operations.expenses.updateExpense(
           { ...input, expenseId: id },
+          principal,
+        ),
+      ),
+    );
+  }
+
+  // Finding 104: «Eliminar gasto» voids it; nothing is deleted (ADR-0086).
+  @Post(':expenseId/void')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'voidExpense' })
+  @ApiParam({ name: 'expenseId', format: 'uuid' })
+  @ApiBody({ type: ExpenseVoidDto })
+  @ApiOkResponse({ type: AdminExpenseDto })
+  @Header('Cache-Control', 'no-store')
+  async void(
+    @Param('expenseId') expenseId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<AdminExpenseDto> {
+    const id = requireId(expenseId, 'Invalid Expense identifier');
+    const input = parsed(parseExpenseVoid(body ?? {}), 'Invalid Expense void');
+    const principal = await this.authenticate(authorization);
+    return toExpenseDto(
+      await run(() =>
+        this.operations.expenses.voidExpense(
+          { expenseId: id, ...input },
           principal,
         ),
       ),

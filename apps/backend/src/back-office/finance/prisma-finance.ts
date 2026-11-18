@@ -89,7 +89,7 @@ export const createPrismaFinance = (
       facts.ofMonth(from, until),
       prisma.costBudgetLine.findMany({ orderBy: { position: 'asc' } }),
       prisma.expense.findMany({
-        where: { incurredOn: { gte: from, lt: until } },
+        where: { incurredOn: { gte: from, lt: until }, voidedAt: null },
         select: {
           amountCentavos: true,
           expenseCategory: { select: { name: true } },
