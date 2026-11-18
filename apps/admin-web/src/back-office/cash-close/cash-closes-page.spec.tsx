@@ -8,6 +8,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -272,11 +273,9 @@ describe("AW151 Cierres de caja on a narrow browser", () => {
     renderAdmin("/dinero/caja?month=2026-10");
 
     const short = await rowOf("vie 23/10");
-    expect(
-      within(short).getByRole("cell", { name: "Bs 510,00" }),
-    ).toHaveAttribute("data-label", "Contado");
-    expect(
-      within(short).getByRole("cell", { name: "−Bs 10,00" }),
-    ).toHaveAttribute("data-label", "Diferencia");
+    const card = compactCard(short);
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("Bs 510,00");
+    expect(card.detail).toContain("−Bs 10,00");
   });
 });

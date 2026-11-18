@@ -17,6 +17,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -220,10 +221,13 @@ describe("AW08 Insumos on a narrow browser", () => {
     );
     const { user } = renderAdmin("/estudio/insumos");
     const row = await rowOf("Papel higiénico");
-    expect(within(row).getByText("Stock bajo").closest("td")).toHaveAttribute(
-      "data-label",
-      "Estado",
-    );
+    // FIX-088: the phone card, «Stock bajo» on its right.
+    expect(compactCard(row)).toMatchObject({
+      compact: true,
+      title: "Papel higiénico",
+      status: "Stock bajo",
+      labels: 0,
+    });
 
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
     expect(

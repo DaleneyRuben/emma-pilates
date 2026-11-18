@@ -19,6 +19,7 @@ import {
   expectClientPhoto,
   herPhoto,
 } from "../../test/client-photo-fixtures";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -252,10 +253,11 @@ describe("AW21 Clientes on a narrow browser", () => {
     server.use(clientTable(() => jsonResponse(clientPage([lucia]))));
     renderAdmin("/clientas");
 
-    const plan = await screen.findByRole("cell", {
-      name: "Paquete de 8 clases",
-    });
-    expect(plan).toHaveAttribute("data-label", "Plan");
+    const card = compactCard(
+      (await screen.findByText("Paquete de 8 clases")).closest("tr")!,
+    );
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("Paquete de 8 clases");
     expect(
       screen.getByRole("searchbox", {
         name: "Buscar por nombre, correo o teléfono",

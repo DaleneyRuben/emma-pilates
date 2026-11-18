@@ -15,6 +15,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import { emma, rita } from "../../test/people-fixtures";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -199,8 +200,8 @@ describe("AW11 Nómina on a narrow browser", () => {
     server.use(payrollTable(() => jsonResponse(salaryPage([emmaSeptember]))));
     renderAdmin("/dinero/sueldos/pagados");
     const row = await rowOf("Emma Vargas");
-    expect(
-      within(row).getByRole("cell", { name: "20/09/2026" }),
-    ).toHaveAttribute("data-label", "Fecha");
+    const card = compactCard(row);
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("20/09/2026");
   });
 });
