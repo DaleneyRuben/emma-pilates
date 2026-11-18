@@ -10753,8 +10753,8 @@ C. **Compact cards at 420 px.** **Comentarios**: each card is the comment in
    bold, «Valeria Prueba · Otro · 17/11/2026 · 17:24» under it, and on the
    right «• Nuevo» (a dot and the word) or a plain grey «Revisado». The
    same for **Clientas** (name, «8 clases · 7 de 8 + 1 · 04/12/2026»,
-   «Activo»), **Pagos**, **Personal**, **Congelamientos** (the decision, or
-   «Decidido por …», under the card), **Caja**, **Gastos**, **Movimientos**, **Sueldos
+   «Activo»), **Pagos**, **Personal**, **Congelamientos** (dates, reason and «Vence 5 feb → 12 feb» in the
+   line; **Aprobar** and **Rechazar**, or «Decidido por …», under the card), **Caja**, **Gastos**, **Movimientos**, **Sueldos
    pagados**, **Planes**, **Tipos de clase**, **Sucursales**, **Evaluaciones**
    and **Referidos**. No card shows uppercase column labels. At 1440 px the
    tables are unchanged.
@@ -10766,7 +10766,9 @@ E. **Titles match the menu.** **Clientas › Todas** is titled «Clientas»,
    **Dinero › Caja** «Caja», and **Dinero › Sueldos › Pagados** «Sueldos
    pagados».
 F. **Caja.** Every row has the same ground; a short day's «−Bs …» is red and
-   a surplus amber, in the Diferencia figure only.
+   a surplus amber, in the Diferencia figure only. At 420 px the card reads
+   «Contado Bs 240,00 · Diferencia −Bs 7,00». An empty Insumo's **Retiro** is
+   disabled.
 G. **Informes.** At 420 px **El mes** with classes draws «Clases dictadas»
    inside the screen (nothing scrolls sideways). **Dinero** has one date
    filter, **Desde · Hasta**: «Ingreso devengado · noviembre de 2026» follows
