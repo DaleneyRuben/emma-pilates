@@ -61,12 +61,12 @@ export const pendingFreezeColumns = (onDone: (message: string) => void) => [
   columns.display({
     id: "planEnd",
     header: "Vence",
-    meta: { card: "hidden" },
+    meta: { card: "detail", cardLabel: "Vence" },
     cell: ({ row }) => quiet(freezePendingPlanEnd(row.original)),
   }),
   columns.accessor("reason", {
     header: "Motivo",
-    meta: { card: "hidden" },
+    meta: { card: "detail" },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),
@@ -97,7 +97,7 @@ export const decidedFreezeColumns = () => [
   columns.display({
     id: "planEnd",
     header: "Vence",
-    meta: { card: "hidden" },
+    meta: { card: "detail", cardLabel: "Vence" },
     cell: ({ row }) => quiet(freezeDecidedPlanEnd(row.original)),
   }),
   columns.display({

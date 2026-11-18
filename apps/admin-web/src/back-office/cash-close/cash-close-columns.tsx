@@ -82,7 +82,12 @@ export const cashDayColumns = [
   columns.display({
     id: "counted",
     header: "Contado",
-    meta: { card: "detail", cardOrder: 1, align: "right" },
+    meta: {
+      card: "detail",
+      cardOrder: 1,
+      cardLabel: "Contado",
+      align: "right",
+    },
     cell: ({ row }) =>
       row.original.close === null ? (
         quiet
@@ -95,7 +100,12 @@ export const cashDayColumns = [
   columns.display({
     id: "difference",
     header: "Diferencia",
-    meta: { card: "detail", cardOrder: 2, align: "right" },
+    meta: {
+      card: "detail",
+      cardOrder: 2,
+      cardLabel: "Diferencia",
+      align: "right",
+    },
     cell: ({ row }) => {
       const close = row.original.close;
       if (close === null) return quiet;

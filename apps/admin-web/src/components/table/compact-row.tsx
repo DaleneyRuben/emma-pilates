@@ -90,14 +90,20 @@ export function CompactRow<Data>({
           data-part="detail"
           className={cn(
             cellBase,
-            "col-start-1 min-w-0 text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline",
+            "col-start-1 min-w-0 text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline [&>span>*>*]:inline [&>span>*>*+*]:before:content-['_·_']",
           )}
         >
-          {details.map(({ cell }) => (
-            <span key={cell.id} className="empty:hidden">
-              {render(cell)}
-            </span>
-          ))}
+          {details.map(({ cell }) => {
+            const label = cell.column.columnDef.meta?.cardLabel;
+            return (
+              <span key={cell.id} className="empty:hidden">
+                {label === undefined ? null : (
+                  <span data-card-label="">{`${label} `}</span>
+                )}
+                {render(cell)}
+              </span>
+            );
+          })}
         </TableCell>
       )}
       {actions.length === 0 ? null : (

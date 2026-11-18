@@ -33,6 +33,8 @@ declare module "@tanstack/react-table" {
     card?: CardPart;
     /** Order inside the detail line; column order by default. */
     cardOrder?: number;
+    /** A word before a figure that reads ambiguously alone («Contado»). */
+    cardLabel?: string;
   }
 }
 
