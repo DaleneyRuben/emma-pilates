@@ -7,7 +7,6 @@ import {
   colors,
   fontFamilies,
   Glyph,
-  IconRow,
   IconRowGroup,
   LineIcon,
   QueryFailure,
@@ -15,6 +14,7 @@ import {
   Screen,
   spacing,
   StateScreen,
+  TextButton,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -31,6 +31,7 @@ import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { PersonRow } from "../ui/person-row";
+import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { StatusPill } from "../ui/session-row";
 import { describeContact } from "./assistant-format";
@@ -48,19 +49,15 @@ const minimumQueryLength = 2;
 const debounceMilliseconds = 250;
 const placeholder = "Buscar por nombre, teléfono o correo";
 
-// v2 S04: the secondary «Nuevo cliente» under the search field.
-function NewClientButton({ onPress }: { onPress: () => void }) {
+// FIX-083 (Ronda 2 pick A): «Nuevo cliente» is a quiet link under the results.
+function NewClientLink({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable
-      accessibilityLabel="Nuevo cliente"
-      accessibilityRole="button"
+    <TextButton
+      label="¿No está? Crear cliente nuevo"
       onPress={onPress}
-      style={({ pressed }) => [styles.newClient, pressed && styles.pressed]}
+      style={styles.newClient}
       testID="client-search-new-client"
-    >
-      <Glyph color={colors.primaryOnTint} name="person" size={18} strokeWidth={1.6} />
-      <Text style={styles.newClientLabel}>Nuevo cliente</Text>
-    </Pressable>
+    />
   );
 }
 
@@ -107,6 +104,7 @@ export function ClientSearchScreen() {
   const eyebrow =
     member?.branches.length === 1 ? `${roleLabel} · ${member.branches[0]?.name}` : roleLabel;
 
+  const newClientLink = <NewClientLink onPress={() => navigation.navigate("NewClient")} />;
   const search = (
     <>
       <RootHeader bell eyebrow={eyebrow} label="Buscar cliente" title="Buscar cliente" />
@@ -139,22 +137,20 @@ export function ClientSearchScreen() {
         )}
       </View>
       {searching ? null : (
-        <IconRowGroup>
-          <IconRow
-            chevron
-            icon="receipt"
+        <PlainRowGroup>
+          <PlainRow
             label="Facturas por subir"
             onPress={() => navigation.navigate("Invoices")}
             testID="client-search-invoices"
             value={invoiceCount > 0 ? String(invoiceCount) : undefined}
           />
-        </IconRowGroup>
-      )}
-      {searching && clients.length === 0 && results.data?.status === 200 ? null : (
-        <NewClientButton onPress={() => navigation.navigate("NewClient")} />
+        </PlainRowGroup>
       )}
       {!searching ? (
-        <Text style={styles.hint}>Escribe al menos dos letras o números para buscar.</Text>
+        <>
+          <Text style={styles.hint}>Escribe al menos dos letras o números para buscar.</Text>
+          {newClientLink}
+        </>
       ) : results.isPending ? (
         <Text accessibilityLabel="Buscando clientes" style={styles.hint}>
           Buscando…
@@ -198,6 +194,7 @@ export function ClientSearchScreen() {
               />
             ))}
           </IconRowGroup>
+          {newClientLink}
         </ScrollView>
       )}
     </>
@@ -236,23 +233,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 52,
   },
-  list: { paddingBottom: spacing.xxl },
-  newClient: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.button,
-    flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  newClientLabel: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  pressed: { opacity: 0.7 },
+  list: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  newClient: { alignSelf: "flex-start" },
   screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
   searchPanel: { gap: spacing.md, paddingRight: spacing.lg, width: 360 },
   split: { flexDirection: "row", paddingRight: 0 },
