@@ -10763,8 +10763,13 @@ D. **Pills only for exceptions.** Normal states read as grey text
    wrong states keep a pill («Pendiente», «Nuevo», «Stock bajo», «Rechazado»,
    «Fuera de servicio»).
 E. **Titles match the menu.** **Clientas › Todas** is titled «Clientas»,
-   **Dinero › Caja** «Caja», and **Dinero › Sueldos › Pagados** «Sueldos
-   pagados».
+   **Dinero › Caja** «Caja», **Dinero › Sueldos › Pagados** «Sueldos
+   pagados», **Informes › El mes** «Informes» (was «Indicadores»),
+   **Informes › Dinero** «Dinero» (was «Reporte de ingresos y gastos»),
+   **Horario › Nutrición** «Nutrición» (was «Evaluaciones nutricionales») and
+   **Promociones › Clases de campaña** «Clases de campaña» (was «Campaña»).
+   Every other page's title is its menu or tab name; the boards' names
+   (AW16, AW25, AW39) in older tests are the design references.
 F. **Caja.** Every row has the same ground; a short day's «−Bs …» is red and
    a surplus amber, in the Diferencia figure only. At 420 px the card reads
    «Contado Bs 240,00 · Diferencia −Bs 7,00». An empty Insumo's **Retiro** is
