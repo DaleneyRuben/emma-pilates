@@ -214,8 +214,8 @@ export function SupplyPanelForm({
           onConfirm={() => void archive()}
         >
           <p>
-            Dejará de aparecer en Insumos y en Registrar retiro. Sus retiros
-            seguirán en «Retiros e insumos consumidos».
+            Dejará de aparecer en Insumos y en Registrar retiro. Sus movimientos
+            seguirán en «Movimientos de insumos».
           </p>
         </ConfirmDialog>
       )}
