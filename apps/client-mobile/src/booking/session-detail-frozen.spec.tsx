@@ -3,7 +3,7 @@ import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/
 
 import { weekdayDayMonth } from "../subscription/freeze-window";
 import { jsonResponse } from "../test-support";
-import { openDetail, startsAt, subscription } from "./session-detail-test-support";
+import { detail, openDetail, startsAt, subscription } from "./session-detail-test-support";
 
 jest.setTimeout(20_000);
 
@@ -49,6 +49,15 @@ describe("Client Session detail on a frozen day", () => {
     expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
     expect(screen.getByText("3 de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
+  });
+
+  it("leaves out the classes left this week, which a frozen day cannot use", async () => {
+    const { screen } = await openDetail({
+      ...frozen(classDay, classDay),
+      "/api/v1/sessions/session-1": () => jsonResponse(detail(3, 2)),
+    });
+
+    expect(screen.queryByText(/clases? esta semana/)).toBeNull();
   });
 
   it("offers another day, back on the class list", async () => {
