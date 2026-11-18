@@ -7855,27 +7855,46 @@ and cannot list the statements. Log in as Test 24 describes.
    only Emma's statements. As Daniela it does not include Emma's. As Camila
    it answers `403` `back_office_access_denied`, and so does approval.
 
-6. **«Mis pagos» in the Staff app (MOB-073).** Log in as Emma (Test 12) and
-   open **Tu cuenta**. Perfil shows **Mis pagos** above «Notificaciones»;
-   Camila, Paola, Gabriela, and Carolina do not have the row. It opens one
-   card per statement, newest first: its period («Octubre 2026» for a whole
-   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de
-   noviembre de 2026» for a week or a range), «Aprobado» or «Borrador», the
-   total with centavos (`Bs 322,00`), and one row per concept: «Clases
-   dictadas · 3», «Canceladas por mínimo · 1», «Comisiones · 1». A draft
-   says «Puede cambiar hasta que administración lo apruebe.» **Ver cada
-   clase** lists each line («Clase», «lun 5 oct · 10:00 · Centro · Reformer
-   Pilates · 6 alumnas, 2 extra», `Bs 81,00`; a statement approved before
-   FIX-070 keeps «6 alumnas, 2 extra»);
-   **Ocultar detalle** folds it. Under **Pagos recibidos** each Salary
-   Payment of hers from Nómina shows its amount and date («1 de octubre de
-   2026»). A payment with a receipt (Test 28 step 7) shows its thumbnail
-   and **Ver**; tapping it opens the photo full screen under «Pago del 1 de
-   noviembre de 2026», closed with the X. One without reads «Sin
-   comprobante» and does nothing. If the photo cannot load, the screen says
-   «No pudimos mostrar el comprobante.» With nothing calculated or paid the
-   screen says «Todavía no tienes pagos.» Pull down to reload. On the iPad
-   the cards sit in one centred column.
+6. **«Mis pagos» in the Staff app (MOB-073, finding 111).** Log in as Emma
+   (Test 12); **Mis pagos** is her second tab. Camila, Paola, Gabriela, and
+   Carolina do not have it. On top sits one Rosa profundo summary, the first
+   that applies: **Por cobrar** with the sum of every approved statement not
+   yet paid («Liquidación de octubre 2026, ya aprobada. Falta el pago.», or
+   «2 liquidaciones aprobadas. Falta el pago.»); else **En curso · Noviembre
+   2026** with the open draft's total and «1 clase dictada hasta hoy · puede
+   cambiar hasta que administración lo apruebe.»; else **Último pago · 18 de
+   noviembre** with that payment's amount, the statement it paid («Liquidación
+   del 1 – 17 de noviembre de 2026.») and «Sin comprobante adjunto.», or a
+   **Ver comprobante** button when it has a receipt. Under **Historial** each
+   statement is one row, newest first: its period («Octubre 2026» for a whole
+   month, «20 de octubre de 2026» for a day, «26 de octubre – 1 de noviembre
+   de 2026» for a week or a range), a status line («Pagado el 18 de
+   noviembre» in green with a check, «Aprobado · por pagar» in amber with a
+   clock, «En curso · puede cambiar» with an hourglass), the total with
+   centavos (`Bs 1.534,90`) and a chevron. There is no «Pagos recibidos» list
+   any more: a payment shows on the statement it paid. A Salary Payment with
+   no statement (recorded by hand) appears under **Otros pagos** with its
+   amount, date («15 de octubre de 2026 · sin comprobante») and a payment icon
+   or its receipt thumbnail.
+   Tapping a row opens the statement's screen: «‹ Mis pagos», «Liquidación»
+   (or «Periodo en curso»), the period as title, then one card with «Total»
+   and a pill («Pagado», «Por pagar», «En curso»), the total in large type,
+   and a payment strip: «Pagado el 18 de noviembre · Sin comprobante
+   adjunto», or the receipt thumbnail with «Ver comprobante» (it opens the
+   photo full screen under «Pago del 18 de noviembre de 2026», closed with
+   the X), «Aprobado · falta el pago», or «Todavía sin aprobar · Puede cambiar
+   hasta que administración lo apruebe.». A coloured bar shows each concept's
+   share of the total, over one row per concept with its dot: «Clases
+   dictadas · 1 Bs 65,00», «Canceladas por mínimo · 54 Bs 1.350,00»,
+   «Comisiones · 2 Bs 119,90». **Ver cada clase** lists each line («Clase»,
+   «lun 5 oct · 10:00 · Centro · Reformer Pilates · 6 alumnas, 2 extra»,
+   `Bs 81,00`; a statement approved before FIX-070 keeps «6 alumnas, 2
+   extra»); **Ocultar detalle** folds it. If a receipt cannot load, the
+   screen says «No pudimos mostrar el comprobante.» With nothing calculated
+   or paid the screen says «Todavía no tienes pagos.» Pull down to reload on
+   either screen. On the iPad both screens sit in one centred column.
+   Daniela (`daniela@example.com` on `emma_vacia`) shows «Último pago · 18 de
+   noviembre», Bs 1.534,90, and one «1 – 17 de noviembre de 2026» row.
 7. **Her own payments only.** `GET /api/v1/trainer/salary-payments` as Emma
    returns only Emma's Salary Payments, newest first, as
    `{ id, amountCentavos, paidOn, receiptUrl }`. As Camila, Paola, or

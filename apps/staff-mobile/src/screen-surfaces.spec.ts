@@ -28,6 +28,8 @@ describe("screen surfaces", () => {
       "assistant/invitation-menu.tsx",
       // Finding 113: the reasons inset in S28's sheet and the WhatsApp ring on a Lino row.
       "coordinator/contact-list-parts.tsx",
+      // Finding 111: the payment strip inside the statement's Lino card.
+      "profile/pay-statement-card.tsx",
       "trainer/trainer-roster-screen.tsx",
     ];
     const offenders = sourceFiles(__dirname)
