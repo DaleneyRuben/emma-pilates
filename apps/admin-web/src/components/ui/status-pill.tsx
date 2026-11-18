@@ -29,6 +29,7 @@ export function StatusPill({
   }
   return (
     <span
+      data-status-pill=""
       className={cn(
         "inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 text-pie font-semibold whitespace-nowrap",
         exceptions[tone],

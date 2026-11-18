@@ -76,7 +76,8 @@ export function CompactRow<Data>({
           data-part="status"
           className={cn(
             cellBase,
-            "col-start-2 row-span-2 row-start-1 pt-0.5 text-right text-nota",
+            // The phone card's exception is a dot and its word, no pill.
+            "col-start-2 row-span-2 row-start-1 pt-0.5 text-right text-nota [&_[data-status-pill]]:h-auto [&_[data-status-pill]]:bg-transparent [&_[data-status-pill]]:px-0 [&_[data-status-pill]]:font-normal",
           )}
         >
           {status.map(({ cell }) => (
