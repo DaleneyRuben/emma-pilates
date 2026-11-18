@@ -79,10 +79,12 @@ describe("the widened Coordinator", () => {
 
     expect(await screen.findByText("Detergente")).toBeVisible();
     expect(
-      screen.getByRole("button", { name: "Registrar retiro" }),
+      screen.getByRole("button", { name: "Registrar retiro de Detergente" }),
     ).toBeVisible();
     expect(
-      screen.getByRole("button", { name: "Registrar reposición" }),
+      screen.getByRole("button", {
+        name: "Registrar reposición de Detergente",
+      }),
     ).toBeVisible();
     expect(screen.queryByRole("button", { name: "Nuevo insumo" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Detergente" })).toBeNull();

@@ -32,8 +32,12 @@ type CatalogPageProps<Row extends { id: string }> = {
   onPageChange: (page: number) => void;
   rangeLabel?: RangeLabel;
   query: UseQueryResult<{ items: Row[]; totalItems: number }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- each accessor column carries its own value type.
-  columns: (open: (row: Row) => void) => ColumnDef<Row, any>[];
+  /** `act` opens a panel action from a row (FIX-088's per-row links). */
+  columns: (
+    open: (row: Row) => void,
+    act: (action: PanelAction) => void,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- each accessor column carries its own value type.
+  ) => ColumnDef<Row, any>[];
   /** `done` closes the panel; a message becomes the page notice. */
   renderForm?: (
     row: Row | undefined,
@@ -177,7 +181,9 @@ export function CatalogPage<Row extends { id: string }>({
       ) : (
         <>
           <DataTable
-            columns={columns(open)}
+            columns={columns(open, (action) =>
+              show({ kind: "action", action }),
+            )}
             rows={query.data.items}
             rowId={(row) => row.id}
             emptyMessage={emptyMessage}

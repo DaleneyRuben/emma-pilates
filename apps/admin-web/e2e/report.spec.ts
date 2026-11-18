@@ -25,7 +25,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Reporte de ingresos y gastos",
+      name: "Dinero",
     }),
   ).toBeVisible();
   await expect(page.getByText(/· Todas las sucursales$/)).toBeVisible();

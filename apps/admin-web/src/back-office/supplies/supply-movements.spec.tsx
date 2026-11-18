@@ -60,7 +60,10 @@ const openPanel = async (
 ) => {
   const rendered = renderAdmin("/estudio/insumos");
   await screen.findByRole("cell", { name: "Detergente" });
-  await rendered.user.click(screen.getByRole("button", { name: action }));
+  // FIX-088: each row opens it with its own Supply already chosen.
+  await rendered.user.click(
+    screen.getByRole("button", { name: `${action} de Detergente` }),
+  );
   const panel = await screen.findByRole("dialog", { name: action });
   return { ...rendered, panel };
 };
@@ -91,6 +94,8 @@ describe("AW10 Registrar retiro on a desktop browser", () => {
       "Papel higiénico (2 unid.)",
     ]);
 
+    expect(supply).toHaveValue(detergent.id);
+    await user.selectOptions(supply, "");
     await user.click(within(panel).getByRole("button", { name: "Registrar" }));
     expect(supply).toHaveAccessibleDescription("Elige un insumo.");
 

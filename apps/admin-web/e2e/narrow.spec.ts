@@ -3,7 +3,7 @@ import { sidebar, signIn } from "./support/session";
 
 // The 420 px variant every admin screen has (design system → Admin Desktop
 // Web Responsiveness, P01d): the menu of nine destinations, bottom sheet,
-// and one card per row.
+// and one compact card per row.
 test.use({ viewport: { width: 420, height: 860 } });
 
 test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows", async ({
@@ -55,11 +55,19 @@ test("a narrow browser gets the drawer, the bottom-sheet selector, and card rows
     .getByRole("link", { name: /^Estudio/ })
     .click();
   await expect(page.getByText("Mostrando 1–7 de 7 miembros")).toBeVisible();
-  // The header row is hidden and each cell carries its column name.
+  // FIX-088 (Tablas en celular A): the header row is hidden and each row is
+  // a compact card: the name in bold, one detail line, the status.
   await expect(page.getByRole("columnheader", { name: "Rol" })).toBeHidden();
-  const roleCell = page.getByRole("cell", { name: "Administradora" });
-  await expect(roleCell).toHaveAttribute("data-label", "Rol");
-  await expect(roleCell).toBeVisible();
+  const card = page.locator("tr[data-compact]").filter({
+    hasText: "Paola Mendoza",
+  });
+  await expect(card.locator('[data-part="title"]')).toContainText(
+    "Paola Mendoza",
+  );
+  await expect(card.locator('[data-part="detail"]')).toContainText(
+    "Administradora",
+  );
+  await expect(card.locator("td[data-label]")).toHaveCount(0);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

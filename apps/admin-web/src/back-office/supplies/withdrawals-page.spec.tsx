@@ -21,6 +21,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -265,8 +266,8 @@ describe("AW31 on a narrow browser", () => {
     server.use(history(() => jsonResponse(september)));
     renderAdmin("/estudio/insumos/retiros?month=2026-09");
     const row = await rowOf("Detergente");
-    expect(
-      within(row).getByRole("cell", { name: "21/09/2026 · 11:00" }),
-    ).toHaveAttribute("data-label", "Fecha");
+    const card = compactCard(row);
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("21/09/2026 · 11:00");
   });
 });

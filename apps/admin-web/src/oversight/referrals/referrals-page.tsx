@@ -78,6 +78,7 @@ const referralColumns = () => [
   // The host's extra class for the invite (BKM-014).
   columns.accessor("inviteReward", {
     header: "Clase de premio",
+    meta: { card: "hidden" },
     cell: ({ row }) => {
       const { inviteReward, inviteRewardGrantedAt } = row.original;
       if (inviteReward === "granted" && inviteRewardGrantedAt !== null) {

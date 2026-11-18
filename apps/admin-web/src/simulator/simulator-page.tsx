@@ -139,7 +139,10 @@ function Calculator({ draft }: { draft: Draft }) {
           line="Ingreso en caja que cubre los costos fijos, el pago a instructoras y el impuesto"
         />
       </div>
-      <p className="text-nota text-texto-tenue tabular">{month.derivation}</p>
+      {/* FIX-088: the owner's check in words and bolivianos. */}
+      <p className="text-nota text-texto-tenue tabular">
+        {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
+      </p>
       <ProjectionSection input={input} />
     </>
   );

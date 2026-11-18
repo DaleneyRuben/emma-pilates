@@ -48,6 +48,7 @@ const periodColumns = [
   columns.display({
     id: "days",
     header: "Días",
+    meta: { card: "hidden" },
     cell: ({ row }) =>
       quiet(freezeDayCount(row.original.startsOn, row.original.endsOn)),
   }),
@@ -60,10 +61,12 @@ export const pendingFreezeColumns = (onDone: (message: string) => void) => [
   columns.display({
     id: "planEnd",
     header: "Vence",
+    meta: { card: "detail", cardLabel: "Vence" },
     cell: ({ row }) => quiet(freezePendingPlanEnd(row.original)),
   }),
   columns.accessor("reason", {
     header: "Motivo",
+    meta: { card: "detail" },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),
@@ -71,6 +74,7 @@ export const pendingFreezeColumns = (onDone: (message: string) => void) => [
   columns.display({
     id: "decision",
     header: "Decisión",
+    meta: { card: "actions" },
     cell: ({ row }) => <DecisionCell freeze={row.original} onDone={onDone} />,
   }),
 ];
@@ -93,11 +97,13 @@ export const decidedFreezeColumns = () => [
   columns.display({
     id: "planEnd",
     header: "Vence",
+    meta: { card: "detail", cardLabel: "Vence" },
     cell: ({ row }) => quiet(freezeDecidedPlanEnd(row.original)),
   }),
   columns.display({
     id: "decidedBy",
     header: "Decisión",
+    meta: { card: "actions" },
     cell: ({ row }) => quiet(freezeDecidedBy(row.original)),
   }),
 ];

@@ -17,6 +17,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { compactCard } from "../../test/compact-card";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 import { useNarrowViewport } from "../../test/viewport";
@@ -205,8 +206,8 @@ describe("AW13 Gastos on a narrow browser", () => {
     );
     renderAdmin("/dinero/gastos");
     const row = await rowOf("Reparación");
-    expect(
-      within(row).getByRole("cell", { name: "15/09/2026" }),
-    ).toHaveAttribute("data-label", "Fecha");
+    const card = compactCard(row);
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("15/09/2026");
   });
 });

@@ -73,10 +73,7 @@ function BranchCashCloses({
 
   return (
     <article className="flex flex-col gap-5">
-      <PageHeader
-        title="Cierres de caja"
-        subtitle={`Sucursal ${branch.name}`}
-      />
+      <PageHeader title="Caja" subtitle={`Sucursal ${branch.name}`} />
       <MonthStepper
         month={month}
         latest={latest}
@@ -126,7 +123,7 @@ export function CashClosesPage({
   if (selectedBranch === undefined) {
     return (
       <NoBranchPage
-        title="Cierres de caja"
+        title="Caja"
         pending={status === "pending"}
         loadingMessage="Cargando cierres de caja…"
         emptyMessage="Todavía no hay sucursales activas."

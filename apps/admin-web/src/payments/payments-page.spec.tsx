@@ -22,6 +22,7 @@ import {
   expectClientPhoto,
   herPhoto,
 } from "../test/client-photo-fixtures";
+import { compactCard } from "../test/compact-card";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -302,10 +303,11 @@ describe("AW28 Pagos on a narrow browser", () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))));
     renderAdmin("/dinero/pagos");
 
-    const plan = await screen.findByRole("cell", {
-      name: "Paquete de 8 clases",
-    });
-    expect(plan).toHaveAttribute("data-label", "Plan");
+    const card = compactCard(
+      (await screen.findByText("Paquete de 8 clases")).closest("tr")!,
+    );
+    expect(card).toMatchObject({ compact: true, labels: 0 });
+    expect(card.detail).toContain("Paquete de 8 clases");
     expect(
       screen.getByRole("searchbox", { name: "Buscar por cliente" }),
     ).toBeVisible();
