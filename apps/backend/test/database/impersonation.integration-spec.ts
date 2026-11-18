@@ -55,6 +55,7 @@ describe('Impersonation persistence (FUT-001)', () => {
       accountId: world.trainer.accountId,
       name: 'Camila Rojas',
       role: 'trainer',
+      gender: 'female',
       status: 'active',
     });
     await expect(

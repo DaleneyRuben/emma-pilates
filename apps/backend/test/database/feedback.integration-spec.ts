@@ -247,6 +247,7 @@ describe('Feedback (PostgreSQL)', () => {
       senderEmail: expect.any(String) as string,
       senderName: expect.any(String) as string,
       senderClientId: expect.any(String) as string,
+      senderGender: null,
       createdAt: sentAt,
       triagedAt: null,
     });
@@ -364,6 +365,8 @@ describe('Feedback (PostgreSQL)', () => {
       senderName: 'Camila Rojas',
       senderClientId: null,
       senderEmail: 'camila@example.com',
+      // FIX-081: «Entrenadora» or «Entrenador» in Comentarios.
+      senderGender: 'female',
     });
   });
 

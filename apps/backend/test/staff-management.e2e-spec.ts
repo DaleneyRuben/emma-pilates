@@ -173,16 +173,22 @@ describe('administrator staff members (e2e)', () => {
         email: 'rocio.paz@example.com',
         phone: null,
         role: 'trainer',
+        gender: 'female',
         branchIds: [centro],
       },
       expect.anything(),
     );
 
-    await request(app.getHttpServer())
-      .post('/api/v1/administrator/staff-members')
-      .set('authorization', bearer)
-      .send({ name: '', email: 'not-an-email', role: 'trainer', branchIds: [] })
-      .expect(400);
+    for (const body of [
+      { name: '', email: 'not-an-email', role: 'trainer', branchIds: [] },
+      { name: 'Ro', email: 'ro@example.com', role: 'trainer', gender: 'x' },
+    ]) {
+      await request(app.getHttpServer())
+        .post('/api/v1/administrator/staff-members')
+        .set('authorization', bearer)
+        .send({ branchIds: [], ...body })
+        .expect(400);
+    }
   });
 
   it('maps staff rules to stable problem codes', async () => {
@@ -320,7 +326,19 @@ describe('administrator staff members (e2e)', () => {
       expect.anything(),
     );
 
+    // FIX-081: the gender is optional here and kept when not sent.
+    await request(app.getHttpServer())
+      .put(`/api/v1/administrator/staff-members/${staffId}/contact`)
+      .set('authorization', bearer)
+      .send({ name: 'Rocío Paz', phone: null, gender: 'male' })
+      .expect(200);
+    expect(operations.changeContact).toHaveBeenLastCalledWith(
+      { staffMemberId: staffId, name: 'Rocío Paz', phone: null, gender: 'male' },
+      expect.anything(),
+    );
+
     for (const body of [
+      { name: 'Rocío', phone: null, gender: 'otro' },
       { name: '', phone: null },
       { name: 'Rocío', phone: null, email: 'otra@example.com' },
       { name: 'Rocío' },

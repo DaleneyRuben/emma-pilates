@@ -13,6 +13,7 @@ import {
   StaffManagementError,
   type StaffManagementDependencies,
 } from '../../src/booking/staff/staff-management';
+import { changeStaffContact } from '../../src/booking/staff/staff-contact';
 import {
   createPrismaStaffDirectory,
   PrismaStaffManagementUnitOfWork,
@@ -341,5 +342,39 @@ describe('Prisma staff management', () => {
       ),
       'last_administrator',
     );
+  });
+  // FIX-081 (finding 118): the gender says how a Role reads; existing
+  // members keep the feminine form the labels always used.
+  it('stores the gender at creation, corrects it, and reads feminine by default', async () => {
+    const created = await createStaffMember(
+      {
+        name: 'Mario Rojas',
+        email: 'mario.rojas@example.com',
+        phone: null,
+        role: 'coordinator',
+        gender: 'male',
+        branchIds: [],
+      },
+      paola,
+      dependencies(),
+    );
+    expect(created.gender).toBe('male');
+
+    const corrected = await changeStaffContact(
+      {
+        staffMemberId: created.id,
+        name: 'Mario Rojas',
+        phone: null,
+        gender: 'female',
+      },
+      paola,
+      dependencies(),
+    );
+    expect(corrected.gender).toBe('female');
+
+    const daniela = await createPrismaStaffDirectory(prisma).read(
+      staffId('daniela'),
+    );
+    expect(daniela?.gender).toBe('female');
   });
 });

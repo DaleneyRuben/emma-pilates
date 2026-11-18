@@ -42,6 +42,7 @@ describe('Staff profile read', () => {
       email: 'emma.vargas@example.com',
       phone: null,
       role: 'trainer',
+      gender: 'female',
       photo: null,
       branches: [
         expect.objectContaining({ name: 'Centro' }),
