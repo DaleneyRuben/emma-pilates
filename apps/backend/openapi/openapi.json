@@ -8881,6 +8881,20 @@
             }
           },
           {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "description": "Withdrawals when absent",
+            "schema": {
+              "enum": [
+                "withdrawal",
+                "restock",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "supplyId",
             "required": false,
             "in": "query",
@@ -18297,6 +18311,13 @@
             "type": "string",
             "format": "uuid"
           },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "withdrawal",
+              "restock"
+            ]
+          },
           "supplyId": {
             "type": "string",
             "format": "uuid"
@@ -18310,14 +18331,20 @@
           "recordedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "recordedByName": {
+            "type": "string",
+            "description": "Who recorded the movement"
           }
         },
         "required": [
           "id",
+          "kind",
           "supplyId",
           "supplyName",
           "quantity",
-          "recordedAt"
+          "recordedAt",
+          "recordedByName"
         ]
       },
       "WithdrawalTotalDto": {

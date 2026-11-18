@@ -67,11 +67,12 @@ export const everySupplyQueryOptions = (branchId: string) =>
 export const withdrawalHistoryQueryOptions = (
   branchId: string,
   month: string,
-  search: ListSearch & { supplyId?: string },
+  search: ListSearch & { supplyId?: string; kind?: "withdrawal" | "restock" },
 ) => {
   const params: ListAdminWithdrawalsParams = {
     branchId,
     month,
+    kind: search.kind ?? "all",
     page: search.page,
     pageSize: search.pageSize,
     ...(search.supplyId === undefined ? {} : { supplyId: search.supplyId }),
