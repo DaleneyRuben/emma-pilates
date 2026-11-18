@@ -18,6 +18,6 @@ env:
 - tapOn:
     id: "home-plan-card"
 - extendedWaitUntil:
-    visible: "Clases extra: .*"
+    visible: ".* de regalo \\(.*\\) · vence .*"
     timeout: 15000
 - takeScreenshot: fix064-mi-plan-clases-extra

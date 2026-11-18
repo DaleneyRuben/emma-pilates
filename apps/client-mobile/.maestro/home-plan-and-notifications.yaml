@@ -49,7 +49,7 @@ env:
 - tapOn:
     id: "home-plan-card"
 - extendedWaitUntil:
-    visible: "Renovación anticipada"
+    visible: "Renovar mi plan"
     timeout: 10000
 - assertVisible: "Renovar mi plan"
 - takeScreenshot: client-home-3-miplan
