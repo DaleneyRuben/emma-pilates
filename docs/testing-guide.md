@@ -10676,7 +10676,8 @@ on your own ports, and log in as Paola. Check each step at 1440 px and at
 A. **Horario, standing classes.** **Horario** on a week with classes. Every
    class is a white block with a thin border: the class type, «07:00 –
    08:00», the trainer's full name on her own line (with her photo when she
-   has one), then «4/10» or «Llena · 3 en espera». No pink fill, no amber
+   has one), then «4/10» or «Llena · 3 en espera» (a class shorter than an
+   hour puts it on the time line, «16:00 – 16:45 · Llena · 3 en espera»). No pink fill, no amber
    border, nothing cut off at 1440 px.
 B. **Short of Equipment.** Mark a Reformer as out of service (Test 82) so
    the week's 12-place Reformer classes have more places than working
@@ -10697,7 +10698,8 @@ D. **Inicio.** No brown «N pendientes» block. **Por resolver** is one white
    respuesta.». Below, two quiet cards: **Hoy** («2 clases · 1 reserva · 6 %
    ocupación» and each class, «18:00 Reformer Pilates · Daniela Ortiz (1 de
    8)», **Ver horario**) and **Cobrado hoy** («Bs 0», «Efectivo Bs 0 · QR Bs 0
-   · ninguno por revisar», **Ver pagos**). Carolina sees **Clientas** instead
+   · ninguno por revisar», or «2 QR por revisar, aún no cuentan», **Ver
+   pagos**). Carolina sees **Clientas** instead
    of Cobrado hoy and no Descartar.
 E. **Recomendaciones.** In **Informes**, press **Recalcular** so the month
    has findings. Back on Inicio: one row per trainer, «Revisa el horario de
@@ -10705,17 +10707,20 @@ E. **Recomendaciones.** In **Informes**, press **Recalcular** so the month
    for every client, «Contacta a 3 clientas con plan vigente que no
    reservaron» with their names. Resolved and discarded findings are not
    shown, at most three rows, and **Ver las N** (N the open findings) opens
-   Informes. **Descartar** on a trainer's row discards every weekday of hers
-   at once; Informes then lists them as «Descartada».
+   Informes (with nothing to show, «Ir a Informes»). **Descartar** on a
+   trainer's row discards every weekday of hers at once; Informes then lists
+   them as «Descartada». If some fail: «No pudimos descartar 1 de las 2
+   recomendaciones.».
 F. **Sueldos.** **Dinero › Sueldos › Por aprobar** on the current month.
    One control «‹ Noviembre de 2026 ›» with **Otro período**, and one line
    «Noviembre cierra el 30. Para pagarle antes a una instructora, elige
-   «Otro período».». Each person still to approve has a white card: name,
+   «Otro período».» (on the 1st only «Noviembre cierra el 30.»; **Otro
+   período** then opens the whole month). Each person still to approve has a white card: name,
    «Entrenadora · Noviembre de 2026» (her Role in her gender), the total
    large, one line per concept, **Ver las N líneas**, and a solid **Aprobar
    Bs …**. Until it can be approved the button is grey: «Se aprueba desde el
-   1 de diciembre», and the Coordinator's card adds «Su bono espera las
-   renovaciones» with «… el 8 de diciembre». At 1440 px the cards sit two
+   1 de diciembre», and the Coordinator's card («Coordinadora · …») adds
+   «Su bono espera las renovaciones» with «… el 8 de diciembre». At 1440 px the cards sit two
    per row, at 420 px one.
 G. **Approved people leave Por aprobar.** Approve one person (with the
    receipt photo, Test 171). Her card goes away, the notice says
