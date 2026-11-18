@@ -68,6 +68,7 @@ describe("Horario (v2 HOR boards)", () => {
     ).toBeOnTheScreen();
     expect(screen.getByText("6 de 12 lugares")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar para una clienta" })).toBeNull();
+    expect(screen.queryByTestId("icon-row-disc")).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
     await waitFor(() =>
