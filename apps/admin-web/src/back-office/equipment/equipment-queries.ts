@@ -22,6 +22,7 @@ import {
   type EquipmentInputDto,
   type EquipmentIssuePageDto,
   type EquipmentListDto,
+  type EquipmentStockDto,
   type EquipmentStockInputDto,
   type EquipmentStockListDto,
   type EquipmentTypeInputDto,
@@ -30,6 +31,7 @@ import {
 import {
   queryOptions,
   useMutation,
+  useQuery,
   useQueryClient,
   type QueryClient,
 } from "@tanstack/react-query";
@@ -71,6 +73,15 @@ export const branchStocksQueryOptions = (branchId: string) =>
           .data as EquipmentStockListDto
       ).items,
   });
+
+/** A stock as the Branch's list has it now, or the panel's snapshot. */
+export function useBranchStock(
+  branchId: string,
+  snapshot: EquipmentStockDto,
+): EquipmentStockDto {
+  const { data } = useQuery(branchStocksQueryOptions(branchId));
+  return data?.find((row) => row.typeId === snapshot.typeId) ?? snapshot;
+}
 
 // A Branch has a handful of machines, so one page of 100 faults is the list.
 export const branchIssuesQueryOptions = (
@@ -158,10 +169,11 @@ const send = async (change: EquipmentChange): Promise<unknown> => {
 };
 
 // AW37: every change to one Branch's Equipment, its types and its faults.
+// A refusal refreshes too: it usually means the lists moved meanwhile.
 export function useEquipmentChange(branchId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: send,
-    onSuccess: () => refreshBranchEquipment(queryClient, branchId),
+    onSettled: () => refreshBranchEquipment(queryClient, branchId),
   });
 }

@@ -11,7 +11,7 @@ import { Label } from "../../components/ui/label";
 import { backOfficeProblem } from "../back-office-problems";
 import { DescriptionField, Failure, fieldError } from "./equipment-forms";
 import { damagedLabel, parseQuantity } from "./equipment-format";
-import { useEquipmentChange } from "./equipment-queries";
+import { useBranchStock, useEquipmentChange } from "./equipment-queries";
 
 function Stepper({
   value,
@@ -74,7 +74,7 @@ function Stepper({
 // what happened; it is an open fault like a machine's.
 export function DamageForm({
   branchId,
-  stock,
+  stock: snapshot,
   onDone,
 }: {
   branchId: string;
@@ -82,15 +82,18 @@ export function DamageForm({
   onDone: (notice: string) => void;
 }) {
   const change = useEquipmentChange(branchId);
+  const stock = useBranchStock(branchId, snapshot);
   const descriptionId = useId();
   const [count, setCount] = useState(1);
   const [description, setDescription] = useState("");
   const [descriptionError, setDescriptionError] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const [exceeds, setExceeds] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
+    setExceeds(false);
     const text = description.trim();
     if (text === "") {
       setDescriptionError("Cuenta qué pasó.");
@@ -110,11 +113,11 @@ export function DamageForm({
       onDone(`Registramos ${damagedLabel(count)} en ${stock.typeName}.`);
     } catch (error) {
       const problem = backOfficeProblem(error);
-      setFailure(
-        problem.code === "equipment_damage_exceeds_usable"
-          ? `Solo hay ${stock.usable} que se pueden usar.`
-          : problem.message,
-      );
+      if (problem.code === "equipment_damage_exceeds_usable") {
+        setExceeds(true);
+      } else {
+        setFailure(problem.message);
+      }
     }
   };
 
@@ -129,7 +132,11 @@ export function DamageForm({
           error={descriptionError}
           onChange={setDescription}
         />
-        <Failure message={failure} />
+        <Failure
+          message={
+            exceeds ? `Solo hay ${stock.usable} que se pueden usar.` : failure
+          }
+        />
       </SidePanelBody>
       <SidePanelFooter>
         <Button type="submit" size="lg" busy={change.isPending}>
@@ -144,7 +151,7 @@ export function DamageForm({
 // never below the open damage.
 export function QuantityForm({
   branch,
-  stock,
+  stock: snapshot,
   onDone,
 }: {
   branch: { id: string; name: string };
@@ -152,25 +159,31 @@ export function QuantityForm({
   onDone: (notice: string) => void;
 }) {
   const change = useEquipmentChange(branch.id);
+  const stock = useBranchStock(branch.id, snapshot);
   const quantityId = useId();
-  const [quantity, setQuantity] = useState(String(stock.quantity));
-  const [error, setError] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(String(snapshot.quantity));
+  const [problem, setProblem] = useState<"invalid" | "below" | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
-  const belowDamaged = `No puede ser menor que los dañados (${stock.damaged}).`;
+  const error =
+    problem === "invalid"
+      ? "Escribe una cantidad del 0 al 9999."
+      : problem === "below"
+        ? `No puede ser menor que los dañados (${stock.damaged}).`
+        : null;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
     const count = quantity === "" ? null : parseQuantity(quantity);
     if (count === null) {
-      setError("Escribe una cantidad del 0 al 9999.");
+      setProblem("invalid");
       return;
     }
     if (count < stock.damaged) {
-      setError(belowDamaged);
+      setProblem("below");
       return;
     }
-    setError(null);
+    setProblem(null);
     try {
       await change.mutateAsync({
         kind: "set-stock",
@@ -178,11 +191,11 @@ export function QuantityForm({
       });
       onDone(`${stock.typeName}: ahora son ${count}.`);
     } catch (refusal) {
-      const problem = backOfficeProblem(refusal);
-      if (problem.code === "equipment_quantity_below_damaged") {
-        setError(belowDamaged);
+      const answer = backOfficeProblem(refusal);
+      if (answer.code === "equipment_quantity_below_damaged") {
+        setProblem("below");
       } else {
-        setFailure(problem.message);
+        setFailure(answer.message);
       }
     }
   };
