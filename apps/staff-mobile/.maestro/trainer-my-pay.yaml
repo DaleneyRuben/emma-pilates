@@ -30,16 +30,8 @@ env:
             id: "pay-statement"
           timeout: 10000
       - takeScreenshot: fix111-liquidacion
-      - tapOn: "Ver cada clase"
-      # A statement may hold dozens of lines: the fold link ends up below them.
-      - scrollUntilVisible:
-          element: "Ocultar detalle"
-          timeout: 60000
-          speed: 80
-      - takeScreenshot: mob073-ver-cada-clase
-      - tapOn: "Ocultar detalle"
-      - assertVisible: "Ver cada clase"
-      # BKO-008: a payment with a receipt opens it full screen.
+      # BKO-008: the payment strip sits near the top, before the classes
+      # unfold; a receipt opens full screen.
       - runFlow:
           when:
             visible: "Ver el comprobante del pago.*"
@@ -50,6 +42,16 @@ env:
                 timeout: 15000
             - takeScreenshot: bko008-comprobante
             - tapOn: "Cerrar"
-            - assertVisible: "Ver cada clase"
+            - assertVisible:
+                id: "pay-statement"
+      - tapOn: "Ver cada clase"
+      # A statement may hold dozens of lines: the fold link ends up below them.
+      - scrollUntilVisible:
+          element: "Ocultar detalle"
+          timeout: 60000
+          speed: 80
+      - takeScreenshot: mob073-ver-cada-clase
+      - tapOn: "Ocultar detalle"
+      - assertVisible: "Ver cada clase"
       - tapOn: "Volver"
       - assertVisible: "Historial"
