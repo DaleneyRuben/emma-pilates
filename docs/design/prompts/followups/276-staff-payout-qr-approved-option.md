@@ -35,13 +35,18 @@ As `Telefono.dc.html` draws it:
 - Uploading: the sheet «Sube tu QR de cobro» with «Elegir de la galería»,
   «Tomar foto», «Cancelar»; then the sheet **«¿Hasta cuándo vale?»** with the
   photo's thumbnail, «Lo dice tu banco al generar el QR.», a calendar (days
-  from tomorrow), «Vale hasta el 15/01/2027. Te avisaremos 7 días antes y ese
-  día.», **Guardar QR** and «Cancelar». After saving: «Guardamos tu QR. Vale
+  from tomorrow), «Vale hasta el 15/01/2027. Te avisaremos 7 días antes y cuando
+  venza.», **Guardar QR** and «Cancelar». After saving: «Guardamos tu QR. Vale
   hasta el 15/01/2027.»
-- Reminders, push and inbox, opening this screen: «Tu QR de cobro vence
-  pronto» / «Tu QR de cobro vence el 5/12, sube uno nuevo.» seven days
-  before; «Tu QR de cobro venció» / «Tu QR de cobro venció hoy, sube uno
-  nuevo para que podamos pagarte.» on the day.
+- The date is the last day the QR works: «Vale hasta el 15/12» still pays
+  on the 15th, and it counts as expired from the 16th (this reads 275's «on
+  the day» precisely).
+- Reminders, push and inbox, opening this screen, once each: «Tu QR de
+  cobro vence pronto» / «Tu QR de cobro vence el 15/12, sube uno nuevo.»
+  seven days before the last day (from the 8th); «Tu QR de cobro venció» /
+  «Tu QR de cobro venció el 15/12, sube uno nuevo para que podamos
+  pagarte.» the first day it no longer works (the 16th). A new QR starts its
+  own reminders and the old one's stop.
 
 ## Admin web
 
