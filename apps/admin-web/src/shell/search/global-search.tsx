@@ -107,7 +107,10 @@ export function GlobalSearch({ className }: { className?: string }) {
               setActive((current - 1 + results.length) % results.length);
             } else if (open && event.key === "Enter") {
               event.preventDefault();
-              const result = results[current];
+              // Matches for older words must not open the wrong Clienta.
+              const result = matches.settled
+                ? results[current]
+                : ({ kind: "all", words } as const);
               if (result !== undefined) choose(result);
             }
           }}
