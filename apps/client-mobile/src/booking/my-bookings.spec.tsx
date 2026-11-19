@@ -265,10 +265,15 @@ describe("Client My Bookings", () => {
         { targetSessionId: "session-alt" },
         expect.stringMatching(/^[0-9a-f-]{36}$/),
       );
-      expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
+      // FIX-090 (states review Y8): a change says the class moved, with its
+      // new day and time, and does not count the plan again.
+      expect(screen.getByText("Clase cambiada")).toBeOnTheScreen();
     });
+    expect(screen.getByText(/^Reformer Pilates · \S+ \d+ \S+ · \d{2}:\d{2}$/)).toBeOnTheScreen();
+    expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    expect(screen.queryByText(/Te quedan/)).toBeNull();
 
-    // MOB-074 walk: once that Booking is cancelled, «Reserva confirmada» no
+    // MOB-074 walk: once that Booking is cancelled, the change's notice no
     // longer holds, so the toast goes with it.
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
     await waitFor(() => {
@@ -278,7 +283,7 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen();
     });
-    expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    expect(screen.queryByText("Clase cambiada")).toBeNull();
   });
 
   // MOB-070: a double tap must replay the same Reschedule, as Reservar and
