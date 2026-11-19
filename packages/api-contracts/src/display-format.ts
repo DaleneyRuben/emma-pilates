@@ -99,23 +99,19 @@ export function formatDateTime(input: DateInput): string {
     : `${formatListDate(input)} · ${date.time}`;
 }
 
-const withDecimals = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2,
-  useGrouping: "always",
-});
-const whole = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 0,
-  useGrouping: "always",
-});
+// Grouped by hand: Hermes may read `useGrouping: "always"` as `true`, and
+// Spanish then groups only from 10.000 («Bs 1534,90»).
+function grouped(whole: number): string {
+  return String(whole).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 
 /** «Bs 1.534,90», and «Bs 450» when the decimals are ,00. Amounts are centavos. */
 export function formatMoney(centavos: number): string {
   const absolute = Math.abs(Math.round(centavos));
+  const units = grouped(Math.floor(absolute / 100));
+  const cents = absolute % 100;
   const text =
-    absolute % 100 === 0
-      ? whole.format(absolute / 100)
-      : withDecimals.format(absolute / 100);
+    cents === 0 ? units : `${units},${String(cents).padStart(2, "0")}`;
   return `${centavos < 0 ? "−" : ""}Bs ${text}`;
 }
 
