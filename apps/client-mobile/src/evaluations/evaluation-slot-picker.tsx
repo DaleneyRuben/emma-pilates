@@ -5,7 +5,7 @@ import {
   dayChipLabel,
   formatBolivianos,
   fontFamilies,
-  initials,
+  PersonAvatar,
   radii,
   spacing,
   surfaces,
@@ -34,9 +34,7 @@ export const openDays = (
 function NutritionistCard({ branchName, name }: { branchName: string; name: string }) {
   return (
     <View style={styles.nutritionist}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{initials(name)}</Text>
-      </View>
+      <PersonAvatar name={name} photoUri={null} size={44} />
       <View>
         <Text style={styles.nutritionistName}>{name}</Text>
         <BodyText style={styles.muted}>{`Nutricionista · 45 min · ${branchName}`}</BodyText>
@@ -143,15 +141,6 @@ export function EvaluationSlotPicker({
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 44,
-    justifyContent: "center",
-    width: 44,
-  },
-  avatarText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 16 },
   // C13's day chips match Reservar's: 48 × 60 on Lino, the chosen one Palo de rosa.
   day: {
     alignItems: "center",

@@ -2,8 +2,7 @@ import type { ReferredClientDto } from "@pilates/api-contracts";
 import {
   colors,
   fontFamilies,
-  initials,
-  radii,
+  PersonAvatar,
   SectionTitle,
   spacing,
   surfaces,
@@ -55,9 +54,7 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
         <Fragment key={entry.referredClientId}>
           {index === 0 ? null : <View style={styles.hairline} />}
           <View style={styles.row}>
-            <View style={styles.disc}>
-              <Text style={styles.discText}>{initials(entry.referredName)}</Text>
-            </View>
+            <PersonAvatar name={entry.referredName} photoUri={null} size={36} />
             <Text style={styles.label}>{entry.referredName}</Text>
             <Text style={styles.value}>{invitationStatus[entry.invitationStatus]}</Text>
           </View>
@@ -68,20 +65,11 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  discText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 15 },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
   limits: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
     marginTop: spacing.md,
@@ -100,5 +88,5 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingHorizontal: spacing.lg,
   },
-  value: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  value: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
 });

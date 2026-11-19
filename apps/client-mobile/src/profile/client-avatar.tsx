@@ -1,8 +1,9 @@
-import { colors, initials, radii, typography } from "@pilates/mobile-core";
+import { colors, fontFamilies, initials, radii } from "@pilates/mobile-core";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 // The Perfil avatar (18, 22): the photo centre-cropped by the circle, or the
-// initials on the tint when the Client has none (prompt 22, follow-up 60 §1).
+// initials when the Client has none (prompt 22, follow-up 60 §1): bold Crema
+// on Palo de rosa, like every initials circle in palette B (FIX-089).
 export function ClientAvatar({
   name,
   photoUri,
@@ -35,14 +36,14 @@ export function ClientAvatar({
 const styles = StyleSheet.create({
   avatar: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.emphasis,
     borderRadius: radii.pill,
     justifyContent: "center",
   },
   avatarText: {
-    color: colors.primaryOnTint,
-    fontSize: typography.bodyLarge,
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
     fontWeight: "600",
   },
-  photo: { backgroundColor: colors.primaryTint },
+  photo: { backgroundColor: colors.emphasis },
 });

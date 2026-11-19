@@ -6,7 +6,6 @@ import {
   FormField,
   Glyph,
   type InvoiceChoice,
-  radii,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -36,8 +35,8 @@ export function InvoiceDisclosure({
         style={styles.row}
         testID="invoice-disclosure"
       >
-        <View style={styles.disc}>
-          <Glyph name="receipt" size={18} strokeWidth={1.5} />
+        <View style={styles.icon}>
+          <Glyph color={colors.text} name="receipt" size={20} strokeWidth={1.5} />
         </View>
         <Text style={styles.label}>¿Necesitas factura?</Text>
         <Chevron direction={open ? "up" : "down"} size={16} strokeWidth={1.5} tone="muted" />
@@ -77,14 +76,8 @@ export function InvoiceDisclosure({
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the glyph alone, no tinted disc.
+  icon: { alignItems: "center", justifyContent: "center", width: 24 },
   fields: { gap: spacing.md, paddingBottom: spacing.lg, paddingHorizontal: spacing.lg },
   label: {
     color: colors.text,
@@ -92,7 +85,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.body,
     fontSize: typography.bodyMedium,
   },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
     alignItems: "center",
     flexDirection: "row",

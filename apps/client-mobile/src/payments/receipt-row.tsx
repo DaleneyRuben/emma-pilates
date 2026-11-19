@@ -36,8 +36,8 @@ export function ReceiptRow({
         style={styles.row}
         testID={testID}
       >
-        <View style={styles.disc}>
-          <Glyph name="upload" size={18} strokeWidth={1.5} />
+        <View style={styles.icon}>
+          <Glyph color={colors.text} name="upload" size={20} strokeWidth={1.5} />
         </View>
         <View style={styles.body}>
           <Text style={styles.label}>
@@ -74,7 +74,7 @@ export function ReceiptRow({
         onPress={onRemove}
         style={styles.remove}
       >
-        <Glyph color={colors.textMuted} name="cross" size={16} strokeWidth={1.6} />
+        <Glyph color={colors.text} name="cross" size={16} strokeWidth={1.6} />
       </Pressable>
     </View>
   );
@@ -83,16 +83,10 @@ export function ReceiptRow({
 const styles = StyleSheet.create({
   attached: { alignItems: "center", flex: 1, flexDirection: "row", gap: spacing.md },
   body: { flex: 1, gap: spacing.xxs },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the glyph alone, no tinted disc.
+  icon: { alignItems: "center", justifyContent: "center", width: 24 },
   label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   remove: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   row: {
     alignItems: "center",
