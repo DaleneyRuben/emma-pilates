@@ -159,7 +159,7 @@ describe("Client Reservar, palette B", () => {
       fontFamily: "WorkSans_600SemiBold",
       fontWeight: "600" as const,
     };
-    expect(rows[0].getByText("5 de 12 lugares")).toHaveStyle(seats);
+    expect(rows[0].getByText("5 de 12")).toHaveStyle(seats);
     expect(rows[1].getByText("Quedan 2 lugares")).toHaveStyle(seats);
     expect(rows[2].getByText("Lleno")).toHaveStyle(seats);
     expect(rows[0].getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });

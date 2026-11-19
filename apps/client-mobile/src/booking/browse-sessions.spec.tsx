@@ -125,7 +125,7 @@ describe("Client Browse Sessions", () => {
       ).toBeOnTheScreen();
     });
     expect(screen.getAllByText("Emma Vargas · 50 min")).toHaveLength(2);
-    expect(screen.getByText("9 de 12 lugares")).toBeOnTheScreen();
+    expect(screen.getByText("9 de 12")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
     expect(screen.queryByText(/clases esta semana/)).not.toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();

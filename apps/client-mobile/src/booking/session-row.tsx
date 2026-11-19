@@ -20,7 +20,19 @@ const fewSeats = 2;
 export function seatsLabel(seats: Seats): string {
   const few = seats.availableSeats > 0 && seats.availableSeats <= fewSeats;
   if (!few) return seatsTag(seats);
+  return fewSeatsLabel(seats);
+}
+
+function fewSeatsLabel(seats: Seats): string {
   return seats.availableSeats === 1 ? "Queda 1 lugar" : `Quedan ${seats.availableSeats} lugares`;
+}
+
+/** The row says the places short, «9 de 12», as ClaseE draws them. */
+function rowPlaces(seats: Seats): string {
+  const label = seatsLabel(seats);
+  return label === seatsTag(seats) && seats.availableSeats > 0
+    ? `${seats.bookedCount} de ${seats.capacity}`
+    : label;
 }
 
 function durationMinutes(startsAt: string, endsAt: string): number {
@@ -58,7 +70,7 @@ export function SessionRow({
       detailLead={trainerFace}
       detailLines={1}
       onPress={onPress}
-      places={seatsLabel(session)}
+      places={rowPlaces(session)}
       testID={testID}
       time={formatStartTime(session.startsAt)}
       title={session.classTypeName}
