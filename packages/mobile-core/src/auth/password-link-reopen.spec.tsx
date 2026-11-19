@@ -57,4 +57,23 @@ describe("an activation link checked again", () => {
     await waitFor(() => expect(screen.getByText("Este enlace ya no es válido")).toBeOnTheScreen());
     expect(screen.queryByLabelText("Contraseña nueva")).toBeNull();
   });
+
+  it("keeps a good link when a check on return fails to reach the server", async () => {
+    let onChange: ((state: AppStateStatus) => void) | undefined;
+    jest.spyOn(AppState, "addEventListener").mockImplementation((_type, listener) => {
+      onChange = listener as (state: AppStateStatus) => void;
+      return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>;
+    });
+    const api = apiAnswering(current);
+    (api.inspectLink as jest.Mock).mockRejectedValueOnce(new TypeError("Network request failed"));
+    const screen = await render(
+      <AuthenticationFlow api={api} intent={{ token: "link-token", type: "activate-account" }} />,
+    );
+    expect(await screen.findByText("Crea tu contraseña")).toBeOnTheScreen();
+
+    await act(async () => onChange?.("active"));
+
+    expect(screen.getByLabelText("Contraseña nueva")).toBeOnTheScreen();
+    expect(screen.queryByText("Este enlace ya no es válido")).toBeNull();
+  });
 });
