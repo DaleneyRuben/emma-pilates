@@ -1,65 +1,40 @@
+import type { AdminClientDto } from "@pilates/api-contracts";
 import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import type { AdminPath, Destination } from "../../app/navigation";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "../../lib/cn";
-import { useRail } from "../rail/use-rail";
+import { ClientResult } from "./client-result";
+import { useClientMatches } from "./use-client-matches";
 
 type Result =
-  | { kind: "page"; label: string; to: AdminPath }
-  | { kind: "clients"; label: string; query: string };
-
-// Accents and case aside, so «nutricion» finds Nutrición.
-const folded = (text: string): string =>
-  text
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase();
-
-const pagesOf = (destinations: readonly Destination[]) =>
-  destinations.flatMap((destination) =>
-    destination.tabs.flatMap((tab) =>
-      [tab, ...(tab.views ?? [])].map((page) => ({
-        to: page.to,
-        label:
-          destination.tabs.length === 1 && tab.views === undefined
-            ? destination.label
-            : `${destination.label} · ${page.label}`,
-      })),
-    ),
-  );
-
-const maxPages = 6;
+  { kind: "client"; client: AdminClientDto } | { kind: "all"; words: string };
 
 /**
- * Follow-up 232's global search, Ctrl K: the pages the Role may open match
- * by name, and the last result searches Clientas for the words. Classes and
- * payments answer here once their pages search by text.
+ * Follow-up 232's global search, Ctrl K, narrowed by FIX-091 (W9 B) to
+ * Clientas: her matches answer while typing and open her file; the last
+ * result lists every match in Clientas. Classes and payments are searched in
+ * Horario, Pagos and her file.
  */
 export function GlobalSearch({ className }: { className?: string }) {
   const navigate = useNavigate();
-  const { destinations } = useRail();
   const input = useRef<HTMLInputElement>(null);
   const listId = useId();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
-  const pages = useMemo(() => pagesOf(destinations), [destinations]);
-
   const words = query.trim();
+  const matches = useClientMatches(words);
+
   const results: Result[] =
-    words === ""
+    matches.clients.length === 0
       ? []
       : [
-          ...pages
-            .filter((page) => folded(page.label).includes(folded(words)))
-            .slice(0, maxPages)
-            .map((page) => ({ kind: "page" as const, ...page })),
-          {
-            kind: "clients",
-            label: `Buscar «${words}» en Clientas`,
-            query: words,
-          },
+          ...matches.clients.map((client) => ({
+            kind: "client" as const,
+            client,
+          })),
+          { kind: "all", words },
         ];
+  const current = Math.min(active, Math.max(results.length - 1, 0));
 
   useEffect(() => {
     const focusOnCtrlK = (event: KeyboardEvent) => {
@@ -78,11 +53,24 @@ export function GlobalSearch({ className }: { className?: string }) {
   };
   const choose = (result: Result) => {
     close();
-    if (result.kind === "page") void navigate({ to: result.to });
-    else void navigate({ to: "/clientas", search: { q: result.query } });
+    if (result.kind === "all") {
+      void navigate({ to: "/clientas", search: { q: result.words } });
+    } else {
+      // Searched by her email, so Clientas lists her and opens her file
+      // (walkthrough finding 88).
+      void navigate({
+        to: "/clientas",
+        search: { q: result.client.email, cliente: result.client.id },
+      });
+    }
   };
   const optionId = (index: number) => `${listId}-${index}`;
   const open = results.length > 0;
+  const status = (() => {
+    if (words === "" || open) return null;
+    if (matches.failed) return "No pudimos buscar. Inténtalo de nuevo.";
+    return matches.settled ? `Ninguna clienta con «${words}»` : "Buscando…";
+  })();
 
   return (
     <div className={cn("relative", className)}>
@@ -96,12 +84,12 @@ export function GlobalSearch({ className }: { className?: string }) {
         <input
           ref={input}
           role="combobox"
-          aria-label="Buscar en todo"
+          aria-label="Buscar una clienta"
           aria-expanded={open}
           aria-controls={listId}
           aria-autocomplete="list"
-          aria-activedescendant={open ? optionId(active) : undefined}
-          placeholder="Buscar una clienta, una clase, un pago o una página"
+          aria-activedescendant={open ? optionId(current) : undefined}
+          placeholder="Buscar una clienta"
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
@@ -113,15 +101,13 @@ export function GlobalSearch({ className }: { className?: string }) {
               close();
             } else if (open && event.key === "ArrowDown") {
               event.preventDefault();
-              setActive((index) => (index + 1) % results.length);
+              setActive((current + 1) % results.length);
             } else if (open && event.key === "ArrowUp") {
               event.preventDefault();
-              setActive(
-                (index) => (index - 1 + results.length) % results.length,
-              );
+              setActive((current - 1 + results.length) % results.length);
             } else if (open && event.key === "Enter") {
               event.preventDefault();
-              const result = results[active];
+              const result = results[current];
               if (result !== undefined) choose(result);
             }
           }}
@@ -131,34 +117,50 @@ export function GlobalSearch({ className }: { className?: string }) {
           Ctrl K
         </kbd>
       </label>
-      {open ? (
-        <ul
-          id={listId}
-          role="listbox"
-          aria-label="Resultados"
-          className="absolute inset-x-0 top-[calc(100%+8px)] z-50 flex flex-col rounded-marco bg-superficie p-2 shadow-popover"
-        >
-          {results.map((result, index) => (
-            <li
-              key={result.kind === "page" ? result.to : "clientas"}
-              id={optionId(index)}
-              role="option"
-              aria-selected={index === active}
-              // The input keeps focus, so its blur does not close the list
-              // before the click lands.
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => choose(result)}
-              className={cn(
-                "flex min-h-11 cursor-pointer items-center rounded-[10px] px-3 text-cuerpo text-texto",
-                index === active && "bg-rosa-tinte text-rosa-enlace",
-                result.kind === "clients" && "font-medium",
-              )}
+      {words === "" ? null : (
+        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 flex flex-col gap-1 rounded-marco bg-superficie p-2 shadow-popover">
+          <p className="px-3 pt-1 text-nota text-texto-tenue">
+            Busca clientas por nombre, celular o correo
+          </p>
+          {status === null ? null : (
+            <p role="status" className="px-3 py-2 text-cuerpo text-texto">
+              {status}
+            </p>
+          )}
+          {open ? (
+            <ul
+              id={listId}
+              role="listbox"
+              aria-label="Clientas"
+              className="flex flex-col"
             >
-              {result.label}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+              {results.map((result, index) => (
+                <li
+                  key={result.kind === "client" ? result.client.id : "all"}
+                  id={optionId(index)}
+                  role="option"
+                  aria-selected={index === current}
+                  // The input keeps focus, so its blur does not close the
+                  // list before the click lands.
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => choose(result)}
+                  className={cn(
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-[10px] px-3 py-1.5 text-cuerpo",
+                    index === current && "bg-rosa-tinte",
+                    result.kind === "all" && "font-medium text-rosa-enlace",
+                  )}
+                >
+                  {result.kind === "client" ? (
+                    <ClientResult client={result.client} />
+                  ) : (
+                    `Ver todas las clientas con «${result.words}»`
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

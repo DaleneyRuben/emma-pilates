@@ -244,7 +244,7 @@ export const createPrismaFeedbackStore = (
         ...(status === undefined ? {} : { status: statuses[status] }),
         ...(app === undefined ? {} : { app: apps[app] }),
       };
-      const [records, totalItems, newCount] = await Promise.all([
+      const [records, totalItems, perStatus] = await Promise.all([
         prisma.feedback.findMany({
           where,
           select: feedbackSelect,
@@ -253,16 +253,23 @@ export const createPrismaFeedbackStore = (
           take: pageSize,
         }),
         prisma.feedback.count({ where }),
-        prisma.feedback.count({
-          where: { deletedAt: null, status: PrismaFeedbackStatus.NEW },
+        prisma.feedback.groupBy({
+          by: ['status'],
+          where: { deletedAt: null },
+          _count: { _all: true },
         }),
       ]);
+      const countOf = (wanted: FeedbackStatus) =>
+        perStatus.find((group) => group.status === statuses[wanted])?._count
+          ._all ?? 0;
       return {
         items: records.map(toRow),
         page,
         pageSize,
         totalItems,
-        newCount,
+        newCount: countOf('new'),
+        reviewedCount: countOf('reviewed'),
+        resolvedCount: countOf('resolved'),
       };
     },
 

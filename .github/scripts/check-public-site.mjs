@@ -2,8 +2,9 @@
 // have no build, so nothing checked them before they published. This checks
 // what a broken page would break: `_headers` is present and names the
 // security headers, every page is a complete HTML document in Spanish with
-// a title and a description, and every site-relative link, stylesheet, and
-// image resolves to a file in the folder. Run from anywhere:
+// a title and a description, carries the shared header, and every
+// site-relative link, stylesheet, and image resolves to a file in the
+// folder. Run from anywhere:
 // node .github/scripts/check-public-site.mjs
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -63,6 +64,26 @@ for (const page of found) {
   for (const [pattern, message] of checks) {
     if (!pattern.test(html)) problems.push(`${name} ${message}`);
   }
+  // FIX-091 (W15 B): every page carries the same header, the brand and
+  // Soporte · Privacidad · Cerrar mi cuenta, in that order.
+  const nav =
+    /<nav class="navegacion" aria-label="Páginas">([\s\S]*?)<\/nav>/.exec(html);
+  const links = [
+    ...(nav?.[1] ?? "").matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g),
+  ]
+    .map(([, href, label]) => `${href} ${label}`)
+    .join(", ");
+  if (
+    links !==
+    "/soporte Soporte, /privacidad Privacidad, /eliminar-cuenta Cerrar mi cuenta"
+  )
+    problems.push(`${name} does not carry the shared header links`);
+  if (
+    !/<a class="marca" href="\/"[^>]*>Emma <span>Pilates Studio<\/span><\/a>/.test(
+      html,
+    )
+  )
+    problems.push(`${name} does not carry the brand in the header`);
   for (const [, target] of html.matchAll(/\b(?:href|src)="(\/[^"#?]*)/g)) {
     if (!resolves(target))
       problems.push(`${name} links to ${target}, which does not exist`);

@@ -148,6 +148,12 @@ export class AdminFeedbackPageDto {
 
   @ApiProperty({ minimum: 0, description: 'Every Feedback still «Nuevo»' })
   newCount!: number;
+
+  @ApiProperty({ minimum: 0, description: 'Every Feedback «Revisado»' })
+  reviewedCount!: number;
+
+  @ApiProperty({ minimum: 0, description: 'Every Feedback «Resuelto»' })
+  resolvedCount!: number;
 }
 
 export class AdminFeedbackExportDto {

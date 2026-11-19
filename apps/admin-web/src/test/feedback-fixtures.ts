@@ -56,4 +56,6 @@ export const feedbackPage = (
   pageSize: 20,
   totalItems,
   newCount,
+  reviewedCount: items.filter((item) => item.status === "reviewed").length,
+  resolvedCount: items.filter((item) => item.status === "resolved").length,
 });

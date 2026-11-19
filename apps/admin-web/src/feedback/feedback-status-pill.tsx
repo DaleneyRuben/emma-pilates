@@ -2,18 +2,12 @@ import type { AdminFeedbackDtoStatus } from "@pilates/api-contracts";
 import { StatusPill } from "../components/ui/status-pill";
 import { statusLabels } from "./feedback-format";
 
-// AW38: «Nuevo» waits for someone (Advertencia), «Revisado» is read
-// (neutral), «Resuelto» changed something (Éxito).
-const tones = {
-  new: "advertencia",
-  reviewed: "neutral",
-  resolved: "exito",
-} as const;
-
+// AW38: the status as a plain word; FIX-091 (W3 B) took the pill off «Nuevo»,
+// the counters on top already say how many wait.
 export function FeedbackStatusPill({
   status,
 }: {
   status: AdminFeedbackDtoStatus;
 }) {
-  return <StatusPill tone={tones[status]}>{statusLabels[status]}</StatusPill>;
+  return <StatusPill tone="neutral">{statusLabels[status]}</StatusPill>;
 }

@@ -85,7 +85,10 @@ export type FeedbackPage = {
   page: number;
   pageSize: number;
   totalItems: number;
+  /** Every live Feedback in each status, whatever the filters (FIX-091). */
   newCount: number;
+  reviewedCount: number;
+  resolvedCount: number;
 };
 
 export type FeedbackListQuery = {
