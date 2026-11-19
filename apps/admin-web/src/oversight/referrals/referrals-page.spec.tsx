@@ -208,7 +208,10 @@ describe("AW26 Referidos on a desktop browser", () => {
       within(table).getByRole("columnheader", { name: "Fecha de registro" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Sin resultados")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
   });
 
   it("says when the studio has no Referrals yet", async () => {

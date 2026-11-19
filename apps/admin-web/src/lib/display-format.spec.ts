@@ -20,7 +20,9 @@ describe("shared display formats", () => {
 
   it("writes a list date as «jue 19 nov»", () => {
     expect(formatListDate("2026-11-19")).toBe("jue 19 nov");
-    expect(formatListDate(new Date("2026-11-20T02:00:00.000Z"))).toBe("jue 19 nov");
+    expect(formatListDate(new Date("2026-11-20T02:00:00.000Z"))).toBe(
+      "jue 19 nov",
+    );
   });
 
   it("writes a title date as «Jueves 19 de noviembre»", () => {
@@ -29,7 +31,9 @@ describe("shared display formats", () => {
   });
 
   it("writes a date with its time as «jue 19 nov · 08:00» in La Paz", () => {
-    expect(formatDateTime("2026-11-19T12:00:00.000Z")).toBe("jue 19 nov · 08:00");
+    expect(formatDateTime("2026-11-19T12:00:00.000Z")).toBe(
+      "jue 19 nov · 08:00",
+    );
   });
 
   it("writes places as «N de M lugares»", () => {
