@@ -1,3 +1,5 @@
+import { formatTitleDate } from "@pilates/api-contracts";
+
 const timeZone = "America/La_Paz";
 const boliviaOffset = "-04:00";
 
@@ -16,12 +18,6 @@ const timeFormatter = new Intl.DateTimeFormat("es-BO", {
   hour12: false,
   minute: "2-digit",
   timeZone,
-});
-const longDateFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone,
-  weekday: "long",
 });
 
 export function boliviaCivilDate(instant: Date): string {
@@ -112,8 +108,9 @@ export function formatMonthHeading(startsAt: string): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
+/** «Jueves 19 de noviembre», the shared title date (FIX-090). */
 export function formatSessionDate(startsAt: string): string {
-  return longDateFormatter.format(new Date(startsAt)).replace(",", "");
+  return formatTitleDate(startsAt);
 }
 
 /**
