@@ -82,6 +82,7 @@ export function TrainerAgendaScreen() {
           accessibilityLabel="Hoy"
           accessibilityRole="button"
           onPress={() => setSelectedDate(today)}
+          hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
           style={styles.todayButton}
           testID="agenda-today"
         >
@@ -162,16 +163,19 @@ export function TrainerAgendaScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
   screen: { gap: spacing.xl, paddingHorizontal: spacing.xlSm },
+  // FIX-089: a secondary chip, Crema with a Rosa profundo outline.
   todayButton: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderWidth: 1.5,
     borderRadius: radii.pill,
     height: 36,
     justifyContent: "center",
     paddingHorizontal: spacing.mdLg,
   },
   todayLabel: {
-    color: colors.primaryOnTint,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 14,
     fontWeight: "600",

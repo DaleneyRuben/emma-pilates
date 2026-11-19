@@ -10,7 +10,6 @@ import {
   FormField,
   NoticeRow,
   OutlinedButton,
-  PrimaryButton,
   radii,
   spacing,
   TextButton,
@@ -207,7 +206,8 @@ export function PendingInvitationCard({
               onChangeText={setEmail}
               value={email}
             />
-            <PrimaryButton
+            {/* «Reservar clase» stays the screen's one solid button (FIX-089). */}
+            <OutlinedButton
               busy={busy}
               disabled={accountWaiting}
               label="Guardar correo"

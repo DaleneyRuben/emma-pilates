@@ -210,16 +210,24 @@ const styles = StyleSheet.create({
   muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   onSelected: { color: colors.onPrimary },
   question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
   step: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderWidth: 1.5,
+    borderRadius: radii.button,
     height: 48,
     justifyContent: "center",
     width: 48,
   },
   stepDisabled: { opacity: 0.4 },
-  stepSymbol: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 24 },
+  stepSymbol: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 24,
+    fontWeight: "600",
+  },
   stepper: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
   switchLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
   switchRow: {
