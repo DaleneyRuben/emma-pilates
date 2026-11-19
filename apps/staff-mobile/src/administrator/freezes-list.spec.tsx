@@ -59,7 +59,7 @@ describe("freezes list", () => {
     // Cancelar una clase, instead of a cramped subtitle under it.
     expect(
       StyleSheet.flatten(screen.getByRole("header", { name: "Congelamientos" }).props.style),
-    ).toMatchObject({ fontSize: 24 });
+    ).toMatchObject({ fontSize: 30 });
     // Walkthrough finding 94: BackBar's quiet line, as on the headed screens.
     expect(StyleSheet.flatten(screen.getByText(explanation).props.style)).toMatchObject({
       fontSize: 14,

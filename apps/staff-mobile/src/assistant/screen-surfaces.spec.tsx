@@ -27,7 +27,7 @@ describe("Assistant surfaces on Superficie", () => {
     const screen = await openLucia(withoutPlan());
 
     expect(screen.getByTestId("client-no-plan")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
     });
   });
@@ -77,7 +77,7 @@ describe("Assistant cards and empty states (MOB-039)", () => {
 
     expect(screen.getByText("Historial de clases")).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-history").parent).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
     });
   });
@@ -92,13 +92,14 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
   });
 
-  it("draws the tablet's empty panel with the person disc, a Lora 24 title, and its helper", async () => {
+  it("draws the tablet's empty panel with the plain person icon, a Lora 24 title, and its helper", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
-    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({ height: 72, width: 72 });
+    // FIX-089: no tinted disc behind the icon.
+    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Selecciona un cliente para ver sus detalles")).toHaveStyle({
       fontFamily: "Lora_400Regular",
