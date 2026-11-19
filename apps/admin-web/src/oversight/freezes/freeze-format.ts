@@ -17,8 +17,9 @@ export function freezeDayCount(startsOn: string, endsOn: string): string {
 }
 
 /**
- * «jue 5 feb → jue 12 feb»: what approving a pending request does to the plan end
- * (walkthrough finding 52); undefined when an older API does not send it.
+ * «jue 12 feb (antes jue 5 feb)»: what approving a pending request does to
+ * the plan end (walkthrough finding 52; FIX-091 W16 B words it as the review
+ * panel's «Vencería»); undefined when an older API does not send it.
  */
 export function freezePendingPlanEnd(
   freeze: FreezeReviewDto,
@@ -28,7 +29,7 @@ export function freezePendingPlanEnd(
   if (planEndsOnAfter === undefined || planEndsOnAfter === null) {
     return shortDay(planEndsOn);
   }
-  return `${shortDay(planEndsOn)} → ${shortDay(planEndsOnAfter)}`;
+  return `${shortDay(planEndsOnAfter)} (antes ${shortDay(planEndsOn)})`;
 }
 
 /** «jue 12 feb (antes jue 5 feb)» once approved; the unchanged end when refused. */

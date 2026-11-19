@@ -15,4 +15,9 @@ export interface AdminClientExportRowDto {
   phone: string | null;
   /** Bolivia civil date she joined */
   clientSince: string;
+  /**
+   * Bolivia civil date of her latest class kept, as the list’s «Última clase»; null if none (FIX-091)
+   * @nullable
+   */
+  lastClassOn?: string | null;
 }

@@ -166,7 +166,7 @@ describe("AW22 Editar perfil", () => {
     ).not.toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", {
-        name: "Agregar clase de cortesía",
+        name: "Dar clase de cortesía",
       }),
     ).not.toBeInTheDocument();
     expect(

@@ -1,4 +1,3 @@
-import { classesLeft } from "./client-columns";
 import {
   type AdminClientDetailDto,
   formatListDate,
@@ -17,6 +16,7 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
+import { ActionList } from "../../components/panel/action-rows";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { ClientPhoto } from "../../components/client-photo";
 import { Button } from "../../components/ui/button";
@@ -30,6 +30,7 @@ import { ClientEvaluationsTab } from "./client-evaluations-tab";
 import { ClientFileTabs, type ClientFileTab } from "./client-file-tabs";
 import { ClientPaymentsTab } from "./client-payments-tab";
 import { ClientPhone } from "./client-phone";
+import { ClientPlanBlock } from "./client-plan-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 import { CourtesyAccessAction } from "./courtesy-access-action";
@@ -45,82 +46,39 @@ const clientDetailQueryOptions = (clientId: string) =>
     staleTime: 0,
   });
 
-function PlanBlock({
-  clientId,
-  view,
-  role,
+// FIX-091 (W7 B): the Administrator's actions on her file, one row each at
+// the end of Resumen. A deactivated account keeps only the Plan's classes
+// (AW22: nothing left to grant or close).
+function ClientActions({
+  client,
+  onGranted,
+  onClosed,
 }: {
-  clientId: string;
-  view: AdminClientDetailDto["subscription"];
-  role: AdminRole;
+  client: AdminClientDetailDto;
+  onGranted: (notice: string) => void;
+  onClosed: (notice: string) => void;
 }) {
-  const current = view.subscription;
-  if (current === null || current === undefined || view.status === "none") {
-    return (
-      <SummaryBlock title="Plan">
-        <SummaryRow label="Plan">
-          <span className="text-texto-muy-tenue">Sin plan activo</span>
-        </SummaryRow>
-      </SummaryBlock>
-    );
-  }
-  if (view.status === "expired") {
-    return (
-      <SummaryBlock title="Plan">
-        <SummaryRow label="Plan">
-          <span className="flex items-center justify-end gap-2">
-            <span className="text-texto-muy-tenue">Sin plan activo</span>
-            <StatusPill tone="error">Plan vencido</StatusPill>
-          </span>
-        </SummaryRow>
-        <p className="px-3 py-2 text-ayuda text-texto-tenue">
-          Último plan vencido el {formatListDate(current.endsOn)}.
-        </p>
-      </SummaryBlock>
-    );
-  }
+  const open = client.accountStatus !== "disabled";
+  const active = client.subscription.status === "active";
   return (
-    <SummaryBlock title="Plan">
-      <SummaryRow label="Plan">
-        <span className="flex items-center justify-end gap-2">
-          {current.planName}
-          <StatusPill tone="exito">Activa</StatusPill>
-        </span>
-      </SummaryRow>
-      <SummaryRow label="Vigencia">
-        <span className="tabular">
-          {formatListDate(current.startsOn)} – {formatListDate(current.endsOn)}
-        </span>
-      </SummaryRow>
-      {/* Every Plan grants a fixed number of classes (follow-up 11). */}
-      <SummaryRow label="Clases disponibles" figure>
-        {classesLeft(
-          current.remainingClassAllowance,
-          current.originalClassAllowance,
-          current.extraClasses,
-        )}
-      </SummaryRow>
-      {/* Walkthrough n.º 60: the Plan she already bought. */}
-      {view.nextSubscription == null ? null : (
-        <SummaryRow label="Plan siguiente">
-          {`${view.nextSubscription.planName} · empieza el ${formatListDate(view.nextSubscription.startsOn)}`}
-        </SummaryRow>
-      )}
-      {current.extraClassesLine ? (
-        <p className="px-3 py-2 text-nota text-texto">
-          {current.extraClassesLine}
-        </p>
-      ) : null}
-      {view.status === "active" && role === "administrator" ? (
-        <div className="flex flex-wrap gap-2 px-3 py-2">
-          <AllowanceAdjustmentAction clientId={clientId} reason="courtesy" />
+    <ActionList title="Acciones">
+      {active ? (
+        <>
+          <AllowanceAdjustmentAction clientId={client.id} reason="courtesy" />
           <AllowanceAdjustmentAction
-            clientId={clientId}
+            clientId={client.id}
             reason="class_return"
           />
-        </div>
+        </>
       ) : null}
-    </SummaryBlock>
+      {/* REL-011: only without an active Plan. */}
+      {open && !active ? (
+        <CourtesyAccessAction client={client} onGranted={onGranted} />
+      ) : null}
+      {open ? (
+        <CloseClientAccountAction client={client} onClosed={onClosed} />
+      ) : null}
+    </ActionList>
   );
 }
 
@@ -128,10 +86,12 @@ function ClientSummary({
   client,
   contact,
   role,
+  actions,
 }: {
   client: AdminClientDetailDto;
   contact: ReactNode;
   role: AdminRole;
+  actions: ReactNode;
 }) {
   return (
     <>
@@ -153,7 +113,7 @@ function ClientSummary({
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
       {contact}
-      <PlanBlock clientId={client.id} view={client.subscription} role={role} />
+      <ClientPlanBlock view={client.subscription} />
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
@@ -169,6 +129,7 @@ function ClientSummary({
       {role === "administrator" ? (
         <ClientAcquisitionBlock clientId={client.id} />
       ) : null}
+      {actions}
     </>
   );
 }
@@ -251,6 +212,15 @@ export function ClientDetailPanel({
               <ClientSummary
                 client={query.data}
                 role={role}
+                actions={
+                  role === "administrator" ? (
+                    <ClientActions
+                      client={query.data}
+                      onGranted={setGranted}
+                      onClosed={onClosed}
+                    />
+                  ) : null
+                }
                 contact={
                   editing ? (
                     <ClientProfileForm
@@ -273,7 +243,8 @@ export function ClientDetailPanel({
       {/* AW22: a deactivated account has nothing left to edit or close. */}
       {tab !== "resumen" ||
       query.data === undefined ||
-      query.data.accountStatus === "disabled" ? null : (
+      query.data.accountStatus === "disabled" ||
+      (editing && granted === null) ? null : (
         <SidePanelFooter>
           {granted === null ? null : (
             <p role="status" className="text-nota text-exito-texto">
@@ -282,9 +253,7 @@ export function ClientDetailPanel({
           )}
           {editing ? null : (
             <Button
-              variant="neutral"
-              size="sm"
-              className="self-start"
+              className="self-end"
               onClick={() => {
                 setSaved(false);
                 setEditing(true);
@@ -293,22 +262,6 @@ export function ClientDetailPanel({
               Editar perfil
             </Button>
           )}
-          <div className="flex flex-wrap gap-2">
-            {/* REL-011: only the Administrator, and only without an active Plan. */}
-            {role === "administrator" &&
-            query.data.subscription.status !== "active" ? (
-              <CourtesyAccessAction
-                client={query.data}
-                onGranted={setGranted}
-              />
-            ) : null}
-            {role === "administrator" ? (
-              <CloseClientAccountAction
-                client={query.data}
-                onClosed={onClosed}
-              />
-            ) : null}
-          </div>
         </SidePanelFooter>
       )}
     </>

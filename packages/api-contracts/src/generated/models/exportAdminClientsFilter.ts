@@ -14,4 +14,6 @@ export const ExportAdminClientsFilter = {
   expired: "expired",
   none: "none",
   founder: "founder",
+  expiring: "expiring",
+  unbooked: "unbooked",
 } as const;

@@ -41,7 +41,12 @@ describe("Rechazar un congelamiento", () => {
     const row = (await screen.findByText("Valeria Quiroga")).closest(
       "tr",
     ) as HTMLElement;
-    await user.click(within(row).getByRole("button", { name: "Rechazar" }));
+    // FIX-091 (W16 B): the decision is in the request's review panel.
+    await user.click(within(row).getByRole("button", { name: "Revisar" }));
+    const panel = await screen.findByRole("dialog", {
+      name: "Valeria Quiroga · congelamiento",
+    });
+    await user.click(within(panel).getByRole("button", { name: "Rechazar" }));
 
     const dialog = await screen.findByRole("alertdialog", {
       name: "¿Rechazar el congelamiento de Valeria Quiroga?",

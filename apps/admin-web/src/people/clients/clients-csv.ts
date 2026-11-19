@@ -14,6 +14,9 @@ import type { ClientFilter } from "../people-search";
 // the owner asked for.
 const header = ["Nombre", "Estado", "Correo", "Teléfono", "Desde"];
 
+/** FIX-091 (W8 A): the list's «Última clase», for the live Clients only. */
+const clientsHeader = [...header, "Última clase"];
+
 /** The row's «Estado» pill, as the table says it. */
 const stateLabel: Record<
   AdminClientExportRowDto["subscriptionStatus"],
@@ -37,13 +40,14 @@ export const sinceDate = (contact: AdminPromotionContactDto): string =>
 
 export const clientsCsv = (rows: readonly AdminClientExportRowDto[]): string =>
   csvDocument([
-    header,
+    clientsHeader,
     ...rows.map((row) => [
       row.name,
       stateLabel[row.subscriptionStatus],
       row.email,
       row.phone ?? "",
       formatCivilDate(row.clientSince),
+      row.lastClassOn == null ? "" : formatCivilDate(row.lastClassOn),
     ]),
   ]);
 
@@ -67,6 +71,8 @@ const fileSlug: Record<ClientFilter | "all", string> = {
   none: "sin-plan",
   expired: "expirado",
   founder: "fundadora",
+  expiring: "por-vencer",
+  unbooked: "sin-reservar",
   closed: "cuenta-cerrada",
 };
 

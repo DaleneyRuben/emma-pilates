@@ -19,8 +19,12 @@ import {
 // Plan's name, or whether the Client had one before.
 export type DirectorySubscriptionStatus = 'active' | 'expired' | 'none';
 
-/** Clientas › Todas's chips (follow-up 232); «Todas» is no filter. */
-export type ClientDirectoryFilter = DirectorySubscriptionStatus | 'founder';
+/**
+ * Clientas › Todas's chips (follow-up 232); «Todas» is no filter. FIX-091
+ * (W8 A) adds «Por vencer» (`expiring`) and «Sin reservar» (`unbooked`).
+ */
+export type ClientDirectoryFilter =
+  DirectorySubscriptionStatus | 'founder' | 'expiring' | 'unbooked';
 
 export type AdministratorClientRow = {
   id: string;
@@ -49,6 +53,8 @@ export type AdministratorClientRow = {
   invitedByName: string | null;
   /** Bolivia civil date she joined: the CSV's «Desde» (FIX-065). */
   clientSince: Date;
+  /** «Última clase»: the Bolivia day of her latest class kept (FIX-091). */
+  lastClassOn: Date | null;
 };
 
 export type AdministratorClientPage = {
@@ -62,6 +68,10 @@ export type AdministratorClientPage = {
   activePlanClientCount: number;
   /** Clients of the studio holding a live Fundadora place. */
   founderClientCount: number;
+  /** «Por vencer»: active Plans ending within 3 days (FIX-091). */
+  expiringClientCount: number;
+  /** «Sin reservar»: an active Plan and no class ahead (FIX-091). */
+  unbookedClientCount: number;
 };
 
 export type AdministratorClientRecord = {
@@ -100,6 +110,8 @@ export interface AdministratorClientDirectory {
     query?: string;
     filter?: ClientDirectoryFilter;
     today: Date;
+    /** «Última clase» counts the classes started by then. */
+    now: Date;
   }) => Promise<AdministratorClientPage>;
   read: (clientId: string) => Promise<AdministratorClientRecord | null>;
   findActiveSubscription: (
@@ -161,12 +173,14 @@ export const listAdministratorClients = async (
 ): Promise<AdministratorClientPage> => {
   requireOperations(principal);
   const query = command.query?.trim() ?? '';
+  const instant = now();
   return directory.list({
     page: command.page,
     pageSize: command.pageSize,
     ...(query === '' ? {} : { query }),
     ...(command.filter === undefined ? {} : { filter: command.filter }),
-    today: boliviaDate(now()),
+    today: boliviaDate(instant),
+    now: instant,
   });
 };
 
@@ -184,7 +198,8 @@ export const exportAdministratorClients = async (
   const { accountId, staffMemberId, audit } = requireOperations(principal);
   const query = command.query?.trim() ?? '';
   const rows: AdministratorClientRow[] = [];
-  const today = boliviaDate(now());
+  const instant = now();
+  const today = boliviaDate(instant);
   for (let page = 1; ; page += 1) {
     const result = await directory.list({
       page,
@@ -192,6 +207,7 @@ export const exportAdministratorClients = async (
       ...(query === '' ? {} : { query }),
       ...(command.filter === undefined ? {} : { filter: command.filter }),
       today,
+      now: instant,
     });
     rows.push(...result.items);
     if (result.items.length < exportPageSize) break;
@@ -201,7 +217,7 @@ export const exportAdministratorClients = async (
     actor: { accountId, staffMemberId, audit },
     clientCount: rows.length,
     ...(command.filter === undefined ? {} : { filter: command.filter }),
-    occurredAt: now(),
+    occurredAt: instant,
   });
   return rows;
 };

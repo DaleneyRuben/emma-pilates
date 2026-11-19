@@ -77,19 +77,30 @@ describe("Clientas › Todas chips and columns", () => {
     expect(
       [
         "Todas",
+        "Por vencer · 4",
+        "Sin reservar · 9",
         "Con plan",
         "Sin plan",
         "Plan vencido",
-        "Fundadora",
+        "Fundadoras",
         "Cuenta cerrada",
       ].map((name) => chip(name).getAttribute("aria-pressed")),
-    ).toEqual(["true", "false", "false", "false", "false", "false"]);
+    ).toEqual([
+      "true",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+    ]);
     expect(reads.at(-1)?.has("filter")).toBe(false);
 
-    await user.click(chip("Fundadora"));
+    await user.click(chip("Fundadoras"));
     await waitFor(() => expect(reads.at(-1)?.get("filter")).toBe("founder"));
     expect(reads.at(-1)?.get("page")).toBe("1");
-    expect(chip("Fundadora")).toHaveAttribute("aria-pressed", "true");
+    expect(chip("Fundadoras")).toHaveAttribute("aria-pressed", "true");
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 1,
       pageSize: 20,
@@ -165,7 +176,7 @@ describe("Clientas › Todas chips and columns", () => {
       expect(router.state.matches.at(-1)?.search).toMatchObject({
         filter: "founder",
       });
-      expect(chip("Fundadora")).toHaveAttribute("aria-pressed", "true");
+      expect(chip("Fundadoras")).toHaveAttribute("aria-pressed", "true");
       expect(
         screen.queryByRole("link", { name: "Fundadoras" }),
       ).not.toBeInTheDocument();
@@ -177,7 +188,7 @@ describe("Clientas › Todas chips and columns", () => {
     renderAdmin("/clientas/fundadoras");
 
     await screen.findByRole("cell", { name: /Isabel Arce/ });
-    expect(chip("Fundadora")).toHaveAttribute("aria-pressed", "true");
+    expect(chip("Fundadoras")).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/lugares de fundadora/)).not.toBeInTheDocument();
     expect(founderReads).toEqual([]);
   });
@@ -188,6 +199,9 @@ describe("Clientas › Todas chips and columns", () => {
     ["active", "Ninguna clienta con plan activo."],
     ["none", "Ninguna clienta sin plan."],
     ["expired", "Ninguna clienta con el plan vencido."],
+    // FIX-091 (W8 A).
+    ["expiring", "Ninguna clienta con el plan por vencer."],
+    ["unbooked", "Todas las clientas con plan tienen una clase reservada."],
   ])("says no Client matches the %s chip", async (filter, message) => {
     server.use(
       ...signedInHandlers(),

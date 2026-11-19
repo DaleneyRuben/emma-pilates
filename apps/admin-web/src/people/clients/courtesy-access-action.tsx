@@ -14,7 +14,7 @@ import {
   useIdempotencyKey,
 } from "../../api/idempotency-key";
 import { isApiError } from "../../api/problem";
-import { Button } from "../../components/ui/button";
+import { ActionRow } from "../../components/panel/action-rows";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -82,18 +82,14 @@ export function CourtesyAccessAction({
   };
 
   return (
-    <>
-      <Button
-        variant="neutral"
-        size="sm"
-        onClick={() => {
-          setEndsOn(addDays(boliviaToday(), 30));
-          setProblem(null);
-          setOpen(true);
-        }}
-      >
-        Acceso de prueba
-      </Button>
+    <ActionRow
+      label="Acceso de prueba"
+      onClick={() => {
+        setEndsOn(addDays(boliviaToday(), 30));
+        setProblem(null);
+        setOpen(true);
+      }}
+    >
       <ConfirmDialog
         open={open}
         onOpenChange={setOpen}
@@ -134,6 +130,6 @@ export function CourtesyAccessAction({
           </div>
         )}
       </ConfirmDialog>
-    </>
+    </ActionRow>
   );
 }
