@@ -246,4 +246,31 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     await waitFor(() => expect(screen.getByText("Diego Rojas")).toBeOnTheScreen());
     expect(screen.queryByRole("button", { name: "Ver la app como…" })).not.toBeOnTheScreen();
   });
+
+  // FIX-090: the team is named in the app's words, «instructora».
+  it("names the roles it can show when nobody can be seen yet", async () => {
+    const runtime = createStaffRuntime(
+      routeFetcher({
+        ...routes(() => administrator, []),
+        "/api/v1/administrator/staff-members": () =>
+          jsonResponse({ ...staffPage, items: [staffPage.items[4]] }),
+      }),
+      "administrator",
+    );
+    const screen = await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
+    await fireEvent.press(screen.getByTestId("tab-profile"));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Ver la app como…" })).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Ver la app como…" }));
+    expect(
+      await screen.findByText(
+        "Cuando actives a una instructora, asistente o nutricionista, aparecerá aquí.",
+      ),
+    ).toBeOnTheScreen();
+  });
 });
