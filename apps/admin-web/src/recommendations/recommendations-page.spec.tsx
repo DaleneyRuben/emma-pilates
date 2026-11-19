@@ -101,6 +101,42 @@ describe("AW44 Recomendaciones del mes", () => {
     expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
   });
 
+  it("opens another month on its own first type, not the last chip chosen", async () => {
+    server.use(
+      http.get(apiUrl(listPath), ({ request }) => {
+        const month = new URL(request.url).searchParams.get("month");
+        return jsonResponse({
+          month,
+          recommendations:
+            month === "2026-10" ? [finding, inactive] : [finding],
+        });
+      }),
+    );
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const section = (month: string) => (
+      <QueryClientProvider client={queryClient}>
+        <RecommendationsSection month={month} readOnly={false} />
+      </QueryClientProvider>
+    );
+    const { rerender } = render(section("2026-10"));
+    const user = userEvent.setup();
+    await screen.findByText(finding.detail);
+    const kinds = () =>
+      screen.getByRole("group", { name: "Tipo de recomendación" });
+    await user.click(
+      within(kinds()).getByRole("button", { name: "Clientas · 1" }),
+    );
+
+    rerender(section("2026-11"));
+
+    expect(
+      await within(kinds()).findByRole("button", { name: "Horario · 1" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(await screen.findByText(finding.detail)).toBeVisible();
+  });
+
   // A resolved finding that holds again comes back as new unless it was
   // discarded, so Resueltas keeps Descartar for it.
   it("still discards a resolved finding", async () => {
