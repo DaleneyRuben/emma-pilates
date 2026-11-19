@@ -79,7 +79,7 @@ describe("Clientas › Todas chips and columns", () => {
         "Todas",
         "Con plan",
         "Sin plan",
-        "Expirado",
+        "Plan vencido",
         "Fundadora",
         "Cuenta cerrada",
       ].map((name) => chip(name).getAttribute("aria-pressed")),
@@ -96,7 +96,7 @@ describe("Clientas › Todas chips and columns", () => {
       filter: "founder",
     });
 
-    await user.click(chip("Expirado"));
+    await user.click(chip("Plan vencido"));
     await waitFor(() => expect(reads.at(-1)?.get("filter")).toBe("expired"));
 
     // Todas' first page is cached since the address past its last page

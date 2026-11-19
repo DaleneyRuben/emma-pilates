@@ -133,7 +133,7 @@ describe("AW29 decisions on a desktop browser", () => {
     expect(reason).not.toHaveAttribute("placeholder");
     expect(
       within(panel).getByText(
-        "Ej.: el monto no coincide con la transferencia recibida.",
+        "Ej.: el monto no coincide con el pago recibido.",
       ),
     ).toBeInTheDocument();
     expect(

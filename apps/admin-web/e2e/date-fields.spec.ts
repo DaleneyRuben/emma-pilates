@@ -9,8 +9,8 @@ const openNewSession = async (page: Page) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "Horario" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Nueva sesión", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "Nueva sesión" });
+  await page.getByRole("button", { name: "Nueva clase", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Nueva clase" });
   await expect(panel.getByLabel("Fecha")).toBeVisible();
   return panel;
 };

@@ -103,9 +103,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       within(tile("Ingresos")).getByText("Pagos confirmados en el rango"),
     ).toBeVisible();
     expect(
-      within(tile("Ingresos")).getByText(
-        "Efectivo Bs 780 · Transferencias Bs 1.500",
-      ),
+      within(tile("Ingresos")).getByText("Efectivo Bs 780 · QR Bs 1.500"),
     ).toBeVisible();
     expect(
       within(tile("Ingresos")).getByText(
@@ -138,9 +136,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(screen.getByRole("combobox", { name: "Sucursal" })).toHaveValue(
       "all",
     );
-    expect(
-      screen.queryByText(/La nómina y los ingresos por transferencia/),
-    ).toBeNull();
+    expect(screen.queryByText(/La nómina y los ingresos por QR/)).toBeNull();
 
     const categories = screen.getByRole("table", {
       name: "Gastos por categoría",
@@ -217,7 +213,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(within(tile("Neto")).getByText("Bs 299,50")).toBeVisible();
     expect(
       screen.getByText(
-        "La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».",
+        "La nómina y los ingresos por QR se ven solo en «Todas las sucursales».",
       ),
     ).toBeVisible();
     const categories = screen.getByRole("table", {

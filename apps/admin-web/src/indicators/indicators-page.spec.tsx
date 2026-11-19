@@ -89,7 +89,7 @@ describe("AW39 Indicadores", () => {
     expect(within(occupancy).getByText("59 %")).toBeVisible();
     expect(
       within(
-        screen.getByRole("region", { name: "Alumnas por clase" }),
+        screen.getByRole("region", { name: "Clientas por clase" }),
       ).getByText("6,5"),
     ).toBeVisible();
     expect(

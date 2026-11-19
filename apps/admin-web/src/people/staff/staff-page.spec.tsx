@@ -63,7 +63,7 @@ describe("AW23 Personal on a desktop browser", () => {
     expect(
       within(emmaRow).getByRole("cell", { name: "Centro, Equipetrol" }),
     ).toHaveAttribute("data-label", "Sucursales");
-    expect(within(emmaRow).getByText("Activo")).toBeInTheDocument();
+    expect(within(emmaRow).getByText("Activa")).toBeInTheDocument();
     expect(
       within(emmaRow).getByRole("cell", { name: /emma@emmapilates.bo/ }),
     ).toHaveAttribute("data-label", "Contacto");
@@ -80,7 +80,7 @@ describe("AW23 Personal on a desktop browser", () => {
       within(await rowOf("Valentina Soria")).getByText("Pendiente"),
     ).toBeInTheDocument();
     expect(
-      within(await rowOf("Rita Salas")).getByText("Desactivado"),
+      within(await rowOf("Rita Salas")).getByText("Desactivada"),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Nuevo miembro" })).toBeEnabled();
     expect(screen.getByText("Mostrando 1–5 de 5 miembros")).toBeVisible();

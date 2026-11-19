@@ -58,7 +58,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     ).parentElement as HTMLElement;
     expect(
       within(pending).getByRole("cell", { name: /Andrea Céspedes/ }),
-    ).toHaveAttribute("data-label", "Cliente que refiere");
+    ).toHaveAttribute("data-label", "Clienta que refiere");
     expect(within(pending).getByText("3 referidas en total")).toBeVisible();
     expect(
       within(pending).getByRole("cell", { name: "mar 11 ago" }),
@@ -166,7 +166,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     await screen.findByRole("cell", { name: /Camila Vargas Ortiz/ });
 
     await user.type(
-      screen.getByRole("searchbox", { name: "Buscar por nombre de cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por nombre de clienta" }),
       "valeria",
     );
 
@@ -287,7 +287,7 @@ describe("AW26 Referidos on a narrow browser", () => {
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(card.detail).toContain("Valeria Terceros");
     expect(
-      screen.getByRole("searchbox", { name: "Buscar por nombre de cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por nombre de clienta" }),
     ).toBeVisible();
   });
 });

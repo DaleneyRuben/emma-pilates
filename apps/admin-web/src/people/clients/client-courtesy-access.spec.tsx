@@ -165,7 +165,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
     ],
     [
       "purchase_intent_open_exists",
-      "Tiene una compra por transferencia sin terminar. Vuelve a intentarlo cuando venza.",
+      "Tiene una compra por QR sin terminar. Vuelve a intentarlo cuando venza.",
     ],
     [
       "courtesy_end_date_invalid",
@@ -194,7 +194,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
 
     expect(
       await within(dialog).findByText(
-        "Tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+        "Tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
       ),
     ).toBeInTheDocument();
     expect(

@@ -24,7 +24,7 @@ describe("the Pagos CSV", () => {
     expect(paymentsCsv([issuedCash, pendingTransfer])).toBe(
       "\uFEFFFecha,Cliente,Tipo,Plan,Método,Monto (Bs),Estado,NIT o CI,Nombre o razón social,Factura emitida,Emitida por,Emitida el\r\n" +
         "22/10/2026,Ana Pérez,Plan,Paquete de 8 clases,Efectivo,1050.00,Confirmado,4567891,Ana Pérez,Sí,Paola Mendoza,22/10/2026\r\n" +
-        "21/09/2026,Lucía Fernández,Plan,Paquete de 8 clases,Transferencia,500.00,Pendiente,,,No,,\r\n",
+        "21/09/2026,Lucía Fernández,Plan,Paquete de 8 clases,QR,500.00,Pendiente,,,No,,\r\n",
     );
   });
 

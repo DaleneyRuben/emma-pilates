@@ -53,7 +53,7 @@ describe("AW03 Duración", () => {
 
   it("creates a one-off Session for the minutes typed, starting at 60", async () => {
     const sent = capture("post", sessionsPath);
-    const { panel, user } = await openPanel("Nueva sesión", "Nueva sesión");
+    const { panel, user } = await openPanel("Nueva clase", "Nueva clase");
     const duration = within(panel).getByLabelText("Duración");
 
     expect(duration).toHaveValue("60");
@@ -62,7 +62,7 @@ describe("AW03 Duración", () => {
       reformer.id,
     );
     await user.selectOptions(
-      await within(panel).findByLabelText("Entrenadora"),
+      await within(panel).findByLabelText("Instructora"),
       valeria.id,
     );
     await user.type(within(panel).getByLabelText("Fecha"), dayOfNextWeek(3));
@@ -91,14 +91,14 @@ describe("AW03 Duración", () => {
 
   it("gives each weekly row its own minutes and checks overlaps with them", async () => {
     const sent = capture("post", `${schedulesPath}/batch`);
-    const { panel, user } = await openPanel("Nueva sesión", "Nueva sesión");
+    const { panel, user } = await openPanel("Nueva clase", "Nueva clase");
     await user.click(within(panel).getByLabelText("Cada semana"));
     await user.selectOptions(
       await within(panel).findByLabelText("Tipo de clase"),
       reformer.id,
     );
     await user.selectOptions(
-      await within(panel).findByLabelText("Entrenadora"),
+      await within(panel).findByLabelText("Instructora"),
       valeria.id,
     );
     await user.selectOptions(within(panel).getByLabelText("Día, fila 1"), "1");
@@ -145,7 +145,7 @@ describe("AW03 Duración", () => {
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
     const duration = within(panel).getByLabelText("Duración");
 
     expect(duration).toHaveValue("50");
@@ -166,7 +166,7 @@ describe("AW03 Duración", () => {
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
     await view.user.click(within(panel).getByLabelText("Esta y las futuras"));
     const duration = await within(panel).findByLabelText("Duración");
 

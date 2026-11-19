@@ -54,7 +54,7 @@ describe("payout QR in AW12's Registrar pago", () => {
       within(panel).queryByText("Sin QR de cobro"),
     ).not.toBeInTheDocument();
 
-    await user.selectOptions(within(panel).getByLabelText("Empleado"), emma.id);
+    await user.selectOptions(within(panel).getByLabelText("Persona"), emma.id);
     expect(
       await within(panel).findByRole("img", {
         name: "QR de cobro de Emma Vargas",
@@ -63,7 +63,7 @@ describe("payout QR in AW12's Registrar pago", () => {
     expect(within(panel).getByText("Vale hasta el mar 15 dic")).toBeVisible();
 
     await user.selectOptions(
-      within(panel).getByLabelText("Empleado"),
+      within(panel).getByLabelText("Persona"),
       camila.id,
     );
     expect(await within(panel).findByText("Sin QR de cobro")).toBeVisible();

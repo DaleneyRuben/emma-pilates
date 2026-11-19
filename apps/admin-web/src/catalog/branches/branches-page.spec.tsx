@@ -229,7 +229,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
 
     expect(
       await within(panel).findByText(
-        "No puedes archivarla: tiene sesiones programadas o un horario semanal vigente.",
+        "No puedes archivarla: tiene clases programadas o un horario semanal vigente.",
       ),
     ).toBeInTheDocument();
 

@@ -82,9 +82,7 @@ describe("AW28 Pagos invoices", () => {
     renderAdmin("/dinero/pagos?status=all");
 
     const pending = await rowOf(/Sofía Guzmán/);
-    expect(
-      within(pending).getByRole("cell", { name: "Transferencia" }),
-    ).toBeVisible();
+    expect(within(pending).getByRole("cell", { name: "QR" })).toBeVisible();
     expect(within(invoiceCell(pending)).getByText("4567891")).toBeVisible();
     expect(
       within(pending).queryByRole("button", { name: /Marcar emitida/ }),

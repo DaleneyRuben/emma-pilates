@@ -32,11 +32,11 @@ describe("Simulador on a desktop browser", () => {
     expect(screen.getByText(/Nada se guarda/)).toBeVisible();
 
     await fill(user, "Clases por semana", "33");
-    await fill(user, "Alumnas por clase", "4");
+    await fill(user, "Clientas por clase", "4");
     await fill(user, "Precio por clase para la clienta (Bs)", "70");
     await fill(user, "Pago por clase a la instructora (Bs)", "65");
-    await fill(user, "Alumnas incluidas en el pago", "4");
-    await fill(user, "Pago por alumna extra (Bs)", "8");
+    await fill(user, "Clientas incluidas en el pago", "4");
+    await fill(user, "Pago por clienta extra (Bs)", "8");
     await fill(user, "Costos fijos (Bs)", "21175");
     await fill(user, "Impuestos (%)", "16");
 
@@ -96,7 +96,7 @@ describe("Simulador on a desktop browser", () => {
     const { user } = renderAdmin("/informes/simulador");
     await heading();
 
-    await fill(user, "Alumnas por clase", "6");
+    await fill(user, "Clientas por clase", "6");
 
     // Trainer pay is 143 × (Bs 65 + 2 × Bs 8) = Bs 11.583.
     expect(

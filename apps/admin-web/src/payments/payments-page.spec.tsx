@@ -94,7 +94,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     expect(within(lucia).getByText("Bs 1.050")).toBeInTheDocument();
     expect(within(lucia).queryByText(/de crédito/)).not.toBeInTheDocument();
     expect(
-      screen.getByText("Todo el estudio · 6 transferencias esperando revisión"),
+      screen.getByText("Todo el estudio · 6 pagos por QR esperando revisión"),
     ).toBeVisible();
     expect(screen.getByText("Mostrando 2 de 2 pagos pendientes")).toBeVisible();
     expect(
@@ -205,7 +205,7 @@ describe("AW28 Pagos on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Todo el estudio · ninguna transferencia por revisar"),
+      screen.getByText("Todo el estudio · ningún pago por QR por revisar"),
     ).toBeVisible();
   });
 

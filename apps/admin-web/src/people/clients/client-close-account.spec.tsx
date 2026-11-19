@@ -171,7 +171,7 @@ describe("AW22 Cerrar cuenta", () => {
 
     expect(
       await within(dialog).findByText(
-        "No se puede cerrar todavía: tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+        "No se puede cerrar todavía: tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
       ),
     ).toBeInTheDocument();
     expect(

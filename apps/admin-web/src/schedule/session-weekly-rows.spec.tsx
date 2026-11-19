@@ -26,15 +26,15 @@ const batchPath = `${schedulesPath}/batch`;
 const openWeekly = async () => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
   await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
-  await view.user.click(screen.getByRole("button", { name: "Nueva sesión" }));
-  const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
+  await view.user.click(screen.getByRole("button", { name: "Nueva clase" }));
+  const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
   await view.user.click(within(panel).getByLabelText("Cada semana"));
   await view.user.selectOptions(
     await within(panel).findByLabelText("Tipo de clase"),
     mat.id,
   );
   await view.user.selectOptions(
-    within(panel).getByLabelText("Entrenadora"),
+    within(panel).getByLabelText("Instructora"),
     daniela.id,
   );
   await view.user.type(
@@ -123,7 +123,7 @@ describe("AW03 Cada semana with several days", () => {
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "3 series semanales creadas: 12 sesiones en los próximos 30 días. 1 se omitió porque se cruzaba con otra sesión.",
+      "3 series semanales creadas: 12 clases en los próximos 30 días. 1 se omitió porque se cruzaba con otra clase.",
     );
   });
 

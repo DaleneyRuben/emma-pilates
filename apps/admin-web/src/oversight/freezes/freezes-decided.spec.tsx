@@ -86,7 +86,7 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
     await user.selectOptions(screen.getByLabelText("Vista"), "Decididas");
 
     const approved = await rowOf("Valeria Quiroga");
-    expect(within(approved).getByText("Aprobado")).toBeInTheDocument();
+    expect(within(approved).getByText("Aprobada")).toBeInTheDocument();
     expect(within(approved).getByText("7 días")).toBeInTheDocument();
     expect(
       within(approved).getByText("vie 12 feb (antes vie 5 feb)"),
@@ -97,7 +97,7 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
       ),
     ).toBeInTheDocument();
     const refused = await rowOf("Daniela Rojas");
-    expect(within(refused).getByText("Rechazado")).toBeInTheDocument();
+    expect(within(refused).getByText("Rechazada")).toBeInTheDocument();
     expect(within(refused).getByText("vie 5 feb")).toBeInTheDocument();
     expect(
       within(refused).getByText(

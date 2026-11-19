@@ -26,7 +26,7 @@ describe("the Inicio pending list", () => {
       ).map((row) => [row.title, row.note, row.to]),
     ).toEqual([
       ["3 sueldos por aprobar", "noviembre de 2026", "/dinero/sueldos"],
-      ["1 pago por revisar", "Transferencias y QR", "/dinero/pagos"],
+      ["1 pago por revisar", "Por QR, desde la app", "/dinero/pagos"],
       [
         "1 congelamiento por decidir",
         "Pedido desde la app",

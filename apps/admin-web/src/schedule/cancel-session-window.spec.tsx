@@ -16,7 +16,7 @@ const openConfirmation = async () => {
   await user.click(
     await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
   );
-  const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
   await user.click(
     within(panel).getByRole("button", { name: "Cancelar esta clase" }),
   );

@@ -103,7 +103,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     ).toBeVisible();
     expect(
       within(panel).getByText(
-        "La recepción lo usa para escribirle por WhatsApp.",
+        "La asistente lo usa para escribirle por WhatsApp.",
       ),
     ).toBeVisible();
     expect(within(panel).getByText("Elige un rol.")).toBeVisible();

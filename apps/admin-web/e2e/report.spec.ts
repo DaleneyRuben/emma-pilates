@@ -63,7 +63,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      "La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».",
+      "La nómina y los ingresos por QR se ven solo en «Todas las sucursales».",
     ),
   ).toBeVisible();
   await expect(categories.getByText(/Nómina/)).toHaveCount(0);

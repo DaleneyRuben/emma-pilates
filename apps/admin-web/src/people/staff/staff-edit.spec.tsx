@@ -68,7 +68,7 @@ describe("AW24 Editar miembro", () => {
     ).toBeChecked();
     expect(
       within(panel).getByText(
-        "Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas. Cámbialas de entrenadora en Horario antes de guardar.",
+        "Si sacas una sucursal, sus clases ya asignadas no se reasignan solas. Cámbialas de instructora en Horario antes de guardar.",
       ),
     ).toBeVisible();
 
@@ -146,7 +146,7 @@ describe("AW24 Editar miembro", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(
-      await within(panel).findByText(/Cámbiale la entrenadora desde Horario/),
+      await within(panel).findByText(/Cámbiale la instructora desde Horario/),
     ).toBeVisible();
     expect(
       within(panel).getByRole("checkbox", { name: "Equipetrol" }),
@@ -282,7 +282,7 @@ describe("AW24 Editar miembro", () => {
       within(confirm).getByRole("button", { name: "Desactivar" }),
     );
     expect(
-      await within(panel).findByText(/Cámbiale la entrenadora desde Horario/),
+      await within(panel).findByText(/Cámbiale la instructora desde Horario/),
     ).toBeVisible();
 
     await user.click(

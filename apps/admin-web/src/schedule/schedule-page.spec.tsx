@@ -60,7 +60,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
     expect(
       await screen.findByText(
-        "Sucursal Centro · sala única · 3 sesiones esta semana",
+        "Sucursal Centro · sala única · 3 clases esta semana",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText(formatWeekRange(nextMonday))).toBeInTheDocument();
@@ -108,7 +108,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
     await user.click(screen.getByRole("button", { name: "Semana siguiente" }));
     expect(
-      await screen.findByText("No hay sesiones programadas esta semana."),
+      await screen.findByText("No hay clases programadas esta semana."),
     ).toBeInTheDocument();
     expect(router.state.matches.at(-1)?.search).toEqual({
       week: addDays(nextMonday, 7),
@@ -137,7 +137,7 @@ describe("AW02 Horario on a desktop browser", () => {
 
     expect(
       await screen.findByText(
-        "Sucursal Equipetrol · sala única · 0 sesiones esta semana",
+        "Sucursal Equipetrol · sala única · 0 clases esta semana",
       ),
     ).toBeInTheDocument();
     expect(reads.map((params) => params.get("branchId"))).toContain(
@@ -190,7 +190,7 @@ describe("AW02 Horario on a desktop browser", () => {
       await screen.findByText("No tienes permiso para ver esta sección."),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Nueva sesión" }),
+      screen.queryByRole("button", { name: "Nueva clase" }),
     ).not.toBeInTheDocument();
   });
 
@@ -213,7 +213,7 @@ describe("AW02 Horario on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Nueva sesión" }),
+      screen.queryByRole("button", { name: "Nueva clase" }),
     ).not.toBeInTheDocument();
   });
 
@@ -227,13 +227,11 @@ describe("AW02 Horario on a desktop browser", () => {
 
     expect(
       await screen.findByText(
-        "Se muestran las primeras 100 sesiones de la semana.",
+        "Se muestran las primeras 100 clases de la semana.",
       ),
     ).toBeVisible();
     expect(
-      screen.getByText(
-        "Sucursal Centro · sala única · 100 sesiones esta semana",
-      ),
+      screen.getByText("Sucursal Centro · sala única · 100 clases esta semana"),
     ).toBeVisible();
   });
 

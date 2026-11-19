@@ -189,7 +189,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       await screen.findByText("1 día con ventas en efectivo sin cierre"),
     ).toBeVisible();
     expect(
-      screen.getByText("Revisa con recepción qué pasó esos días."),
+      screen.getByText("Revisa con la asistente qué pasó esos días."),
     ).toBeVisible();
 
     const short = await rowOf("vie 23 oct");

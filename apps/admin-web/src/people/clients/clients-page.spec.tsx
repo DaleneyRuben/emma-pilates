@@ -60,7 +60,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       within(row).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
-    expect(within(row).getByText("Activo")).toBeInTheDocument();
+    expect(within(row).getByText("Activa")).toBeInTheDocument();
     expect(
       screen.getByText("148 clientas · 96 con plan activo · 12 fundadoras"),
     ).toBeVisible();
@@ -100,11 +100,11 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       within(expired).queryByText("Sin plan activo"),
     ).not.toBeInTheDocument();
-    expect(within(expired).getByText("Expirado")).toBeInTheDocument();
+    expect(within(expired).getByText("Plan vencido")).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Ana Quiroga/ })
       .parentElement as HTMLElement;
     expect(within(never).getAllByText("Sin plan")).toHaveLength(2);
-    expect(within(never).queryByText("Expirado")).not.toBeInTheDocument();
+    expect(within(never).queryByText("Plan vencido")).not.toBeInTheDocument();
   });
 
   it("keeps the search in the address and sends it to the backend", async () => {

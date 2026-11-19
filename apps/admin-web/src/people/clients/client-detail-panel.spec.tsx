@@ -62,14 +62,14 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       ...handlers(() => jsonResponse({ ...luciaDetail, photo: herPhoto })),
     );
     const { panel } = await openLucia();
-    await within(panel).findByText("Cliente desde vie 12 abr");
+    await within(panel).findByText("Clienta desde vie 12 abr");
     expectClientPhoto(panel, "Lucía Fernández");
   });
 
   it("FIX-041 heads the file with her initials when she has no photo", async () => {
     server.use(...handlers(() => jsonResponse(luciaDetail)));
     const { panel } = await openLucia();
-    await within(panel).findByText("Cliente desde vie 12 abr");
+    await within(panel).findByText("Clienta desde vie 12 abr");
     expectClientInitials(panel, "Lucía Fernández", "LF");
   });
 
@@ -82,12 +82,12 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       within(panel).getByRole("heading", { name: "Lucía Fernández" }),
     ).toHaveFocus();
     expect(
-      await within(panel).findByText("Cliente desde vie 12 abr"),
+      await within(panel).findByText("Clienta desde vie 12 abr"),
     ).toBeInTheDocument();
     expect(within(panel).getByText("lucia@example.com")).toBeInTheDocument();
     expect(within(panel).getByText("🇧🇴 +591 70011001")).toBeInTheDocument();
     expect(within(panel).getByText("Paquete de 8 clases")).toBeInTheDocument();
-    expect(within(panel).getByText("Activo")).toBeInTheDocument();
+    expect(within(panel).getByText("Activa")).toBeInTheDocument();
     expect(
       within(panel).getByText("mar 1 sept – mié 30 sept"),
     ).toBeInTheDocument();
@@ -162,7 +162,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     const { panel } = await openLucia();
 
     expect(await within(panel).findByText("Sin plan activo")).toBeVisible();
-    expect(within(panel).getByText("Expirado")).toBeInTheDocument();
+    expect(within(panel).getByText("Plan vencido")).toBeInTheDocument();
     expect(
       within(panel).getByText("Último plan vencido el mar 30 jun."),
     ).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     const { panel } = await openLucia();
 
     expect(await within(panel).findByText("Sin plan activo")).toBeVisible();
-    expect(within(panel).queryByText("Expirado")).not.toBeInTheDocument();
+    expect(within(panel).queryByText("Plan vencido")).not.toBeInTheDocument();
     expect(within(panel).queryByText(/Último plan/)).not.toBeInTheDocument();
   });
 

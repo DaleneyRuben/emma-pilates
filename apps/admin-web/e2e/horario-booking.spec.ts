@@ -20,7 +20,7 @@ test("books a Client into a class from Horario", async ({ page }) => {
       name: new RegExp(`Reformer Pilates, ${time}, Emma Vargas, 0 de 6`),
     })
     .click();
-  const detail = page.getByRole("dialog", { name: "Editar sesión" });
+  const detail = page.getByRole("dialog", { name: "Editar clase" });
   await expect(detail.getByText("Nadie reservó todavía.")).toBeVisible();
   await detail.getByRole("button", { name: "Reservar a una clienta" }).click();
 

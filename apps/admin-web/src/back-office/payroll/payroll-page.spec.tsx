@@ -92,7 +92,7 @@ describe("AW11 Nómina on a desktop browser", () => {
     const { router, user } = renderAdmin("/dinero/sueldos/pagados");
     await rowOf("Camila Rojas");
 
-    const filter = screen.getByLabelText("Empleado");
+    const filter = screen.getByLabelText("Persona");
     expect(
       within(filter)
         .getAllByRole("option")
@@ -133,7 +133,7 @@ describe("AW11 Nómina on a desktop browser", () => {
         pageSize: 20,
       }),
     );
-    expect(screen.getByLabelText("Empleado")).toHaveValue("all");
+    expect(screen.getByLabelText("Persona")).toHaveValue("all");
     expect(reads.at(-1)?.has("staffMemberId")).toBe(false);
   });
 
@@ -157,7 +157,7 @@ describe("AW11 Nómina on a desktop browser", () => {
       await screen.findByText("Todavía no hay pagos registrados."),
     ).toBeVisible();
 
-    await user.selectOptions(screen.getByLabelText("Empleado"), rita.id);
+    await user.selectOptions(screen.getByLabelText("Persona"), rita.id);
     expect(
       await screen.findByText("No hay pagos registrados para esta persona."),
     ).toBeVisible();
