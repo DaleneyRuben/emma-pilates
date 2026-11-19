@@ -62,6 +62,21 @@ describe("the offline banner when the API cannot be reached", () => {
     expect(screen.queryByText(banner)).toBeNull();
   });
 
+  it("stays away when a screen fails on a bug, not on the network", async () => {
+    const screen = await render(
+      <MobileQueryProvider>
+        <Screen
+          load={() => Promise.reject(new TypeError("Cannot read property 'x' of undefined"))}
+        />
+      </MobileQueryProvider>,
+    );
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(screen.queryByText(banner)).toBeNull();
+  });
+
   it("stays while a screen's request still fails, though another got through", async () => {
     const screen = await render(
       <MobileQueryProvider>
