@@ -14,6 +14,7 @@ import {
   QueryFailure,
   Screen,
   ScreenTopBar,
+  SectionTitle,
   spacing,
   surfaces,
   typography,
@@ -25,6 +26,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { formatBolivianos } from "./plan-format";
+import { PlanRenewalHero, planToRenew } from "./plan-renewal-hero";
 
 /** Set when «Subir otro comprobante» found the rejected Plan no longer sold. */
 export type PlansParams = { rejectedPlanGone?: true };
@@ -66,10 +68,11 @@ const scarcityLine = (placesLeft: number) =>
  * Client, in the strong tone with the count when few places are left (C08b).
  * It never says «Fundadora» nor how many places there were. Palette B
  * (FIX-089): a Crema card with a plain icon; the strong tone is the screen's
- * one Palo de rosa hero.
+ * one Palo de rosa hero, so it stays Crema under the Plan to renew (C3 A).
  */
-function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
-  const strong = placesLeft !== null;
+function LaunchBanner({ placesLeft, quiet }: { placesLeft: number | null; quiet: boolean }) {
+  const scarce = placesLeft !== null;
+  const strong = scarce && !quiet;
   return (
     <View
       accessibilityRole="text"
@@ -78,31 +81,21 @@ function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
     >
       <Glyph
         color={strong ? colors.onEmphasis : colors.text}
-        name={strong ? "flame" : "tag"}
+        name={scarce ? "flame" : "tag"}
         size={20}
         strokeWidth={1.6}
       />
       <Text style={[styles.bannerText, strong && styles.bannerTextStrong]}>
-        {strong ? scarcityLine(placesLeft) : "Oferta por tiempo limitado · 15 % en tu plan"}
+        {scarce ? scarcityLine(placesLeft) : "Oferta por tiempo limitado · 15 % en tu plan"}
       </Text>
     </View>
   );
 }
 
-function PlanRow({
-  current,
-  plan,
-  onPress,
-}: {
-  current: boolean;
-  plan: PlanDto;
-  onPress: () => void;
-}) {
+function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   return (
     <Pressable
-      accessibilityLabel={
-        current ? `${describePlanCardLabel(plan)}, tu plan actual` : describePlanCardLabel(plan)
-      }
+      accessibilityLabel={describePlanCardLabel(plan)}
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
@@ -111,7 +104,6 @@ function PlanRow({
       <View style={styles.rowBody}>
         <Text style={styles.planName}>{plan.name}</Text>
         <Text style={styles.terms}>{planRowTerms(plan)}</Text>
-        {current ? <Text style={styles.current}>Tu plan actual</Text> : null}
       </View>
       <View style={styles.prices}>
         <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
@@ -139,14 +131,9 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
   // the payment must not replace itself when the payment turns pending.
   const focused = useIsFocused();
   const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
-  // FIX-082: the Plan she has now is marked; the summary names it by its
-  // snapshot, so the match is by name.
+  // C3 A: the Plan she has, or last had, goes on top to renew.
   const subscription = useGetCurrentClientSubscription({ fetcher });
   const view = subscription.data?.status === 200 ? subscription.data.data : null;
-  const currentPlanName =
-    view !== null && (view.status === "active" || view.status === "expiring_soon")
-      ? (view.subscription?.planName ?? null)
-      : null;
   const blocked =
     standing.kind === "in_review" ||
     (standing.kind === "rejected" && route?.params?.rejectedPlanGone !== true);
@@ -164,25 +151,51 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
       ) : plans.data.data.length === 0 ? (
         <BodyText>Por ahora no hay planes disponibles.</BodyText>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          {plans.data.data.some((plan) => plan.listPriceCentavos !== undefined) ? (
-            <LaunchBanner placesLeft={launchPlacesLeft(plans.data.data)} />
-          ) : null}
+        <PlanList
+          onOpen={(planId) => navigation.navigate("PlanDetail", { planId })}
+          plans={plans.data.data}
+          renewal={planToRenew(view, plans.data.data)}
+        />
+      )}
+    </Screen>
+  );
+}
+
+function PlanList({
+  onOpen,
+  plans,
+  renewal,
+}: {
+  onOpen: (planId: string) => void;
+  plans: readonly PlanDto[];
+  renewal: PlanDto | null;
+}) {
+  const others = plans.filter((plan) => plan.id !== renewal?.id);
+  const banner = plans.some((plan) => plan.listPriceCentavos !== undefined) ? (
+    <LaunchBanner placesLeft={launchPlacesLeft(plans)} quiet={renewal !== null} />
+  ) : null;
+  return (
+    <ScrollView contentContainerStyle={styles.list}>
+      {renewal === null ? (
+        banner
+      ) : (
+        <PlanRenewalHero onRenew={() => onOpen(renewal.id)} plan={renewal} />
+      )}
+      {others.length === 0 ? null : (
+        <View>
+          {renewal === null ? null : <SectionTitle>Otros planes</SectionTitle>}
           <View style={styles.group}>
-            {plans.data.data.map((plan, index) => (
+            {others.map((plan, index) => (
               <Fragment key={plan.id}>
                 {index === 0 ? null : <View style={styles.hairline} />}
-                <PlanRow
-                  current={plan.name === currentPlanName}
-                  onPress={() => navigation.navigate("PlanDetail", { planId: plan.id })}
-                  plan={plan}
-                />
+                <PlanRow onPress={() => onOpen(plan.id)} plan={plan} />
               </Fragment>
             ))}
           </View>
-        </ScrollView>
+        </View>
       )}
-    </Screen>
+      {renewal === null ? null : banner}
+    </ScrollView>
   );
 }
 
@@ -204,12 +217,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bannerTextStrong: { color: colors.onEmphasis },
-  current: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-    fontWeight: "500",
-  },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
