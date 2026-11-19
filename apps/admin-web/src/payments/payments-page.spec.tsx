@@ -89,7 +89,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     // Credit is retired (PAY-005): an older Payment's Credit is not shown.
     expect(within(amount).queryByText(/de crédito/)).not.toBeInTheDocument();
     expect(
-      within(sofia).getByRole("cell", { name: "Paquete de 8 clases" }),
+      within(sofia).getByRole("cell", { name: /^Paquete de 8 clases/ }),
     ).toBeInTheDocument();
     expect(
       within(sofia).getByRole("cell", { name: "lun 21 sept · 14:05" }),
@@ -100,7 +100,9 @@ describe("AW28 Pagos on a desktop browser", () => {
     const lucia = await rowOf(/Lucía Fernández/);
     expect(within(lucia).getByText("Bs 1.050")).toBeInTheDocument();
     expect(within(lucia).queryByText(/de crédito/)).not.toBeInTheDocument();
-    expect(screen.getByText("Todo el estudio")).toBeVisible();
+    expect(
+      within(screen.getByRole("main")).getByText("Todo el estudio"),
+    ).toBeVisible();
     expect(statusChip("Por revisar · 6")).toHaveAttribute(
       "aria-pressed",
       "true",
