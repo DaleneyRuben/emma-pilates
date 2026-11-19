@@ -3767,9 +3767,7 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
-- from FIX-091 (Test 185): an Expense's «Detalle» column (W11A) and a
-  reason when refusing a freeze (W16B) need new columns, so a migration the
-  owner has to approve; the campaign history has no Clientas or Clases
+- from FIX-091 (Test 185): the campaign history has no Clientas or Clases
   columns (the API keeps only each campaign's name and date); a freeze panel
   shows no earlier freezes of the same clienta; the break-even reads in Bs,
   not in clientas;
@@ -11088,7 +11086,10 @@ E. **Staff fixes.** Cerrar caja asks for the count first; the expected cash
 
 The owner's picks per screen (`DECISIONES-AUDITORIA-2026-11-19.md`,
 «Elecciones del usuario por pantalla», W1–W16; boards in
-`propuestas/web-boards/`). No migration. Use a copy of `emma_vacia`
+`propuestas/web-boards/`). Two migrations, both a nullable column the
+owner approved on 2026-11-19: `expenses.detail` (W11 A) and
+`freezes.refusal_reason` (W16 B/C); run `prisma migrate deploy` on your
+copy first. Use a copy of `emma_vacia`
 (password «Password»), the API and the admin web on your own ports, log in
 as ana@, and check every step at 1440 px and at 420 px (open the menu with
 **Abrir menú**). Only the five colours appear anywhere.
@@ -11159,7 +11160,10 @@ as ana@, and check every step at 1440 px and at 420 px (open the menu with
     and **Dar de baja** (both confirm), then one table of equipment types
     with **Ver**.
 11. **W11 Gastos.** Month arrows next to Categoría (`?month=2026-11`); the
-    table is Fecha, Categoría, Monto, Editar; beside it (under it at 420 px)
+    table is Fecha, Categoría, Detalle, Monto, Editar (an expense without a
+    detail shows «—»); **Nuevo gasto** and **Editar gasto** have **Detalle
+    (opcional)** under Categoría («Ej.: Productos de limpieza», at most 120
+    characters; emptying it clears the detail); beside it (under it at 420 px)
     the month's total and one line per category. Eliminated expenses leave
     the list: **Ver gastos borrados** shows them, **Volver a los gastos**
     returns. **Editar categorías** and **Nuevo gasto** are unchanged; a new
@@ -11188,3 +11192,11 @@ as ana@, and check every step at 1440 px and at 420 px (open the menu with
     («· N restantes»), Vencería («mar 9 mar (antes lun 1 mar)»), Motivo and
     **Rechazar** (asks first) / **Aprobar**; the panel closes with
     «Congelamiento aprobado». Seed a request as a clienta with a 90-day plan.
+    Under Motivo, **Motivo si rechazas (opcional)** says «Se lo enviamos a
+    <nombre>». Type «Esas fechas el estudio está cerrado», **Rechazar** and
+    **Sí, rechazar**: the clienta's notification reads «Tu solicitud de
+    congelamiento fue rechazada. Motivo: Esas fechas el estudio está
+    cerrado», and **Decididos** shows the reason under «Rechazada». Refusing
+    with the field empty sends the earlier «Tu solicitud de congelamiento fue
+    rechazada.»; text in the field never travels with **Aprobar**. The Staff
+    app still refuses without a reason.
