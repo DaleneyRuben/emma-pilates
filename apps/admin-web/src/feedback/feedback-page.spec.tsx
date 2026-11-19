@@ -96,6 +96,23 @@ describe("AW38 Comentarios (REL-012)", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("draws no pager over an empty list, whatever page the address asks", async () => {
+    server.use(
+      feedbackList((params) =>
+        jsonResponse({
+          ...feedbackPage([], 0),
+          page: Number(params.get("page")),
+        }),
+      ),
+    );
+    renderAdmin("/comentarios?page=2");
+
+    expect(
+      await screen.findByText("Todavía no hay comentarios."),
+    ).toBeVisible();
+    expect(screen.queryByText(/^Página \d+ de \d+$/)).not.toBeInTheDocument();
+  });
+
   it("filters by status and app", async () => {
     server.use(feedbackList(() => jsonResponse(feedbackPage([problem]))));
     const { user } = renderAdmin("/comentarios");
