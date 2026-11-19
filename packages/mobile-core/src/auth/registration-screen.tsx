@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
   AcquisitionChannelField,
-  acquisitionChannelRequired,
   type AcquisitionChannelChoice,
 } from "../acquisition/acquisition-channel-field";
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
@@ -21,6 +20,10 @@ import { restartPendingWindow, type PendingRegistration } from "./pending-regist
 import { limitKeepsAnyLink } from "./request-limit-copy";
 
 export const minimumPasswordLength = 8;
+
+/** C6 B: the summary's line, «Revisa 2 datos antes de seguir». */
+const reviewTitle = (count: number) =>
+  count === 1 ? "Revisa 1 dato antes de seguir" : `Revisa ${count} datos antes de seguir`;
 
 const referralProblems = new Set(["referral_code_invalid", "referral_self_reference"]);
 
@@ -52,28 +55,35 @@ export function RegistrationScreen({
   const [submitting, setSubmitting] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
 
-  const nameError = submitted && name.trim() === "" ? "Escribe tu nombre." : undefined;
-  const emailError =
-    submitted && !email.includes("@") ? "Escribe un correo electrónico válido." : undefined;
+  // C6 B: a short error under each marked field, after a «!».
+  const nameError = submitted && name.trim() === "" ? "! Escribe tu nombre" : undefined;
+  const emailError = submitted && !email.includes("@") ? "! Escribe un correo válido" : undefined;
   const phoneMistake = phoneProblem(phone.country, phone.digits);
-  const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
+  const phoneError =
+    !submitted || phoneMistake === null
+      ? undefined
+      : phone.digits.trim() === ""
+        ? "! Escribe tu número"
+        : `! ${phoneMistake}`;
   const passwordError =
-    submitted && password.length < minimumPasswordLength ? "Mínimo 8 caracteres." : undefined;
+    submitted && password.length < minimumPasswordLength
+      ? "! Usa al menos 8 caracteres"
+      : undefined;
   const confirmationError = !submitted
     ? undefined
     : confirmation === ""
-      ? "Repite la contraseña."
+      ? "! Repite la contraseña"
       : passwordError === undefined && password !== confirmation
-        ? "Las contraseñas no coinciden."
+        ? "! Las contraseñas no coinciden"
         : undefined;
-  const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
+  const channelError = submitted && channel === null ? "! Elige una opción" : undefined;
   const missing = [
     [nameError, "Nombre"],
     [emailError, "Correo electrónico"],
     [phoneError, "Celular"],
     [passwordError, "Contraseña"],
     [confirmationError, "Confirmar contraseña"],
-    [channelError, "Cómo nos conociste"],
+    [channelError, "¿Cómo nos conociste?"],
   ]
     .filter(([problem]) => problem !== undefined)
     .map(([, label]) => label as string);
@@ -124,12 +134,14 @@ export function RegistrationScreen({
 
   return (
     <AuthenticationScreen
+      brand={false}
       footer={
         <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
       }
+      topBar={{ onBack, title: "Crea tu cuenta" }}
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
-      <FormErrorSummary fields={missing} />
+      <FormErrorSummary fields={missing} title={reviewTitle} />
       {waitSeconds > 0 ? (
         <WaitNotice
           message={limitKeepsAnyLink}
@@ -140,9 +152,9 @@ export function RegistrationScreen({
       <FormField
         autoCapitalize="words"
         error={nameError}
+        hint="Ej.: Lucía Mendoza"
         label="Nombre"
         onChangeText={setName}
-        placeholder="Tu nombre y apellido"
         value={name}
       />
       <FormField
@@ -164,9 +176,9 @@ export function RegistrationScreen({
       <FormField
         autoComplete="new-password"
         error={passwordError}
+        hint="Mínimo 8 caracteres"
         label="Contraseña"
         onChangeText={setPassword}
-        placeholder="Mínimo 8 caracteres"
         secureTextEntry
         value={password}
       />
@@ -175,7 +187,6 @@ export function RegistrationScreen({
         error={confirmationError}
         label="Confirmar contraseña"
         onChangeText={setConfirmation}
-        placeholder="Repite la contraseña"
         secureTextEntry
         value={confirmation}
       />
@@ -185,7 +196,7 @@ export function RegistrationScreen({
           <FormField
             autoCapitalize="characters"
             autoCorrect={false}
-            error={referralError ? "Revisa el código de referido." : undefined}
+            error={referralError ? "! Revisa el código de referido" : undefined}
             hint="Ej.: EMMA-2026"
             label="Código de referido"
             onChangeText={setReferralCode}
