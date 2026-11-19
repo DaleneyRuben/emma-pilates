@@ -229,9 +229,11 @@ describe("Client Home", () => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
     expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    // FIX-090: the app's one banner, not a second copy of Inicio's own.
     expect(
-      screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
-    ).toBeOnTheScreen();
+      screen.getAllByText("Sin conexión. Mostrando la última información guardada."),
+    ).toHaveLength(1);
+    expect(screen.queryByText(/Mostrando tus datos/)).toBeNull();
     expect(screen.queryByText("No pudimos cargar tu inicio.")).not.toBeOnTheScreen();
   });
 
@@ -250,7 +252,7 @@ describe("Client Home", () => {
     });
     expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
     expect(
-      screen.getByText("Sin conexión. Mostrando tus datos de la última vez."),
+      screen.getByText("Sin conexión. Mostrando la última información guardada."),
     ).toBeOnTheScreen();
   });
 
@@ -268,9 +270,11 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("No pudimos cargar tu inicio.")).toBeOnTheScreen();
     });
+    // FIX-090: the app's one banner says the connection failed, over the
+    // screen's own error.
     expect(
-      screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
-    ).not.toBeOnTheScreen();
+      screen.getAllByText("Sin conexión. Mostrando la última información guardada."),
+    ).toHaveLength(1);
     expect(screen.queryByText("Hola, Lucía")).not.toBeOnTheScreen();
   });
 
@@ -300,7 +304,7 @@ describe("Client Home", () => {
     });
     expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
     expect(
-      screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
+      screen.queryByText("Sin conexión. Mostrando la última información guardada."),
     ).not.toBeOnTheScreen();
   });
 });
