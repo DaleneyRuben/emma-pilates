@@ -3,11 +3,11 @@ import {
   BodyText,
   colors,
   EmphasisCard,
+  ExceptionPill,
   fontFamilies,
   formatBolivianos,
   OutlinedButton,
   PrimaryButton,
-  radii,
   spacing,
   surfaces,
   typography,
@@ -19,7 +19,6 @@ import { clockTime, evaluationDate, paidEvaluationLabel } from "./evaluation-for
 
 type CardState = {
   chip: string;
-  dot: string;
   line: string;
   released: boolean;
   canCancel: boolean;
@@ -37,7 +36,6 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
     return {
       ...base,
       chip: "El estudio liberó tu turno",
-      dot: colors.warning,
       line: `Tu pago de ${amount} sigue vigente: elige otro turno y no pagas de nuevo.`,
       released: true,
     };
@@ -48,7 +46,6 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
       ...base,
       canCancel,
       chip: "Gratis con tu plan",
-      dot: colors.onEmphasis,
       line: canCancel ? "Puedes cancelarla hasta 3 horas antes." : "Ya no se puede cancelar.",
     };
   }
@@ -69,26 +66,14 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
           : canCancel
             ? "Puedes cancelarla hasta 3 horas antes."
             : "Ya no se puede reprogramar.";
-  const dot =
-    evaluation.paymentState === "pending" || evaluation.paymentState === "rejected"
-      ? colors.warning
-      : colors.success;
-  return { ...base, canCancel, canMove, chip, dot, line, needsReceipt };
-}
-
-function Chip({ dot, label, onLino }: { dot: string; label: string; onLino: boolean }) {
-  return (
-    <View style={[styles.chip, onLino && styles.chipOnLino]}>
-      <View style={[styles.dot, { backgroundColor: dot }]} />
-      <Text style={[styles.chipLabel, onLino && styles.chipLabelOnLino]}>{label}</Text>
-    </View>
-  );
+  return { ...base, canCancel, canMove, chip, line, needsReceipt };
 }
 
 /**
- * Option A's «Tu próxima evaluación»: C14's Rosa profundo hero with a state
- * chip, one muted line under it and full-width actions. A slot the studio
- * released draws the hero in Lino with the time struck through.
+ * Option A's «Tu próxima evaluación»: C14's hero with its state as a Crema
+ * line (palette B: a normal state is words, FIX-089), one line under it and
+ * full-width actions. A slot the studio released draws the card in Crema
+ * with the time struck through and the exception on the Rubor pill.
  */
 export function NextEvaluationCard({
   evaluation,
@@ -118,13 +103,13 @@ export function NextEvaluationCard({
           <Text style={styles.releasedEyebrow}>{eyebrow}</Text>
           <Text style={[styles.time, styles.releasedTime]}>{time}</Text>
           <Text style={styles.releasedDetails}>{details}</Text>
-          <Chip dot={state.dot} label={state.chip} onLino />
+          <ExceptionPill>{state.chip}</ExceptionPill>
         </View>
       ) : (
         <EmphasisCard eyebrow={eyebrow} testID="next-evaluation">
           <Text style={styles.time}>{time}</Text>
           <Text style={styles.details}>{details}</Text>
-          <Chip dot={state.dot} label={state.chip} onLino={false} />
+          <Text style={styles.state}>{state.chip}</Text>
         </EmphasisCard>
       )}
       <BodyText style={styles.line}>{state.line}</BodyText>
@@ -151,44 +136,31 @@ export function NextEvaluationCard({
 const styles = StyleSheet.create({
   actions: { gap: spacing.sm },
   block: { gap: spacing.md },
-  chip: {
-    alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    gap: spacing.xs,
-    minHeight: 28,
-    paddingHorizontal: spacing.smLg,
-  },
-  chipLabel: {
-    color: colors.white,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-  chipLabelOnLino: { color: colors.text },
-  chipOnLino: { backgroundColor: colors.warningTint },
   details: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
   },
-  dot: { borderRadius: radii.pill, height: 8, width: 8 },
-  line: { color: colors.textMuted, fontSize: 14 },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   releasedCard: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
-  releasedDetails: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 15 },
+  releasedDetails: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15 },
   releasedEyebrow: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
     letterSpacing: typography.label * 0.12,
     textTransform: "uppercase",
   },
-  releasedTime: { color: colors.textMuted, textDecorationLine: "line-through" },
+  releasedTime: { color: colors.text, textDecorationLine: "line-through" },
+  state: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
   time: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 40,
     fontVariant: ["tabular-nums"],
