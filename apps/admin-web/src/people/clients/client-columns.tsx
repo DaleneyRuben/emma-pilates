@@ -4,6 +4,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { RowOpener } from "../../catalog/catalog-page";
 import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
+import { addDays, boliviaToday } from "../../lib/bolivia-time";
 import { ClientPhone } from "./client-phone";
 
 const columns = createColumnHelper<AdminClientDto>();
@@ -25,8 +26,17 @@ const endsLabel = (client: AdminClientDto): string | null => {
   return client.subscriptionStatus === "active" ? date : `Venció el ${date}`;
 };
 
+// FIX-091 (W8 A): «Por vencer», the 3 days of her own renewal reminder, the
+// one exception the list marks with the Rubor pill.
+const endsSoon = (client: AdminClientDto): boolean =>
+  client.subscriptionStatus === "active" &&
+  client.planEndsOn !== null &&
+  client.planEndsOn <= addDays(boliviaToday(), 3);
+
 // AW21 on P03 (follow-up 232): Clienta (with her Fundadora number), Contacto,
-// Plan, Le quedan, Vence, Invitada por, Estado.
+// Plan, Le quedan, Vence, Invitada por, Estado. FIX-091 (W8 A): «Última
+// clase» right after «Vence», so what she needs and when she last came read
+// together.
 export const clientColumns = (open: (row: AdminClientDto) => void) => [
   columns.accessor("name", {
     header: "Clienta",
@@ -105,6 +115,9 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     cell: ({ row }) => {
       const label = endsLabel(row.original);
       if (label === null) return none;
+      if (endsSoon(row.original)) {
+        return <StatusPill tone="advertencia">{label}</StatusPill>;
+      }
       return (
         <span
           className={
@@ -114,6 +127,19 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
           }
         >
           {label}
+        </span>
+      );
+    },
+  }),
+  columns.accessor("lastClassOn", {
+    header: "Última clase",
+    cell: ({ getValue }) => {
+      const day = getValue();
+      return day == null ? (
+        none
+      ) : (
+        <span className="text-texto-secundario tabular">
+          {formatListDate(day)}
         </span>
       );
     },
