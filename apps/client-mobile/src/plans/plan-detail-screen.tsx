@@ -160,12 +160,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar
-        fullBleed
-        onBack={() => navigation.goBack()}
-        title="Elige tu plan"
-        tone="context"
-      />
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={detail.name} />
       <ScrollView contentContainerStyle={styles.content}>
         <PlanHero plan={detail} />
         <PlanIncludes

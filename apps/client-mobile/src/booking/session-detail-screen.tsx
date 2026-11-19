@@ -89,13 +89,12 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const [forcedFull, setForcedFull] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
 
-  // 04 names where it was opened from, the Reservar tab, instead of a title.
+  // The header names the class itself, never the screen it was opened from (FIX-089).
   const header = (
     <ScreenTopBar
       fullBleed
       onBack={() => navigation.goBack()}
-      title="Reservar una clase"
-      tone="context"
+      title={session.data?.status === 200 ? session.data.data.classType.name : "Clase"}
     />
   );
 

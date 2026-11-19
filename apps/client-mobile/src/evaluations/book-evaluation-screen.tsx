@@ -13,7 +13,6 @@ import {
   EmphasisCard,
   fontFamilies,
   formatBolivianos,
-  Heading,
   IconRow,
   IconRowGroup,
   PrimaryButton,
@@ -147,14 +146,8 @@ export function BookEvaluationScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar
-        fullBleed
-        onBack={() => navigation.goBack()}
-        title="Evaluación nutricional"
-        tone="context"
-      />
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirma tu cita" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Heading accessibilityRole="header">Confirma tu cita</Heading>
         <EmphasisCard
           eyebrow={capitalized(evaluationDate(slot.startsAt))}
           note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
