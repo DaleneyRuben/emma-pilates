@@ -136,7 +136,7 @@ describe("Inicio and Mi plan plan cards", () => {
     });
 
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeDisabled();
   });
 
   // Independent review: the Plan she bought covers a class on or after its
@@ -151,7 +151,7 @@ describe("Inicio and Mi plan plan cards", () => {
         }),
     });
 
-    expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.getByText("Usarás 1 de tus 12 clases.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
   });
 });

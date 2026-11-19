@@ -34,23 +34,21 @@ describe("Client Session detail", () => {
       },
     });
 
-    // Follow-up 227 (C04): the hero carries the time and the seats; the
-    // Trainer, the Branch and the free-cancellation limit are icon rows.
+    // C4 A: the block carries the day, the time and the minutes; the
+    // Trainer, the Branch, the places and the free-cancellation limit are
+    // rows of a quiet table (session-detail-layout.spec).
     const facts = within(screen.getByTestId("session-facts"));
     expect(facts.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(facts.getByText("Instructora")).toBeOnTheScreen();
     expect(facts.getByText("Centro")).toBeOnTheScreen();
-    // Walkthrough n.º 27: the limit names its day. The class starts four hours
-    // from now, so the limit is today, or tomorrow near midnight.
-    expect(
-      facts.getByText(/^Cancela sin costo hasta (hoy|mañana) a las \d{2}:\d{2}$/),
-    ).toBeOnTheScreen();
-    expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
-    expect(screen.getByText("de 12 lugares libres")).toBeOnTheScreen();
+    // Walkthrough n.º 27: the limit names its day.
+    expect(facts.getByText("Cancelas gratis hasta")).toBeOnTheScreen();
+    expect(screen.getByText(/^75 minutos · termina /)).toBeOnTheScreen();
+    expect(facts.getByText("3 de 12 libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
-    expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
+    expect(screen.getByText("Usarás 1 de tus 5 clases.")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
 
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
@@ -82,7 +80,7 @@ describe("Client Session detail", () => {
         return jsonResponse({ id: "booking-guest" }, 201);
       },
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
     await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
     expect(screen.queryByText(/Te quedan \d+ clases en tu plan/)).toBeNull();
     expect(screen.getByText("Tu pase de invitada ya se usó.")).toBeOnTheScreen();
@@ -125,7 +123,7 @@ describe("Client Session detail", () => {
 
     expect(screen.getByText("La lista de espera no usa clases de tu plan")).toBeOnTheScreen();
     expect(screen.getByText("Te avisamos si se libera un lugar")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reservar esta clase" })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
 
@@ -147,7 +145,7 @@ describe("Client Session detail", () => {
       { pushPlatform: platform },
     );
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
@@ -197,14 +195,14 @@ describe("Client Session detail", () => {
         }),
     });
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
     expect(screen.queryByText("No te quedan clases en tu plan.")).toBeNull();
   });
 
   it("disables booking without remaining classes and links to the Plans", async () => {
     const { screen } = await openDetail({}, 0, 3);
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeDisabled();
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
@@ -228,7 +226,7 @@ describe("Client Session detail", () => {
         jsonResponse({ code: "booking_overlap", status: 409, title: "Conflict" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();
@@ -245,7 +243,7 @@ describe("Client Session detail", () => {
         jsonResponse({ code, status: 409, title: "Conflict" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
 
     await waitFor(() => {
       expect(screen.getByText(message)).toBeOnTheScreen();
@@ -258,7 +256,7 @@ describe("Client Session detail", () => {
         jsonResponse({ code: "weekly_cap_reached", status: 409, title: "Conflict" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya usaste tus clases de esta semana.")).toBeOnTheScreen();

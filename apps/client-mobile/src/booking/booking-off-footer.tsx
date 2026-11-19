@@ -43,7 +43,7 @@ export function BookingOffFooter({
   return (
     <>
       {/* FIX-089: the reason is the off button's own line, under it. */}
-      <PrimaryButton disabled disabledReason={copy[reason].note} label="Reservar" />
+      <PrimaryButton disabled disabledReason={copy[reason].note} label="Reservar esta clase" />
       <TextButton
         label={busy ? "Preparando…" : copy[reason].action}
         onPress={() => {

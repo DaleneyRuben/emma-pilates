@@ -20,7 +20,7 @@ describe("The Client tabs", () => {
       "POST /api/v1/sessions/session-1/bookings": () => jsonResponse({ id: "booking-1" }, 201),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });

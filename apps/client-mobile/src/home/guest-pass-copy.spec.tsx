@@ -100,7 +100,7 @@ describe("Guest Pass copy", () => {
 
     expect(screen.getByText("Es tu clase gratis de invitada")).toBeOnTheScreen();
     expect(screen.queryByText("Se descuenta 1 clase de tu plan")).toBeNull();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
   });
 
   it("asks for a plan on a class detail once the pass is used", async () => {
@@ -109,7 +109,7 @@ describe("Guest Pass copy", () => {
     });
 
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
   });
 });
