@@ -102,7 +102,7 @@ const weakSchedules = (
         group.bookings.reduce((total, value) => total + value, 0),
         group.bookings.length,
       );
-      const students = average === '1' ? 'alumna' : 'alumnas';
+      const students = average === '1' ? 'clienta' : 'clientas';
       const day = weekdayNames[group.weekday % 7];
       const total = group.bookings.length;
       const cancelled =

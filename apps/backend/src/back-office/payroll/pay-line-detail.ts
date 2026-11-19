@@ -46,7 +46,7 @@ export const bolivianosText = (centavos: number): string => {
 };
 
 export const studentsText = (students: number): string =>
-  `${students} ${students === 1 ? 'alumna' : 'alumnas'}`;
+  `${students} ${students === 1 ? 'clienta' : 'clientas'}`;
 
 export type ClassPlace = {
   startsAt: Date;
