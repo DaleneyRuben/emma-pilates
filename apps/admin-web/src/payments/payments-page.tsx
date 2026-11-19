@@ -241,7 +241,7 @@ export function PaymentsPage({
       filter={
         <div className="flex flex-wrap items-center gap-3">
           <SearchFilter
-            label="Buscar por cliente"
+            label="Buscar por clienta"
             value={search.q ?? ""}
             onChange={(text) =>
               onSearchChange({ q: text === "" ? undefined : text, page: 1 })
