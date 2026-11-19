@@ -12,16 +12,16 @@ const pendingCard = (panel: HTMLElement) => {
   return card;
 };
 
-// The full-width, 40 px button of AW24's pending card (in px: the root is
-// 15 px, so 2.5rem draws 37.5): on v2 (follow-up 225) a Marfil button on the
-// Lino card, with no border, and the same ground while disabled.
+// The full-width button of AW24's pending card (in px: the root is 15 px):
+// FIX-089 draws it as the secondary button, Crema with a Rosa profundo
+// border, 44 px tall.
 const cardButton = [
-  "h-[40px]",
+  "h-[44px]",
   "w-full",
-  "bg-superficie",
-  "text-texto",
+  "border-rosa-profundo",
+  "bg-crema",
+  "text-rosa-profundo",
   "text-fila-menu",
-  "disabled:bg-superficie",
 ];
 
 // WEB-015: AW24's pending card as the export draws it.
@@ -36,7 +36,7 @@ describe("AW24's pending card surface", () => {
 
     const card = pendingCard(panel);
     expect(card).toHaveClass("gap-2.5", "rounded-marco", "bg-lino", "p-4");
-    expect(card).not.toHaveClass("bg-advertencia/10");
+    expect(card).not.toHaveClass("bg-advertencia-tinte");
   });
 
   it("puts the address and «Cambiar correo» on one row and tones the two lifetimes apart", async () => {
@@ -46,7 +46,7 @@ describe("AW24's pending card surface", () => {
     const change = card.getByRole("button", { name: "Cambiar correo" });
     expect(change.parentElement).toHaveClass("justify-between");
     expect(card.getByText(/^El enlace vence el/)).toHaveClass(
-      "text-[12.5px]",
+      "text-nota",
       "text-texto-secundario",
     );
     expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass(

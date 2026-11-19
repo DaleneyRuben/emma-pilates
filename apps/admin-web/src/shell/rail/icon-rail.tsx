@@ -13,7 +13,7 @@ export function IconRail() {
   return (
     <nav
       aria-label="Secciones"
-      className="sticky top-0 flex h-svh w-[96px] shrink-0 flex-col gap-1 overflow-y-auto bg-lino px-2 py-5"
+      className="sticky top-0 flex h-svh w-[96px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-divisor bg-lino px-2 py-5"
     >
       {destinations.map((destination) => {
         const current = place?.destination.label === destination.label;
@@ -34,7 +34,7 @@ export function IconRail() {
               className={cn(
                 "relative flex h-8 w-14 items-center justify-center rounded-full text-primario group-hover:bg-rosa-tinte",
                 current &&
-                  "bg-rosa-profundo text-blanco group-hover:bg-rosa-profundo",
+                  "bg-rosa-profundo text-crema group-hover:bg-rosa-profundo",
               )}
             >
               <DestinationIcon icon={destination.icon} size={22} />

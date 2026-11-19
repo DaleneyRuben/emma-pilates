@@ -38,13 +38,13 @@ function PhoneInput({
   };
 
   return (
-    <div className="flex min-h-[44px] w-full rounded-tarjeta border border-borde bg-lino focus-within:border-primario focus-within:shadow-foco has-[input[aria-invalid=true]]:border-error">
+    <div className="flex min-h-[44px] w-full rounded-panel border border-borde bg-crema focus-within:border-primario focus-within:shadow-foco has-[input[aria-invalid=true]]:border-rosa-profundo has-[input[aria-invalid=true]]:inset-ring has-[input[aria-invalid=true]]:inset-ring-rosa-profundo">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             type="button"
             aria-label={`País: ${country.name}, +${country.dial}`}
-            className="flex shrink-0 items-center gap-1.5 rounded-l-tarjeta border-r border-arena-linea pr-2.5 pl-3 text-cuerpo font-semibold text-rosa-enlace hover:bg-rosa-tinte focus-visible:shadow-foco"
+            className="flex shrink-0 items-center gap-1.5 rounded-l-panel border-r border-arena-linea pr-2.5 pl-3 text-cuerpo font-semibold text-rosa-enlace hover:bg-rosa-tinte focus-visible:shadow-foco"
           >
             <span aria-hidden="true" className="leading-none">
               {country.flag}

@@ -14,7 +14,7 @@ const sizes = {
 /**
  * FIX-041 (walkthrough n.º 30): a Client's circle wherever the web draws
  * her, her thumbnail when she has a photo, otherwise her initials in
- * Primario tinte. The admin-session cookie authenticates the same-origin
+ * Crema on Palo de rosa (FIX-089). The admin-session cookie authenticates the same-origin
  * image.
  */
 export function ClientPhoto({
@@ -39,7 +39,7 @@ export function ClientPhoto({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primario-tinte font-medium text-primario-profundo",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-palo-de-rosa font-bold text-crema",
         sizes[size],
         className,
       )}

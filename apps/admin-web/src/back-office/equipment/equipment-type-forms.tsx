@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { selectedClass } from "../../components/ui/chip";
 import { cn } from "../../lib/cn";
 import { backOfficeProblem } from "../back-office-problems";
 import { Failure, fieldError } from "./equipment-forms";
@@ -136,7 +137,7 @@ export function NewTypeForm({
               key={value}
               className={cn(
                 "flex cursor-pointer items-start gap-3 rounded-tarjeta border border-borde bg-superficie px-4 py-3 has-focus-visible:shadow-foco",
-                value === tracking && "border-primario bg-primario-tinte",
+                value === tracking && selectedClass,
               )}
             >
               <input

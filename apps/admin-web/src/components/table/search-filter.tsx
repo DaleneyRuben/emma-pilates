@@ -60,7 +60,7 @@ export function SearchFilter({
         placeholder={label}
         value={text}
         onChange={(event) => setText(event.target.value)}
-        className="h-[38px] pl-9 text-nota [&::-webkit-search-cancel-button]:appearance-none"
+        className="h-[44px] pl-9 text-nota md:h-[38px] [&::-webkit-search-cancel-button]:appearance-none"
       />
     </div>
   );

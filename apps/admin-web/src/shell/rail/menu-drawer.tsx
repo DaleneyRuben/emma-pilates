@@ -29,7 +29,10 @@ export function MenuDrawer() {
         <button
           type="button"
           aria-label="Abrir menú"
-          className={cn(squareButton, "bg-lino text-primario")}
+          className={cn(
+            squareButton,
+            "border border-borde bg-lino text-primario",
+          )}
         >
           <Menu size={24} strokeWidth={1.6} aria-hidden="true" />
         </button>
@@ -64,19 +67,19 @@ export function MenuDrawer() {
               className={cn(
                 "flex min-h-12 items-center gap-3 rounded-tarjeta px-3 text-[16px] text-texto hover:bg-rosa-tinte focus-visible:shadow-foco",
                 current &&
-                  "bg-rosa-profundo font-semibold text-blanco hover:bg-rosa-profundo",
+                  "bg-rosa-profundo font-semibold text-crema hover:bg-rosa-profundo",
               )}
             >
               <DestinationIcon
                 icon={destination.icon}
                 size={22}
-                className={current ? "text-blanco" : "text-primario"}
+                className={current ? "text-crema" : "text-rosa-profundo"}
               />
               <span className="flex-1">{destination.label}</span>
               {count === undefined ? null : (
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rosa-profundo px-[7px] text-pie font-semibold text-blanco tabular"
+                  className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rosa-profundo px-[7px] text-pie font-semibold text-crema tabular"
                 >
                   {countFormat.format(count.value)}
                 </span>

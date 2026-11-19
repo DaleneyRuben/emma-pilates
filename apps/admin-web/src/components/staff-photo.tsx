@@ -20,7 +20,7 @@ const staffPhotoUrl = (
 
 /**
  * FIX-041 (follow-up 242): a Staff Member's circle, her photo when she has
- * one, otherwise her initials in Rosa tinte. `src` overrides the stored
+ * one, otherwise her initials in Crema on Palo de rosa (FIX-089). `src` overrides the stored
  * photo (the panel's preview while it uploads); `children` lays over it.
  */
 export function StaffPhoto({
@@ -47,7 +47,7 @@ export function StaffPhoto({
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-rosa-tinte font-semibold text-rosa-enlace",
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-palo-de-rosa font-bold text-crema",
         sizes[size],
         className,
       )}

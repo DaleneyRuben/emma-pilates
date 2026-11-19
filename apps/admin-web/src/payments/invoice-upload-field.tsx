@@ -114,9 +114,12 @@ export function InvoiceUploadField({
           onDrop={onDrop}
           className="flex flex-col items-center gap-2 rounded-marco border-[1.5px] border-dashed border-borde-fuerte px-4 py-5 text-center"
         >
-          <span className="flex size-11 items-center justify-center rounded-full bg-rosa-tinte text-primario">
-            <Upload size={20} strokeWidth={1.6} aria-hidden="true" />
-          </span>
+          <Upload
+            size={24}
+            strokeWidth={1.6}
+            aria-hidden="true"
+            className="text-rosa-profundo"
+          />
           <span className="text-cuerpo">
             Arrastra aquí la factura o elige un archivo
           </span>

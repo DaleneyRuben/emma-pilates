@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { NavigationItem } from "../app/navigation";
 import { countFormat } from "../components/table/pagination";
+import { chipClass, selectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { countedName, useRail } from "./rail/use-rail";
 
@@ -39,7 +40,7 @@ export function DestinationTabs() {
                 {count === undefined ? null : (
                   <span
                     aria-hidden="true"
-                    className="ml-1.5 rounded-full bg-rosa-profundo px-[7px] py-0.5 text-pie font-semibold text-blanco tabular"
+                    className="ml-1.5 rounded-full bg-rosa-profundo px-[7px] py-0.5 text-pie font-semibold text-crema tabular"
                   >
                     {countFormat.format(count.value)}
                   </span>
@@ -59,8 +60,8 @@ export function DestinationTabs() {
               key={view.to}
               item={view}
               current={view.to === place.page.to}
-              className="inline-flex h-9 items-center rounded-full bg-lino px-3.5 text-celda text-texto hover:bg-rosa-tinte"
-              currentClassName="bg-rosa-tinte font-semibold text-rosa-enlace"
+              className={chipClass}
+              currentClassName={selectedClass}
             >
               {view === place.tab ? (view.viewLabel ?? view.label) : view.label}
             </PageLink>

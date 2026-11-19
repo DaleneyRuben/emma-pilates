@@ -8,7 +8,7 @@ export function Select({ className, ...props }: ComponentProps<"select">) {
     <select
       data-slot="select"
       className={cn(
-        "select-chevron h-[44px] w-full rounded-tarjeta border border-borde bg-lino px-3 pr-9 text-cuerpo text-texto focus-visible:border-primario focus-visible:shadow-foco disabled:bg-deshabilitado disabled:text-deshabilitado-texto aria-invalid:border-error",
+        "select-chevron h-[44px] w-full rounded-panel border border-borde bg-crema px-3 pr-9 text-cuerpo text-texto focus-visible:border-primario focus-visible:shadow-foco disabled:opacity-70 aria-invalid:border-rosa-profundo aria-invalid:inset-ring aria-invalid:inset-ring-rosa-profundo",
         className,
       )}
       {...props}

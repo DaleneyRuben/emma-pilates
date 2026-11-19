@@ -52,11 +52,13 @@ export function DecisionCell({
   return (
     <span className="flex flex-col items-start gap-2">
       <span className="flex flex-wrap gap-2">
+        {/* FIX-089: a row repeats down the table, so no solid button. */}
         <Button
           disabled={mutation.isPending}
           onClick={() => mutation.mutate("approved")}
           size="sm"
           type="button"
+          variant="secondary"
         >
           Aprobar
         </Button>
