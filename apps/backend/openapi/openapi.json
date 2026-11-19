@@ -1107,6 +1107,15 @@
         "operationId": "listSessionAvailability",
         "parameters": [
           {
+            "name": "includeAttendees",
+            "required": false,
+            "in": "query",
+            "description": "E7: Staff also get who is coming, by initials only; ignored for a Client",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "includeCancelled",
             "required": false,
             "in": "query",
@@ -12130,6 +12139,13 @@
                 "$ref": "#/components/schemas/SessionCancellationSummaryDto"
               }
             ]
+          },
+          "attendeeInitials": {
+            "description": "E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -15402,6 +15418,13 @@
                 "$ref": "#/components/schemas/SessionCancellationSummaryDto"
               }
             ]
+          },
+          "attendeeInitials": {
+            "description": "E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "sessionScheduleId": {
             "type": "string",

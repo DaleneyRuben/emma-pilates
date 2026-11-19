@@ -41,6 +41,8 @@ export interface AdministratorSessionAvailabilityDto {
    * @nullable
    */
   cancellation?: SessionCancellationSummaryDto | null;
+  /** E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees. */
+  attendeeInitials?: string[];
   /** @nullable */
   sessionScheduleId: string | null;
   isException: boolean;

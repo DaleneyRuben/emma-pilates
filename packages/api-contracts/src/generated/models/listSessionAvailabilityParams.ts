@@ -7,6 +7,10 @@
 
 export type ListSessionAvailabilityParams = {
   /**
+   * E7: Staff also get who is coming, by initials only; ignored for a Client
+   */
+  includeAttendees?: boolean;
+  /**
    * FIX-052: Staff also get the cancelled classes, with their cause; ignored for a Client
    */
   includeCancelled?: boolean;
