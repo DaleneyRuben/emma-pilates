@@ -120,9 +120,13 @@ describe("AW44 Recomendaciones del mes", () => {
         <RecommendationsSection month={month} readOnly={false} />
       </QueryClientProvider>
     );
-    const { rerender } = render(section("2026-10"));
+    // November is already cached when the page comes back to it.
+    const { rerender } = render(section("2026-11"));
+    await screen.findByText(finding.detail);
+    rerender(section("2026-10"));
     const user = userEvent.setup();
     await screen.findByText(finding.detail);
+    await screen.findByRole("button", { name: "Clientas · 1" });
     const kinds = () =>
       screen.getByRole("group", { name: "Tipo de recomendación" });
     await user.click(
@@ -131,8 +135,11 @@ describe("AW44 Recomendaciones del mes", () => {
 
     rerender(section("2026-11"));
 
+    const next = await screen.findByRole("group", {
+      name: "Tipo de recomendación",
+    });
     expect(
-      await within(kinds()).findByRole("button", { name: "Horario · 1" }),
+      within(next).getByRole("button", { name: "Horario · 1" }),
     ).toHaveAttribute("aria-pressed", "true");
     expect(await screen.findByText(finding.detail)).toBeVisible();
   });
