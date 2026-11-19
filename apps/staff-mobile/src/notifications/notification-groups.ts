@@ -11,15 +11,16 @@ export type NotificationEntry =
     };
 
 // FIX-083 (Notificaciones, pick A): the plural line a group of each kind reads.
-// A group counts read notices too, so the copy never calls them «nuevos».
+// A group counts read notices too, so the copy never calls them «nuevos», nor
+// «por revisar»: a decided receipt or Freeze stays in it, read (FIX-090).
 const plurals: Record<string, string> = {
   evaluation_booked: "evaluaciones agendadas",
   evaluation_cancelled: "evaluaciones canceladas",
   evaluation_rescheduled: "evaluaciones reprogramadas",
   feedback_received: "comentarios",
-  freeze_requested: "congelamientos por revisar",
+  freeze_requested: "pedidos de congelamiento",
   payment_confirmed: "pagos confirmados",
-  payment_submitted: "comprobantes por revisar",
+  payment_submitted: "comprobantes recibidos",
   session_assigned: "clases asignadas",
   session_cancelled: "clases canceladas",
 };
