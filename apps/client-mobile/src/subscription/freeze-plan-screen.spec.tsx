@@ -107,10 +107,9 @@ describe("Congelar plan", () => {
     expect(screen.getByText("7 días")).toBeOnTheScreen();
     expect(screen.getByText(weekdayDayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
     expect(screen.getByText(`antes, el ${dayMonth(termEndsOn)}`)).toBeOnTheScreen();
-    expect(screen.getByText("Motivo", { exact: true })).toBeOnTheScreen();
-    expect(
-      within(screen.getByTestId("form-error-summary")).getByText("Falta 1 dato para guardar"),
-    ).toBeOnTheScreen();
+    const left = within(screen.getByTestId("form-error-summary"));
+    expect(left.getByText("Falta 1 dato para guardar")).toBeOnTheScreen();
+    expect(left.getByText("Motivo")).toBeOnTheScreen();
 
     await fireEvent.changeText(screen.getByLabelText("Motivo"), "Viaje familiar");
     await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));

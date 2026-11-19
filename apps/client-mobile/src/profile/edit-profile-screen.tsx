@@ -10,6 +10,7 @@ import {
 import {
   BodyText,
   colors,
+  FormErrorSummary,
   FormField,
   FormScrollView,
   LoadingState,
@@ -56,6 +57,13 @@ const profileSchema = (stored: string | null) =>
   });
 
 type ProfileValues = z.infer<ReturnType<typeof profileSchema>>;
+
+// FormB (FIX-089): the labels the summary names, in the form's order.
+const fieldLabels: Record<keyof ProfileValues, string> = {
+  name: "Nombre",
+  email: "Correo electrónico",
+  phone: "Celular",
+};
 
 function EditProfileForm({
   client,
@@ -130,6 +138,11 @@ function EditProfileForm({
       }
       keyboardVerticalOffset={spacing.xxl}
     >
+      <FormErrorSummary
+        fields={(Object.keys(fieldLabels) as (keyof ProfileValues)[])
+          .filter((field) => errors[field] !== undefined)
+          .map((field) => fieldLabels[field])}
+      />
       <ProfilePhotoSection client={client} />
       <Controller
         control={control}
