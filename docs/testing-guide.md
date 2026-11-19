@@ -2725,8 +2725,9 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    `/reglas-del-estudio` opens `/ajustes/reglas-del-estudio` (no longer in
    the account menu).
 4. **Top bar and search.** The top bar shows «Emma Pilates Studio», the
-   search field «Buscar una clienta, una clase, un pago o una página»
-   (Ctrl K focuses it), the Branch cell and Paola with «Administración».
+   search field «Buscar una clienta» (Ctrl K focuses it; since FIX-091 it
+   finds only Clientas, Test 185 W9), the Branch cell and Paola with
+   «Administración».
    Type `caja`: the list offers **Dinero · Caja** and **Buscar «caja» en
    Clientas**; the arrow keys move between them and Enter opens the
    highlighted one. Type a name such as `Lucía` and press Enter: Clientas ›
@@ -2914,8 +2915,9 @@ Bolivia time, whatever time zone your computer uses.
    07:00 for 120 minutes and Lunes 08:00 clash, Lunes 07:00 for 45 and
    Lunes 08:00 do not. Nothing is
    saved if the Trainer or Class Type is refused. Each row is its own weekly
-   schedule afterwards: click one of its Sessions and **Esta y las futuras**
-   shows only that day and time. **Guardar** with empty fields marks each one;
+   schedule afterwards: click one of its Sessions and the **Serie semanal**
+   tab (FIX-091, Test 185 W1; formerly **Esta y las futuras**) shows only
+   that day and time. **Guardar** with empty fields marks each one;
    a Session that overlaps another says "Se cruza con otra sesión…".
    **From an empty slot** (desktop width only): point at an empty hour of a
    day column, for example Friday at 10:00. It shows a pale fill, a dashed
@@ -2936,7 +2938,7 @@ Bolivia time, whatever time zone your computer uses.
    date, time, Duración, or capacity; Duración starts at the Session's own
    minutes, and a new start keeps them unless you change them; capacity
    cannot go below the booked seats) or
-   **Esta y las futuras** (change the weekly schedule from a **Vigente desde**
+   **Esta y las futuras**, since FIX-091 the **Serie semanal** tab (change the weekly schedule from a **Vigente desde**
    date, with the series' own Duración: unbooked Sessions move, booked ones
    stay, and the page says how many of each). **Terminar la serie** stops the schedule from a date after asking.
    **Vigente hasta (opcional)** and **Pausar la serie** (BKM-018) are Test 129.
@@ -3214,8 +3216,8 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
 8. **Factura** (PAY-007, follow-up 147; since FIX-044, Test 136). Choose
    **Estado: Todos**. The **Factura** column shows the NIT or CI with the name
    under it, or "Sin factura" (Valeria's fixture cash sale). A **Confirmado**
-   row with invoice data shows **Por emitir** and **Subir factura**, which
-   opens the payment's panel; an uploaded one shows **Emitida** "por <name> ·
+   row with invoice data shows **Por emitir**, and its **⋯** menu (FIX-091)
+   offers **Subir factura**, which opens the payment's panel; an uploaded one shows **Emitida** "por <name> ·
    dd/mm/aaaa". «Marcar emitida» and «Deshacer» are gone. The **Factura**
    filter's **Factura por subir** (`?invoice=unissued`) lists only the
    confirmed sales with invoice data and no file yet (an old «Emitida · sin
@@ -3765,6 +3767,12 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- from FIX-091 (Test 185): an Expense's «Detalle» column (W11A) and a
+  reason when refusing a freeze (W16B) need new columns, so a migration the
+  owner has to approve; the campaign history has no Clientas or Clases
+  columns (the API keeps only each campaign's name and date); a freeze panel
+  shows no earlier freezes of the same clienta; the break-even reads in Bs,
+  not in clientas;
 - parts of the client v2 boards (MOB-074) the API or the app cannot do yet:
   «¡Quedan solo N lugares con 15 % de descuento!» on Elige tu plan (the API
   does not expose the places left, BKM-019), the «Más elegido» pill (no Plan
@@ -7229,9 +7237,10 @@ a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
 ### A. Give a Trainer her code (AW24)
 
 1. In the admin web open **Personal** and click **Emma Vargas** (a Trainer).
-   Under the Branches the panel shows **Código personal** with its own
-   **Guardar código**.
-2. Type `emma` and click **Guardar código** (or press Enter): the field reads
+   Under the Branches the panel shows **Código personal** (since FIX-091 in
+   its own section «Código de invitación», saved by the panel's single
+   **Guardar cambios**; there is no **Guardar código** any more, Test 185 W14).
+2. Type `emma` and click **Guardar código** (since FIX-091 **Guardar cambios**) (or press Enter): the field reads
    `EMMA` and «Código guardado: EMMA.» appears. The panel's **Guardar** still
    saves only Role and Branches.
 3. Open **Andrea Suárez** (another Trainer), type `EMMA`, and save: «Ese
@@ -7703,8 +7712,9 @@ B. **Invoice card.** On that same S10 screen, **Datos para la factura**
    starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
    **Nombre o razón social**. Both can stay empty. This branch does not
    store them; PAY-007 owns the columns and the «Factura emitida» mark.
-C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
-   **Anular venta**. The button stays disabled until **Motivo** has text.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** (since
+   FIX-091 the chip **Confirmados**) and press **Anular venta** (since FIX-091
+   in the row's **⋯** menu). The button stays disabled until **Motivo** has text.
    After the void the row is **Anulado** and shows the reason. The income
    report drops that amount from the totals and lists the sale under
    **Ventas anuladas** with the same reason. The Subscription no longer
@@ -8040,7 +8050,8 @@ A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
    menu with «Abrir menú»), press **Dar clases de campaña**. The page says
    how many clientas will receive it and names who has no live Plan («N sin
    plan: se les suma en su próximo plan (…)»). Write «Inicio de año», leave
-   **Clases extra** at 1, press **Dar las clases**, then **Confirmar
+   **Clases extra** at 1, press **Dar las clases** (since FIX-091: **Nueva
+   campaña**, **Clases para cada clienta**, **Regalar N clases**), then **Confirmar
    campaña**. The result names how many received a class and who gets it
    with her next Plan. Open one recipient's detail: «Clases extra: 1 ·
    Campaña» when the campaign is her first grant.
@@ -8315,7 +8326,7 @@ D. **The previous month is finalized.** Through day 8 of a month (La Paz
 E. **Simulador (AW37).** The form now has «Precio por clase para la clienta
    (Bs)» (70), «Pago por clase a la instructora (Bs)» (65), «Alumnas
    incluidas en el pago» (4), and «Pago por alumna extra (Bs)» (8) instead of
-   the single «Precio por clase (Bs)». With the opening values «Resultado»
+   the single «Precio por clase (Bs)». With the opening values «Resultado» (since FIX-091 «Quedaría al mes»)
    reads «Bs 3.163,60» (ingreso Bs 40.040,00), «Punto de equilibrio»
    «Bs 36.273,81», and the derivation «(21175 + 9295) / 0.84 = 36273.81».
    With 6 students per class, Trainer pay is Bs 81 a class: the derivation
@@ -8863,7 +8874,7 @@ C. **Vigente hasta (BKM-018).** **Nueva sesión › Cada semana** shows
    la pauses o la termines.». A last date before **Vigente desde** says «Elige
    una fecha desde «Vigente desde» en adelante.». With Sábado 10:00 from
    21/11/2026 until 05/12/2026 the series' last class is on 5 December
-   (`effective_until` is 2026-12-06, the day after). **Esta y las futuras**
+   (`effective_until` is 2026-12-06, the day after). **Esta y las futuras** (since FIX-091 the **Serie semanal** tab)
    shows the series' last date and can clear it (no end) or set one.
 D. **Pausar la serie (BKM-018).** Open a class of a weekly series: **Pausar
    la serie** opens «Pausar la serie» with «En esas fechas no se publican
@@ -9135,6 +9146,8 @@ C. **Read-only panel.** Click a cancelled class: the panel is titled **Clase
    está en pausa.», and the Entrenadora and Lugares rows («N de M al
    cancelarse»). No booking button, no fields, no Guardar.
 D. **Editar sesión (proposal A).** Open a standing class of a weekly series:
+   (Since FIX-091 the panel is three tabs, Reservas / Editar / Serie
+   semanal, Test 185 W1; the description below is the earlier layout.)
    **Reservaron (n)** with a small **Reservar** button beside it (on a full
    class, **Lista de espera**), the bookings as a plain list, then **Aplicar
    cambios a** over **Solo esta sesión / Esta y las futuras** and the fields,
@@ -9316,7 +9329,8 @@ A. **Revisar pago (S12).** Before confirming, the Staff app shows the row
    cuando confirmes el pago.». A sale without invoice data shows **Sin
    factura** «No la pidió». The admin web's review panel shows the same data.
 B. **Web upload (W1/W2).** In **Dinero › Pagos** at 1440 and 420 px the
-   confirmed row shows **Por emitir** and **Subir factura**. The panel
+   confirmed row shows **Por emitir** and **Subir factura** (since FIX-091 in
+   the row's **⋯** menu). The panel
    **Factura** lists the payment, the NIT or CI, the name and the state, and a
    dashed box «Arrastra aquí la factura o elige un archivo» · «PDF, JPG o PNG,
    hasta 10 MB». Drop a PDF: a progress bar, then the file card «PDF · n KB ·
@@ -10021,7 +10035,9 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    mentions founders. `GET /api/v1/administrator/campaigns/preview` answers
    `recipientCount`, `owed` (id and name), an empty, deprecated `skipped`,
    and since FIX-066 `pastCampaigns` (Test 160).
-3. Write «Inicio de año», **Clases extra** 1, **Dar las clases**. The dialog
+3. Write «Inicio de año», **Clases extra** 1, **Dar las clases** (since
+   FIX-091 **Nueva campaña** › **Clases para cada clienta** › **Regalar 1
+   clase** per Clienta, Test 185 W13). The dialog
    reads «Cada clienta activa recibe las clases: en su plan vigente o, si no
    tiene uno, en su próximo plan. Ningún precio cambia.» **Confirmar
    campaña**. Expected: «N clientas recibieron 1 clase extra. M sin plan: se
@@ -10042,7 +10058,7 @@ Pass never receives them, and a closed Account receives nothing. One migration,
    class on that Plan straight away.
 6. Close an Account from the Client app (Test 35) and open the page again:
    she is no longer counted. With more than ten Clients without a Plan, the
-   line names ten and ends «y N más». On an empty database **Dar las clases** is
+   line names ten and ends «y N más». On an empty database **Dar las clases** (since FIX-091 **Regalar las clases**) is
    disabled («0 clientas la recibirán.»).
 7. Check the admin web at 1440 px and 420 px, then drop the copy.
 
@@ -11067,3 +11083,104 @@ E. **Staff fixes.** Cerrar caja asks for the count first; the expected cash
    recibidos» and «N pedidos de congelamiento». A new payout QR, or its expiry,
    marks the older QR notices read, so Daniela no longer sees two that
    contradict each other.
+
+## Test 185: the sixteen admin web screen picks (FIX-091)
+
+The owner's picks per screen (`DECISIONES-AUDITORIA-2026-11-19.md`,
+«Elecciones del usuario por pantalla», W1–W16; boards in
+`propuestas/web-boards/`). No migration. Use a copy of `emma_vacia`
+(password «Password»), the API and the admin web on your own ports, log in
+as ana@, and check every step at 1440 px and at 420 px (open the menu with
+**Abrir menú**). Only the five colours appear anywhere.
+
+1. **W2 Horario.** Today's column is Rubor. A cancelled class is one thin
+   line «cancelada · mínimo» (in the day list «08:00 · Reformer Pilates ·
+   cancelada · mínimo»); it still opens «Clase cancelada», and the hour under
+   it stays free for **Nueva clase**.
+2. **W1 Editar clase.** Click a live class. The title is the class itself
+   («Vie 20 nov · 10:00 · Reformer Pilates») with «N de 8 lugares · <Instructora>»
+   under it; notices and the missing-equipment line sit above three tabs:
+   **Reservas · N** (opens first: «Reservaron» and «Lista de espera» with
+   initials circles, attendance and waitlist position, a full-width
+   **Reservar a una clienta**, or **Agregar a la lista de espera** when full),
+   **Editar** (this class only, with **Cancelar esta clase** under the save)
+   and **Serie semanal** (this and the following classes, **Pausar la serie**,
+   **Terminar la serie**). A one-off class has no Serie semanal tab; a past
+   class shows only the read-only list.
+3. **W3 Comentarios.** Three counters on top: **Sin leer**, **Revisados**,
+   **Resueltos** (studio-wide, whatever the filters). Estado and App are
+   chips. Each row shows the sender's initials circle, the comment with
+   «App de clientas · 1.1.0 (1) · iOS 26.2» under it, Tipo, Estado as a plain
+   word and Fecha. **Exportar CSV** and the panel are unchanged.
+4. **W4 Pagos.** Estado chips **Todos / Por revisar · N / Confirmados /
+   Rechazados / Anulados** and the toggle chip **Factura por subir**. Tipo and
+   Método are a line under the Plan («Plan · QR»). The row's **⋯** («Acciones
+   de <clienta>») offers **Revisar comprobante**, **Subir factura** or **Ver
+   factura**, and **Anular venta** (same confirmation, reason required). The
+   pill «Pendiente» now reads «Por revisar», also in the review panel and the
+   ficha's Pagos tab; the CSV still says «Pendiente».
+5. **W5 Informes › Dinero.** A **Período** chip row (**Este mes** by
+   default, **Últimos 3 meses**, **Últimos 6 meses**, **Elegir fechas** for
+   the Desde/Hasta fields). Three figures **Entró / Salió / Quedó**; Quedó
+   adds «Punto de equilibrio de <mes>: Bs X» for Todas las sucursales (or
+   «carga el presupuesto en Finanzas» without a budget); Entró adds «+N % que
+   <mes>» on the month so far. **Mes contra mes** compares the month with the
+   previous one (at 420 px each concept is a card titled by its name). The
+   chart, Gastos por categoría, Totales por mes, voided sales and Ingreso
+   devengado (now last) are all still there.
+6. **W6 Informes › El mes.** Four figures (Ocupación, Clientas por clase,
+   Clientas activas, Renovación), then **Recomendaciones del mes** with chips
+   **Horario · N / Clientas · N / Resueltas** and **Descartar** per row (also
+   on resolved ones; only discarded ones lack it). Cobrado / Devengado /
+   Diferido, «Clases dictadas» and «Informe del mes» follow.
+7. **W7 Ficha de la clienta.** Tabs Resumen / Reservas / Pagos / Evaluaciones.
+   Resumen keeps Contacto, Plan, Referidos with the code, «¿Cómo nos
+   conociste?», and ends with **Acciones** rows (Dar clase de cortesía,
+   Devolver una clase, Acceso de prueba, Cerrar cuenta); **Editar perfil** is
+   in the footer.
+8. **W8 Clientas.** Chips **Todas / Por vencer · N / Sin reservar · N / Con
+   plan / Sin plan / Plan vencido / Fundadoras / Cuenta cerrada**. «Por
+   vencer» is an active plan ending within 3 days (its Vence date is a Rubor
+   pill); «Sin reservar» has an active plan and nothing booked ahead. A new
+   column **Última clase** («mar 10 nov», «—» without one) also lands in the
+   CSV (dd/mm/aaaa). Search, Para contactar, Congelamientos and Exportar CSV
+   are unchanged. API: `filter=expiring|unbooked`, `expiringClientCount`,
+   `unbookedClientCount`, `lastClassOn`.
+9. **W9 Buscar una clienta.** Type `lu` in the top bar: after a moment up to
+   five Clientas appear (circle, name, «phone · Plan · N restantes») and
+   «Ver todas las clientas con «lu»». Enter or a click opens her ficha.
+   Pages, classes and payments are no longer offered (open Ajustes pages from
+   the rail). Ctrl K, the arrows and Escape still work; at 420 px use the
+   **Buscar** button.
+10. **W10 Equipos.** «Fallas abiertas · N» on top with **Marcar resuelta**
+    and **Dar de baja** (both confirm), then one table of equipment types
+    with **Ver**.
+11. **W11 Gastos.** Month arrows next to Categoría (`?month=2026-11`); the
+    table is Fecha, Categoría, Monto, Editar; beside it (under it at 420 px)
+    the month's total and one line per category. Eliminated expenses leave
+    the list: **Ver gastos borrados** shows them, **Volver a los gastos**
+    returns. **Editar categorías** and **Nuevo gasto** are unchanged.
+12. **W12 Simulador.** «Tus supuestos» (all eight fields) on the left;
+    on the right **Quedaría al mes** (was «Resultado»), Entraría / Saldría,
+    Punto de equilibrio and its formula; Proyección below.
+13. **W13 Clases de campaña.** «Campañas dadas» lists past campaigns;
+    **Nueva campaña** opens a panel: Nombre («Ej.: Navidad 2026»), **Clases
+    para cada clienta** (1 to 4), **Clientas activas · N**, a Rubor summary
+    «Vas a regalar N clases en total», and **Regalar N clases**, which still
+    asks to confirm.
+14. **W14 Editar miembro.** Open Daniela in Personal: sections **Datos**
+    (photo, name, email or the pending invitation, phone), **Rol y
+    sucursales** (gender, the five roles, branches) and, for an Instructora,
+    **Código de invitación**. One **Guardar cambios** saves everything,
+    the code first (a refused code saves nothing and shows under the field).
+    **Desactivar cuenta** is an outlined button left of it.
+15. **W15 Página pública.** Every page has «Emma Pilates Studio» and
+    Soporte · Privacidad · Cerrar mi cuenta. The home is the title, «Desde aquí
+    puedes pedir ayuda, leer nuestra política de privacidad o cerrar tu
+    cuenta.» and three cards. No store buttons yet.
+16. **W16 Congelamientos.** Chips **Por decidir · N / Decididos**. A pending
+    request shows Pide («jue 10 al jue 17 dic»), Días, Vencería and
+    **Revisar**, which opens «<Clienta> · congelamiento» with Pide, Plan
+    («· N restantes»), Vencería («mar 9 mar (antes lun 1 mar)»), Motivo and
+    **Rechazar** (asks first) / **Aprobar**; the panel closes with
+    «Congelamiento aprobado». Seed a request as a clienta with a 90-day plan.
