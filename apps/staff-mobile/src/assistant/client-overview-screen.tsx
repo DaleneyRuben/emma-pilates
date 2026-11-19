@@ -155,6 +155,7 @@ export function ClientOverviewScreen({
           <>
             <ClientPlanCard
               active={active}
+              freeze={data.subscription.freeze}
               nextPlan={futurePlan}
               sells={sells}
               subscription={subscription}
