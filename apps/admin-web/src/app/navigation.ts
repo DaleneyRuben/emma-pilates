@@ -374,3 +374,16 @@ export const movedPaths: Readonly<
   "/estudio": "/estudio/personal",
   "/ajustes": "/ajustes/tipos-de-clase",
 };
+
+/**
+ * FIX-090: «Dinero · Pagos», the section an address belongs to, as the
+ * Coordinator's «sin acceso» notice names it; undefined for any other path.
+ */
+export const sectionNameOf = (pathname: string): string | undefined => {
+  const moved = movedPaths[pathname]?.split("?")[0];
+  const place = placeOf(moved ?? pathname);
+  if (place === undefined) return undefined;
+  return place.destination.tabs.length === 1
+    ? place.destination.label
+    : `${place.destination.label} · ${place.tab.label}`;
+};

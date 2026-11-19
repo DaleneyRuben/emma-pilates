@@ -2,6 +2,7 @@ import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { sectionNameOf } from "../app/navigation";
 import { isForbidden } from "../components/page/is-forbidden";
 import { NoBranchPage } from "../components/page/no-branch-page";
 import { PageHeader } from "../components/page/page-header";
@@ -58,9 +59,7 @@ function BranchSchedule({
   const narrow = useIsNarrowViewport();
   const [panel, setPanel] = useState<SessionPanelState>({ mode: "closed" });
   const [notice, setNotice] = useState<string | null>(
-    search.aviso === "sin-acceso"
-      ? "Esa sección es solo para administración."
-      : null,
+    search.aviso === "sin-acceso" ? noAccessNotice(search.seccion) : null,
   );
   const [day, setDay] = useState<string | null>(null);
   const sessions = useQuery(
@@ -179,6 +178,14 @@ function BranchSchedule({
 // The week's placeholder keeps the previous week on screen while the next
 // one loads, so the page is remounted per Branch: a Branch switch starts
 // from its loading line, like every other Branch-scoped page.
+// FIX-090: the notice names the section she tried to open.
+const noAccessNotice = (path: string | undefined): string => {
+  const name = path === undefined ? undefined : sectionNameOf(path);
+  return name === undefined
+    ? "Esa sección es solo para administración."
+    : `«${name}» es solo para administración.`;
+};
+
 export function SchedulePage({
   search,
   onWeekChange,
