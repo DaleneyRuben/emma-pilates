@@ -1,121 +1,30 @@
 import { formatListDate } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { useId, useState } from "react";
 import type { SearchChange } from "../catalog/catalog-search";
 import { PageHeader } from "../components/page/page-header";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
-import { parseCivilDate } from "../components/form/civil-date";
-import { CivilDateInput } from "../components/form/civil-date-input";
 import { boliviaMonth, boliviaToday } from "../lib/bolivia-time";
 import { chipClass, selectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { FinancePanel } from "./finance-panel";
+import { monthResultQueryOptions } from "./finance-queries";
 import { MonthChart } from "./month-chart";
 import {
   expenseReportQueryOptions,
   incomeReportQueryOptions,
   reportBranchesQueryOptions,
 } from "./report-queries";
+import { ComparisonTable } from "./report-comparison";
+import { useMonthComparison } from "./use-month-comparison";
+import { ReportPeriodPicker } from "./report-period-picker";
 import { monthTotals, reportMonths } from "./report-range";
-import {
-  resolveReportRange,
-  type ReportRange,
-  type ReportSearch,
-} from "./report-search";
+import { resolveReportRange, type ReportSearch } from "./report-search";
 import { CategoryTable, MonthTable } from "./report-tables";
 import { ReportTiles } from "./report-tiles";
 import { RevenueSection } from "./revenue-section";
 import { VoidedSales } from "./voided-sales";
-
-function DateField({
-  label,
-  value,
-  onChange,
-  rangeStart,
-  rangeEnd,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  rangeStart?: string;
-  rangeEnd?: string;
-}) {
-  const id = useId();
-  return (
-    <div className="flex items-center gap-2">
-      <label
-        htmlFor={id}
-        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
-      >
-        {label}
-      </label>
-      <CivilDateInput
-        id={id}
-        value={value}
-        onChange={onChange}
-        rangeStart={rangeStart}
-        rangeEnd={rangeEnd}
-        align={rangeStart === undefined ? "start" : "end"}
-        className="w-auto"
-        inputClassName="h-[34px] text-nota"
-      />
-    </div>
-  );
-}
-
-// The range fields keep what was typed; only an ordered pair reaches the
-// address (and the reports).
-function RangeFields({
-  range,
-  onChange,
-}: {
-  range: ReportRange;
-  onChange: (range: ReportRange) => void;
-}) {
-  const [draft, setDraft] = useState(range);
-  const [shown, setShown] = useState(range);
-  if (shown.from !== range.from || shown.to !== range.to) {
-    setShown(range);
-    setDraft(range);
-  }
-  const backwards = draft.from > draft.to;
-  const change = (next: ReportRange) => {
-    setDraft(next);
-    if (
-      parseCivilDate(next.from) !== null &&
-      parseCivilDate(next.to) !== null &&
-      next.from <= next.to
-    ) {
-      onChange(next);
-    }
-  };
-
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex flex-wrap items-center gap-3">
-        <DateField
-          label="Desde"
-          value={draft.from}
-          onChange={(from) => change({ ...draft, from })}
-          rangeEnd={draft.to}
-        />
-        <DateField
-          label="Hasta"
-          value={draft.to}
-          onChange={(to) => change({ ...draft, to })}
-          rangeStart={draft.from}
-        />
-      </div>
-      {backwards ? (
-        <p role="alert" className="text-ayuda text-error-texto">
-          La fecha inicial no puede ser posterior a la final.
-        </p>
-      ) : null}
-    </div>
-  );
-}
 
 function ReportTabs({
   vista,
@@ -149,6 +58,8 @@ function ReportTabs({
   );
 }
 
+// FIX-091 (W5 B): Entró, Salió and Quedó, then the month against the month
+// before, the chart, the tables of the range, and the month's accrued revenue.
 // AW16: confirmed income (Booking & Membership) against Expenses and Salary
 // Payments (Back Office) for a Bolivia date range, for every Branch or one.
 // Its own selector adds «Todas las sucursales» (the shell's is replaced).
@@ -159,7 +70,8 @@ export function ReportPage({
   search: ReportSearch;
   onSearchChange: SearchChange<ReportSearch>;
 }) {
-  const range = resolveReportRange(search, boliviaToday());
+  const today = boliviaToday();
+  const range = resolveReportRange(search, today);
   const finance = search.vista === "finanzas";
   const branches = useQuery(reportBranchesQueryOptions());
   const branchId = search.branch === "all" ? undefined : search.branch;
@@ -176,6 +88,12 @@ export function ReportPage({
   const expenses = useQuery({
     ...expenseReportQueryOptions(range, branchId),
     enabled: !finance,
+  });
+  const comparison = useMonthComparison(range, branchId, !finance);
+  // Quedó's break-even is the whole studio's, for the month the range ends in.
+  const breakEven = useQuery({
+    ...monthResultQueryOptions(range.to.slice(0, 7)),
+    enabled: !finance && branchId === undefined,
   });
   const failed = income.isError ? income : expenses.isError ? expenses : null;
   const scope =
@@ -196,8 +114,9 @@ export function ReportPage({
         actions={
           finance ? undefined : (
             <div className="flex flex-wrap items-start gap-3">
-              <RangeFields
+              <ReportPeriodPicker
                 range={range}
+                today={today}
                 onChange={(next) => onSearchChange(next)}
               />
               <ListFilter
@@ -236,11 +155,6 @@ export function ReportPage({
           La nómina y los ingresos por QR se ven solo en «Todas las sucursales».
         </p>
       )}
-      <RevenueSection
-        month={range.to.slice(0, 7)}
-        active={search.vista !== undefined && !finance}
-        branchName={branchId === undefined ? undefined : (branch?.name ?? "")}
-      />
       {finance ? null : failed !== null ? (
         <QueryFailure
           error={failed.error}
@@ -261,6 +175,12 @@ export function ReportPage({
             branchName={
               branchId === undefined ? undefined : (branch?.name ?? "")
             }
+            change={comparison.change}
+            finance={breakEven.data}
+          />
+          <ComparisonTable
+            comparison={comparison}
+            allBranches={branchId === undefined}
           />
           {income.data.totalCentavos === 0 &&
           expenses.data.totalCentavos === 0 ? (
@@ -291,6 +211,11 @@ export function ReportPage({
           </div>
         </>
       )}
+      <RevenueSection
+        month={range.to.slice(0, 7)}
+        active={search.vista !== undefined && !finance}
+        branchName={branchId === undefined ? undefined : (branch?.name ?? "")}
+      />
     </article>
   );
 }

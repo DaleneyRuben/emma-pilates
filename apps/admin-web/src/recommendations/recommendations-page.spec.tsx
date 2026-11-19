@@ -53,7 +53,8 @@ const renderSection = (readOnly = false) => {
 describe("AW44 Recomendaciones del mes", () => {
   useMockServer();
 
-  it("lists the month's findings and discards one", async () => {
+  // FIX-091 (W6 B): grouped by type with chips; the settled ones apart.
+  it("groups the month's findings by type and discards one", async () => {
     server.use(list([finding, inactive]));
     const { user } = renderSection();
 
@@ -61,8 +62,22 @@ describe("AW44 Recomendaciones del mes", () => {
       screen.getByRole("region", { name: "Recomendaciones del mes" }),
     ).toBeVisible();
     expect(await screen.findByText(finding.detail)).toBeVisible();
+    const kinds = screen.getByRole("group", { name: "Tipo de recomendación" });
+    expect(
+      within(kinds).getByRole("button", { name: "Horario · 1" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByText(inactive.detail)).toBeNull();
+    expect(screen.getByText("Nueva")).toBeVisible();
+
+    await user.click(
+      within(kinds).getByRole("button", { name: "Clientas · 1" }),
+    );
     expect(screen.getByText(inactive.detail)).toBeVisible();
-    expect(screen.getAllByText("Nueva")).toHaveLength(2);
+    expect(screen.queryByText(finding.detail)).toBeNull();
+
+    await user.click(
+      within(kinds).getByRole("button", { name: "Horario · 1" }),
+    );
     const row = screen.getByText(finding.detail).closest("li");
     expect(row).not.toBeNull();
     server.use(
@@ -75,7 +90,30 @@ describe("AW44 Recomendaciones del mes", () => {
       within(row as HTMLElement).getByRole("button", { name: "Descartar" }),
     );
 
-    expect(await screen.findByText("Descartada")).toBeVisible();
+    expect(
+      await within(kinds).findByRole("button", { name: "Horario · 0" }),
+    ).toBeVisible();
+    expect(screen.queryByText(finding.detail)).toBeNull();
+    expect(screen.getByText("Nada pendiente en este grupo.")).toBeVisible();
+    await user.click(within(kinds).getByRole("button", { name: "Resueltas" }));
+    expect(screen.getByText(finding.detail)).toBeVisible();
+    expect(screen.getByText("Descartada")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
+  });
+
+  // A resolved finding that holds again comes back as new unless it was
+  // discarded, so Resueltas keeps Descartar for it.
+  it("still discards a resolved finding", async () => {
+    server.use(list([{ ...finding, state: "resolved" }]));
+    renderSection();
+
+    expect(await screen.findByText(finding.detail)).toBeVisible();
+    const kinds = screen.getByRole("group", { name: "Tipo de recomendación" });
+    expect(
+      within(kinds).getByRole("button", { name: "Resueltas" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Resuelta")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Descartar" })).toBeEnabled();
   });
 
   it("hides Descartar when the page is read only", async () => {

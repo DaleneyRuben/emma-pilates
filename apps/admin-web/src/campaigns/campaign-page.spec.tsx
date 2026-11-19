@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import { emptyPageHandlers } from "../test/page-handlers";
@@ -44,6 +44,16 @@ const campaignHandlers = () => [
   }),
 ];
 
+// FIX-091 (W13 A): the form lives in the «Nueva campaña» panel.
+const openPanel = async (
+  user: ReturnType<typeof renderAdmin>["user"],
+): Promise<HTMLElement> => {
+  await user.click(
+    await screen.findByRole("button", { name: "Nueva campaña" }),
+  );
+  return screen.findByRole("dialog", { name: "Nueva campaña" });
+};
+
 describe("AW21 Campaña", () => {
   useMockServer();
   beforeEach(() => {
@@ -70,9 +80,58 @@ describe("AW21 Campaña", () => {
         name: "Clases de campaña",
       }),
     ).toBeVisible();
-    expect(await screen.findByText("12 clientas la recibirán.")).toBeVisible();
+    const history = await screen.findByRole("region", {
+      name: "Campañas dadas",
+    });
+    expect(within(history).getByText("Fin de año")).toBeVisible();
+    expect(within(history).getByText("mar 17 nov")).toBeVisible();
+
+    const panel = await openPanel(user);
     expect(
-      screen.getByText("1 sin plan: se le suma en su próximo plan (Sofía)."),
+      within(panel).getByRole("button", { name: "Clientas activas · 12" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    const summary = within(panel).getByRole("region", { name: "Resumen" });
+    expect(
+      within(summary).getByText("Vas a regalar 12 clases en total"),
+    ).toBeVisible();
+    expect(
+      within(summary).getByText("12 clientas la recibirán."),
+    ).toBeVisible();
+    expect(
+      within(summary).getByText(
+        "1 sin plan: se le suma en su próximo plan (Sofía).",
+      ),
+    ).toBeVisible();
+    expect(within(summary).getByText("No se puede deshacer.")).toBeVisible();
+
+    await user.clear(within(panel).getByLabelText("Clases para cada clienta"));
+    await user.type(
+      within(panel).getByLabelText("Clases para cada clienta"),
+      "2",
+    );
+    expect(
+      within(summary).getByText("Vas a regalar 24 clases en total"),
+    ).toBeVisible();
+    expect(
+      within(panel).getByRole("button", { name: "Regalar 24 clases" }),
+    ).toBeVisible();
+  });
+
+  it("says when no campaign was given yet", async () => {
+    server.use(
+      http.get(apiUrl(previewPath), () =>
+        jsonResponse({
+          recipientCount: 3,
+          owed: [],
+          skipped: [],
+          pastCampaigns: [],
+        }),
+      ),
+    );
+    renderAdmin("/promociones/clases-de-campana");
+
+    expect(
+      await screen.findByText("Aún no diste ninguna campaña."),
     ).toBeVisible();
   });
 
@@ -88,13 +147,19 @@ describe("AW21 Campaña", () => {
   it("submits the campaign and counts every Client it reached", async () => {
     const { user } = renderAdmin("/promociones/clases-de-campana");
 
+    let panel = await openPanel(user);
     await user.type(
-      await screen.findByLabelText("Nombre de la campaña"),
+      within(panel).getByLabelText("Nombre de la campaña"),
       "Inicio de año",
     );
-    await user.clear(screen.getByLabelText("Clases extra"));
-    await user.type(screen.getByLabelText("Clases extra"), "1");
-    await user.click(screen.getByRole("button", { name: "Dar las clases" }));
+    await user.clear(within(panel).getByLabelText("Clases para cada clienta"));
+    await user.type(
+      within(panel).getByLabelText("Clases para cada clienta"),
+      "1",
+    );
+    await user.click(
+      within(panel).getByRole("button", { name: "Regalar 12 clases" }),
+    );
     await user.click(
       await screen.findByRole("button", { name: "Confirmar campaña" }),
     );
@@ -106,9 +171,20 @@ describe("AW21 Campaña", () => {
         "2 clientas recibieron 1 clase extra. 1 sin plan: se le suma en su próximo plan (Sofía).",
       ),
     ).toBeVisible();
-    // Walkthrough finding 92: the form empties so a second click gives nothing.
-    expect(screen.getByLabelText("Nombre de la campaña")).toHaveValue("");
-    expect(screen.getByLabelText("Clases extra")).toHaveValue("1");
+    // The panel closes on success; walkthrough finding 92: the form empties
+    // so a second click gives nothing.
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", { name: "Nueva campaña" }),
+      ).not.toBeInTheDocument(),
+    );
+    panel = await openPanel(user);
+    expect(within(panel).getByLabelText("Nombre de la campaña")).toHaveValue(
+      "",
+    );
+    expect(
+      within(panel).getByLabelText("Clases para cada clienta"),
+    ).toHaveValue("1");
   });
 
   // Review of walkthrough finding 92: a campaign given again on purpose is a
@@ -116,11 +192,12 @@ describe("AW21 Campaña", () => {
   it("sends a campaign given twice with a new key each time", async () => {
     const { user } = renderAdmin("/promociones/clases-de-campana");
     const give = async () => {
+      const panel = await openPanel(user);
       await user.type(
-        await screen.findByLabelText("Nombre de la campaña"),
+        within(panel).getByLabelText("Nombre de la campaña"),
         "Inicio de año",
       );
-      await user.click(screen.getByRole("button", { name: "Dar las clases" }));
+      await user.click(within(panel).getByRole("button", { name: /^Regalar/ }));
       await user.click(
         await screen.findByRole("button", { name: "Confirmar campaña" }),
       );
@@ -129,7 +206,9 @@ describe("AW21 Campaña", () => {
     await give();
     await waitFor(() => expect(submitted).toHaveLength(1));
     await waitFor(() =>
-      expect(screen.getByLabelText("Nombre de la campaña")).toHaveValue(""),
+      expect(
+        screen.queryByRole("dialog", { name: "Nueva campaña" }),
+      ).not.toBeInTheDocument(),
     );
     await give();
     await waitFor(() => expect(submitted).toHaveLength(2));
@@ -141,8 +220,9 @@ describe("AW21 Campaña", () => {
   it("warns when a campaign with the same name was already given", async () => {
     const { user } = renderAdmin("/promociones/clases-de-campana");
 
+    await openPanel(user);
     await user.type(
-      await screen.findByLabelText("Nombre de la campaña"),
+      screen.getByLabelText("Nombre de la campaña"),
       "fin de año",
     );
 
@@ -164,24 +244,26 @@ describe("AW21 Campaña", () => {
         jsonResponse({ recipientCount: 0, owed: [], skipped: [] }),
       ),
     );
-    renderAdmin("/promociones/clases-de-campana");
+    const { user } = renderAdmin("/promociones/clases-de-campana");
 
-    expect(await screen.findByText("0 clientas la recibirán.")).toBeVisible();
-    expect(screen.queryByText(/fundadora/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/sin plan/)).not.toBeInTheDocument();
+    const panel = await openPanel(user);
+    expect(within(panel).getByText("0 clientas la recibirán.")).toBeVisible();
+    expect(within(panel).queryByText(/fundadora/)).not.toBeInTheDocument();
+    expect(within(panel).queryByText(/sin plan/)).not.toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Dar las clases" }),
+      within(panel).getByRole("button", { name: /^Regalar/ }),
     ).toBeDisabled();
   });
 
   it("confirms that every active Client receives the classes", async () => {
     const { user } = renderAdmin("/promociones/clases-de-campana");
 
+    const panel = await openPanel(user);
     await user.type(
-      await screen.findByLabelText("Nombre de la campaña"),
+      within(panel).getByLabelText("Nombre de la campaña"),
       "Inicio de año",
     );
-    await user.click(screen.getByRole("button", { name: "Dar las clases" }));
+    await user.click(within(panel).getByRole("button", { name: /^Regalar/ }));
 
     expect(
       await screen.findByText(

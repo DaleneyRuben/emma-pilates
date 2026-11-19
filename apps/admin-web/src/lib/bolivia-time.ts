@@ -159,6 +159,10 @@ export function addMonths(month: string, count: number): string {
   return `${Math.floor(next / 12)}-${String((next % 12) + 1).padStart(2, "0")}`;
 }
 
+/** "agosto": a Bolivia month `YYYY-MM` by name alone. */
+export const monthName = (month: string): string =>
+  months[Number(month.slice(5, 7)) - 1] ?? "";
+
 /** "agosto de 2026", as AW31 names the month. */
 export const formatMonth = (month: string): string =>
   `${months[Number(month.slice(5, 7)) - 1] ?? ""} de ${month.slice(0, 4)}`;
