@@ -3,13 +3,14 @@ import { signIn } from "./support/session";
 
 // AW13/AW14 as the representative mutation: an Expense recorded at the
 // selected Branch with a category added inline, and Branch scoping after.
+// FIX-091 (W11 B): Gastos shows one month, so the walk opens September.
+const september = "/dinero/gastos?month=2026-09";
+const emptySeptember = "No hay gastos en septiembre de 2026.";
 test("records an Expense at Centro with an inline category", async ({
   page,
 }) => {
-  await signIn(page, "/dinero/gastos");
-  await expect(
-    page.getByText("Todavía no hay gastos en esta sucursal."),
-  ).toBeVisible();
+  await signIn(page, september);
+  await expect(page.getByText(emptySeptember)).toBeVisible();
 
   await page.getByRole("button", { name: "Nuevo gasto" }).click();
   const panel = page.getByRole("dialog", { name: "Nuevo gasto" });
@@ -45,20 +46,19 @@ test("records an Expense at Centro with an inline category", async ({
     .getByRole("dialog", { name: "Sucursal" })
     .getByRole("option", { name: /Equipetrol/ })
     .click();
-  await expect(
-    page.getByText("Todavía no hay gastos en esta sucursal."),
-  ).toBeVisible();
+  await expect(page.getByText(emptySeptember)).toBeVisible();
   await expect(page.getByRole("row", { name: /Mantenimiento/ })).toHaveCount(0);
 });
 
-// Finding 104: «Eliminar gasto» keeps the row, marked, and the report stops
-// counting it. The «Editar» action names the row it opens.
+// Finding 104: «Eliminar gasto» moves the row to «Ver gastos borrados»
+// (FIX-091), marked, and the report stops counting it. The «Editar» action
+// names the row it opens.
 test("eliminates an Expense and leaves it out of Informes › Dinero", async ({
   page,
 }) => {
   const report = "/informes/dinero?from=2026-09-01&to=2026-09-30";
   const categories = page.getByRole("table", { name: "Gastos por categoría" });
-  await signIn(page, "/dinero/gastos");
+  await signIn(page, september);
   await page.getByRole("button", { name: "Nuevo gasto" }).click();
   const create = page.getByRole("dialog", { name: "Nuevo gasto" });
   const adder = create.getByRole("button", { name: "Nueva categoría" });
@@ -73,7 +73,7 @@ test("eliminates an Expense and leaves it out of Informes › Dinero", async ({
   await page.goto(report);
   await expect(categories.getByRole("cell", { name: "Luz" })).toBeVisible();
 
-  await page.goto("/dinero/gastos");
+  await page.goto(september);
   await page.getByRole("button", { name: "Editar el gasto de Luz" }).click();
   const panel = page.getByRole("dialog", { name: "Editar gasto" });
   await panel.getByRole("button", { name: "Eliminar gasto" }).click();
@@ -84,6 +84,11 @@ test("eliminates an Expense and leaves it out of Informes › Dinero", async ({
   await confirm.getByRole("button", { name: "Eliminar", exact: true }).click();
   await expect(
     page.getByText("Eliminamos el gasto de Bs 350 en Luz."),
+  ).toBeVisible();
+  await expect(page.getByRole("row", { name: /Luz/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "Ver gastos borrados" }).click();
+  await expect(
+    page.getByText("Gastos borrados de septiembre de 2026"),
   ).toBeVisible();
   const row = page.getByRole("row", { name: /Luz/ });
   await expect(row.getByText("Eliminado", { exact: true })).toBeVisible();

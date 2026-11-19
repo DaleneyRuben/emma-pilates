@@ -11,6 +11,7 @@ import {
   maintenance,
   repair,
   repairSeptember,
+  expenseReportHandler,
 } from "../../test/expense-fixtures";
 import {
   apiUrl,
@@ -45,7 +46,7 @@ describe("AW14 Expense form on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     tableReads = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), expenseReportHandler());
   });
 
   it("records an Expense at the selected Branch after validating it", async () => {
@@ -238,7 +239,7 @@ describe("AW14 Expense form on a desktop browser", () => {
 describe("AW14 Expense form on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), expenseReportHandler()));
 
   it("fills the screen and opens the category adder when none exist yet", async () => {
     server.use(

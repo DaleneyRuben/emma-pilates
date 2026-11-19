@@ -55,6 +55,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   actions?: ReactNode;
   /** A summary under a loaded table (AW27's studio total). */
   footer?: ReactNode;
+  /** A column beside the table from lg up, under it below (FIX-091 W11). */
+  aside?: ReactNode;
   /** A row to open once the page lists it (a link from another page). */
   openRowId?: string;
   /**
@@ -105,6 +107,7 @@ export function CatalogPage<Row extends { id: string }>({
   links,
   actions,
   footer,
+  aside,
   openRowId,
   onLinkSettled,
 }: CatalogPageProps<Row>) {
@@ -153,6 +156,36 @@ export function CatalogPage<Row extends { id: string }>({
     }
   }, [lastPage, search.page, onPageClamp]);
 
+  const listing = query.isPending ? (
+    <LoadingNotice>{loadingMessage}</LoadingNotice>
+  ) : query.isError ? (
+    <QueryFailure
+      error={query.error}
+      what={what}
+      onRetry={() => void query.refetch()}
+    />
+  ) : (
+    <>
+      <DataTable
+        columns={columns(open, (action) => show({ kind: "action", action }))}
+        rows={query.data.items}
+        rowId={(row) => row.id}
+        emptyMessage={emptyMessage}
+        onRowClick={renderForm === undefined ? undefined : open}
+        canClickRow={canOpen}
+        avatar={avatar}
+        pagination={{
+          page: search.page,
+          pageSize: search.pageSize,
+          totalItems: query.data.totalItems,
+          onPageChange,
+          rangeLabel,
+        }}
+      />
+      {footer}
+    </>
+  );
+
   return (
     <article className="flex flex-col gap-5">
       <PageHeader
@@ -189,36 +222,13 @@ export function CatalogPage<Row extends { id: string }>({
       />
       {filter}
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
-      {query.isPending ? (
-        <LoadingNotice>{loadingMessage}</LoadingNotice>
-      ) : query.isError ? (
-        <QueryFailure
-          error={query.error}
-          what={what}
-          onRetry={() => void query.refetch()}
-        />
+      {aside === undefined ? (
+        listing
       ) : (
-        <>
-          <DataTable
-            columns={columns(open, (action) =>
-              show({ kind: "action", action }),
-            )}
-            rows={query.data.items}
-            rowId={(row) => row.id}
-            emptyMessage={emptyMessage}
-            onRowClick={renderForm === undefined ? undefined : open}
-            canClickRow={canOpen}
-            avatar={avatar}
-            pagination={{
-              page: search.page,
-              pageSize: search.pageSize,
-              totalItems: query.data.totalItems,
-              onPageChange,
-              rangeLabel,
-            }}
-          />
-          {footer}
-        </>
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="flex min-w-0 flex-col gap-5">{listing}</div>
+          {aside}
+        </div>
       )}
       {panelTitles === undefined || renderForm === undefined ? null : (
         <SidePanel
