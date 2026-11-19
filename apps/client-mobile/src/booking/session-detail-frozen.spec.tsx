@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { dayMonth } from "../subscription/freeze-window";
@@ -38,13 +38,13 @@ describe("Client Session detail on a frozen day", () => {
     // line right under it (FIX-089).
     expect(button).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     expect(button).toHaveProp("accessibilityHint", expect.stringMatching(/^Podrás reservar desde/));
-    expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Reservar esta clase" })).toBeNull();
     expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
     // FIX-090: the shared list date inside the sentence, «lun 23 nov».
     expect(
       screen.getByText(`Podrás reservar desde el ${dayMonth(addCivilDays(endsOn, 1))}.`),
     ).toBeOnTheScreen();
-    expect(screen.queryByText("Se descuenta 1 clase de tu plan")).toBeNull();
+    expect(screen.queryByText(/^Usarás/)).toBeNull();
   });
 
   it("draws a neutral header and drops the free cancellation line", async () => {
@@ -54,8 +54,10 @@ describe("Client Session detail on a frozen day", () => {
       backgroundColor: "#F9F4F2",
       borderColor: "#CDA697",
     });
-    expect(screen.getByText("9 de 12 lugares")).toBeOnTheScreen();
-    expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
+    expect(
+      within(screen.getByTestId("session-fact-places")).getByText("3 de 12 libres"),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Cancelas gratis hasta")).toBeNull();
     // FIX-082: the facts' icons stand alone, no tinted disc.
     expect(screen.queryByTestId("icon-row-disc", { includeHiddenElements: true })).toBeNull();
   });
@@ -93,7 +95,7 @@ describe("Client Session detail on a frozen day", () => {
       frozen(addCivilDays(classDay, 1), addCivilDays(classDay, 3)),
     );
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
     expect(screen.queryByText(/congelado/)).toBeNull();
   });
 });

@@ -32,8 +32,8 @@ describe("Client Session detail when Reservar is off", () => {
     expect(screen.getByText("Necesitas un plan para reservar.")).toBeOnTheScreen();
     expect(screen.queryByText("No te quedan clases en tu plan.")).toBeNull();
     // FIX-089: the reason is the off button's own line, under it.
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Reservar" })).toHaveProp(
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toHaveProp(
       "accessibilityHint",
       "Necesitas un plan para reservar.",
     );
@@ -60,7 +60,7 @@ describe("Client Session detail when Reservar is off", () => {
     expect(
       screen.getByText("Tu pago está en revisión. Podrás reservar cuando el estudio lo confirme."),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver estado del pago" }));
@@ -86,8 +86,8 @@ describe("Client Session detail when Reservar is off", () => {
       "/api/v1/payments/current": () => jsonResponse(pendingPayment),
     });
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeEnabled();
-    expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
+    expect(screen.getByText("Usarás 1 de tus 5 clases.")).toBeOnTheScreen();
   });
 
   it("offers another receipt for the same Plan after a rejection (C04f)", async () => {

@@ -248,9 +248,9 @@ describe("Client Browse Sessions", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     await waitFor(() => {
-      expect(screen.getByText("de 12 lugares libres")).toBeOnTheScreen();
+      expect(screen.getByText("3 de 12 libres")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Reservar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeOnTheScreen();
   });
 
   it("marks the selected Branch in «Elige una sucursal» (follow-up 74)", async () => {
