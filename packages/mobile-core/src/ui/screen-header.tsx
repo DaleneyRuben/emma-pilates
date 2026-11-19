@@ -14,6 +14,7 @@ import { colors, spacing, typography } from "./tokens";
 export function ScreenHeader({
   action,
   fullBleed = false,
+  inset = false,
   onBack,
   subtitle,
   testID = "screen-header",
@@ -23,6 +24,8 @@ export function ScreenHeader({
   action?: ReactNode;
   /** Inside a padded `Screen`: span its padding. */
   fullBleed?: boolean;
+  /** Pads the header 16 pt on each side, for a parent without its own padding. */
+  inset?: boolean;
   onBack?: () => void;
   /** One quiet line under the title. */
   subtitle?: string;
@@ -32,7 +35,10 @@ export function ScreenHeader({
 }) {
   const showRow = onBack !== undefined || action !== undefined;
   return (
-    <View style={[styles.block, fullBleed && styles.fullBleed]} testID={testID}>
+    <View
+      style={[styles.block, (inset || fullBleed) && styles.inset, fullBleed && styles.fullBleed]}
+      testID={testID}
+    >
       {showRow ? (
         <View style={styles.row}>
           {onBack === undefined ? null : (
@@ -71,9 +77,9 @@ const styles = StyleSheet.create({
   fullBleed: {
     marginHorizontal: -spacing.lg,
     marginTop: -spacing.lg,
-    paddingHorizontal: spacing.lg,
     paddingTop: spacing.smd,
   },
+  inset: { paddingHorizontal: spacing.lg },
   pressed: { opacity: 0.6 },
   row: { alignItems: "center", flexDirection: "row", minHeight: 44 },
   subtitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },

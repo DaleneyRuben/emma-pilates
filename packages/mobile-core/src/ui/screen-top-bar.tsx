@@ -18,6 +18,7 @@ export function ScreenTopBar({
     <ScreenHeader
       action={action}
       fullBleed={fullBleed}
+      inset
       onBack={onBack}
       testID="screen-top-bar"
       title={title}
