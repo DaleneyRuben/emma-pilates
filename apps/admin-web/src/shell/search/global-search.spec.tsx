@@ -154,6 +154,20 @@ describe("the global search", () => {
       expect(router.state.location.search).not.toHaveProperty("cliente");
     });
 
+    it("lists every match for the new words when Enter beats the older matches", async () => {
+      const { user, router } = renderAdmin("/");
+      await heading(/^Buen/);
+
+      await user.type(search(), "val");
+      await screen.findByRole("option", { name: /^Valeria Quiroga/ });
+      // Enter right after typing on: the shown matches answer «val».
+      await user.type(search(), "e{Enter}");
+
+      await heading("Clientas");
+      expect(router.state.location.search).toMatchObject({ q: "vale" });
+      expect(router.state.location.search).not.toHaveProperty("cliente");
+    });
+
     it("takes focus with Ctrl K and lets Escape close the results", async () => {
       const { user } = renderAdmin("/");
       await heading(/^Buen/);
