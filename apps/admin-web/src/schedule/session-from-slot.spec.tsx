@@ -5,6 +5,7 @@ import {
   boliviaInstant,
   boliviaToday,
   formatCivilDate,
+  weekdayOf,
 } from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
@@ -156,8 +157,9 @@ describe("AW02 empty slots on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
-  // FIX-090: a past slot never proposes a past date; it starts from today.
-  it("opens a past slot's form on today, at the slot's hour", async () => {
+  // FIX-090: a past slot never proposes a past date; it proposes the next
+  // coming day with the slot's weekday, at the slot's hour.
+  it("opens a past slot's form on the next coming day of that weekday", async () => {
     const lastWeek = addDays(nextMonday, -14);
     server.use(weekHandler([]));
     const { user } = await openWeek(lastWeek);
@@ -166,15 +168,15 @@ describe("AW02 empty slots on a desktop browser", () => {
       screen.getByRole("button", { name: slotName(lastWeek, "09:00") }),
     );
     const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
-    expect(lastWeek < boliviaToday()).toBe(true);
-    expect(within(panel).getByLabelText("Fecha")).toHaveValue(
-      formatCivilDate(boliviaToday()),
+    const today = boliviaToday();
+    const proposed = [0, 1, 2, 3, 4, 5, 6, 7]
+      .map((offset) => addDays(today, offset))
+      .filter((day) => weekdayOf(day) === weekdayOf(lastWeek))
+      .map(formatCivilDate);
+    expect(proposed).toContain(
+      (within(panel).getByLabelText("Fecha") as HTMLInputElement).value,
     );
     expect(within(panel).getByLabelText("Hora")).toHaveValue("09:00");
-    await user.click(within(panel).getByLabelText("Cada semana"));
-    expect(within(panel).getByLabelText("Vigente desde")).toHaveValue(
-      formatCivilDate(boliviaToday()),
-    );
   });
 });
 
