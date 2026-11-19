@@ -112,7 +112,13 @@ describe("the widened Coordinator", () => {
     expect(screen.getByText("7 días")).toBeVisible();
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByRole("button", { name: /Guardar/ })).toBeNull();
-    expect(screen.queryByText("Evaluación nutricional pagada")).toBeNull();
+    // FIX-090: the same fixed rules as the Administrator, without the amounts.
+    expect(screen.getByText("Evaluación nutricional pagada")).toBeVisible();
+    expect(
+      screen.getByText(
+        "Con precio · el monto y el pago a la nutricionista los ve la administración",
+      ),
+    ).toBeVisible();
     expect(screen.queryByText(/Bs/)).toBeNull();
   });
 });
