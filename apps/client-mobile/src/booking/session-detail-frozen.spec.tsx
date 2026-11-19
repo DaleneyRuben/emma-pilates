@@ -54,7 +54,7 @@ describe("Client Session detail on a frozen day", () => {
       backgroundColor: "#F9F4F2",
       borderColor: "#CDA697",
     });
-    expect(screen.getByText("3 de 12 cupos libres")).toBeOnTheScreen();
+    expect(screen.getByText("9 de 12 lugares")).toBeOnTheScreen();
     expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
     // FIX-082: the facts' icons stand alone, no tinted disc.
     expect(screen.queryByTestId("icon-row-disc", { includeHiddenElements: true })).toBeNull();

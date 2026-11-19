@@ -93,7 +93,7 @@ async function openDetail(availableSeats: number) {
 }
 
 // Follow-up 227 (C04) in palette B (FIX-089): the seats sit on the Palo de
-// rosa hero, the free count in Lora 32 Crema over «de M cupos libres», a
+// rosa hero, the free count in Lora 32 Crema over «de M lugares libres», a
 // Crema bar by the booked share on Rubor, and the «Lleno» pill when full. The
 // header names the class, so the hero does not repeat it.
 describe("Client Session detail capacity block", () => {
@@ -116,7 +116,7 @@ describe("Client Session detail capacity block", () => {
       fontFamily: fontFamilies.display,
       fontSize: 32,
     });
-    expect(block.getByText("de 12 cupos libres")).toBeOnTheScreen();
+    expect(block.getByText("de 12 lugares libres")).toBeOnTheScreen();
     expect(block.queryByText("Lleno")).not.toBeOnTheScreen();
 
     const bar = block.getByRole("progressbar");

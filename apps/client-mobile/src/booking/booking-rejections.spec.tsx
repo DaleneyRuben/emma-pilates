@@ -130,7 +130,7 @@ describe("Client booking rejection messages", () => {
   it.each([
     ["reschedule_outside_window", "Solo puedes reprogramar dentro de la ventana de cancelación."],
     ["reschedule_target_ineligible", "Esa clase no está disponible para reprogramar."],
-    ["session_full", "La clase ya no tiene cupos."],
+    ["session_full", "La clase ya no tiene lugares."],
     ["weekly_cap_reached", "Ya usaste tus clases de esta semana."],
     [
       "booking_before_start_date",

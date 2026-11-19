@@ -158,7 +158,7 @@ describe("Client class list rows", () => {
     const { cards } = await openClassList();
 
     expect(cards[0].queryByTestId("seat-pill")).toBeNull();
-    expect(cards[0].getByText("3 cupos")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(cards[0].getByText("9 de 12 lugares")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#93615D", fontSize: 13 });
   });
 });

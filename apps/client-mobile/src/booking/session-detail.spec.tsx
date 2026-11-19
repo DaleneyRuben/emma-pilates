@@ -46,7 +46,7 @@ describe("Client Session detail", () => {
       facts.getByText(/^Cancela sin costo hasta (hoy|mañana) a las \d{2}:\d{2}$/),
     ).toBeOnTheScreen();
     expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
-    expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
+    expect(screen.getByText("de 12 lugares libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
     expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
 
@@ -124,7 +124,7 @@ describe("Client Session detail", () => {
     );
 
     expect(screen.getByText("La lista de espera no usa clases de tu plan")).toBeOnTheScreen();
-    expect(screen.getByText("Te avisamos si se libera un cupo")).toBeOnTheScreen();
+    expect(screen.getByText("Te avisamos si se libera un lugar")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
