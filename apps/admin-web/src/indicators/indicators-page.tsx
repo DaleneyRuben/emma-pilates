@@ -9,27 +9,12 @@ import { IndicatorChart } from "./indicator-chart";
 import { hasAmounts, monthKpisQueryOptions } from "./indicator-queries";
 import { RecommendationsSection } from "../recommendations/recommendations-page";
 import { MonthNarrative } from "./month-narrative";
+import { StatTile, StatTiles } from "../components/ui/stat-tile";
 
 const tenths = new Intl.NumberFormat("es-BO", {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
-
-function Tile({ name, figure }: { name: string; figure: string }) {
-  return (
-    <section
-      aria-label={name}
-      className="flex flex-col gap-1 rounded-marco border border-borde bg-lino px-5 py-4"
-    >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-        {name}
-      </h2>
-      <p className="font-serif text-cifra leading-tight text-texto tabular">
-        {figure}
-      </p>
-    </section>
-  );
-}
 
 export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
   const latest = boliviaMonth();
@@ -38,7 +23,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
   const queries = useQueries({
     queries: series.map((item) => monthKpisQueryOptions(item)),
   });
-  const current = queries[2];
+  const data = queries[2]?.data;
   const failed = queries.find((query) => query.isError);
 
   return (
@@ -58,45 +43,43 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
             for (const query of queries) void query.refetch();
           }}
         />
-      ) : current?.data === undefined ? (
+      ) : data === undefined ? (
         <LoadingNotice>Cargando los indicadores…</LoadingNotice>
       ) : (
+        <StatTiles>
+          <StatTile label="Ocupación" figure={`${data.occupancyPercent} %`} />
+          <StatTile
+            label="Clientas por clase"
+            figure={tenths.format(data.averageStudentsTimes10 / 10)}
+          />
+          <StatTile
+            label="Clientas activas"
+            figure={String(data.activeClients)}
+          />
+          <StatTile label="Renovación" figure={`${data.renewalPercent} %`} />
+        </StatTiles>
+      )}
+      {/* FIX-091 (W6 B): what to do comes right after the four figures. */}
+      <RecommendationsSection month={month} readOnly={readOnly} />
+      {failed !== undefined || data === undefined ? null : (
         <>
-          <div className="grid gap-3 md:grid-cols-4">
-            <Tile
-              name="Ocupación"
-              figure={`${current.data.occupancyPercent} %`}
-            />
-            <Tile
-              name="Clientas por clase"
-              figure={tenths.format(current.data.averageStudentsTimes10 / 10)}
-            />
-            <Tile
-              name="Clientas activas"
-              figure={String(current.data.activeClients)}
-            />
-            <Tile
-              name="Renovación"
-              figure={`${current.data.renewalPercent} %`}
-            />
-          </div>
-          {hasAmounts(current.data) ? (
-            <div className="grid gap-3 md:grid-cols-3">
-              <Tile
-                name="Cobrado"
-                figure={formatBolivianos(current.data.cashCentavos)}
+          {hasAmounts(data) ? (
+            <StatTiles>
+              <StatTile
+                label="Cobrado"
+                figure={formatBolivianos(data.cashCentavos)}
               />
-              <Tile
-                name="Devengado"
-                figure={formatBolivianos(current.data.accruedCentavos)}
+              <StatTile
+                label="Devengado"
+                figure={formatBolivianos(data.accruedCentavos)}
               />
-              <Tile
-                name="Diferido"
-                figure={formatBolivianos(current.data.deferredCentavos)}
+              <StatTile
+                label="Diferido"
+                figure={formatBolivianos(data.deferredCentavos)}
               />
-            </div>
+            </StatTiles>
           ) : null}
-          {current.data.sessionsHeld === 0 ? (
+          {data.sessionsHeld === 0 ? (
             <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
               Sin clases dictadas en este mes.
             </p>
@@ -111,7 +94,6 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
           <MonthNarrative month={month} />
         </>
       )}
-      <RecommendationsSection month={month} readOnly={readOnly} />
     </article>
   );
 }
