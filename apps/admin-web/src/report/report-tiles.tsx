@@ -1,98 +1,89 @@
-import type { ExpenseReportDto, IncomeReportDto } from "@pilates/api-contracts";
-import type { ReactNode } from "react";
-import { cn } from "../lib/cn";
+import type {
+  ExpenseReportDto,
+  IncomeReportDto,
+  MonthResultDto,
+} from "@pilates/api-contracts";
+import { StatTile, StatTiles } from "../components/ui/stat-tile";
+import { monthName } from "../lib/bolivia-time";
 import { formatBolivianos, formatSignedBolivianos } from "../lib/money";
 
-function Tile({
-  name,
-  rule,
-  figure,
-  children,
-}: {
-  name: string;
-  rule: string;
-  figure: string;
-  children: ReactNode;
-}) {
-  return (
-    <section
-      aria-label={name}
-      className={cn(
-        "flex min-w-0 flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4 lg:px-3 xl:px-5",
-        rule,
-      )}
-    >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] whitespace-nowrap text-texto-tenue uppercase">
-        {name}
-      </h2>
-      <p className="font-serif text-cifra-grande leading-tight whitespace-nowrap text-texto tabular lg:text-precio xl:text-cifra-grande">
-        {figure}
-      </p>
-      {children}
-    </section>
-  );
-}
+const Line = ({ children }: { children: string }) => <p>{children}</p>;
 
-const Line = ({ children }: { children: string }) => (
-  <p className="text-nota text-texto-tenue">{children}</p>
+const Detail = ({ children }: { children: string }) => (
+  <p className="text-ayuda tabular">{children}</p>
 );
 
+/** The break-even of the month the range ends in (Finanzas' own figure). */
+function breakEvenLine(finance: MonthResultDto): string {
+  if (finance.lines.length === 0) {
+    return "Punto de equilibrio: carga el presupuesto en Finanzas";
+  }
+  return `Punto de equilibrio de ${monthName(finance.month.slice(0, 7))}: ${formatBolivianos(finance.breakEvenCentavos)}`;
+}
+
 /**
- * AW16's three figures (design README): Ingresos in Éxito, Gastos in Error,
- * Neto in Plomo cálido, since the net is a summary, not a status. The
- * lines under them say what each figure counts for the chosen scope
- * (CONTEXT-MAP: only cash income and a Branch's Expenses count for a Branch).
+ * FIX-091 (W5 B): AW16's three figures, Entró, Salió and Quedó. The lines
+ * under them say what each figure counts for the chosen scope (CONTEXT-MAP:
+ * only cash income and a Branch's Expenses count for a Branch); Entró adds
+ * how it compares with the month before, Quedó the month's break-even, which
+ * is the whole studio's, so a Branch has none.
  */
 export function ReportTiles({
   income,
   expenses,
   branchName,
+  change,
+  finance,
 }: {
   income: IncomeReportDto;
   expenses: ExpenseReportDto;
   branchName: string | undefined;
+  /** «+12 % que octubre», only when the range is one month. */
+  change: string | null;
+  finance: MonthResultDto | undefined;
 }) {
   return (
-    <div className="grid gap-3 md:grid-cols-3 lg:gap-2 xl:gap-3">
-      <Tile
-        name="Ingresos"
-        rule="border-t-exito"
-        figure={formatBolivianos(income.totalCentavos)}
-      >
-        {branchName === undefined ? (
-          <>
-            <Line>Pagos confirmados en el rango</Line>
-            <p className="text-ayuda text-texto-muy-tenue tabular">
-              {`Efectivo ${formatBolivianos(income.byMethod.cash)} · QR ${formatBolivianos(income.byMethod.transfer)}`}
-            </p>
-            <p className="text-ayuda text-texto-muy-tenue tabular">
-              {`Planes ${formatBolivianos(income.byKind.plan)} · Evaluaciones ${formatBolivianos(income.byKind.evaluation)}`}
-            </p>
-          </>
-        ) : (
-          <Line>{`Pagos en efectivo cobrados en ${branchName}`}</Line>
-        )}
-      </Tile>
-      <Tile
-        name="Gastos"
-        rule="border-t-error"
+    <StatTiles className="max-md:grid-cols-1">
+      <StatTile label="Entró" figure={formatBolivianos(income.totalCentavos)}>
+        <div className="flex flex-col gap-0.5 text-nota">
+          {change === null ? null : <p className="font-medium">{change}</p>}
+          {branchName === undefined ? (
+            <>
+              <Line>Pagos confirmados en el rango</Line>
+              <Detail>
+                {`Efectivo ${formatBolivianos(income.byMethod.cash)} · QR ${formatBolivianos(income.byMethod.transfer)}`}
+              </Detail>
+              <Detail>
+                {`Planes ${formatBolivianos(income.byKind.plan)} · Evaluaciones ${formatBolivianos(income.byKind.evaluation)}`}
+              </Detail>
+            </>
+          ) : (
+            <Line>{`Pagos en efectivo cobrados en ${branchName}`}</Line>
+          )}
+        </div>
+      </StatTile>
+      <StatTile
+        label="Salió"
         figure={formatBolivianos(expenses.totalCentavos)}
-      >
-        <Line>
-          {branchName === undefined
+        line={
+          branchName === undefined
             ? "Nómina más los gastos de cada sucursal"
-            : `Gastos registrados en ${branchName}`}
-        </Line>
-      </Tile>
-      <Tile
-        name="Neto"
-        rule="border-t-texto"
+            : `Gastos registrados en ${branchName}`
+        }
+      />
+      <StatTile
+        label="Quedó"
         figure={formatSignedBolivianos(
           income.totalCentavos - expenses.totalCentavos,
         )}
       >
-        <Line>Ingresos menos gastos</Line>
-      </Tile>
-    </div>
+        <div className="flex flex-col gap-0.5 text-nota">
+          <Line>Ingresos menos gastos</Line>
+          {branchName === undefined && finance !== undefined ? (
+            <Line>{breakEvenLine(finance)}</Line>
+          ) : null}
+        </div>
+      </StatTile>
+    </StatTiles>
   );
 }

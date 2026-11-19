@@ -21,7 +21,8 @@ describe("AW16 Reporte's period", () => {
   useMockServer();
   beforeEach(() => {
     clearReportReads();
-    server.use(...signedInHandlers(), ...reportHandlers());
+    server.use(...signedInHandlers());
+    server.use(...reportHandlers());
   });
 
   it("opens on this month when the address names no range", async () => {
@@ -81,13 +82,19 @@ describe("AW16 Reporte's period", () => {
     fireEvent.change(screen.getByLabelText("Desde"), {
       target: { value: "01/09/2026" },
     });
+    // The month against the month before already read September, so the
+    // address is what shows the new range took.
     await waitFor(() =>
-      expect(incomeReads.at(-1)?.get("from")).toBe("2026-09-01T04:00:00.000Z"),
+      expect(router.state.matches.at(-1)?.search).toMatchObject({
+        from: "2026-09-01",
+        to: "2026-09-30",
+      }),
     );
-    expect(router.state.matches.at(-1)?.search).toMatchObject({
-      from: "2026-09-01",
-      to: "2026-09-30",
-    });
+    expect(
+      await within(screen.getByRole("region", { name: "Entró" })).findByText(
+        "Bs 2.280",
+      ),
+    ).toBeVisible();
 
     const reads = incomeReads.length;
     fireEvent.change(screen.getByLabelText("Hasta"), {

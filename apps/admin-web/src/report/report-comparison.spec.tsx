@@ -115,10 +115,11 @@ describe("AW16 Reporte month against month", () => {
       target: { value: centro.id },
     });
 
+    await screen.findByText("Pagos en efectivo cobrados en Centro");
     const table = await screen.findByRole("table", { name: "Mes contra mes" });
     expect(
-      await within(table).findAllByRole("cell", { name: "Bs 780" }),
-    ).not.toHaveLength(0);
+      within(row(table, "Entró")).getAllByRole("cell", { name: "Bs 780" }),
+    ).toHaveLength(2);
     expect(within(table).queryByRole("cell", { name: "Sueldos" })).toBeNull();
   });
 

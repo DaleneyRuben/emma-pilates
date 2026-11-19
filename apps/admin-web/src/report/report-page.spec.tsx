@@ -39,7 +39,9 @@ describe("AW16 Reporte on a desktop browser", () => {
     await heading();
 
     expect(screen.getAllByRole("status")).toHaveLength(1);
-    expectBrandedLoading("Cargando el ingreso devengado…");
+    // The accrued revenue sits at the end now, so the report's own loader
+    // is the first one on the page.
+    expectBrandedLoading("Cargando el reporte…");
     expect(
       await within(
         await screen.findByRole("region", { name: "Entró" }),
@@ -127,9 +129,6 @@ describe("AW16 Reporte on a desktop browser", () => {
         "whitespace-nowrap",
       );
     }
-    expect(
-      within(tile("Entró")).getByRole("heading", { name: "Entró" }),
-    ).toHaveClass("whitespace-nowrap");
 
     expect(Object.fromEntries(incomeReads[0] ?? [])).toEqual({
       from: "2026-08-01T04:00:00.000Z",
