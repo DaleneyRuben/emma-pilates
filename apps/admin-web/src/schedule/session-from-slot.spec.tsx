@@ -156,7 +156,8 @@ describe("AW02 empty slots on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
-  it("lets a past slot open the form, which refuses the date as the button's form does", async () => {
+  // FIX-090: a past slot never proposes a past date; it starts from today.
+  it("opens a past slot's form on today, at the slot's hour", async () => {
     const lastWeek = addDays(nextMonday, -14);
     server.use(weekHandler([]));
     const { user } = await openWeek(lastWeek);
@@ -166,9 +167,13 @@ describe("AW02 empty slots on a desktop browser", () => {
     );
     const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
     expect(lastWeek < boliviaToday()).toBe(true);
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
-    expect(within(panel).getByLabelText("Fecha")).toHaveAccessibleDescription(
-      "Elige una fecha desde hoy.",
+    expect(within(panel).getByLabelText("Fecha")).toHaveValue(
+      formatCivilDate(boliviaToday()),
+    );
+    expect(within(panel).getByLabelText("Hora")).toHaveValue("09:00");
+    await user.click(within(panel).getByLabelText("Cada semana"));
+    expect(within(panel).getByLabelText("Vigente desde")).toHaveValue(
+      formatCivilDate(boliviaToday()),
     );
   });
 });
