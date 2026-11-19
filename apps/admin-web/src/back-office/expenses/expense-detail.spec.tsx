@@ -1,3 +1,4 @@
+import type { AdminExpenseDto } from "@pilates/api-contracts";
 import { screen, within } from "@testing-library/react";
 import { http } from "msw";
 import { centro } from "../../test/booking-handlers";
@@ -15,7 +16,11 @@ import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 
 const withDetail = { ...repairSeptember, detail: "Cambio de resorte" };
-const withoutDetail = expenseRow("02", maintenance, 120_000, "2026-09-02");
+// An API from before W11 A answers no detail at all.
+const withoutDetail = {
+  ...expenseRow("02", maintenance, 120_000, "2026-09-02"),
+  detail: undefined,
+} as unknown as AdminExpenseDto;
 
 // W11 A (owner 2026-11-19): Gastos lists Fecha, Categoría, Detalle, Monto,
 // and the form takes an optional detail.
