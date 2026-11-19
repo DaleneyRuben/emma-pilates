@@ -30,8 +30,9 @@ describe("the start time of a class row", () => {
 
     const time = screen.getByText("09:00", { includeHiddenElements: true });
     expect(time.props.numberOfLines).toBe(1);
-    expect(time).toHaveStyle({ minWidth: 56 });
-    expect(time).not.toHaveStyle({ width: 56 });
+    const box = screen.getByTestId("class-row-time", { includeHiddenElements: true });
+    expect(box).toHaveStyle({ minWidth: 62 });
+    expect(box).not.toHaveStyle({ width: 62 });
   });
 
   it("stays on one line among the reschedule options", async () => {
