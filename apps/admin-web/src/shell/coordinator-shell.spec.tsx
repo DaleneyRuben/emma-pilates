@@ -44,25 +44,26 @@ describe("the admin web for the Coordinator", () => {
     expect(within(rail).queryByText("Dinero")).not.toBeInTheDocument();
   });
 
+  // FIX-090: the notice names the section she tried to open.
   it.each([
-    "/dinero/pagos",
-    "/informes/dinero",
-    "/dinero/sueldos/pagados",
-    "/ajustes/planes",
-    "/ajustes/tipos-de-clase",
-    "/ajustes/sucursales",
-    "/ajustes/qr-del-estudio",
-    "/dinero/caja",
-    "/informes/simulador",
-    "/dinero/sueldos?month=2026-12",
-    "/promociones/clases-de-campana",
-    "/back-office/pagos",
-  ])("returns %s to Horario with the notice", async (path) => {
+    ["/dinero/pagos", "Dinero · Pagos"],
+    ["/informes/dinero", "Informes · Dinero"],
+    ["/dinero/sueldos/pagados", "Dinero · Sueldos"],
+    ["/ajustes/planes", "Ajustes · Planes"],
+    ["/ajustes/tipos-de-clase", "Ajustes · Tipos de clase"],
+    ["/ajustes/sucursales", "Ajustes · Sucursales"],
+    ["/ajustes/qr-del-estudio", "Ajustes · QR del estudio"],
+    ["/dinero/caja", "Dinero · Caja"],
+    ["/informes/simulador", "Informes · Simulador"],
+    ["/dinero/sueldos?month=2026-12", "Dinero · Sueldos"],
+    ["/promociones/clases-de-campana", "Promociones · Clases de campaña"],
+    ["/back-office/pagos", "Dinero · Pagos"],
+  ])("returns %s to Horario with a notice naming %s", async (path, name) => {
     const { router } = renderAdmin(path);
 
     await heading("Horario");
     expect(
-      await screen.findByText("Esa sección es solo para administración."),
+      await screen.findByText(`«${name}» es solo para administración.`),
     ).toBeInTheDocument();
     await waitFor(() =>
       expect(router.state.location.pathname).toBe("/horario"),
@@ -106,7 +107,7 @@ describe("the admin web for the Coordinator", () => {
     );
     renderAdmin("/informes");
 
-    await heading("Informes");
+    await heading("El mes");
     expect(
       await screen.findByRole("region", { name: "Ocupación" }),
     ).toBeInTheDocument();

@@ -97,7 +97,9 @@ describe("the Coordinator's pay statement", () => {
       await screen.findByRole("heading", { level: 1, name: "Horario" }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText("Esa sección es solo para administración."),
+      await screen.findByText(
+        "«Dinero · Sueldos» es solo para administración.",
+      ),
     ).toBeInTheDocument();
     await waitFor(() =>
       expect(router.state.location.pathname).toBe("/horario"),
