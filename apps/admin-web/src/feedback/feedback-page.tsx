@@ -1,23 +1,21 @@
-import { formatDateTime } from "@pilates/api-contracts";
-import type { AdminFeedbackDto } from "@pilates/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createColumnHelper } from "@tanstack/react-table";
 import { Download } from "lucide-react";
-import { CatalogPage, RowOpener } from "../catalog/catalog-page";
+import { CatalogPage } from "../catalog/catalog-page";
 import type { SearchChange } from "../catalog/catalog-search";
-import { ListFilter } from "../components/table/list-filter";
+import { ClientPhoto } from "../components/client-photo";
 import { countFormat } from "../components/table/pagination";
 import { Button } from "../components/ui/button";
+import { FilterChips } from "../components/ui/filter-chips";
 import { saveFile } from "../lib/save-file";
+import { feedbackColumns } from "./feedback-columns";
+import { FeedbackCounters } from "./feedback-counters";
 import {
   appLabels,
-  deviceLabel,
   feedbackCsv,
   feedbackCsvName,
   typeLabels,
 } from "./feedback-format";
 import { FeedbackPanel } from "./feedback-panel";
-import { FeedbackSender } from "./feedback-sender";
 import {
   feedbackTableQueryOptions,
   fetchAllFeedback,
@@ -27,28 +25,26 @@ import type {
   FeedbackSearch,
   FeedbackStatusFilter,
 } from "./feedback-search";
-import { FeedbackStatusPill } from "./feedback-status-pill";
 
-const statusOptions: { value: FeedbackStatusFilter; label: string }[] = [
-  { value: "all", label: "Todos" },
+// FIX-091 (W3 B): the two filters as chips; «all» is the catch-all chip.
+const statusOptions = [
+  { value: undefined, label: "Todos" },
   { value: "new", label: "Nuevo" },
   { value: "reviewed", label: "Revisado" },
   { value: "resolved", label: "Resuelto" },
-];
+] as const;
 
-const appOptions: { value: FeedbackAppFilter; label: string }[] = [
-  { value: "all", label: "Las dos" },
+const appOptions = [
+  { value: undefined, label: "Las dos" },
   { value: "client", label: appLabels.client },
   { value: "staff", label: appLabels.staff },
-];
+] as const;
+
+const chosen = <Value extends string>(value: Value) =>
+  value === "all" ? undefined : (value as Exclude<Value, "all">);
 
 const comentarios = (count: number) =>
   `${countFormat.format(count)} ${count === 1 ? "comentario" : "comentarios"}`;
-
-const subtitle = (newCount: number) =>
-  newCount === 0
-    ? "Desde las dos apps · ninguno nuevo"
-    : `Desde las dos apps · ${countFormat.format(newCount)} ${newCount === 1 ? "comentario nuevo" : "comentarios nuevos"}`;
 
 function EmptyFeedback({ filtered }: { filtered: boolean }) {
   return (
@@ -64,71 +60,6 @@ function EmptyFeedback({ filtered }: { filtered: boolean }) {
     </span>
   );
 }
-
-const columns = createColumnHelper<AdminFeedbackDto>();
-
-const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
-  columns.accessor("createdAt", {
-    header: "Fecha",
-    meta: { card: "detail", cardOrder: 3 },
-    cell: ({ getValue }) => (
-      <span className="whitespace-nowrap text-texto-secundario tabular">
-        {formatDateTime(getValue())}
-      </span>
-    ),
-  }),
-  columns.accessor("senderName", {
-    header: "Enviado por",
-    meta: { card: "detail", cardOrder: 1 },
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap text-texto-secundario">
-        <FeedbackSender feedback={row.original} />
-      </span>
-    ),
-  }),
-  columns.accessor("type", {
-    header: "Tipo",
-    meta: { card: "detail", cardOrder: 2 },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{typeLabels[getValue()]}</span>
-    ),
-  }),
-  columns.accessor("text", {
-    header: "Comentario",
-    meta: { card: "title" },
-    cell: ({ row }) => (
-      <span className="line-clamp-2 max-w-[420px]">
-        <RowOpener
-          label={row.original.text}
-          onOpen={() => open(row.original)}
-        />
-      </span>
-    ),
-  }),
-  columns.accessor("app", {
-    header: "App",
-    meta: { card: "hidden" },
-    cell: ({ getValue }) => (
-      <span className="whitespace-nowrap text-texto-secundario">
-        {appLabels[getValue()]}
-      </span>
-    ),
-  }),
-  columns.display({
-    id: "version",
-    header: "Versión",
-    meta: { card: "hidden" },
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap text-texto-secundario tabular">
-        {deviceLabel(row.original)}
-      </span>
-    ),
-  }),
-  columns.accessor("status", {
-    header: "Estado",
-    cell: ({ getValue }) => <FeedbackStatusPill status={getValue()} />,
-  }),
-];
 
 // AW38 (REL-012): what Clients and Staff send from «Enviar comentarios»,
 // triaged here and exported for Google's production questionnaire.
@@ -155,9 +86,7 @@ export function FeedbackPage({
   return (
     <CatalogPage
       title="Comentarios"
-      subtitle={
-        query.data === undefined ? undefined : subtitle(query.data.newCount)
-      }
+      subtitle="Desde las dos apps"
       loadingMessage="Cargando comentarios…"
       what="los comentarios"
       emptyMessage={<EmptyFeedback filtered={filtered} />}
@@ -178,18 +107,23 @@ export function FeedbackPage({
       }
       filter={
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <ListFilter
+          {query.data === undefined ? null : (
+            <FeedbackCounters page={query.data} />
+          )}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <FilterChips<Exclude<FeedbackStatusFilter, "all">>
               label="Estado"
-              value={search.status}
+              value={chosen(search.status)}
               options={statusOptions}
-              onChange={(status) => onSearchChange({ status, page: 1 })}
+              onChange={(status) =>
+                onSearchChange({ status: status ?? "all", page: 1 })
+              }
             />
-            <ListFilter
+            <FilterChips<Exclude<FeedbackAppFilter, "all">>
               label="App"
-              value={search.app}
+              value={chosen(search.app)}
               options={appOptions}
-              onChange={(app) => onSearchChange({ app, page: 1 })}
+              onChange={(app) => onSearchChange({ app: app ?? "all", page: 1 })}
             />
           </div>
           {exportFeedback.isError ? (
@@ -209,6 +143,9 @@ export function FeedbackPage({
       }
       query={query}
       columns={feedbackColumns}
+      avatar={(feedback) => (
+        <ClientPhoto name={feedback.senderName} photo={null} size={40} />
+      )}
       renderForm={(feedback, done) =>
         feedback === undefined ? null : (
           <FeedbackPanel feedback={feedback} onDone={done} />
