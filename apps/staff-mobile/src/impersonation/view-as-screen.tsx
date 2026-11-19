@@ -121,7 +121,7 @@ export function ViewAsScreen() {
         )}
         {people.length === 0 ? (
           <EmptyState
-            message="Cuando actives a una entrenadora, asistente o nutricionista, aparecerá aquí."
+            message="Cuando actives a una instructora, asistente o nutricionista, aparecerá aquí."
             title="Nadie a quien ver todavía"
             variant="plain"
           />
