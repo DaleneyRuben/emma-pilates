@@ -15,27 +15,31 @@ export function useIsOnline(): boolean {
 }
 
 /**
- * FIX-090: true once a request fails to connect (fetch rejects with a
- * TypeError) and until one gets through. The device can report a network
- * while the API is out of reach; an answer from the API, even an error,
- * means it is reachable.
+ * FIX-090: true while a query on a mounted screen last failed to connect
+ * (fetch rejects with a TypeError). The device can report a network while
+ * the API is out of reach; an answer from the API, even an error, means it
+ * is reachable.
  */
 function useApiUnreachable(): boolean {
   const queryClient = useQueryClient();
   const [unreachable, setUnreachable] = useState(false);
 
-  useEffect(
-    () =>
-      queryClient.getQueryCache().subscribe((event) => {
-        if (event.type !== "updated") return;
-        if (event.action.type === "error") {
-          setUnreachable(event.action.error instanceof TypeError);
-        } else if (event.action.type === "success") {
-          setUnreachable(false);
-        }
-      }),
-    [queryClient],
-  );
+  useEffect(() => {
+    const cache = queryClient.getQueryCache();
+    const check = () =>
+      setUnreachable(
+        cache
+          .getAll()
+          .some(
+            (query) =>
+              query.getObserversCount() > 0 &&
+              query.state.status === "error" &&
+              query.state.error instanceof TypeError,
+          ),
+      );
+    check();
+    return cache.subscribe(check);
+  }, [queryClient]);
 
   return unreachable;
 }
