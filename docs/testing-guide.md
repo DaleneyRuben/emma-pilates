@@ -11024,3 +11024,46 @@ H. **Phone-width web lists (Lista C).** At 420 px, Clientas and Personal show
 I. **Fonts.** Every text in both apps (tab labels and buttons included) is Work
    Sans, with Lora for titles and big figures; nothing is under 12 pt. The
    public site loads Lora and Work Sans from Google Fonts.
+
+## Test 184: one set of words, one format, and the audit's direct fixes (FIX-090)
+
+The owner's words and formats (`DECISIONES-AUDITORIA-2026-11-19.md`) and the
+direct fixes of the 2026-11-19 audit (report sections 5 and 6). Stacked on
+FIX-089. No migration. Use a copy of `emma_vacia` (password «Password»), the
+API, the worker, both Metro servers and the admin web on your own ports.
+
+A. **Words.** Every surface says «Clientas» (the staff tab too), «Clase» for a
+   class («Nueva clase», «Cancelar clase», «Clase cancelada»; «Cerrar sesión»
+   stays for logging out), «Instructora» for the trainer Role (Perfil, class
+   facts, Personal, the eyebrows) and «Asistente». Clientas and staff read in
+   the feminine («Activa», «Clienta desde», «Clienta referida», «Aprobada»);
+   an ended plan reads «Plan vencido».
+B. **Formats.** Places read «4 de 8 lugares» (the tight class rows keep
+   «4 de 8»); never «cupos». Dates in lists read «jue 19 nov», titles
+   «Jueves 19 de noviembre», with a time «jue 19 nov · 08:00»; no dd/mm/aaaa
+   or ISO on any screen (date inputs and CSV exports keep theirs). Money reads
+   «Bs 1.534,90», and «Bs 450» when the decimals are ,00, on every surface.
+C. **Web fixes.** The 404 page has the logo layout. Comentarios with
+   `?page=2` and one page goes back to page 1. Clientas › Sin plan with none
+   says «Ninguna clienta sin plan.». Editar plan › **Ocultar en la app** asks
+   first. Cerrar cuenta for a clienta with a prepaid next plan names it. Nueva
+   clase from a past empty cell proposes today. The Coordinator sees the
+   «Evaluación nutricional pagada» row in Reglas, and her «sin acceso» notice
+   names the section. Page titles match the menu. Retiro and Reposición are 44
+   px apart at 420 px. The public site says «Cerrar mi cuenta».
+D. **Client fixes.** The tab reads «Mis reservas». A rejected payment's
+   message ends its sentence before «Sube uno nuevo». Rescheduling says «Clase
+   cambiada». Leaving the waitlist asks first and then says «Saliste de la
+   lista de espera». A used activation link is reported before any password
+   is typed. With the API unreachable the one offline banner shows on every
+   screen. «Volver al inicio» from a payment notification logs no warning.
+   «Recuperar contraseña» says its title once. The invoice notice reads «La
+   factura de tu plan 8 clases ya está en Mis facturas.».
+E. **Staff fixes.** Cerrar caja asks for the count first; the expected cash
+   and the difference show only after a count. Lucía's ficha shows her
+   approved freeze («Congelado del … al …»). A day whose classes were all
+   cancelled says «Todas las clases de hoy se cancelaron» on Horario, Cancelar
+   clase and Reservar una clase. Notification groups read «N comprobantes
+   recibidos» and «N pedidos de congelamiento». A new payout QR, or its expiry,
+   marks the older QR notices read, so Daniela no longer sees two that
+   contradict each other.
