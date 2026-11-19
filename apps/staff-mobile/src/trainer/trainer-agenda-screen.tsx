@@ -149,6 +149,7 @@ export function TrainerAgendaScreen() {
           <View>
             <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
             <AgendaDay
+              isToday={isToday}
               now={new Date()}
               onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
               sessions={sessions}

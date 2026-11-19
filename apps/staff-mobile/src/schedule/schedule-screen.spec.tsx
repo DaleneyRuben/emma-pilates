@@ -25,7 +25,7 @@ async function openSchedule(role: "assistant" | "coordinator", profile: unknown)
   );
   await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
   await fireEvent.press(screen.getByTestId("tab-schedule"));
-  await waitFor(() => expect(screen.getByText("Emma Vargas · 50 min")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByTestId("schedule-session-session-1")).toBeOnTheScreen());
   return screen;
 }
 
@@ -39,13 +39,14 @@ describe("Horario (v2 HOR boards)", () => {
     const screen = await openSchedule("assistant", assistant);
 
     expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
-    // FIX-089 (ClaseE): the shared class row in one card, the places «N de M».
+    // FIX-089 (ClaseE): today's next class leads as the Palo de rosa hero,
+    // with the places «N de M».
     expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
-    const row = within(screen.getByTestId("schedule-session-session-1"));
-    expect(row.getByText("Reformer Pilates")).toBeOnTheScreen();
-    expect(row.getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
-    expect(row.getByText("6 de 12")).toHaveStyle({ color: "#93615D", fontWeight: "600" });
-    expect(screen.getByTestId("class-list")).toBeOnTheScreen();
+    const hero = within(screen.getByTestId("next-class-hero"));
+    expect(hero.getByText(/^PRÓXIMA/)).toBeOnTheScreen();
+    expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(hero.getByText("6 de 12")).toBeOnTheScreen();
+    expect(hero.getByTestId("schedule-session-session-1")).toBeOnTheScreen();
     expect(screen.queryByText("6 lugares libres")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
@@ -103,11 +104,13 @@ describe("Horario (v2 HOR boards)", () => {
           routeFetcher({
             ...routes(coordinator),
             [daySessions]: () =>
+              // Today's next class is the hero; the face leads the other rows.
               jsonResponse([
-                { ...session, trainerPhoto: { imageAssetId: "asset-emma" } },
+                { ...session, trainerName: "Andrea Suárez", trainerPhoto: null },
+                { ...session, id: "session-2", trainerPhoto: { imageAssetId: "asset-emma" } },
                 {
                   ...session,
-                  id: "session-2",
+                  id: "session-3",
                   trainerName: "Andrea Suárez",
                   trainerPhoto: null,
                 },
@@ -125,7 +128,7 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    const emma = await screen.findByTestId("schedule-session-session-1");
+    const emma = await screen.findByTestId("schedule-session-session-2");
     await waitFor(() =>
       expect(within(emma).getByLabelText("Foto de Emma Vargas")).toHaveStyle({
         width: 20,
@@ -134,7 +137,7 @@ describe("Horario (v2 HOR boards)", () => {
     );
     expect(within(emma).getByText("Emma Vargas · 50 min")).toBeOnTheScreen();
     expect(
-      within(screen.getByTestId("schedule-session-session-2")).getByText("AS"),
+      within(screen.getByTestId("schedule-session-session-3")).getByText("AS"),
     ).toBeOnTheScreen();
   });
 
@@ -199,9 +202,9 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    // A full class is the exception, so it alone takes the pill.
-    expect(await screen.findByTestId("exception-pill")).toBeOnTheScreen();
-    expect(screen.getByText("Completa")).toBeOnTheScreen();
+    // A full class says so; as today's next class it leads as the hero.
+    expect(await screen.findByText("Completa")).toBeOnTheScreen();
+    expect(within(screen.getByTestId("next-class-hero")).getByText("Completa")).toBeOnTheScreen();
     expect(screen.queryByText("12 de 12")).toBeNull();
     expect(screen.getByText("2 canceladas por mínimo")).toBeOnTheScreen();
     expect(screen.getByText("Ver")).toBeOnTheScreen();
@@ -249,7 +252,7 @@ describe("Horario (v2 HOR boards)", () => {
 
     expect(await screen.findByTestId("schedule-session-session-1")).toHaveProp(
       "accessibilityLabel",
-      expect.stringMatching(/, 50 min, 2 en espera$/),
+      expect.stringMatching(/, 50 min, 2 en espera, Próxima/),
     );
   });
 });

@@ -79,7 +79,10 @@ export function MenuDrawer() {
               {count === undefined ? null : (
                 <span
                   aria-hidden="true"
-                  className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rosa-profundo px-[7px] text-pie font-semibold text-crema tabular"
+                  className={cn(
+                    "inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rosa-profundo px-[7px] text-pie font-semibold text-crema tabular",
+                    current && "ring-1 ring-crema",
+                  )}
                 >
                   {countFormat.format(count.value)}
                 </span>

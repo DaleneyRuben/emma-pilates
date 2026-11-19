@@ -33,6 +33,8 @@ import { BranchField } from "../ui/branch-field";
 import { DayStrip, DayStripAction } from "../ui/day-strip";
 import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
+import { TodayHero } from "../ui/today-hero";
+import { splitNextClass } from "../trainer/next-class";
 import {
   allCancelledTitle,
   countLabel,
@@ -126,6 +128,20 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
     ofType.length > 0 && ofType.every((session) => (session.cancellation ?? null) !== null);
   const nextDate = dates[dates.indexOf(selectedDate) + 1];
   const dayTitle = selectedDate === today ? "Hoy" : dayHeading(selectedDate);
+  const { next, rest } = splitNextClass(visible, selectedDate === today, now);
+  const exceptionOf = (session: (typeof visible)[number]) =>
+    bookedSessionIds.has(session.id)
+      ? "Ya reservada"
+      : session.availableSeats === 0
+        ? "Completa"
+        : undefined;
+  const openSession = (session: (typeof visible)[number]) =>
+    navigation.navigate("SessionDetail", {
+      clientId,
+      clientName,
+      clientPhoto,
+      sessionId: session.id,
+    });
 
   return (
     <Screen style={styles.screen}>
@@ -200,43 +216,48 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
           <SectionTitle>
             {`${dayTitle} · ${countLabel(visible.length, "clase", "clases")}`}
           </SectionTitle>
-          <SessionList tablet={tablet}>
-            {visible.map((session) => {
-              const booked = bookedSessionIds.has(session.id);
-              const full = session.availableSeats === 0;
-              const exception = booked ? "Ya reservada" : full ? "Completa" : undefined;
-              const places = placesLabel(session.bookedCount, session.capacity);
-              return (
-                <SessionRow
-                  key={session.id}
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
-                  exception={exception}
-                  onPress={() =>
-                    navigation.navigate("SessionDetail", {
-                      clientId,
-                      clientName,
-                      clientPhoto,
-                      sessionId: session.id,
-                    })
-                  }
-                  places={places}
-                  standalone={tablet}
-                  subtitle={session.trainerName}
-                  subtitleLead={
-                    <StaffFace
-                      fetcher={fetcher}
-                      name={session.trainerName}
-                      photo={session.trainerPhoto}
-                      size={20}
-                    />
-                  }
-                  testID={`session-card-${session.id}`}
-                  time={startTime(session.startsAt, session.endsAt)}
-                  title={session.classTypeName}
-                />
-              );
-            })}
-          </SessionList>
+          {next === undefined ? null : (
+            <TodayHero
+              accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}, ${exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}`}
+              detail={`${next.branchName} · ${next.trainerName}`}
+              now={now}
+              onPress={() => openSession(next)}
+              places={exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}
+              startsAt={next.startsAt}
+              testID={`session-card-${next.id}`}
+              title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
+            />
+          )}
+          {rest.length === 0 ? null : (
+            <SessionList tablet={tablet}>
+              {rest.map((session) => {
+                const exception = exceptionOf(session);
+                const places = placesLabel(session.bookedCount, session.capacity);
+                return (
+                  <SessionRow
+                    key={session.id}
+                    accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
+                    exception={exception}
+                    onPress={() => openSession(session)}
+                    places={places}
+                    standalone={tablet}
+                    subtitle={session.trainerName}
+                    subtitleLead={
+                      <StaffFace
+                        fetcher={fetcher}
+                        name={session.trainerName}
+                        photo={session.trainerPhoto}
+                        size={20}
+                      />
+                    }
+                    testID={`session-card-${session.id}`}
+                    time={startTime(session.startsAt, session.endsAt)}
+                    title={session.classTypeName}
+                  />
+                );
+              })}
+            </SessionList>
+          )}
         </ScrollView>
       )}
       <OtherDateSheet

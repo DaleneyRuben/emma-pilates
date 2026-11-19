@@ -57,11 +57,12 @@ describe("Assistant rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    // FIX-089 (ClaseE): the shared class row, the places «N de M», no pill.
+    // FIX-089 (ClaseE): today's only class leads as the hero, the places
+    // «N de M», no pill.
     const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
-    expect(card.getByText("6 de 12")).toHaveStyle({ fontWeight: "600" });
+    expect(card.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(card.getByText(/ · Emma Vargas$/)).toBeOnTheScreen();
+    expect(card.getByText("6 de 12")).toBeOnTheScreen();
     expect(card.queryByTestId("exception-pill")).toBeNull();
     expect(
       screen.getByText(/^(Hoy|[A-ZÁÉÍÓÚ][a-záéíóú]+ \d+ de [a-z]+) · 1 clase$/),

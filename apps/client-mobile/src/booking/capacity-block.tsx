@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   row: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
   track: {
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.primary,
     borderRadius: radii.pill,
     flexDirection: "row",
     height: 6,

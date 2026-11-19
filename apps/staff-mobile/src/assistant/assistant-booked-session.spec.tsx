@@ -34,20 +34,21 @@ describe("Assistant booked Session", () => {
     clearMobileQueryCache();
   });
 
-  it("marks the Client's own booking on the list with the «Ya reservada» exception pill", async () => {
+  // As today's next class it leads as the hero, which says it in place of the
+  // places (ClaseE, FIX-089); a later row would take the Rubor pill.
+  it("marks the Client's own booking on the list with «Ya reservada»", async () => {
     const screen = await openBrowse(bookedRoutes());
 
     const card = within(
       screen.getByRole("button", {
-        name: /^Reformer Pilates \d.*, Ya reservada$/,
+        name: /^Reformer Pilates \d.*, Ya reservada, Próxima/,
       }),
     );
     await waitFor(() => {
       expect(card.getByText("Ya reservada")).toBeOnTheScreen();
     });
     expect(card.queryByText("6 de 12")).toBeNull();
-    expect(card.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#E7CCBF" });
-    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#93615D", fontSize: 12 });
+    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#F9F4F2" });
   });
 
   it("keeps the seat count on a Session she only waits for", async () => {

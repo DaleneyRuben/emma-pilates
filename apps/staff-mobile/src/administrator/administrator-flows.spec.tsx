@@ -309,7 +309,8 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
+    // Today's only class leads as the hero (ClaseE), the Trainer in its detail.
+    expect(screen.getByText(/ · Emma Vargas$/)).toBeOnTheScreen();
     expect(screen.getByText("6 de 12")).toBeOnTheScreen();
     expect(screen.getByText(/ · 1 clase$/)).toBeOnTheScreen();
 
