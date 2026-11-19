@@ -57,7 +57,14 @@ describe("the global search", () => {
   const optionNames = () =>
     within(screen.getByRole("listbox", { name: "Clientas" }))
       .getAllByRole("option")
-      .map((option) => option.textContent);
+      .map((option) => {
+        // Her initials are drawn for the eye only.
+        const shown = option.cloneNode(true) as HTMLElement;
+        shown.querySelectorAll("[aria-hidden]").forEach((hidden) => {
+          hidden.remove();
+        });
+        return shown.textContent;
+      });
 
   beforeEach(() => {
     searched = [];
@@ -66,9 +73,9 @@ describe("the global search", () => {
   describe("for the Administrator", () => {
     beforeEach(() =>
       server.use(
+        ...clientHandlers(),
         ...signedInHandlers(),
         ...emptyPageHandlers(),
-        ...clientHandlers(),
       ),
     );
 
@@ -118,7 +125,13 @@ describe("the global search", () => {
 
       await screen.findByRole("dialog", { name: "Valeria Quiroga" });
       expect(router.state.location.pathname).toBe("/clientas");
-      expect(search()).toHaveValue("");
+      // Her file is modal, so the top bar sits behind it.
+      expect(
+        screen.getByRole("combobox", {
+          name: "Buscar una clienta",
+          hidden: true,
+        }),
+      ).toHaveValue("");
     });
 
     it("moves through the results with the arrow keys and lists every match with Enter", async () => {
