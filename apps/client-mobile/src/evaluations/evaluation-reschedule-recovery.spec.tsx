@@ -38,7 +38,7 @@ type Sent = { slotId: string; key: string | null };
 
 const openPicker = async (fetcher: typeof globalThis.fetch) => {
   const screen = await openProfileRow(fetcher, "Evaluación nutricional");
-  await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
+  await fireEvent.press(await screen.findByRole("button", { name: "Cambiar fecha" }));
   expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
   return screen;
 };
@@ -93,7 +93,7 @@ describe("Around a paid Evaluation move", () => {
     expect(await screen.findByText("Evaluación reprogramada")).toBeOnTheScreen();
     // The same screen leaves the slot choice and shows the booking section again.
     expect(screen.queryByText("Elige el nuevo horario")).toBeNull();
-    expect(screen.getByText("Reserva otra evaluación")).toBeOnTheScreen();
+    expect(screen.getByText("¿Otra evaluación?")).toBeOnTheScreen();
   });
 
   it("retries the same slot under the same key after a lost response", async () => {

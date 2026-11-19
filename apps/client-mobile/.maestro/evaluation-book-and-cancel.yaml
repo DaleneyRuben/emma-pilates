@@ -45,13 +45,15 @@ env:
 - runFlow: subflows/dismiss-push-permission.yaml
 # The toast lasts eight seconds; the card on top is the lasting proof.
 - extendedWaitUntil:
-    visible: "Tu próxima evaluación"
+    visible:
+      id: "next-evaluation"
     timeout: 15000
-- assertVisible: "Pago en revisión"
+# C5 pick C: the appointment block names the price and state, the actions sit
+# inside it.
+- assertVisible: ".*Pago en revisión · llega 10 min antes"
 - assertVisible: "El estudio revisa tu comprobante de Bs 70 y te avisa por la app."
-- assertVisible: "Reserva otra evaluación"
 - takeScreenshot: fix057-3-pago-en-revision
-- tapOn: "Reprogramar"
+- tapOn: "Cambiar fecha"
 - extendedWaitUntil:
     visible: "Elige el nuevo horario"
     timeout: 10000
@@ -69,7 +71,7 @@ env:
     timeout: 10000
 - tapOn: "Sí, mover evaluación"
 - extendedWaitUntil:
-    visible: "Reserva otra evaluación"
+    visible: "Evaluación reprogramada"
     timeout: 15000
 - assertNotVisible: "Elige el nuevo horario"
 - takeScreenshot: fix057-5-reprogramada
@@ -81,5 +83,6 @@ env:
 - extendedWaitUntil:
     visible: "Reserva tu evaluación"
     timeout: 15000
-- assertNotVisible: "Tu próxima evaluación"
+- assertNotVisible:
+    id: "next-evaluation"
 - takeScreenshot: fix057-6-cancelada

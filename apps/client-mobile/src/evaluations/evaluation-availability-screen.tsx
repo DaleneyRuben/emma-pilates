@@ -13,7 +13,6 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   LoadingState,
   QueryFailure,
   Screen,
@@ -21,8 +20,6 @@ import {
   SectionTitle,
   spacing,
   StateScreen,
-  TextButton,
-  typography,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
@@ -42,8 +39,8 @@ import {
 } from "./evaluation-format";
 import { planOfferLine } from "./evaluation-offer-copy";
 import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
-import { EvaluationSlotPicker, openDays } from "./evaluation-slot-picker";
-import { MovingBand, NoSlots } from "./evaluation-screen-parts";
+import { EvaluationBookingSection } from "./evaluation-booking-section";
+import { openDays } from "./evaluation-slot-picker";
 import { NextEvaluationCard } from "./next-evaluation-card";
 import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
 import { useEvaluationCommands } from "./use-evaluation-commands";
@@ -69,7 +66,9 @@ const toastTitle = (notice: Notice) =>
 /**
  * C13, walkthrough finding 70 (follow-up 264, option A): one «Evaluación
  * nutricional» with the next Evaluation and its actions on top, the slots
- * to book (or to move it to) below, and «Anteriores» at the foot.
+ * to book (or to move it to) below, and «Anteriores» at the foot. Since C5
+ * pick C the appointment is one Palo de rosa block with its actions inside,
+ * and «¿Otra evaluación?» offers the next three slots before the calendar.
  */
 export function EvaluationAvailabilityScreen({
   route,
@@ -196,9 +195,8 @@ export function EvaluationAvailabilityScreen({
         {movingNow === null ? failure : null}
         {items.length > 0 ? (
           <View>
-            <SectionTitle>
-              {items.length === 1 ? "Tu próxima evaluación" : "Tus próximas evaluaciones"}
-            </SectionTitle>
+            {/* One appointment names itself in its block («Tu cita»). */}
+            {items.length > 1 ? <SectionTitle>Tus próximas evaluaciones</SectionTitle> : null}
             <View style={styles.cards}>
               {items.map((evaluation) => (
                 <NextEvaluationCard
@@ -221,50 +219,19 @@ export function EvaluationAvailabilityScreen({
           </View>
         ) : null}
         {awaitingNewSlot ? null : (
-          <View style={styles.section}>
-            <SectionTitle>
-              {movingNow !== null
-                ? "Elige el nuevo horario"
-                : items.length > 0
-                  ? "Reserva otra evaluación"
-                  : "Reserva tu evaluación"}
-            </SectionTitle>
-            {movingNow !== null ? (
-              <>
-                <MovingBand evaluation={movingNow} onBack={() => setMoving(null)} />
-                {failure}
-              </>
-            ) : items.length > 0 && offer !== null ? (
-              <BodyText style={styles.muted}>{offer}</BodyText>
-            ) : null}
-            {availability === null ? (
-              <QueryFailure
-                label="No pudimos cargar los horarios de evaluación."
-                onRetry={() => void slots.refetch()}
-              />
-            ) : movingNow === null && !hasPlan ? (
-              <>
-                <BodyText>Necesitas un plan activo para reservar.</BodyText>
-                <TextButton label="Ver planes" onPress={() => navigation.navigate("Plans")} />
-              </>
-            ) : days.length === 0 ? (
-              <NoSlots
-                availability={availability}
-                showUsed={
-                  movingNow === null && availability.months.some((m) => m.status === "used")
-                }
-              />
-            ) : (
-              <>
-                <EvaluationSlotPicker days={days} onPick={pick} />
-                <BodyText style={styles.muted}>
-                  {movingNow === null
-                    ? "Puedes reservar hasta 3 horas antes."
-                    : "Puedes reprogramarla hasta 3 horas antes."}
-                </BodyText>
-              </>
-            )}
-          </View>
+          <EvaluationBookingSection
+            availability={availability}
+            booked={items.length > 0}
+            days={days}
+            failure={failure}
+            hasPlan={hasPlan}
+            moving={movingNow}
+            offer={offer}
+            onPick={pick}
+            onPlans={() => navigation.navigate("Plans")}
+            onRetry={() => void slots.refetch()}
+            onStopMoving={() => setMoving(null)}
+          />
         )}
         {pastItems.length > 0 ? (
           <View>
@@ -339,7 +306,5 @@ const styles = StyleSheet.create({
   cards: { gap: spacing.xl },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   failure: { color: colors.errorText },
-  muted: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   screen: { gap: spacing.lg },
-  section: { gap: spacing.md },
 });

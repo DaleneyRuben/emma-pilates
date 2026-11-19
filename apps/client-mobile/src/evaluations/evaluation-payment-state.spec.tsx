@@ -48,17 +48,17 @@ describe("The payment state of a paid Evaluation", () => {
     const screen = await openWith([paid("pending")]);
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pago en revisión")).toBeOnTheScreen();
+    expect(within(card).getByText(/Pago en revisión · llega 10 min antes$/)).toBeOnTheScreen();
     expect(
       screen.getByText("El estudio revisa tu comprobante de Bs 70 y te avisa por la app."),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/^Pagada/)).toBeNull();
   });
 
-  it("offers both Reprogramar and Cancelar evaluación while the transfer is pending", async () => {
+  it("offers both Cambiar fecha and Cancelar evaluación while the transfer is pending", async () => {
     const screen = await openWith([paid("pending", { reschedulable: true })]);
 
-    expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(await screen.findByRole("button", { name: "Cambiar fecha" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
@@ -66,7 +66,7 @@ describe("The payment state of a paid Evaluation", () => {
     const screen = await openWith([paid("rejected")]);
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pago rechazado")).toBeOnTheScreen();
+    expect(within(card).getByText(/Pago rechazado · llega 10 min antes$/)).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
@@ -74,7 +74,7 @@ describe("The payment state of a paid Evaluation", () => {
     const screen = await openWith([paid("confirmed", { cancellable: false, reschedulable: true })]);
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pagada")).toBeOnTheScreen();
+    expect(within(card).getByText(/Pagada · llega 10 min antes$/)).toBeOnTheScreen();
     expect(
       screen.getByText("Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella."),
     ).toBeOnTheScreen();
@@ -85,7 +85,7 @@ describe("The payment state of a paid Evaluation", () => {
     const screen = await openWith([paid(undefined)]);
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pagada")).toBeOnTheScreen();
+    expect(within(card).getByText(/Pagada · llega 10 min antes$/)).toBeOnTheScreen();
     expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
   });
 
