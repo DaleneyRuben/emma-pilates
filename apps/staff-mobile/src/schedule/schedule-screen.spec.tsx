@@ -252,7 +252,7 @@ describe("Horario (v2 HOR boards)", () => {
 
     expect(await screen.findByTestId("schedule-session-session-1")).toHaveProp(
       "accessibilityLabel",
-      expect.stringMatching(/, 50 min, 2 en espera$/),
+      expect.stringMatching(/, 50 min, 2 en espera, Próxima/),
     );
   });
 });

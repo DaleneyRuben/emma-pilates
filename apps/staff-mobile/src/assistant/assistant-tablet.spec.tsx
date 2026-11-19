@@ -6,10 +6,24 @@ import { jsonResponse } from "../test-support";
 import {
   assistantRoutes,
   expiredOverview,
+  from,
   invitation,
+  minute,
   newClient,
   openClientSearch,
+  session,
+  until,
 } from "./assistant-fixtures";
+
+const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+// Today's next class leads as the hero (ClaseE); the later one fills the grid.
+const later = {
+  ...session,
+  id: "session-2",
+  classTypeName: "Mat Pilates",
+  startsAt: new Date(Date.parse(session.startsAt) + 60 * minute).toISOString(),
+  endsAt: new Date(Date.parse(session.endsAt) + 60 * minute).toISOString(),
+};
 
 jest.setTimeout(20_000);
 
@@ -103,6 +117,7 @@ describe("Assistant flows on a tablet", () => {
   it("books a Session in a two-column grid and returns to the split with her Bookings", async () => {
     const screen = await selectLucia({
       ...assistantRoutes(),
+      [dayList]: () => jsonResponse([session, later]),
       "POST /api/v1/sessions/session-1/bookings": () => jsonResponse({ id: "booking-new" }, 201),
     });
 
