@@ -15,7 +15,7 @@ import {
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
+import { capacityLabel, staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -31,7 +31,7 @@ type Detail = {
   startsAt: string;
   trainerName: string;
   trainerPhoto: { imageAssetId: string } | null;
-  /** FIX-081: «Entrenadora» or «Entrenador»; feminine from an older API. */
+  /** FIX-081: «Instructora» or «Instructor»; feminine from an older API. */
   trainerGender?: StaffGenderCode;
 };
 
@@ -62,7 +62,7 @@ export function SessionHero({
           {`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
         </Text>
         <Text style={styles.quietNote}>
-          {`${full ? 0 : detail.availableSeats} de ${detail.capacity} cupos libres`}
+          {capacityLabel(full ? detail.capacity : detail.bookedCount, detail.capacity)}
         </Text>
       </View>
     );
@@ -123,7 +123,7 @@ export function SessionFacts({
       ? undefined
       : new Date(new Date(detail.startsAt).getTime() - cancellationWindowMinutes * 60_000);
   const lastRow = full
-    ? { icon: "bell" as const, label: "Te avisamos si se libera un cupo" }
+    ? { icon: "bell" as const, label: "Te avisamos si se libera un lugar" }
     : deadline === undefined || deadline.getTime() <= mountedAt
       ? null
       : {

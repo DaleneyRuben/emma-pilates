@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 /**
  * 04's seats on the hero card (follow-up 227, C04): the free count in Lora 32
- * Crema over «de M cupos libres», then a Crema bar by the booked share on
+ * Crema over «de M lugares libres», then a Crema bar by the booked share on
  * Rubor (palette B, FIX-089).
  */
 export function CapacityBlock({
@@ -23,7 +23,9 @@ export function CapacityBlock({
     <View style={styles.block} testID="capacity-block">
       <View style={styles.row}>
         <Text style={styles.number}>{String(full ? 0 : availableSeats)}</Text>
-        <Text style={styles.label}>{`de ${capacity} cupos libres`}</Text>
+        <Text
+          style={styles.label}
+        >{`de ${capacity} ${capacity === 1 ? "lugar libre" : "lugares libres"}`}</Text>
       </View>
       <View
         accessibilityRole="progressbar"
