@@ -66,6 +66,19 @@ describe("ScreenHeader", () => {
 });
 
 describe("ScreenTopBar", () => {
+  // Its callers outside a padded Screen (Recuperar contraseña) relied on the
+  // bar's own 16 pt inset; full bleed spans the Screen's padding and keeps it.
+  it("keeps its own 16 pt inset, with or without full bleed", async () => {
+    const bare = await render(<ScreenTopBar onBack={jest.fn()} title="Recuperar contraseña" />);
+    expect(bare.getByTestId("screen-top-bar")).toHaveStyle({ paddingHorizontal: spacing.lg });
+
+    const bleed = await render(<ScreenTopBar fullBleed onBack={jest.fn()} title="Mi plan" />);
+    expect(bleed.getByTestId("screen-top-bar")).toHaveStyle({
+      marginHorizontal: -spacing.lg,
+      paddingHorizontal: spacing.lg,
+    });
+  });
+
   it("is the shared header", async () => {
     const screen = await render(<ScreenTopBar onBack={jest.fn()} title="Mi crédito" />);
 
