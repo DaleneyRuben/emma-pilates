@@ -19,6 +19,7 @@ export function sessionSpan(session: Session) {
 // Follow-up 96: every hour of a day that no Session fully covers is an empty
 // slot that opens «Nueva clase» there. Slots sit before the blocks of the
 // same start in the DOM, so Tab follows the day and blocks paint on top.
+// A cancelled class is only a thin line (FIX-091), so its hour stays free.
 export function dayItems(
   day: string,
   hours: number[],
@@ -28,10 +29,13 @@ export function dayItems(
     (session) => boliviaParts(session.startsAt).date === day,
   );
   const spans = ofDay.map(sessionSpan);
+  const held = ofDay
+    .filter((session) => (session.cancellation ?? null) === null)
+    .map(sessionSpan);
   const slots = hours
     .filter(
       (hour) =>
-        !spans.some(
+        !held.some(
           ({ start, end }) => start <= hour * 60 && end >= (hour + 1) * 60,
         ),
     )

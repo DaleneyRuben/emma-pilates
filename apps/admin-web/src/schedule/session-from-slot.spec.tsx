@@ -22,6 +22,7 @@ import {
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
+import { classPanelName } from "../test/class-panel";
 
 const longDay = new Intl.DateTimeFormat("es", {
   timeZone: "UTC",
@@ -135,7 +136,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     await user.keyboard("{Escape}");
     await user.click(block);
     expect(
-      await screen.findByRole("dialog", { name: "Editar clase" }),
+      await screen.findByRole("dialog", { name: classPanelName }),
     ).toBeInTheDocument();
   });
 

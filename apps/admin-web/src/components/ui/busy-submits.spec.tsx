@@ -15,6 +15,7 @@ import {
   signedInHandlers,
   signedOutHandlers,
 } from "../../test/session-handlers";
+import { classPanelName, openPanelTab } from "../../test/class-panel";
 
 // Holds a request until the spec lets it answer, so the busy state can be read.
 const held = () => {
@@ -136,7 +137,8 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
     await user.click(
       await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+    const panel = await screen.findByRole("dialog", { name: classPanelName });
+    await openPanelTab(user, panel, "Editar");
     await user.click(
       within(panel).getByRole("button", { name: "Cancelar esta clase" }),
     );

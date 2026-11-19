@@ -11,6 +11,7 @@ import {
   weekSessions,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const equipetrolSession = {
   ...saturdayEmpty,
@@ -53,7 +54,8 @@ describe("Horario cache after a change", () => {
     await user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 09:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+    const panel = await screen.findByRole("dialog", { name: classPanelName });
+    await openPanelTab(user, panel, "Editar");
     await user.clear(within(panel).getByLabelText("Capacidad"));
     await user.type(within(panel).getByLabelText("Capacidad"), "8");
     const centroReads = reads[centro.id];

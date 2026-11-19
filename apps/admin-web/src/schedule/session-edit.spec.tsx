@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { formatDateTime, formatListDate } from "@pilates/api-contracts";
+import { formatListDate } from "@pilates/api-contracts";
 import { boliviaInstant, formatCivilDate } from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import {
@@ -33,13 +33,16 @@ import {
   studioSettingsPath,
 } from "../test/studio-settings-fixtures";
 import { useNarrowViewport } from "../test/viewport";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const civil = (date: string) => formatListDate(date);
 
-const openSession = async (name: RegExp) => {
+// FIX-091 (W1): the class panel opens on Reservas; these open a tab.
+const openSession = async (name: RegExp, tab?: string) => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
   await view.user.click(await screen.findByRole("button", { name }));
-  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+  const panel = await screen.findByRole("dialog", { name: classPanelName });
+  if (tab !== undefined) await openPanelTab(view.user, panel, tab);
   return { ...view, panel };
 };
 
@@ -63,14 +66,14 @@ describe("AW03 Editar clase on a desktop browser", () => {
         },
       ),
     );
-    const { panel, user } = await openSession(/Reformer Pilates, 07:00/);
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 07:00/,
+      "Editar",
+    );
 
     expect(
-      within(panel).getByText(
-        `${formatDateTime(mondayReformer.startsAt)} · 4 de 10 lugares`,
-      ),
+      within(panel).getByText("4 de 10 lugares · Valeria Peña"),
     ).toBeInTheDocument();
-    expect(within(panel).getByLabelText("Solo esta clase")).toBeChecked();
     expect(within(panel).getByText("Reformer Pilates")).toBeInTheDocument();
     expect(
       within(panel).getByLabelText("Capacidad"),
@@ -103,7 +106,10 @@ describe("AW03 Editar clase on a desktop browser", () => {
         problemResponse(409, "capacity_below_bookings"),
       ),
     );
-    const { panel, user } = await openSession(/Reformer Pilates, 07:00/);
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 07:00/,
+      "Editar",
+    );
     const capacity = within(panel).getByLabelText("Capacidad");
 
     await user.clear(capacity);
@@ -144,9 +150,11 @@ describe("AW03 Editar clase on a desktop browser", () => {
         },
       ),
     );
-    const { panel, user } = await openSession(/Reformer Pilates, 07:00/);
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 07:00/,
+      "Serie semanal",
+    );
 
-    await user.click(within(panel).getByLabelText("Esta y las futuras"));
     expect(await within(panel).findByLabelText("Día de la semana")).toHaveValue(
       "1",
     );
@@ -196,8 +204,10 @@ describe("AW03 Editar clase on a desktop browser", () => {
         },
       ),
     );
-    const { panel, user } = await openSession(/Reformer Pilates, 07:00/);
-    await user.click(within(panel).getByLabelText("Esta y las futuras"));
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 07:00/,
+      "Serie semanal",
+    );
 
     await user.click(
       await within(panel).findByRole("button", { name: "Terminar la serie" }),
@@ -220,37 +230,30 @@ describe("AW03 Editar clase on a desktop browser", () => {
     );
   });
 
-  it("lays the panel out as the owner chose: bookings with their button, the scope over the fields, the series below (FIX-042)", async () => {
-    const { panel } = await openSession(/Reformer Pilates, 07:00/);
-
-    const booked = await within(panel).findByRole("region", {
-      name: /Reservaron/,
-    });
-    expect(
-      within(booked).getByRole("button", { name: "Reservar a una clienta" }),
-    ).toHaveTextContent("Reservar");
-    const scope = within(panel).getByRole("group", {
-      name: "Aplicar cambios a",
-    });
-    expect(within(panel).getByText("Aplicar cambios a")).not.toHaveClass(
-      "sr-only",
+  it("lays each tab out as the owner chose: save then cancel in Editar, the series form then pause and end in Serie semanal (FIX-091)", async () => {
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 07:00/,
+      "Editar",
     );
-    const save = within(panel).getByRole("button", { name: "Guardar" });
-    const pause = await within(panel).findByRole("button", {
+    const follows = (a: Element, b: Element) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+    expect(
+      follows(
+        within(panel).getByRole("button", { name: "Guardar" }),
+        within(panel).getByRole("button", { name: "Cancelar esta clase" }),
+      ),
+    ).toBe(true);
+
+    await openPanelTab(user, panel, "Serie semanal");
+    const save = await within(panel).findByRole("button", { name: "Guardar" });
+    const pause = within(panel).getByRole("button", {
       name: "Pausar la serie",
     });
     const end = within(panel).getByRole("button", {
       name: "Terminar la serie",
     });
-    const cancel = within(panel).getByRole("button", {
-      name: "Cancelar esta clase",
-    });
-    const follows = (a: Element, b: Element) =>
-      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(follows(booked, scope)).toBe(true);
-    expect(follows(scope, save)).toBe(true);
     expect(follows(save, pause)).toBe(true);
-    expect(follows(cancel, pause)).toBe(true);
     expect(follows(pause, end)).toBe(true);
     expect(
       within(panel).getByText(/Serie semanal · cada lunes 07:00/),
@@ -267,14 +270,16 @@ describe("AW03 Editar clase on a desktop browser", () => {
           : jsonResponse({ affectedBookings: 10 });
       }),
     );
-    const { panel, user } = await openSession(/Mat Pilates, 16:00/);
+    const { panel, user } = await openSession(/Mat Pilates, 16:00/, "Editar");
 
     expect(
       within(panel).getByText(
-        `${formatDateTime(wednesdayMat.startsAt)} · 10 de 10 lugares · 3 en lista de espera`,
+        "10 de 10 lugares · 3 en lista de espera · Daniela Ortiz",
       ),
     ).toBeInTheDocument();
-    expect(within(panel).queryByLabelText("Esta y las futuras")).toBeNull();
+    expect(
+      within(panel).queryByRole("tab", { name: "Serie semanal" }),
+    ).toBeNull();
 
     const cancel = async () => {
       await user.click(
@@ -313,7 +318,10 @@ describe("AW03 Editar clase on a desktop browser", () => {
         jsonResponse({ affectedBookings: 0 }),
       ),
     );
-    const { panel, user } = await openSession(/Reformer Pilates, 09:00/);
+    const { panel, user } = await openSession(
+      /Reformer Pilates, 09:00/,
+      "Editar",
+    );
 
     expect(
       await within(panel).findByText(
@@ -345,7 +353,7 @@ describe("AW03 Editar clase on a desktop browser", () => {
     server.use(
       http.get(apiUrl(studioSettingsPath), () => jsonResponse({}, 503)),
     );
-    const { panel } = await openSession(/Reformer Pilates, 09:00/);
+    const { panel } = await openSession(/Reformer Pilates, 09:00/, "Editar");
 
     expect(
       await within(panel).findByText(
