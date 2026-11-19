@@ -8,7 +8,7 @@ import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanel } from "../components/panel/side-panel";
 import { DataTable } from "../components/table/data-table";
-import type { ListSearch } from "../components/table/pagination";
+import { pageCount, type ListSearch } from "../components/table/pagination";
 import type { RangeLabel } from "../components/table/table-pagination";
 import { Button } from "../components/ui/button";
 
@@ -32,6 +32,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   filter: ReactNode;
   search: ListSearch;
   onPageChange: (page: number) => void;
+  /** Steps back from a page past the last one; `onPageChange` by default. */
+  onPageClamp?: (page: number) => void;
   rangeLabel?: RangeLabel;
   query: UseQueryResult<{ items: Row[]; totalItems: number }>;
   /** `act` opens a panel action from a row (FIX-088's per-row links). */
@@ -94,6 +96,7 @@ export function CatalogPage<Row extends { id: string }>({
   filter,
   search,
   onPageChange,
+  onPageClamp = onPageChange,
   rangeLabel,
   query,
   columns,
@@ -136,6 +139,19 @@ export function CatalogPage<Row extends { id: string }>({
   useEffect(() => {
     if (openedLink !== undefined || linkMissing) onLinkSettled?.();
   }, [openedLink, linkMissing, onLinkSettled]);
+  // FIX-090: an address past the last page of a list with rows steps back
+  // to it, so it never reads «Página 2 de 1» over the empty message.
+  const lastPage =
+    query.data === undefined ||
+    query.isPlaceholderData ||
+    query.data.totalItems === 0
+      ? undefined
+      : pageCount(query.data.totalItems, search.pageSize);
+  useEffect(() => {
+    if (lastPage !== undefined && search.page > lastPage) {
+      onPageClamp(lastPage);
+    }
+  }, [lastPage, search.page, onPageClamp]);
 
   return (
     <article className="flex flex-col gap-5">
