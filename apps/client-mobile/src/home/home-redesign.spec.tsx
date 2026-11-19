@@ -158,7 +158,8 @@ describe("Client Inicio, option A", () => {
     const inRow = within(screen.getByTestId("home-plan-card"));
     expect(inRow.getByText("Trimestral · 1 restante")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te queda 1 · vence el 5 de febrero")).toBeOnTheScreen();
-    expect(inRow.getByText("Por vencer")).toHaveStyle({ color: "#9A7434" });
+    // FIX-089: the exception is the one Rubor pill.
+    expect(within(inRow.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
   });
 
   it("keeps the other shortcuts quiet, without a tinted disc", async () => {
