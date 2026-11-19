@@ -84,6 +84,13 @@ export class FreezeReviewDto {
   @ApiProperty()
   planName!: string;
 
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Classes her Plan has left, as Revisar congelamiento says (FIX-091)',
+  })
+  remainingClassAllowance?: number;
+
   @ApiProperty({ format: 'date' })
   startsOn!: string;
 

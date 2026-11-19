@@ -18,7 +18,13 @@ const reviewSelect = {
   decidedAt: true,
   decidedByAccount: { select: { staffMember: { select: { name: true } } } },
   client: clientNameSelect,
-  subscription: { select: { planNameSnapshot: true, endsOn: true } },
+  subscription: {
+    select: {
+      planNameSnapshot: true,
+      endsOn: true,
+      remainingClassAllowance: true,
+    },
+  },
 } as const;
 
 const civil = (date: Date) => date.toISOString().slice(0, 10);
@@ -78,7 +84,11 @@ const toReview = (
     decidedByAccount: { staffMember: { name: string } | null } | null;
     auditRecordId: string | null;
     client: { name: string; profileImageAssetId: string | null };
-    subscription: { planNameSnapshot: string; endsOn: Date };
+    subscription: {
+      planNameSnapshot: string;
+      endsOn: Date;
+      remainingClassAllowance: number;
+    };
   },
   recorded: DecisionEnds = {},
 ) => {
@@ -103,6 +113,8 @@ const toReview = (
     id: row.id,
     ...clientNameAndPhoto(row.client),
     planName: row.subscription.planNameSnapshot,
+    // FIX-091 (W16 B): what her Plan has left, as the review panel says.
+    remainingClassAllowance: row.subscription.remainingClassAllowance,
     startsOn: civil(row.startsOn),
     endsOn: civil(row.endsOn),
     reason: row.reason,
