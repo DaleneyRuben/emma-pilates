@@ -50,7 +50,10 @@ const decideFreezeSchema = z
     refusalReason: z.string().trim().max(300).optional(),
   })
   .refine(
-    (body) => body.decision === 'refused' || body.refusalReason === undefined,
+    (body) =>
+      body.decision === 'refused' ||
+      body.refusalReason === undefined ||
+      body.refusalReason === '',
   )
   .transform(({ refusalReason, ...body }) =>
     refusalReason === undefined || refusalReason === ''
