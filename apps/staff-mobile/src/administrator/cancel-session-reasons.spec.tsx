@@ -68,6 +68,8 @@ describe("Cancelar clase (S14) without bookings and its refusals", () => {
   it("cancels a class with no bookings after the short confirmation", async () => {
     const screen = await openEmptySession(() => jsonResponse({ affectedBookings: 0 }));
 
+    // FIX-090: the detail spells its places out in full.
+    expect(screen.getByText("0 de 8 lugares")).toBeOnTheScreen();
     expect(
       screen.getByText("Esto no se puede deshacer. La clase no tiene reservas."),
     ).toBeOnTheScreen();
