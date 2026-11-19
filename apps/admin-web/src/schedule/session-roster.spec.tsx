@@ -39,6 +39,7 @@ import {
   signedInHandlers,
 } from "../test/session-handlers";
 import { studioRulesHandler } from "../test/studio-settings-fixtures";
+import { classPanelName } from "../test/class-panel";
 
 const mariana = clientRow("Mariana Peña");
 const martina = clientRow("Martina Salvatierra", {
@@ -61,7 +62,7 @@ const openSession = async (
 ): Promise<ReturnType<typeof renderAdmin> & { panel: HTMLElement }> => {
   const view = renderAdmin(`/horario?week=${week}`);
   await view.user.click(await screen.findByRole("button", { name }));
-  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+  const panel = await screen.findByRole("dialog", { name: classPanelName });
   return { ...view, panel };
 };
 
@@ -169,7 +170,7 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
     ).toBeInTheDocument();
   });
 
-  it("keeps the booking button above the loading logo, not beside it (WEB-045)", async () => {
+  it("keeps the booking button under the loading logo, not beside it (WEB-045, FIX-091)", async () => {
     server.use(
       http.get(
         apiUrl(rosterPath(mondayReformer.id)),
@@ -185,10 +186,11 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
     const button = within(panel).getByRole("button", {
       name: "Reservar a una clienta",
     });
-    // The logo is centred across the panel: the button's row holds no logo.
-    expect(button.parentElement).not.toContainElement(loading);
+    // The logo is centred across the panel, stacked over the button, never
+    // squeezed into a row beside it.
+    expect(button.parentElement).toHaveClass("flex-col");
     expect(
-      button.compareDocumentPosition(loading) &
+      loading.compareDocumentPosition(button) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
@@ -231,7 +233,7 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
         key: expect.stringMatching(uuid) as string,
       }),
     );
-    const detail = await screen.findByRole("dialog", { name: "Editar clase" });
+    const detail = await screen.findByRole("dialog", { name: classPanelName });
     expect(within(detail).getByRole("status")).toHaveTextContent(
       "Mariana Peña quedó reservada.",
     );

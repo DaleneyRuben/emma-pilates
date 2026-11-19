@@ -10,13 +10,15 @@ import {
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
 import { studioRules, studioRulesPath } from "../test/studio-settings-fixtures";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const openConfirmation = async () => {
   const { user } = renderAdmin(`/horario?week=${nextMonday}`);
   await user.click(
     await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
   );
-  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+  const panel = await screen.findByRole("dialog", { name: classPanelName });
+  await openPanelTab(user, panel, "Editar");
   await user.click(
     within(panel).getByRole("button", { name: "Cancelar esta clase" }),
   );

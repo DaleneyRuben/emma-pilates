@@ -17,6 +17,7 @@ import {
   weeklyScheduleId,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const openPanel = async (button: string | RegExp, dialog: string) => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
@@ -145,7 +146,8 @@ describe("AW03 Duración", () => {
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+    const panel = await screen.findByRole("dialog", { name: classPanelName });
+    await openPanelTab(view.user, panel, "Editar");
     const duration = within(panel).getByLabelText("Duración");
 
     expect(duration).toHaveValue("50");
@@ -166,8 +168,8 @@ describe("AW03 Duración", () => {
     await view.user.click(
       await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
-    await view.user.click(within(panel).getByLabelText("Esta y las futuras"));
+    const panel = await screen.findByRole("dialog", { name: classPanelName });
+    await openPanelTab(view.user, panel, "Serie semanal");
     const duration = await within(panel).findByLabelText("Duración");
 
     expect(duration).toHaveValue(String(mondaySchedule.durationMinutes));

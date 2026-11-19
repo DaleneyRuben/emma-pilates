@@ -16,6 +16,7 @@ import {
   weeklyScheduleId,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const noEnd =
   "Sin fecha de fin, la serie sigue cada semana hasta que la pauses o la termines.";
@@ -51,8 +52,8 @@ const openSeries = async () => {
   await view.user.click(
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
   );
-  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
-  await view.user.click(within(panel).getByLabelText("Esta y las futuras"));
+  const panel = await screen.findByRole("dialog", { name: classPanelName });
+  await openPanelTab(view.user, panel, "Serie semanal");
   await within(panel).findByLabelText("Día de la semana");
   return { ...view, panel };
 };

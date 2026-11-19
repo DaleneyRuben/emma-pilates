@@ -20,6 +20,7 @@ import {
   weeklyScheduleId,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import { classPanelName, openPanelTab } from "../test/class-panel";
 
 const seriesPath = `${schedulesPath}/${weeklyScheduleId}`;
 // «23 de diciembre»: the long day without its weekday.
@@ -30,7 +31,8 @@ const openSeriesClass = async () => {
   await view.user.click(
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
   );
-  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
+  const panel = await screen.findByRole("dialog", { name: classPanelName });
+  await openPanelTab(view.user, panel, "Serie semanal");
   return { ...view, panel };
 };
 
