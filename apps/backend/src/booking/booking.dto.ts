@@ -140,6 +140,14 @@ export class SessionAvailabilityDto {
       'The cancelled class and its cause, null for a class that stands. The Session availability list sends it only when Staff ask for includeCancelled; the Administrator search always does.',
   })
   cancellation?: SessionCancellationSummaryDto | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    isArray: true,
+    description:
+      'E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.',
+  })
+  attendeeInitials?: string[];
 }
 
 // The Administrator's projection (API-002, WEB-003): the same Session plus
@@ -239,6 +247,7 @@ const availabilityQuerySchema = z
     until: z.iso.datetime(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
     includeCancelled: z.enum(['true', 'false']).optional(),
+    includeAttendees: z.enum(['true', 'false']).optional(),
   })
   .refine(({ from, until }) => new Date(from) < new Date(until), {
     message: 'until must be after from',
@@ -269,6 +278,7 @@ export const parseAvailabilityQuery = (
   until: Date;
   limit: number;
   includeCancelled?: true;
+  includeAttendees?: true;
 } | null => {
   const result = availabilityQuerySchema.safeParse(value);
   if (!result.success) return null;
@@ -280,6 +290,9 @@ export const parseAvailabilityQuery = (
     limit: result.data.limit,
     ...(result.data.includeCancelled === 'true'
       ? { includeCancelled: true as const }
+      : {}),
+    ...(result.data.includeAttendees === 'true'
+      ? { includeAttendees: true as const }
       : {}),
   };
 };

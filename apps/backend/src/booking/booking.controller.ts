@@ -86,6 +86,13 @@ export class BookingController {
     description:
       'FIX-052: Staff also get the cancelled classes, with their cause; ignored for a Client',
   })
+  @ApiQuery({
+    name: 'includeAttendees',
+    required: false,
+    type: Boolean,
+    description:
+      'E7: Staff also get who is coming, by initials only; ignored for a Client',
+  })
   @ApiOkResponse({ type: SessionAvailabilityDto, isArray: true })
   async list(
     @Headers('authorization') authorization: string | undefined,
