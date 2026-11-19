@@ -34,7 +34,7 @@ export function TrainerOptions({
 }) {
   return (
     <>
-      <option value="">Elige una entrenadora</option>
+      <option value="">Elige una instructora</option>
       {trainers.map((trainer) => (
         <option key={trainer.id} value={trainer.id}>
           {trainer.name}

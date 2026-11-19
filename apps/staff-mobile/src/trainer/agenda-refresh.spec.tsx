@@ -49,7 +49,7 @@ describe("Trainer agenda refresh (UX-004)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() =>
-      expect(screen.getByText("No hay reservas para esta sesión.")).toBeOnTheScreen(),
+      expect(screen.getByText("No hay reservas para esta clase.")).toBeOnTheScreen(),
     );
     schedule = [session("session-1", "Reformer Pilates", 7)];
 

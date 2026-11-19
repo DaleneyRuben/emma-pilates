@@ -291,7 +291,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
   });
 
-  it("opens Facturas por subir from Clientes for the Assistant", async () => {
+  it("opens Facturas por subir from Clientas for the Assistant", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -312,7 +312,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     ).toBeOnTheScreen();
   });
 
-  it("keeps Facturas por subir on Clientes when none is waiting, to reach Subidas", async () => {
+  it("keeps Facturas por subir on Clientas when none is waiting, to reach Subidas", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(

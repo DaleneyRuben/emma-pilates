@@ -66,15 +66,15 @@ describe("Inicio and Mi plan plan cards", () => {
 
     const card = within(screen.getByTestId("home-guest-pass-card"));
     expect(card.getByText("Tu plan · 12 clases")).toBeOnTheScreen();
-    expect(card.getByText("Empieza el 17 de noviembre")).toBeOnTheScreen();
+    expect(card.getByText("Empieza el mar 17 nov")).toBeOnTheScreen();
     expect(screen.queryByText("Clase de invitada usada")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
 
     await fireEvent.press(card.getByRole("button", { name: "Mi plan" }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
 
-    expect(screen.getByText("Tu plan siguiente empieza el 17 de noviembre.")).toBeOnTheScreen();
-    expect(screen.queryByText("Tu plan vence el 16 de noviembre.")).toBeNull();
+    expect(screen.getByText("Tu plan siguiente empieza el mar 17 nov.")).toBeOnTheScreen();
+    expect(screen.queryByText("Tu plan vence el lun 16 nov.")).toBeNull();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
   });
 
@@ -96,9 +96,7 @@ describe("Inicio and Mi plan plan cards", () => {
 
     const card = within(screen.getByTestId("home-plan-card"));
     expect(card.getByText("12 clases · 13 restantes")).toBeOnTheScreen();
-    expect(
-      card.getByText("12 del plan + 1 de regalo · vence el 30 de noviembre"),
-    ).toBeOnTheScreen();
+    expect(card.getByText("12 del plan + 1 de regalo · vence el lun 30 nov")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Mi plan, 12 clases/ }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
@@ -107,7 +105,7 @@ describe("Inicio and Mi plan plan cards", () => {
     expect(hero.getByText("13")).toBeOnTheScreen();
     // FIX-082 (Mi plan option A): the origin joins the card's one line.
     expect(
-      hero.getByText("12 del plan + 1 de regalo (invitación) · vence el 30 de noviembre"),
+      hero.getByText("12 del plan + 1 de regalo (invitación) · vence el lun 30 nov"),
     ).toBeOnTheScreen();
   });
 

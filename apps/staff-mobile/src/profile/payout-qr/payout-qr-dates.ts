@@ -1,8 +1,17 @@
+import { formatListDate } from "@pilates/api-contracts";
+import { boliviaCivilDate } from "@pilates/mobile-core";
+
 const pad = (value: number) => String(value).padStart(2, "0");
 
-/** `dd/mm/aaaa`, the design system's date format. */
-export const fullCivilDate = (date: string) =>
-  `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+/**
+ * FIX-090: the shared list date, «mar 15 dic», never «15/12/2026». A QR may
+ * be valid for up to five years, so a day past this year keeps its year.
+ */
+export const qrDate = (date: string, now: Date = new Date()): string => {
+  const year = date.slice(0, 4);
+  const listDate = formatListDate(date);
+  return year === boliviaCivilDate(now).slice(0, 4) ? listDate : `${listDate} ${year}`;
+};
 
 // The API refuses a last day that is not after today or is more than five
 // years away (FIX-072); the calendar offers the same span.

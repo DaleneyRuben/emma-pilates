@@ -61,14 +61,14 @@ describe("AW24 Editar miembro", () => {
       within(panel).getByRole("textbox", { name: "Correo electrónico" }),
     ).toHaveValue("emma@emmapilates.bo");
     expect(
-      within(panel).getByRole("radio", { name: "Entrenadora" }),
+      within(panel).getByRole("radio", { name: "Instructora" }),
     ).toBeChecked();
     expect(
       within(panel).getByRole("checkbox", { name: "Centro" }),
     ).toBeChecked();
     expect(
       within(panel).getByText(
-        "Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas. Cámbialas de entrenadora en Horario antes de guardar.",
+        "Si sacas una sucursal, sus clases ya asignadas no se reasignan solas. Cámbialas de instructora en Horario antes de guardar.",
       ),
     ).toBeVisible();
 
@@ -146,7 +146,7 @@ describe("AW24 Editar miembro", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(
-      await within(panel).findByText(/Cámbiale la entrenadora desde Horario/),
+      await within(panel).findByText(/Cámbiale la instructora desde Horario/),
     ).toBeVisible();
     expect(
       within(panel).getByRole("checkbox", { name: "Equipetrol" }),
@@ -220,7 +220,7 @@ describe("AW24 Editar miembro", () => {
 
     expect(within(panel).getByText("Pendiente de activación")).toBeVisible();
     expect(
-      within(panel).getByText("El enlace vence el 30/09/2026."),
+      within(panel).getByText("El enlace vence el mié 30 sept."),
     ).toBeVisible();
     expect(
       within(panel).getByText(
@@ -237,7 +237,7 @@ describe("AW24 Editar miembro", () => {
       ),
     ).toBeVisible();
     expect(
-      within(panel).getByText("El enlace vence el 02/10/2026."),
+      within(panel).getByText("El enlace vence el vie 2 oct."),
     ).toBeVisible();
 
     await user.click(
@@ -282,7 +282,7 @@ describe("AW24 Editar miembro", () => {
       within(confirm).getByRole("button", { name: "Desactivar" }),
     );
     expect(
-      await within(panel).findByText(/Cámbiale la entrenadora desde Horario/),
+      await within(panel).findByText(/Cámbiale la instructora desde Horario/),
     ).toBeVisible();
 
     await user.click(
@@ -330,7 +330,7 @@ describe("AW24 Editar miembro", () => {
         "Esta cuenta está desactivada: ya no puede entrar.",
       ),
     ).toBeVisible();
-    expect(within(panel).getByText("Entrenadora")).toBeVisible();
+    expect(within(panel).getByText("Instructora")).toBeVisible();
     expect(within(panel).getByText("Centro")).toBeVisible();
     expect(
       within(panel).queryByRole("button", { name: "Guardar" }),

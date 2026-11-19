@@ -1,3 +1,4 @@
+import { formatMoney } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto, PayStatementDto } from "@pilates/api-contracts";
 import {
   Chevron,
@@ -11,7 +12,6 @@ import {
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import { type StatementStatus, statementStatus, statusLine } from "./pay-ledger";
 import { payPeriodHeading } from "./pay-period-heading";
 
@@ -43,7 +43,7 @@ export function PayHistory({
           const tone = statusTone[status.kind];
           return (
             <Pressable
-              accessibilityLabel={`${label}, ${statusLine(status)}, ${formatExactBolivianos(statement.totalCentavos)}`}
+              accessibilityLabel={`${label}, ${statusLine(status)}, ${formatMoney(statement.totalCentavos)}`}
               accessibilityRole="button"
               key={statement.id}
               onPress={() => onOpen(statement.id)}
@@ -63,7 +63,7 @@ export function PayHistory({
                   </Text>
                 </View>
               </View>
-              <Text style={styles.amount}>{formatExactBolivianos(statement.totalCentavos)}</Text>
+              <Text style={styles.amount}>{formatMoney(statement.totalCentavos)}</Text>
               <Chevron size={16} strokeWidth={1.5} tone="muted" />
             </Pressable>
           );

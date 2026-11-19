@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { formatBolivianos, parseBolivianos } from "../../lib/money";
+import { parseBolivianos } from "../../lib/money";
 
 /**
  * A Money Amount typed as `1.050,00` (or `1050.50`): the form keeps the text
@@ -11,6 +11,12 @@ export const bolivianosField = (messages: { invalid: string; zero: string }) =>
     .transform((text) => parseBolivianos(text))
     .pipe(z.number(messages.invalid).int().min(1, messages.zero));
 
-/** An amount as the Administrator would type it back, without "Bs". */
+const editable = new Intl.NumberFormat("es-BO", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  useGrouping: "always",
+});
+
+/** An amount to edit, as the Administrator would type it: «1.050,00». */
 export const bolivianosText = (centavos: number): string =>
-  formatBolivianos(centavos).replace(/^Bs\s/, "");
+  editable.format(centavos / 100);

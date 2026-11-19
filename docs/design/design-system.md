@@ -12,7 +12,9 @@ This project is for Bolivia. Scope is **user-visible text only** — every scree
 
 Assumed default: informal **"tú"** address (not "usted") — standard for consumer wellness apps in the region. Flag if the studio prefers the formal register.
 
-Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals). Dates are `dd/mm/aaaa`, times are 24-hour.
+Currency is the boliviano, written `Bs 1.534,90` (dot thousands, comma decimals), with no decimals when they are ,00 (`Bs 450`). Dates in lists read `jue 19 nov`, in titles `Jueves 19 de noviembre`, with a time `jue 19 nov · 08:00`; never `dd/mm/aaaa` or ISO on screen (CSV exports and date inputs keep theirs). Times are 24-hour. Capacity reads `4 de 8 lugares` (FIX-090; the shared formatters live in `@pilates/api-contracts`).
+
+Words (owner, 2026-11-19): **Clientas** (never Clientes or Alumnas), **Clase** (never Sesión; «sesión» is only logging in and out), **Instructora** (the trainer Role), **Asistente** (the front-desk Role). Clientas and the team read in the feminine: Activa, Clienta desde, Aprobada, Clienta referida; an ended plan is «Plan vencido».
 
 ## Color Palette
 

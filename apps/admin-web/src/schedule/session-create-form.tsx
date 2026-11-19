@@ -19,7 +19,13 @@ import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
-import { boliviaInstant, boliviaToday, weekdayOf } from "../lib/bolivia-time";
+import {
+  addDays,
+  boliviaInstant,
+  boliviaParts,
+  boliviaToday,
+  weekdayOf,
+} from "../lib/bolivia-time";
 import {
   activeClassTypesQueryOptions,
   branchTrainersQueryOptions,
@@ -47,6 +53,15 @@ export type SessionStart = { date: string; time: string };
 // Bolivia "Vigente desde" date, materialized 30 days ahead (ADR-0059).
 // Opened from an empty slot (follow-up 96), the slot's day and hour fill
 // Fecha and Hora, and the day carries into «Cada semana».
+function comingSlotDate(start: SessionStart, today: string): string {
+  const now = boliviaParts(new Date()).time;
+  let date = start.date;
+  while (date < today || (date === today && start.time <= now)) {
+    date = addDays(date, 7);
+  }
+  return date;
+}
+
 export function SessionCreateForm({
   branchId,
   start,
@@ -57,6 +72,10 @@ export function SessionCreateForm({
   onDone: (notice: string) => void;
 }) {
   const today = boliviaToday();
+  // FIX-090: a past slot never proposes a past date or hour; it proposes the
+  // next coming day with the slot's weekday.
+  const startDate =
+    start === undefined ? undefined : comingSlotDate(start, today);
   const change = useScheduleChange(branchId);
   const classTypes = useQuery(activeClassTypesQueryOptions());
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
@@ -70,15 +89,15 @@ export function SessionCreateForm({
       time: start?.time ?? "",
       durationMinutes: startingMinutes,
       capacity: "",
-      date: start?.date ?? "",
+      date: startDate ?? "",
       rows: [
         {
-          weekday: start === undefined ? "" : String(weekdayOf(start.date)),
+          weekday: startDate === undefined ? "" : String(weekdayOf(startDate)),
           time: start?.time ?? "",
           durationMinutes: startingMinutes,
         },
       ],
-      effectiveFrom: start?.date ?? "",
+      effectiveFrom: startDate ?? "",
       effectiveUntil: "",
     },
   });
@@ -155,8 +174,8 @@ export function SessionCreateForm({
           />
           {frequency === "weekly" ? (
             <p className="text-ayuda text-texto-tenue">
-              Genera las sesiones de los próximos 30 días y las sigue creando
-              cada semana.
+              Genera las clases de los próximos 30 días y las sigue creando cada
+              semana.
             </p>
           ) : null}
           <FormField
@@ -193,14 +212,14 @@ export function SessionCreateForm({
             name="trainerStaffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entrenadora</FormLabel>
+                <FormLabel>Instructora</FormLabel>
                 <FormControl>
                   <Select {...field}>
                     <TrainerOptions trainers={trainers.data ?? []} />
                   </Select>
                 </FormControl>
                 <FormDescription>
-                  Solo entrenadoras asignadas a esta sucursal.
+                  Solo instructoras asignadas a esta sucursal.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

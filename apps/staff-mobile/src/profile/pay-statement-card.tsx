@@ -1,3 +1,4 @@
+import { formatMoney, formatListDate } from "@pilates/api-contracts";
 import type {
   OwnSalaryPaymentDto,
   PayStatementDto,
@@ -16,8 +17,6 @@ import {
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate, formatCivilDayMonth } from "../assistant/assistant-format";
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import { statusTone } from "./pay-history";
 import type { StatementStatus } from "./pay-ledger";
 import { ReceiptThumbnail } from "./receipt-viewer";
@@ -91,7 +90,7 @@ function AmountRow({
         <Text style={styles.rowLabel}>{label}</Text>
         {detail === undefined ? null : <Text style={styles.detail}>{detail}</Text>}
       </View>
-      <Text style={styles.amount}>{formatExactBolivianos(centavos)}</Text>
+      <Text style={styles.amount}>{formatMoney(centavos)}</Text>
     </View>
   );
 }
@@ -182,13 +181,12 @@ export function PaymentStrip({
     return (
       <View style={styles.strip}>
         {icon}
-        <StripText note="Administración ya aprobó este total." title="Aprobado · falta el pago" />
+        <StripText note="Administración ya aprobó este total." title="Aprobada · falta el pago" />
       </View>
     );
   }
   const { payment } = status;
-  const title =
-    payment === undefined ? "Pagado" : `Pagado el ${formatCivilDayMonth(payment.paidOn)}`;
+  const title = payment === undefined ? "Pagado" : `Pagado el ${formatListDate(payment.paidOn)}`;
   const receiptUrl = payment?.receiptUrl ?? null;
   if (payment === undefined || receiptUrl === null) {
     return (
@@ -200,7 +198,7 @@ export function PaymentStrip({
   }
   return (
     <Pressable
-      accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}`}
+      accessibilityLabel={`Ver el comprobante del pago del ${formatListDate(payment.paidOn)}`}
       accessibilityRole="button"
       onPress={() => onReceipt(payment)}
       style={({ pressed }) => [styles.strip, pressed && styles.pressed]}

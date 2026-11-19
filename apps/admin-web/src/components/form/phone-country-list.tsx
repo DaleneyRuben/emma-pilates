@@ -9,7 +9,7 @@ import {
 } from "../../lib/phone-number";
 
 const sectionClass =
-  "px-4 pt-2.5 pb-1 text-[11px] font-medium tracking-[0.12em] text-texto-tenue uppercase";
+  "px-4 pt-2.5 pb-1 text-pie font-medium tracking-[0.12em] text-texto-tenue uppercase";
 
 // The arrow keys move from the search into the options and between them
 // (Home/End jump); Enter or Space choose, as in the Branch selector.

@@ -32,11 +32,11 @@ describe("Simulador on a desktop browser", () => {
     expect(screen.getByText(/Nada se guarda/)).toBeVisible();
 
     await fill(user, "Clases por semana", "33");
-    await fill(user, "Alumnas por clase", "4");
+    await fill(user, "Clientas por clase", "4");
     await fill(user, "Precio por clase para la clienta (Bs)", "70");
     await fill(user, "Pago por clase a la instructora (Bs)", "65");
-    await fill(user, "Alumnas incluidas en el pago", "4");
-    await fill(user, "Pago por alumna extra (Bs)", "8");
+    await fill(user, "Clientas incluidas en el pago", "4");
+    await fill(user, "Pago por clienta extra (Bs)", "8");
     await fill(user, "Costos fijos (Bs)", "21175");
     await fill(user, "Impuestos (%)", "16");
 
@@ -53,14 +53,14 @@ describe("Simulador on a desktop browser", () => {
     // FIX-088: the derivation in words and bolivianos, not a raw formula.
     expect(
       screen.getByText(
-        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 9.295,00) ÷ (1 − 16 % de impuesto) = Bs 36.273,81",
+        "(costos fijos Bs 21.175 + pago a instructoras Bs 9.295) ÷ (1 − 16 % de impuesto) = Bs 36.273,81",
       ),
     ).toBeVisible();
 
     const projection = screen.getByRole("region", { name: "Proyección" });
     expect(within(projection).getByRole("table")).toBeVisible();
     const base = within(projection).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("Bs 120.120,00")).toBeVisible();
+    expect(within(base).getByText("Bs 120.120")).toBeVisible();
     expect(within(base).getByText("Bs 9.490,80")).toBeVisible();
     expect(
       within(projection).getByRole("row", { name: /12 meses Alto/ }),
@@ -87,7 +87,7 @@ describe("Simulador on a desktop browser", () => {
     const base = within(
       screen.getByRole("region", { name: "Proyección" }),
     ).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("Bs 4.686,00")).toBeVisible();
+    expect(within(base).getByText("Bs 4.686")).toBeVisible();
   });
 
   // FIX-008 (review 2026-10-28): the Client price and Trainer pay were one
@@ -96,12 +96,12 @@ describe("Simulador on a desktop browser", () => {
     const { user } = renderAdmin("/informes/simulador");
     await heading();
 
-    await fill(user, "Alumnas por clase", "6");
+    await fill(user, "Clientas por clase", "6");
 
     // Trainer pay is 143 × (Bs 65 + 2 × Bs 8) = Bs 11.583.
     expect(
       screen.getByText(
-        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 11.583,00) ÷ (1 − 16 % de impuesto) = Bs 38.997,62",
+        "(costos fijos Bs 21.175 + pago a instructoras Bs 11.583) ÷ (1 − 16 % de impuesto) = Bs 38.997,62",
       ),
     ).toBeVisible();
     expect(

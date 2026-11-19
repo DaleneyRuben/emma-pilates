@@ -148,7 +148,7 @@ describe('recommendation subjects', () => {
     const listed = await readRecommendations(prisma, { month });
 
     expect(listed.find((row) => row.subject === `${trainerId}:2`)?.detail).toBe(
-      'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,3 alumnas.',
+      'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,3 clientas.',
     );
   });
 });

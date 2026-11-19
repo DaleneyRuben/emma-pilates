@@ -8,7 +8,7 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "./test-support";
 jest.setTimeout(20_000);
 
 const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
-const centroDay = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const centroDay = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 
 // Started an hour ago, still running: the backend refuses a Booking into it
 // and refuses to cancel it, so a list that leads to either hides it.

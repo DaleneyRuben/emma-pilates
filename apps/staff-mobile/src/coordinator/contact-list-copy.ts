@@ -1,4 +1,8 @@
-import type { ContactAlertItemDto, ContactAlertItemDtoReasonsItem } from "@pilates/api-contracts";
+import {
+  formatListDate,
+  type ContactAlertItemDto,
+  type ContactAlertItemDtoReasonsItem,
+} from "@pilates/api-contracts";
 import { isCompletePhone, phoneWithFlag } from "@pilates/mobile-core";
 
 export const contactAlertReasons: Record<ContactAlertItemDtoReasonsItem, string> = {
@@ -7,14 +11,8 @@ export const contactAlertReasons: Record<ContactAlertItemDtoReasonsItem, string>
   fewer_than_4_classes_in_first_30_days: "Menos de 4 clases en su primer mes",
 };
 
-const startedOnFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-});
-
 export const startedOnLabel = (civilDate: string): string =>
-  `Empezó el ${startedOnFormatter.format(new Date(`${civilDate}T12:00:00.000Z`))}`;
+  `Empezó el ${formatListDate(civilDate)}`;
 
 export const whatsAppHref = (phone: string): string | null => {
   const digits = phone.replace(/\D/g, "");

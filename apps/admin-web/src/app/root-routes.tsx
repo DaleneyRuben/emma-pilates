@@ -100,7 +100,10 @@ export const authenticatedRoute = createRoute({
       adminRoleOf(session) === "coordinator" &&
       !coordinatorMayOpen(location.pathname)
     ) {
-      throw redirect({ to: "/horario", search: { aviso: "sin-acceso" } });
+      throw redirect({
+        to: "/horario",
+        search: { aviso: "sin-acceso", seccion: location.pathname },
+      });
     }
   },
   errorComponent: StartupErrorPage,

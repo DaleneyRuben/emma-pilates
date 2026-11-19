@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { formatListDate } from "@pilates/api-contracts";
 import { boliviaCivilDate, clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -126,15 +127,15 @@ describe("Mi QR de cobro", () => {
       ),
     );
 
-    const row = await screen.findByRole("button", { name: "Mi QR de cobro, Vence el 5/12" });
+    const row = await screen.findByRole("button", { name: "Mi QR de cobro, Vence el sáb 5 dic" });
     await fireEvent.press(row);
 
     expect(
       await screen.findByText(
-        "Tu QR vence el 5/12. Sube uno nuevo antes para que no se atrase tu pago.",
+        "Tu QR vence el sáb 5 dic. Sube uno nuevo antes para que no se atrase tu pago.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Vence el 5/12 · sube uno nuevo")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el sáb 5 dic · sube uno nuevo")).toBeOnTheScreen();
     expect(await screen.findByLabelText("Tu QR de cobro")).toBeOnTheScreen();
     expect(screen.getByTestId("payout-qr-change")).toBeOnTheScreen();
     expect(screen.queryByText("Todavía no subiste tu QR de cobro")).toBeNull();
@@ -149,10 +150,10 @@ describe("Mi QR de cobro", () => {
 
     expect(
       await screen.findByText(
-        "Tu QR venció el 15/11. Administración no puede usarlo para pagarte: sube uno nuevo.",
+        "Tu QR venció el dom 15 nov. Administración no puede usarlo para pagarte: sube uno nuevo.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Venció el 15/11 · sube uno nuevo")).toBeOnTheScreen();
+    expect(screen.getByText("Venció el dom 15 nov · sube uno nuevo")).toBeOnTheScreen();
   });
 
   it("uploads her first QR with its last valid day", async () => {
@@ -160,7 +161,9 @@ describe("Mi QR de cobro", () => {
     const calls: string[] = [];
     const month = nextMonth();
     const day = `${month}-15`;
-    const shown = `15/${month.slice(5)}/${month.slice(0, 4)}`;
+    const year = month.slice(0, 4);
+    const thisYear = year === String(new Date().getFullYear());
+    const shown = `${formatListDate(day)}${thisYear ? "" : ` ${year}`}`;
     let current: unknown = null;
     const fetcher = routeFetcher(
       routes(null, {

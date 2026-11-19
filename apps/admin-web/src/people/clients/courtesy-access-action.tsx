@@ -1,8 +1,9 @@
 import {
+  type AdminClientDetailDto,
+  formatListDate,
   getGetAdminClientQueryKey,
   getListAdminClientsQueryKey,
   grantCourtesyAccess,
-  type AdminClientDetailDto,
 } from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -17,15 +18,15 @@ import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { addDays, boliviaToday, formatCivilDate } from "../../lib/bolivia-time";
+import { addDays, boliviaToday } from "../../lib/bolivia-time";
 
 const refusals: Record<string, string> = {
   subscription_not_expired:
     "Ya tiene un plan en uso. Puedes darle acceso de prueba cuando termine.",
   payment_pending_exists:
-    "Tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+    "Tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
   purchase_intent_open_exists:
-    "Tiene una compra por transferencia sin terminar. Vuelve a intentarlo cuando venza.",
+    "Tiene una compra por QR sin terminar. Vuelve a intentarlo cuando venza.",
   courtesy_end_date_invalid: "Elige una fecha entre hoy y un año desde hoy.",
 };
 const failure = "No pudimos dar el acceso. Inténtalo de nuevo.";
@@ -72,7 +73,7 @@ export function CourtesyAccessAction({
         }),
       ]);
       setOpen(false);
-      onGranted(`Acceso de prueba activo hasta el ${formatCivilDate(endsOn)}.`);
+      onGranted(`Acceso de prueba activo hasta el ${formatListDate(endsOn)}.`);
     } catch (error) {
       setProblem(
         (isApiError(error) ? refusals[error.code] : undefined) ?? failure,

@@ -50,7 +50,7 @@ async function openAsCoordinator(routes = coordinatorRoutes()) {
   const fetcher = routeFetcher(routes);
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "coordinator")} />);
   await waitFor(() => {
-    expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });
   return { screen, fetcher };
 }
@@ -62,9 +62,9 @@ async function openClient(
 ) {
   await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), query);
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: `Ver cliente ${name}` })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: `Ver clienta ${name}` })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: `Ver cliente ${name}` }));
+  await fireEvent.press(screen.getByRole("button", { name: `Ver clienta ${name}` }));
   await waitFor(() => {
     expect(screen.getByLabelText(name)).toBeOnTheScreen();
   });
@@ -77,7 +77,7 @@ describe("the Coordinator's Staff app", () => {
   });
 
   // v2: Para contactar and Horario (with «Cancelar una clase») are her tabs now.
-  it("lands on Buscar cliente with «Nuevo cliente», beside her own tabs", async () => {
+  it("lands on Buscar clienta with «Nueva clienta», beside her own tabs", async () => {
     const { screen } = await openAsCoordinator();
 
     expect(screen.getByTestId("client-search-new-client")).toBeOnTheScreen();
@@ -97,7 +97,7 @@ describe("the Coordinator's Staff app", () => {
     expect(reads.some((path) => path.includes("plan-quotes"))).toBe(false);
   });
 
-  it("offers «Nuevo cliente» when the search finds no one", async () => {
+  it("offers «Nueva clienta» when the search finds no one", async () => {
     const { screen } = await openAsCoordinator();
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "zzz");
@@ -123,7 +123,7 @@ describe("the Coordinator's Staff app", () => {
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
     });
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");

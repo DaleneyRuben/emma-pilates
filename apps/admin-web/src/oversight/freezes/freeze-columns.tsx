@@ -1,8 +1,8 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { FreezeReviewDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { DecisionCell } from "./decision-cell";
 import {
   freezeDayCount,
@@ -39,11 +39,11 @@ const periodColumns = [
   }),
   columns.accessor("startsOn", {
     header: "Desde",
-    cell: ({ getValue }) => quiet(formatCivilDate(getValue())),
+    cell: ({ getValue }) => quiet(formatListDate(getValue())),
   }),
   columns.accessor("endsOn", {
     header: "Hasta",
-    cell: ({ getValue }) => quiet(formatCivilDate(getValue())),
+    cell: ({ getValue }) => quiet(formatListDate(getValue())),
   }),
   columns.display({
     id: "days",
@@ -87,11 +87,11 @@ export const decidedFreezeColumns = () => [
     header: "Resultado",
     cell: ({ getValue }) =>
       getValue() === "approved" ? (
-        <StatusPill tone="exito">Aprobado</StatusPill>
+        <StatusPill tone="exito">Aprobada</StatusPill>
       ) : getValue() === "withdrawn" ? (
-        <StatusPill tone="neutral">Retirado</StatusPill>
+        <StatusPill tone="neutral">Retirada</StatusPill>
       ) : (
-        <StatusPill tone="error">Rechazado</StatusPill>
+        <StatusPill tone="error">Rechazada</StatusPill>
       ),
   }),
   columns.display({

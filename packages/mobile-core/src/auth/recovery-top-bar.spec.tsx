@@ -51,6 +51,15 @@ describe.each([
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeOnTheScreen();
   });
 
+  // FIX-090 (client review A2): the bar names the screen once; the big
+  // wordmark under it said a second, louder title.
+  it("names the form once, with no wordmark under the bar", async () => {
+    const screen = await openRecovery(createApiMock(), staff);
+
+    expectTopBar(screen, "Recuperar contraseña");
+    expect(screen.queryByText("Emma Pilates Studio")).toBeNull();
+  });
+
   it("keeps the bar on «Revisa tu correo» after sending", async () => {
     const screen = await openRecovery(createApiMock(), staff);
 

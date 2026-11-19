@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminPaymentDto } from "@pilates/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -8,7 +9,6 @@ import { ListFilter } from "../components/table/list-filter";
 import { countFormat } from "../components/table/pagination";
 import { SearchFilter } from "../components/table/search-filter";
 import { Button } from "../components/ui/button";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { ClientPhoto } from "../components/client-photo";
 import { formatBolivianos } from "../lib/money";
 import { saveFile } from "../lib/save-file";
@@ -47,8 +47,8 @@ const nouns: Record<PaymentStatusFilter, [string, string]> = {
 
 const waiting = (count: number) =>
   count === 0
-    ? "Todo el estudio · ninguna transferencia por revisar"
-    : `Todo el estudio · ${countFormat.format(count)} ${count === 1 ? "transferencia esperando" : "transferencias esperando"} revisión`;
+    ? "Todo el estudio · ningún pago por QR por revisar"
+    : `Todo el estudio · ${countFormat.format(count)} ${count === 1 ? "pago por QR esperando" : "pagos por QR esperando"} revisión`;
 
 const empty: Record<PaymentStatusFilter, [string, string?]> = {
   pending: [
@@ -81,8 +81,8 @@ function EmptyPayments({ search }: { search: PaymentSearch }) {
         <span className="text-nota text-texto-tenue">{hint}</span>
       )}
       <span className="text-ayuda text-texto-muy-tenue">
-        Las clientas envían sus transferencias desde la app y la recepción
-        registra el efectivo; aquí se revisan y se marcan las facturas.
+        Las clientas pagan por QR desde la app y la asistente registra el
+        efectivo; aquí se revisan y se marcan las facturas.
       </span>
     </span>
   );
@@ -98,7 +98,7 @@ const canOpenPayment = (row: AdminPaymentDto) =>
 
 const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   columns.accessor("clientName", {
-    header: "Cliente",
+    header: "Clienta",
     cell: ({ row }) => (
       <span className="flex items-center gap-2.5">
         <ClientPhoto
@@ -155,7 +155,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilMoment(getValue())}
+        {formatDateTime(getValue())}
       </span>
     ),
   }),
@@ -241,7 +241,7 @@ export function PaymentsPage({
       filter={
         <div className="flex flex-wrap items-center gap-3">
           <SearchFilter
-            label="Buscar por cliente"
+            label="Buscar por clienta"
             value={search.q ?? ""}
             onChange={(text) =>
               onSearchChange({ q: text === "" ? undefined : text, page: 1 })

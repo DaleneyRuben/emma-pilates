@@ -21,7 +21,7 @@ const thumbnail = () =>
     headers: { "Content-Type": "image/jpeg" },
     status: 200,
   });
-const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 
 // FIX-041 (follow-up 242): the Trainer's face wherever the Assistant sees her.
 describe("The Trainer's face on the Assistant's screens", () => {
@@ -59,7 +59,7 @@ describe("The Trainer's face on the Assistant's screens", () => {
     );
   });
 
-  it("swaps the «Entrenadora» row's icon for her 36 px photo on S08", async () => {
+  it("swaps the «Instructora» row's icon for her 36 px photo on S08", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/sessions/session-1": () =>
@@ -79,7 +79,7 @@ describe("The Trainer's face on the Assistant's screens", () => {
         height: 36,
       }),
     );
-    expect(within(row).getByText("Entrenadora")).toBeOnTheScreen();
+    expect(within(row).getByText("Instructora")).toBeOnTheScreen();
     expect(within(row).queryByTestId("icon-row-disc")).toBeNull();
   });
 
@@ -95,8 +95,8 @@ describe("The Trainer's face on the Assistant's screens", () => {
     expect(within(row).getByText("EV")).toBeOnTheScreen();
   });
 
-  // FIX-081 (finding 118): «Entrenador» beside a man's name.
-  it("names a male Trainer «Entrenador» on S08", async () => {
+  // FIX-081 (finding 118): «Instructor» beside a man's name.
+  it("names a male Trainer «Instructor» on S08", async () => {
     const screen = await openLucia({
       ...assistantRoutes(),
       "/api/v1/sessions/session-1": () => jsonResponse({ ...sessionDetail, trainerGender: "male" }),
@@ -108,7 +108,7 @@ describe("The Trainer's face on the Assistant's screens", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     const row = await screen.findByTestId("session-trainer-row");
-    expect(within(row).getByText("Entrenador")).toBeOnTheScreen();
+    expect(within(row).getByText("Instructor")).toBeOnTheScreen();
   });
 
   it("puts her face on the reschedule option card", async () => {

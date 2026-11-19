@@ -65,7 +65,7 @@ describe("Trainer roster empty state (UX-009)", () => {
         textAlign: "center",
       });
     });
-    expect(screen.getByText("No hay reservas para esta sesión.")).toHaveStyle({
+    expect(screen.getByText("No hay reservas para esta clase.")).toHaveStyle({
       color: "#93615D",
       fontSize: 15,
     });

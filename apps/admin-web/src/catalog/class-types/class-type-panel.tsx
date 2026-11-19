@@ -65,7 +65,7 @@ const textFields = [
 
 const helpers: Partial<Record<keyof ClassTypeInput, string>> = {
   defaultCapacity:
-    "Capacidad por defecto; cada sesión puede ajustarla desde el horario.",
+    "Capacidad por defecto; cada clase puede ajustarla desde el horario.",
 };
 
 // AW07 with follow-up 39 §2: the description is required because it is what
@@ -165,8 +165,7 @@ export function ClassTypePanelForm({
                   <Textarea rows={3} {...field} />
                 </FormControl>
                 <FormDescription>
-                  Una o dos frases que la clienta lee en el detalle de la
-                  sesión.
+                  Una o dos frases que la clienta lee en el detalle de la clase.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -175,7 +174,7 @@ export function ClassTypePanelForm({
           {numberFields.map(renderText)}
           {classType === undefined ? null : (
             <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
-              Los cambios se aplican a las sesiones que se generen desde ahora;
+              Los cambios se aplican a las clases que se generen desde ahora;
               las ya programadas no cambian.
             </p>
           )}
@@ -217,8 +216,8 @@ export function ClassTypePanelForm({
           }
         >
           <p>
-            Ya no se podrá elegir para sesiones nuevas. Las sesiones que ya
-            existen se mantienen.
+            Ya no se podrá elegir para clases nuevas. Las clases que ya existen
+            se mantienen.
           </p>
         </ConfirmDialog>
       )}

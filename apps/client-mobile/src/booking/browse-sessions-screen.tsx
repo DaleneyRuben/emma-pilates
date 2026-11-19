@@ -117,7 +117,7 @@ export function BrowseSessionsScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Heading accessibilityLabel="Reservar">Reservar una clase</Heading>
+      <Heading accessibilityLabel="Reservar">Reservar</Heading>
       {selectedBranch ? (
         <BranchLine
           count={branchList.length}
@@ -219,7 +219,7 @@ export function BrowseSessionsScreen() {
           <ClassList testID="browse-session-group">
             {visibleSessions.map((session) => (
               <SessionRow
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
+                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session)}`}
                 key={session.id}
                 onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                 session={session}

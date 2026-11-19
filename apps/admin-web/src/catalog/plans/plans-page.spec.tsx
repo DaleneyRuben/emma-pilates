@@ -80,7 +80,7 @@ describe("AW04 Planes on a desktop browser", () => {
       within(row).getByRole("cell", { name: "12 clases" }),
     ).toBeInTheDocument();
     expect(
-      within(row).getByRole("cell", { name: "Bs 780,00" }),
+      within(row).getByRole("cell", { name: "Bs 780" }),
     ).toBeInTheDocument();
     expect(within(row).getByText("Oculto")).toBeInTheDocument();
     const capped = screen.getByRole("cell", { name: /Bimestral 16 clases/ })
@@ -238,7 +238,7 @@ describe("AW04 Planes on a desktop browser", () => {
     );
   });
 
-  it("hides a visible Plan from the Client catalog and shows a hidden one again", async () => {
+  it("hides a visible Plan from the Client catalog after asking and shows a hidden one again", async () => {
     const bodies: unknown[] = [];
     server.use(
       planTable(() => jsonResponse(page([mensual, anual]))),
@@ -259,6 +259,12 @@ describe("AW04 Planes on a desktop browser", () => {
     await user.click(
       within(panel).getByRole("button", { name: "Ocultar en la app" }),
     );
+    // FIX-090: hiding a Plan from the clients' catalogue asks first.
+    const confirm = await screen.findByRole("alertdialog", {
+      name: "¿Ocultar Bimestral 16 clases en la app?",
+    });
+    expect(bodies).toEqual([]);
+    await user.click(within(confirm).getByRole("button", { name: "Ocultar" }));
     await waitFor(() => expect(bodies).toEqual([{ visible: false }]));
 
     await user.click(

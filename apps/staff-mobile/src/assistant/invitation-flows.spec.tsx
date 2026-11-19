@@ -30,7 +30,7 @@ const overviewRoutes = (pending = invitation) => ({
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
   await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
@@ -83,7 +83,7 @@ describe("Assistant invitations (S05, S06)", () => {
 
     expect(await screen.findByText("Enviamos un enlace de verificación nuevo.")).toBeOnTheScreen();
     expect(sent).toHaveBeenCalledTimes(1);
-    await fireEvent.press(screen.getByRole("button", { name: "Ver cliente" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Ver clienta" }));
     expect(await screen.findByLabelText("Ana Nueva")).toBeOnTheScreen();
   });
 
@@ -109,7 +109,7 @@ describe("Assistant invitations (S05, S06)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Ver cliente" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver clienta" }));
 
     expect(await screen.findByLabelText("Ana Nueva")).toBeOnTheScreen();
     expect(
@@ -119,7 +119,7 @@ describe("Assistant invitations (S05, S06)", () => {
     ).toBeOnTheScreen();
     expect(screen.queryByText("Cuenta pendiente de activación")).toBeNull();
     expect(screen.queryByRole("button", { name: "Reenviar enlace" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Ver cliente" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Ver clienta" })).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace de verificación" }));
 

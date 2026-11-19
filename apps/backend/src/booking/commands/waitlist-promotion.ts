@@ -135,8 +135,8 @@ export const promoteWaitlistInTransaction = (
             category: 'booking_schedule',
             type: 'waitlist_promoted',
             businessEventKey: `waitlist-promoted:${entryId}`,
-            title: 'Cupo liberado',
-            message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${promoted.session.classType.name}.`,
+            title: 'Lugar liberado',
+            message: `¡Tienes un lugar! Te promovimos de la lista de espera para tu clase de ${promoted.session.classType.name}.`,
             destination: { type: 'booking', id: bookingId },
             occurredAt: closedAt,
           });

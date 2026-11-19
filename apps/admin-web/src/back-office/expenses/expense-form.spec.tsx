@@ -89,7 +89,7 @@ describe("AW14 Expense form on a desktop browser", () => {
 
     expect(
       await screen.findByText(
-        "Gasto de Bs 300,00 en Mantenimiento registrado en Centro.",
+        "Gasto de Bs 300 en Mantenimiento registrado en Centro.",
       ),
     ).toBeInTheDocument();
     expect(sent).toEqual([

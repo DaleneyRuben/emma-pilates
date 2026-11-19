@@ -169,16 +169,16 @@ describe("Inicio for the Administrator", () => {
       http.get(apiUrl(incomeReportPath), ({ request }) => {
         const url = new URL(request.url);
         ranges.push(`${url.searchParams.get("from")}`);
-        return jsonResponse(emptyIncome(50_200, 30_000));
+        return jsonResponse(emptyIncome(50_250, 30_000));
       }),
     );
     renderAdmin("/");
 
     const money = await screen.findByRole("region", { name: "Cobrado hoy" });
-    expect(await within(money).findByText("Bs 802")).toBeVisible();
+    expect(await within(money).findByText("Bs 802,50")).toBeVisible();
     expect(
       within(money).getByText(
-        "Efectivo Bs 502 · QR Bs 300 · 2 QR por revisar, aún no cuentan",
+        "Efectivo Bs 502,50 · QR Bs 300 · 2 QR por revisar, aún no cuentan",
       ),
     ).toBeVisible();
     expect(

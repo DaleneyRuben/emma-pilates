@@ -98,7 +98,7 @@ export function PayStatementsPage({
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title="Sueldos por aprobar"
+        title="Sueldos"
         subtitle="Todo el estudio · instructoras y coordinadora, con las tarifas vigentes."
         actions={
           <Button

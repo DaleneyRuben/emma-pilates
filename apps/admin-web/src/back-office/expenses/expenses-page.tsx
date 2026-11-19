@@ -1,3 +1,4 @@
+import { formatDateTime, formatListDate } from "@pilates/api-contracts";
 import type { AdminExpenseDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -10,7 +11,6 @@ import { useKnownOption } from "../../components/table/use-known-option";
 import { Pencil } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilDate, formatCivilMoment } from "../../lib/bolivia-time";
 import { cn } from "../../lib/cn";
 import { formatBolivianos } from "../../lib/money";
 import type { Branch } from "../../shell/branch/branch-context";
@@ -33,7 +33,7 @@ const voidedLine = (expense: AdminExpenseDto) =>
     expense.voidedByName === null || expense.voidedByName === ""
       ? "Eliminado"
       : `Eliminado por ${expense.voidedByName}`,
-    formatCivilMoment(expense.voidedAt ?? ""),
+    formatDateTime(expense.voidedAt ?? ""),
     ...(expense.voidReason === null ? [] : [expense.voidReason]),
   ].join(" · ");
 
@@ -80,7 +80,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilDate(getValue())}
+        {formatListDate(getValue())}
       </span>
     ),
   }),

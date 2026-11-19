@@ -91,7 +91,7 @@ describe("Salary Payment receipts on the admin web", () => {
       ),
     ).toBeInTheDocument();
 
-    await user.selectOptions(within(panel).getByLabelText("Empleado"), emma.id);
+    await user.selectOptions(within(panel).getByLabelText("Persona"), emma.id);
     await user.type(within(panel).getByLabelText("Monto"), "3.500,00");
     await user.type(within(panel).getByLabelText("Fecha"), "20/09/2026");
     expect(
@@ -102,7 +102,7 @@ describe("Salary Payment receipts on the admin web", () => {
       await within(panel).findByText("Comprobante adjunto"),
     ).toBeInTheDocument();
     expect(
-      within(panel).getByText("La entrenadora lo ve en su app."),
+      within(panel).getByText("La instructora lo ve en su app."),
     ).toBeInTheDocument();
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 

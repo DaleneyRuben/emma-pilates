@@ -11,7 +11,7 @@ test("the Branch selector scopes Horario to the chosen Branch", async ({
   await page.getByRole("button", { name: "Semana siguiente" }).click();
 
   await expect(
-    page.getByText(/^Sucursal Centro · sala única · \d+ sesiones esta semana$/),
+    page.getByText(/^Sucursal Centro · sala única · \d+ clases esta semana$/),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: /^Mat Pilates, 09:00/ }).first(),
@@ -32,7 +32,7 @@ test("the Branch selector scopes Horario to the chosen Branch", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      /^Sucursal Equipetrol · sala única · \d+ sesiones esta semana$/,
+      /^Sucursal Equipetrol · sala única · \d+ clases esta semana$/,
     ),
   ).toBeVisible();
   await expect(

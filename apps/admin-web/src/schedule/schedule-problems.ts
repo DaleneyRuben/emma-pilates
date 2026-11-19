@@ -9,11 +9,11 @@ type Problem = { field?: ScheduleField; message: string };
 const problems: Record<string, Problem> = {
   session_overlap: {
     message:
-      "Se cruza con otra sesión de esta sucursal o con otra clase de la entrenadora.",
+      "Se cruza con otra clase de esta sucursal o con otra clase de la instructora.",
   },
   trainer_not_assignable: {
     field: "trainerStaffMemberId",
-    message: "Esta entrenadora ya no puede dar clases en esta sucursal.",
+    message: "Esta instructora ya no puede dar clases en esta sucursal.",
   },
   capacity_below_bookings: {
     field: "capacity",
@@ -27,11 +27,10 @@ const problems: Record<string, Problem> = {
     message: "Dos días se repiten o se cruzan. Revisa las filas.",
   },
   session_not_editable: {
-    message: "Esta sesión ya empezó o fue cancelada; ya no se puede cambiar.",
+    message: "Esta clase ya empezó o fue cancelada; ya no se puede cambiar.",
   },
   session_not_found: {
-    message:
-      "Esta sesión ya no existe. Cierra el panel y actualiza el horario.",
+    message: "Esta clase ya no existe. Cierra el panel y actualiza el horario.",
   },
   session_schedule_not_found: {
     message:
@@ -58,7 +57,7 @@ const problems: Record<string, Problem> = {
       "Esta serie ya no está en pausa. Cierra el panel y actualiza el horario.",
   },
   session_not_cancellable: {
-    message: "Esta sesión ya no se puede cancelar: empezó o ya fue cancelada.",
+    message: "Esta clase ya no se puede cancelar: empezó o ya fue cancelada.",
   },
   administration_access_denied: {
     message: "No tienes permiso para cambiar el horario.",

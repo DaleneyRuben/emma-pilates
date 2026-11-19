@@ -28,11 +28,14 @@ const clockOf = (instant: Date): string =>
     hourCycle: 'h23',
   }).format(instant);
 
+// «lun 2 nov»: a civil date (UTC midnight) in the list format every
+// surface uses (FIX-090).
+export const civilListDate = (day: Date): string =>
+  `${weekdays[day.getUTCDay()]} ${day.getUTCDate()} ${months[day.getUTCMonth()]}`;
+
 // «lun 2 nov · 10:45», in Bolivia.
-export const classMoment = (startsAt: Date): string => {
-  const day = boliviaDate(startsAt);
-  return `${weekdays[day.getUTCDay()]} ${day.getUTCDate()} ${months[day.getUTCMonth()]} · ${clockOf(startsAt)}`;
-};
+export const classMoment = (startsAt: Date): string =>
+  `${civilListDate(boliviaDate(startsAt))} · ${clockOf(startsAt)}`;
 
 // «Bs 480» or «Bs 1.534,90».
 export const bolivianosText = (centavos: number): string => {
@@ -46,7 +49,7 @@ export const bolivianosText = (centavos: number): string => {
 };
 
 export const studentsText = (students: number): string =>
-  `${students} ${students === 1 ? 'alumna' : 'alumnas'}`;
+  `${students} ${students === 1 ? 'clienta' : 'clientas'}`;
 
 export type ClassPlace = {
   startsAt: Date;

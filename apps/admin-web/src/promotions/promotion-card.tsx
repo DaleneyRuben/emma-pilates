@@ -89,7 +89,7 @@ export function PromotionCard({
       {promotion.image === null || promotion.image === undefined ? (
         <span className="flex aspect-video w-[120px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-control bg-primario-tinte text-primario-profundo max-md:w-[88px]">
           <Image size={18} strokeWidth={1.5} aria-hidden="true" />
-          <span className="text-[10px]">Sin imagen</span>
+          <span className="text-pie">Sin imagen</span>
         </span>
       ) : (
         <img

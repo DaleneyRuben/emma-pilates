@@ -117,7 +117,7 @@ describe("describeAccountClosure", () => {
         },
       }).lines,
     ).toEqual([
-      "Tu plan 12 clases termina hoy, y también tu Trimestral 24 clases, que empezaba el 2 de diciembre. No se devuelve dinero y pierdes las 12 clases que te quedan.",
+      "Tu plan 12 clases termina hoy, y también tu Trimestral 24 clases, que empezaba el mié 2 dic. No se devuelve dinero y pierdes las 12 clases que te quedan.",
       ...always,
     ]);
   });

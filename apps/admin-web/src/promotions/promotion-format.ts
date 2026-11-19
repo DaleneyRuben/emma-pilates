@@ -1,6 +1,6 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { AdminPromotionDtoState } from "@pilates/api-contracts";
 import { countFormat } from "../components/table/pagination";
-import { formatCivilDate } from "../lib/bolivia-time";
 
 // Follow-up 39 §3: the derived state on every card. An archived Promotion
 // never reaches the list (delete archives it), so it has no pill here.
@@ -23,10 +23,10 @@ export const formatDisplayWindow = (
   endsOn: string | null,
 ): string => {
   if (startsOn !== null && endsOn !== null) {
-    return `Del ${formatCivilDate(startsOn)} al ${formatCivilDate(endsOn)}`;
+    return `Del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}`;
   }
-  if (startsOn !== null) return `Desde el ${formatCivilDate(startsOn)}`;
-  if (endsOn !== null) return `Hasta el ${formatCivilDate(endsOn)}`;
+  if (startsOn !== null) return `Desde el ${formatListDate(startsOn)}`;
+  if (endsOn !== null) return `Hasta el ${formatListDate(endsOn)}`;
   return "Sin fechas todavía";
 };
 

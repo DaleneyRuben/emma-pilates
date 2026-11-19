@@ -31,14 +31,14 @@ describe("pay statement concepts", () => {
       {
         key: "class",
         label: "Clases dictadas",
-        rate: "1 × Bs 65,00",
+        rate: "1 × Bs 65",
         subtotalCentavos: 6_500,
         count: 1,
       },
       {
         key: "minimum_not_met",
         label: "Canceladas por mínimo",
-        rate: "2 × Bs 25,00",
+        rate: "2 × Bs 25",
         subtotalCentavos: 5_000,
         count: 2,
       },
@@ -59,7 +59,7 @@ describe("pay statement concepts", () => {
       line("new_client", 5_000),
     ]);
 
-    expect(newClients?.rate).toBe("2 × Bs 50,00 · 1 × Bs 80,00");
+    expect(newClients?.rate).toBe("2 × Bs 50 · 1 × Bs 80");
   });
 
   it("keeps a kind a newer API adds, under «Otros», so the total adds up", () => {

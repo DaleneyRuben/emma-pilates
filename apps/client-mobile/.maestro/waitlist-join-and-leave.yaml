@@ -33,7 +33,7 @@ env:
     visible:
       id: "session-join-waitlist"
     timeout: 15000
-- assertVisible: "Clase llena. Te avisaremos si se libera un cupo."
+- assertVisible: "Te avisamos si se libera un lugar"
 - takeScreenshot: client-waitlist-1-full
 - tapOn:
     id: "session-join-waitlist"

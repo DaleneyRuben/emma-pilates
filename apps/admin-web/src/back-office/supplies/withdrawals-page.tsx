@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminSupplyDto, WithdrawalDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -15,11 +16,7 @@ import { ListFilter } from "../../components/table/list-filter";
 import { MonthStepper } from "../../components/table/month-stepper";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
 import { useKnownOption } from "../../components/table/use-known-option";
-import {
-  boliviaMonth,
-  formatCivilMoment,
-  formatMonth,
-} from "../../lib/bolivia-time";
+import { boliviaMonth, formatMonth } from "../../lib/bolivia-time";
 import { archivedLast, namesById } from "../../lib/named";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
@@ -88,7 +85,7 @@ const movementColumns = [
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilMoment(getValue())}
+        {formatDateTime(getValue())}
       </span>
     ),
   }),
@@ -160,10 +157,7 @@ function BranchWithdrawals({
         <ChevronLeft size={14} strokeWidth={1.8} aria-hidden="true" />
         Volver a Insumos
       </Link>
-      <PageHeader
-        title="Movimientos de insumos"
-        subtitle={`Sucursal ${branch.name}`}
-      />
+      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
       <div className="flex flex-wrap items-center gap-3">
         <MonthStepper
           month={month}
@@ -260,7 +254,7 @@ export function WithdrawalsPage({
   if (selectedBranch === undefined) {
     return (
       <NoBranchPage
-        title="Movimientos de insumos"
+        title="Insumos"
         pending={status === "pending"}
         loadingMessage="Cargando movimientos…"
         emptyMessage="Todavía no hay sucursales activas."

@@ -27,7 +27,7 @@ export function PaymentDone({
   startsOn?: string;
 }) {
   const cash = kind === "cash";
-  // The only way on is «Volver a Clientes»: the Android back button takes it
+  // The only way on is «Volver a Clientas»: the Android back button takes it
   // too instead of reopening the spent plan list (MOB-074).
   const back = useEffectEvent(onBack);
   useEffect(() => {
@@ -49,7 +49,7 @@ export function PaymentDone({
             ? `Administración lo revisa y programa el plan siguiente de ${firstName}, que empieza el ${startsOn}. No entra en la caja de hoy.`
             : `Administración lo revisa y activa el plan de ${firstName}. No entra en la caja de hoy.`
       }
-      primaryAction={{ label: "Volver a Clientes", onPress: onBack, testID: "cash-back-to-client" }}
+      primaryAction={{ label: "Volver a Clientas", onPress: onBack, testID: "cash-back-to-client" }}
       title={cash ? "¡Pago registrado!" : "Comprobante enviado"}
     >
       <View style={styles.summary}>

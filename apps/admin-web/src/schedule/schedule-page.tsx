@@ -2,6 +2,7 @@ import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { sectionNameOf } from "../app/navigation";
 import { isForbidden } from "../components/page/is-forbidden";
 import { NoBranchPage } from "../components/page/no-branch-page";
 import { PageHeader } from "../components/page/page-header";
@@ -26,7 +27,7 @@ import { WeekGrid } from "./week-grid";
 
 type Session = AdministratorSessionAvailabilityDto;
 const sessionCount = (count: number) =>
-  count === 1 ? "1 sesión esta semana" : `${count} sesiones esta semana`;
+  count === 1 ? "1 clase esta semana" : `${count} clases esta semana`;
 
 const standingCount = (sessions: readonly Session[]) =>
   sessions.filter((session) => (session.cancellation ?? null) === null).length;
@@ -58,9 +59,7 @@ function BranchSchedule({
   const narrow = useIsNarrowViewport();
   const [panel, setPanel] = useState<SessionPanelState>({ mode: "closed" });
   const [notice, setNotice] = useState<string | null>(
-    search.aviso === "sin-acceso"
-      ? "Esa sección es solo para administración."
-      : null,
+    search.aviso === "sin-acceso" ? noAccessNotice(search.seccion) : null,
   );
   const [day, setDay] = useState<string | null>(null);
   const sessions = useQuery(
@@ -104,7 +103,7 @@ function BranchSchedule({
                 }}
               >
                 <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-                Nueva sesión
+                Nueva clase
               </Button>
             )
           }
@@ -130,13 +129,12 @@ function BranchSchedule({
           <>
             {standingCount(sessions.data) === 0 ? (
               <p className="text-nota text-texto-tenue">
-                No hay sesiones programadas esta semana.
+                No hay clases programadas esta semana.
               </p>
             ) : null}
             {count >= weekSessionLimit ? (
               <p className="text-nota text-advertencia-texto">
-                Se muestran las primeras {weekSessionLimit} sesiones de la
-                semana.
+                Se muestran las primeras {weekSessionLimit} clases de la semana.
               </p>
             ) : null}
             {narrow ? (
@@ -179,6 +177,14 @@ function BranchSchedule({
 // The week's placeholder keeps the previous week on screen while the next
 // one loads, so the page is remounted per Branch: a Branch switch starts
 // from its loading line, like every other Branch-scoped page.
+// FIX-090: the notice names the section she tried to open.
+const noAccessNotice = (path: string | undefined): string => {
+  const name = path === undefined ? undefined : sectionNameOf(path);
+  return name === undefined
+    ? "Esa sección es solo para administración."
+    : `«${name}» es solo para administración.`;
+};
+
 export function SchedulePage({
   search,
   onWeekChange,

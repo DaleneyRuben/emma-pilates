@@ -1,10 +1,11 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
-import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
+import { boliviaParts } from "../../lib/bolivia-time";
 import type { NameSearch } from "../oversight-search";
 import {
   referralTableQueryOptions,
@@ -23,14 +24,14 @@ const studioSummary = (total: number) =>
     : count(total, "referido", "referidos");
 
 const civilDate = (instant: string) =>
-  formatCivilDate(boliviaParts(instant).date);
+  formatListDate(boliviaParts(instant).date);
 
 const columns = createColumnHelper<ReferralRow>();
 
 // The row is the whole record (AW26): no panel, no link.
 const referralColumns = () => [
   columns.accessor("referrerName", {
-    header: "Cliente que refiere",
+    header: "Clienta que refiere",
     cell: ({ row }) => (
       <span className="flex flex-col">
         <span className="font-medium text-texto">
@@ -47,7 +48,7 @@ const referralColumns = () => [
     ),
   }),
   columns.accessor("referredName", {
-    header: "Cliente referido",
+    header: "Clienta referida",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),
@@ -143,7 +144,7 @@ export function ReferralsPage({
       emptyMessage={<EmptyReferrals searching={search.q !== undefined} />}
       filter={
         <SearchFilter
-          label="Buscar por nombre de cliente"
+          label="Buscar por nombre de clienta"
           value={search.q ?? ""}
           onChange={(text) =>
             onSearchChange({ q: text === "" ? undefined : text, page: 1 })

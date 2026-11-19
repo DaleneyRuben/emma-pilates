@@ -2,6 +2,7 @@ import {
   type AvailabilityBlockDto,
   getListAvailabilityBlocksQueryKey,
   useListAvailabilityBlocks,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   Chevron,
@@ -27,7 +28,6 @@ import { RootHeader } from "../ui/root-header";
 import {
   addCivilDays,
   boliviaToday,
-  civilDateLong,
   countLabel,
   displayTime,
   weekdayName,
@@ -44,15 +44,15 @@ const blockRange = (block: AvailabilityBlockDto): string =>
 
 const bookedLabel = (count: number): string => {
   if (count === 0) return "sin reservas";
-  return count === 1 ? "1 reservado" : `${count} reservados`;
+  return count === 1 ? "1 con reserva" : `${count} con reserva`;
 };
 
 // A block only carries a date line when it starts later or has an end.
 const dateLine = (block: AvailabilityBlockDto, today: string): string | null => {
-  const from = block.effectiveFrom > today ? civilDateLong(block.effectiveFrom) : null;
+  const from = block.effectiveFrom > today ? formatListDate(block.effectiveFrom) : null;
   // effectiveUntil is exclusive, so the last day is the one before it.
   const until =
-    block.effectiveUntil === null ? null : civilDateLong(addCivilDays(block.effectiveUntil, -1));
+    block.effectiveUntil === null ? null : formatListDate(addCivilDays(block.effectiveUntil, -1));
   if (from !== null && until !== null) return `Desde el ${from} · hasta el ${until}`;
   if (from !== null) return `Desde el ${from}`;
   if (until !== null) return `Hasta el ${until}`;
@@ -72,7 +72,7 @@ export function AvailabilityScreen() {
 
   const header = (
     <RootHeader
-      note="Las clientas eligen cupos de 45 min dentro de estos rangos."
+      note="Las clientas eligen turnos de 45 min dentro de estos rangos."
       title="Mi disponibilidad"
     />
   );
@@ -160,7 +160,7 @@ export function AvailabilityScreen() {
                     </Text>
                     <Text style={styles.muted}>
                       {[
-                        `${block.slotsPerWeek} cupos · ${bookedLabel(block.upcomingBookedCount)}`,
+                        `${block.slotsPerWeek} turnos · ${bookedLabel(block.upcomingBookedCount)}`,
                         ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
                       ].join(" · ")}
                     </Text>

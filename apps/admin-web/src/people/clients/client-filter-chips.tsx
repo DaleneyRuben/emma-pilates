@@ -6,7 +6,7 @@ const chips: readonly { value: ClientFilter | undefined; label: string }[] = [
   { value: undefined, label: "Todas" },
   { value: "active", label: "Con plan" },
   { value: "none", label: "Sin plan" },
-  { value: "expired", label: "Expirado" },
+  { value: "expired", label: "Plan vencido" },
   { value: "founder", label: "Fundadora" },
   // FIX-065 (walkthrough finding 91, follow-up 268).
   { value: "closed", label: "Cuenta cerrada" },

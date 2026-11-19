@@ -57,7 +57,7 @@ describe("AW38 Comentarios (REL-012)", () => {
     expect(within(row).getByText("Problema")).toBeInTheDocument();
     expect(within(row).getByText("App de clientas")).toBeInTheDocument();
     expect(within(row).getByText("1.0.1 (3) · Android 14")).toBeInTheDocument();
-    expect(within(row).getByText("22/10/2026 · 20:30")).toBeInTheDocument();
+    expect(within(row).getByText("jue 22 oct · 20:30")).toBeInTheDocument();
     expect(within(row).getByText("Nuevo")).toBeInTheDocument();
     const resolved = await rowOf(/Sería útil/);
     expect(within(resolved).getByText("Resuelto")).toBeInTheDocument();
@@ -71,6 +71,46 @@ describe("AW38 Comentarios (REL-012)", () => {
         { name: "Comentarios" },
       ),
     ).toHaveAttribute("aria-current", "page");
+  });
+
+  // FIX-090: «Página 2 de 1 · Todavía no hay comentarios» never shows.
+  it("steps back to the last page when the address asks for one past it", async () => {
+    server.use(
+      feedbackList((params) =>
+        jsonResponse(
+          params.get("page") === "1"
+            ? feedbackPage([problem, suggestion])
+            : { ...feedbackPage([], 2), page: Number(params.get("page")) },
+        ),
+      ),
+    );
+    const { router } = renderAdmin("/comentarios?page=2");
+
+    expect(await rowOf(/No puedo ver mis reservas/)).toBeVisible();
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ page: 1 }),
+    );
+    expect(screen.getByText("Página 1 de 1")).toBeVisible();
+    expect(
+      screen.queryByText("Todavía no hay comentarios."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("draws no pager over an empty list, whatever page the address asks", async () => {
+    server.use(
+      feedbackList((params) =>
+        jsonResponse({
+          ...feedbackPage([], 0),
+          page: Number(params.get("page")),
+        }),
+      ),
+    );
+    renderAdmin("/comentarios?page=2");
+
+    expect(
+      await screen.findByText("Todavía no hay comentarios."),
+    ).toBeVisible();
+    expect(screen.queryByText(/^Página \d+ de \d+$/)).not.toBeInTheDocument();
   });
 
   it("filters by status and app", async () => {

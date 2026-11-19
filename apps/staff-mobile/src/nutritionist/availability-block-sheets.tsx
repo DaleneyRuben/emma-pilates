@@ -1,6 +1,6 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { BodyText, ConfirmationSheet } from "@pilates/mobile-core";
 
-import { civilDateLong } from "./nutritionist-format";
 import { keptLine } from "./availability-block-form-parts";
 
 export type Confirmation = "replace" | "end";
@@ -29,7 +29,7 @@ export function BlockChangeSheet({
     <ConfirmationSheet
       busy={busy}
       confirmLabel={ending ? "Quitar horario" : "Aplicar cambio"}
-      note={`${ending ? "Quitar" : "Aplicar"} desde el ${civilDateLong(effectiveFrom)}.`}
+      note={`${ending ? "Quitar" : "Aplicar"} desde el ${formatListDate(effectiveFrom)}.`}
       onConfirm={ending ? onRemove : onApply}
       onDismiss={onClose}
       testID="block-change-sheet"

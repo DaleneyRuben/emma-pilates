@@ -51,7 +51,7 @@ async function openContactList(routes = coordinatorRoutes()) {
   const fetcher = routeFetcher(routes);
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "coordinator")} />);
   await waitFor(() => {
-    expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });
   await fireEvent.press(screen.getByTestId("tab-contacts"));
   await waitFor(() => {
@@ -81,10 +81,10 @@ describe("S28 Para contactar", () => {
     expect(
       screen.getByText("7 días sin reservar · menos de 2 clases a los 15 días"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Sin teléfono · empezó el 5 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("Sin teléfono · empezó el lun 5 oct")).toBeOnTheScreen();
 
     expect(screen.getByText("Valeria Quiroga")).toBeOnTheScreen();
-    expect(screen.getByText("Empezó el 2 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("Empezó el vie 2 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Menos de 2 clases a los 15 días")).toBeNull();
 
     expect(
@@ -108,7 +108,7 @@ describe("S28 Para contactar", () => {
     await waitFor(() => {
       expect(screen.getByText("Por qué está aquí")).toBeOnTheScreen();
     });
-    expect(screen.getByText("🇧🇴 +591 70011005 · empezó el 2 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("🇧🇴 +591 70011005 · empezó el vie 2 oct")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Escribir por WhatsApp" }));
     expect(Linking.openURL).toHaveBeenCalledWith("https://wa.me/59170011005");
 

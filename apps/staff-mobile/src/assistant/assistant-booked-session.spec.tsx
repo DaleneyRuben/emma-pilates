@@ -74,6 +74,6 @@ describe("Assistant booked Session", () => {
     expect(
       screen.queryByText("Se descuenta 1 clase de su plan. Le avisamos por notificación."),
     ).toBeNull();
-    expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
+    expect(screen.getByText("lugares libres de 12")).toBeOnTheScreen();
   });
 });

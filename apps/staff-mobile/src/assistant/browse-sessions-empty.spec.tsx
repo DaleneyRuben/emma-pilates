@@ -6,7 +6,7 @@ import { assistantRoutes, from, openLucia, session, until } from "./assistant-fi
 
 jest.setTimeout(20_000);
 
-const todaySessions = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const todaySessions = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 
 async function openBooking(sessions: unknown[]) {
   const screen = await openLucia({
@@ -46,5 +46,18 @@ describe("Assistant booking empty states (S07)", () => {
     expect(screen.getByText("Elige otro día de la semana para reservar.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Ver mañana" }));
     expect(screen.getByLabelText(/^Hoy /)).toHaveProp("accessibilityState", { selected: false });
+  });
+
+  // FIX-090 (audit S8): a day whose classes were all cancelled says so.
+  it("says every class of the day was cancelled", async () => {
+    const screen = await openBooking([
+      { ...session, cancellation: { cause: "minimum_not_met", cancelledAt: from, bookedCount: 0 } },
+    ]);
+
+    await waitFor(() =>
+      expect(screen.getByText("Todas las clases de hoy se cancelaron")).toBeOnTheScreen(),
+    );
+    expect(screen.queryByText("Este día no hay clases")).toBeNull();
+    expect(screen.queryByTestId("session-card-session-1")).toBeNull();
   });
 });

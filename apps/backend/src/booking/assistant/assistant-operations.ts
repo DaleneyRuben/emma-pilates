@@ -2,6 +2,7 @@ import type { PrismaClient } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
+import { clientSubscriptionFreezeReads } from '../client/client-subscription-freeze-reads';
 import type { PaymentCommands } from '../payments/prisma-payment-commands';
 import { priceFounderPlanList } from '../payments/founder-plan-quote';
 import { readRenewalStartsOn } from '../payments/prisma-start-date-allocation';
@@ -59,6 +60,8 @@ export const createAssistantClientOperations = (input: {
           catalog.findAttendedBookings(clientId),
         readRenewalStartsOn: (clientId) =>
           readRenewalStartsOn(input.prisma, clientId, input.now()),
+        // FIX-090: the ficha shows the plan's Freeze (audit C3).
+        readFreeze: clientSubscriptionFreezeReads(input.prisma).readFreeze,
       }),
     bookings: (command, principal) =>
       listAssistantClientBookings(command, {

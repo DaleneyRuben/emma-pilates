@@ -1,6 +1,7 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { CalendarDays } from "lucide-react";
 import { useRef, useState, type ChangeEvent, type ComponentProps } from "react";
-import { boliviaToday, formatCivilDate } from "../../lib/bolivia-time";
+import { boliviaToday } from "../../lib/bolivia-time";
 import { cn } from "../../lib/cn";
 import { Input } from "../ui/input";
 import { Popover, PopoverAnchor, PopoverContent } from "../ui/popover";
@@ -43,6 +44,13 @@ const isoOrNull = (value: string | undefined): string | null =>
  * The form keeps `YYYY-MM-DD` once the text is a real date, and the typed
  * text otherwise, so an invalid date stays on screen and cannot be submitted.
  */
+const limitReason = (side: "desde" | "hasta", limit: string | undefined) => {
+  const date = isoOrNull(limit);
+  return date === null
+    ? ""
+    : `Elige una fecha ${side} el ${formatListDate(date)}.`;
+};
+
 export function CivilDateInput({
   value,
   onChange,
@@ -160,12 +168,8 @@ export function CivilDateInput({
           limits={{
             min: isoOrNull(min) ?? undefined,
             max: isoOrNull(max) ?? undefined,
-            minReason:
-              minReason ??
-              `Elige una fecha desde el ${formatCivilDate(min ?? "")}.`,
-            maxReason:
-              maxReason ??
-              `Elige una fecha hasta el ${formatCivilDate(max ?? "")}.`,
+            minReason: minReason ?? limitReason("desde", min),
+            maxReason: maxReason ?? limitReason("hasta", max),
           }}
           focusOnMount={fromButton}
           onPick={write}

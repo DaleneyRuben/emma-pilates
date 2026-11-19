@@ -56,13 +56,13 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await render(<App runtime={createClientRuntime(routeFetcher(routes))} />);
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
   await waitFor(() => {
-    expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+    expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
   });
   return screen;
 }
@@ -130,7 +130,7 @@ describe("Client booking rejection messages", () => {
   it.each([
     ["reschedule_outside_window", "Solo puedes reprogramar dentro de la ventana de cancelación."],
     ["reschedule_target_ineligible", "Esa clase no está disponible para reprogramar."],
-    ["session_full", "La clase ya no tiene cupos."],
+    ["session_full", "La clase ya no tiene lugares."],
     ["weekly_cap_reached", "Ya usaste tus clases de esta semana."],
     [
       "booking_before_start_date",

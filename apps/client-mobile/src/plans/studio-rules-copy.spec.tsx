@@ -124,11 +124,11 @@ describe("Client copy from the Studio Settings", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+        expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
 
     await waitFor(() => {
       expect(screen.getByText(/ · faltan menos de 30 h$/)).toBeOnTheScreen();

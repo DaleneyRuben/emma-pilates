@@ -14,16 +14,12 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
-  colors,
-  fontFamilies,
   Heading,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   spacing,
-  typography,
   useIsOnline,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -31,7 +27,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
@@ -61,16 +57,6 @@ type HomeNavigation = {
       | "Referrals",
   ) => void;
 };
-
-const offlineBannerCopy = "Sin conexión. Mostrando tus datos de la última vez.";
-
-function OfflineHomeBanner() {
-  return (
-    <View accessibilityRole="alert" style={styles.offlineBanner}>
-      <Text style={styles.offlineBannerText}>{offlineBannerCopy}</Text>
-    </View>
-  );
-}
 
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigation>();
@@ -113,7 +99,7 @@ export function HomeScreen() {
 
   // A network failure keeps the last successful answer (TanStack leaves it in
   // `data`) and reports the error. Inicio renders that answer instead of the
-  // failure, and says so when either query failed over cached data (FIX-011).
+  // failure (FIX-011); the app's one offline banner says so (FIX-090).
   const loadedProfile = profile.data?.status === 200 ? profile.data : undefined;
   const loadedSubscription = subscription.data?.status === 200 ? subscription.data : undefined;
   const showingCachedHome =
@@ -178,7 +164,6 @@ export function HomeScreen() {
         refreshControl={refreshControl}
         testID="home-scroll"
       >
-        {showingCachedHome ? <OfflineHomeBanner /> : null}
         <HomeHeader
           onNotifications={() => navigation.navigate("Notifications")}
           onProfile={() => navigation.navigate("ProfileTab")}
@@ -270,17 +255,5 @@ const styles = StyleSheet.create({
   underPromotion: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  offlineBanner: {
-    backgroundColor: colors.warning,
-    borderRadius: radii.inset,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  offlineBannerText: {
-    color: colors.white,
-    fontSize: typography.note,
-    fontWeight: "500",
-    fontFamily: fontFamilies.bodyMedium,
-  },
   screen: { paddingBottom: 0 },
 });

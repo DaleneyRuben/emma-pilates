@@ -72,8 +72,10 @@ describe("groupNotifications", () => {
       ])[0];
 
     expect(pair("feedback_received")).toMatchObject({ label: "2 comentarios" });
-    expect(pair("payment_submitted")).toMatchObject({ label: "2 comprobantes por revisar" });
-    expect(pair("freeze_requested")).toMatchObject({ label: "2 congelamientos por revisar" });
+    // FIX-090 (audit S10): a group counts settled notices too, so it never
+    // claims they are all still «por revisar».
+    expect(pair("payment_submitted")).toMatchObject({ label: "2 comprobantes recibidos" });
+    expect(pair("freeze_requested")).toMatchObject({ label: "2 pedidos de congelamiento" });
     expect(pair("session_cancelled")).toMatchObject({ label: "2 clases canceladas" });
     expect(pair("session_assigned")).toMatchObject({ label: "2 clases asignadas" });
     expect(pair("evaluation_booked")).toMatchObject({ label: "2 evaluaciones agendadas" });

@@ -30,7 +30,7 @@ describe("NextPlanStartChooser", () => {
     expect(screen.getByRole("header", { name: "Fecha de inicio" })).toBeOnTheScreen();
     expect(
       screen.getByText(
-        "El plan actual de Rocío vence el 5 de diciembre. El nuevo empieza el 10 de diciembre; se puede elegir hasta el 2 de enero.",
+        "El plan actual de Rocío vence el sáb 5 dic. El nuevo empieza el jue 10 dic; se puede elegir hasta el sáb 2 ene.",
       ),
     ).toBeOnTheScreen();
     expect(screen.getByTestId("start-date-2026-12-10")).toHaveProp("accessibilityState", {

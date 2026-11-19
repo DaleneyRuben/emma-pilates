@@ -1,16 +1,16 @@
 import type { AdminPromotionContactDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
 import { ClientPhoto } from "../../components/client-photo";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { PageNotice } from "../../components/page/page-notice";
-import { countFormat, pageCount } from "../../components/table/pagination";
+import { countFormat } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
 import { Button } from "../../components/ui/button";
 import { useAdminRole } from "../../session/admin-role";
-import type { ClientSearch } from "../people-search";
+import type { ClientFilter, ClientSearch } from "../people-search";
 import { clientColumns } from "./client-columns";
 import { ClientFilterChips } from "./client-filter-chips";
 import { clientTableQueryOptions } from "./client-queries";
@@ -44,19 +44,41 @@ function FounderPlaces() {
 const origin =
   "Las cuentas se crean desde la app del personal o cuando la clienta se registra.";
 
-function EmptyDirectory({ searching }: { searching: boolean }) {
-  return (
-    <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
-        {searching
-          ? "No se encontró ninguna clienta."
-          : "Todavía no hay clientas."}
-      </span>
-      {searching ? (
+// FIX-090: a chip with nobody under it says so; the first-run message is
+// for a studio with no Clients at all.
+const emptyChip: Record<Exclude<ClientFilter, "closed">, string> = {
+  active: "Ninguna clienta con plan activo.",
+  none: "Ninguna clienta sin plan.",
+  expired: "Ninguna clienta con el plan vencido.",
+  founder: "Ninguna clienta fundadora.",
+};
+
+function EmptyDirectory({
+  searching,
+  filter,
+}: {
+  searching: boolean;
+  filter: ClientFilter | undefined;
+}) {
+  if (searching) {
+    return (
+      <span className="flex flex-col items-center gap-1">
+        <span className="text-texto-secundario">
+          No se encontró ninguna clienta.
+        </span>
         <span className="text-nota text-texto-tenue">
           Revisa cómo escribiste el nombre o el teléfono.
         </span>
-      ) : null}
+        <span className="text-ayuda text-texto-muy-tenue">{origin}</span>
+      </span>
+    );
+  }
+  if (filter !== undefined && filter !== "closed") {
+    return <span className="text-texto-secundario">{emptyChip[filter]}</span>;
+  }
+  return (
+    <span className="flex flex-col items-center gap-1">
+      <span className="text-texto-secundario">Todavía no hay clientas.</span>
       <span className="text-ayuda text-texto-muy-tenue">{origin}</span>
     </span>
   );
@@ -117,18 +139,6 @@ export function ClientsPage({
     exportClients.reset();
     onSearchChange(change);
   };
-  // A withdrawal can empty a later page: step back to the last one left,
-  // keeping the line that says what happened.
-  const lastClosedPage =
-    !closed || closedQuery.data === undefined || closedQuery.isPlaceholderData
-      ? undefined
-      : pageCount(closedQuery.data.totalItems, search.pageSize);
-  useEffect(() => {
-    if (lastClosedPage !== undefined && search.page > lastClosedPage) {
-      onSearchChange({ page: lastClosedPage });
-    }
-  }, [lastClosedPage, search.page, onSearchChange]);
-
   const shown = closed ? closedQuery.data : query.data;
   const exportButton = (
     <Button
@@ -191,6 +201,9 @@ export function ClientsPage({
     filter,
     search,
     onPageChange: (page: number) => changeSearch({ page }),
+    // A withdrawal can empty a later page: the step back to the last one
+    // left keeps the line that says what happened.
+    onPageClamp: (page: number) => onSearchChange({ page }),
   };
 
   if (closed) {
@@ -215,8 +228,13 @@ export function ClientsPage({
       {...shared}
       loadingMessage="Cargando clientas…"
       what="las clientas"
-      emptyMessage={<EmptyDirectory searching={search.q !== undefined} />}
-      panelTitles={{ create: "Detalle de cliente", edit: (row) => row.name }}
+      emptyMessage={
+        <EmptyDirectory
+          searching={search.q !== undefined}
+          filter={search.filter}
+        />
+      }
+      panelTitles={{ create: "Detalle de clienta", edit: (row) => row.name }}
       rangeLabel={({ shown: count }) =>
         `Mostrando ${countFormat.format(count)} de ${clientas(studio ?? 0)}`
       }

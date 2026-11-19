@@ -9,8 +9,8 @@ import { signIn } from "./support/session";
 
 // AW03 through the real backend: a one-off Session created next Saturday
 // at Centro, where the fixtures schedule nothing, then moved an hour later
-// from Editar sesión.
-test("creates a one-off Session and moves it from Editar sesión", async ({
+// from Editar clase.
+test("creates a one-off Session and moves it from Editar clase", async ({
   page,
 }) => {
   const monday = addDays(weekStartOf(boliviaToday()), 7);
@@ -26,8 +26,8 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
       .first(),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "Nueva sesión", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "Nueva sesión" });
+  await page.getByRole("button", { name: "Nueva clase", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Nueva clase" });
   await expect(panel.getByText("Sucursal Centro · sala única")).toBeVisible();
   // UX-018: a create panel opens on its first field, not on «Cerrar».
   await expect(panel.getByLabel("Una sola vez")).toBeFocused();
@@ -36,7 +36,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
     .getByLabel("Tipo de clase")
     .selectOption({ label: "Reformer Pilates" });
   await panel
-    .getByLabel("Entrenadora")
+    .getByLabel("Instructora")
     .selectOption({ label: "Daniela Ortiz" });
   await expect(panel.getByLabel("Capacidad")).toHaveValue("12");
   await panel.getByLabel("Fecha").fill(saturday);
@@ -44,7 +44,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await panel.getByLabel("Duración").fill("75");
   await panel.getByRole("button", { name: "Guardar" }).click();
 
-  await expect(page.getByRole("status")).toHaveText("Sesión creada.");
+  await expect(page.getByRole("status")).toHaveText("Clase creada.");
   await expect(panel).toHaveCount(0);
   const created = week.getByRole("button", {
     name: "Reformer Pilates, 11:00, Daniela Ortiz, 0 de 12 lugares",
@@ -53,9 +53,9 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await expect(created).toContainText("11:00 – 12:15");
 
   await created.click();
-  const edit = page.getByRole("dialog", { name: "Editar sesión" });
-  // A one-off Session belongs to no series: no «Solo esta sesión» choice.
-  await expect(edit.getByLabel("Solo esta sesión")).toHaveCount(0);
+  const edit = page.getByRole("dialog", { name: "Editar clase" });
+  // A one-off Session belongs to no series: no «Solo esta clase» choice.
+  await expect(edit.getByLabel("Solo esta clase")).toHaveCount(0);
   await expect(edit.getByText("Reformer Pilates")).toBeVisible();
   await expect(edit.getByLabel("Fecha")).toHaveValue(formatCivilDate(saturday));
   await expect(edit.getByLabel("Duración")).toHaveValue("75");
@@ -70,7 +70,7 @@ test("creates a one-off Session and moves it from Editar sesión", async ({
   await edit.getByLabel("Hora").fill("12:00");
   await edit.getByRole("button", { name: "Guardar" }).click();
 
-  await expect(page.getByRole("status")).toHaveText("Sesión actualizada.");
+  await expect(page.getByRole("status")).toHaveText("Clase actualizada.");
   await expect(edit).toHaveCount(0);
   await expect(created).toHaveCount(0);
   const moved = week.getByRole("button", {

@@ -1,4 +1,4 @@
-import type { EvaluationAvailabilityDto } from "@pilates/api-contracts";
+import { formatListDate, type EvaluationAvailabilityDto } from "@pilates/api-contracts";
 
 import { planOfferLine } from "./evaluation-offer-copy";
 import { boliviaInstant, firstDay, secondDay, slot } from "./evaluation-test-support";
@@ -59,11 +59,7 @@ describe("planOfferLine", () => {
       includedEvaluation: "none",
       priceCentavos: 7_000,
     } as unknown as EvaluationAvailabilityDto;
-    const freeFrom = new Intl.DateTimeFormat("es-BO", {
-      day: "numeric",
-      month: "long",
-      timeZone: "America/La_Paz",
-    }).format(new Date(boliviaInstant(secondDay, "09:00")));
+    const freeFrom = formatListDate(boliviaInstant(secondDay, "09:00"));
 
     expect(planOfferLine(mixed)).toBe(
       `Desde el ${freeFrom}, tu primera evaluación del trimestre es gratis. Antes cuesta Bs 70.`,

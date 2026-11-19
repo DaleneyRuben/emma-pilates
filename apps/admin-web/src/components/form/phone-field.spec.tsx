@@ -29,7 +29,7 @@ function PhoneForm({
         <PhoneFormField
           control={form.control}
           name="phone"
-          description="La recepción lo usa para escribirle por WhatsApp."
+          description="La asistente lo usa para escribirle por WhatsApp."
         />
         <Button type="submit">Guardar</Button>
       </form>
@@ -57,7 +57,7 @@ describe("PhoneFormField", () => {
     const digits = screen.getByLabelText("Celular");
     expect(digits).toHaveAttribute("placeholder", "8 dígitos");
     expect(digits).toHaveAccessibleDescription(
-      "La recepción lo usa para escribirle por WhatsApp.",
+      "La asistente lo usa para escribirle por WhatsApp.",
     );
     expect(prefix("País: Bolivia, +591")).toHaveTextContent("🇧🇴+591");
 

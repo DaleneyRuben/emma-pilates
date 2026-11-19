@@ -44,7 +44,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
   return (
     <article className="flex flex-col gap-6">
       <PageHeader
-        title="Informes"
+        title="El mes"
         subtitle="Asistencia, ocupación y clientas del mes"
         actions={
           <MonthStepper month={month} latest={latest} onChange={setMonth} />
@@ -68,7 +68,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
               figure={`${current.data.occupancyPercent} %`}
             />
             <Tile
-              name="Alumnas por clase"
+              name="Clientas por clase"
               figure={tenths.format(current.data.averageStudentsTimes10 / 10)}
             />
             <Tile

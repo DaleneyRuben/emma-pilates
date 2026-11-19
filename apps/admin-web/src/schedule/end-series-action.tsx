@@ -64,8 +64,8 @@ export function EndSeriesAction({
     >
       <p>
         {schedule.classTypeName} deja de repetirse desde la fecha que elijas.
-        Las sesiones sin reservas se cancelan; las que tienen reservas o lista
-        de espera se mantienen.
+        Las clases sin reservas se cancelan; las que tienen reservas o lista de
+        espera se mantienen.
       </p>
       <div className="flex flex-col gap-1.5 pt-1">
         <Label htmlFor={dateId}>Deja de repetirse desde</Label>

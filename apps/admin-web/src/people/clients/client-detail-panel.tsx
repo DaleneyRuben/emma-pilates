@@ -1,8 +1,9 @@
 import { classesLeft } from "./client-columns";
 import {
+  type AdminClientDetailDto,
+  formatListDate,
   getAdminClient,
   getGetAdminClientQueryKey,
-  type AdminClientDetailDto,
 } from "@pilates/api-contracts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { useId, useState, type ReactNode } from "react";
@@ -21,7 +22,6 @@ import { ClientPhoto } from "../../components/client-photo";
 import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { useAdminRole, type AdminRole } from "../../session/admin-role";
 import { AllowanceAdjustmentAction } from "./allowance-adjustment-action";
 import { ClientAcquisitionBlock } from "./client-acquisition-block";
@@ -70,11 +70,11 @@ function PlanBlock({
         <SummaryRow label="Plan">
           <span className="flex items-center justify-end gap-2">
             <span className="text-texto-muy-tenue">Sin plan activo</span>
-            <StatusPill tone="error">Expirado</StatusPill>
+            <StatusPill tone="error">Plan vencido</StatusPill>
           </span>
         </SummaryRow>
         <p className="px-3 py-2 text-ayuda text-texto-tenue">
-          Último plan vencido el {formatCivilDate(current.endsOn)}.
+          Último plan vencido el {formatListDate(current.endsOn)}.
         </p>
       </SummaryBlock>
     );
@@ -84,13 +84,12 @@ function PlanBlock({
       <SummaryRow label="Plan">
         <span className="flex items-center justify-end gap-2">
           {current.planName}
-          <StatusPill tone="exito">Activo</StatusPill>
+          <StatusPill tone="exito">Activa</StatusPill>
         </span>
       </SummaryRow>
       <SummaryRow label="Vigencia">
         <span className="tabular">
-          {formatCivilDate(current.startsOn)} –{" "}
-          {formatCivilDate(current.endsOn)}
+          {formatListDate(current.startsOn)} – {formatListDate(current.endsOn)}
         </span>
       </SummaryRow>
       {/* Every Plan grants a fixed number of classes (follow-up 11). */}
@@ -104,7 +103,7 @@ function PlanBlock({
       {/* Walkthrough n.º 60: the Plan she already bought. */}
       {view.nextSubscription == null ? null : (
         <SummaryRow label="Plan siguiente">
-          {`${view.nextSubscription.planName} · empieza el ${formatCivilDate(view.nextSubscription.startsOn)}`}
+          {`${view.nextSubscription.planName} · empieza el ${formatListDate(view.nextSubscription.startsOn)}`}
         </SummaryRow>
       )}
       {current.extraClassesLine ? (
@@ -139,7 +138,7 @@ function ClientSummary({
       <div className="flex items-center gap-3">
         <ClientPhoto name={client.name} photo={client.photo} size={40} />
         <p className="text-nota text-texto-tenue">
-          Cliente desde {formatCivilDate(client.clientSince)}
+          Clienta desde {formatListDate(client.clientSince)}
         </p>
       </div>
       {client.accountStatus === "pending" ? (

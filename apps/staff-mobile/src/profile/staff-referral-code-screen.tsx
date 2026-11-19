@@ -25,7 +25,7 @@ import { BackBar } from "../ui/back-bar";
 const noticeMilliseconds = 3000;
 
 const steps = [
-  "Compartes tu código con tus alumnas",
+  "Compartes tu código con tus clientas",
   "Ella lo escribe al crear su cuenta",
   "Queda registrada como tu clienta",
 ] as const;

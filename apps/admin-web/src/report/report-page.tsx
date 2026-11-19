@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import type { SearchChange } from "../catalog/catalog-search";
@@ -7,11 +8,7 @@ import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
 import { parseCivilDate } from "../components/form/civil-date";
 import { CivilDateInput } from "../components/form/civil-date-input";
-import {
-  boliviaMonth,
-  boliviaToday,
-  formatCivilDate,
-} from "../lib/bolivia-time";
+import { boliviaMonth, boliviaToday } from "../lib/bolivia-time";
 import { chipClass, selectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { FinancePanel } from "./finance-panel";
@@ -194,7 +191,7 @@ export function ReportPage({
         subtitle={
           finance
             ? "Caja del mes · Todas las sucursales"
-            : `${formatCivilDate(range.from)} – ${formatCivilDate(range.to)} · ${scope}`
+            : `${formatListDate(range.from)} – ${formatListDate(range.to)} · ${scope}`
         }
         actions={
           finance ? undefined : (
@@ -236,8 +233,7 @@ export function ReportPage({
       ) : null}
       {finance || branchId === undefined ? null : (
         <p className="text-nota text-texto-tenue">
-          La nómina y los ingresos por transferencia se ven solo en «Todas las
-          sucursales».
+          La nómina y los ingresos por QR se ven solo en «Todas las sucursales».
         </p>
       )}
       <RevenueSection

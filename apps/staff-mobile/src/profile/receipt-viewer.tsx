@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
 import {
   colors,
@@ -10,7 +11,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate } from "../assistant/assistant-format";
 import { useStaffFetcher } from "../staff-fetcher";
 
 // The receipt is a private, authenticated image read through her own route
@@ -66,7 +66,7 @@ export function useReceiptViewer() {
       aspectRatio={full.data?.aspectRatio ?? 1}
       label="Comprobante del pago"
       onClose={() => setOpen(null)}
-      title={open === null ? undefined : `Pago del ${formatCivilDate(open.paidOn)}`}
+      title={open === null ? undefined : `Pago del ${formatListDate(open.paidOn)}`}
       uri={full.data?.uri ?? null}
       visible={open !== null && !failed}
     />

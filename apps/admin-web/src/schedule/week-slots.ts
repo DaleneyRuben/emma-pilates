@@ -17,7 +17,7 @@ export function sessionSpan(session: Session) {
 }
 
 // Follow-up 96: every hour of a day that no Session fully covers is an empty
-// slot that opens «Nueva sesión» there. Slots sit before the blocks of the
+// slot that opens «Nueva clase» there. Slots sit before the blocks of the
 // same start in the DOM, so Tab follows the day and blocks paint on top.
 export function dayItems(
   day: string,

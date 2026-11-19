@@ -1,4 +1,9 @@
-import { useGetPaymentReview } from "@pilates/api-contracts";
+import {
+  useGetPaymentReview,
+  formatMoney,
+  formatListDate,
+  formatDateTime,
+} from "@pilates/api-contracts";
 import {
   CardActionRow,
   cardWithActionRow,
@@ -6,7 +11,6 @@ import {
   colors,
   EmphasisCard,
   fontFamilies,
-  formatBolivianos,
   FormField,
   FormScrollView,
   FullScreenImage,
@@ -30,13 +34,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDayMonth } from "../assistant/assistant-format";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
-import { describeSale, formatSubmittedAt } from "./administrator-format";
+import { describeSale } from "./administrator-format";
 import { PaymentBreakdown } from "./payment-breakdown";
 import type { PaymentsNotice } from "./pending-payments-screen";
 
@@ -112,7 +115,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
     payment.kind !== "evaluation" &&
     payment.startsOn !== undefined &&
     payment.startsOn > boliviaCivilDate(new Date())
-      ? formatCivilDayMonth(payment.startsOn)
+      ? formatListDate(payment.startsOn)
       : null;
   const nextPlan = startsLater !== null && payment.nextPlan === true;
   const confirmedNotice: PaymentsNotice =
@@ -194,7 +197,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           {header}
           <IconRowGroup>
             <PersonRow
-              amount={formatBolivianos(payment.amountDueCentavos)}
+              amount={formatMoney(payment.amountDueCentavos)}
               detail={describeSale(payment)}
               face={
                 <ClientFace
@@ -257,13 +260,13 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           eyebrow="Monto a verificar"
           note={`${payment.clientName} · ${describeSale(payment)}`}
         >
-          <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
+          <Text style={styles.amount}>{formatMoney(payment.amountDueCentavos)}</Text>
           <Text style={styles.state}>{stateLabels[payment.state]}</Text>
         </EmphasisCard>
         <PaymentBreakdown payment={payment} />
         <IconRowGroup>
           <IconRow icon="credit" label="Transferencia" />
-          <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />
+          <IconRow icon="clock" label={`Enviado el ${formatDateTime(payment.submittedAt)}`} />
           {startsLater === null ? null : nextPlan ? (
             <IconRow icon="calendar" label="Plan siguiente" value={`Empieza el ${startsLater}`} />
           ) : (

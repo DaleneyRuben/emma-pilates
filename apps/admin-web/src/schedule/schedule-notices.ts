@@ -1,4 +1,5 @@
-import { formatCivilDate, formatLongDay } from "../lib/bolivia-time";
+import { formatListDate } from "@pilates/api-contracts";
+import { formatLongDay } from "../lib/bolivia-time";
 import type { ScheduleChangeResult } from "./use-schedule-change";
 
 // What the page says after a change, so the Administrator sees how many
@@ -10,8 +11,8 @@ const skippedNote = (skipped: number): string =>
   skipped === 0
     ? ""
     : skipped === 1
-      ? " 1 se omitió porque se cruzaba con otra sesión."
-      : ` ${skipped} se omitieron porque se cruzaban con otras sesiones.`;
+      ? " 1 se omitió porque se cruzaba con otra clase."
+      : ` ${skipped} se omitieron porque se cruzaban con otras clases.`;
 
 const keptNote = (kept: number, suffix: string): string =>
   kept === 1
@@ -25,7 +26,7 @@ const clauses = (parts: (string | false)[]): string =>
 // One row keeps the single schedule's wording; several rows are counted
 // together (WEB-025).
 export const createdNotice = (outcome: ScheduleChangeResult): string => {
-  if (outcome.kind !== "create-schedules") return "Sesión creada.";
+  if (outcome.kind !== "create-schedules") return "Clase creada.";
   const { schedules } = outcome.result;
   const created = schedules.reduce((sum, row) => sum + row.created, 0);
   const skipped = schedules.reduce((sum, row) => sum + row.skipped, 0);
@@ -33,7 +34,7 @@ export const createdNotice = (outcome: ScheduleChangeResult): string => {
     schedules.length === 1
       ? "Serie semanal creada"
       : `${schedules.length} series semanales creadas`;
-  return `${made}: ${count(created, "sesión", "sesiones")} en los próximos 30 días.${skippedNote(skipped)}`;
+  return `${made}: ${count(created, "clase", "clases")} en los próximos 30 días.${skippedNote(skipped)}`;
 };
 
 export const replacedNotice = (
@@ -50,33 +51,33 @@ export const replacedNotice = (
       `${result.cancelledSessions} sin reservas ${result.cancelledSessions === 1 ? "se reemplazó" : "se reemplazaron"}`,
     result.keptSessions > 0 && keptNote(result.keptSessions, " sin cambios"),
   ]);
-  const created = count(result.created, "sesión nueva", "sesiones nuevas");
-  return `Serie actualizada desde el ${formatCivilDate(effectiveFrom)}: ${created}${changed === "" ? "" : `; ${changed}`}.${skippedNote(result.skipped)}`;
+  const created = count(result.created, "clase nueva", "clases nuevas");
+  return `Serie actualizada desde el ${formatListDate(effectiveFrom)}: ${created}${changed === "" ? "" : `; ${changed}`}.${skippedNote(result.skipped)}`;
 };
 
 export const endedNotice = (
   result: { cancelledSessions: number; keptSessions: number },
   effectiveFrom: string,
 ): string => {
-  const date = formatCivilDate(effectiveFrom);
+  const date = formatListDate(effectiveFrom);
   const changed = clauses([
     result.cancelledSessions > 0 &&
       count(
         result.cancelledSessions,
-        "sesión sin reservas se canceló",
-        "sesiones sin reservas se cancelaron",
+        "clase sin reservas se canceló",
+        "clases sin reservas se cancelaron",
       ),
     result.keptSessions > 0 && keptNote(result.keptSessions, ""),
   ]);
   return changed === ""
-    ? `La serie deja de repetirse desde el ${date}. No había sesiones futuras que cambiar.`
+    ? `La serie deja de repetirse desde el ${date}. No había clases futuras que cambiar.`
     : `La serie deja de repetirse desde el ${date}: ${changed}.`;
 };
 
 export const cancelledNotice = (affectedBookings: number): string =>
   affectedBookings === 0
-    ? "Sesión cancelada."
-    : `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
+    ? "Clase cancelada."
+    : `Clase cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
 
 // BKM-018 (follow-up 234): the toasts after pausing and resuming a series.
 export const pausedNotice = (pausedUntil: string | null): string =>

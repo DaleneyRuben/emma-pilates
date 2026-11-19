@@ -54,7 +54,7 @@ describe("Tu código de referido (S30)", () => {
     const row = await screen.findByRole("button", { name: "Tu código de referido, DANIELA" });
     await fireEvent.press(row);
 
-    expect(await screen.findByText("Compartes tu código con tus alumnas")).toBeOnTheScreen();
+    expect(await screen.findByText("Compartes tu código con tus clientas")).toBeOnTheScreen();
     expect(screen.getByText("DANIELA")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Copiar" }));
     expect(await screen.findByText("Código copiado")).toBeOnTheScreen();

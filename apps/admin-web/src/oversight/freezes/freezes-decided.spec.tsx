@@ -50,7 +50,7 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
     renderAdmin("/clientas/congelamientos");
 
     const row = await rowOf("Valeria Quiroga");
-    expect(within(row).getByText("5 feb → 12 feb")).toBeInTheDocument();
+    expect(within(row).getByText("vie 5 feb → vie 12 feb")).toBeInTheDocument();
     expect(within(row).getByText("7 días")).toBeInTheDocument();
     expect(
       within(row).getByRole("button", { name: "Aprobar" }),
@@ -86,19 +86,23 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
     await user.selectOptions(screen.getByLabelText("Vista"), "Decididas");
 
     const approved = await rowOf("Valeria Quiroga");
-    expect(within(approved).getByText("Aprobado")).toBeInTheDocument();
+    expect(within(approved).getByText("Aprobada")).toBeInTheDocument();
     expect(within(approved).getByText("7 días")).toBeInTheDocument();
     expect(
-      within(approved).getByText("12 feb (antes 5 feb)"),
+      within(approved).getByText("vie 12 feb (antes vie 5 feb)"),
     ).toBeInTheDocument();
     expect(
-      within(approved).getByText("Decidido por Paola Mendoza · 8 nov 10:15"),
+      within(approved).getByText(
+        "Decidido por Paola Mendoza · dom 8 nov · 10:15",
+      ),
     ).toBeInTheDocument();
     const refused = await rowOf("Daniela Rojas");
-    expect(within(refused).getByText("Rechazado")).toBeInTheDocument();
-    expect(within(refused).getByText("5 feb")).toBeInTheDocument();
+    expect(within(refused).getByText("Rechazada")).toBeInTheDocument();
+    expect(within(refused).getByText("vie 5 feb")).toBeInTheDocument();
     expect(
-      within(refused).getByText("Decidido por Paola Mendoza · 7 nov 09:00"),
+      within(refused).getByText(
+        "Decidido por Paola Mendoza · sáb 7 nov · 09:00",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Aprobar" }),

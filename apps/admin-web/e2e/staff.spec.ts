@@ -18,14 +18,14 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   const roleFilter = page.getByLabel("Rol");
   await expect(roleFilter.locator("option")).toHaveText([
     "Todos",
-    "Entrenadora",
+    "Instructora",
     "Asistente",
     "Administradora",
     "Nutricionista",
     "Coordinadora",
   ]);
   await expect(
-    page.getByRole("row", { name: /Emma Vargas/ }).getByText("Entrenadora"),
+    page.getByRole("row", { name: /Emma Vargas/ }).getByText("Instructora"),
   ).toBeVisible();
   await expect(
     page
@@ -128,7 +128,7 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   ).toBeVisible();
   await expect(camila).toHaveCount(0);
   await expect(
-    page.getByRole("row", { name: /Camila Rojas/ }).getByText("Desactivado"),
+    page.getByRole("row", { name: /Camila Rojas/ }).getByText("Desactivada"),
   ).toBeVisible();
 
   // A deactivated member opens read-only.

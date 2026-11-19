@@ -1,7 +1,10 @@
-import type { AdminClientDetailDto } from "@pilates/api-contracts";
+import {
+  formatListDate,
+  type AdminClientDetailDto,
+} from "@pilates/api-contracts";
 import { screen, within } from "@testing-library/react";
 import { http } from "msw";
-import { addDays, boliviaToday, formatCivilDate } from "../../lib/bolivia-time";
+import { addDays, boliviaToday } from "../../lib/bolivia-time";
 import {
   apiUrl,
   jsonResponse,
@@ -131,7 +134,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
 
     expect(
       await within(panel).findByText(
-        `Acceso de prueba activo hasta el ${formatCivilDate(endsOn)}.`,
+        `Acceso de prueba activo hasta el ${formatListDate(endsOn)}.`,
       ),
     ).toBeInTheDocument();
     expect(grants).toEqual([
@@ -162,7 +165,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
     ],
     [
       "purchase_intent_open_exists",
-      "Tiene una compra por transferencia sin terminar. Vuelve a intentarlo cuando venza.",
+      "Tiene una compra por QR sin terminar. Vuelve a intentarlo cuando venza.",
     ],
     [
       "courtesy_end_date_invalid",
@@ -191,7 +194,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
 
     expect(
       await within(dialog).findByText(
-        "Tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+        "Tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
       ),
     ).toBeInTheDocument();
     expect(

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
+import { AppState } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -63,6 +64,12 @@ export function PasswordLinkScreen({
 }) {
   const activation = intent.type === "activate-account";
   const [state, setState] = useState<LinkState>("loading");
+  // A link opened again is checked again from «Comprobando enlace».
+  const [checkedIntent, setCheckedIntent] = useState(intent);
+  if (checkedIntent !== intent) {
+    setCheckedIntent(intent);
+    setState("loading");
+  }
   const [failed, setFailed] = useState(false);
   const {
     control,
@@ -74,30 +81,50 @@ export function PasswordLinkScreen({
     resolver: zodResolver(passwordSchema),
   });
 
+  // FIX-090: the link is checked on every open (each one is a new intent)
+  // and whenever the app returns to the front, so a link used meanwhile says
+  // so before she types a password, not after.
   useEffect(() => {
     let active = true;
     const expectedPurpose = activation ? "activation" : "password_recovery";
 
-    void api
-      .inspectLink(intent.token)
-      .then((result) => {
-        if (!active) return;
-        if (result.purpose !== undefined && result.purpose !== expectedPurpose) {
-          setState("expired");
-          return;
-        }
-        setState(
-          result.status === "current" || result.status === "removed" ? result.status : "expired",
-        );
-      })
-      .catch(() => {
-        if (active) setState("expired");
-      });
+    const inspect = () =>
+      void api
+        .inspectLink(intent.token)
+        .then((result) => {
+          if (!active) return;
+          if (result.purpose !== undefined && result.purpose !== expectedPurpose) {
+            setState("expired");
+            return;
+          }
+          setState((shown) =>
+            shown === "activated"
+              ? shown
+              : result.status === "current" || result.status === "removed"
+                ? result.status
+                : "expired",
+          );
+        })
+        .catch(() => {
+          // A failed re-check (no network on return) keeps what she already saw.
+          if (active)
+            setState((shown) =>
+              shown === "activated" || shown === "current" || shown === "removed"
+                ? shown
+                : "expired",
+            );
+        });
+
+    inspect();
+    const foreground = AppState.addEventListener?.("change", (appState) => {
+      if (appState === "active") inspect();
+    });
 
     return () => {
       active = false;
+      foreground?.remove();
     };
-  }, [activation, api, intent.token]);
+  }, [activation, api, intent]);
 
   const submit = handleSubmit(async ({ password }) => {
     setFailed(false);

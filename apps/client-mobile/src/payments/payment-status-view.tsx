@@ -41,6 +41,13 @@ function Facts({ rows }: { rows: readonly [string, string][] }) {
  * 11's three states on v2 (follow-up 225 §6, walkthrough n.º 15): centred,
  * the line icon in its disc, the owner's copy, the Plan's facts, and buttons.
  */
+/** The staff reason as its own sentence: a full stop when she left none (FIX-090). */
+function sentence(text: string | null | undefined): string {
+  const trimmed = text?.trim() ?? "";
+  if (trimmed === "" || /[.!?…]$/.test(trimmed)) return trimmed;
+  return `${trimmed}.`;
+}
+
 export function PaymentStatusView({
   busy = false,
   endsOn,
@@ -87,11 +94,11 @@ export function PaymentStatusView({
   }
 
   if (state === "rejected") {
-    const reason = payment.rejectionReason?.trim();
+    const reason = sentence(payment.rejectionReason);
     return (
       <StateScreen
         icon="alert"
-        note={`${reason === undefined || reason === "" ? "" : `${reason} `}Sube uno nuevo para activar tu plan.`}
+        note={`${reason === "" ? "" : `${reason} `}Sube uno nuevo para activar tu plan.`}
         primaryAction={
           onPrimary === undefined
             ? undefined

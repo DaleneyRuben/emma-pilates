@@ -46,7 +46,7 @@ describe("ClassHistoryList", () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     const heading = screen.getByText("Agosto 2026");
-    expect(heading).toHaveStyle({ fontSize: 11, textTransform: "uppercase" });
+    expect(heading).toHaveStyle({ fontSize: 12, textTransform: "uppercase" });
     expect(heading.parent).toHaveStyle({ borderBottomColor: "#CDA697", borderBottomWidth: 1 });
     expect(screen.getByText("2 clases")).toHaveStyle({ color: "#93615D", fontSize: 12 });
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
@@ -69,7 +69,7 @@ describe("ClassHistoryList", () => {
     expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
     expect(screen.getByText("sáb")).toHaveStyle({
       color: "#93615D",
-      fontSize: 10,
+      fontSize: 12,
       textTransform: "uppercase",
     });
     expect(screen.getByText("Mat Pilates")).toHaveStyle({
@@ -86,7 +86,7 @@ describe("ClassHistoryList", () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     expect(
-      screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
+      screen.getByLabelText("Sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
   });
 

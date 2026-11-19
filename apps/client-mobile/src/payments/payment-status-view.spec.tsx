@@ -67,10 +67,26 @@ describe("PaymentStatusView", () => {
       screen.getByText("Tu plan ya está activo. Nos vemos pronto en el estudio."),
     ).toBeOnTheScreen();
     expect(screen.getByText("Vence")).toBeOnTheScreen();
-    expect(screen.getByText("1 de diciembre")).toBeOnTheScreen();
+    expect(screen.getByText("mar 1 dic")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
     await fireEvent.press(screen.getByRole("button", { name: "Ir al inicio" }));
     expect(onPrimary).toHaveBeenCalled();
     expect(onHome).toHaveBeenCalled();
+  });
+
+  // FIX-090 (states review Y8): a reason without its full stop still ends
+  // its sentence before «Sube uno nuevo…».
+  it("ends the staff reason with a full stop before asking for a new receipt", async () => {
+    const screen = await render(
+      <PaymentStatusView
+        onHome={jest.fn()}
+        payment={{ ...payment, rejectionReason: "No vimos la transferencia recibida" }}
+        state="rejected"
+      />,
+    );
+
+    expect(
+      screen.getByText("No vimos la transferencia recibida. Sube uno nuevo para activar tu plan."),
+    ).toBeOnTheScreen();
   });
 });

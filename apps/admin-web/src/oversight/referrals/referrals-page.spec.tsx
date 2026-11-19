@@ -58,10 +58,10 @@ describe("AW26 Referidos on a desktop browser", () => {
     ).parentElement as HTMLElement;
     expect(
       within(pending).getByRole("cell", { name: /Andrea Céspedes/ }),
-    ).toHaveAttribute("data-label", "Cliente que refiere");
+    ).toHaveAttribute("data-label", "Clienta que refiere");
     expect(within(pending).getByText("3 referidas en total")).toBeVisible();
     expect(
-      within(pending).getByRole("cell", { name: "11/08/2026" }),
+      within(pending).getByRole("cell", { name: "mar 11 ago" }),
     ).toHaveAttribute("data-label", "Fecha de registro");
     expect(within(pending).queryByText("Pendiente")).not.toBeInTheDocument();
     expect(
@@ -105,10 +105,10 @@ describe("AW26 Referidos on a desktop browser", () => {
     const bought = (await screen.findByRole("cell", { name: /Camila Vargas/ }))
       .parentElement as HTMLElement;
     expect(
-      within(bought).getByRole("cell", { name: "04/08/2026" }),
+      within(bought).getByRole("cell", { name: "mar 4 ago" }),
     ).toHaveAttribute("data-label", "Compró");
     expect(
-      within(bought).getByRole("cell", { name: "Sumada el 04/08/2026" }),
+      within(bought).getByRole("cell", { name: "Sumada el mar 4 ago" }),
     ).toHaveAttribute("data-label", "Clase de premio");
     const waiting = screen.getByRole("cell", { name: /Valeria Terceros/ })
       .parentElement as HTMLElement;
@@ -123,7 +123,7 @@ describe("AW26 Referidos on a desktop browser", () => {
       .parentElement as HTMLElement;
     // 19:30 on 15 November in Bolivia.
     expect(
-      within(owed).getByRole("cell", { name: "15/11/2026" }),
+      within(owed).getByRole("cell", { name: "dom 15 nov" }),
     ).toBeVisible();
     expect(
       within(owed).getByRole("cell", {
@@ -166,7 +166,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     await screen.findByRole("cell", { name: /Camila Vargas Ortiz/ });
 
     await user.type(
-      screen.getByRole("searchbox", { name: "Buscar por nombre de cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por nombre de clienta" }),
       "valeria",
     );
 
@@ -208,7 +208,10 @@ describe("AW26 Referidos on a desktop browser", () => {
       within(table).getByRole("columnheader", { name: "Fecha de registro" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Sin resultados")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
   });
 
   it("says when the studio has no Referrals yet", async () => {
@@ -287,7 +290,7 @@ describe("AW26 Referidos on a narrow browser", () => {
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(card.detail).toContain("Valeria Terceros");
     expect(
-      screen.getByRole("searchbox", { name: "Buscar por nombre de cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por nombre de clienta" }),
     ).toBeVisible();
   });
 });

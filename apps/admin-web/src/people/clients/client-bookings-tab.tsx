@@ -1,6 +1,6 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilMoment } from "../../lib/bolivia-time";
 import {
   clientBookingsQueryOptions,
   clientHistoryQueryOptions,
@@ -12,7 +12,7 @@ const detailOf = (item: {
   trainerName: string;
   branchName: string;
 }) =>
-  `${formatCivilMoment(item.startsAt)} · ${item.trainerName} · ${item.branchName}`;
+  `${formatDateTime(item.startsAt)} · ${item.trainerName} · ${item.branchName}`;
 
 // P03 Reservas: her coming classes (the waitlist marked) and the classes she
 // took. Booking her into a class stays on Horario (WEB-039).

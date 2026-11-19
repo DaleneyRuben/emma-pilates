@@ -49,11 +49,11 @@ const minimumQueryLength = 2;
 const debounceMilliseconds = 250;
 const placeholder = "Buscar por nombre, teléfono o correo";
 
-// FIX-083 (Ronda 2 pick A): «Nuevo cliente» is a quiet link under the results.
+// FIX-083 (Ronda 2 pick A): «Nueva clienta» is a quiet link under the results.
 function NewClientLink({ onPress }: { onPress: () => void }) {
   return (
     <TextButton
-      label="¿No está? Crear cliente nuevo"
+      label="¿No está? Crear clienta nueva"
       onPress={onPress}
       style={styles.newClient}
       testID="client-search-new-client"
@@ -107,7 +107,7 @@ export function ClientSearchScreen() {
   const newClientLink = <NewClientLink onPress={() => navigation.navigate("NewClient")} />;
   const search = (
     <>
-      <RootHeader bell eyebrow={eyebrow} label="Buscar cliente" title="Buscar cliente" />
+      <RootHeader bell eyebrow={eyebrow} label="Buscar clienta" title="Buscar clienta" />
       <View style={styles.field}>
         <LineIcon color={colors.textMuted} size={18} strokeWidth={1.5}>
           <Circle cx={11} cy={11} r={6.5} />
@@ -152,13 +152,13 @@ export function ClientSearchScreen() {
           {newClientLink}
         </>
       ) : results.isPending ? (
-        <Text accessibilityLabel="Buscando clientes" style={styles.hint}>
+        <Text accessibilityLabel="Buscando clientas" style={styles.hint}>
           Buscando…
         </Text>
       ) : results.isError || results.data.status !== 200 ? (
         <>
           <QueryFailure
-            label="No pudimos buscar clientes."
+            label="No pudimos buscar clientas."
             onRetry={() => void results.refetch()}
           />
           {newClientLink}
@@ -169,7 +169,7 @@ export function ClientSearchScreen() {
           layout="inList"
           note="Revisa cómo lo escribiste o crea una ficha nueva."
           primaryAction={{
-            label: "Nuevo cliente",
+            label: "Nueva clienta",
             onPress: () => navigation.navigate("NewClient"),
             testID: "client-search-empty-new-client",
           }}
@@ -184,7 +184,7 @@ export function ClientSearchScreen() {
           <IconRowGroup>
             {clients.map((client) => (
               <PersonRow
-                accessibilityLabel={`Ver cliente ${client.name}`}
+                accessibilityLabel={`Ver clienta ${client.name}`}
                 detail={describeContact(client.phone, client.email)}
                 face={
                   <ClientFace fetcher={fetcher} name={client.name} photo={client.photo} size={36} />

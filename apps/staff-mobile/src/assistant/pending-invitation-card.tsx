@@ -2,6 +2,7 @@ import {
   getGetAssistantClientOverviewQueryKey,
   getGetClientInvitationQueryKey,
   useGetClientInvitation,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   colors,
@@ -23,7 +24,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { accountEmailLimitCode, formatInstantDate, resendLimitNotice } from "./assistant-format";
+import { accountEmailLimitCode, resendLimitNotice } from "./assistant-format";
 import { InvitationMenu } from "./invitation-menu";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 import { StateCard } from "./state-card";
@@ -40,7 +41,7 @@ const invitationProblems: Record<string, string> = {
 const activationNote = (expiresAt: string | null | undefined): string | undefined => {
   if (!expiresAt) return undefined;
   const verb = new Date(expiresAt).getTime() <= Date.now() ? "venció" : "vence";
-  return `El enlace ${verb} el ${formatInstantDate(expiresAt)}`;
+  return `El enlace ${verb} el ${formatListDate(expiresAt)}`;
 };
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;

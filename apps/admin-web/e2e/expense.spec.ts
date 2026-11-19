@@ -36,7 +36,7 @@ test("records an Expense at Centro with an inline category", async ({
   await expect(panel).toHaveCount(0);
   const row = page.getByRole("row", { name: /Mantenimiento/ });
   await expect(row.getByRole("cell", { name: "Bs 450,50" })).toBeVisible();
-  await expect(row.getByRole("cell", { name: "01/09/2026" })).toBeVisible();
+  await expect(row.getByRole("cell", { name: "mar 1 sept" })).toBeVisible();
   await expect(page.getByText("Mostrando 1–1 de 1 gasto")).toBeVisible();
 
   // An Expense belongs to its Branch (BKO-001 D11).
@@ -83,7 +83,7 @@ test("eliminates an Expense and leaves it out of Informes › Dinero", async ({
   await confirm.getByLabel("Motivo (opcional)").fill("Cargado dos veces");
   await confirm.getByRole("button", { name: "Eliminar", exact: true }).click();
   await expect(
-    page.getByText("Eliminamos el gasto de Bs 350,00 en Luz."),
+    page.getByText("Eliminamos el gasto de Bs 350 en Luz."),
   ).toBeVisible();
   const row = page.getByRole("row", { name: /Luz/ });
   await expect(row.getByText("Eliminado", { exact: true })).toBeVisible();

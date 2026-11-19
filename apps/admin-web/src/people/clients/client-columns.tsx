@@ -1,9 +1,9 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { AdminClientDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { RowOpener } from "../../catalog/catalog-page";
 import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { ClientPhone } from "./client-phone";
 
 const columns = createColumnHelper<AdminClientDto>();
@@ -21,7 +21,7 @@ export const classesLeft = (
 // P03's «Vence»: the active Plan's last day, or when the last one ended.
 const endsLabel = (client: AdminClientDto): string | null => {
   if (client.planEndsOn === null) return null;
-  const date = formatCivilDate(client.planEndsOn);
+  const date = formatListDate(client.planEndsOn);
   return client.subscriptionStatus === "active" ? date : `Venció el ${date}`;
 };
 
@@ -69,7 +69,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
             {/* Walkthrough n.º 60: the Plan bought after a spent Guest Pass. */}
             {startsOn == null ? null : (
               <span className="text-ayuda text-texto-tenue tabular">
-                Empieza el {formatCivilDate(startsOn)}
+                Empieza el {formatListDate(startsOn)}
               </span>
             )}
           </span>
@@ -135,9 +135,9 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     cell: ({ getValue }) => {
       switch (getValue()) {
         case "active":
-          return <StatusPill tone="exito">Activo</StatusPill>;
+          return <StatusPill tone="exito">Activa</StatusPill>;
         case "expired":
-          return <StatusPill tone="error">Expirado</StatusPill>;
+          return <StatusPill tone="error">Plan vencido</StatusPill>;
         default:
           // Never bought a Plan: nothing expired (follow-up 54).
           return <StatusPill tone="neutral">Sin plan</StatusPill>;

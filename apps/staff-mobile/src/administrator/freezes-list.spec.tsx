@@ -84,14 +84,14 @@ describe("freezes list", () => {
   it("shows the dates and days whole, with the reason on its own line", async () => {
     const screen = await openFreezes([requestedFreeze], [], "Congelamientos, 1 por revisar");
 
-    await waitFor(() => expect(screen.getByText("9 al 15 nov · 7 días")).toBeOnTheScreen());
-    expect(screen.getByText("9 al 15 nov · 7 días").props.numberOfLines).toBeUndefined();
+    await waitFor(() => expect(screen.getByText("lun 9 al dom 15 nov · 7 días")).toBeOnTheScreen());
+    expect(screen.getByText("lun 9 al dom 15 nov · 7 días").props.numberOfLines).toBeUndefined();
     expect(screen.getByText("Viaje de trabajo")).toBeOnTheScreen();
     // Review: the row's label replaces its text for screen readers, so the
     // dates, days and reason are its hint.
     expect(
       screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
-    ).toHaveProp("accessibilityHint", "9 al 15 nov · 7 días · Viaje de trabajo");
+    ).toHaveProp("accessibilityHint", "lun 9 al dom 15 nov · 7 días · Viaje de trabajo");
     await fireEvent.press(
       screen.getByRole("button", { name: "Revisar congelamiento de Lucía Fernández" }),
     );
@@ -107,15 +107,15 @@ describe("freezes list", () => {
 
     await waitFor(() => expect(screen.getByText("Decididas")).toBeOnTheScreen());
     expect(screen.getByText("Ana Rojas")).toBeOnTheScreen();
-    expect(screen.getByText("30 nov al 4 dic · 5 días")).toBeOnTheScreen();
-    expect(screen.getByText("Aprobada · ahora vence el 15 ene")).toBeOnTheScreen();
+    expect(screen.getByText("lun 30 nov al vie 4 dic · 5 días")).toBeOnTheScreen();
+    expect(screen.getByText("Aprobada · ahora vence el vie 15 ene")).toBeOnTheScreen();
     expect(screen.getByText("Carla Vaca")).toBeOnTheScreen();
     expect(screen.getByText("Rechazada")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver congelamiento de Ana Rojas" }));
     await waitFor(() =>
       expect(
-        screen.getByText("Aprobada por Paola Mendoza el 8 de noviembre a las 10:15"),
+        screen.getByText("Aprobada por Paola Mendoza el dom 8 nov a las 10:15"),
       ).toBeOnTheScreen(),
     );
     expect(screen.queryByRole("button", { name: "Aprobar congelamiento" })).toBeNull();

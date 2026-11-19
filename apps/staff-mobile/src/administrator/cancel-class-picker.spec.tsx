@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
+import { session } from "../assistant/assistant-fixtures";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
@@ -25,9 +26,9 @@ const routes = {
   "/api/v1/administrator/sessions": () => jsonResponse([]),
 };
 
-const openCancelClass = async () => {
+const openCancelClass = async (extra: Record<string, () => Response> = {}) => {
   const screen = await render(
-    <App runtime={createStaffRuntime(routeFetcher(routes), "administrator")} />,
+    <App runtime={createStaffRuntime(routeFetcher({ ...routes, ...extra }), "administrator")} />,
   );
   await waitFor(() =>
     expect(screen.getByRole("button", { name: "Cancelar una clase" })).toBeOnTheScreen(),
@@ -63,5 +64,22 @@ describe("Cancelar una clase (S13)", () => {
       { selected: true },
     );
     expect(screen.getByText("Este día no hay clases")).toBeOnTheScreen();
+  });
+
+  // FIX-090 (audit S8): a day whose classes were all cancelled says so.
+  it("says every class of today was cancelled", async () => {
+    const cancelled = {
+      ...session,
+      cancellation: { cause: "studio", cancelledAt: session.startsAt, bookedCount: 0 },
+    };
+    const screen = await openCancelClass({
+      ...routes,
+      "/api/v1/sessions": () => jsonResponse([cancelled]),
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText("Todas las clases de hoy se cancelaron")).toBeOnTheScreen(),
+    );
+    expect(screen.queryByText("Hoy no hay clases para cancelar")).toBeNull();
   });
 });

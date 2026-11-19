@@ -73,10 +73,10 @@ async function openMyBookings(upcoming: unknown[]) {
   });
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(
-    () => expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen(),
+    () => expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
   await waitFor(() => expect(screen.getByTestId("bookings-next-class")).toBeOnTheScreen());
   return screen;
 }

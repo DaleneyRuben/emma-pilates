@@ -140,7 +140,7 @@ describe("Gastos: editing and eliminating an Expense", () => {
     expect(within(row).getByText("Eliminado")).toBeVisible();
     expect(
       within(row).getByText(
-        "Eliminado por Paola Mendoza · 18/11/2026 · 14:30 · Cargado dos veces",
+        "Eliminado por Paola Mendoza · mié 18 nov · 14:30 · Cargado dos veces",
       ),
     ).toBeVisible();
     expect(within(row).queryByRole("button")).not.toBeInTheDocument();
@@ -177,7 +177,7 @@ describe("Gastos: editing and eliminating an Expense", () => {
     items = [{ ...voidedRepair, voidedByName: "", voidReason: null }];
     renderAdmin("/dinero/gastos");
     expect(
-      await screen.findByText("Eliminado · 18/11/2026 · 14:30"),
+      await screen.findByText("Eliminado · mié 18 nov · 14:30"),
     ).toBeVisible();
   });
 });

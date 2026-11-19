@@ -98,16 +98,16 @@ describe("Pagos pendientes names an Evaluation sale", () => {
     const screen = await openPayments(lucia, reviewOf({ kind: "evaluation", evaluationStartsAt }));
 
     expect(
-      screen.getByText("Evaluación nutricional · lun 16, 09:00 · hace 3 minutos"),
+      screen.getByText("Evaluación nutricional · lun 16 nov · 09:00 · hace 3 minutos"),
     ).toBeOnTheScreen();
 
     await review(screen);
     expect(
-      screen.getByText("Lucia Fernandez · Evaluación nutricional · lun 16, 09:00"),
+      screen.getByText("Lucia Fernandez · Evaluación nutricional · lun 16 nov · 09:00"),
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Rechazar" }));
-    expect(screen.getByText("Evaluación nutricional · lun 16, 09:00")).toBeOnTheScreen();
+    expect(screen.getByText("Evaluación nutricional · lun 16 nov · 09:00")).toBeOnTheScreen();
   });
 });
 

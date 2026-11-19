@@ -186,7 +186,7 @@ describe("Administrator payments and Session cancellation", () => {
     // v2 S12: the amount on the hero, the transfer and its time as rows.
     expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
     expect(screen.getByText("Transferencia")).toBeOnTheScreen();
-    expect(screen.getByText(/^Enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
+    expect(screen.getByText(/^Enviado el \S+ \d+ \S+ · 19:40$/)).toBeOnTheScreen();
     expect(screen.getByText("Comprobante")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante de transferencia")).toBeOnTheScreen();
@@ -286,7 +286,7 @@ describe("Administrator payments and Session cancellation", () => {
     let sessions = [session];
     const screen = await openPendingPayments({
       ...administratorRoutes(() => []),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse(sessions),
       "POST /api/v1/administrator/sessions/session-1/cancel": () => {
         cancelled();
@@ -325,16 +325,16 @@ describe("Administrator payments and Session cancellation", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Cancelar clase")).toBeOnTheScreen();
     });
     // v2 S14: what happens as rows, and a warning row instead of the amber block.
     expect(screen.getByText("Se cancelan las 6 reservas")).toBeOnTheScreen();
     expect(screen.getByText("Esto no se puede deshacer.")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar clase" }));
     await waitFor(() => {
       expect(cancelled).toHaveBeenCalled();
-      expect(screen.getByText("Sesión cancelada")).toBeOnTheScreen();
+      expect(screen.getByText("Clase cancelada")).toBeOnTheScreen();
     });
     expect(
       screen.getByText("Avisamos a las 6 clientas y cada una recuperó su clase."),
@@ -348,7 +348,7 @@ describe("Administrator payments and Session cancellation", () => {
   it("searches every Branch at once and names the Branch on each Session", async () => {
     const screen = await openPendingPayments({
       ...administratorRoutes(() => []),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse([session]),
       "/api/v1/administrator/sessions": () =>
         jsonResponse([
@@ -383,7 +383,7 @@ describe("Administrator payments and Session cancellation", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Cancelar clase")).toBeOnTheScreen();
     });
     expect(screen.getByText(/Urubó/)).toBeOnTheScreen();
   });

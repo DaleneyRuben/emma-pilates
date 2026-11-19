@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type {
   StaffInvoiceDto,
   StaffInvoiceFileDto,
@@ -7,7 +8,6 @@ import { useState } from "react";
 import { WarningRow } from "../auth/auth-notices";
 import { Button, buttonVariants } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { invoiceFileUrl, useRemoveInvoice } from "./invoice-queries";
 
 const sizeFormat = new Intl.NumberFormat("es-BO", {
@@ -48,7 +48,7 @@ export function InvoiceFileCard({
             {file.fileName}
           </span>
           <span className="text-ayuda text-texto-tenue">
-            {`${kindOf(file.mediaType)} · ${sizeOf(file.byteSize)} · subida por ${file.uploadedByName} · ${formatCivilMoment(file.uploadedAt)}`}
+            {`${kindOf(file.mediaType)} · ${sizeOf(file.byteSize)} · subida por ${file.uploadedByName} · ${formatDateTime(file.uploadedAt)}`}
           </span>
         </span>
       </div>

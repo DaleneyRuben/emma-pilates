@@ -3,12 +3,13 @@ import {
   useGetAssistantClientInvoiceData,
   type AssistantCashPaymentDto,
   type PlanQuoteDto,
+  formatMoney,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   colors,
   fontFamilies,
-  formatBolivianos,
   FormScrollView,
   IconRowGroup,
   invoiceChoiceFrom,
@@ -37,7 +38,7 @@ import { ValueRow } from "../ui/value-row";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { describeClasses, formatCivilDate, formatCivilDayMonth } from "./assistant-format";
+import { describeClasses } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 import {
@@ -52,7 +53,7 @@ import { PaymentDone } from "./payment-done";
 
 type ConfirmNavigation = {
   goBack: () => void;
-  // Back to the search, dropping plan and payment (S10 «Volver a Clientes»).
+  // Back to the search, dropping plan and payment (S10 «Volver a Clientas»).
   popTo: (screen: "ClientSearch") => void;
 };
 
@@ -66,7 +67,7 @@ const paymentProblems: Record<string, string> = {
   branch_not_assigned: "Solo puedes registrar pagos en tus sucursales.",
   plan_not_purchasable: "Este plan ya no está disponible.",
   start_date_out_of_window: "Esa fecha de inicio no está disponible.",
-  future_subscription_exists: "El cliente ya tiene un plan siguiente.",
+  future_subscription_exists: "La clienta ya tiene un plan siguiente.",
   start_date_before_booked_class:
     "La clienta tiene una clase reservada con su acceso actual. Elige un inicio después de esa clase.",
 };
@@ -114,7 +115,7 @@ export function ConfirmCashPaymentScreen({
     );
   const invoiceData = invoiceDataPayload(invoice);
   const start = renewalStartsOn === undefined ? startsOn : nextStart;
-  const amount = formatBolivianos(quote.priceCentavos);
+  const amount = formatMoney(quote.priceCentavos);
 
   const refuse = (error: unknown, fallback: string, path: Method) => {
     const code = error instanceof AssistantApiError ? error.code : null;
@@ -183,9 +184,9 @@ export function ConfirmCashPaymentScreen({
       <Screen style={styles.screen}>
         <CenteredCard maxWidth={520}>
           <PaymentDone
-            amount={result === null ? amount : formatBolivianos(result.payment.amountDueCentavos)}
+            amount={result === null ? amount : formatMoney(result.payment.amountDueCentavos)}
             classes={describeClasses(result?.payment.classAllowance ?? quote.classAllowance)}
-            endsOn={result?.subscription ? formatCivilDate(result.subscription.endsOn) : undefined}
+            endsOn={result?.subscription ? formatListDate(result.subscription.endsOn) : undefined}
             firstName={firstName(clientName)}
             kind={sent.kind}
             onBack={() => {
@@ -193,7 +194,7 @@ export function ConfirmCashPaymentScreen({
               navigation.popTo("ClientSearch");
             }}
             scheduled={renewalStartsOn !== undefined}
-            startsOn={nextStart === undefined ? undefined : formatCivilDayMonth(nextStart)}
+            startsOn={nextStart === undefined ? undefined : formatListDate(nextStart)}
           />
         </CenteredCard>
       </Screen>
@@ -272,14 +273,10 @@ export function ConfirmCashPaymentScreen({
               <IconRowGroup>
                 <ValueRow
                   label={quote.name}
-                  value={formatBolivianos(quote.listPriceCentavos ?? quote.priceCentavos)}
+                  value={formatMoney(quote.listPriceCentavos ?? quote.priceCentavos)}
                 />
                 {discount > 0 ? (
-                  <ValueRow
-                    label="Descuento"
-                    tone="emphasis"
-                    value={`−${formatBolivianos(discount)}`}
-                  />
+                  <ValueRow label="Descuento" tone="emphasis" value={`−${formatMoney(discount)}`} />
                 ) : null}
                 {/* Credit is retired (PAY-005): the cash collected is the full price. */}
                 <ValueRow label="Total en efectivo" strong value={amount} />

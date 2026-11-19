@@ -236,7 +236,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
     );
     expect(
       within(panel).getByText(
-        "Los cambios se aplican a las sesiones que se generen desde ahora; las ya programadas no cambian.",
+        "Los cambios se aplican a las clases que se generen desde ahora; las ya programadas no cambian.",
       ),
     ).toBeInTheDocument();
 

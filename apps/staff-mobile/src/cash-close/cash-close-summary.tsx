@@ -1,10 +1,11 @@
+import { formatMoney } from "@pilates/api-contracts";
 import type { CashCloseDto } from "@pilates/api-contracts";
 import { IconRowGroup, StateScreen } from "@pilates/mobile-core";
 import { StyleSheet, View } from "react-native";
 
 import { clockTime } from "../nutritionist/nutritionist-format";
 import { ValueRow } from "../ui/value-row";
-import { formatCashCloseBolivianos, formatSignedBolivianos } from "./cash-close-format";
+import { formatSignedBolivianos } from "./cash-close-format";
 
 // S25 «Caja cerrada» (v2): after recording, or when the day was already closed.
 export function CashCloseSummary({
@@ -27,14 +28,8 @@ export function CashCloseSummary({
       >
         <View style={styles.rows}>
           <IconRowGroup>
-            <ValueRow
-              label="Efectivo esperado"
-              value={formatCashCloseBolivianos(close.expectedCentavos)}
-            />
-            <ValueRow
-              label="Efectivo contado"
-              value={formatCashCloseBolivianos(close.countedCentavos)}
-            />
+            <ValueRow label="Efectivo esperado" value={formatMoney(close.expectedCentavos)} />
+            <ValueRow label="Efectivo contado" value={formatMoney(close.countedCentavos)} />
             <ValueRow label="Diferencia" value={formatSignedBolivianos(close.differenceCentavos)} />
             {close.note === null ? null : <ValueRow label="Nota" value={close.note} />}
           </IconRowGroup>

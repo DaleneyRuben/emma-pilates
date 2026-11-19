@@ -146,7 +146,7 @@ export function SalaryPaymentPanelForm({
             name="staffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Empleado</FormLabel>
+                <FormLabel>Persona</FormLabel>
                 <FormControl>
                   <Select {...field} disabled={!staff.isSuccess}>
                     <option value="">

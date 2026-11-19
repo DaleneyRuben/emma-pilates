@@ -1,4 +1,5 @@
-import { boliviaParts, formatLongDay } from "../lib/bolivia-time";
+import { formatTitleDate } from "@pilates/api-contracts";
+import { boliviaParts } from "../lib/bolivia-time";
 
 const greetingAt = (minutes: number): string =>
   minutes < 12 * 60
@@ -14,10 +15,9 @@ export function homeGreeting(
 ): { title: string; day: string } {
   const { date, minutes } = boliviaParts(now);
   const first = name.trim().split(/\s+/)[0] ?? "";
-  const day = formatLongDay(date);
   return {
     title:
       first === "" ? greetingAt(minutes) : `${greetingAt(minutes)}, ${first}`,
-    day: `${day.charAt(0).toUpperCase()}${day.slice(1)}`,
+    day: formatTitleDate(date),
   };
 }

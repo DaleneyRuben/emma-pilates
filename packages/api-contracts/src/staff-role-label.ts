@@ -9,7 +9,7 @@ export type StaffRoleCode =
 export type StaffGenderCode = "female" | "male";
 
 const labels: Record<StaffRoleCode, Record<StaffGenderCode, string>> = {
-  trainer: { female: "Entrenadora", male: "Entrenador" },
+  trainer: { female: "Instructora", male: "Instructor" },
   nutritionist: { female: "Nutricionista", male: "Nutricionista" },
   assistant: { female: "Asistente", male: "Asistente" },
   administrator: { female: "Administradora", male: "Administrador" },

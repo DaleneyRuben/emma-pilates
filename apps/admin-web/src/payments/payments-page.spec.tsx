@@ -78,7 +78,7 @@ describe("AW28 Pagos on a desktop browser", () => {
 
     expectBrandedLoading("Cargando pagos…");
     const sofia = await rowOf(/Sofía Guzmán/);
-    const amount = within(sofia).getByRole("cell", { name: /Bs 500,00/ });
+    const amount = within(sofia).getByRole("cell", { name: /Bs 500/ });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
     // Credit is retired (PAY-005): an older Payment's Credit is not shown.
@@ -87,14 +87,14 @@ describe("AW28 Pagos on a desktop browser", () => {
       within(sofia).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
     expect(
-      within(sofia).getByRole("cell", { name: "21/09/2026 · 14:05" }),
+      within(sofia).getByRole("cell", { name: "lun 21 sept · 14:05" }),
     ).toBeInTheDocument();
     expect(within(sofia).getByText("Pendiente")).toBeInTheDocument();
     const lucia = await rowOf(/Lucía Fernández/);
-    expect(within(lucia).getByText("Bs 1.050,00")).toBeInTheDocument();
+    expect(within(lucia).getByText("Bs 1.050")).toBeInTheDocument();
     expect(within(lucia).queryByText(/de crédito/)).not.toBeInTheDocument();
     expect(
-      screen.getByText("Todo el estudio · 6 transferencias esperando revisión"),
+      screen.getByText("Todo el estudio · 6 pagos por QR esperando revisión"),
     ).toBeVisible();
     expect(screen.getByText("Mostrando 2 de 2 pagos pendientes")).toBeVisible();
     expect(
@@ -149,7 +149,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     await rowOf(/Lucía Fernández/);
 
     await user.type(
-      screen.getByRole("searchbox", { name: "Buscar por cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por clienta" }),
       "sofia",
     );
 
@@ -205,7 +205,7 @@ describe("AW28 Pagos on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Todo el estudio · ninguna transferencia por revisar"),
+      screen.getByText("Todo el estudio · ningún pago por QR por revisar"),
     ).toBeVisible();
   });
 
@@ -225,7 +225,10 @@ describe("AW28 Pagos on a desktop browser", () => {
     expect(
       within(table).getByRole("columnheader", { name: "Estado" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
   });
 
   it("offers a retry when the list cannot load", async () => {
@@ -309,7 +312,7 @@ describe("AW28 Pagos on a narrow browser", () => {
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(card.detail).toContain("Paquete de 8 clases");
     expect(
-      screen.getByRole("searchbox", { name: "Buscar por cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por clienta" }),
     ).toBeVisible();
     expect(screen.getByLabelText("Estado")).toHaveValue("pending");
   });

@@ -79,7 +79,7 @@ describe("Session formatting", () => {
     expect(formatTimeRange("2026-09-21T11:00:00.000Z", "2026-09-21T11:50:00.000Z")).toBe(
       "07:00 – 07:50",
     );
-    expect(formatSessionDate("2026-09-21T11:00:00.000Z")).toBe("lunes 21 de septiembre");
+    expect(formatSessionDate("2026-09-21T11:00:00.000Z")).toBe("Lunes 21 de septiembre");
   });
 
   it("writes a Session's start alone in La Paz time, as Inicio's next class does", () => {

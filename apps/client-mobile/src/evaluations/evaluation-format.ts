@@ -1,3 +1,4 @@
+import { formatDateTime, formatListDate, formatTitleDate } from "@pilates/api-contracts";
 import { boliviaCivilDate } from "@pilates/mobile-core";
 
 const timeZone = "America/La_Paz";
@@ -8,17 +9,6 @@ const clockFormatter = new Intl.DateTimeFormat("es-BO", {
   minute: "2-digit",
   timeZone,
 });
-const longDateFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone,
-  weekday: "long",
-});
-const dayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone,
-});
 // Months are first-day civil dates; format them at UTC noon so no zone
 // shifts them into the previous month.
 const monthNameFormatter = new Intl.DateTimeFormat("es-BO", {
@@ -26,26 +16,24 @@ const monthNameFormatter = new Intl.DateTimeFormat("es-BO", {
   timeZone: "UTC",
 });
 
-const capitalized = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
-
 // "09:45" in Bolivia time.
 export function clockTime(instant: string): string {
   return clockFormatter.format(new Date(instant));
 }
 
-// "Lunes 24 de agosto".
+// "Lunes 24 de agosto", FIX-090's title date.
 export function evaluationDate(instant: string): string {
-  return capitalized(longDateFormatter.format(new Date(instant)).replace(",", ""));
+  return formatTitleDate(instant);
 }
 
-// "2 de diciembre".
+// "mié 2 dic", FIX-090's list date.
 export function evaluationDayMonth(instant: string): string {
-  return dayMonthFormatter.format(new Date(instant));
+  return formatListDate(instant);
 }
 
-// "6 de agosto, 09:30".
+// "jue 6 ago · 09:30", FIX-090's date with its time.
 export function evaluationDayAndTime(instant: string): string {
-  return `${dayMonthFormatter.format(new Date(instant))}, ${clockTime(instant)}`;
+  return formatDateTime(instant);
 }
 
 // "octubre" for "2026-10-01".

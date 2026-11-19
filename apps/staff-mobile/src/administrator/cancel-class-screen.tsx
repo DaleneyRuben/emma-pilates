@@ -33,7 +33,13 @@ import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
 import { TodayHero } from "../ui/today-hero";
 import { splitNextClass } from "../trainer/next-class";
-import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
+import {
+  allCancelledTitle,
+  countLabel,
+  dayHeading,
+  noClassesOfType,
+  startTime,
+} from "../ui/session-time";
 
 export type CancellableSession = SessionAvailabilityDto & { branchName: string };
 
@@ -67,7 +73,7 @@ export function CancelClassScreen() {
   const branch = branchList.find((candidate) => candidate.id === selectedBranchId) ?? branchList[0];
   const { from, until } = civilDateRange(selectedDate);
   const branchSessions = useListSessionAvailability(
-    { branchId: branch?.id ?? "", from, until, limit: 100 },
+    { branchId: branch?.id ?? "", from, until, limit: 100, includeCancelled: true },
     {
       fetcher,
       query: { enabled: branch !== undefined && !allBranches, refetchOnMount: "always" },
@@ -75,7 +81,7 @@ export function CancelClassScreen() {
   );
   // API-002: an Administrator acts on every Branch, so one search spans them.
   const everySession = useListAdministratorSessions(
-    { from, until, limit: 100 },
+    { from, until, limit: 100, includeCancelled: true },
     { fetcher, query: { enabled: allBranches, refetchOnMount: "always" } },
   );
   const sessions = allBranches ? everySession : branchSessions;
@@ -104,11 +110,15 @@ export function CancelClassScreen() {
   const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
   const typeName = classTypeList.find((classType) => classType.id === classTypeId)?.name;
   const now = new Date();
-  const visible = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
-    (session) =>
-      !hasStarted(session.startsAt, now) &&
-      (classTypeId === allClassTypes || session.classTypeId === classTypeId),
+  // FIX-090: cancelled classes come too, only to tell an all-cancelled day apart.
+  const ofType = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
+    (session) => classTypeId === allClassTypes || session.classTypeId === classTypeId,
   );
+  const visible = ofType.filter(
+    (session) => (session.cancellation ?? null) === null && !hasStarted(session.startsAt, now),
+  );
+  const allCancelled =
+    ofType.length > 0 && ofType.every((session) => (session.cancellation ?? null) !== null);
   const strip = days.slice(0, stripDays);
   const later = days.slice(stripDays);
   const pickedLater = later.includes(selectedDate);
@@ -169,7 +179,13 @@ export function CancelClassScreen() {
             layout="inList"
             note="Elige otro día o una fecha más adelante."
             textAction={{ label: "Elegir otra fecha", onPress: () => setChoosingDate(true) }}
-            title={isToday ? "Hoy no hay clases para cancelar" : "Este día no hay clases"}
+            title={
+              allCancelled
+                ? allCancelledTitle(selectedDate, today)
+                : isToday
+                  ? "Hoy no hay clases para cancelar"
+                  : "Este día no hay clases"
+            }
           />
         ) : (
           <StateScreen

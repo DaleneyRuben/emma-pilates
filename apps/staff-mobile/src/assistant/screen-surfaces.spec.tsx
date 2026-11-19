@@ -38,11 +38,11 @@ describe("Assistant surfaces on Superficie", () => {
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
-    const panel = screen.getByText("Selecciona un cliente para ver sus detalles").parent;
+    const panel = screen.getByText("Selecciona una clienta para ver sus detalles").parent;
     expect(StyleSheet.flatten(panel?.props.style)).not.toHaveProperty("backgroundColor");
   });
 
-  it("puts the unread count on the bell beside Buscar cliente", async () => {
+  it("puts the unread count on the bell beside Buscar clienta", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(
@@ -101,7 +101,7 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     // FIX-089: no tinted disc behind the icon.
     expect(screen.queryByTestId("empty-state-disc")).toBeNull();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
-    expect(screen.getByText("Selecciona un cliente para ver sus detalles")).toHaveStyle({
+    expect(screen.getByText("Selecciona una clienta para ver sus detalles")).toHaveStyle({
       fontFamily: "Lora_400Regular",
       fontSize: 24,
     });

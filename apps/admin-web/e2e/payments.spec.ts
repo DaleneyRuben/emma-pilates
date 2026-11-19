@@ -12,7 +12,7 @@ test("confirms one transfer and rejects another with a reason", async ({
   await sendTransfer("sofia@example.com");
   await signIn(page, "/dinero/pagos");
   await expect(
-    page.getByText("Todo el estudio · 2 transferencias esperando revisión"),
+    page.getByText("Todo el estudio · 2 pagos por QR esperando revisión"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Mariana Peña" }).click();
@@ -20,8 +20,8 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
   // Mariana has no earlier Plan, so this sale reserves her founder place
   // and the panel shows the 15 % price.
-  await expect(panel.getByText("Bs 476,00")).toBeVisible();
-  await expect(panel.getByText("Transferencia")).toBeVisible();
+  await expect(panel.getByText("Bs 476")).toBeVisible();
+  await expect(panel.getByText("QR")).toBeVisible();
   const receipt = panel.getByRole("img", {
     name: "Comprobante de Mariana Peña",
   });
@@ -52,7 +52,7 @@ test("confirms one transfer and rejects another with a reason", async ({
     page.getByRole("button", { name: "Mariana Peña", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByText("Todo el estudio · 1 transferencia esperando revisión"),
+    page.getByText("Todo el estudio · 1 pago por QR esperando revisión"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Sofía Guzmán" }).click();
@@ -62,13 +62,13 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(reason).toBeFocused();
   const reject = panel.getByRole("button", { name: "Confirmar rechazo" });
   await expect(reject).toBeDisabled();
-  await reason.fill("El monto no coincide con la transferencia recibida.");
+  await reason.fill("El monto no coincide con el pago recibido.");
   await reject.click();
   await expect(
     page.getByText("Pago de Sofía Guzmán rechazado: le avisamos el motivo."),
   ).toBeVisible();
   await expect(
-    page.getByText("Todo el estudio · ninguna transferencia por revisar"),
+    page.getByText("Todo el estudio · ningún pago por QR por revisar"),
   ).toBeVisible();
 
   // Decided Payments stay as history under Todos and never open again.

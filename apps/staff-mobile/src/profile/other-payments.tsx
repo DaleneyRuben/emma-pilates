@@ -1,3 +1,4 @@
+import { formatMoney, formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
 import {
   Chevron,
@@ -11,16 +12,14 @@ import {
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate } from "../assistant/assistant-format";
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import { ReceiptThumbnail, useReceiptViewer } from "./receipt-viewer";
 
 function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
   const receipt = (payment.receiptUrl ?? null) === null ? "sin comprobante" : "ver comprobante";
   return (
     <View style={styles.body}>
-      <Text style={styles.amount}>{formatExactBolivianos(payment.amountCentavos)}</Text>
-      <Text style={styles.date}>{`${formatCivilDate(payment.paidOn)} · ${receipt}`}</Text>
+      <Text style={styles.amount}>{formatMoney(payment.amountCentavos)}</Text>
+      <Text style={styles.date}>{`${formatListDate(payment.paidOn)} · ${receipt}`}</Text>
     </View>
   );
 }
@@ -49,7 +48,7 @@ export function OtherPayments({ payments }: { payments: OwnSalaryPaymentDto[] })
           }
           return (
             <Pressable
-              accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}, ${formatExactBolivianos(payment.amountCentavos)}`}
+              accessibilityLabel={`Ver el comprobante del pago del ${formatListDate(payment.paidOn)}, ${formatMoney(payment.amountCentavos)}`}
               accessibilityRole="button"
               key={payment.id}
               onPress={() => receipts.show(payment)}

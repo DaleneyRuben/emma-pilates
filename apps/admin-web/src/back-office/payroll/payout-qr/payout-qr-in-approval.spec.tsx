@@ -88,9 +88,9 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
         name: "QR de cobro de Emma Vargas",
       }),
     ).toBeInTheDocument();
-    expect(within(dialog).getByText("Vale hasta el 15/12/2026")).toBeVisible();
+    expect(within(dialog).getByText("Vale hasta el mar 15 dic")).toBeVisible();
     const confirm = within(dialog).getByRole("button", {
-      name: "Aprobar Bs 297,00",
+      name: "Aprobar Bs 297",
     });
     expect(confirm).toBeDisabled();
     expect(
@@ -106,13 +106,13 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
     expect(confirm).toBeEnabled();
 
     await user.click(
-      within(dialog).getByRole("button", { name: "Aprobar Bs 297,00" }),
+      within(dialog).getByRole("button", { name: "Aprobar Bs 297" }),
     );
     await waitFor(() => expect(approved).toBe(true));
     expect(bodies).toEqual([{ receiptImageAssetId: uploadedAssetId }]);
     expect(
       await screen.findByText(
-        "Aprobamos Bs 297,00 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
+        "Aprobamos Bs 297 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
     expect(

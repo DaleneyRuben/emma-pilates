@@ -1,6 +1,6 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto, PayStatementDto } from "@pilates/api-contracts";
 
-import { formatCivilDayMonth } from "../assistant/assistant-format";
 import { payPeriodHeading } from "./pay-period-heading";
 
 /**
@@ -26,10 +26,10 @@ export function statementStatus(
 /** The row's one line under the period: «Pagado el 18 de noviembre». */
 export function statusLine(status: StatementStatus): string {
   if (status.kind === "open") return "En curso · puede cambiar";
-  if (status.kind === "unpaid") return "Aprobado · por pagar";
+  if (status.kind === "unpaid") return "Aprobada · por pagar";
   return status.payment === undefined
     ? "Pagado"
-    : `Pagado el ${formatCivilDayMonth(status.payment.paidOn)}`;
+    : `Pagado el ${formatListDate(status.payment.paidOn)}`;
 }
 
 /** Payments Nómina recorded without a statement, such as one paid by hand. */
@@ -96,7 +96,7 @@ export function paySummary(
       ? "Pago registrado por administración."
       : `${payPeriodHeading(statement).label}.`;
   return {
-    eyebrow: `Último pago · ${formatCivilDayMonth(last.paidOn)}`,
+    eyebrow: `Último pago · ${formatListDate(last.paidOn)}`,
     centavos: last.amountCentavos,
     note: receipt === null ? `${paidFor} Sin comprobante adjunto.` : paidFor,
     receipt,

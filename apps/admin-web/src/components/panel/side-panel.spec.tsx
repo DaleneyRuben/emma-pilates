@@ -47,7 +47,7 @@ describe("SidePanel", () => {
   // focuses the dialog content, whose first tab stop is «Cerrar».
   it("moves focus to the first field when the panel opens", () => {
     render(
-      <SidePanel open onOpenChange={() => undefined} title="Nueva sesión">
+      <SidePanel open onOpenChange={() => undefined} title="Nueva clase">
         <input aria-label="Tipo de clase" />
       </SidePanel>,
     );

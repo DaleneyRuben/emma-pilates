@@ -5,6 +5,7 @@ import {
   boliviaInstant,
   boliviaToday,
   formatCivilDate,
+  weekdayOf,
 } from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
@@ -29,7 +30,7 @@ const longDay = new Intl.DateTimeFormat("es", {
   month: "long",
 });
 const slotName = (date: string, time: string) =>
-  `Nueva sesión el ${longDay.format(new Date(`${date}T12:00:00Z`)).replace(",", "")} a las ${time}`;
+  `Nueva clase el ${longDay.format(new Date(`${date}T12:00:00Z`)).replace(",", "")} a las ${time}`;
 
 const weekHandler = (sessions: readonly unknown[] = weekSessions) =>
   http.get(apiUrl(sessionsPath), () => jsonResponse(sessions));
@@ -46,7 +47,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     server.use(...signedInHandlers(), ...sessionFormHandlers());
   });
 
-  it("opens Nueva sesión on that day and hour in the selected Branch, everything else as the header button", async () => {
+  it("opens Nueva clase on that day and hour in the selected Branch, everything else as the header button", async () => {
     let body: unknown;
     server.use(
       weekHandler(),
@@ -60,7 +61,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     await user.click(
       screen.getByRole("button", { name: slotName(dayOfNextWeek(1), "10:00") }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
 
     expect(
       within(panel).getByText("Sucursal Centro · sala única"),
@@ -71,7 +72,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     );
     expect(within(panel).getByLabelText("Hora")).toHaveValue("10:00");
     expect(within(panel).getByLabelText("Tipo de clase")).toHaveValue("");
-    expect(within(panel).getByLabelText("Entrenadora")).toHaveValue("");
+    expect(within(panel).getByLabelText("Instructora")).toHaveValue("");
     expect(within(panel).getByLabelText("Capacidad")).toHaveValue("");
 
     await user.selectOptions(
@@ -79,7 +80,7 @@ describe("AW02 empty slots on a desktop browser", () => {
       reformer.id,
     );
     await user.selectOptions(
-      within(panel).getByLabelText("Entrenadora"),
+      within(panel).getByLabelText("Instructora"),
       valeria.id,
     );
     await user.clear(within(panel).getByLabelText("Hora"));
@@ -105,7 +106,7 @@ describe("AW02 empty slots on a desktop browser", () => {
     await user.click(
       screen.getByRole("button", { name: slotName(dayOfNextWeek(3), "18:00") }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
     await user.click(within(panel).getByLabelText("Cada semana"));
 
     expect(within(panel).getByLabelText("Día, fila 1")).toHaveValue("4");
@@ -128,13 +129,13 @@ describe("AW02 empty slots on a desktop browser", () => {
       screen.getByRole("button", { name: slotName(dayOfNextWeek(0), "08:00") }),
     ).toHaveFocus();
     await user.keyboard("{Enter}");
-    const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
     expect(within(panel).getByLabelText("Hora")).toHaveValue("08:00");
 
     await user.keyboard("{Escape}");
     await user.click(block);
     expect(
-      await screen.findByRole("dialog", { name: "Editar sesión" }),
+      await screen.findByRole("dialog", { name: "Editar clase" }),
     ).toBeInTheDocument();
   });
 
@@ -156,7 +157,9 @@ describe("AW02 empty slots on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
-  it("lets a past slot open the form, which refuses the date as the button's form does", async () => {
+  // FIX-090: a past slot never proposes a past date; it proposes the next
+  // coming day with the slot's weekday, at the slot's hour.
+  it("opens a past slot's form on the next coming day of that weekday", async () => {
     const lastWeek = addDays(nextMonday, -14);
     server.use(weekHandler([]));
     const { user } = await openWeek(lastWeek);
@@ -164,12 +167,16 @@ describe("AW02 empty slots on a desktop browser", () => {
     await user.click(
       screen.getByRole("button", { name: slotName(lastWeek, "09:00") }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
-    expect(lastWeek < boliviaToday()).toBe(true);
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
-    expect(within(panel).getByLabelText("Fecha")).toHaveAccessibleDescription(
-      "Elige una fecha desde hoy.",
+    const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
+    const today = boliviaToday();
+    const proposed = [0, 1, 2, 3, 4, 5, 6, 7]
+      .map((offset) => addDays(today, offset))
+      .filter((day) => weekdayOf(day) === weekdayOf(lastWeek))
+      .map(formatCivilDate);
+    expect(proposed).toContain(
+      (within(panel).getByLabelText("Fecha") as HTMLInputElement).value,
     );
+    expect(within(panel).getByLabelText("Hora")).toHaveValue("09:00");
   });
 });
 
@@ -185,7 +192,7 @@ describe("AW02 on a narrow browser", () => {
     renderAdmin(`/horario?week=${nextMonday}`);
     await screen.findByRole("tablist", { name: "Días de la semana" });
     expect(
-      screen.queryByRole("button", { name: /^Nueva sesión el / }),
+      screen.queryByRole("button", { name: /^Nueva clase el / }),
     ).not.toBeInTheDocument();
   });
 });

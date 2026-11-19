@@ -142,7 +142,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
         {empty ? (
           <EmptyState
             icon="calendar"
-            message="No hay reservas para esta sesión."
+            message="No hay reservas para esta clase."
             title="Sin reservas"
             variant="plain"
           />

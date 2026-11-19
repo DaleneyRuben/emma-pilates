@@ -2,6 +2,7 @@ import {
   getGetTodayCashCloseQueryKey,
   useGetTodayCashClose,
   type CashCloseDto,
+  formatTitleDate,
 } from "@pilates/api-contracts";
 import {
   FormScrollView,
@@ -17,7 +18,6 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CenteredCard } from "../assistant/assistant-layout";
-import { civilDateLong } from "../nutritionist/nutritionist-format";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { BranchChips, useCashBranches } from "../ui/branch-chips";
@@ -26,8 +26,6 @@ import { useIsStackRoot } from "../ui/use-is-stack-root";
 import { CashCloseForm } from "./cash-close-form";
 import { CashCloseNoCash } from "./cash-close-no-cash";
 import { CashCloseSummary } from "./cash-close-summary";
-
-const capitalized = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 // S25: the Assistant's (or the Administrator's) daily Cash Close (BKO-003).
 export function CashCloseScreen() {
@@ -86,7 +84,7 @@ export function CashCloseScreen() {
         )}
         <CashCloseSummary
           close={day.close}
-          doneLabel={root ? "Ir a Clientes" : "Volver"}
+          doneLabel={root ? "Ir a Clientas" : "Volver"}
           onDone={() => (root ? navigation.navigate("ClientsTab") : navigation.goBack())}
         />
       </>
@@ -118,7 +116,7 @@ export function CashCloseScreen() {
   const where =
     day === undefined || branches.branch === null
       ? undefined
-      : `${capitalized(civilDateLong(day.businessDate))} · ${branches.branch.name}`;
+      : `${formatTitleDate(day.businessDate)} · ${branches.branch.name}`;
   const title = day?.close ? "Caja" : "Cerrar caja";
 
   return (

@@ -78,13 +78,13 @@ describe("Sueldos por aprobar", () => {
 
     const card = await screen.findByRole("article", { name: "Emma Vargas" });
     expect(
-      await within(card).findByText("Entrenadora · Septiembre de 2026"),
+      await within(card).findByText("Instructora · Septiembre de 2026"),
     ).toBeInTheDocument();
-    expect(within(card).getByText("Bs 297,00")).toBeInTheDocument();
+    expect(within(card).getByText("Bs 297")).toBeInTheDocument();
     const minimumRow = within(card).getByText(
-      "Canceladas por mínimo (2 × Bs 25,00)",
+      "Canceladas por mínimo (2 × Bs 25)",
     ).parentElement!;
-    expect(within(minimumRow).getByText("Bs 50,00")).toBeInTheDocument();
+    expect(within(minimumRow).getByText("Bs 50")).toBeInTheDocument();
     expect(
       within(card).getByText("Comisiones de primer plan (1)"),
     ).toBeInTheDocument();
@@ -151,25 +151,25 @@ describe("Sueldos por aprobar", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar Bs 297,00" }),
+      await screen.findByRole("button", { name: "Aprobar Bs 297" }),
     );
     const dialog = await screen.findByRole("alertdialog", {
-      name: "¿Aprobar Bs 297,00 a Emma Vargas por septiembre de 2026?",
+      name: "¿Aprobar Bs 297 a Emma Vargas por septiembre de 2026?",
     });
     expect(within(dialog).getByText("5 líneas")).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Volver" }));
     expect(approved).toBe(0);
 
-    await user.click(screen.getByRole("button", { name: "Aprobar Bs 297,00" }));
+    await user.click(screen.getByRole("button", { name: "Aprobar Bs 297" }));
     const confirming = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, confirming);
     await user.click(
-      within(confirming).getByRole("button", { name: "Aprobar Bs 297,00" }),
+      within(confirming).getByRole("button", { name: "Aprobar Bs 297" }),
     );
     await waitFor(() => expect(approved).toBe(1));
     expect(
       await screen.findByText(
-        "Aprobamos Bs 297,00 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
+        "Aprobamos Bs 297 a Emma Vargas con su comprobante. Quedó en Pagados y Emma lo verá en su app.",
       ),
     ).toBeInTheDocument();
     expect(
@@ -295,12 +295,12 @@ describe("Sueldos por aprobar", () => {
     const { user } = renderAdmin("/dinero/sueldos?month=2026-09");
 
     await user.click(
-      await screen.findByRole("button", { name: "Aprobar Bs 297,00" }),
+      await screen.findByRole("button", { name: "Aprobar Bs 297" }),
     );
     const confirming = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, confirming);
     await user.click(
-      within(confirming).getByRole("button", { name: "Aprobar Bs 297,00" }),
+      within(confirming).getByRole("button", { name: "Aprobar Bs 297" }),
     );
     expect(
       await screen.findByText(
@@ -334,7 +334,7 @@ describe("Sueldos por aprobar", () => {
     await user.click(screen.getByRole("button", { name: "Volver a calcular" }));
     expect(
       await screen.findByText(
-        /^Recalculamos septiembre de 2026 a las \d\d:\d\d\. Cambió 1 sueldo: Emma Vargas pasó de Bs 297,00 a Bs 322,00\.$/,
+        /^Recalculamos septiembre de 2026 a las \d\d:\d\d\. Cambió 1 sueldo: Emma Vargas pasó de Bs 297 a Bs 322\.$/,
       ),
     ).toBeInTheDocument();
   });

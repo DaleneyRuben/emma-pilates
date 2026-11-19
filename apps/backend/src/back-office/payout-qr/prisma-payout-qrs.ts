@@ -10,6 +10,7 @@ import {
   receiptObject,
   receiptObjectSelect,
 } from '../../uploads/private-image-object';
+import { settleReviewNotices } from '../../notifications/prisma-notification-store';
 import { civilText } from '../prisma-audit';
 import type { PayoutQrGateway } from './payout-qrs';
 
@@ -65,6 +66,13 @@ export const createPrismaPayoutQrs = (
                 imageAssetId: previous.imageAssetId,
                 now: input.now,
               });
+              // FIX-090 (audit S10): the old QR's reminders stop asking.
+              for (const kind of ['expiring', 'expired']) {
+                await settleReviewNotices(transaction, {
+                  businessEventKey: `payout-qr-${kind}:${previous.id}`,
+                  settledAt: input.now,
+                });
+              }
             }
             const qr = await transaction.staffPayoutQr.create({
               data: {

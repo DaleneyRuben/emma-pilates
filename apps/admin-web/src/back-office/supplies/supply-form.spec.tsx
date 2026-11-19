@@ -204,7 +204,7 @@ describe("AW09 Supply form on a desktop browser", () => {
     });
     expect(
       within(dialog).getByText(
-        "Dejará de aparecer en Insumos y en Registrar retiro. Sus movimientos seguirán en «Movimientos de insumos».",
+        "Dejará de aparecer en Insumos y en Registrar retiro. Sus movimientos seguirán en Insumos › Movimientos.",
       ),
     ).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Archivar" }));

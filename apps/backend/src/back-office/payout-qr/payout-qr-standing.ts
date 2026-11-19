@@ -1,5 +1,6 @@
 import type { NewNotification } from '../../notifications/prisma-notification-store';
 import { addCivilDays } from '../../time/bolivia-time';
+import { civilListDate } from '../payroll/pay-line-detail';
 
 export type PayoutQrStanding = 'valid' | 'expiring' | 'expired';
 
@@ -36,9 +37,6 @@ export const validateValidUntil = (value: string, today: Date): Date | null => {
     : null;
 };
 
-const dayMonth = (civilDate: Date): string =>
-  `${civilDate.getUTCDate()}/${civilDate.getUTCMonth() + 1}`;
-
 export type PayoutQrReminderCandidate = {
   id: string;
   accountId: string;
@@ -53,7 +51,7 @@ export const payoutQrReminderFor = (
 ): PayoutQrReminder | null => {
   const standing = payoutQrStanding(qr.validUntil, today);
   if (standing === 'valid') return null;
-  const day = dayMonth(qr.validUntil);
+  const day = civilListDate(qr.validUntil);
   const destination = { type: 'payout_qr', id: qr.id };
   return standing === 'expiring'
     ? {

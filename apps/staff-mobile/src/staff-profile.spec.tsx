@@ -72,7 +72,7 @@ describe("Staff Perfil", () => {
       screen.getByText("Tu nombre y tu correo los actualiza administración."),
     ).toBeOnTheScreen();
     expect(screen.getByText("Rol")).toBeOnTheScreen();
-    expect(screen.getByText("Entrenadora")).toBeOnTheScreen();
+    expect(screen.getByText("Instructora")).toBeOnTheScreen();
     expect(screen.getByText("Sucursales")).toBeOnTheScreen();
     expect(screen.getByText("Centro, Equipetrol")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar" })).not.toBeOnTheScreen();

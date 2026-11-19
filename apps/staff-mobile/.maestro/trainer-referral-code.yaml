@@ -19,7 +19,7 @@ env:
 - takeScreenshot: bkm017-staff-1-perfil
 - tapOn: "Tu código de referido.*"
 - extendedWaitUntil:
-    visible: "Compartes tu código con tus alumnas"
+    visible: "Compartes tu código con tus clientas"
     timeout: 15000
 - tapOn: "Copiar"
 - extendedWaitUntil:

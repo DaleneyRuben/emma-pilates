@@ -2,6 +2,7 @@ import {
   getGetStaffPaymentInvoiceFileUrl,
   getGetStaffPaymentInvoicePageUrl,
   type StaffInvoiceFileDto,
+  formatDateTime,
 } from "@pilates/api-contracts";
 import {
   CardActionRow,
@@ -21,7 +22,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-import { formatSubmittedAt } from "../administrator/administrator-format";
 import { useStaffFetcher } from "../staff-fetcher";
 
 // E5 «Por emitir»: the dashed box that says what to upload.
@@ -80,7 +80,7 @@ export function InvoiceFileCard({
             {file.fileName}
           </Text>
           <Text style={styles.muted}>
-            {`Subida por ${file.uploadedByName} · ${formatSubmittedAt(file.uploadedAt)}`}
+            {`Subida por ${file.uploadedByName} · ${formatDateTime(file.uploadedAt)}`}
           </Text>
         </View>
       </View>

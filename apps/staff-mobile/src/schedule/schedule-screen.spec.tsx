@@ -47,11 +47,11 @@ describe("Horario (v2 HOR boards)", () => {
     expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
     expect(hero.getByText("6 de 12")).toBeOnTheScreen();
     expect(hero.getByTestId("schedule-session-session-1")).toBeOnTheScreen();
-    expect(screen.queryByText("6 cupos")).toBeNull();
+    expect(screen.queryByText("6 lugares libres")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar para una clienta" }));
-    await waitFor(() => expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen());
   });
 
   // FIX-081 (finding 118, owner 2026-11-18): the eyebrow names the person's
@@ -231,7 +231,7 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    expect(await screen.findByText("Hoy todas las clases están canceladas")).toBeOnTheScreen();
+    expect(await screen.findByText("Todas las clases de hoy se cancelaron")).toBeOnTheScreen();
     expect(screen.getByText("1 cancelada por mínimo")).toBeOnTheScreen();
   });
 

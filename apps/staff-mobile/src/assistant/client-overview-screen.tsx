@@ -1,11 +1,8 @@
-import { useGetAssistantClientOverview } from "@pilates/api-contracts";
+import { useGetAssistantClientOverview, formatDateTime } from "@pilates/api-contracts";
 import {
-  boliviaCivilDate,
   ClientFace,
   colors,
-  dayChipLabel,
   fontFamilies,
-  formatTimeRange,
   isCompletePhone,
   LoadingState,
   PrimaryButton,
@@ -45,13 +42,6 @@ type OverviewNavigation = {
   };
 };
 
-// «Mar 3 · 09:30»: when her next Booking is, beside «Próximas reservas».
-function nextLabel(startsAt: string, endsAt: string): string {
-  const { weekday, day } = dayChipLabel(boliviaCivilDate(new Date(startsAt)));
-  const label = `${weekday} ${day} · ${formatTimeRange(startsAt, endsAt).split(" – ")[0]}`;
-  return label.charAt(0).toUpperCase() + label.slice(1);
-}
-
 /** S06, the Client's file (v2, walkthrough 17). */
 export function ClientOverviewScreen({
   route,
@@ -71,7 +61,7 @@ export function ClientOverviewScreen({
 
   // Beside the search on a tablet there is nowhere to go back to.
   const inPanel = useInClientPanel();
-  const back = inPanel ? null : <BackBar back="Clientes" onBack={() => navigation.goBack()} />;
+  const back = inPanel ? null : <BackBar back="Clientas" onBack={() => navigation.goBack()} />;
 
   if (overview.isPending) {
     return (
@@ -165,6 +155,7 @@ export function ClientOverviewScreen({
           <>
             <ClientPlanCard
               active={active}
+              freeze={data.subscription.freeze}
               nextPlan={futurePlan}
               sells={sells}
               subscription={subscription}
@@ -186,9 +177,7 @@ export function ClientOverviewScreen({
             onPress={() => navigation.navigate("ClientBookings", context)}
             testID="client-overview-bookings"
             value={
-              data.nextBooking
-                ? `Próxima: ${nextLabel(data.nextBooking.startsAt, data.nextBooking.endsAt)}`
-                : undefined
+              data.nextBooking ? `Próxima: ${formatDateTime(data.nextBooking.startsAt)}` : undefined
             }
           />
           <PlainRow

@@ -3,23 +3,34 @@ import {
   formatSignedBolivianos,
   parseBolivianos,
 } from "./money";
+import { bolivianosText } from "../components/form/money-field";
 
 describe("formatBolivianos", () => {
+  // FIX-090: the shared format, without decimals when they are ,00.
   it("prints integer centavos as Bs with dot thousands and comma decimals (ADR-0082)", () => {
-    expect(formatBolivianos(105_000)).toBe("Bs 1.050,00");
-    expect(formatBolivianos(56_000)).toBe("Bs 560,00");
-    expect(formatBolivianos(960_000)).toBe("Bs 9.600,00");
+    expect(formatBolivianos(105_000)).toBe("Bs 1.050");
+    expect(formatBolivianos(56_000)).toBe("Bs 560");
+    expect(formatBolivianos(960_000)).toBe("Bs 9.600");
     expect(formatBolivianos(15_050)).toBe("Bs 150,50");
     expect(formatBolivianos(5)).toBe("Bs 0,05");
-    expect(formatBolivianos(1_200_000)).toBe("Bs 12.000,00");
+    expect(formatBolivianos(1_200_000)).toBe("Bs 12.000");
+    expect(formatBolivianos(153_490)).toBe("Bs 1.534,90");
   });
 });
 
 describe("formatSignedBolivianos", () => {
   it("puts a minus sign before Bs when a net figure is below zero", () => {
-    expect(formatSignedBolivianos(-120_000)).toBe("−Bs 1.200,00");
-    expect(formatSignedBolivianos(96_000)).toBe("Bs 960,00");
-    expect(formatSignedBolivianos(0)).toBe("Bs 0,00");
+    expect(formatSignedBolivianos(-120_000)).toBe("−Bs 1.200");
+    expect(formatSignedBolivianos(-12_050)).toBe("−Bs 120,50");
+    expect(formatSignedBolivianos(96_000)).toBe("Bs 960");
+    expect(formatSignedBolivianos(0)).toBe("Bs 0");
+  });
+});
+
+describe("bolivianosText", () => {
+  it("gives an amount to edit back with its two decimals and no Bs", () => {
+    expect(bolivianosText(105_000)).toBe("1.050,00");
+    expect(bolivianosText(15_050)).toBe("150,50");
   });
 });
 

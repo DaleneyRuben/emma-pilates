@@ -75,14 +75,14 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
 
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
   await waitFor(
     () => {
-      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+      expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
@@ -124,8 +124,9 @@ describe("Client My Bookings", () => {
     expect(screen.getByText("Cuando reserves una clase, aparecerá aquí.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
 
+    // FIX-090: the screen's title is its tab's label.
     await waitFor(() => {
-      expect(screen.getByText("Reservar una clase")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservar")).toHaveTextContent("Reservar");
     });
   });
 
@@ -187,6 +188,8 @@ describe("Client My Bookings", () => {
       expect(left).toHaveBeenCalled();
       expect(screen.queryByText("Pilates Prenatal")).not.toBeOnTheScreen();
     });
+    // FIX-090 (states review Y1): leaving says so afterwards.
+    expect(screen.getByText("Saliste de la lista de espera")).toBeOnTheScreen();
   });
 
   it("reschedules a Booking inside the Cancellation Window to a same-day Session", async () => {
@@ -264,10 +267,15 @@ describe("Client My Bookings", () => {
         { targetSessionId: "session-alt" },
         expect.stringMatching(/^[0-9a-f-]{36}$/),
       );
-      expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
+      // FIX-090 (states review Y8): a change says the class moved, with its
+      // new day and time, and does not count the plan again.
+      expect(screen.getByText("Clase cambiada")).toBeOnTheScreen();
     });
+    expect(screen.getByText(/^Reformer Pilates · \S+ \d+ \S+ · \d{2}:\d{2}$/)).toBeOnTheScreen();
+    expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    expect(screen.queryByText(/Te quedan/)).toBeNull();
 
-    // MOB-074 walk: once that Booking is cancelled, «Reserva confirmada» no
+    // MOB-074 walk: once that Booking is cancelled, the change's notice no
     // longer holds, so the toast goes with it.
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
     await waitFor(() => {
@@ -277,7 +285,7 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen();
     });
-    expect(screen.queryByText("Reserva confirmada")).toBeNull();
+    expect(screen.queryByText("Clase cambiada")).toBeNull();
   });
 
   // MOB-070: a double tap must replay the same Reschedule, as Reservar and

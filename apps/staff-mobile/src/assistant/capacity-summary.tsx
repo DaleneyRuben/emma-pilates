@@ -29,8 +29,8 @@ export function CapacitySummary({
           <Text style={styles.free}>{String(free)}</Text>
           <Text style={styles.of}>
             {full && waitlistCount > 0
-              ? `cupos libres de ${capacity} · ${waitlistCount} en espera`
-              : `cupos libres de ${capacity}`}
+              ? `lugares libres de ${capacity} · ${waitlistCount} en espera`
+              : `lugares libres de ${capacity}`}
           </Text>
         </View>
         <View style={styles.track}>

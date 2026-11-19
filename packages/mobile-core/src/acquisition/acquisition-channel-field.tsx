@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: typography.label,
     letterSpacing: 1.54,
     textTransform: "uppercase",
   },

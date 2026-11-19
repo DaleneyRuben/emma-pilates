@@ -97,15 +97,15 @@ describe("Mis facturas", () => {
     expect(screen.queryByTestId("invoice-row-disc", { includeHiddenElements: true })).toBeNull();
 
     expect(
-      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026, Bs 502, Lista/ }),
+      await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov, Bs 502, Lista/ }),
     ).toBeOnTheScreen();
     expect(
       screen.getByRole("button", {
-        name: /Evaluación nutricional, 3 nov 2026, Bs 120, En preparación/,
+        name: /Evaluación nutricional, mar 3 nov, Bs 120, En preparación/,
       }),
     ).toBeOnTheScreen();
     expect(
-      screen.getByRole("button", { name: /Paquete de 8 clases, 6 oct 2026, Bs 502, Pago anulado/ }),
+      screen.getByRole("button", { name: /Paquete de 8 clases, mar 6 oct, Bs 502, Pago anulado/ }),
     ).toBeOnTheScreen();
     // FIX-089: «Lista» and «En preparación» are words; a voided sale is the
     // exception, on the one Rubor pill.
@@ -127,7 +127,7 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([ready]);
 
     await fireEvent.press(
-      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+      await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov/ }),
     );
     expect(await screen.findByText("Mariana Quiroga")).toBeOnTheScreen();
     expect(screen.getByText("123456")).toBeOnTheScreen();
@@ -149,7 +149,7 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([ready]);
 
     await fireEvent.press(
-      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+      await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov/ }),
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Ver la factura, 2 páginas" }));
 
@@ -171,7 +171,7 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([ready]);
 
     await fireEvent.press(
-      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+      await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov/ }),
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Descargar" }));
 
@@ -183,7 +183,7 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([ready]);
 
     await fireEvent.press(
-      await screen.findByRole("button", { name: /Paquete de 8 clases, 5 nov 2026/ }),
+      await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov/ }),
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Descargar" }));
 
@@ -196,7 +196,7 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([preparing]);
 
     await fireEvent.press(
-      await screen.findByRole("button", { name: /Evaluación nutricional, 3 nov 2026/ }),
+      await screen.findByRole("button", { name: /Evaluación nutricional, mar 3 nov/ }),
     );
 
     expect(await screen.findByText("El estudio está preparando tu factura")).toBeOnTheScreen();

@@ -2,6 +2,7 @@ import {
   useGetAssistantClientOverview,
   useQuoteAssistantClientPlans,
   type PlanQuoteDto,
+  formatMoney,
 } from "@pilates/api-contracts";
 import {
   Chevron,
@@ -9,7 +10,6 @@ import {
   colors,
   describePlanCardLabel,
   describePlanTerms,
-  formatBolivianos,
   fontFamilies,
   SectionTitle,
   LoadingState,
@@ -119,11 +119,9 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
               </View>
               <View style={styles.prices}>
                 {plan.listPriceCentavos === undefined ? null : (
-                  <Text style={styles.originalPrice}>
-                    {formatBolivianos(plan.listPriceCentavos)}
-                  </Text>
+                  <Text style={styles.originalPrice}>{formatMoney(plan.listPriceCentavos)}</Text>
                 )}
-                <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+                <Text style={styles.price}>{formatMoney(plan.priceCentavos)}</Text>
               </View>
               <Chevron size={16} strokeWidth={1.5} tone="muted" />
             </Pressable>

@@ -119,7 +119,7 @@ describe("AW37 Equipos on a desktop browser", () => {
       await within(faults).findByText(brokenSpring.description),
     ).toBeInTheDocument();
     expect(
-      within(faults).getByText(/Reportó Emma Vargas · 22\/10\/2026/),
+      within(faults).getByText(/Reportó Emma Vargas · jue 22 oct/),
     ).toBeInTheDocument();
     expect(within(faults).getByText("Reformer 5")).toBeInTheDocument();
     expect(within(faults).getByText("Fuera de servicio")).toBeInTheDocument();
@@ -317,12 +317,12 @@ describe("AW37 Equipos on a desktop browser", () => {
     await user.click(within(faults).getByRole("radio", { name: "Resueltas" }));
     expect(
       await within(faults).findByText(
-        /Resuelta por Paola Mendoza · 20\/10\/2026/,
+        /Resuelta por Paola Mendoza · mar 20 oct/,
       ),
     ).toBeInTheDocument();
     expect(within(faults).getByText("Balones · 2 dañados")).toBeInTheDocument();
     expect(
-      within(faults).getByText(/Dada de baja por Paola Mendoza · 19\/10\/2026/),
+      within(faults).getByText(/Dada de baja por Paola Mendoza · lun 19 oct/),
     ).toBeInTheDocument();
     expect(
       within(faults).queryByRole("button", { name: "Marcar resuelta" }),

@@ -112,10 +112,11 @@
   --text-titulo-panel--line-height: 1.3;
   --text-celda: 14px;
   --text-celda--line-height: 1.45;
-  --text-cabecera-tabla: 10.5px;
+  /* FIX-090: nothing on screen under 12 px. */
+  --text-cabecera-tabla: 12px;
   --text-cabecera-tabla--line-height: 1.2;
   --text-cabecera-tabla--letter-spacing: 0.14em;
-  --text-etiqueta-campo: 10.5px;
+  --text-etiqueta-campo: 12px;
   --text-etiqueta-campo--line-height: 1.2;
   --text-etiqueta-campo--letter-spacing: 0.14em;
   /* FIX-089 (FormB): hints and secondary lines at 13 px. */

@@ -41,8 +41,9 @@ const movementAction = (
   ),
 });
 
+// FIX-090: 44 px targets, apart, so a phone tap lands on the one meant.
 const rowLink =
-  "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco disabled:text-deshabilitado-texto";
+  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control px-2 text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco disabled:text-deshabilitado-texto";
 
 const supplyColumns =
   (branchId: string, managesCatalog: boolean) =>
@@ -84,7 +85,7 @@ const supplyColumns =
       header: "",
       meta: { align: "right" },
       cell: ({ row }) => (
-        <span className="inline-flex gap-4">
+        <span className="inline-flex gap-3">
           {(["withdrawal", "restock"] as const).map((kind) => (
             <button
               key={kind}

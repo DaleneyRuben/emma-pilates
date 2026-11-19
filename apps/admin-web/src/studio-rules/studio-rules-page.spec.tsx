@@ -106,10 +106,10 @@ describe("AW36 Reglas del estudio", () => {
       ),
     ).toBeVisible();
     expect(
-      within(fixed).getByText("Bs 70,00 · Bs 50,00 para la nutricionista"),
+      within(fixed).getByText("Bs 70 · Bs 50 para la nutricionista"),
     ).toBeVisible();
     expect(
-      screen.getByText("Versión 3 · guardada el 23/10/2026 por Paola Mendoza"),
+      screen.getByText("Versión 3 · guardada el vie 23 oct por Paola Mendoza"),
     ).toBeVisible();
   });
 

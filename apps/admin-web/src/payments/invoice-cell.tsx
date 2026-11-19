@@ -1,7 +1,8 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { AdminPaymentDto } from "@pilates/api-contracts";
 import { Button } from "../components/ui/button";
 import { StatusPill } from "../components/ui/status-pill";
-import { boliviaParts, formatCivilDate } from "../lib/bolivia-time";
+import { boliviaParts } from "../lib/bolivia-time";
 
 /**
  * PAY-007, follow-up 147 §3, and FIX-044 (follow-up 248, W1): AW28's
@@ -50,7 +51,7 @@ export function InvoiceCell({
               <span className="text-ayuda text-texto-tenue">
                 {file === null
                   ? "sin archivo"
-                  : `por ${file.uploadedByName} · ${formatCivilDate(boliviaParts(file.uploadedAt).date)}`}
+                  : `por ${file.uploadedByName} · ${formatListDate(boliviaParts(file.uploadedAt).date)}`}
               </span>
             </>
           )}

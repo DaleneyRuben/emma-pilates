@@ -1,4 +1,7 @@
-import type { AdminClientDetailDto } from "@pilates/api-contracts";
+import {
+  formatListDate,
+  type AdminClientDetailDto,
+} from "@pilates/api-contracts";
 
 const reservas = (count: number) =>
   count === 1 ? "su reserva futura" : `sus ${count} reservas futuras`;
@@ -46,6 +49,13 @@ export const describeClosureForAdministrator = (
                 ? "; pierde la clase que le queda"
                 : `; pierde las ${left} clases que le quedan`
           }.`,
+        ]),
+    // FIX-090: a Plan already paid that has not started ends too
+    // (walkthrough n.º 78).
+    ...(subscription.nextSubscription == null
+      ? []
+      : [
+          `Su próximo plan ${subscription.nextSubscription.planName}, ya pagado, que empezaba el ${formatListDate(subscription.nextSubscription.startsOn)}, también termina, sin reembolso.`,
         ]),
     "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",
     "Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.",

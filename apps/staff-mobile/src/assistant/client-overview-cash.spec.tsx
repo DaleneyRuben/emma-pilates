@@ -15,7 +15,7 @@ jest.setTimeout(20_000);
 // BKM-006: an effective Plan no longer blocks cash. Only a future Plan does,
 // and walkthrough finding 117 says which one and until when.
 const note =
-  "Próximo plan ya pagado: Paquete de 8 clases, desde el 13 de octubre. Podrás registrar otro pago cuando empiece.";
+  "Próximo plan ya pagado: Paquete de 8 clases, desde el mar 13 oct. Podrás registrar otro pago cuando empiece.";
 
 describe("Client overview cash action", () => {
   afterEach(async () => {
@@ -68,7 +68,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("0 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
+      expect(screen.getByText("0 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -89,7 +89,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("0 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
+      expect(screen.getByText("0 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -128,7 +128,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Vencido")).toBeOnTheScreen();
+      expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -150,7 +150,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByText("0 del plan + 2 extra · vence el 12 de octubre")).toBeOnTheScreen(),
+      expect(screen.getByText("0 del plan + 2 extra · vence el lun 12 oct")).toBeOnTheScreen(),
     );
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
@@ -169,7 +169,7 @@ describe("Client overview cash action", () => {
         }),
     });
 
-    await waitFor(() => expect(screen.getByText("Vencido")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Plan vencido")).toBeOnTheScreen());
     expect(screen.getByText("clases sin usar")).toBeOnTheScreen();
     expect(screen.queryByText(/disponible/)).toBeNull();
   });

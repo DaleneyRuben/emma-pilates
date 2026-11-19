@@ -39,7 +39,7 @@ const booking = {
 const screens: [string, ComponentType<never>, object, string][] = [
   ["S12", ReviewPaymentScreen as ComponentType<never>, { paymentId: "payment-1" }, "Revisar pago"],
   ["S13", CancelClassScreen as ComponentType<never>, {}, "Cancelar una clase"],
-  ["S14", CancelSessionScreen as ComponentType<never>, { session }, "Cancelar sesión"],
+  ["S14", CancelSessionScreen as ComponentType<never>, { session }, "Cancelar clase"],
   ["S17", AvailabilityBlockFormScreen as ComponentType<never>, {}, "Nuevo horario"],
   [
     "S21 reprogramar",

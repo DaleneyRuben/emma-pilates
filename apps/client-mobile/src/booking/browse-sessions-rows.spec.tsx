@@ -154,11 +154,13 @@ describe("Client class list rows", () => {
     expect(box).toHaveStyle({ minWidth: 62 });
   });
 
-  it("writes the seats as bold text, without a pill", async () => {
+  // ClaseE draws the places short in the row («9 de 12») so the trainer line
+  // keeps its length; the detail and the spoken label say «9 de 12 lugares».
+  it("writes the seats as short bold text, without a pill", async () => {
     const { cards } = await openClassList();
 
     expect(cards[0].queryByTestId("seat-pill")).toBeNull();
-    expect(cards[0].getByText("3 cupos")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(cards[0].getByText("9 de 12")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#93615D", fontSize: 13 });
   });
 });

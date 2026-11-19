@@ -1,9 +1,8 @@
-import { useListStaffInvoices, type StaffInvoiceDto } from "@pilates/api-contracts";
+import { useListStaffInvoices, type StaffInvoiceDto, formatMoney } from "@pilates/api-contracts";
 import {
   colors,
   EmptyState,
   fontFamilies,
-  formatBolivianos,
   IconRowGroup,
   LoadingState,
   QueryFailure,
@@ -89,7 +88,7 @@ export function InvoicesScreen() {
           {items.map((invoice) => (
             <PersonRow
               accessibilityLabel={`${invoice.clientName}, ${detailOf(invoice, filter)}`}
-              amount={formatBolivianos(invoice.amountDueCentavos)}
+              amount={formatMoney(invoice.amountDueCentavos)}
               detail={detailOf(invoice, filter)}
               key={invoice.paymentId}
               name={invoice.clientName}

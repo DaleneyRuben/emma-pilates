@@ -52,7 +52,7 @@ const september = withdrawalPage(
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Movimientos de insumos",
+    name: "Insumos",
   });
 const rowOf = async (name: string) =>
   (await screen.findByRole("cell", { name })).parentElement as HTMLElement;
@@ -106,7 +106,7 @@ describe("AW31 Movimientos de insumos on a desktop browser", () => {
     expect(quantity).toHaveAttribute("data-label", "Cantidad");
     expect(quantity).toHaveClass("md:text-right");
     expect(
-      within(paperRow).getByRole("cell", { name: "21/09/2026 · 18:30" }),
+      within(paperRow).getByRole("cell", { name: "lun 21 sept · 18:30" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("2 movimientos en septiembre de 2026."),
@@ -268,6 +268,6 @@ describe("AW31 on a narrow browser", () => {
     const row = await rowOf("Detergente");
     const card = compactCard(row);
     expect(card).toMatchObject({ compact: true, labels: 0 });
-    expect(card.detail).toContain("21/09/2026 · 11:00");
+    expect(card.detail).toContain("lun 21 sept · 11:00");
   });
 });

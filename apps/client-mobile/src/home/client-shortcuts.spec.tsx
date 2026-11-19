@@ -120,7 +120,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     // The tiles carry no note with a Plan (follow-up 227); the summary is the hint.
     await waitFor(() => {
-      expect(screen.getByHintText("Próxima: 2 de octubre")).toBeOnTheScreen();
+      expect(screen.getByHintText("Próxima: vie 2 oct")).toBeOnTheScreen();
     });
     expect(screen.getByHintText("2 amigas invitadas")).toBeOnTheScreen();
 
@@ -173,7 +173,7 @@ describe("Client Home quick actions and notification destinations", () => {
     });
     await fireEvent.press(screen.getByText("Tu clase de Reformer Pilates fue cancelada."));
     await waitFor(() => {
-      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+      expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
     });
   });
 });

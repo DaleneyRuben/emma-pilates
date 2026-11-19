@@ -68,7 +68,7 @@ describe("Renewing from the Plan detail", () => {
     await fireEvent.press(screen.getByTestId("start-date-2026-10-01"));
     expect(
       screen.getByText(
-        "Tu plan actual vence el 24 de septiembre. El nuevo empieza el 1 de octubre; se puede elegir hasta el 22 de octubre.",
+        "Tu plan actual vence el jue 24 sept. El nuevo empieza el jue 1 oct; se puede elegir hasta el jue 22 oct.",
       ),
     ).toBeOnTheScreen();
 

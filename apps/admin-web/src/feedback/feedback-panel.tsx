@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type {
   AdminFeedbackDto,
   AdminFeedbackDtoStatus,
@@ -10,7 +11,6 @@ import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import {
   appLabels,
   roleLabelOf,
@@ -81,7 +81,7 @@ export function FeedbackPanel({
         <SummaryBlock title="Datos">
           <SummaryRow label="Fecha">
             <span className="tabular">
-              {formatCivilMoment(feedback.createdAt)}
+              {formatDateTime(feedback.createdAt)}
             </span>
           </SummaryRow>
           <SummaryRow label="App">{appLabels[feedback.app]}</SummaryRow>

@@ -211,7 +211,11 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
 }
 
 // C18: the Plan's state as Mi plan names it.
-const planPill = { active: "Activo", expiring_soon: "Por vencer", expired: "Vencido" } as const;
+const planPill = {
+  active: "Activo",
+  expiring_soon: "Por vencer",
+  expired: "Plan vencido",
+} as const;
 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },

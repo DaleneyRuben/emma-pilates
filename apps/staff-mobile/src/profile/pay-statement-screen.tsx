@@ -1,3 +1,4 @@
+import { formatMoney } from "@pilates/api-contracts";
 import {
   cardWithActionRow,
   colors,
@@ -15,7 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackBar, backBarScroll } from "../ui/back-bar";
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { statementStatus } from "./pay-ledger";
 import { payPeriodHeading } from "./pay-period-heading";
@@ -94,7 +94,7 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.state}>{stateWord}</Text>
             </View>
-            <Text style={styles.total}>{formatExactBolivianos(statement.totalCentavos)}</Text>
+            <Text style={styles.total}>{formatMoney(statement.totalCentavos)}</Text>
             <PaymentStrip onReceipt={receipts.show} status={status} />
             {receipts.error}
             <StatementBreakdown statement={statement} />

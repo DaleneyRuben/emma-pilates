@@ -2,6 +2,8 @@ import {
   cancelBooking,
   getGetCurrentClientSubscriptionQueryKey,
   getListUpcomingBookingsQueryKey,
+  formatDateTime,
+  formatListDate,
   leaveWaitlist,
   useGetCurrentClientSubscription,
   useListUpcomingBookings,
@@ -38,7 +40,7 @@ import { BookingCard, CancelBookingFacts, useBookingAction } from "./booking-car
 import { ClassHistoryTab } from "./class-history-tab";
 import { ClientNextClassHero, nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
-import { formatCancellationWindow, formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
+import { formatCancellationWindow, formatTimeRange } from "@pilates/mobile-core";
 
 type BookingsTab = "history" | "upcoming";
 
@@ -71,6 +73,9 @@ export function BookingsScreen({
   const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
     setCancelledShown(false),
   );
+  // FIX-090: leaving the waitlist is confirmed afterwards, like a cancel.
+  const [leftShown, setLeftShown] = useState(false);
+  const leftNotice = useStickyNotice(leftShown ? true : undefined, () => setLeftShown(false));
   const upcoming = useListUpcomingBookings({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -135,9 +140,12 @@ export function BookingsScreen({
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
     setCancelledShown(false);
+    setLeftShown(false);
     try {
       const response = await leaveWaitlist(item.waitlistEntryId, undefined, fetcher);
-      if (response.status !== 204) {
+      if (response.status === 204) {
+        setLeftShown(true);
+      } else {
         setFailure("No pudimos sacarte de la lista de espera. Inténtalo de nuevo.");
       }
     } catch {
@@ -247,14 +255,20 @@ export function BookingsScreen({
         title="¿Salir de la lista de espera?"
         visible={leaving !== null}
       />
-      {confirmed !== null ? (
+      {confirmed?.rescheduled === true ? (
+        <BrandToast
+          note={`${confirmed.classTypeName} · ${formatDateTime(confirmed.startsAt)}`}
+          onClose={dismissConfirmed}
+          title="Clase cambiada"
+        />
+      ) : confirmed !== null ? (
         <BrandToast
           note={
             confirmed.planName === "Pase de invitada"
               ? "Tu pase de invitada ya se usó."
               : remaining !== undefined
                 ? `Te quedan ${remaining} clases en tu plan`
-                : `${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
+                : `${confirmed.classTypeName} · ${formatListDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
           }
           onClose={dismissConfirmed}
           title="Reserva confirmada"
@@ -274,6 +288,9 @@ export function BookingsScreen({
           onClose={() => setCancelledShown(false)}
           title="Reserva cancelada"
         />
+      ) : null}
+      {leftNotice !== null && confirmed === null && cancelledNotice === null ? (
+        <BrandToast onClose={() => setLeftShown(false)} title="Saliste de la lista de espera" />
       ) : null}
     </Screen>
   );

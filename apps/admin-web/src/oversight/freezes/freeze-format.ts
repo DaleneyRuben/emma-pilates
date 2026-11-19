@@ -1,26 +1,13 @@
-import type { FreezeReviewDto } from "@pilates/api-contracts";
-import { boliviaParts } from "../../lib/bolivia-time";
-
-const shortMonths = [
-  "ene",
-  "feb",
-  "mar",
-  "abr",
-  "may",
-  "jun",
-  "jul",
-  "ago",
-  "sep",
-  "oct",
-  "nov",
-  "dic",
-];
+import {
+  formatDateTime,
+  formatListDate,
+  type FreezeReviewDto,
+} from "@pilates/api-contracts";
 
 const civilUtc = (date: string) => new Date(`${date}T00:00:00.000Z`).getTime();
 
-/** «5 feb», as the staff app's freeze rows name a day. */
-const shortDay = (date: string): string =>
-  `${Number(date.slice(8, 10))} ${shortMonths[Number(date.slice(5, 7)) - 1] ?? ""}`;
+/** «jue 5 feb», the shared list date (FIX-090). */
+const shortDay = (date: string): string => formatListDate(date);
 
 /** «7 días» from the first to the last frozen day, both counted. */
 export function freezeDayCount(startsOn: string, endsOn: string): string {
@@ -30,7 +17,7 @@ export function freezeDayCount(startsOn: string, endsOn: string): string {
 }
 
 /**
- * «5 feb → 12 feb»: what approving a pending request does to the plan end
+ * «jue 5 feb → jue 12 feb»: what approving a pending request does to the plan end
  * (walkthrough finding 52); undefined when an older API does not send it.
  */
 export function freezePendingPlanEnd(
@@ -44,7 +31,7 @@ export function freezePendingPlanEnd(
   return `${shortDay(planEndsOn)} → ${shortDay(planEndsOnAfter)}`;
 }
 
-/** «12 feb (antes 5 feb)» once approved; the unchanged end when refused. */
+/** «jue 12 feb (antes jue 5 feb)» once approved; the unchanged end when refused. */
 export function freezeDecidedPlanEnd(
   freeze: FreezeReviewDto,
 ): string | undefined {
@@ -61,7 +48,7 @@ export function freezeDecidedPlanEnd(
 }
 
 /**
- * «Decidido por Paola Mendoza · 8 nov 10:15» in La Paz time, dropping what
+ * «Decidido por Paola Mendoza · dom 8 nov · 10:15» in La Paz time, dropping what
  * an older API leaves out.
  */
 export function freezeDecidedBy(freeze: FreezeReviewDto): string | undefined {
@@ -76,6 +63,5 @@ export function freezeDecidedBy(freeze: FreezeReviewDto): string | undefined {
       ? ` por ${decidedByName}`
       : "";
   if (!decidedAt) return `${verb}${by}`;
-  const parts = boliviaParts(decidedAt);
-  return `${verb}${by} · ${shortDay(parts.date)} ${parts.time}`;
+  return `${verb}${by} · ${formatDateTime(decidedAt)}`;
 }

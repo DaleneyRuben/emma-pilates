@@ -9,7 +9,7 @@ function LaggingSearch({ onSent }: { onSent: (value: string) => void }) {
   const [value, setValue] = useState("");
   return (
     <SearchFilter
-      label="Buscar por cliente"
+      label="Buscar por clienta"
       value={value}
       onChange={(next) => {
         onSent(next);
@@ -24,7 +24,7 @@ describe("SearchFilter", () => {
     const sent: string[] = [];
     const user = userEvent.setup();
     render(<LaggingSearch onSent={(value) => sent.push(value)} />);
-    const field = screen.getByRole("searchbox", { name: "Buscar por cliente" });
+    const field = screen.getByRole("searchbox", { name: "Buscar por clienta" });
 
     await user.type(field, "luc");
     await waitFor(() => expect(sent).toContain("luc"));
@@ -41,7 +41,7 @@ describe("SearchFilter", () => {
       return (
         <>
           <SearchFilter
-            label="Buscar por cliente"
+            label="Buscar por clienta"
             value={value}
             onChange={setValue}
           />
@@ -57,7 +57,7 @@ describe("SearchFilter", () => {
     await user.click(screen.getByRole("button", { name: "Atrás" }));
 
     expect(
-      screen.getByRole("searchbox", { name: "Buscar por cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por clienta" }),
     ).toHaveValue("");
   });
 });

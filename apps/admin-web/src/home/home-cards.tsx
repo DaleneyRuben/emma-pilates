@@ -1,3 +1,4 @@
+import { formatMoney } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -7,10 +8,6 @@ import { boliviaParts } from "../lib/bolivia-time";
 import { incomeReportQueryOptions } from "../report/report-queries";
 import { weekSessionsQueryOptions } from "../schedule/schedule-queries";
 import { todaySummary } from "./home-pending";
-
-// Walkthrough n.º 22: whole bolivianos on the summaries.
-const wholeBolivianos = (centavos: number) =>
-  `Bs ${countFormat.format(Math.round(centavos / 100))}`;
 
 const asideLink =
   "text-nota font-medium text-primario-profundo hover:text-primario-presionado";
@@ -130,12 +127,12 @@ export function MoneyCard({
       ) : (
         <>
           <span className="text-cuerpo text-texto tabular">
-            {wholeBolivianos(income.data.totalCentavos)}
+            {formatMoney(income.data.totalCentavos)}
           </span>
           <span className="text-celda text-texto-secundario tabular">
             {[
-              `Efectivo ${wholeBolivianos(income.data.byMethod.cash)}`,
-              `QR ${wholeBolivianos(income.data.byMethod.transfer)}`,
+              `Efectivo ${formatMoney(income.data.byMethod.cash)}`,
+              `QR ${formatMoney(income.data.byMethod.transfer)}`,
               pendingPayments === 0
                 ? "ninguno por revisar"
                 : `${countFormat.format(pendingPayments)} QR por revisar, aún no cuentan`,

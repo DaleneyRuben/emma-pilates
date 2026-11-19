@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
 
 /** «07:00»: the start alone, for the time column of a v2 class row. */
@@ -20,6 +21,14 @@ export function dayHeading(civilDate: string): string {
 /** «1 clase», «3 clases». */
 export function countLabel(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
+}
+
+// FIX-090 (audit S8): a day whose classes were all cancelled says so instead
+// of «no hay clases»: «Todas las clases de hoy se cancelaron».
+export function allCancelledTitle(date: string, today: string): string {
+  return date === today
+    ? "Todas las clases de hoy se cancelaron"
+    : `Todas las clases del ${formatListDate(date)} se cancelaron`;
 }
 
 // «Hoy no hay Mat» or «El martes no hay Mat» (walkthrough 6, option A).

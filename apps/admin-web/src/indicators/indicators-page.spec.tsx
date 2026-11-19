@@ -79,7 +79,7 @@ describe("AW39 Indicadores", () => {
     renderAdmin("/informes");
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Informes" }),
+      await screen.findByRole("heading", { level: 1, name: "El mes" }),
     ).toBeVisible();
     expect(screen.getByRole("link", { name: "El mes" })).toHaveAttribute(
       "aria-current",
@@ -89,7 +89,7 @@ describe("AW39 Indicadores", () => {
     expect(within(occupancy).getByText("59 %")).toBeVisible();
     expect(
       within(
-        screen.getByRole("region", { name: "Alumnas por clase" }),
+        screen.getByRole("region", { name: "Clientas por clase" }),
       ).getByText("6,5"),
     ).toBeVisible();
     expect(
@@ -104,17 +104,17 @@ describe("AW39 Indicadores", () => {
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Cobrado" })).getByText(
-        "Bs 300,00",
+        "Bs 300",
       ),
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Devengado" })).getByText(
-        "Bs 120,00",
+        "Bs 120",
       ),
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Diferido" })).getByText(
-        "Bs 270,00",
+        "Bs 270",
       ),
     ).toBeVisible();
     expect(

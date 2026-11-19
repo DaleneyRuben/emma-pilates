@@ -96,7 +96,7 @@ describe("AW29 decisions on a desktop browser", () => {
     });
     expect(
       within(dialog).getByText(
-        "Verifica que Bs 500,00 llegó a la cuenta del estudio. Al confirmar, su plan Paquete de 8 clases empieza hoy y le avisamos.",
+        "Verifica que Bs 500 llegó a la cuenta del estudio. Al confirmar, su plan Paquete de 8 clases empieza hoy y le avisamos.",
       ),
     ).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Volver" }));
@@ -133,7 +133,7 @@ describe("AW29 decisions on a desktop browser", () => {
     expect(reason).not.toHaveAttribute("placeholder");
     expect(
       within(panel).getByText(
-        "Ej.: el monto no coincide con la transferencia recibida.",
+        "Ej.: el monto no coincide con el pago recibido.",
       ),
     ).toBeInTheDocument();
     expect(

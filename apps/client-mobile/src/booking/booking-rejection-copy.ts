@@ -7,7 +7,7 @@ const bookingRejections: Record<string, string> = {
     "Ya no se puede cancelar: falta menos que la ventana de cancelación.",
   reschedule_outside_window: "Solo puedes reprogramar dentro de la ventana de cancelación.",
   reschedule_target_ineligible: "Esa clase no está disponible para reprogramar.",
-  session_full: "La clase ya no tiene cupos.",
+  session_full: "La clase ya no tiene lugares.",
   weekly_cap_reached: "Ya usaste tus clases de esta semana.",
   booking_before_start_date:
     "Tu plan todavía no empieza: podrás reservar desde su fecha de inicio.",
@@ -21,7 +21,7 @@ const bookingRejections: Record<string, string> = {
   active_booking_exists: "Ya tienes una reserva en esta clase.",
   active_waitlist_entry_exists: "Ya estás en la lista de espera.",
   no_eligible_subscription: "No te quedan clases en tu plan.",
-  session_has_capacity: "La clase tiene cupos: puedes reservar directamente.",
+  session_has_capacity: "La clase tiene lugares libres: puedes reservar directamente.",
 };
 
 export function bookingRejectionMessage(code: string | undefined): string | null {

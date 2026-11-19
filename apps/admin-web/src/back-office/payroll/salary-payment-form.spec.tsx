@@ -54,7 +54,7 @@ const fill = async (
   values: { staffMemberId: string; amount: string; date: string },
 ) => {
   await user.selectOptions(
-    within(panel).getByLabelText("Empleado"),
+    within(panel).getByLabelText("Persona"),
     values.staffMemberId,
   );
   await user.clear(within(panel).getByLabelText("Monto"));
@@ -93,15 +93,15 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     const { panel, user } = await openCreate();
     expect(panel).toHaveAttribute("data-presentation", "side-panel");
     expect(
-      within(within(panel).getByLabelText("Empleado")).getByRole("option", {
+      within(within(panel).getByLabelText("Persona")).getByRole("option", {
         name: "Rita Salas (cuenta desactivada)",
       }),
     ).toBeInTheDocument();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
-    expect(
-      within(panel).getByLabelText("Empleado"),
-    ).toHaveAccessibleDescription("Elige a quién le pagaste.");
+    expect(within(panel).getByLabelText("Persona")).toHaveAccessibleDescription(
+      "Elige a quién le pagaste.",
+    );
     expect(within(panel).getByLabelText("Monto")).toHaveAccessibleDescription(
       expect.stringContaining("Escribe un monto como 3.500,00."),
     );
@@ -118,7 +118,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(
-      await screen.findByText("Pago de Bs 1.500,00 a Camila Rojas registrado."),
+      await screen.findByText("Pago de Bs 1.500 a Camila Rojas registrado."),
     ).toBeInTheDocument();
     expect(sent).toEqual([
       {
@@ -185,7 +185,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
       await screen.findByRole("button", { name: "Emma Vargas" }),
     );
     let panel = await screen.findByRole("dialog", { name: "Editar pago" });
-    expect(within(panel).getByLabelText("Empleado")).toHaveValue(emma.id);
+    expect(within(panel).getByLabelText("Persona")).toHaveValue(emma.id);
     expect(within(panel).getByLabelText("Monto")).toHaveValue("3.500,00");
     expect(within(panel).getByLabelText("Fecha")).toHaveValue("20/09/2026");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
@@ -224,7 +224,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     await waitFor(() =>
       expect(
-        within(panel).getByLabelText("Empleado"),
+        within(panel).getByLabelText("Persona"),
       ).toHaveAccessibleDescription(
         "Esta persona ya no está en el personal. Elige otra.",
       ),

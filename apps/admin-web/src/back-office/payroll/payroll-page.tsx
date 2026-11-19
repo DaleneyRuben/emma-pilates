@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { AdminSalaryPaymentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Image as ImageIcon, ImagePlus } from "lucide-react";
@@ -9,7 +10,6 @@ import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
 import { useKnownOption } from "../../components/table/use-known-option";
 import { Button } from "../../components/ui/button";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import { staffOptionLabel } from "./payroll-format";
 import {
@@ -24,7 +24,7 @@ const columns = createColumnHelper<AdminSalaryPaymentDto>();
 
 const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
   columns.accessor("staffMemberName", {
-    header: "Empleado",
+    header: "Persona",
     cell: ({ row }) => (
       <RowOpener
         label={row.original.staffMemberName}
@@ -43,7 +43,7 @@ const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilDate(getValue())}
+        {formatListDate(getValue())}
       </span>
     ),
   }),
@@ -137,7 +137,7 @@ export function PayrollPage({
 
   return (
     <CatalogPage
-      title="Sueldos pagados"
+      title="Sueldos"
       subtitle="Todo el estudio · solo registra que el pago se hizo, no cómo se calculó."
       createLabel="Registrar pago"
       loadingMessage="Cargando pagos…"
@@ -150,7 +150,7 @@ export function PayrollPage({
       panelTitles={{ create: "Registrar pago", edit: "Editar pago" }}
       filter={
         <ListFilter
-          label="Empleado"
+          label="Persona"
           value={search.staffMemberId ?? "all"}
           options={[
             { value: "all", label: "Todos" },

@@ -20,12 +20,12 @@ async function openBooking(bookingWindowDays: number | Promise<number>, routes: 
         )
       : base(input, init)) as typeof globalThis.fetch;
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "assistant")} />);
-  await waitFor(() => expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen());
   await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
   await waitFor(() =>
-    expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen(),
+    expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen(),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" }));
   await waitFor(() => expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen());
   await fireEvent.press(screen.getByRole("button", { name: "Reservar clase" }));
   await waitFor(() => expect(screen.getByTestId("assistant-day-strip")).toBeOnTheScreen());
@@ -111,7 +111,7 @@ describe("Assistant Reservar booking window (FIX-026)", () => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen(),
     );
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    await waitFor(() => expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("lugares libres de 12")).toBeOnTheScreen());
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar para Lucía" }));
 

@@ -79,7 +79,7 @@ describe("AW38 Comentarios names the sender", () => {
     expect(within(staffPanel).getByText("Enviado por")).toBeInTheDocument();
     expect(within(staffPanel).getByText("Emma Vargas")).toBeInTheDocument();
     // FIX-081: her Role reads in her gender.
-    expect(within(staffPanel).getByText("Entrenadora")).toBeInTheDocument();
+    expect(within(staffPanel).getByText("Instructora")).toBeInTheDocument();
     await user.click(
       within(staffPanel).getByRole("button", { name: "Cerrar" }),
     );

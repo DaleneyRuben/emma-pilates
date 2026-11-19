@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { EquipmentIssueDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useState } from "react";
@@ -9,7 +10,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilMoment } from "../../lib/bolivia-time";
 import { backOfficeProblem } from "../back-office-problems";
 import { damagedLabel, issueSubject, issueTitle } from "./equipment-format";
 import {
@@ -35,11 +35,11 @@ function IssueRow({
         </p>
         <p className="text-cuerpo text-texto">{issue.description}</p>
         <p className="text-nota text-texto-tenue tabular">
-          {`Reportó ${issue.reportedByName} · ${formatCivilMoment(issue.reportedAt)}`}
+          {`Reportó ${issue.reportedByName} · ${formatDateTime(issue.reportedAt)}`}
         </p>
         {issue.resolvedAt === null ? null : (
           <p className="text-nota text-texto-tenue tabular">
-            {`${issue.writtenOff ? "Dada de baja" : "Resuelta"} por ${issue.resolvedByName ?? ""} · ${formatCivilMoment(issue.resolvedAt)}`}
+            {`${issue.writtenOff ? "Dada de baja" : "Resuelta"} por ${issue.resolvedByName ?? ""} · ${formatDateTime(issue.resolvedAt)}`}
           </p>
         )}
       </div>

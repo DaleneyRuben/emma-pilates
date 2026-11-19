@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminPaymentDto, PaymentReviewDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { isApiError } from "../api/problem";
@@ -5,11 +6,7 @@ import { ClientPhoto } from "../components/client-photo";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanelBody } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
-import {
-  boliviaToday,
-  formatCivilMoment,
-  formatLongDay,
-} from "../lib/bolivia-time";
+import { boliviaToday, formatLongDay } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import { PaymentDecision } from "./payment-decision";
 import { paymentReviewQueryOptions } from "./payment-queries";
@@ -25,9 +22,9 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
         {formatBolivianos(review.amountDueCentavos)}
       </SummaryRow>
       <SummaryRow label="Fecha">
-        <span className="tabular">{formatCivilMoment(review.submittedAt)}</span>
+        <span className="tabular">{formatDateTime(review.submittedAt)}</span>
       </SummaryRow>
-      <SummaryRow label="Método">Transferencia</SummaryRow>
+      <SummaryRow label="Método">QR</SummaryRow>
       <StartRow review={review} />
       {review.state === "pending" ? null : (
         <SummaryRow label="Estado">

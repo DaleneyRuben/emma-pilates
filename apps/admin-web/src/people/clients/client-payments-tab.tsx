@@ -1,6 +1,6 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { formatCivilMoment } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import { methodLabels } from "../../payments/payments-csv";
 import { PaymentStatePill } from "../../payments/payment-state-pill";
@@ -31,7 +31,7 @@ export function ClientPaymentsTab({
             <ClientFileItem
               key={payment.id}
               title={payment.planName}
-              detail={`${formatCivilMoment(payment.submittedAt)} · ${methodLabels[payment.method]}`}
+              detail={`${formatDateTime(payment.submittedAt)} · ${methodLabels[payment.method]}`}
               aside={
                 <span className="flex flex-col items-end gap-1">
                   <span className="font-serif text-fila text-texto tabular">

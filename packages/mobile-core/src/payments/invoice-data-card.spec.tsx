@@ -122,3 +122,13 @@ describe("InvoiceDataCard", () => {
     expect(screen.getByText("Usa solo números, letras y guiones.")).toBeOnTheScreen();
   });
 });
+
+// FIX-090 (base audit B11, code audit 8.2): every touch target is 44 pt.
+describe("the invoice choice pills", () => {
+  it("are 44 pt tall", async () => {
+    const screen = await render(<Harness initial={invoiceChoiceFrom(null)} />);
+
+    expect(screen.getByRole("button", { name: "Con factura" })).toHaveStyle({ minHeight: 44 });
+    expect(screen.getByRole("button", { name: "Sin factura" })).toHaveStyle({ minHeight: 44 });
+  });
+});

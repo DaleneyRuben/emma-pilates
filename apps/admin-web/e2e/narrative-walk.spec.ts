@@ -7,7 +7,7 @@ test("reads the month report and asks a question at 1440 and 420", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await signIn(page, "/informes");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Informes" }),
+    page.getByRole("heading", { level: 1, name: "El mes" }),
   ).toBeVisible();
   const report = page.getByRole("region", { name: "Informe del mes" });
   await expect(report).toBeVisible();

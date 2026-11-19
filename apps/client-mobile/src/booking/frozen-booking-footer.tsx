@@ -10,13 +10,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { dayMonth, freezeRange } from "../subscription/freeze-window";
 
-const weekdays = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-
-/** «lunes 23 de noviembre»: a sentence spells the weekday out (review of FIX-082). */
-function longWeekdayDayMonth(civil: string): string {
-  return `${weekdays[new Date(`${civil}T12:00:00.000Z`).getUTCDay()]} ${dayMonth(civil)}`;
-}
-
 /**
  * Class detail on a frozen day (FIX-082, design audit 2026-11-18, option B):
  * the frozen days in bold, the first day she can book, the off button that
@@ -42,7 +35,7 @@ export function FrozenBookingFooter({
       {/* Palette B: the reason line sits under the off button (FIX-089). */}
       <PrimaryButton
         disabled
-        disabledReason={`Podrás reservar desde el ${longWeekdayDayMonth(addCivilDays(endsOn, 1))}.`}
+        disabledReason={`Podrás reservar desde el ${dayMonth(addCivilDays(endsOn, 1))}.`}
         label="No disponible durante el congelamiento"
       />
       <TextButton label="Elegir otro día" onPress={onOtherDay} />

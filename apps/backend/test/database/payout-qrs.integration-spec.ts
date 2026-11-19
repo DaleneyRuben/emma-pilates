@@ -157,6 +157,53 @@ describe('staff payout QRs (PostgreSQL)', () => {
     ]);
   });
 
+  // FIX-090 (audit S10): a new QR settles the old one's reminders, so no
+  // «vence» or «venció» notice keeps asking after she uploaded a new one.
+  it("settles the replaced QR's reminders", async () => {
+    const daniela = await staffMember();
+    const first = await qrUpload(daniela.accountId);
+    const second = await qrUpload(daniela.accountId);
+    const old = await gateway.replace({
+      ...daniela,
+      imageAssetId: first.id,
+      validUntil: civil('2026-11-24'),
+      actor: actorOf(daniela.accountId),
+      now,
+    });
+    for (const kind of ['expiring', 'expired']) {
+      await prisma.notification.create({
+        data: {
+          accountId: daniela.accountId,
+          category: 'REMINDER',
+          type: `payout_qr_${kind}`,
+          businessEventKey: `payout-qr-${kind}:${old.id}`,
+          title: 'Tu QR de cobro',
+          message: 'Sube uno nuevo.',
+          createdAt: now,
+        },
+      });
+    }
+
+    await gateway.replace({
+      ...daniela,
+      imageAssetId: second.id,
+      validUntil: civil('2027-01-15'),
+      actor: actorOf(daniela.accountId),
+      now: later,
+    });
+
+    await expect(
+      prisma.notification.findMany({
+        where: { accountId: daniela.accountId },
+        orderBy: { type: 'asc' },
+        select: { type: true, readAt: true },
+      }),
+    ).resolves.toEqual([
+      { type: 'payout_qr_expired', readAt: later },
+      { type: 'payout_qr_expiring', readAt: later },
+    ]);
+  });
+
   it('keeps one current QR when two first uploads race', async () => {
     const daniela = await staffMember();
     const [a, b] = await Promise.all([

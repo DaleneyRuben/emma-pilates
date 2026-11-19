@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "../ui/fonts";
@@ -5,14 +6,8 @@ import { colors, spacing } from "../ui/tokens";
 import { StartDateStrip } from "./start-date-chooser";
 import { addCivilDays, nextPlanStartOptions } from "./start-date-options";
 
-const dayMonth = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-});
-
-const format = (civilDate: string): string =>
-  dayMonth.format(new Date(`${civilDate}T12:00:00.000Z`));
+// FIX-090: «sáb 5 dic», the shared list date.
+const format = (civilDate: string): string => formatListDate(civilDate);
 
 /**
  * Design follow-up 254 § 4 (booking ADR-0013): the next Plan's «Fecha de

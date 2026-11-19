@@ -21,7 +21,7 @@ test("refuses to close a Client with a transfer in review, then closes another",
   // Refused at once: the closure button never enables.
   await expect(
     refused.getByText(
-      "No se puede cerrar todavía: tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+      "No se puede cerrar todavía: tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
     ),
   ).toBeVisible();
   await expect(

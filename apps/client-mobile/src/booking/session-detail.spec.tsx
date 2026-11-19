@@ -12,8 +12,8 @@ describe("Client Session detail", () => {
     clearMobileQueryCache();
   });
 
-  // FIX-081 (finding 118): the row beside his name reads «Entrenador».
-  it("names a male Trainer «Entrenador»", async () => {
+  // FIX-081 (finding 118), FIX-090: the row beside his name reads «Instructor».
+  it("names a male Trainer «Instructor»", async () => {
     const { screen } = await openDetail({
       "/api/v1/sessions/session-1": () =>
         jsonResponse({ ...detail(3), trainerName: "Diego Paz", trainerGender: "male" }),
@@ -21,7 +21,7 @@ describe("Client Session detail", () => {
 
     const facts = within(screen.getByTestId("session-facts"));
     await waitFor(() => expect(facts.getByText("Diego Paz")).toBeOnTheScreen());
-    expect(facts.getByText("Entrenador")).toBeOnTheScreen();
+    expect(facts.getByText("Instructor")).toBeOnTheScreen();
   });
 
   it("shows the Session facts and books with an idempotency key", async () => {
@@ -38,7 +38,7 @@ describe("Client Session detail", () => {
     // Trainer, the Branch and the free-cancellation limit are icon rows.
     const facts = within(screen.getByTestId("session-facts"));
     expect(facts.getByText("Emma Vargas")).toBeOnTheScreen();
-    expect(facts.getByText("Entrenadora")).toBeOnTheScreen();
+    expect(facts.getByText("Instructora")).toBeOnTheScreen();
     expect(facts.getByText("Centro")).toBeOnTheScreen();
     // Walkthrough n.º 27: the limit names its day. The class starts four hours
     // from now, so the limit is today, or tomorrow near midnight.
@@ -46,7 +46,7 @@ describe("Client Session detail", () => {
       facts.getByText(/^Cancela sin costo hasta (hoy|mañana) a las \d{2}:\d{2}$/),
     ).toBeOnTheScreen();
     expect(screen.getByText(/ · 75 minutos$/)).toBeOnTheScreen();
-    expect(screen.getByText("de 12 cupos libres")).toBeOnTheScreen();
+    expect(screen.getByText("de 12 lugares libres")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
     expect(screen.getByText("Se descuenta 1 clase de tu plan")).toBeOnTheScreen();
 
@@ -124,7 +124,7 @@ describe("Client Session detail", () => {
     );
 
     expect(screen.getByText("La lista de espera no usa clases de tu plan")).toBeOnTheScreen();
-    expect(screen.getByText("Te avisamos si se libera un cupo")).toBeOnTheScreen();
+    expect(screen.getByText("Te avisamos si se libera un lugar")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));

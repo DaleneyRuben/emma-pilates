@@ -52,15 +52,15 @@ describe("Trainer agenda header", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Mi agenda")).toHaveTextContent("Hola, Emma");
     });
-    expect(screen.getByText("Entrenadora · Miércoles 21 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("Instructora · Miércoles 21 de octubre")).toBeOnTheScreen();
   });
 
   // FIX-081 (finding 118): the eyebrow names his Role in his gender.
-  it("calls a man «Entrenador» over the greeting", async () => {
+  it("calls a man «Instructor» over the greeting", async () => {
     const screen = await renderTrainer("male");
 
     await waitFor(() => {
-      expect(screen.getByText("Entrenador · Miércoles 21 de octubre")).toBeOnTheScreen();
+      expect(screen.getByText("Instructor · Miércoles 21 de octubre")).toBeOnTheScreen();
     });
   });
 

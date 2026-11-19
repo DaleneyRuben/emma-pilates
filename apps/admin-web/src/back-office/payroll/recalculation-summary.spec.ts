@@ -38,7 +38,7 @@ describe("recalculation summary", () => {
         at,
       ),
     ).toBe(
-      "Recalculamos noviembre de 2026 a las 14:32. Cambió 2 sueldos: Emma Vargas pasó de Bs 65,00 a Bs 90,00; Daniela Ortiz, nuevo: Bs 25,00.",
+      "Recalculamos noviembre de 2026 a las 14:32. Cambió 2 sueldos: Emma Vargas pasó de Bs 65 a Bs 90; Daniela Ortiz, nuevo: Bs 25.",
     );
   });
 });

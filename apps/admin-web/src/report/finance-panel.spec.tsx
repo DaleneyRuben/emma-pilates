@@ -68,7 +68,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
     const income = await screen.findByRole("region", {
       name: "Ingresos en caja",
     });
-    expect(within(income).getByText("Bs 2.280,00")).toBeVisible();
+    expect(within(income).getByText("Bs 2.280")).toBeVisible();
     expect(
       within(income).getByText("Pagos confirmados en el mes"),
     ).toBeVisible();
@@ -92,15 +92,13 @@ describe("AW16 Finanzas on a desktop browser", () => {
         screen.getByRole("region", { name: "Punto de equilibrio" }),
       ).getByText("Bs 25.386,90"),
     ).toBeVisible();
-    expect(
-      screen.getByText("Costo de la nutricionista Bs 150,00"),
-    ).toBeVisible();
+    expect(screen.getByText("Costo de la nutricionista Bs 150")).toBeVisible();
     const table = screen.getByRole("table", {
       name: "Presupuesto frente a lo gastado",
     });
     const rent = within(table).getByRole("cell", { name: "Alquiler" })
       .parentElement as HTMLElement;
-    expect(within(rent).getAllByText("Bs 8.500,00")).toHaveLength(2);
+    expect(within(rent).getAllByText("Bs 8.500")).toHaveLength(2);
     expect(
       within(table).getByRole("cell", { name: "Imprevistos (10 %)" }),
     ).toBeVisible();
@@ -122,9 +120,7 @@ describe("AW16 Finanzas on a desktop browser", () => {
     );
     renderAdmin("/informes/dinero?vista=finanzas&month=2026-10");
 
-    expect(
-      await screen.findByText("Sueldos pagados Bs 12.000,00"),
-    ).toBeVisible();
+    expect(await screen.findByText("Sueldos pagados Bs 12.000")).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Resultado" })).getByText(
         "Ingresos en caja menos impuesto, gastos, sueldos y nutricionista",
@@ -207,7 +203,7 @@ describe("AW16 Finanzas on a narrow browser", () => {
       name: "Presupuesto frente a lo gastado",
     });
     expect(
-      within(table).getAllByRole("cell", { name: "Bs 8.500,00" })[0],
+      within(table).getAllByRole("cell", { name: "Bs 8.500" })[0],
     ).toHaveAttribute("data-label", "Presupuesto");
   });
 });

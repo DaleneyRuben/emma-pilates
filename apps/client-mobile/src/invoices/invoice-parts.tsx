@@ -1,16 +1,9 @@
-import type { ClientInvoiceDto } from "@pilates/api-contracts";
+import { formatListDate, type ClientInvoiceDto } from "@pilates/api-contracts";
 import { colors, ExceptionPill, fontFamilies, typography } from "@pilates/mobile-core";
 import { StyleSheet, Text } from "react-native";
 
-const dateFormat = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-  timeZone: "America/La_Paz",
-});
-
-/** «5 nov 2026», the day she paid, in Bolivia. */
-export const invoiceDate = (instant: string): string => dateFormat.format(new Date(instant));
+/** «jue 5 nov», the day she paid, in Bolivia (FIX-090's list date). */
+export const invoiceDate = (instant: string): string => formatListDate(instant);
 
 export const invoiceStateLabel = (invoice: ClientInvoiceDto): string =>
   invoice.voided ? "Pago anulado" : invoice.state === "ready" ? "Lista" : "En preparación";

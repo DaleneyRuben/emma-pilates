@@ -83,7 +83,7 @@ describe("AW39 Para contactar", () => {
     ) as HTMLElement;
     expect(within(row).getByText("🇧🇴 +591 70011005")).toBeInTheDocument();
     expect(within(row).getByText("7 días sin reservar")).toBeInTheDocument();
-    expect(within(row).getByText("02/10/2026")).toBeInTheDocument();
+    expect(within(row).getByText("vie 2 oct")).toBeInTheDocument();
     const whatsapp = within(row).getByRole("link", { name: "Abrir WhatsApp" });
     expect(whatsapp).toHaveAttribute("href", "https://wa.me/59170011005");
     expect(whatsapp).toHaveAttribute("target", "_blank");

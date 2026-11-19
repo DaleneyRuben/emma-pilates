@@ -35,7 +35,13 @@ import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
 import { TodayHero } from "../ui/today-hero";
 import { splitNextClass } from "../trainer/next-class";
-import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
+import {
+  allCancelledTitle,
+  countLabel,
+  dayHeading,
+  noClassesOfType,
+  startTime,
+} from "../ui/session-time";
 import { TabletGrid } from "./assistant-layout";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { ClientBanner } from "./client-banner";
@@ -74,7 +80,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   const branch = branchList.find((candidate) => candidate.id === selectedBranchId) ?? branchList[0];
   const { from, until } = civilDateRange(selectedDate);
   const sessions = useListSessionAvailability(
-    { branchId: branch?.id ?? "", from, until, limit: 100 },
+    { branchId: branch?.id ?? "", from, until, limit: 100, includeCancelled: true },
     {
       fetcher,
       query: { enabled: branch !== undefined, refetchOnMount: "always" },
@@ -111,11 +117,15 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
   const typeName = classTypeList.find((classType) => classType.id === classTypeId)?.name;
   const now = new Date();
-  const visible = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
-    (session) =>
-      !hasStarted(session.startsAt, now) &&
-      (classTypeId === allClassTypes || session.classTypeId === classTypeId),
+  // FIX-090: cancelled classes come too, only to tell an all-cancelled day apart.
+  const ofType = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
+    (session) => classTypeId === allClassTypes || session.classTypeId === classTypeId,
   );
+  const visible = ofType.filter(
+    (session) => (session.cancellation ?? null) === null && !hasStarted(session.startsAt, now),
+  );
+  const allCancelled =
+    ofType.length > 0 && ofType.every((session) => (session.cancellation ?? null) !== null);
   const nextDate = dates[dates.indexOf(selectedDate) + 1];
   const dayTitle = selectedDate === today ? "Hoy" : dayHeading(selectedDate);
   const { next, rest } = splitNextClass(visible, selectedDate === today, now);
@@ -187,7 +197,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                 ? undefined
                 : { label: "Ver mañana", onPress: () => setSelectedDate(nextDate) }
             }
-            title="Este día no hay clases"
+            title={allCancelled ? allCancelledTitle(selectedDate, today) : "Este día no hay clases"}
           />
         ) : (
           <StateScreen

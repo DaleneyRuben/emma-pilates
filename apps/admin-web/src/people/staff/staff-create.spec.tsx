@@ -103,14 +103,14 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     ).toBeVisible();
     expect(
       within(panel).getByText(
-        "La recepción lo usa para escribirle por WhatsApp.",
+        "La asistente lo usa para escribirle por WhatsApp.",
       ),
     ).toBeVisible();
     expect(within(panel).getByText("Elige un rol.")).toBeVisible();
     expect(within(panel).getByText("Elige el género.")).toBeVisible();
 
     await user.click(within(genders).getByRole("radio", { name: "Masculino" }));
-    await user.click(within(roles).getByRole("radio", { name: "Entrenador" }));
+    await user.click(within(roles).getByRole("radio", { name: "Instructor" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(
       await within(panel).findByText("Elige al menos una sucursal."),

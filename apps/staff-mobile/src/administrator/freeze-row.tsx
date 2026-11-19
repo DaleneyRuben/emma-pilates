@@ -23,7 +23,7 @@ export function FreezeRow({
   onPress: () => void;
 }) {
   const fetcher = useStaffFetcher();
-  const period = `${freezeRange(freeze.startsOn, freeze.endsOn, "short")} · ${freezeDays(freeze.startsOn, freeze.endsOn)}`;
+  const period = `${freezeRange(freeze.startsOn, freeze.endsOn)} · ${freezeDays(freeze.startsOn, freeze.endsOn)}`;
   return (
     <Pressable
       accessibilityHint={`${period} · ${note}`}

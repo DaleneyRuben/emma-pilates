@@ -75,9 +75,9 @@ test.describe("the Coordinator's admin web", () => {
     await signIn(page, "/dinero/pagos", fixtures.coordinator);
 
     await expect(
-      page.getByText("Esa sección es solo para administración."),
+      page.getByText("«Dinero · Pagos» es solo para administración."),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/horario\?aviso=sin-acceso$/);
+    await expect(page).toHaveURL(/\/horario\?aviso=sin-acceso&seccion=/);
 
     for (const path of [
       "/api/v1/administrator/payments",

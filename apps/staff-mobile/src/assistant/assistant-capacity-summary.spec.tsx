@@ -41,7 +41,7 @@ describe("Assistant Session detail capacity summary", () => {
 
     expect(box).toHaveStyle({ backgroundColor: "#B78380", borderRadius: 18 });
     expect(summary.getByText("6")).toHaveStyle({ fontSize: 32 });
-    expect(summary.getByText("cupos libres de 12")).toBeOnTheScreen();
+    expect(summary.getByText("lugares libres de 12")).toBeOnTheScreen();
     expect(summary.getByTestId("capacity-bar")).toBeOnTheScreen();
     expect(
       screen.getByText("Se descuenta 1 clase de su plan. Le avisamos por notificación."),
@@ -57,11 +57,11 @@ describe("Assistant Session detail capacity summary", () => {
     });
 
     expect(summary.getByText("0")).toBeOnTheScreen();
-    expect(summary.getByText("cupos libres de 12 · 2 en espera")).toBeOnTheScreen();
+    expect(summary.getByText("lugares libres de 12 · 2 en espera")).toBeOnTheScreen();
     expect(summary.getByText("Completa")).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Anotarla en la lista de espera" }),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Si se libera un cupo, le avisamos a Lucía.")).toBeOnTheScreen();
+    expect(screen.getByText("Si se libera un lugar, le avisamos a Lucía.")).toBeOnTheScreen();
   });
 });

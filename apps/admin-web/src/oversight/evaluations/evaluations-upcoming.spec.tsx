@@ -47,7 +47,7 @@ describe("AW25 subtitle when the week is empty", () => {
 
     expect(
       await screen.findByText(
-        "Sucursal Centro · ninguna en la semana · próxima: lun 28/09 · 09:00",
+        "Sucursal Centro · ninguna en la semana · próxima: lun 28 sept · 09:00",
       ),
     ).toBeVisible();
     const upcoming = reads.find((params) => params.get("from") !== weekFrom);

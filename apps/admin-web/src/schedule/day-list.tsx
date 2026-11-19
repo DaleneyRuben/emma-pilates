@@ -52,7 +52,7 @@ export function DayList({
               <span>{tab.weekday}</span>
               <span className="font-serif text-fila tabular">{tab.day}</span>
               {date === today ? (
-                <span className="text-[10px] leading-none">hoy</span>
+                <span className="text-pie leading-none">hoy</span>
               ) : null}
             </button>
           );
@@ -61,7 +61,7 @@ export function DayList({
       <div role="tabpanel" className="flex flex-col gap-2">
         {ofDay.length === 0 ? (
           <p className="rounded-marco border border-borde bg-lino px-4 py-6 text-center text-nota text-texto-tenue">
-            Sin sesiones este día.
+            Sin clases este día.
           </p>
         ) : (
           ofDay.map((session) => (

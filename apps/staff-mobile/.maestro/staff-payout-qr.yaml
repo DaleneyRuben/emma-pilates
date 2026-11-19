@@ -62,12 +62,13 @@ env:
 - tapOn: "Mes siguiente"
 - tapOn:
     id: "calendar-day-${output.qrDay}"
-- assertVisible: "Vale hasta el 15/${output.mm}/${output.yyyy}. Te avisaremos 7 días antes y cuando venza."
+# FIX-090: list dates, «mar 15 dic», with the year only outside this year.
+- assertVisible: "Vale hasta el [a-zé]+ 15 [a-z]+( ${output.yyyy})?\\. Te avisaremos 7 días antes y cuando venza\\."
 - takeScreenshot: fix072-4-date-sheet
 - tapOn:
     id: "payout-qr-save"
 - extendedWaitUntil:
-    visible: "Guardamos tu QR. Vale hasta el 15/${output.mm}/${output.yyyy}."
+    visible: "Guardamos tu QR\\. Vale hasta el [a-zé]+ 15 [a-z]+( ${output.yyyy})?\\."
     timeout: 60000
 - assertVisible:
     id: "payout-qr-change"
@@ -77,6 +78,6 @@ env:
 - tapOn:
     id: "back-bar"
 - extendedWaitUntil:
-    visible: "Mi QR de cobro, Vale hasta 15/${output.m}"
+    visible: "Mi QR de cobro, Vale hasta .*15 [a-z]+.*"
     timeout: 15000
 - takeScreenshot: fix072-6-perfil-vale-hasta

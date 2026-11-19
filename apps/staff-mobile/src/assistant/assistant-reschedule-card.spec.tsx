@@ -72,7 +72,7 @@ describe("Assistant reschedule option card", () => {
     expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
     // FIX-089: the seats are a normal state, so bold words and no pill.
     expect(card.getByTestId("seat-pill")).not.toHaveStyle({ borderRadius: 999 });
-    expect(card.getByText("6 cupos")).toHaveStyle({
+    expect(card.getByText("6 lugares libres")).toHaveStyle({
       color: "#93615D",
       fontSize: 13,
       fontWeight: "600",

@@ -79,7 +79,7 @@ describe("Clientas › Todas chips and columns", () => {
         "Todas",
         "Con plan",
         "Sin plan",
-        "Expirado",
+        "Plan vencido",
         "Fundadora",
         "Cuenta cerrada",
       ].map((name) => chip(name).getAttribute("aria-pressed")),
@@ -96,11 +96,18 @@ describe("Clientas › Todas chips and columns", () => {
       filter: "founder",
     });
 
-    await user.click(chip("Expirado"));
+    await user.click(chip("Plan vencido"));
     await waitFor(() => expect(reads.at(-1)?.get("filter")).toBe("expired"));
 
+    // Todas' first page is cached since the address past its last page
+    // stepped back to it (FIX-090), so the address is what changes.
     await user.click(chip("Todas"));
-    await waitFor(() => expect(reads.at(-1)?.has("filter")).toBe(false));
+    await waitFor(() =>
+      expect(router.state.matches.at(-1)?.search).toEqual({
+        page: 1,
+        pageSize: 20,
+      }),
+    );
   });
 
   it("shows what is left, when it ends, who invited her, and the Fundadora number", async () => {
@@ -115,7 +122,7 @@ describe("Clientas › Todas chips and columns", () => {
       "Le quedan",
     );
     expect(
-      within(row).getByRole("cell", { name: "09/10/2026" }),
+      within(row).getByRole("cell", { name: "vie 9 oct" }),
     ).toHaveAttribute("data-label", "Vence");
     expect(
       within(row).getByRole("cell", { name: "Carla Rojas" }),
@@ -124,7 +131,7 @@ describe("Clientas › Todas chips and columns", () => {
     const expired = screen.getByRole("cell", { name: /Sofía Guzmán Rojas/ })
       .parentElement as HTMLElement;
     expect(
-      within(expired).getByRole("cell", { name: "Venció el 30/06/2026" }),
+      within(expired).getByRole("cell", { name: "Venció el mar 30 jun" }),
     ).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Mariana Peña/ })
       .parentElement as HTMLElement;
@@ -173,5 +180,26 @@ describe("Clientas › Todas chips and columns", () => {
     expect(chip("Fundadora")).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/lugares de fundadora/)).not.toBeInTheDocument();
     expect(founderReads).toEqual([]);
+  });
+
+  // FIX-090: a chip with nobody under it says so, not «Todavía no hay
+  // clientas» while the studio has seven.
+  it.each([
+    ["active", "Ninguna clienta con plan activo."],
+    ["none", "Ninguna clienta sin plan."],
+    ["expired", "Ninguna clienta con el plan vencido."],
+  ])("says no Client matches the %s chip", async (filter, message) => {
+    server.use(
+      ...signedInHandlers(),
+      http.get(apiUrl(clientsPath), () =>
+        jsonResponse(clientPage([], { studioClientCount: 7 })),
+      ),
+    );
+    renderAdmin(`/clientas?filter=${filter}`);
+
+    expect(await screen.findByText(message)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Todavía no hay clientas."),
+    ).not.toBeInTheDocument();
   });
 });

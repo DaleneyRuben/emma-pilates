@@ -1,3 +1,4 @@
+import { capacityLabel, formatDateTime } from "@pilates/api-contracts";
 import type {
   AdministratorSessionAvailabilityDto,
   AdministratorSessionRosterDto,
@@ -8,7 +9,6 @@ import { useState } from "react";
 import { SidePanel } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import type { Branch } from "../shell/branch/branch-context";
-import { formatSessionMoment } from "../lib/bolivia-time";
 import { BookClientForm } from "./book-client-form";
 import { CancelledSessionView } from "./cancelled-session-view";
 import { cancellationOf } from "./session-cancellation";
@@ -24,7 +24,7 @@ export type SessionPanelState =
   | { mode: "create"; start?: SessionStart }
   | { mode: "edit"; session: Session };
 
-// AW03: "8 de 10 lugares reservados · 3 en lista de espera" (invariant 4).
+// AW03: "8 de 10 lugares · 3 en lista de espera" (invariant 4).
 // The roster refreshes after a booking while the panel keeps the Session it
 // opened with, so its counts win (finding 81).
 const occupancyLine = (
@@ -33,8 +33,11 @@ const occupancyLine = (
 ) => {
   const waiting = Math.max(session.waitlistCount, roster?.waitlist.length ?? 0);
   return [
-    formatSessionMoment(session.startsAt),
-    `${seatsTaken(session, roster?.bookings.length)} de ${session.capacity} lugares reservados`,
+    formatDateTime(session.startsAt),
+    capacityLabel(
+      seatsTaken(session, roster?.bookings.length),
+      session.capacity,
+    ),
     ...(waiting > 0 ? [`${waiting} en lista de espera`] : []),
   ].join(" · ");
 };
@@ -116,18 +119,18 @@ export function SessionPanel({
       }}
       title={
         session === null
-          ? "Nueva sesión"
+          ? "Nueva clase"
           : cancellation !== null
             ? "Clase cancelada"
             : booking
               ? "Reservar a una clienta"
-              : "Editar sesión"
+              : "Editar clase"
       }
       description={
         session === null
           ? `Sucursal ${branch.name} · sala única`
           : booking || cancellation !== null
-            ? `${session.classTypeName} · ${formatSessionMoment(session.startsAt)}`
+            ? `${session.classTypeName} · ${formatDateTime(session.startsAt)}`
             : occupancyLine(session, roster.data)
       }
     >

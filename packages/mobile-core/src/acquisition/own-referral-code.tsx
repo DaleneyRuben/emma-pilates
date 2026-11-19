@@ -1,4 +1,5 @@
 import {
+  formatListDate,
   getGetOwnReferralCodeQueryKey,
   useChangeOwnReferralCode,
   useGetOwnReferralCode,
@@ -14,12 +15,6 @@ import { Glyph } from "../ui/glyph";
 import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
 import { type CodeStatus, ReferralCodeSheet } from "./referral-code-sheet";
-
-const editableFromFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "America/La_Paz",
-});
 
 // The API's refusals of a save (BKM-017), shown on the sheet's status line.
 const refusals: Record<string, CodeStatus> = {
@@ -92,7 +87,7 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
   if (editableFrom !== null && new Date(editableFrom).getTime() > mountedAt) {
     return (
       <Text style={styles.waitLine}>
-        Podrás cambiarlo de nuevo el {editableFromFormatter.format(new Date(editableFrom))}
+        Podrás cambiarlo de nuevo el {formatListDate(editableFrom)}
       </Text>
     );
   }

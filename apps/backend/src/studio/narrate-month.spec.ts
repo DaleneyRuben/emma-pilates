@@ -66,7 +66,7 @@ describe('narrate month', () => {
           rule: 'weak_schedule',
           subject: 'trainer:2',
           detail:
-            'Revisa el horario del martes: promedia 1,7 alumnas en 4 clases.',
+            'Revisa el horario del martes: promedia 1,7 clientas en 4 clases.',
         }),
       ],
     });
@@ -74,7 +74,7 @@ describe('narrate month', () => {
     expect(result.actions).toEqual([
       {
         text: 'Revisa el horario del martes.',
-        because: 'Promedia 1,7 alumnas en 4 clases.',
+        because: 'Promedia 1,7 clientas en 4 clases.',
       },
     ]);
   });
@@ -84,7 +84,7 @@ describe('narrate month', () => {
       finding({
         rule: 'weak_schedule',
         subject: `trainer:${index + 1}`,
-        detail: `Revisa el horario del ${day}: promedia 1 alumna en 3 clases.`,
+        detail: `Revisa el horario del ${day}: promedia 1 clienta en 3 clases.`,
       }),
     );
     const result = narrateMonth({

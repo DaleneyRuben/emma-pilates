@@ -44,6 +44,8 @@ export type ConfirmedBooking = {
   startsAt: string;
   endsAt: string;
   planName?: string;
+  /** FIX-090: a Reschedule moved her Booking; the toast says so. */
+  rescheduled?: boolean;
 };
 
 type DetailNavigation = {

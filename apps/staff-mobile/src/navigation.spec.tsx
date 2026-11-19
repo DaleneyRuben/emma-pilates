@@ -52,10 +52,10 @@ describe("StaffNavigation", () => {
 
   it.each([
     ["trainer", "Mi agenda"],
-    ["assistant", "Buscar cliente"],
+    ["assistant", "Buscar clienta"],
     ["administrator", "Pagos pendientes"],
     ["nutritionist", "Mi agenda"],
-    ["coordinator", "Buscar cliente"],
+    ["coordinator", "Buscar clienta"],
   ] as const)("routes %s to its Staff destination", async (role, label) => {
     const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 
@@ -66,10 +66,10 @@ describe("StaffNavigation", () => {
   // Follow-up 225 §8: Perfil replaces the avatar on every root (owner, 2026-11-02).
   it.each([
     ["trainer", ["Agenda", "Mis pagos", "Perfil"]],
-    ["assistant", ["Clientes", "Horario", "Caja", "Perfil"]],
+    ["assistant", ["Clientas", "Horario", "Caja", "Perfil"]],
     ["nutritionist", ["Agenda", "Disponibilidad", "Perfil"]],
-    ["administrator", ["Pagos", "Clientes", "Horario", "Perfil"]],
-    ["coordinator", ["Clientes", "Para contactar", "Horario", "Perfil"]],
+    ["administrator", ["Pagos", "Clientas", "Horario", "Perfil"]],
+    ["coordinator", ["Clientas", "Para contactar", "Horario", "Perfil"]],
   ] as const)("gives %s its own tab bar", async (role, tabs) => {
     const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 

@@ -32,7 +32,7 @@ export function RescheduleOptions({ children }: { children: ReactNode }) {
 
 /**
  * One alternative as a class row (ClaseE, FIX-089): the start in its Rubor
- * box, the class over «Trainer · N cupos», and a radio filled in Rosa
+ * box, the class over «Trainer · N de M lugares», and a radio filled in Rosa
  * profundo once chosen.
  */
 export function RescheduleOption({
@@ -60,9 +60,7 @@ export function RescheduleOption({
       </View>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
-        <Text style={styles.details}>
-          {`${session.trainerName} · ${seatsTag(session.availableSeats)}`}
-        </Text>
+        <Text style={styles.details}>{`${session.trainerName} · ${seatsTag(session)}`}</Text>
       </View>
       <View style={[styles.radio, selected && styles.radioOn]} testID="reschedule-radio">
         {selected ? (

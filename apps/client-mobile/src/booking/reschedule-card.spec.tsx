@@ -82,11 +82,11 @@ describe("Client reschedule option card", () => {
     );
     await waitFor(
       () => {
-        expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+        expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     });
@@ -101,7 +101,7 @@ describe("Client reschedule option card", () => {
   }
 
   // C06 in palette B (ClaseE, FIX-089): the options are rows of one Crema
-  // card, the start in a Rubor box and «Trainer · N cupos» under the class,
+  // card, the start in a Rubor box and «Trainer · N de M lugares» under the class,
   // with a radio at the end.
   it("draws the option as a class row of the card with its radio", async () => {
     const { button, card, screen } = await openReschedule();
@@ -118,7 +118,7 @@ describe("Client reschedule option card", () => {
       fontSize: 15,
     });
     expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
-    expect(card.getByText("Emma Vargas · 8 cupos")).toHaveStyle({
+    expect(card.getByText("Emma Vargas · 4 de 12 lugares")).toHaveStyle({
       color: "#93615D",
       fontSize: 13,
     });

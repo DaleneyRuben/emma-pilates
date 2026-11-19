@@ -104,8 +104,16 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
     });
 
     await user.click(hide);
-    await waitFor(() => busy(hide));
-    const save = within(panel).getByRole("button", { name: "Guardar" });
+    const confirm = within(
+      await screen.findByRole("alertdialog", { name: /^¿Ocultar/ }),
+    ).getByRole("button", { name: "Ocultar" });
+    await user.click(confirm);
+    await waitFor(() => busy(confirm));
+    // Behind the confirmation, so out of the accessibility tree.
+    const save = within(panel).getByRole("button", {
+      name: "Guardar",
+      hidden: true,
+    });
     expect(save).not.toHaveAttribute("aria-busy");
     expect(save).toBeDisabled();
     answer.release();
@@ -128,7 +136,7 @@ describe("busy submit buttons (WEB-023, follow-up 93)", () => {
     await user.click(
       await screen.findByRole("button", { name: /Mat Pilates, 16:00/ }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+    const panel = await screen.findByRole("dialog", { name: "Editar clase" });
     await user.click(
       within(panel).getByRole("button", { name: "Cancelar esta clase" }),
     );

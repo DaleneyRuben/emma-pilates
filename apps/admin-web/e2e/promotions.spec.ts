@@ -46,7 +46,7 @@ test("lists, drafts, reorders by dragging, and deletes Promotions", async ({
   ).toBeVisible();
   const first = page.getByRole("article", { name: "Horario de fin de año" });
   await expect(first.getByText("Borrador")).toBeVisible();
-  await expect(first.getByText("Del 01/10/2026 al 31/10/2026")).toBeVisible();
+  await expect(first.getByText("Del jue 1 oct al sáb 31 oct")).toBeVisible();
   await expect(first.getByText("Sin imagen")).toBeVisible();
   expect(await headlines(page)).toEqual([
     "Horario de fin de año",

@@ -54,12 +54,12 @@ async function openEmptySession(answer: () => Response) {
   );
   await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
   await fireEvent.press(await screen.findByRole("button", { name: /^Reformer Principiante/ }));
-  await waitFor(() => expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByLabelText("Cancelar clase")).toBeOnTheScreen());
   return screen;
 }
 
 // Walkthrough 24: an empty class can be cancelled, and a refusal says why.
-describe("Cancelar sesión (S14) without bookings and its refusals", () => {
+describe("Cancelar clase (S14) without bookings and its refusals", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
@@ -68,12 +68,14 @@ describe("Cancelar sesión (S14) without bookings and its refusals", () => {
   it("cancels a class with no bookings after the short confirmation", async () => {
     const screen = await openEmptySession(() => jsonResponse({ affectedBookings: 0 }));
 
+    // FIX-090: the detail spells its places out in full.
+    expect(screen.getByText("0 de 8 lugares")).toBeOnTheScreen();
     expect(
       screen.getByText("Esto no se puede deshacer. La clase no tiene reservas."),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Qué va a pasar")).toBeNull();
-    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
-    await waitFor(() => expect(screen.getByText("Sesión cancelada")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar clase" }));
+    await waitFor(() => expect(screen.getByText("Clase cancelada")).toBeOnTheScreen());
     expect(screen.getByText("La clase no tenía reservas.")).toBeOnTheScreen();
   });
 
@@ -84,7 +86,7 @@ describe("Cancelar sesión (S14) without bookings and its refusals", () => {
   ])("names the reason for %s", async (code, message) => {
     const screen = await openEmptySession(() => jsonResponse({ code }, 409));
 
-    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar sesión" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar clase" }));
     expect(await screen.findByText(message)).toBeOnTheScreen();
     expect(screen.queryByText(/Inténtalo de nuevo/)).toBeNull();
   });

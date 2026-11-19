@@ -1,10 +1,10 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { parseCivilDate } from "../../components/form/civil-date";
 import {
   addDays,
   addMonths,
   boliviaMonth,
   boliviaToday,
-  formatCivilDate,
   formatLongDay,
   formatMonth,
   formatWeekRange,
@@ -100,7 +100,7 @@ export function windowOf(
     return {
       ...shared,
       kind: "range",
-      label: `Del ${formatCivilDate(from)} al ${formatCivilDate(to)}`,
+      label: `Del ${formatListDate(from)} al ${formatListDate(to)}`,
       query: to < from ? null : { from, until: addDays(to, 1) },
     };
   }
@@ -147,8 +147,8 @@ export function formatPayPeriod(
   ) {
     return capitalized(formatMonth(periodStart.slice(0, 7)));
   }
-  if (last === periodStart) return formatCivilDate(periodStart);
-  return `Del ${formatCivilDate(periodStart)} al ${formatCivilDate(last)}`;
+  if (last === periodStart) return formatListDate(periodStart);
+  return `Del ${formatListDate(periodStart)} al ${formatListDate(last)}`;
 }
 
 /**

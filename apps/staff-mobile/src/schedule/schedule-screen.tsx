@@ -32,7 +32,7 @@ import { useCashBranches } from "../ui/branch-chips";
 import { DayStrip } from "../ui/day-strip";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
-import { countLabel, dayHeading } from "../ui/session-time";
+import { allCancelledTitle, countLabel, dayHeading } from "../ui/session-time";
 import { splitNextClass } from "../trainer/next-class";
 import { ScheduleCancelledFold, ScheduleClassRow, ScheduleNextClass } from "./schedule-class-card";
 
@@ -45,18 +45,14 @@ type ScheduleNavigation = {
 
 // «3 clases hoy», or «Martes 3 de noviembre · 3 clases» on another day (FIX-083).
 function dayCount(date: string, today: string, count: number, cancelled: number): string {
-  if (count === 0 && cancelled > 0) {
-    return date === today
-      ? "Hoy todas las clases están canceladas"
-      : `${dayHeading(date)} · todas canceladas`;
-  }
+  if (count === 0 && cancelled > 0) return allCancelledTitle(date, today);
   const classes = countLabel(count, "clase", "clases");
   return date === today ? `${classes} hoy` : `${dayHeading(date)} · ${classes}`;
 }
 
 /**
  * The read-only week of classes (HOR boards). The Assistant books from a
- * Client's file, so «Reservar para una clienta» opens Clientes; the
+ * Client's file, so «Reservar para una clienta» opens Clientas; the
  * Coordinator and the Administrator cancel a class from here instead.
  */
 export function ScheduleScreen() {

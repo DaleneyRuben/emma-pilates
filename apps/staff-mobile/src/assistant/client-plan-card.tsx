@@ -1,14 +1,34 @@
-import type { ClientOverviewDto } from "@pilates/api-contracts";
-import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
+import { formatListDate, type ClientOverviewDto } from "@pilates/api-contracts";
+import {
+  boliviaCivilDate,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDayMonth } from "./assistant-format";
 import { bookableClasses } from "./bookable-classes";
 
 type Subscription = NonNullable<ClientOverviewDto["subscription"]["subscription"]>;
+type Freeze = NonNullable<ClientOverviewDto["subscription"]["freeze"]>;
+
+/**
+ * FIX-090 (audit C3): the plan's Freeze, so front desk can say why a day
+ * cannot be booked; nothing once it ended, or when refused or withdrawn.
+ */
+function freezeLine(freeze: Freeze | null | undefined, today: string): string | null {
+  if (freeze == null || freeze.endsOn < today) return null;
+  const days = `del ${formatListDate(freeze.startsOn)} al ${formatListDate(freeze.endsOn)}`;
+  if (freeze.state === "approved") return `Congelado ${days}: esos días no puede reservar.`;
+  if (freeze.state === "requested") return `Pidió congelar ${days}; está por revisar.`;
+  return null;
+}
 
 function allowanceLine(subscription: Subscription, active: boolean): string {
-  const ends = `${active ? "vence" : "venció"} el ${formatCivilDayMonth(subscription.endsOn)}`;
+  const ends = `${active ? "vence" : "venció"} el ${formatListDate(subscription.endsOn)}`;
   const extra = subscription.extraClasses ?? 0;
   const left = subscription.remainingClassAllowance;
   const plan =
@@ -31,16 +51,19 @@ function unitLabel(count: number, active: boolean): string {
  */
 export function ClientPlanCard({
   active,
+  freeze,
   nextPlan,
   sells,
   subscription,
 }: {
   active: boolean;
+  freeze?: Freeze | null;
   nextPlan: Subscription | null;
   sells: boolean;
   subscription: Subscription;
 }) {
   const available = bookableClasses(subscription);
+  const frozen = freezeLine(freeze, boliviaCivilDate(new Date()));
   return (
     <View style={styles.card} testID="client-plan-card">
       <View style={styles.top}>
@@ -48,7 +71,7 @@ export function ClientPlanCard({
         <View style={styles.status}>
           <View style={[styles.dot, !active && styles.dotEnded]} />
           <Text style={[styles.statusLabel, !active && styles.statusEnded]}>
-            {active ? "Activo" : "Vencido"}
+            {active ? "Plan activo" : "Plan vencido"}
           </Text>
         </View>
       </View>
@@ -60,12 +83,13 @@ export function ClientPlanCard({
       {subscription.extraClassesLine ? (
         <Text style={styles.quiet}>{subscription.extraClassesLine}</Text>
       ) : null}
+      {frozen === null ? null : <Text style={styles.next}>{frozen}</Text>}
       {nextPlan === null ? null : (
         <>
           <View style={styles.rule} />
           {/* Walkthrough finding 117: which Plan is paid, and why no «Registrar pago». */}
           <Text style={styles.next}>
-            {`Próximo plan ya pagado: ${nextPlan.planName}, desde el ${formatCivilDayMonth(nextPlan.startsOn)}.${sells ? " Podrás registrar otro pago cuando empiece." : ""}`}
+            {`Próximo plan ya pagado: ${nextPlan.planName}, desde el ${formatListDate(nextPlan.startsOn)}.${sells ? " Podrás registrar otro pago cuando empiece." : ""}`}
           </Text>
         </>
       )}

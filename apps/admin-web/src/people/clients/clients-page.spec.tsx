@@ -60,7 +60,7 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       within(row).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
-    expect(within(row).getByText("Activo")).toBeInTheDocument();
+    expect(within(row).getByText("Activa")).toBeInTheDocument();
     expect(
       screen.getByText("148 clientas · 96 con plan activo · 12 fundadoras"),
     ).toBeVisible();
@@ -100,11 +100,11 @@ describe("AW21 Clientes on a desktop browser", () => {
     expect(
       within(expired).queryByText("Sin plan activo"),
     ).not.toBeInTheDocument();
-    expect(within(expired).getByText("Expirado")).toBeInTheDocument();
+    expect(within(expired).getByText("Vencido")).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Ana Quiroga/ })
       .parentElement as HTMLElement;
     expect(within(never).getAllByText("Sin plan")).toHaveLength(2);
-    expect(within(never).queryByText("Expirado")).not.toBeInTheDocument();
+    expect(within(never).queryByText("Plan vencido")).not.toBeInTheDocument();
   });
 
   it("keeps the search in the address and sends it to the backend", async () => {
@@ -163,8 +163,13 @@ describe("AW21 Clientes on a desktop browser", () => {
       within(table).getByRole("columnheader", { name: "Estado" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Mostrando 0 de 148 clientas")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page count or page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Anterior" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("searchbox", {
         name: "Buscar por nombre, correo o teléfono",

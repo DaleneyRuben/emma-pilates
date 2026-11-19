@@ -36,8 +36,8 @@ const weekHandler = () =>
 const openNewSession = async () => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
   await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
-  await view.user.click(screen.getByRole("button", { name: "Nueva sesión" }));
-  const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
+  await view.user.click(screen.getByRole("button", { name: "Nueva clase" }));
+  const panel = await screen.findByRole("dialog", { name: "Nueva clase" });
   return { ...view, panel };
 };
 
@@ -46,7 +46,7 @@ const optionsOf = (select: HTMLElement) =>
     .getAllByRole("option")
     .map((option) => option.textContent);
 
-describe("AW03 Nueva sesión on a desktop browser", () => {
+describe("AW03 Nueva clase on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     weekReads = 0;
@@ -80,16 +80,16 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         "Reformer Pilates",
       ]),
     );
-    const trainer = within(panel).getByLabelText("Entrenadora");
+    const trainer = within(panel).getByLabelText("Instructora");
     await waitFor(() =>
       expect(optionsOf(trainer)).toEqual([
-        "Elige una entrenadora",
+        "Elige una instructora",
         "Daniela Ortiz",
         "Valeria Peña",
       ]),
     );
     expect(trainer).toHaveAccessibleDescription(
-      "Solo entrenadoras asignadas a esta sucursal.",
+      "Solo instructoras asignadas a esta sucursal.",
     );
 
     await user.selectOptions(classType, reformer.id);
@@ -111,10 +111,10 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Sesión creada.",
+      "Clase creada.",
     );
     expect(
-      screen.queryByRole("dialog", { name: "Nueva sesión" }),
+      screen.queryByRole("dialog", { name: "Nueva clase" }),
     ).not.toBeInTheDocument();
     await waitFor(() => expect(weekReads).toBeGreaterThan(readsBefore));
   });
@@ -136,7 +136,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
     expect(within(panel).queryByLabelText("Fecha")).not.toBeInTheDocument();
     expect(
       within(panel).getByText(
-        "Genera las sesiones de los próximos 30 días y las sigue creando cada semana.",
+        "Genera las clases de los próximos 30 días y las sigue creando cada semana.",
       ),
     ).toBeInTheDocument();
     await user.selectOptions(
@@ -144,7 +144,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       mat.id,
     );
     await user.selectOptions(
-      within(panel).getByLabelText("Entrenadora"),
+      within(panel).getByLabelText("Instructora"),
       daniela.id,
     );
     await user.selectOptions(within(panel).getByLabelText("Día, fila 1"), "3");
@@ -166,7 +166,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Serie semanal creada: 4 sesiones en los próximos 30 días. 1 se omitió porque se cruzaba con otra sesión.",
+      "Serie semanal creada: 4 clases en los próximos 30 días. 1 se omitió porque se cruzaba con otra clase.",
     );
   });
 
@@ -215,7 +215,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       reformer.id,
     );
     await user.selectOptions(
-      within(panel).getByLabelText("Entrenadora"),
+      within(panel).getByLabelText("Instructora"),
       valeria.id,
     );
     await user.type(within(panel).getByLabelText("Fecha"), dayOfNextWeek(0));
@@ -224,17 +224,17 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(
       await within(panel).findByText(
-        "Se cruza con otra sesión de esta sucursal o con otra clase de la entrenadora.",
+        "Se cruza con otra clase de esta sucursal o con otra clase de la instructora.",
       ),
     ).toBeInTheDocument();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     await waitFor(() =>
       expect(
-        within(panel).getByLabelText("Entrenadora"),
+        within(panel).getByLabelText("Instructora"),
       ).toHaveAccessibleDescription(
         expect.stringContaining(
-          "Esta entrenadora ya no puede dar clases en esta sucursal.",
+          "Esta instructora ya no puede dar clases en esta sucursal.",
         ),
       ),
     );
@@ -242,7 +242,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
   });
 });
 
-describe("AW03 Nueva sesión on a narrow browser", () => {
+describe("AW03 Nueva clase on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => {

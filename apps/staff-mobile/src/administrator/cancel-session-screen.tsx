@@ -1,3 +1,4 @@
+import { capacityLabel } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   colors,
@@ -51,7 +52,7 @@ function refusal(error: unknown): string {
 const windowLabel = (minutes: number) =>
   minutes % 60 === 0 ? `${minutes / 60} h` : `${Math.floor(minutes / 60)} h ${minutes % 60}`;
 
-/** S14 Cancelar sesión (v2), with a short confirmation for an empty class. */
+/** S14 Cancelar clase (v2), with a short confirmation for an empty class. */
 export function CancelSessionScreen({
   route,
 }: {
@@ -83,7 +84,7 @@ export function CancelSessionScreen({
 
   const day = dayHeading(boliviaCivilDate(new Date(session.startsAt)));
   const time = formatTimeRange(session.startsAt, session.endsAt);
-  const header = <BackBar onBack={() => navigation.goBack()} title="Cancelar sesión" />;
+  const header = <BackBar onBack={() => navigation.goBack()} title="Cancelar clase" />;
 
   if (affected !== null) {
     return (
@@ -98,7 +99,7 @@ export function CancelSessionScreen({
                 : `Avisamos a las ${affected} clientas y cada una recuperó su clase.`
           }
           primaryAction={{ label: "Volver a las clases", onPress: () => navigation.goBack() }}
-          title="Sesión cancelada"
+          title="Clase cancelada"
         >
           <View style={styles.summary}>
             <IconRowGroup>
@@ -123,6 +124,7 @@ export function CancelSessionScreen({
           <Text style={styles.title}>{session.classTypeName}</Text>
           <Text style={styles.muted}>{`${day} · ${time}`}</Text>
           <Text style={styles.muted}>{`${session.trainerName} · ${session.branchName}`}</Text>
+          <Text style={styles.muted}>{capacityLabel(session.bookedCount, session.capacity)}</Text>
         </View>
         {empty ? null : (
           <View>
@@ -164,7 +166,7 @@ export function CancelSessionScreen({
       <View style={styles.actions}>
         <PrimaryButton
           busy={submitting}
-          label="Sí, cancelar sesión"
+          label="Sí, cancelar clase"
           onPress={() => void cancel()}
           testID="cancel-session-confirm"
           tone="error"

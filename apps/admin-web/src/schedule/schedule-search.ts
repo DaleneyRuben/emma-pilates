@@ -6,6 +6,8 @@ export const scheduleSearchSchema = z.object({
   week: z.iso.date().optional().catch(undefined),
   /** Set when the Coordinator was sent back from a money page (ADR-0102). */
   aviso: z.enum(["sin-acceso"]).optional().catch(undefined),
+  /** The address she tried, so the notice names its section (FIX-090). */
+  seccion: z.string().optional().catch(undefined),
 });
 
 export type ScheduleSearch = z.infer<typeof scheduleSearchSchema>;

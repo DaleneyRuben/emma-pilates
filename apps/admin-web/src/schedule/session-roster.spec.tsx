@@ -61,7 +61,7 @@ const openSession = async (
 ): Promise<ReturnType<typeof renderAdmin> & { panel: HTMLElement }> => {
   const view = renderAdmin(`/horario?week=${week}`);
   await view.user.click(await screen.findByRole("button", { name }));
-  const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
   return { ...view, panel };
 };
 
@@ -231,7 +231,7 @@ describe("WEB-039 who booked a class and booking a Client from Horario", () => {
         key: expect.stringMatching(uuid) as string,
       }),
     );
-    const detail = await screen.findByRole("dialog", { name: "Editar sesión" });
+    const detail = await screen.findByRole("dialog", { name: "Editar clase" });
     expect(within(detail).getByRole("status")).toHaveTextContent(
       "Mariana Peña quedó reservada.",
     );

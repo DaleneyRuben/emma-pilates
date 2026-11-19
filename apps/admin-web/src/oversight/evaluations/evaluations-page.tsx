@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
@@ -9,11 +10,7 @@ import { ListFilter } from "../../components/table/list-filter";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
 import { useKnownOption } from "../../components/table/use-known-option";
 import { WeekStepper } from "../../components/table/week-stepper";
-import {
-  boliviaToday,
-  formatWeekdayMoment,
-  weekStartOf,
-} from "../../lib/bolivia-time";
+import { boliviaToday, weekStartOf } from "../../lib/bolivia-time";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
 import {
@@ -39,7 +36,7 @@ const booked = (count: number, next: string | null | undefined) =>
       ? "ninguna en la semana"
       : next === null
         ? "ninguna evaluación agendada"
-        : `ninguna en la semana · próxima: ${formatWeekdayMoment(next)}`;
+        : `ninguna en la semana · próxima: ${formatDateTime(next)}`;
 
 const columns = createColumnHelper<EvaluationRow>();
 
@@ -47,7 +44,7 @@ const columns = createColumnHelper<EvaluationRow>();
 // no detail to open; the row is the whole appointment.
 const evaluationColumns = () => [
   columns.accessor("clientName", {
-    header: "Cliente",
+    header: "Clienta",
     cell: ({ row }) => (
       <span className="flex flex-col">
         <span className="font-medium text-texto">
@@ -69,7 +66,7 @@ const evaluationColumns = () => [
     header: "Fecha y hora",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatWeekdayMoment(getValue())}
+        {formatDateTime(getValue())}
       </span>
     ),
   }),

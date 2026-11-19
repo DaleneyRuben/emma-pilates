@@ -23,7 +23,7 @@ import { useStaffFetcher } from "../../staff-fetcher";
 import { BackBar } from "../../ui/back-bar";
 import { PayoutQrCard } from "./payout-qr-card";
 import { payoutQrBanner } from "./payout-qr-copy";
-import { fullCivilDate } from "./payout-qr-dates";
+import { qrDate } from "./payout-qr-dates";
 import { PayoutQrDateSheet, PayoutQrSourceSheet } from "./payout-qr-upload-sheets";
 import { useSavePayoutQr } from "./use-save-payout-qr";
 
@@ -38,7 +38,7 @@ export function PayoutQrScreen() {
   const [notice, setNotice] = useState<string | undefined>();
   const toast = useTransientNotice(notice, noticeMilliseconds, () => setNotice(undefined));
   const flow = useSavePayoutQr((validUntil) =>
-    setNotice(`Guardamos tu QR. Vale hasta el ${fullCivilDate(validUntil)}.`),
+    setNotice(`Guardamos tu QR. Vale hasta el ${qrDate(validUntil)}.`),
   );
   const header = (
     <BackBar back="Perfil" onBack={() => navigation.goBack()} title="Mi QR de cobro" />

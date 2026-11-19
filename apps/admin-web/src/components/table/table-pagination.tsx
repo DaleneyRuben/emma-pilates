@@ -24,7 +24,6 @@ export function TablePagination({
   rangeLabel,
 }: TablePaginationProps) {
   const pages = pageCount(totalItems, pageSize);
-
   return (
     <nav
       aria-label="Paginación"
@@ -35,27 +34,30 @@ export function TablePagination({
           ? pageRangeLabel({ page, pageSize, totalItems })
           : rangeLabel({ page, pageSize, totalItems, shown })}
       </p>
-      <div className="flex items-center gap-2">
-        <p>
-          Página {countFormat.format(page)} de {countFormat.format(pages)}
-        </p>
-        <Button
-          variant="neutral"
-          size="sm"
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="neutral"
-          size="sm"
-          disabled={page >= pages}
-          onClick={() => onPageChange(page + 1)}
-        >
-          Siguiente
-        </Button>
-      </div>
+      {/* FIX-090: an empty list says so, with no page count («Página 2 de 1»). */}
+      {totalItems === 0 ? null : (
+        <div className="flex items-center gap-2">
+          <p>
+            Página {countFormat.format(page)} de {countFormat.format(pages)}
+          </p>
+          <Button
+            variant="neutral"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
+            Anterior
+          </Button>
+          <Button
+            variant="neutral"
+            size="sm"
+            disabled={page >= pages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            Siguiente
+          </Button>
+        </div>
+      )}
     </nav>
   );
 }

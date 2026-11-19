@@ -71,7 +71,7 @@ export function ClassTypesPage({
   return (
     <CatalogPage
       title="Tipos de clase"
-      subtitle="Cada sesión del horario se programa desde un tipo de clase."
+      subtitle="Cada clase del horario se programa desde un tipo de clase."
       createLabel="Nuevo tipo de clase"
       loadingMessage="Cargando tipos de clase…"
       what="los tipos de clase"

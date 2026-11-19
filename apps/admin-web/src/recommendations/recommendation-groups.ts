@@ -31,7 +31,7 @@ const scheduleGroup = (
     .sort((a, b) => a - b)
     .map(weekdayName)
     .filter((day) => day !== "");
-  const trainer = items[0]?.trainerName ?? "una entrenadora";
+  const trainer = items[0]?.trainerName ?? "una instructora";
   return {
     key: `schedule:${key}`,
     kind: "schedule",

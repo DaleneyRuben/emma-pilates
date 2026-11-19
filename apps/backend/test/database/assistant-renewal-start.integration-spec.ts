@@ -84,7 +84,11 @@ describe('assistant overview renewal start (PostgreSQL)', () => {
       .set('authorization', bearer)
       .expect(200);
     return response.body as {
-      subscription: { status: string; renewalStartsOn?: string };
+      subscription: {
+        status: string;
+        renewalStartsOn?: string;
+        freeze?: { state: string; startsOn: string; endsOn: string } | null;
+      };
     };
   };
 
@@ -122,5 +126,38 @@ describe('assistant overview renewal start (PostgreSQL)', () => {
     const body = await readOverview(client.clientId);
 
     expect(body.subscription).not.toHaveProperty('renewalStartsOn');
+  });
+
+  // FIX-090 (audit C3): front desk sees the plan's Freeze on the ficha, so she
+  // can answer why a day cannot be booked.
+  it("names the current plan's approved Freeze", async () => {
+    const client = await world.newClient('Congelada');
+    const current = await buyCash(client.clientId);
+    const startsOn = new Date(now.getTime() + 2 * day);
+    const endsOn = new Date(now.getTime() + 4 * day);
+    await world.prisma.freeze.create({
+      data: {
+        subscriptionId: current.id,
+        clientId: client.clientId,
+        startsOn: new Date(
+          `${startsOn.toISOString().slice(0, 10)}T00:00:00.000Z`,
+        ),
+        endsOn: new Date(`${endsOn.toISOString().slice(0, 10)}T00:00:00.000Z`),
+        reason: 'Viaje',
+        state: 'APPROVED',
+        decidedAt: now,
+        decidedByAccountId: assistant.accountId,
+      },
+    });
+
+    const body = await readOverview(client.clientId);
+
+    expect(body.subscription.freeze).toEqual(
+      expect.objectContaining({
+        state: 'approved',
+        startsOn: startsOn.toISOString().slice(0, 10),
+        endsOn: endsOn.toISOString().slice(0, 10),
+      }),
+    );
   });
 });

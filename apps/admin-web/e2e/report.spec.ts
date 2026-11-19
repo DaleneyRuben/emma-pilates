@@ -4,10 +4,11 @@ import { signIn } from "./support/session";
 // The first «Bs …» a tile shows, as centavos; «−Bs» is a negative Neto.
 const centavosOf = async (tile: Locator): Promise<number> => {
   const text = await tile.innerText();
-  const match = /(−?)Bs ([\d.]+),(\d{2})/.exec(text);
+  // FIX-090: whole amounts drop their ,00.
+  const match = /(−?)Bs ([\d.]+)(?:,(\d{2}))?/.exec(text);
   if (match === null) throw new Error(`No amount in «${text}»`);
   const units = Number((match[2] ?? "").replaceAll(".", ""));
-  const value = units * 100 + Number(match[3]);
+  const value = units * 100 + Number(match[3] ?? 0);
   return match[1] === "−" ? -value : value;
 };
 
@@ -37,7 +38,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   );
 
   const income = tile(page, "Ingresos");
-  await expect(income.getByText(/Bs [\d.]+,\d{2}/).first()).toBeVisible();
+  await expect(income.getByText(/Bs [\d.]+/).first()).toBeVisible();
   const ingresos = await centavosOf(income);
   const gastos = await centavosOf(tile(page, "Gastos"));
   const neto = await centavosOf(tile(page, "Neto"));
@@ -57,13 +58,13 @@ test("reports the studio's money and narrows it to one Branch", async ({
   await expect(
     income.getByText("Pagos en efectivo cobrados en Centro"),
   ).toBeVisible();
-  await expect(income.getByText("Bs 780,00")).toBeVisible();
+  await expect(income.getByText("Bs 780")).toBeVisible();
   await expect(
     tile(page, "Gastos").getByText("Gastos registrados en Centro"),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».",
+      "La nómina y los ingresos por QR se ven solo en «Todas las sucursales».",
     ),
   ).toBeVisible();
   await expect(categories.getByText(/Nómina/)).toHaveCount(0);
@@ -79,7 +80,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   await expect(
     page.getByText("La fecha inicial no puede ser posterior a la final."),
   ).toBeVisible();
-  await expect(income.getByText("Bs 780,00")).toBeVisible();
+  await expect(income.getByText("Bs 780")).toBeVisible();
   await page.getByLabel("Desde").fill("2020-01-01");
   await page.getByLabel("Hasta").fill("2020-01-31");
   await expect(

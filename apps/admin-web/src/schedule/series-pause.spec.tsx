@@ -30,7 +30,7 @@ const openSeriesClass = async () => {
   await view.user.click(
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ }),
   );
-  const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
   return { ...view, panel };
 };
 

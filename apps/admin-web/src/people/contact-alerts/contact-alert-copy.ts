@@ -1,4 +1,7 @@
-import type { ContactAlertItemDtoReasonsItem } from "@pilates/api-contracts";
+import {
+  formatListDate,
+  type ContactAlertItemDtoReasonsItem,
+} from "@pilates/api-contracts";
 
 export const contactAlertReasons: Record<
   ContactAlertItemDtoReasonsItem,
@@ -9,13 +12,8 @@ export const contactAlertReasons: Record<
   fewer_than_4_classes_in_first_30_days: "Menos de 4 clases en su primer mes",
 };
 
-export const startedOnLabel = (civilDate: string): string => {
-  const [year, month, day] = civilDate.split("-");
-  if (year === undefined || month === undefined || day === undefined) {
-    return civilDate;
-  }
-  return `${day}/${month}/${year}`;
-};
+export const startedOnLabel = (civilDate: string): string =>
+  formatListDate(civilDate);
 
 // wa.me takes the digits alone, code first. FIX-037: a stored «+<code>
 // <digits>» already carries its country (any country); an older number

@@ -1,10 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import {
-  boliviaInstant,
-  formatCivilDate,
-  formatSessionMoment,
-} from "../lib/bolivia-time";
+import { formatDateTime, formatListDate } from "@pilates/api-contracts";
+import { boliviaInstant, formatCivilDate } from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import {
   apiUrl,
@@ -37,17 +34,16 @@ import {
 } from "../test/studio-settings-fixtures";
 import { useNarrowViewport } from "../test/viewport";
 
-const civil = (date: string) =>
-  `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+const civil = (date: string) => formatListDate(date);
 
 const openSession = async (name: RegExp) => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
   await view.user.click(await screen.findByRole("button", { name }));
-  const panel = await screen.findByRole("dialog", { name: "Editar sesión" });
+  const panel = await screen.findByRole("dialog", { name: "Editar clase" });
   return { ...view, panel };
 };
 
-describe("AW03 Editar sesión on a desktop browser", () => {
+describe("AW03 Editar clase on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     server.use(...signedInHandlers(), ...sessionFormHandlers());
@@ -71,10 +67,10 @@ describe("AW03 Editar sesión on a desktop browser", () => {
 
     expect(
       within(panel).getByText(
-        `${formatSessionMoment(mondayReformer.startsAt)} · 4 de 10 lugares reservados`,
+        `${formatDateTime(mondayReformer.startsAt)} · 4 de 10 lugares`,
       ),
     ).toBeInTheDocument();
-    expect(within(panel).getByLabelText("Solo esta sesión")).toBeChecked();
+    expect(within(panel).getByLabelText("Solo esta clase")).toBeChecked();
     expect(within(panel).getByText("Reformer Pilates")).toBeInTheDocument();
     expect(
       within(panel).getByLabelText("Capacidad"),
@@ -83,7 +79,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
 
     await user.selectOptions(
-      await within(panel).findByLabelText("Entrenadora"),
+      await within(panel).findByLabelText("Instructora"),
       daniela.id,
     );
     await user.clear(within(panel).getByLabelText("Hora"));
@@ -97,7 +93,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Sesión actualizada.",
+      "Clase actualizada.",
     );
   });
 
@@ -159,7 +155,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
     expect(
       within(panel).getByText(
-        "Las sesiones que ya tienen reservas o lista de espera se mantienen sin cambios.",
+        "Las clases que ya tienen reservas o lista de espera se mantienen sin cambios.",
       ),
     ).toBeInTheDocument();
 
@@ -181,7 +177,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      `Serie actualizada desde el ${civil(dayOfNextWeek(0))}: 4 sesiones nuevas; 3 sin reservas se reemplazaron y 1 con reservas se mantiene sin cambios.`,
+      `Serie actualizada desde el ${civil(dayOfNextWeek(0))}: 4 clases nuevas; 3 sin reservas se reemplazaron y 1 con reservas se mantiene sin cambios.`,
     );
   });
 
@@ -220,7 +216,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
       expect(body).toEqual({ effectiveFrom: dayOfNextWeek(0) }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(
-      `La serie deja de repetirse desde el ${civil(dayOfNextWeek(0))}: 2 sesiones sin reservas se cancelaron y 1 con reservas se mantiene.`,
+      `La serie deja de repetirse desde el ${civil(dayOfNextWeek(0))}: 2 clases sin reservas se cancelaron y 1 con reservas se mantiene.`,
     );
   });
 
@@ -275,7 +271,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
 
     expect(
       within(panel).getByText(
-        `${formatSessionMoment(wednesdayMat.startsAt)} · 10 de 10 lugares reservados · 3 en lista de espera`,
+        `${formatDateTime(wednesdayMat.startsAt)} · 10 de 10 lugares · 3 en lista de espera`,
       ),
     ).toBeInTheDocument();
     expect(within(panel).queryByLabelText("Esta y las futuras")).toBeNull();
@@ -300,13 +296,13 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     await cancel();
     expect(
       await within(panel).findByText(
-        "Esta sesión ya no se puede cancelar: empezó o ya fue cancelada.",
+        "Esta clase ya no se puede cancelar: empezó o ya fue cancelada.",
       ),
     ).toBeInTheDocument();
 
     await cancel();
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Sesión cancelada: 10 reservas reembolsadas y avisos enviados.",
+      "Clase cancelada: 10 reservas reembolsadas y avisos enviados.",
     );
   });
 
@@ -340,7 +336,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
 
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Sesión cancelada.",
+      "Clase cancelada.",
     );
     expect(saturdayEmpty.bookedCount).toBe(0);
   });
@@ -359,7 +355,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
   });
 });
 
-describe("AW03 Editar sesión on a narrow browser", () => {
+describe("AW03 Editar clase on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => {

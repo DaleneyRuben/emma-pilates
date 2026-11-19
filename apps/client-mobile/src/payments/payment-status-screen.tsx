@@ -17,10 +17,23 @@ import { PaymentStatusView } from "./payment-status-view";
 import { useResendReceipt } from "./use-resend-receipt";
 
 type StatusNavigation = {
+  getState: () => { index: number; routeNames: string[] };
   goBack: () => void;
   popToTop: () => void;
+  replace: (screen: string) => void;
   navigate: (screen: "Booking" | "HomeTab", params: { screen: "Browse" | "Home" }) => void;
 };
+
+/**
+ * Returns this stack to its root. Opened from a notification, the result is
+ * the stack's only screen, so there is nothing to pop: it gives way to the
+ * stack's first screen instead (FIX-090, «POP_TO_TOP was not handled»).
+ */
+function returnToRoot(navigation: StatusNavigation): void {
+  const { index, routeNames } = navigation.getState();
+  if (index > 0) navigation.popToTop();
+  else if (routeNames[0] !== undefined) navigation.replace(routeNames[0]);
+}
 
 export function PaymentStatusScreen() {
   const navigation = useNavigation<StatusNavigation>();
@@ -35,7 +48,7 @@ export function PaymentStatusScreen() {
   // Leaving for another tab first returns this stack to its root, so Perfil
   // or Reservar is not left on the spent payment without its tab bar.
   const leaveFor = (screen: "Booking" | "HomeTab", target: "Browse" | "Home") => {
-    navigation.popToTop();
+    returnToRoot(navigation);
     navigation.navigate(screen, { screen: target });
   };
   const goHome = () => leaveFor("HomeTab", "Home");
@@ -45,7 +58,7 @@ export function PaymentStatusScreen() {
   useFocusEffect(
     useCallback(() => {
       const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-        navigation.popToTop();
+        returnToRoot(navigation);
         navigation.navigate("HomeTab", { screen: "Home" });
         return true;
       });
