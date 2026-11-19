@@ -37,6 +37,7 @@ export const expenseRow = (
   expenseCategoryName: expenseCategory.name,
   amountCentavos,
   incurredOn,
+  detail: null,
   voidedAt: null,
   voidedByName: null,
   voidReason: null,
