@@ -144,6 +144,6 @@ describe("Mi plan, option A", () => {
     const screen = await openMiPlan(view());
 
     expect(screen.getByRole("button", { name: "Congelar plan" })).toBeOnTheScreen();
-    expect(screen.getByTestId("glyph-sun", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-sun", hidden)).toHaveProp("stroke", "#93615D");
   });
 });

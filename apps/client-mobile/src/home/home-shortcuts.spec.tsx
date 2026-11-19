@@ -59,19 +59,19 @@ describe("Client Home shortcut tiles", () => {
     const screen = await openHome(active);
 
     expect(screen.getByText("Accesos rápidos")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 12,
       textTransform: "uppercase",
     });
     for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
       expect(screen.getByRole("button", { name: label })).toHaveStyle({
-        backgroundColor: "#F5EFE9",
+        backgroundColor: "#F9F4F2",
         borderRadius: 16,
       });
       expect(screen.getByText(label)).toHaveStyle({ fontSize: 14 });
     }
     expect(screen.queryByTestId("shortcut-disc")).toBeNull();
-    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("width", 18);
     expect(screen.getByTestId("glyph-personAdd", hidden)).toHaveProp("width", 18);
     expect(screen.getByTestId("shortcut-tiles")).toHaveStyle({ flexDirection: "row", gap: 12 });
@@ -82,9 +82,9 @@ describe("Client Home shortcut tiles", () => {
 
     const row = screen.getByRole("button", { name: "Reservar una clase" });
     expect(row).toBeDisabled();
-    expect(row).toHaveStyle({ backgroundColor: "#F5EFE9", borderRadius: 16, opacity: 0.6 });
+    expect(row).toHaveStyle({ backgroundColor: "#F9F4F2", borderRadius: 16, opacity: 0.6 });
     expect(screen.getByText("Necesitas un plan activo")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
     expect(screen.getByTestId("shortcut-lock", hidden)).toBeOnTheScreen();

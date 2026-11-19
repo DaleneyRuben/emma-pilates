@@ -76,7 +76,7 @@ describe("Client Home", () => {
     });
     // FIX-082 (Inicio option A): a light Plan row, no Rosa profundo hero, no
     // «Activo» pill and no «Mi plan» pill; the whole row opens Mi plan.
-    expect(screen.getByTestId("home-plan-card")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByTestId("home-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
     expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «vence el».
     expect(screen.getByText("Vence el 11 de octubre")).toBeOnTheScreen();
@@ -180,9 +180,9 @@ describe("Client Home", () => {
     expect(screen.getByText("Desde Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Mat y Reformer · paga por QR o en el estudio")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
-      backgroundColor: "#FFFFFF",
+      backgroundColor: "#F9F4F2",
     });
-    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByText("Necesitas un plan activo")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Activo")).not.toBeOnTheScreen();

@@ -145,11 +145,11 @@ describe("Client Class History", () => {
     expect(rows).toHaveLength(3);
     expect(StyleSheet.flatten(rows[0].props.style)).not.toHaveProperty("backgroundColor");
     expect(StyleSheet.flatten(rows[1].props.style)).toMatchObject({
-      borderBottomColor: "#EFE7DE",
+      borderBottomColor: "#E7CCBF",
       borderBottomWidth: 1,
     });
     expect(screen.getByText("Septiembre 2026").parent).toHaveStyle({
-      borderBottomColor: "#D8C9BB",
+      borderBottomColor: "#CDA697",
     });
   });
 

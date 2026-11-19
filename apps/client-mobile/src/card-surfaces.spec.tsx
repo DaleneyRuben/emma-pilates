@@ -45,7 +45,7 @@ describe("Client card surfaces (MOB-039)", () => {
       expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("home-plan-card")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
     });
   });

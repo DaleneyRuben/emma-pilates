@@ -58,7 +58,7 @@ describe("Client Subscription detail", () => {
 
     // C12: the plan card, then «Detalles» as rows. FIX-082 (Mi plan option A):
     // a light Lino card with the name and a status dot.
-    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#F9F4F2" });
     expect(screen.getByText("Paquete de 12 clases")).toBeOnTheScreen();
     expect(screen.getByText("Activo")).toBeOnTheScreen();
     expect(screen.getByText("5")).toBeOnTheScreen();

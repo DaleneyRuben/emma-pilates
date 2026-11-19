@@ -54,7 +54,7 @@ describe("Client Inicio, option A", () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     const book = screen.getByRole("button", { name: "Reservar una clase" });
-    expect(book).toHaveStyle({ backgroundColor: "#B78380", minHeight: 52 });
+    expect(book).toHaveStyle({ backgroundColor: "#93615D", minHeight: 52 });
     expect(screen.queryByTestId("shortcut-disc")).toBeNull();
 
     await fireEvent.press(book);
@@ -66,7 +66,7 @@ describe("Client Inicio, option A", () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     const row = screen.getByTestId("home-plan-card");
-    expect(row).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(row).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     const inRow = within(row);
     expect(inRow.getByText("Trimestral · 25 restantes")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te quedan 3 · vence el 5 de febrero")).toBeOnTheScreen();
@@ -167,10 +167,10 @@ describe("Client Inicio, option A", () => {
 
     for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
       expect(screen.getByRole("button", { name: label })).toHaveStyle({
-        backgroundColor: "#F5EFE9",
+        backgroundColor: "#F9F4F2",
       });
     }
-    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.queryByTestId("glyph-calendar", hidden)).toBeNull();
   });
 });

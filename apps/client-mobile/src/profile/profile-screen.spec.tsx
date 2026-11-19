@@ -151,9 +151,9 @@ describe("Client Profile", () => {
     // Follow-up 256 § 2 (verification n.º 43, 44): «Cerrar sesión» is the Error
     // last row, as in the Staff app, and «Cerrar mi cuenta» a muted link after
     // the version, far from it.
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
     expect(screen.getByText("Cerrar mi cuenta")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       textDecorationLine: "underline",
     });
     expect(screen.getByText(/^Emma Pilates Studio · versión .+ ·$/)).toBeOnTheScreen();

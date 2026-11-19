@@ -165,7 +165,7 @@ describe("Client payment invoice data", () => {
   it("shows the amount on the hero and the two numbered steps", async () => {
     const { screen } = await openPaymentWithReceipt(null);
 
-    expect(screen.getByTestId("payment-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByTestId("payment-hero")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByText("Monto exacto a transferir")).toBeOnTheScreen();
     expect(screen.getByText("1 · Paga con el QR del estudio")).toBeOnTheScreen();
     expect(screen.getByText("2 · Sube tu comprobante")).toBeOnTheScreen();

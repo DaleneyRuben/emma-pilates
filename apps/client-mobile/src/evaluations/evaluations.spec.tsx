@@ -60,7 +60,7 @@ describe("Client Evaluations", () => {
       expect(screen.getByText("Confirma tu cita")).toBeOnTheScreen();
     });
     // C14: the appointment on the hero card, its terms as icon rows.
-    expect(screen.getByTestId("evaluation-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByTestId("evaluation-hero")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByText("45 minutos · Gabriela Rojas · Centro")).toBeOnTheScreen();
     expect(screen.getByText("Es gratis: no usa clases de tu plan")).toBeOnTheScreen();
     expect(screen.getByText("Te avisamos un día y una hora antes")).toBeOnTheScreen();

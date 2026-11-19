@@ -12,14 +12,14 @@ const payment = {
 };
 
 // Follow-up 225 §6 and the walkthrough (n.º 15): screen 11 is the centred v2
-// state block, a line icon in a 72 pt disc over a Lora 24 title, the note,
-// the Plan's facts, and real buttons instead of «Volver al inicio» as a link.
+// state block, a plain Rosa profundo line icon (no disc, FIX-089) over a Lora
+// 24 title, the note, the Plan's facts, and real buttons.
 describe("PaymentStatusView", () => {
   it.each([
-    ["pending", "Tu pago está en revisión", "hourglass", "#F2E4E1", "#93615D"],
-    ["confirmed", "¡Pago confirmado!", "check", "#F2E4E1", "#93615D"],
-    ["rejected", "No pudimos confirmar tu pago", "alert", "#F7E5E0", "#A04E3E"],
-  ] as const)("draws the %s state as the v2 block", async (state, title, icon, disc, stroke) => {
+    ["pending", "Tu pago está en revisión", "hourglass"],
+    ["confirmed", "¡Pago confirmado!", "check"],
+    ["rejected", "No pudimos confirmar tu pago", "alert"],
+  ] as const)("draws the %s state as the v2 block", async (state, title, icon) => {
     const screen = await render(
       <PaymentStatusView
         endsOn="2026-12-01"
@@ -31,8 +31,8 @@ describe("PaymentStatusView", () => {
     );
 
     expect(screen.getByRole("header", { name: title })).toHaveStyle({ fontSize: 24 });
-    expect(screen.getByTestId("state-screen-disc")).toHaveStyle({ backgroundColor: disc });
-    expect(screen.getByTestId(`state-screen-icon-${icon}`, hidden)).toHaveProp("stroke", stroke);
+    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
+    expect(screen.getByTestId(`state-screen-icon-${icon}`, hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.getByTestId("payment-status-facts")).toBeOnTheScreen();
     expect(screen.getByText("12 clases")).toBeOnTheScreen();
   });
