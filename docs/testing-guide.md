@@ -11118,7 +11118,8 @@ as ana@, and check every step at 1440 px and at 420 px (open the menu with
    de <clienta>») offers **Revisar comprobante**, **Subir factura** or **Ver
    factura**, and **Anular venta** (same confirmation, reason required). The
    pill «Pendiente» now reads «Por revisar», also in the review panel and the
-   ficha's Pagos tab; the CSV still says «Pendiente».
+   ficha's Pagos tab; the CSV still says «Pendiente». Clicking inside the
+   «Anular venta» dialog does not open the row's panel behind it.
 5. **W5 Informes › Dinero.** A **Período** chip row (**Este mes** by
    default, **Últimos 3 meses**, **Últimos 6 meses**, **Elegir fechas** for
    the Desde/Hasta fields). Three figures **Entró / Salió / Quedó**; Quedó
@@ -11148,7 +11149,9 @@ as ana@, and check every step at 1440 px and at 420 px (open the menu with
    `unbookedClientCount`, `lastClassOn`.
 9. **W9 Buscar una clienta.** Type `lu` in the top bar: after a moment up to
    five Clientas appear (circle, name, «phone · Plan · N restantes») and
-   «Ver todas las clientas con «lu»». Enter or a click opens her ficha.
+   «Ver todas las clientas con «lu»». Enter or a click opens her ficha;
+   Enter pressed before the matches for the typed words arrive opens
+   Clientas filtered by them instead.
    Pages, classes and payments are no longer offered (open Ajustes pages from
    the rail). Ctrl K, the arrows and Escape still work; at 420 px use the
    **Buscar** button.
@@ -11159,7 +11162,8 @@ as ana@, and check every step at 1440 px and at 420 px (open the menu with
     table is Fecha, Categoría, Monto, Editar; beside it (under it at 420 px)
     the month's total and one line per category. Eliminated expenses leave
     the list: **Ver gastos borrados** shows them, **Volver a los gastos**
-    returns. **Editar categorías** and **Nuevo gasto** are unchanged.
+    returns. **Editar categorías** and **Nuevo gasto** are unchanged; a new
+    or corrected expense dated in another month moves the page to that month.
 12. **W12 Simulador.** «Tus supuestos» (all eight fields) on the left;
     on the right **Quedaría al mes** (was «Resultado»), Entraría / Saldría,
     Punto de equilibrio and its formula; Proyección below.
