@@ -43,13 +43,30 @@ export class FreezeRequestDto {
   state!: 'requested';
 }
 
-const decideFreezeSchema = z.strictObject({
-  decision: z.enum(['approved', 'refused']),
-});
+// E9 (staff redesign): a refusal may say why, and the Client reads it in her
+// «Congelamiento rechazado» notification. The Freeze row has no column for it,
+// so it is NOT persisted: storing it needs a migration (owner's approval) later.
+const decideFreezeSchema = z
+  .strictObject({
+    decision: z.enum(['approved', 'refused']),
+    refusalReason: z.string().trim().min(1).max(300).optional(),
+  })
+  .refine(
+    (value) =>
+      value.refusalReason === undefined || value.decision === 'refused',
+  );
 
 export class DecideFreezeDto {
   @ApiProperty({ enum: ['approved', 'refused'] })
   decision!: 'approved' | 'refused';
+
+  @ApiPropertyOptional({
+    minLength: 1,
+    maxLength: 300,
+    description:
+      'Only with a refusal: why, sent to the Client in her notification. Not stored on the Freeze (no column yet).',
+  })
+  refusalReason?: string;
 }
 
 export const parseDecideFreeze = (value: unknown): DecideFreezeDto | null => {

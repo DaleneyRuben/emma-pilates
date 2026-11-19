@@ -15243,6 +15243,12 @@
               "approved",
               "refused"
             ]
+          },
+          "refusalReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "Only with a refusal: why, sent to the Client in her notification. Not stored on the Freeze (no column yet)."
           }
         },
         "required": [
