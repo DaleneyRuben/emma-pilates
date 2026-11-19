@@ -57,7 +57,7 @@ describe("AW23 Personal on a desktop browser", () => {
     expectBrandedLoading("Cargando al personal…");
 
     const emmaRow = await rowOf("Emma Vargas");
-    const role = within(emmaRow).getByRole("cell", { name: "Entrenadora" });
+    const role = within(emmaRow).getByRole("cell", { name: "Instructora" });
     expect(role).toHaveAttribute("data-label", "Rol");
     expect(role.querySelector("[aria-hidden='true']")).toBeNull();
     expect(
@@ -105,7 +105,7 @@ describe("AW23 Personal on a desktop browser", () => {
         .map((option) => option.textContent),
     ).toEqual([
       "Todos",
-      "Entrenadora",
+      "Instructora",
       "Asistente",
       "Administradora",
       "Nutricionista",
@@ -154,7 +154,7 @@ describe("AW23 Personal on a desktop browser", () => {
 
     expect(
       within(await rowOf("Diego Paz")).getByRole("cell", {
-        name: "Entrenador",
+        name: "Instructor",
       }),
     ).toBeInTheDocument();
     expect(

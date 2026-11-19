@@ -110,7 +110,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     expect(within(panel).getByText("Elige el género.")).toBeVisible();
 
     await user.click(within(genders).getByRole("radio", { name: "Masculino" }));
-    await user.click(within(roles).getByRole("radio", { name: "Entrenador" }));
+    await user.click(within(roles).getByRole("radio", { name: "Instructor" }));
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(
       await within(panel).findByText("Elige al menos una sucursal."),

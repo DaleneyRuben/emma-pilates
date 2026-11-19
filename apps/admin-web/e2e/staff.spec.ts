@@ -18,14 +18,14 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   const roleFilter = page.getByLabel("Rol");
   await expect(roleFilter.locator("option")).toHaveText([
     "Todos",
-    "Entrenadora",
+    "Instructora",
     "Asistente",
     "Administradora",
     "Nutricionista",
     "Coordinadora",
   ]);
   await expect(
-    page.getByRole("row", { name: /Emma Vargas/ }).getByText("Entrenadora"),
+    page.getByRole("row", { name: /Emma Vargas/ }).getByText("Instructora"),
   ).toBeVisible();
   await expect(
     page

@@ -96,7 +96,7 @@ describe("AW24 Editar miembro contact", () => {
 
     await user.click(within(genders).getByRole("radio", { name: "Masculino" }));
     expect(
-      within(panel).getByRole("radio", { name: "Entrenador" }),
+      within(panel).getByRole("radio", { name: "Instructor" }),
     ).toBeChecked();
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 

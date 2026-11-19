@@ -61,7 +61,7 @@ describe("AW24 Editar miembro", () => {
       within(panel).getByRole("textbox", { name: "Correo electrónico" }),
     ).toHaveValue("emma@emmapilates.bo");
     expect(
-      within(panel).getByRole("radio", { name: "Entrenadora" }),
+      within(panel).getByRole("radio", { name: "Instructora" }),
     ).toBeChecked();
     expect(
       within(panel).getByRole("checkbox", { name: "Centro" }),
@@ -330,7 +330,7 @@ describe("AW24 Editar miembro", () => {
         "Esta cuenta está desactivada: ya no puede entrar.",
       ),
     ).toBeVisible();
-    expect(within(panel).getByText("Entrenadora")).toBeVisible();
+    expect(within(panel).getByText("Instructora")).toBeVisible();
     expect(within(panel).getByText("Centro")).toBeVisible();
     expect(
       within(panel).queryByRole("button", { name: "Guardar" }),
