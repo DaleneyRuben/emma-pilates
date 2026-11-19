@@ -27,7 +27,8 @@ describe("freeze format (walkthrough findings 52/53)", () => {
   });
 
   it("shows what approving a pending request does to the plan end", () => {
-    expect(freezePendingPlanEnd(base)).toBe("vie 5 feb → vie 12 feb");
+    // FIX-091 (W16 B): the review panel's «Vencería».
+    expect(freezePendingPlanEnd(base)).toBe("vie 12 feb (antes vie 5 feb)");
     expect(freezePendingPlanEnd({ ...base, planEndsOnAfter: null })).toBe(
       "vie 5 feb",
     );

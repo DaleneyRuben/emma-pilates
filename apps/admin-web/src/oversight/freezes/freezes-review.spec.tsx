@@ -42,8 +42,8 @@ describe("Congelamientos por decidir", () => {
   const decisions: unknown[] = [];
   beforeEach(() => {
     decisions.length = 0;
+    server.use(...signedInHandlers());
     server.use(
-      ...signedInHandlers(),
       http.get(apiUrl(freezesPath), () => jsonResponse([valeria, daniela])),
       http.post(
         apiUrl(`${freezesPath}/freeze-1/decision`),
@@ -59,6 +59,7 @@ describe("Congelamientos por decidir", () => {
   it("lists what each one asks, its days, and the new end, with «Revisar»", async () => {
     renderAdmin("/clientas/congelamientos");
 
+    const row = await rowOf("Valeria Quiroga");
     const views = screen.getByRole("group", { name: "Congelamientos" });
     expect(
       within(views).getByRole("button", { name: "Por decidir · 2" }),
@@ -66,7 +67,6 @@ describe("Congelamientos por decidir", () => {
     expect(
       within(views).getByRole("button", { name: "Decididos" }),
     ).toHaveAttribute("aria-pressed", "false");
-    const row = await rowOf("Valeria Quiroga");
     expect(
       within(row).getByRole("cell", { name: "sáb 21 al mar 24 nov" }),
     ).toHaveAttribute("data-label", "Pide");
