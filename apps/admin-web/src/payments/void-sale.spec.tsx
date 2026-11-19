@@ -109,6 +109,31 @@ describe("AW28 Anular venta", () => {
     expect(within(voided).getByText("Anulado")).toBeVisible();
   });
 
+  it("keeps a click inside the dialog from opening the row's panel", async () => {
+    const withInvoice = {
+      ...valeriaPayment,
+      invoiceData: { taxId: "1020304050", name: "Estudio Valeria SRL" },
+    };
+    server.use(
+      http.get(apiUrl(paymentsPath), () =>
+        jsonResponse(paymentPage([withInvoice], { pendingCount: 0 })),
+      ),
+    );
+    const { user } = renderAdmin("/dinero/pagos");
+    await screen.findByRole("heading", { level: 1, name: "Pagos" });
+    await user.click(statusChip("Confirmados"));
+    const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
+      .parentElement as HTMLElement;
+    await voidFromMenu(user, row, "Valeria Quiroga");
+
+    const dialog = await screen.findByRole("alertdialog", {
+      name: /Anular la venta/,
+    });
+    await user.click(within(dialog).getByRole("textbox", { name: "Motivo" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("keeps the dialog open when the void is refused", async () => {
     server.use(
       http.get(apiUrl(paymentsPath), () =>
