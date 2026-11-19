@@ -10965,3 +10965,62 @@ H. **Simulador.** Under the two figures: «(costos fijos Bs 21.175,00 + pago a
 I. **Para contactar.** A Client without a usable phone shows a grey, flat
    **Abrir WhatsApp** (no filled block) that says «Sin teléfono» or «Celular
    incompleto» on hover; an enabled one keeps its Lino button.
+
+## Test 183: the common base, palette B and the shared pieces (FIX-089)
+
+The owner's round-1 picks after the 2026-11-19 design audit
+(`DECISIONES-AUDITORIA-2026-11-19.md`; canvas
+https://claude.ai/artifact/8v5yrLF8zXf2yzci8SF8WH; design follow-up 280).
+JavaScript and CSS only: no migration, no API change, no native build; a Metro
+reload or an OTA is enough for the phones. Use a copy of `emma_vacia`
+(password «Password»), run the API, the worker, both Metro servers and the
+admin web on your own ports, and walk the iPhone 16 Pro, the Android emulator
+and a browser at 1440 and 420 px.
+
+A. **Only five colours.** Every screen of both apps, the admin web and the
+   public site uses Crema `#F9F4F2` for the page and the cards, Rosa arcilla
+   `#CDA697` for 1px borders, Rubor `#E7CCBF` for soft backgrounds, Palo de
+   rosa `#B78380` for the hero block and the initials circles, and Rosa
+   profundo `#93615D` for all text, icons, the primary button and the selected
+   chip. No grey, no white, no green, amber or red anywhere: a cancelled class,
+   a pending payment or an error is said in words and weight.
+B. **Buttons.** One solid Rosa profundo button with a Crema label per screen
+   («Reservar una clase» on Inicio, «Reservar» on a class). Secondary actions
+   are Crema with a Rosa profundo outline. «Cerrar sesión» and every
+   destructive confirmation (leave the waitlist, refuse a freeze in the staff
+   app and on the web) are outlined, never red, and always ask first. A
+   disabled button is Crema with an Arcilla outline and a reason under it (a
+   frozen day reads «Podrás reservar desde el …»).
+C. **Chips.** The chosen day, class type, branch, filter or segment is Rosa
+   profundo with a Crema label; the others are Crema with an Arcilla outline.
+D. **No discs, pills only for exceptions.** Perfil, the class facts, empty
+   states and notices draw their icons alone. Normal states («Activo», «Lista»,
+   «Pagado», places) are plain text; only an exception («Por vencer»,
+   «Completa», «Pendiente») is a Rubor pill with bold text. Unread
+   notifications are bold, not tinted.
+E. **Header (Encabezado A).** Every pushed screen in both apps has the back
+   arrow on its own row and the screen's own large Lora title under it: a class
+   opened from Reservar is titled with the class («Reformer Pilates»), a plan
+   with its name, the evaluation booking «Confirma tu cita». «Recuperar
+   contraseña» keeps a 16 pt inset on Android.
+F. **Class card (Clase E).** As daniela@, **Mi agenda** opens on the next class
+   as a Palo de rosa block («PRÓXIMA», «0 de 8», «16:00 · Reformer Pilates»,
+   «Achumani»); the other classes are rows with the time in a Rubor box and
+   «N de M» at the end; cancelled classes fold into «1 cancelada por mínimo ·
+   Ver», which opens them. Horario, Cancelar una clase and Reservar para una
+   clienta use the same rows. As carla@, Reservar uses the same rows with the
+   trainer line on one line.
+G. **Forms (Form B).** On Login the email example reads «Ej.: tu@correo.com»
+   under the field (the staff app «Ej.: tu@emmapilates.bo») and no password
+   field shows dots. On **Editar perfil**, clear Nombre and tap **Guardar
+   cambios**: a Rubor box reads «Falta 1 dato para guardar · Nombre», the field
+   has a 2 pt Rosa profundo border and «Escribe tu nombre.» in bold. On
+   Registro, **Crear cuenta** with nothing filled lists all six fields. On the
+   web, save **Nueva sesión** empty: «Faltan 5 datos para guardar» and the
+   labels.
+H. **Phone-width web lists (Lista C).** At 420 px, Clientas and Personal show
+   a Palo de rosa circle with Crema initials, the name, a short line and a
+   chevron, under a row of filter chips.
+I. **Fonts.** Every text in both apps (tab labels and buttons included) is Work
+   Sans, with Lora for titles and big figures; nothing is under 12 pt. The
+   public site loads Lora and Work Sans from Google Fonts.
