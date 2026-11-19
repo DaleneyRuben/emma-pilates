@@ -53,12 +53,15 @@ export function BranchLine({
  */
 export function DayStrip({
   dates,
+  frozen = () => false,
   onSelect,
   selected,
   today,
   trailing,
 }: {
   dates: readonly string[];
+  /** C1 B: a day inside an approved Freeze carries a lock and says so. */
+  frozen?: (date: string) => boolean;
   onSelect: (date: string) => void;
   selected: string;
   today: string;
@@ -69,9 +72,10 @@ export function DayStrip({
       {dates.map((date) => {
         const label = dayChipLabel(date);
         const isSelected = date === selected;
+        const isFrozen = frozen(date);
         return (
           <Pressable
-            accessibilityLabel={`${label.weekday} ${label.day}`}
+            accessibilityLabel={`${label.weekday} ${label.day}${isFrozen ? ", congelado" : ""}`}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             key={date}
@@ -83,6 +87,14 @@ export function DayStrip({
               {date === today ? "Hoy" : label.weekday}
             </Text>
             <Text style={[styles.dayNumber, isSelected && styles.onSelected]}>{label.day}</Text>
+            {isFrozen ? (
+              <Glyph
+                color={isSelected ? colors.onPrimary : colors.text}
+                name="lock"
+                size={12}
+                strokeWidth={1.75}
+              />
+            ) : null}
           </Pressable>
         );
       })}
@@ -162,7 +174,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.button,
     gap: spacing.xxs,
     flex: 1,
-    height: 60,
+    height: 64,
     justifyContent: "center",
     minWidth: 0,
   },
