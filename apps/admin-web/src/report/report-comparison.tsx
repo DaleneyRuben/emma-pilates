@@ -98,7 +98,10 @@ export function ComparisonTable({
               key={concept.name}
               className={cn(concept.total && totalRow)}
             >
-              <TableCell data-label="Concepto">{concept.name}</TableCell>
+              {/* At phone width the concept is the card's title, not a labelled line. */}
+              <TableCell className="max-md:font-semibold max-md:before:content-none">
+                {concept.name}
+              </TableCell>
               {reports.map((report) => (
                 <TableCell
                   key={report.month.month}
