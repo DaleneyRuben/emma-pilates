@@ -7,7 +7,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  ButtonLabel,
   colors,
   fontFamilies,
   FormField,
@@ -15,6 +14,7 @@ import {
   IconRow,
   IconRowGroup,
   LoadingState,
+  PrimaryButton,
   QueryFailure,
   radii,
   Screen,
@@ -28,50 +28,13 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
 import { PromotionsConsent } from "./promotions-consent";
 
 export const closedAccountNotice = "Cerramos tu cuenta. Gracias por entrenar con nosotras.";
-
-function DestructiveButton({
-  busy,
-  disabled,
-  label,
-  onPress,
-  testID,
-}: {
-  busy: boolean;
-  disabled: boolean;
-  label: string;
-  onPress: () => void;
-  testID: string;
-}) {
-  return (
-    <Pressable
-      testID={testID}
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ busy, disabled: disabled || busy }}
-      disabled={disabled || busy}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.destructive,
-        disabled && !busy && styles.destructiveDisabled,
-        pressed && styles.destructivePressed,
-      ]}
-    >
-      <ButtonLabel
-        busy={busy}
-        label={label}
-        spinnerColor={colors.error}
-        style={[styles.destructiveLabel, disabled && !busy && styles.destructiveLabelDisabled]}
-      />
-    </Pressable>
-  );
-}
 
 // Prompt 24 (BE-007 G2–G6): the Client closes their own Account after seeing
 // what it does, confirming with the password.
@@ -200,12 +163,16 @@ export function CloseAccountScreen() {
                 </BodyText>
               </View>
             ) : null}
-            <DestructiveButton
+            {/* FIX-089: destructive is the secondary look, confirmed by the
+                password, and the off button says why. */}
+            <PrimaryButton
               busy={submitting}
               disabled={password === ""}
+              disabledReason="Escribe tu contraseña para confirmar"
               label="Cerrar mi cuenta"
               onPress={() => void close()}
               testID="close-account-confirm"
+              tone="error"
             />
             <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
           </View>
@@ -246,24 +213,6 @@ export function CloseAccountScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.mdLg, paddingBottom: spacing.lg },
-  destructive: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.error,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  destructiveDisabled: { borderColor: colors.errorDisabledBorder },
-  destructiveLabel: {
-    fontFamily: fontFamilies.bodyMedium,
-    color: colors.error,
-    fontSize: typography.body,
-    fontWeight: "500",
-  },
-  destructiveLabelDisabled: { color: colors.errorDisabledText },
-  destructivePressed: { backgroundColor: colors.errorTint },
   failure: {
     backgroundColor: colors.errorTint,
     borderRadius: radii.control,
@@ -277,6 +226,6 @@ const styles = StyleSheet.create({
   field: { gap: spacing.sm },
   footer: { gap: spacing.xs, paddingTop: spacing.md },
   lead: { color: colors.text },
-  note: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
+  note: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
   screen: { gap: spacing.lg },
 });
