@@ -39,7 +39,9 @@ import { StaffPhotoBlock } from "./staff-photo-block";
 import { isAccountEmailLimit, staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffRoleFields } from "./staff-role-fields";
+import { StaffFormSection } from "./staff-form-section";
 import { TrainerReferralCodeField } from "./trainer-referral-code-field";
+import { useReferralCodeDraft } from "./use-referral-code-draft";
 
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id) => b.includes(id));
@@ -47,6 +49,9 @@ const sameSet = (a: readonly string[], b: readonly string[]) =>
 // AW24 edit: contact, Role and Branches are separate backend commands; a
 // Role change carries the new Branches so both land together (IDN-007).
 // FIX-038: the name and the phone go first, as one contact command.
+// FIX-091 (W14 A): one page by sections under one «Guardar cambios», which
+// also saves a Trainer's code, before anything else so a refused code
+// changes nothing.
 export function StaffEditForm({
   member,
   onDone,
@@ -77,6 +82,8 @@ export function StaffEditForm({
   const [emailNotice, setEmailNotice] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<StaffFormOutput | null>(null);
   const active = member.status === "active";
+  const trainer = member.role === "trainer";
+  const referral = useReferralCodeDraft(member.id, trainer);
 
   // A Branch archived since the assignment has no chip and the backend
   // refuses its id (`invalid_branch_assignment`): only the ids the chips
@@ -105,10 +112,17 @@ export function StaffEditForm({
     const roleChanged = next !== member.role;
     const branchesChanged =
       !holdsEveryBranch(next) && !sameSet(branchIds, shown(member.branchIds));
-    if (!contactChanged && !roleChanged && !branchesChanged && !emailChanged) {
+    if (
+      !contactChanged &&
+      !roleChanged &&
+      !branchesChanged &&
+      !emailChanged &&
+      !referral.changed
+    ) {
       onDone();
       return;
     }
+    if (!(await referral.save())) return;
     let contactSaved = false;
     let othersSaved = false;
     try {
@@ -211,52 +225,58 @@ export function StaffEditForm({
           <FormErrorSummary />
           {/* A limit notice stays first in the body (AW24). */}
           <EmailLimitNotice limit={limit} />
-          <StaffPhotoBlock member={member} />
-          <StaffContactField control={form.control} name="name" />
-          {member.status === "pending" ? (
-            <PendingInvitation limit={limit} member={member} />
-          ) : (
-            <>
-              <ActiveEmailField
-                control={form.control}
-                current={member.email}
-                name={member.name}
-                typed={typedEmail}
-              />
-              {pending === null ? null : (
-                <PendingEmailChange
-                  limit={limit}
-                  member={member}
-                  pending={pending}
-                  onResent={setPending}
-                  onCancelled={() => {
-                    setPending(null);
-                    setEmailNotice(
-                      `Cancelamos el cambio. ${firstName(member.name)} sigue entrando con ${member.email}.`,
-                    );
-                  }}
+          <StaffFormSection title="Datos">
+            <StaffPhotoBlock member={member} />
+            <StaffContactField control={form.control} name="name" />
+            {member.status === "pending" ? (
+              <PendingInvitation limit={limit} member={member} />
+            ) : (
+              <>
+                <ActiveEmailField
+                  control={form.control}
+                  current={member.email}
+                  name={member.name}
+                  typed={typedEmail}
                 />
-              )}
-              {emailNotice === null ? null : (
-                <p role="status" className="text-ayuda text-texto-secundario">
-                  {emailNotice}
-                </p>
-              )}
-            </>
-          )}
-          <PhoneFormField control={form.control} name="phone" />
-          <StaffRoleFields
-            control={form.control}
-            role={role}
-            gender={gender}
-            branchNote={`Si sacas una sucursal, sus clases ya asignadas no se reasignan solas.${
-              member.role === "trainer"
-                ? " Cámbialas de instructora en Horario antes de guardar."
-                : ""
-            }`}
-          />
-          {member.role === "trainer" ? (
-            <TrainerReferralCodeField staffMemberId={member.id} />
+                {pending === null ? null : (
+                  <PendingEmailChange
+                    limit={limit}
+                    member={member}
+                    pending={pending}
+                    onResent={setPending}
+                    onCancelled={() => {
+                      setPending(null);
+                      setEmailNotice(
+                        `Cancelamos el cambio. ${firstName(member.name)} sigue entrando con ${member.email}.`,
+                      );
+                    }}
+                  />
+                )}
+                {emailNotice === null ? null : (
+                  <p role="status" className="text-ayuda text-texto-secundario">
+                    {emailNotice}
+                  </p>
+                )}
+              </>
+            )}
+            <PhoneFormField control={form.control} name="phone" />
+          </StaffFormSection>
+          <StaffFormSection title="Rol y sucursales">
+            <StaffRoleFields
+              control={form.control}
+              role={role}
+              gender={gender}
+              branchNote={`Si sacas una sucursal, sus clases ya asignadas no se reasignan solas.${
+                trainer
+                  ? " Cámbialas de instructora en Horario antes de guardar."
+                  : ""
+              }`}
+            />
+          </StaffFormSection>
+          {trainer ? (
+            <StaffFormSection title="Código de invitación">
+              <TrainerReferralCodeField draft={referral} />
+            </StaffFormSection>
           ) : null}
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
@@ -265,22 +285,28 @@ export function StaffEditForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" busy={change.isPending}>
-            Guardar
-          </Button>
-          {member.status === "pending" ? (
-            <CancelInvitationAction
-              member={member}
-              onDone={onDone}
-              onFailure={setFailure}
-            />
-          ) : (
-            <DeactivateAction
-              member={member}
-              onDone={onDone}
-              onFailure={setFailure}
-            />
-          )}
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {member.status === "pending" ? (
+              <CancelInvitationAction
+                member={member}
+                onDone={onDone}
+                onFailure={setFailure}
+              />
+            ) : (
+              <DeactivateAction
+                member={member}
+                onDone={onDone}
+                onFailure={setFailure}
+              />
+            )}
+            <Button
+              type="submit"
+              size="lg"
+              busy={form.formState.isSubmitting || change.isPending}
+            >
+              Guardar cambios
+            </Button>
+          </div>
         </SidePanelFooter>
       </form>
       <EmailChangeDialog

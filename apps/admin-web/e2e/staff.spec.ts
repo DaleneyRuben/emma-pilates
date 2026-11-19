@@ -97,7 +97,9 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   await page.getByRole("button", { name: "Camila Rojas" }).click();
   const contact = page.getByRole("dialog", { name: "Editar miembro" });
   await contact.getByLabel("Celular", { exact: true }).fill("7000 0001");
-  await contact.getByRole("button", { name: "Guardar", exact: true }).click();
+  await contact
+    .getByRole("button", { name: "Guardar cambios", exact: true })
+    .click();
   await expect(
     page.getByText("Guardamos los cambios de Camila Rojas."),
   ).toBeVisible();
