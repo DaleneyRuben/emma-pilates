@@ -7,7 +7,6 @@ import {
   createTabStackScreenLayout,
   returnTabsToRoot,
   tabBarHidden,
-  typography,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,6 +21,7 @@ import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
 import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
+import { ClientTabLabel } from "./client-tab-label";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { InvoiceDetailScreen } from "./invoices/invoice-detail-screen";
@@ -141,15 +141,24 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
-const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.borderStrong };
+const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.border };
+
+const tabCount = 4;
 
 const tabOptions =
-  (title: string, icon: ClientTabIconName, root: string) =>
+  (title: string, icon: ClientTabIconName, root: string, position: number) =>
   ({ route }: { route: Parameters<typeof getFocusedRouteNameFromRoute>[0] }) => {
     const hidden = tabBarHidden(taskRoutes, getFocusedRouteNameFromRoute(route), root);
     return {
+      // A drawn label leaves the button unnamed: say it as iOS does for a text one.
+      tabBarAccessibilityLabel: `${title}, tab, ${position} of ${tabCount}`,
       tabBarButtonTestID: `tab-${icon}`,
       tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
+      tabBarLabel: ({ color, focused }: { color: string; focused: boolean }) => (
+        <ClientTabLabel color={color} focused={focused}>
+          {title}
+        </ClientTabLabel>
+      ),
       tabBarStyle: hidden ? { display: "none" as const } : tabBarStyle,
       title,
     };
@@ -170,22 +179,24 @@ const ClientTabs = createBottomTabNavigator({
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,
-    tabBarActiveTintColor: colors.primary,
-    tabBarInactiveTintColor: colors.textSubtle,
+    tabBarActiveTintColor: colors.text,
+    tabBarInactiveTintColor: colors.text,
     tabBarLabelPosition: "below-icon",
-    tabBarLabelStyle: { fontSize: typography.tabLabel },
   },
   screens: {
-    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", tabRoots.HomeTab) },
-    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking", tabRoots.Booking) },
+    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home", tabRoots.HomeTab, 1) },
+    Booking: {
+      screen: BookingStack,
+      options: tabOptions("Reservar", "booking", tabRoots.Booking, 2),
+    },
     Bookings: {
       screen: BookingsStack,
-      options: tabOptions("Mis Reservas", "bookings", tabRoots.Bookings),
+      options: tabOptions("Mis Reservas", "bookings", tabRoots.Bookings, 3),
     },
     // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
     ProfileTab: {
       screen: ProfileStack,
-      options: tabOptions("Perfil", "profile", tabRoots.ProfileTab),
+      options: tabOptions("Perfil", "profile", tabRoots.ProfileTab, 4),
     },
   },
 });
