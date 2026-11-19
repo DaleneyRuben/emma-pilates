@@ -32,7 +32,7 @@ describe("Staff Mis pagos", () => {
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
     expect(summary.getByText("En curso · Noviembre 2026")).toBeOnTheScreen();
-    expect(summary.getByText("Bs 65,00")).toHaveStyle({ fontSize: 36 });
+    expect(summary.getByText("Bs 65")).toHaveStyle({ fontSize: 36 });
     expect(
       summary.getByText(
         "1 clase dictada hasta hoy · puede cambiar hasta que administración lo apruebe.",
@@ -48,7 +48,7 @@ describe("Staff Mis pagos", () => {
     const october = within(screen.getByRole("button", { name: /^Liquidación de octubre 2026,/ }));
     expect(october.getByText("Octubre 2026")).toBeOnTheScreen();
     expect(october.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
-    expect(october.getByText("Bs 322,00")).toBeOnTheScreen();
+    expect(october.getByText("Bs 322")).toBeOnTheScreen();
     // The payment lives on its statement's row, not in a list of its own.
     expect(screen.queryByText("Pagos recibidos")).toBeNull();
     expect(screen.queryByText("Otros pagos")).toBeNull();
@@ -63,7 +63,7 @@ describe("Staff Mis pagos", () => {
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
     expect(summary.getByText("Por cobrar")).toBeOnTheScreen();
-    expect(summary.getByText("Bs 322,00")).toBeOnTheScreen();
+    expect(summary.getByText("Bs 322")).toBeOnTheScreen();
     expect(
       summary.getByText("Liquidación de octubre 2026, ya aprobada. Falta el pago."),
     ).toBeOnTheScreen();
@@ -87,7 +87,7 @@ describe("Staff Mis pagos", () => {
     });
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
-    expect(summary.getByText("Bs 422,00")).toBeOnTheScreen();
+    expect(summary.getByText("Bs 422")).toBeOnTheScreen();
     expect(summary.getByText("2 liquidaciones aprobadas. Falta el pago.")).toBeOnTheScreen();
   });
 
@@ -99,7 +99,7 @@ describe("Staff Mis pagos", () => {
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
     expect(summary.getByText("Último pago · 1 de noviembre")).toBeOnTheScreen();
-    expect(summary.getByText("Bs 322,00")).toBeOnTheScreen();
+    expect(summary.getByText("Bs 322")).toBeOnTheScreen();
     expect(
       summary.getByText("Liquidación de octubre 2026. Sin comprobante adjunto."),
     ).toBeOnTheScreen();
@@ -119,7 +119,7 @@ describe("Staff Mis pagos", () => {
     const others = within(await waitFor(() => screen.getByLabelText("Otros pagos")));
     expect(others.getByText("Bs 150,50")).toBeOnTheScreen();
     expect(others.getByText("15 de octubre de 2026 · sin comprobante")).toBeOnTheScreen();
-    expect(others.queryByText("Bs 322,00")).toBeNull();
+    expect(others.queryByText("Bs 322")).toBeNull();
   });
 
   it("opens a statement with its payment, its sums by concept and each class", async () => {
@@ -134,13 +134,13 @@ describe("Staff Mis pagos", () => {
     // FIX-089: a normal state is a word in weight, never a pill.
     expect(detail.getByText("Pagado")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
     expect(detail.getByText("Pagado").parent).not.toHaveStyle({ borderRadius: 999 });
-    expect(detail.getByText("Bs 322,00")).toHaveStyle({ fontSize: 34 });
+    expect(detail.getByText("Bs 322")).toHaveStyle({ fontSize: 34 });
     expect(detail.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
     expect(detail.getByText("Sin comprobante adjunto")).toBeOnTheScreen();
     expect(detail.getByText("Clases dictadas · 2")).toBeOnTheScreen();
-    expect(detail.getByText("Bs 146,00")).toBeOnTheScreen();
+    expect(detail.getByText("Bs 146")).toBeOnTheScreen();
     expect(detail.getByText("Canceladas por mínimo · 1")).toBeOnTheScreen();
-    expect(detail.getByText("Bs 25,00")).toBeOnTheScreen();
+    expect(detail.getByText("Bs 25")).toBeOnTheScreen();
     expect(detail.getByText("Comisiones · 1")).toBeOnTheScreen();
     expect(detail.getByText("Bs 78,50")).toBeOnTheScreen();
     expect(detail.queryByText("6 clientas, 2 extra")).toBeNull();
@@ -148,7 +148,7 @@ describe("Staff Mis pagos", () => {
     await fireEvent.press(detail.getByRole("button", { name: "Ver cada clase" }));
     expect(detail.getAllByText("Clase")).toHaveLength(2);
     expect(detail.getByText("6 clientas, 2 extra")).toBeOnTheScreen();
-    expect(detail.getByText("Bs 81,00")).toBeOnTheScreen();
+    expect(detail.getByText("Bs 81")).toBeOnTheScreen();
     expect(detail.getByText("Mínimo no alcanzado")).toBeOnTheScreen();
     expect(detail.getByText("Primer plan")).toBeOnTheScreen();
     await fireEvent.press(detail.getByRole("button", { name: "Ocultar detalle" }));
@@ -197,7 +197,7 @@ describe("Staff Mis pagos", () => {
 
     const detail = within(screen.getByTestId("pay-statement"));
     expect(detail.getByText("Otros · 1")).toBeOnTheScreen();
-    expect(detail.getByText("Bs 100,00")).toBeOnTheScreen();
+    expect(detail.getByText("Bs 100")).toBeOnTheScreen();
   });
 
   // BKO-009: a Trainer may be paid by day, week or range, not only by month.

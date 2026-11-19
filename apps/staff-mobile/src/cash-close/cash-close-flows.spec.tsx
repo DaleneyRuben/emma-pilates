@@ -62,7 +62,7 @@ describe("Cerrar caja (S25)", () => {
     expect(
       screen.getByText("Cuenta los billetes antes de mirar el total esperado."),
     ).toBeOnTheScreen();
-    expect(screen.getByLabelText("Esperado según los pagos, Bs 520,00")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
     expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
@@ -73,14 +73,14 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
 
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
-    expect(screen.getByLabelText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · Bs 0 · Cuadra")).toBeOnTheScreen();
     expect(screen.getByText("Cuadra")).toHaveStyle({ color: "#93615D" });
     expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "525,50");
     expect(screen.getByLabelText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "510");
-    expect(screen.getByLabelText("Diferencia · −Bs 10,00 · Falta efectivo")).toBeOnTheScreen();
-    expect(screen.getByText("Falta Bs 10,00")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · −Bs 10 · Falta efectivo")).toBeOnTheScreen();
+    expect(screen.getByText("Falta Bs 10")).toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText("Nota (opcional)"), "Faltó cambio");
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar caja" }));
@@ -97,8 +97,8 @@ describe("Cerrar caja (S25)", () => {
         key: expect.any(String) as string,
       },
     ]);
-    expect(screen.getByText("Bs 510,00")).toBeOnTheScreen();
-    expect(screen.getByText("−Bs 10,00")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 510")).toBeOnTheScreen();
+    expect(screen.getByText("−Bs 10")).toBeOnTheScreen();
     expect(screen.getByText("Faltó cambio")).toBeOnTheScreen();
     expect(screen.getByText("La cerró Camila Rojas a las 19:05.")).toBeOnTheScreen();
   });
@@ -109,10 +109,8 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
     });
 
-    expect(screen.getByLabelText("Esperado según los pagos, Bs 520,00")).toBeOnTheScreen();
-    expect(
-      screen.getByLabelText("Ventas anuladas (efectivo en caja), Bs 290,00"),
-    ).toBeOnTheScreen();
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Ventas anuladas (efectivo en caja), Bs 290")).toBeOnTheScreen();
   });
 
   it("shows no voided line when nothing was voided", async () => {
@@ -229,7 +227,7 @@ describe("Cerrar caja (S25)", () => {
       expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toBeOnTheScreen(),
     );
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "50");
-    expect(screen.getByLabelText("Diferencia · +Bs 50,00 · Sobra efectivo")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Diferencia · +Bs 50 · Sobra efectivo")).toBeOnTheScreen();
   });
 
   it("lets the Administrator close any Branch from Pagos pendientes", async () => {
