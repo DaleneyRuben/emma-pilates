@@ -15859,6 +15859,12 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)"
+          },
+          "lastClassOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Bolivia civil date of the latest class she kept that already started, not counting a no-show; null if none (FIX-091)"
           }
         },
         "required": [
@@ -15957,6 +15963,12 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date she joined"
+          },
+          "lastClassOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Bolivia civil date of her latest class kept, as the list’s «Última clase»; null if none (FIX-091)"
           }
         },
         "required": [
