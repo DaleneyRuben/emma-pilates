@@ -20,7 +20,7 @@ const trainerProfile = {
   email: "diego.rojas@example.com",
   phone: null,
   role: "trainer",
-  // FIX-081 (finding 118): his Role reads «Entrenador».
+  // FIX-081 (finding 118): his Role reads «Instructor».
   gender: "male",
   branches: [{ id: "branch-1", name: "Equipetrol" }],
 };
@@ -126,8 +126,8 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     await waitFor(() => expect(screen.getByText("Diego Rojas")).toBeOnTheScreen());
     // v2 S24: one list of the team, each with her role and Branches.
     expect(screen.getByText("El equipo")).toBeOnTheScreen();
-    expect(screen.getByText("Entrenadora · Equipetrol, Centro")).toBeOnTheScreen();
-    expect(screen.getByText("Entrenador · Equipetrol")).toBeOnTheScreen();
+    expect(screen.getByText("Instructora · Equipetrol, Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Instructor · Equipetrol")).toBeOnTheScreen();
     expect(screen.getByText("Nunca aparece otra persona de administración.")).toBeOnTheScreen();
     expect(screen.queryByText("Paola Mendoza")).not.toBeOnTheScreen();
     expect(
@@ -154,7 +154,7 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     expect(calls).toEqual([
       { method: "POST", path: "/api/v1/impersonations", body: { staffMemberId: "staff-2" } },
     ]);
-    expect(screen.getByText("Entrenador · Quedan 28 min")).toBeOnTheScreen();
+    expect(screen.getByText("Instructor · Quedan 28 min")).toBeOnTheScreen();
     expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Pagos pendientes")).not.toBeOnTheScreen();
 
@@ -183,7 +183,7 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     const screen = await render(<App runtime={runtime} />);
 
     await waitFor(() => expect(screen.getByText("Viendo como Diego Rojas")).toBeOnTheScreen());
-    expect(screen.getByText("Entrenador · Quedan 0 min")).toBeOnTheScreen();
+    expect(screen.getByText("Instructor · Quedan 0 min")).toBeOnTheScreen();
 
     await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen(), {
       timeout: 8_000,

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { NotificationBell } from "./notification-bell";
 
 /**
- * A tab root's title block (v2): an uppercase eyebrow such as «Entrenadora ·
+ * A tab root's title block (v2): an uppercase eyebrow such as «Instructora ·
  * Lunes 2 de noviembre», the Lora 30 title, an optional one-line note, and on
  * the roots that carry it the notification bell. Perfil is a tab, so no root
  * draws the avatar any more (follow-up 225 §8).

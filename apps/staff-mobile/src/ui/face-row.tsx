@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 /**
  * An `IconRow` whose icon disc is a person's 36 px face (FIX-041, follow-up
- * 242: S08's «Entrenadora» row). Same measures, so it sits in an
+ * 242: S08's «Instructora» row). Same measures, so it sits in an
  * `IconRowGroup` with its hairline inset at 64.
  */
 export function FaceRow({
