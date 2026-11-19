@@ -60,6 +60,7 @@ function ClientActions({
 }) {
   const open = client.accountStatus !== "disabled";
   const active = client.subscription.status === "active";
+  if (!open && !active) return null;
   return (
     <ActionList title="Acciones">
       {active ? (
