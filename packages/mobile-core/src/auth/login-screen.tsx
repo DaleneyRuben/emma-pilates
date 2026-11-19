@@ -5,7 +5,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { BrandHeader } from "./auth-layout";
-import { emailPlaceholder, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import { emailHint, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
@@ -104,7 +104,7 @@ export function LoginScreen({
                   label="Correo electrónico"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  placeholder={emailPlaceholder(teamAccess)}
+                  hint={emailHint(teamAccess)}
                   testID="login-email"
                   value={value}
                 />
