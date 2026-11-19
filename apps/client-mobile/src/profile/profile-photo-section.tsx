@@ -4,7 +4,14 @@ import {
   setCurrentClientPhoto,
   type ClientProfileDto,
 } from "@pilates/api-contracts";
-import { BodyText, colors, spacing, TextButton, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  spacing,
+  TextButton,
+  typography,
+} from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -99,6 +106,11 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
 const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: spacing.md },
   error: { color: colors.errorText, textAlign: "center" },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   section: { alignItems: "center", gap: spacing.sm },
 });

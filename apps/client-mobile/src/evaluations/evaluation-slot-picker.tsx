@@ -168,10 +168,14 @@ const styles = StyleSheet.create({
     letterSpacing: typography.label * 0.12,
     textTransform: "uppercase",
   },
-  dayWeekday: { color: colors.textMuted, fontSize: typography.tabLabel },
+  dayWeekday: {
+    color: colors.textMuted,
+    fontSize: typography.label,
+    fontFamily: fontFamilies.body,
+  },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  muted: { color: colors.textMuted, fontSize: typography.note },
+  muted: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   nutritionist: {
     ...surfaces.flatCard,
     alignItems: "center",
@@ -179,7 +183,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.lg,
   },
-  nutritionistName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  nutritionistName: {
+    color: colors.text,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
+    fontFamily: fontFamilies.bodyMedium,
+  },
   slot: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -189,7 +198,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     width: "31%",
   },
-  slotCaption: { color: colors.textMuted, fontSize: typography.label },
+  slotCaption: {
+    color: colors.textMuted,
+    fontSize: typography.label,
+    fontFamily: fontFamilies.body,
+  },
   slotTime: {
     color: colors.text,
     fontFamily: fontFamilies.display,

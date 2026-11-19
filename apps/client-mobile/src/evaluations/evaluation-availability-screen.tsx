@@ -13,6 +13,7 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
+  fontFamilies,
   LoadingState,
   QueryFailure,
   Screen,
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
   cards: { gap: spacing.xl },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   failure: { color: colors.errorText },
-  muted: { color: colors.textMuted, fontSize: typography.note },
+  muted: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   screen: { gap: spacing.lg },
   section: { gap: spacing.md },
 });

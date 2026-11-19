@@ -223,7 +223,12 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     justifyContent: "center",
   },
-  footer: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
+  footer: {
+    color: colors.textMuted,
+    fontSize: typography.label,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleCard },
   screen: { gap: spacing.lg },
   summary: {

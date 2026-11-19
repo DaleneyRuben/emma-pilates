@@ -26,7 +26,12 @@ export function QrSaveFailure() {
 
 const styles = StyleSheet.create({
   check: { marginTop: spacing.xxs },
-  failure: { color: colors.errorText, fontSize: 13, textAlign: "center" },
+  failure: {
+    color: colors.errorText,
+    fontSize: 13,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   notice: {
     alignItems: "flex-start",
     alignSelf: "stretch",

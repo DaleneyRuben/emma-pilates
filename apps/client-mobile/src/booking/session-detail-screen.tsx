@@ -10,6 +10,8 @@ import {
   BodyText,
   boliviaCivilDate,
   colors,
+  fontFamilies,
+  isInsideCancellationWindow,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -20,7 +22,6 @@ import {
   typography,
   usePushNotifications,
   useStudioRules,
-  isInsideCancellationWindow,
   weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -333,10 +334,20 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 }
 
 const styles = StyleSheet.create({
-  about: { color: colors.text, fontSize: typography.body, lineHeight: 22 },
+  about: {
+    color: colors.text,
+    fontSize: typography.body,
+    lineHeight: 22,
+    fontFamily: fontFamilies.body,
+  },
   actions: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.md },
   content: { gap: spacing.xl, paddingBottom: spacing.lg },
   message: { color: colors.errorText },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.md },
 });

@@ -222,7 +222,12 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   group: { ...surfaces.card },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.lg },
   time: {
     color: colors.white,

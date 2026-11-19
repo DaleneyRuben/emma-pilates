@@ -9,9 +9,9 @@ import {
   BodyText,
   ButtonLabel,
   colors,
+  fontFamilies,
   FormField,
   FormScrollView,
-  type GlyphName,
   IconRow,
   IconRowGroup,
   LoadingState,
@@ -22,6 +22,7 @@ import {
   spacing,
   StateScreen,
   TextButton,
+  type GlyphName,
   typography,
   useMobileIdentity,
 } from "@pilates/mobile-core";
@@ -256,6 +257,7 @@ const styles = StyleSheet.create({
   },
   destructiveDisabled: { borderColor: colors.errorDisabledBorder },
   destructiveLabel: {
+    fontFamily: fontFamilies.bodyMedium,
     color: colors.error,
     fontSize: typography.body,
     fontWeight: "500",
@@ -267,10 +269,14 @@ const styles = StyleSheet.create({
     borderRadius: radii.control,
     padding: spacing.smLg,
   },
-  failureText: { color: colors.errorText, fontSize: typography.note },
+  failureText: {
+    color: colors.errorText,
+    fontSize: typography.note,
+    fontFamily: fontFamilies.body,
+  },
   field: { gap: spacing.sm },
   footer: { gap: spacing.xs, paddingTop: spacing.md },
   lead: { color: colors.text },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   screen: { gap: spacing.lg },
 });

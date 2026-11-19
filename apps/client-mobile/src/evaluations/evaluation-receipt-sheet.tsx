@@ -1,6 +1,7 @@
 import type { ClientEvaluationDto } from "@pilates/api-contracts";
 import {
   colors,
+  fontFamilies,
   formatBolivianos,
   radii,
   SectionTitle,
@@ -91,5 +92,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.smLg,
   },
-  title: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
+  title: {
+    color: colors.text,
+    fontSize: typography.titleSecondary,
+    fontWeight: "500",
+    fontFamily: fontFamilies.heading,
+  },
 });

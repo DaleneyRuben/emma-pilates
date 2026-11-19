@@ -2,6 +2,7 @@ import type { PromotionDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  fontFamilies,
   Heading,
   radii,
   spacing,
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   copy: { gap: spacing.smd, padding: spacing.lg },
-  description: { fontSize: typography.note },
+  description: { fontSize: typography.note, fontFamily: fontFamilies.body },
   descriptionPlaceholder: {
     backgroundColor: colors.divider,
     borderRadius: radii.control,
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
   },
   // FIX-082 (Inicio option A): the promotion leads Inicio, so no section
   // label above it and its headline in the card title size.
-  headline: { fontSize: typography.titleCard },
+  headline: { fontSize: typography.titleCard, fontFamily: fontFamilies.heading },
   headlinePlaceholder: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.control,

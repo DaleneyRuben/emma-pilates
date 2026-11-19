@@ -216,6 +216,11 @@ const styles = StyleSheet.create({
   footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.lg },
 });

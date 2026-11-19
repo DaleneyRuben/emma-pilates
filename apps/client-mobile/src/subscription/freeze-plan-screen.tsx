@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   lead: { color: colors.textMuted },
-  prompt: { color: colors.textMuted, fontSize: typography.note },
+  prompt: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   range: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleSmall },
   reason: {
     alignItems: "flex-start",
