@@ -10,8 +10,8 @@ import {
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 /**
- * A Perfil settings row (S23): `IconRow`'s shape with the unread count as a
- * Rosa tinte pill, and «Cerrar sesión» as the Error last row (follow-up 225,
+ * A Perfil settings row (S23): `IconRow`'s shape with the unread count in
+ * Rosa profundo, and «Cerrar sesión» as the Error last row (follow-up 225,
  * walkthrough 19) instead of a separate button.
  */
 export function ProfileRow({
@@ -85,9 +85,10 @@ export function ProfileRow({
 }
 
 const styles = StyleSheet.create({
+  // FIX-089: an unread count is the one badge kept, Rosa profundo with Crema.
   badge: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.primary,
     borderRadius: radii.pill,
     height: 24,
     justifyContent: "center",
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
   badgeLabel: {
-    color: colors.primaryOnTint,
+    color: colors.onPrimary,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 13,
     fontWeight: "600",

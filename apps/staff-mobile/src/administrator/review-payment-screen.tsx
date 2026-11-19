@@ -256,9 +256,9 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         <EmphasisCard
           eyebrow="Monto a verificar"
           note={`${payment.clientName} · ${describeSale(payment)}`}
-          pill={stateLabels[payment.state]}
         >
           <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
+          <Text style={styles.state}>{stateLabels[payment.state]}</Text>
         </EmphasisCard>
         <PaymentBreakdown payment={payment} />
         <IconRowGroup>
@@ -302,9 +302,16 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
 }
 
 const styles = StyleSheet.create({
+  // FIX-089: the state is a word in weight on the hero, not a pill.
+  state: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
   actions: { gap: spacing.xs, paddingTop: spacing.md },
   amount: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 32,
     fontVariant: ["tabular-nums"],
