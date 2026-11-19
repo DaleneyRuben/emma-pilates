@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: typography.label,
     letterSpacing: 1.76,
     textTransform: "uppercase",
   },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   weekday: {
     color: colors.textSubtle,
     fontFamily: fontFamilies.body,
-    fontSize: 10,
+    fontSize: typography.label,
     letterSpacing: 1,
     textTransform: "uppercase",
   },

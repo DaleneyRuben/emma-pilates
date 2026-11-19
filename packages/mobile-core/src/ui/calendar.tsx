@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   weekday: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: typography.label,
     letterSpacing: 0.6,
     textAlign: "center",
     width: `${100 / 7}%`,

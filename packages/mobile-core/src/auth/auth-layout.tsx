@@ -7,7 +7,7 @@ import { Heading } from "../ui/heading";
 import { OutcomeBadge, type OutcomeBadgeProps } from "../ui/outcome-badge";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { colors, radii, spacing } from "../ui/tokens";
+import { colors, radii, spacing, typography } from "../ui/tokens";
 
 /** The pill under the Staff wordmark (S01, S18): this is the team's entrance. */
 export function TeamAccessBadge() {
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.primaryDeep,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: typography.label,
     letterSpacing: 1.98,
     textTransform: "uppercase",
   },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   teamBadgeLabel: {
     color: colors.primaryOnTint,
     fontFamily: fontFamilies.body,
-    fontSize: 10,
+    fontSize: typography.label,
     letterSpacing: 1.8,
     textTransform: "uppercase",
   },

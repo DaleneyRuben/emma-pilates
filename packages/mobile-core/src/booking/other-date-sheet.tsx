@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { dayChipLabel, formatSessionDate } from "../time/session-format";
 import { fontFamilies } from "../ui/fonts";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing } from "../ui/tokens";
+import { colors, radii, spacing, typography } from "../ui/tokens";
 
 /**
  * S13 «Otra»: the days after a day strip, as a sheet of date chips. S13
@@ -82,5 +82,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
-  weekday: { color: colors.textMuted, fontFamily: fontFamilies.bodyMedium, fontSize: 11 },
+  weekday: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.label,
+  },
 });
