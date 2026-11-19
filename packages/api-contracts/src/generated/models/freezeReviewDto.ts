@@ -39,4 +39,9 @@ export interface FreezeReviewDto {
    * @nullable
    */
   decidedByName?: string | null;
+  /**
+   * Why it was refused, as the Client was told (W16)
+   * @nullable
+   */
+  refusalReason?: string | null;
 }

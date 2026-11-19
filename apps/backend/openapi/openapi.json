@@ -15222,6 +15222,11 @@
             "type": "string",
             "nullable": true,
             "description": "The Staff Member who approved or refused it, or the Client who withdrew it"
+          },
+          "refusalReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why it was refused, as the Client was told (W16)"
           }
         },
         "required": [
@@ -15244,6 +15249,11 @@
               "approved",
               "refused"
             ]
+          },
+          "refusalReason": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Why it is refused, sent to the Client; only with a refusal (W16)"
           }
         },
         "required": [
@@ -19632,6 +19642,11 @@
             "format": "date",
             "description": "Bolivia civil date"
           },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "description": "What it was, as Gastos «Detalle» shows it (W11 A)"
+          },
           "voidedAt": {
             "type": "string",
             "format": "date-time",
@@ -19654,6 +19669,7 @@
           "expenseCategoryName",
           "amountCentavos",
           "incurredOn",
+          "detail",
           "voidedAt",
           "voidedByName",
           "voidReason"
@@ -19705,6 +19721,12 @@
             "type": "string",
             "format": "date",
             "description": "Today or earlier in Bolivia"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120,
+            "description": "Optional detail; blank or null clears it (W11 A)"
           }
         },
         "required": [
@@ -19730,6 +19752,12 @@
             "type": "string",
             "format": "date",
             "description": "Today or earlier in Bolivia"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120,
+            "description": "Optional detail; blank or null clears it, absent keeps it (W11 A)"
           }
         },
         "required": [
