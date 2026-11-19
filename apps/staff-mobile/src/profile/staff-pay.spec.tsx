@@ -131,7 +131,9 @@ describe("Staff Mis pagos", () => {
     const detail = within(screen.getByTestId("pay-statement"));
     expect(detail.getByText("Liquidación")).toBeOnTheScreen();
     expect(detail.getByText("Octubre 2026")).toBeOnTheScreen();
-    expect(detail.getByText("Pagado")).toBeOnTheScreen();
+    // FIX-089: a normal state is a word in weight, never a pill.
+    expect(detail.getByText("Pagado")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(detail.getByText("Pagado").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(detail.getByText("Bs 322,00")).toHaveStyle({ fontSize: 34 });
     expect(detail.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
     expect(detail.getByText("Sin comprobante adjunto")).toBeOnTheScreen();
@@ -163,7 +165,7 @@ describe("Staff Mis pagos", () => {
       payments: () => jsonResponse([]),
     });
     const october = within(screen.getByTestId("pay-statement"));
-    expect(october.getByText("Por pagar")).toBeOnTheScreen();
+    expect(october.getByText("Por pagar").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(october.getByText("Aprobado · falta el pago")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));

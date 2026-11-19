@@ -180,7 +180,9 @@ describe("Administrator payments and Session cancellation", () => {
     });
     expect(screen.getByText("Carla Mendoza · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
-    expect(screen.getByText("Pendiente")).toBeOnTheScreen();
+    // FIX-089: the state is a word in weight on the hero, not a pill.
+    expect(screen.getByText("Pendiente")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(screen.getByText("Pendiente").parent).not.toHaveStyle({ borderRadius: 999 });
     // v2 S12: the amount on the hero, the transfer and its time as rows.
     expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
     expect(screen.getByText("Transferencia")).toBeOnTheScreen();
