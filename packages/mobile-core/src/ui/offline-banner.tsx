@@ -16,10 +16,16 @@ export function useIsOnline(): boolean {
 
 /**
  * FIX-090: true while a query on a mounted screen last failed to connect
- * (fetch rejects with a TypeError). The device can report a network while
+ * (fetch rejects with a network TypeError; a bug's TypeError does not count). The device can report a network while
  * the API is out of reach; an answer from the API, even an error, means it
  * is reachable.
  */
+// What fetch says when it cannot reach a server: React Native, browsers, Node.
+const networkFailure = /network request failed|failed to fetch|fetch failed|load failed/i;
+
+const failedToConnect = (error: unknown) =>
+  error instanceof TypeError && networkFailure.test(error.message);
+
 function useApiUnreachable(): boolean {
   const queryClient = useQueryClient();
   const [unreachable, setUnreachable] = useState(false);
@@ -34,7 +40,7 @@ function useApiUnreachable(): boolean {
             (query) =>
               query.getObserversCount() > 0 &&
               query.state.status === "error" &&
-              query.state.error instanceof TypeError,
+              failedToConnect(query.state.error),
           ),
       );
     check();
