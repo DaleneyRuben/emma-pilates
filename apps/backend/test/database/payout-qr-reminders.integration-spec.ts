@@ -101,7 +101,7 @@ describe('payout QR reminders (PostgreSQL)', () => {
       {
         type: 'payout_qr_expiring',
         businessEventKey: `payout-qr-expiring:${soon.qrId}`,
-        message: 'Tu QR de cobro vence el 15/12, sube uno nuevo.',
+        message: 'Tu QR de cobro vence el mar 15 dic, sube uno nuevo.',
         destinationType: 'payout_qr',
         destinationId: soon.qrId,
         createdAt: new Date('2026-12-08T13:00:00.000Z'),
@@ -111,11 +111,44 @@ describe('payout QR reminders (PostgreSQL)', () => {
       expect.objectContaining({
         type: 'payout_qr_expired',
         message:
-          'Tu QR de cobro venció el 7/12, sube uno nuevo para que podamos pagarte.',
+          'Tu QR de cobro venció el lun 7 dic, sube uno nuevo para que podamos pagarte.',
       }),
     ]);
     for (const quiet of [later, disabled, replaced]) {
       await expect(remindersOf(quiet.accountId)).resolves.toEqual([]);
     }
+  });
+
+  // FIX-090 (audit S10): once the QR has expired, the earlier «vence pronto»
+  // notice is settled, so the two never contradict each other.
+  it('settles the expiring notice when the expired one arrives', async () => {
+    const gone = await memberWithQr('2026-12-07');
+    const lastWeek = new Date('2026-12-01T13:00:00.000Z');
+    await prisma.notification.create({
+      data: {
+        accountId: gone.accountId,
+        category: 'REMINDER',
+        type: 'payout_qr_expiring',
+        businessEventKey: `payout-qr-expiring:${gone.qrId}`,
+        title: 'Tu QR de cobro vence pronto',
+        message: 'Tu QR de cobro vence el lun 7 dic, sube uno nuevo.',
+        createdAt: lastWeek,
+      },
+    });
+
+    await createPayoutQrReminderJob(prisma, () => morning).execute();
+
+    const notices = await prisma.notification.findMany({
+      where: { accountId: gone.accountId },
+      orderBy: { createdAt: 'asc' },
+      select: { type: true, readAt: true },
+    });
+    expect(notices).toEqual([
+      {
+        type: 'payout_qr_expiring',
+        readAt: new Date('2026-12-08T13:00:00.000Z'),
+      },
+      { type: 'payout_qr_expired', readAt: null },
+    ]);
   });
 });

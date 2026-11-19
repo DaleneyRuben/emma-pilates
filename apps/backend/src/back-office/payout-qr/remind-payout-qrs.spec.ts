@@ -8,7 +8,7 @@ const occurredAt = new Date('2026-12-08T13:00:00.000Z');
 describe('remindPayoutQrs', () => {
   it('reminds each current QR that is due a reminder it has not had', async () => {
     const record = jest
-      .fn<Promise<void>, [NewNotification]>()
+      .fn<Promise<void>, [NewNotification, string[]]>()
       .mockResolvedValue(undefined);
     const findAlreadySent = jest
       .fn()
@@ -59,9 +59,15 @@ describe('remindPayoutQrs', () => {
       expect.objectContaining({
         businessEventKey: 'payout-qr-expired:qr-gone',
         message:
-          'Tu QR de cobro venció el 7/12, sube uno nuevo para que podamos pagarte.',
+          'Tu QR de cobro venció el lun 7 dic, sube uno nuevo para que podamos pagarte.',
         occurredAt,
       }),
+    ]);
+    // FIX-090 (audit S10): the expired notice settles the earlier «vence
+    // pronto» one, so the two never contradict each other in her inbox.
+    expect(record.mock.calls.map(([, settles]) => settles)).toEqual([
+      [],
+      ['payout-qr-expiring:qr-gone'],
     ]);
   });
 

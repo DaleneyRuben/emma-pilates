@@ -66,7 +66,7 @@ describe('payoutQrReminderFor', () => {
       type: 'payout_qr_expiring',
       businessEventKey: 'payout-qr-expiring:qr-1',
       title: 'Tu QR de cobro vence pronto',
-      message: 'Tu QR de cobro vence el 15/12, sube uno nuevo.',
+      message: 'Tu QR de cobro vence el mar 15 dic, sube uno nuevo.',
       destination: { type: 'payout_qr', id: 'qr-1' },
     });
   });
@@ -79,7 +79,7 @@ describe('payoutQrReminderFor', () => {
       businessEventKey: 'payout-qr-expired:qr-1',
       title: 'Tu QR de cobro venció',
       message:
-        'Tu QR de cobro venció el 15/12, sube uno nuevo para que podamos pagarte.',
+        'Tu QR de cobro venció el mar 15 dic, sube uno nuevo para que podamos pagarte.',
       destination: { type: 'payout_qr', id: 'qr-1' },
     });
   });
