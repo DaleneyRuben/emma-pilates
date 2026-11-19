@@ -108,13 +108,21 @@ export const decidedFreezeColumns = () => [
   ...periodColumns,
   columns.accessor("state", {
     header: "Resultado",
-    cell: ({ getValue }) =>
+    cell: ({ row, getValue }) =>
       getValue() === "approved" ? (
         <StatusPill tone="exito">Aprobada</StatusPill>
       ) : getValue() === "withdrawn" ? (
         <StatusPill tone="neutral">Retirada</StatusPill>
       ) : (
-        <StatusPill tone="error">Rechazada</StatusPill>
+        <span className="flex flex-col items-start gap-1">
+          <StatusPill tone="error">Rechazada</StatusPill>
+          {/* W16 B/C: what the Client was told. */}
+          {row.original.refusalReason == null ? null : (
+            <span className="text-nota text-texto-tenue">
+              {row.original.refusalReason}
+            </span>
+          )}
+        </span>
       ),
   }),
   columns.display({
