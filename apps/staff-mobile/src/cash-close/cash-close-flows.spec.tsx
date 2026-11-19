@@ -57,12 +57,14 @@ describe("Cerrar caja (S25)", () => {
       },
     });
 
-    // FIX-083 (Cerrar caja pick A): count first, the expected cash quietly below.
+    // FIX-083 (Cerrar caja pick A), FIX-090: count first; the expected cash
+    // and the difference only read once she has typed her count.
     expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({ fontSize: 30 });
     expect(
       screen.getByText("Cuenta los billetes antes de mirar el total esperado."),
     ).toBeOnTheScreen();
-    expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/^Esperado según los pagos/)).toBeNull();
+    expect(screen.queryByLabelText(/^Diferencia/)).toBeNull();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
     expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
@@ -73,6 +75,7 @@ describe("Cerrar caja (S25)", () => {
     expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
 
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
     expect(screen.getByLabelText("Diferencia · Bs 0 · Cuadra")).toBeOnTheScreen();
     expect(screen.getByText("Cuadra")).toHaveStyle({ color: "#93615D" });
     expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
@@ -109,6 +112,7 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 29_000 }),
     });
 
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
     expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
     expect(screen.getByLabelText("Ventas anuladas (efectivo en caja), Bs 290")).toBeOnTheScreen();
   });
@@ -119,6 +123,8 @@ describe("Cerrar caja (S25)", () => {
       [centroToday]: () => jsonResponse({ ...today, voidedCashCentavos: 0 }),
     });
 
+    await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
+    expect(screen.getByLabelText("Esperado según los pagos, Bs 520")).toBeOnTheScreen();
     expect(screen.queryByText(/Ventas anuladas/)).toBeNull();
   });
 
