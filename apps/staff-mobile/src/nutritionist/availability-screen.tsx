@@ -17,13 +17,13 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  SectionTitle,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { SectionHeader } from "../ui/section-header";
 import {
   addCivilDays,
   boliviaToday,
@@ -139,10 +139,7 @@ export function AvailabilityScreen() {
       <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
         {header}
         <View>
-          <SectionHeader
-            meta={countLabel(sorted.length, "horario", "horarios")}
-            title="Horarios semanales"
-          />
+          <SectionTitle>{`Horarios semanales · ${countLabel(sorted.length, "horario", "horarios")}`}</SectionTitle>
           <IconRowGroup>
             {sorted.map((block) => {
               const dates = dateLine(block, today);

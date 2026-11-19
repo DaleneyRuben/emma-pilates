@@ -21,6 +21,7 @@ import {
   Screen,
   spacing,
   chipStyles,
+  SectionTitle,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -31,7 +32,6 @@ import { createTrainerApi } from "../trainer-api";
 import { BackBar, backBarScroll } from "../ui/back-bar";
 import { useHasStarted } from "../ui/use-has-started";
 import { PersonRow } from "../ui/person-row";
-import { SectionHeader } from "../ui/section-header";
 import { countLabel } from "../ui/session-time";
 import { requireOk } from "./require-ok";
 
@@ -148,14 +148,11 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
           />
         ) : (
           <View>
-            <SectionHeader
-              meta={
-                attendanceOpen
-                  ? `${marked} de ${session.bookings.length} marcadas`
-                  : countLabel(session.bookings.length, "reserva", "reservas")
-              }
-              title={attendanceOpen ? "Asistencia" : "Reservas"}
-            />
+            <SectionTitle>{`${attendanceOpen ? "Asistencia" : "Reservas"} · ${
+              attendanceOpen
+                ? `${marked} de ${session.bookings.length} marcadas`
+                : countLabel(session.bookings.length, "reserva", "reservas")
+            }`}</SectionTitle>
             <IconRowGroup>
               {session.bookings.map((booking) =>
                 attendanceOpen ? (
