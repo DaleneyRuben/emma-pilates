@@ -120,7 +120,6 @@ export function LoginScreen({
                   label="Contraseña"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  placeholder="••••••••"
                   secureTextEntry
                   testID="login-password"
                   value={value}
