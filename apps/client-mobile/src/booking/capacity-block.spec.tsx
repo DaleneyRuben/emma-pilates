@@ -121,7 +121,7 @@ describe("Client Session detail capacity block", () => {
 
     const bar = block.getByRole("progressbar");
     expect(bar).toHaveProp("accessibilityValue", { max: 12, min: 0, now: 9 });
-    expect(bar).toHaveStyle({ backgroundColor: "#E7CCBF", height: 6 });
+    expect(bar).toHaveStyle({ backgroundColor: "#93615D", height: 6 });
     expect(block.getByTestId("capacity-fill")).toHaveStyle({
       backgroundColor: "#F9F4F2",
       flex: 0.75,

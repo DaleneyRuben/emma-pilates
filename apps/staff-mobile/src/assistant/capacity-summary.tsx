@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   of: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
-  track: { backgroundColor: colors.primaryTint, borderRadius: radii.pill, height: 6 },
+  track: { backgroundColor: colors.primary, borderRadius: radii.pill, height: 6 },
   wrap: surfaces.emphasis,
 });
