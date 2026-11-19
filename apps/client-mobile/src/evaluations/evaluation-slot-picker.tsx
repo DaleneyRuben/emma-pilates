@@ -1,6 +1,7 @@
 import type { EvaluationAvailabilityDto, EvaluationSlotDto } from "@pilates/api-contracts";
 import {
   BodyText,
+  chipStyles,
   colors,
   dayChipLabel,
   formatBolivianos,
@@ -94,9 +95,9 @@ export function EvaluationSlotPicker({
               accessibilityState={{ selected: isSelected }}
               key={day.date}
               onPress={() => setSelectedDate(day.date)}
-              style={[styles.day, isSelected && styles.daySelected]}
+              style={[styles.day, chipStyles.box, isSelected && chipStyles.boxSelected]}
             >
-              <Text style={[styles.dayWeekday, isSelected && styles.daySelectedText]}>
+              <Text style={[styles.dayWeekday, isSelected && chipStyles.labelSelected]}>
                 {chip.weekday}
               </Text>
               <Text style={[styles.dayNumber, isSelected && styles.daySelectedText]}>
@@ -121,7 +122,7 @@ export function EvaluationSlotPicker({
                 accessibilityRole="button"
                 key={slot.id}
                 onPress={() => onPick(slot)}
-                style={styles.slot}
+                style={[styles.slot, chipStyles.box]}
               >
                 <Text style={styles.slotTime}>{clockTime(slot.startsAt)}</Text>
                 {branches.size > 1 ? (
@@ -141,10 +142,9 @@ export function EvaluationSlotPicker({
 }
 
 const styles = StyleSheet.create({
-  // C13's day chips match Reservar's: 48 × 60 on Lino, the chosen one Palo de rosa.
+  // C13's day chips match Reservar's: 48 × 60 palette B chips (FIX-089).
   day: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: radii.button,
     gap: spacing.xxs,
     height: 60,
@@ -157,11 +157,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  daySelected: { backgroundColor: colors.primary },
-  daySelectedText: { color: colors.white },
+  daySelectedText: { color: colors.onPrimary },
   dayStrip: { flexGrow: 0, flexShrink: 0 },
   dayTitle: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
@@ -169,13 +168,13 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   dayWeekday: {
-    color: colors.textMuted,
+    color: colors.text,
     fontSize: typography.label,
     fontFamily: fontFamilies.body,
   },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  muted: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
+  muted: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
   nutritionist: {
     ...surfaces.flatCard,
     alignItems: "center",
@@ -191,7 +190,6 @@ const styles = StyleSheet.create({
   },
   slot: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: radii.button,
     justifyContent: "center",
     minHeight: 52,
@@ -199,7 +197,7 @@ const styles = StyleSheet.create({
     width: "31%",
   },
   slotCaption: {
-    color: colors.textMuted,
+    color: colors.text,
     fontSize: typography.label,
     fontFamily: fontFamilies.body,
   },
