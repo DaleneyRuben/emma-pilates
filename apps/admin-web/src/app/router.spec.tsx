@@ -246,7 +246,7 @@ describe("admin routes", () => {
     );
   });
 
-  it("explains an unknown path and offers the way back to Inicio", async () => {
+  it("explains an unknown path inside the studio's layout and offers the way back to Inicio", async () => {
     renderAt("/no-existe");
 
     expect(
@@ -255,6 +255,13 @@ describe("admin routes", () => {
         name: "Página no encontrada",
       }),
     ).toBeInTheDocument();
+    // FIX-090: never a bare page stuck to the window's edge.
+    expect(
+      screen.getByRole("img", { name: "Emma Pilates Studio" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("main")).toContainElement(
+      screen.getByRole("heading", { level: 1 }),
+    );
     expect(
       screen.getByRole("link", { name: "Volver al inicio" }),
     ).toHaveAttribute("href", "/");
