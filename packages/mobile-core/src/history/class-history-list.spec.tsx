@@ -86,7 +86,7 @@ describe("ClassHistoryList", () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     expect(
-      screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
+      screen.getByLabelText("Sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
   });
 

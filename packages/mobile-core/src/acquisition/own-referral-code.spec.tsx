@@ -113,9 +113,7 @@ describe("own referral code (BKM-017)", () => {
       wrapper,
     });
 
-    expect(
-      await screen.findByText("Podrás cambiarlo de nuevo el 3 de diciembre"),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText("Podrás cambiarlo de nuevo el jue 3 dic")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar código" })).toBeNull();
     jest.useRealTimers();
   });
