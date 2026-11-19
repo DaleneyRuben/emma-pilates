@@ -130,7 +130,12 @@ describe("Staff Perfil", () => {
     expect(
       screen.getByText("Te avisaremos aquí cuando haya algo que necesite tu atención."),
     ).toBeOnTheScreen();
-    // v2 S20: the empty inbox leads back to her agenda.
+    // v2 S20: the empty inbox leads back to her agenda, as a secondary button:
+    // the back arrow and the tab bar already go there (FIX-089).
+    expect(screen.getByRole("button", { name: "Volver a mi agenda" })).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderWidth: 1.5,
+    });
     await fireEvent.press(screen.getByRole("button", { name: "Volver a mi agenda" }));
     await waitFor(() => expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen());
   });
