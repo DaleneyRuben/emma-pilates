@@ -20,17 +20,14 @@ export function ListFilter<Value extends string>({
 
   return (
     <div className="flex items-center gap-2">
-      <label
-        htmlFor={id}
-        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
-      >
+      <label htmlFor={id} className="text-celda font-semibold text-texto">
         {label}
       </label>
       <Select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as Value)}
-        className="h-[34px] w-auto min-w-[140px] text-nota"
+        className="h-[44px] w-auto min-w-[140px] text-nota md:h-[38px]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

@@ -38,6 +38,7 @@ export function ClientPhoto({
   const [failed, setFailed] = useState<string>();
   return (
     <span
+      data-photo=""
       className={cn(
         "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-palo-de-rosa font-bold text-crema",
         sizes[size],

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
+import { ClientPhoto } from "../../components/client-photo";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { PageNotice } from "../../components/page/page-notice";
 import { countFormat, pageCount } from "../../components/table/pagination";
@@ -223,6 +224,9 @@ export function ClientsPage({
       openRowId={search.cliente}
       onLinkSettled={onLinkedClientSettled}
       columns={clientColumns}
+      avatar={(client) => (
+        <ClientPhoto name={client.name} photo={client.photo} size={40} />
+      )}
       renderForm={(client, done) =>
         client === undefined ? null : (
           <ClientDetailPanel clientId={client.id} onClosed={done} />

@@ -27,6 +27,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   panelDescription?: (row: Row) => string;
   /** Rows that open a panel; a settled record is the whole row (AW28). */
   canOpen?: (row: Row) => boolean;
+  /** FIX-089 (ListaC): a person list's circle in the phone card. */
+  avatar?: (row: Row) => ReactNode;
   filter: ReactNode;
   search: ListSearch;
   onPageChange: (page: number) => void;
@@ -88,6 +90,7 @@ export function CatalogPage<Row extends { id: string }>({
   panelTitles,
   panelDescription,
   canOpen,
+  avatar,
   filter,
   search,
   onPageChange,
@@ -189,6 +192,7 @@ export function CatalogPage<Row extends { id: string }>({
             emptyMessage={emptyMessage}
             onRowClick={renderForm === undefined ? undefined : open}
             canClickRow={canOpen}
+            avatar={avatar}
             pagination={{
               page: search.page,
               pageSize: search.pageSize,

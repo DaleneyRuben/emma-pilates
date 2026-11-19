@@ -1,5 +1,6 @@
 import { flexRender, type Cell, type Row } from "@tanstack/react-table";
-import type { ComponentProps } from "react";
+import { ChevronRight } from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../../lib/cn";
 import { TableCell, TableRow } from "../ui/table";
 import type { CardPart } from "./data-table";
@@ -21,18 +22,47 @@ function partOf<Data>(cell: Cell<Data, unknown>, index: number): CardPart {
 const render = <Data,>(cell: Cell<Data, unknown>) =>
   flexRender(cell.column.columnDef.cell, cell.getContext());
 
+type Slot = "avatar" | "text" | "status" | "chevron";
+
+// The phone card's grid: an optional 40 px circle, the text, an optional
+// status, and a chevron when the row opens something. Tailwind needs every
+// class spelled out, so each layout has its template.
+const templates: Record<string, string> = {
+  "avatar text status chevron":
+    "max-md:grid-cols-[40px_minmax(0,1fr)_auto_auto]",
+  "avatar text status": "max-md:grid-cols-[40px_minmax(0,1fr)_auto]",
+  "avatar text chevron": "max-md:grid-cols-[40px_minmax(0,1fr)_auto]",
+  "avatar text": "max-md:grid-cols-[40px_minmax(0,1fr)]",
+  "text status chevron": "max-md:grid-cols-[minmax(0,1fr)_auto_auto]",
+  "text status": "max-md:grid-cols-[minmax(0,1fr)_auto]",
+  "text chevron": "max-md:grid-cols-[minmax(0,1fr)_auto]",
+  text: "max-md:grid-cols-[minmax(0,1fr)]",
+};
+const columnStart = [
+  "col-start-1",
+  "col-start-2",
+  "col-start-3",
+  "col-start-4",
+];
+
 /**
  * FIX-088 (Tablas en celular A): one row as a compact card at phone width.
- * The main text in bold, one grey line with the details joined by « · »,
- * the status on the right, and the row's own actions under them.
+ * FIX-089 (ListaC): a person list leads with her 40 px circle (photo or
+ * Crema initials on Palo de rosa); the name at 15/500, one 13 px line with
+ * the details joined by « · », the status on the right (a Rubor pill only
+ * for an exception), a chevron when the row opens, and the row's own
+ * actions under them.
  */
 export function CompactRow<Data>({
   row,
   extra,
+  avatar,
   onClick,
 }: {
   row: Row<Data>;
   extra: ComponentProps<"tr">;
+  /** A person list's circle; the title's own small photo then hides. */
+  avatar?: ReactNode;
   onClick?: () => void;
 }) {
   const cells = row.getVisibleCells().map((cell, index) => ({
@@ -47,6 +77,15 @@ export function CompactRow<Data>({
   const actions = of("actions");
   const status = of("status");
   const details = of("detail");
+  const lead = avatar !== undefined;
+  const chevron = onClick !== undefined;
+  const slots: Slot[] = [
+    ...(lead ? (["avatar"] as const) : []),
+    "text",
+    ...(status.length === 0 ? [] : (["status"] as const)),
+    ...(chevron ? (["chevron"] as const) : []),
+  ];
+  const at = (slot: Slot) => columnStart[slots.indexOf(slot)];
   const cellBase = "max-md:block max-md:p-0 max-md:before:content-none";
   return (
     <TableRow
@@ -54,18 +93,29 @@ export function CompactRow<Data>({
       data-compact=""
       onClick={onClick}
       className={cn(
-        "max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-x-3 max-md:gap-y-0.5",
-        onClick === undefined ? undefined : "cursor-pointer",
+        "max-md:grid max-md:items-center max-md:gap-x-3 max-md:gap-y-0.5",
+        templates[slots.join(" ")],
+        chevron ? "cursor-pointer" : undefined,
         extra.className,
       )}
     >
+      {lead ? (
+        <TableCell
+          data-part="avatar"
+          className={cn(cellBase, at("avatar"), "row-span-2 row-start-1")}
+        >
+          {avatar}
+        </TableCell>
+      ) : null}
       {of("title").map(({ cell }) => (
         <TableCell
           key={cell.id}
           data-part="title"
           className={cn(
             cellBase,
-            "min-w-0 text-cuerpo font-medium break-words text-texto",
+            at("text"),
+            "row-start-1 min-w-0 text-fila font-medium break-words text-texto",
+            lead && "[&_[data-photo]]:hidden",
           )}
         >
           {render(cell)}
@@ -76,8 +126,8 @@ export function CompactRow<Data>({
           data-part="status"
           className={cn(
             cellBase,
-            // The phone card's exception is a dot and its word, no pill.
-            "col-start-2 row-span-2 row-start-1 pt-0.5 text-right text-nota [&_[data-status-pill]]:h-auto [&_[data-status-pill]]:bg-transparent [&_[data-status-pill]]:px-0 [&_[data-status-pill]]:font-normal",
+            at("status"),
+            "row-span-2 row-start-1 text-right text-nota",
           )}
         >
           {status.map(({ cell }) => (
@@ -85,12 +135,26 @@ export function CompactRow<Data>({
           ))}
         </TableCell>
       )}
+      {chevron ? (
+        <TableCell
+          aria-hidden="true"
+          data-part="chevron"
+          className={cn(
+            cellBase,
+            at("chevron"),
+            "row-span-2 row-start-1 text-rosa-profundo",
+          )}
+        >
+          <ChevronRight size={18} strokeWidth={1.8} />
+        </TableCell>
+      ) : null}
       {details.length === 0 ? null : (
         <TableCell
           data-part="detail"
           className={cn(
             cellBase,
-            "col-start-1 min-w-0 text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline [&>span>*>*]:inline [&>span>*>*+*]:before:content-['_·_']",
+            at("text"),
+            "row-start-2 min-w-0 truncate text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline [&>span>*>*]:inline [&>span>*>*+*]:before:content-['_·_']",
           )}
         >
           {details.map(({ cell }) => {
@@ -111,7 +175,7 @@ export function CompactRow<Data>({
           data-part="actions"
           className={cn(
             cellBase,
-            "col-span-2 mt-2 flex flex-wrap items-center gap-4 max-md:flex",
+            "col-span-full mt-2 flex flex-wrap items-center gap-4 max-md:flex",
           )}
         >
           {actions.map(({ cell }) => (
