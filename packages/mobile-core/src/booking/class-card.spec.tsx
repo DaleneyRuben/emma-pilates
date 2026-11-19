@@ -31,6 +31,43 @@ describe("NextClassHero", () => {
   });
 });
 
+// «Propuestas actualizadas» (owner 2026-11-19): under the hero, who is coming
+// as Crema circles with Rosa profundo initials, «+N» past five.
+describe("NextClassHero attendees", () => {
+  it("draws each attendee as a Crema initials circle", async () => {
+    const screen = await render(
+      <NextClassHero attendees={["LM", "SP"]} eyebrow="Próxima" title="08:00 · Mat Pilates" />,
+    );
+
+    const circles = screen.getAllByTestId("hero-attendee");
+    expect(circles).toHaveLength(2);
+    expect(circles[0]).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(screen.getByText("LM")).toHaveStyle({ color: "#93615D" });
+    expect(screen.getByTestId("next-class-hero").props.accessibilityLabel).toMatch(/Vienen 2 más$/);
+  });
+
+  it("keeps five circles and counts the rest as «+N»", async () => {
+    const screen = await render(
+      <NextClassHero
+        attendees={["A", "B", "C", "D", "E", "F", "G"]}
+        eyebrow="Próxima"
+        title="08:00 · Mat Pilates"
+      />,
+    );
+
+    expect(screen.getAllByTestId("hero-attendee")).toHaveLength(6);
+    expect(screen.getByText("+2")).toBeOnTheScreen();
+  });
+
+  it("leaves the row out when nobody else is coming", async () => {
+    const screen = await render(
+      <NextClassHero attendees={[]} eyebrow="Próxima" title="08:00 · Mat Pilates" />,
+    );
+
+    expect(screen.queryByTestId("hero-attendees")).toBeNull();
+  });
+});
+
 describe("ClassRow in a ClassList", () => {
   it("puts the time in a Rubor box, the class and branch, and the places at the end", async () => {
     const screen = await render(
