@@ -73,6 +73,29 @@ describe("AW38 Comentarios (REL-012)", () => {
     ).toHaveAttribute("aria-current", "page");
   });
 
+  // FIX-090: «Página 2 de 1 · Todavía no hay comentarios» never shows.
+  it("steps back to the last page when the address asks for one past it", async () => {
+    server.use(
+      feedbackList((params) =>
+        jsonResponse(
+          params.get("page") === "1"
+            ? feedbackPage([problem, suggestion])
+            : { ...feedbackPage([], 2), page: Number(params.get("page")) },
+        ),
+      ),
+    );
+    const { router } = renderAdmin("/comentarios?page=2");
+
+    expect(await rowOf(/No puedo ver mis reservas/)).toBeVisible();
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ page: 1 }),
+    );
+    expect(screen.getByText("Página 1 de 1")).toBeVisible();
+    expect(
+      screen.queryByText("Todavía no hay comentarios."),
+    ).not.toBeInTheDocument();
+  });
+
   it("filters by status and app", async () => {
     server.use(feedbackList(() => jsonResponse(feedbackPage([problem]))));
     const { user } = renderAdmin("/comentarios");

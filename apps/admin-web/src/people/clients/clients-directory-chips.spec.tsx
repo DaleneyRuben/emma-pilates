@@ -99,8 +99,15 @@ describe("Clientas › Todas chips and columns", () => {
     await user.click(chip("Expirado"));
     await waitFor(() => expect(reads.at(-1)?.get("filter")).toBe("expired"));
 
+    // Todas' first page is cached since the address past its last page
+    // stepped back to it (FIX-090), so the address is what changes.
     await user.click(chip("Todas"));
-    await waitFor(() => expect(reads.at(-1)?.has("filter")).toBe(false));
+    await waitFor(() =>
+      expect(router.state.matches.at(-1)?.search).toEqual({
+        page: 1,
+        pageSize: 20,
+      }),
+    );
   });
 
   it("shows what is left, when it ends, who invited her, and the Fundadora number", async () => {
@@ -173,5 +180,26 @@ describe("Clientas › Todas chips and columns", () => {
     expect(chip("Fundadora")).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/lugares de fundadora/)).not.toBeInTheDocument();
     expect(founderReads).toEqual([]);
+  });
+
+  // FIX-090: a chip with nobody under it says so, not «Todavía no hay
+  // clientas» while the studio has seven.
+  it.each([
+    ["active", "Ninguna clienta con plan activo."],
+    ["none", "Ninguna clienta sin plan."],
+    ["expired", "Ninguna clienta con el plan vencido."],
+  ])("says no Client matches the %s chip", async (filter, message) => {
+    server.use(
+      ...signedInHandlers(),
+      http.get(apiUrl(clientsPath), () =>
+        jsonResponse(clientPage([], { studioClientCount: 7 })),
+      ),
+    );
+    renderAdmin(`/clientas?filter=${filter}`);
+
+    expect(await screen.findByText(message)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Todavía no hay clientas."),
+    ).not.toBeInTheDocument();
   });
 });
