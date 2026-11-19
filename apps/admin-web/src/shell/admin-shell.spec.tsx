@@ -108,7 +108,7 @@ describe("admin shell", () => {
         ),
       );
       const { user } = renderShell("/dinero/sueldos/pagados");
-      await heading("Sueldos pagados");
+      await heading("Sueldos");
 
       // The page header draws the views, so each look-up reads the current one.
       const views = () =>
@@ -131,7 +131,7 @@ describe("admin shell", () => {
         within(views()).getByRole("link", { name: "Por aprobar" }),
       );
 
-      await heading("Sueldos por aprobar");
+      await heading("Sueldos");
       expect(
         within(views()).getByRole("link", { name: "Por aprobar" }),
       ).toHaveAttribute("aria-current", "page");

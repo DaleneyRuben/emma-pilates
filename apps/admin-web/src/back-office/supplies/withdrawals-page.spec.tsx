@@ -52,7 +52,7 @@ const september = withdrawalPage(
 const heading = () =>
   screen.findByRole("heading", {
     level: 1,
-    name: "Movimientos de insumos",
+    name: "Insumos",
   });
 const rowOf = async (name: string) =>
   (await screen.findByRole("cell", { name })).parentElement as HTMLElement;

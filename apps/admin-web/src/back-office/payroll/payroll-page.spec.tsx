@@ -30,7 +30,7 @@ const payrollTable = (respond: (params: URLSearchParams) => Response) =>
   });
 
 const heading = () =>
-  screen.findByRole("heading", { level: 1, name: "Sueldos pagados" });
+  screen.findByRole("heading", { level: 1, name: "Sueldos" });
 const rowOf = async (name: string) =>
   (await screen.findByRole("cell", { name: new RegExp(name) }))
     .parentElement as HTMLElement;

@@ -79,7 +79,7 @@ describe("AW39 Indicadores", () => {
     renderAdmin("/informes");
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Informes" }),
+      await screen.findByRole("heading", { level: 1, name: "El mes" }),
     ).toBeVisible();
     expect(screen.getByRole("link", { name: "El mes" })).toHaveAttribute(
       "aria-current",
