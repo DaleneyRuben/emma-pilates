@@ -73,4 +73,20 @@ describe("PaymentStatusView", () => {
     expect(onPrimary).toHaveBeenCalled();
     expect(onHome).toHaveBeenCalled();
   });
+
+  // FIX-090 (states review Y8): a reason without its full stop still ends
+  // its sentence before «Sube uno nuevo…».
+  it("ends the staff reason with a full stop before asking for a new receipt", async () => {
+    const screen = await render(
+      <PaymentStatusView
+        onHome={jest.fn()}
+        payment={{ ...payment, rejectionReason: "No vimos la transferencia recibida" }}
+        state="rejected"
+      />,
+    );
+
+    expect(
+      screen.getByText("No vimos la transferencia recibida. Sube uno nuevo para activar tu plan."),
+    ).toBeOnTheScreen();
+  });
 });
