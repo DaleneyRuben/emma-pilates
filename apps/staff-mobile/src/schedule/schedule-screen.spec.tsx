@@ -228,7 +228,7 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    expect(await screen.findByText("Hoy todas las clases están canceladas")).toBeOnTheScreen();
+    expect(await screen.findByText("Todas las clases de hoy se cancelaron")).toBeOnTheScreen();
     expect(screen.getByText("1 cancelada por mínimo")).toBeOnTheScreen();
   });
 
