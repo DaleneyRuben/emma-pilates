@@ -16,6 +16,11 @@ export interface FreezeReviewDto {
    */
   clientPhoto: ClientPhotoDto | null;
   planName: string;
+  /**
+   * Classes her Plan has left, as Revisar congelamiento says (FIX-091)
+   * @minimum 0
+   */
+  remainingClassAllowance?: number;
   startsOn: string;
   endsOn: string;
   reason: string;
