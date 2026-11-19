@@ -69,8 +69,9 @@ export function useRecordCashClose(
 
 /**
  * FIX-083 (Cerrar caja pick A): she counts first, in one large amount field;
- * the expected cash and the difference sit quietly under it, and closing asks
- * once more because a close cannot be undone.
+ * the expected cash and the difference appear under it only once she has
+ * typed her count (FIX-090), and closing asks once more because a close
+ * cannot be undone.
  */
 export function CashCloseForm({
   branch,
@@ -126,29 +127,28 @@ export function CashCloseForm({
         </View>
         <Text style={styles.quiet}>Cuenta los billetes antes de mirar el total esperado.</Text>
       </View>
-      <PlainRowGroup>
-        <PlainRow label="Esperado según los pagos" value={formatMoney(expectedCentavos)} />
-        {voidedCashCentavos > 0 ? (
-          <PlainRow
-            label="Ventas anuladas (efectivo en caja)"
-            value={formatMoney(voidedCashCentavos)}
-          />
-        ) : null}
-        <View
-          accessibilityLabel={
-            difference === null || differenceCentavos === null
-              ? "Diferencia, sin contar todavía"
-              : `Diferencia · ${formatSignedBolivianos(differenceCentavos)} · ${difference.label}`
-          }
-          accessible
-          style={styles.differenceRow}
-        >
-          <Text style={styles.differenceLabel}>Diferencia</Text>
-          <Text style={[styles.differenceValue, difference && { color: difference.text }]}>
-            {differenceCentavos === null ? "—" : differenceValue(differenceCentavos)}
-          </Text>
-        </View>
-      </PlainRowGroup>
+      {/* FIX-090: what the payments expect only reads once she has counted. */}
+      {countedCentavos === null || difference === null || differenceCentavos === null ? null : (
+        <PlainRowGroup>
+          <PlainRow label="Esperado según los pagos" value={formatMoney(expectedCentavos)} />
+          {voidedCashCentavos > 0 ? (
+            <PlainRow
+              label="Ventas anuladas (efectivo en caja)"
+              value={formatMoney(voidedCashCentavos)}
+            />
+          ) : null}
+          <View
+            accessibilityLabel={`Diferencia · ${formatSignedBolivianos(differenceCentavos)} · ${difference.label}`}
+            accessible
+            style={styles.differenceRow}
+          >
+            <Text style={styles.differenceLabel}>Diferencia</Text>
+            <Text style={[styles.differenceValue, { color: difference.text }]}>
+              {differenceValue(differenceCentavos)}
+            </Text>
+          </View>
+        </PlainRowGroup>
+      )}
       <Text style={styles.quiet}>{describeCashSales(cashPaymentCount, branch.name)}</Text>
       {differenceCentavos === null || differenceCentavos === 0 ? null : (
         <FormField
