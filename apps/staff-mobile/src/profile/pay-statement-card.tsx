@@ -1,4 +1,4 @@
-import { formatMoney } from "@pilates/api-contracts";
+import { formatMoney, formatListDate } from "@pilates/api-contracts";
 import type {
   OwnSalaryPaymentDto,
   PayStatementDto,
@@ -17,7 +17,6 @@ import {
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDate, formatCivilDayMonth } from "../assistant/assistant-format";
 import { statusTone } from "./pay-history";
 import type { StatementStatus } from "./pay-ledger";
 import { ReceiptThumbnail } from "./receipt-viewer";
@@ -187,8 +186,7 @@ export function PaymentStrip({
     );
   }
   const { payment } = status;
-  const title =
-    payment === undefined ? "Pagado" : `Pagado el ${formatCivilDayMonth(payment.paidOn)}`;
+  const title = payment === undefined ? "Pagado" : `Pagado el ${formatListDate(payment.paidOn)}`;
   const receiptUrl = payment?.receiptUrl ?? null;
   if (payment === undefined || receiptUrl === null) {
     return (
@@ -200,7 +198,7 @@ export function PaymentStrip({
   }
   return (
     <Pressable
-      accessibilityLabel={`Ver el comprobante del pago del ${formatCivilDate(payment.paidOn)}`}
+      accessibilityLabel={`Ver el comprobante del pago del ${formatListDate(payment.paidOn)}`}
       accessibilityRole="button"
       onPress={() => onReceipt(payment)}
       style={({ pressed }) => [styles.strip, pressed && styles.pressed]}

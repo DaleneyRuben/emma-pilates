@@ -1,3 +1,5 @@
+import { formatListDate, formatTitleDate } from "@pilates/api-contracts";
+
 const timeZone = "America/La_Paz";
 
 export const weekdayNames = [
@@ -57,32 +59,11 @@ export function addCivilDays(civilDate: string, amount: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-const longCivilDate = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-  weekday: "long",
-});
-const shortCivilDate = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  weekday: "short",
-});
-
-// "jueves 1 de octubre" for "2099-10-01".
-export function civilDateLong(civilDate: string): string {
-  return longCivilDate.format(new Date(`${civilDate}T12:00:00.000Z`)).replace(",", "");
-}
-
 // "Hoy", "Mañana", or "jue 1 oct".
 export function civilDateChip(civilDate: string, today: string): string {
   if (civilDate === today) return "Hoy";
   if (civilDate === addCivilDays(today, 1)) return "Mañana";
-  return shortCivilDate
-    .format(new Date(`${civilDate}T12:00:00.000Z`))
-    .replace(",", "")
-    .replace(/\./g, "");
+  return formatListDate(civilDate);
 }
 
 const clockFormatter = new Intl.DateTimeFormat("es-BO", {
@@ -100,15 +81,13 @@ export function civilDateOf(instant: string): string {
   return boliviaToday(new Date(instant));
 }
 
-const capitalized = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
-
-// Agenda day headings: "Hoy · jueves 14 de agosto", "Mañana · …", or
-// "Sábado 16 de agosto".
+// Agenda day headings: "Hoy · Jueves 14 de agosto", "Mañana · …", or
+// "Sábado 16 de agosto" (FIX-090's title dates).
 export function agendaDayLabel(civilDate: string, today: string): string {
-  const long = civilDateLong(civilDate);
-  if (civilDate === today) return `Hoy · ${long}`;
-  if (civilDate === addCivilDays(today, 1)) return `Mañana · ${long}`;
-  return capitalized(long);
+  const title = formatTitleDate(civilDate);
+  if (civilDate === today) return `Hoy · ${title}`;
+  if (civilDate === addCivilDays(today, 1)) return `Mañana · ${title}`;
+  return title;
 }
 
 export function countLabel(count: number, singular: string, plural: string): string {

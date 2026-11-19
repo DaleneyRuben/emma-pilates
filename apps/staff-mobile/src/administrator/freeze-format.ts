@@ -1,27 +1,7 @@
-import type { FreezeReviewDto } from "@pilates/api-contracts";
-import { boliviaCivilDate, formatStartTime } from "@pilates/mobile-core";
-
-import { formatCivilDayMonth } from "../assistant/assistant-format";
-
-const monthFormatters = {
-  long: new Intl.DateTimeFormat("es-BO", { month: "long", timeZone: "UTC" }),
-  short: new Intl.DateTimeFormat("es-BO", { month: "short", timeZone: "UTC" }),
-};
-
-type MonthStyle = keyof typeof monthFormatters;
+import { formatListDate, type FreezeReviewDto } from "@pilates/api-contracts";
+import { formatStartTime } from "@pilates/mobile-core";
 
 const atNoon = (civilDate: string) => new Date(`${civilDate}T12:00:00.000Z`);
-
-const monthOf = (civilDate: string, style: MonthStyle) =>
-  monthFormatters[style].format(atNoon(civilDate)).replace(/\./g, "");
-
-const dayOf = (civilDate: string) => String(atNoon(civilDate).getUTCDate());
-
-/** «5 de febrero», or «5 feb» for a list row. */
-const dayMonth = (civilDate: string, style: MonthStyle) =>
-  style === "long"
-    ? formatCivilDayMonth(civilDate)
-    : `${dayOf(civilDate)} ${monthOf(civilDate, "short")}`;
 
 /** «8 días» from the first to the last frozen day, both counted. */
 export function freezeDays(startsOn: string, endsOn: string): string {
@@ -30,13 +10,14 @@ export function freezeDays(startsOn: string, endsOn: string): string {
 }
 
 /**
- * «9 al 15 de noviembre» when the freeze stays in one month, «30 de noviembre
- * al 4 de diciembre» across two; «short» writes «9 al 15 nov» for a list row.
+ * FIX-090: «vie 20 al dom 22 nov» when the freeze stays in one month, «lun 30
+ * nov al vie 4 dic» across two, in the shared list format.
  */
-export function freezeRange(startsOn: string, endsOn: string, style: MonthStyle = "long"): string {
-  const end = dayMonth(endsOn, style);
-  if (startsOn.slice(0, 7) === endsOn.slice(0, 7)) return `${dayOf(startsOn)} al ${end}`;
-  return `${dayMonth(startsOn, style)} al ${end}`;
+export function freezeRange(startsOn: string, endsOn: string): string {
+  const end = formatListDate(endsOn);
+  if (startsOn.slice(0, 7) !== endsOn.slice(0, 7)) return `${formatListDate(startsOn)} al ${end}`;
+  const [weekday, day] = formatListDate(startsOn).split(" ");
+  return `${weekday} ${day} al ${end}`;
 }
 
 /**
@@ -46,11 +27,11 @@ export function freezeRange(startsOn: string, endsOn: string, style: MonthStyle 
 export function freezePlanEnd(freeze: FreezeReviewDto): string | undefined {
   const { planEndsOn, planEndsOnAfter, state } = freeze;
   if (planEndsOn === undefined) return undefined;
-  const before = formatCivilDayMonth(planEndsOn);
+  const before = formatListDate(planEndsOn);
   const after =
     planEndsOnAfter === undefined || planEndsOnAfter === null
       ? undefined
-      : formatCivilDayMonth(planEndsOnAfter);
+      : formatListDate(planEndsOnAfter);
   if (state === "approved") {
     return after === undefined ? undefined : `Ahora vence el ${after} (antes, el ${before})`;
   }
@@ -66,7 +47,7 @@ const outcome = (freeze: FreezeReviewDto) =>
       : "Rechazada";
 
 /**
- * «Aprobada por Paola Mendoza el 8 de noviembre a las 10:15» in La Paz time,
+ * «Aprobada por Paola Mendoza el dom 8 nov a las 10:15» in La Paz time,
  * dropping what an older API leaves out; undefined while still requested.
  */
 export function freezeDecision(freeze: FreezeReviewDto): string | undefined {
@@ -79,14 +60,14 @@ export function freezeDecision(freeze: FreezeReviewDto): string | undefined {
         ? ` por ${freeze.decidedByName}`
         : "";
   const at = freeze.decidedAt
-    ? ` el ${formatCivilDayMonth(boliviaCivilDate(new Date(freeze.decidedAt)))} a las ${formatStartTime(freeze.decidedAt)}`
+    ? ` el ${formatListDate(freeze.decidedAt)} a las ${formatStartTime(freeze.decidedAt)}`
     : "";
   return `${outcome(freeze)}${by}${at}`;
 }
 
-/** «Aprobada · ahora vence el 12 feb» or «Rechazada» for a decided list row. */
+/** «Aprobada · ahora vence el jue 12 feb» or «Rechazada» for a decided list row. */
 export function freezeDecidedDetail(freeze: FreezeReviewDto): string {
   const after = freeze.planEndsOnAfter;
   if (freeze.state !== "approved" || after === undefined || after === null) return outcome(freeze);
-  return `Aprobada · ahora vence el ${dayMonth(after, "short")}`;
+  return `Aprobada · ahora vence el ${formatListDate(after)}`;
 }

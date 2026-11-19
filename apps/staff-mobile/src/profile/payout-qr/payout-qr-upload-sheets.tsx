@@ -12,7 +12,7 @@ import {
 import { useMemo, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-import { fullCivilDate, validUntilSpan } from "./payout-qr-dates";
+import { qrDate, validUntilSpan } from "./payout-qr-dates";
 
 /** «Sube tu QR de cobro»: where the photo comes from (follow-up 276). */
 export function PayoutQrSourceSheet({
@@ -100,7 +100,7 @@ export function PayoutQrDateSheet({
         today={today}
       />
       {picked === null ? null : (
-        <BodyText>{`Vale hasta el ${fullCivilDate(picked)}. Te avisaremos 7 días antes y cuando venza.`}</BodyText>
+        <BodyText>{`Vale hasta el ${qrDate(picked)}. Te avisaremos 7 días antes y cuando venza.`}</BodyText>
       )}
       {message === null ? null : (
         <Text accessibilityRole="alert" style={styles.failure}>

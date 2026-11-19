@@ -4,6 +4,7 @@ import {
   type AssistantCashPaymentDto,
   type PlanQuoteDto,
   formatMoney,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
@@ -37,7 +38,7 @@ import { ValueRow } from "../ui/value-row";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { describeClasses, formatCivilDate, formatCivilDayMonth } from "./assistant-format";
+import { describeClasses } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 import {
@@ -185,7 +186,7 @@ export function ConfirmCashPaymentScreen({
           <PaymentDone
             amount={result === null ? amount : formatMoney(result.payment.amountDueCentavos)}
             classes={describeClasses(result?.payment.classAllowance ?? quote.classAllowance)}
-            endsOn={result?.subscription ? formatCivilDate(result.subscription.endsOn) : undefined}
+            endsOn={result?.subscription ? formatListDate(result.subscription.endsOn) : undefined}
             firstName={firstName(clientName)}
             kind={sent.kind}
             onBack={() => {
@@ -193,7 +194,7 @@ export function ConfirmCashPaymentScreen({
               navigation.popTo("ClientSearch");
             }}
             scheduled={renewalStartsOn !== undefined}
-            startsOn={nextStart === undefined ? undefined : formatCivilDayMonth(nextStart)}
+            startsOn={nextStart === undefined ? undefined : formatListDate(nextStart)}
           />
         </CenteredCard>
       </Screen>

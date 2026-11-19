@@ -1,14 +1,14 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { ClientOverviewDto } from "@pilates/api-contracts";
 import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDayMonth } from "./assistant-format";
 import { bookableClasses } from "./bookable-classes";
 
 type Subscription = NonNullable<ClientOverviewDto["subscription"]["subscription"]>;
 
 function allowanceLine(subscription: Subscription, active: boolean): string {
-  const ends = `${active ? "vence" : "venció"} el ${formatCivilDayMonth(subscription.endsOn)}`;
+  const ends = `${active ? "vence" : "venció"} el ${formatListDate(subscription.endsOn)}`;
   const extra = subscription.extraClasses ?? 0;
   const left = subscription.remainingClassAllowance;
   const plan =
@@ -65,7 +65,7 @@ export function ClientPlanCard({
           <View style={styles.rule} />
           {/* Walkthrough finding 117: which Plan is paid, and why no «Registrar pago». */}
           <Text style={styles.next}>
-            {`Próximo plan ya pagado: ${nextPlan.planName}, desde el ${formatCivilDayMonth(nextPlan.startsOn)}.${sells ? " Podrás registrar otro pago cuando empiece." : ""}`}
+            {`Próximo plan ya pagado: ${nextPlan.planName}, desde el ${formatListDate(nextPlan.startsOn)}.${sells ? " Podrás registrar otro pago cuando empiece." : ""}`}
           </Text>
         </>
       )}

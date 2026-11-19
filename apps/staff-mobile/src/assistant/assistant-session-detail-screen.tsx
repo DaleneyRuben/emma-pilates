@@ -4,6 +4,7 @@ import {
   useGetAssistantClientOverview,
   useGetSession,
   staffRoleLabel,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   BodyText,
@@ -36,7 +37,6 @@ import { dayHeading } from "../ui/session-time";
 import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { formatCivilDate } from "./assistant-format";
 import { bookableClasses, canBookFor } from "./bookable-classes";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
@@ -148,13 +148,13 @@ export function AssistantSessionDetailScreen({
       const date =
         error.detail === null ? null : /until (\d{4}-\d{2}-\d{2})$/.exec(error.detail)?.[1];
       if (date !== undefined && date !== null) {
-        return `Tu plan está congelado hasta el ${formatCivilDate(date)}.`;
+        return `Tu plan está congelado hasta el ${formatListDate(date)}.`;
       }
     }
     if (error instanceof AssistantApiError && error.code === "booking_before_start_date") {
       const date = error.detail === null ? null : /: (\d{4}-\d{2}-\d{2})$/.exec(error.detail)?.[1];
       if (date !== undefined && date !== null) {
-        return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
+        return `Podrás reservar a partir del ${formatListDate(date)}.`;
       }
     }
     const code = error instanceof AssistantApiError ? error.code : null;

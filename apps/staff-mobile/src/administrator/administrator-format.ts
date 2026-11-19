@@ -1,21 +1,4 @@
-import { boliviaCivilDate, dayChipLabel, formatStartTime } from "@pilates/mobile-core";
-
-const dayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "America/La_Paz",
-});
-const clockFormatter = new Intl.DateTimeFormat("es-BO", {
-  hour: "2-digit",
-  hour12: false,
-  minute: "2-digit",
-  timeZone: "America/La_Paz",
-});
-
-export function formatSubmittedAt(instant: string): string {
-  const date = new Date(instant);
-  return `${dayMonthFormatter.format(date)}, ${clockFormatter.format(date)}`;
-}
+import { formatDateTime } from "@pilates/api-contracts";
 
 export function describeCount(count: number, singular: string, plural: string): string {
   return `${count} ${count === 1 ? singular : plural}`;
@@ -46,9 +29,8 @@ export function describeSessionCancellation({
 }
 
 // Walkthrough n.º 65: what is being paid. An Evaluation names its slot,
-// «Evaluación nutricional · lun 16, 09:00», in La Paz time.
+// «Evaluación nutricional · lun 16 nov · 09:00», in La Paz time.
 export function describeSale(sale: { planName: string; evaluationStartsAt?: string }): string {
   if (sale.evaluationStartsAt === undefined) return sale.planName;
-  const { weekday, day } = dayChipLabel(boliviaCivilDate(new Date(sale.evaluationStartsAt)));
-  return `${sale.planName} · ${weekday} ${day}, ${formatStartTime(sale.evaluationStartsAt)}`;
+  return `${sale.planName} · ${formatDateTime(sale.evaluationStartsAt)}`;
 }

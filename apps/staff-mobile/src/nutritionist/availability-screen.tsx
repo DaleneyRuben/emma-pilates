@@ -2,6 +2,7 @@ import {
   type AvailabilityBlockDto,
   getListAvailabilityBlocksQueryKey,
   useListAvailabilityBlocks,
+  formatListDate,
 } from "@pilates/api-contracts";
 import {
   Chevron,
@@ -27,7 +28,6 @@ import { RootHeader } from "../ui/root-header";
 import {
   addCivilDays,
   boliviaToday,
-  civilDateLong,
   countLabel,
   displayTime,
   weekdayName,
@@ -49,10 +49,10 @@ const bookedLabel = (count: number): string => {
 
 // A block only carries a date line when it starts later or has an end.
 const dateLine = (block: AvailabilityBlockDto, today: string): string | null => {
-  const from = block.effectiveFrom > today ? civilDateLong(block.effectiveFrom) : null;
+  const from = block.effectiveFrom > today ? formatListDate(block.effectiveFrom) : null;
   // effectiveUntil is exclusive, so the last day is the one before it.
   const until =
-    block.effectiveUntil === null ? null : civilDateLong(addCivilDays(block.effectiveUntil, -1));
+    block.effectiveUntil === null ? null : formatListDate(addCivilDays(block.effectiveUntil, -1));
   if (from !== null && until !== null) return `Desde el ${from} · hasta el ${until}`;
   if (from !== null) return `Desde el ${from}`;
   if (until !== null) return `Hasta el ${until}`;

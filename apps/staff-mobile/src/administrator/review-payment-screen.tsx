@@ -1,4 +1,9 @@
-import { useGetPaymentReview, formatMoney } from "@pilates/api-contracts";
+import {
+  useGetPaymentReview,
+  formatMoney,
+  formatListDate,
+  formatDateTime,
+} from "@pilates/api-contracts";
 import {
   CardActionRow,
   cardWithActionRow,
@@ -29,13 +34,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { formatCivilDayMonth } from "../assistant/assistant-format";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
-import { describeSale, formatSubmittedAt } from "./administrator-format";
+import { describeSale } from "./administrator-format";
 import { PaymentBreakdown } from "./payment-breakdown";
 import type { PaymentsNotice } from "./pending-payments-screen";
 
@@ -111,7 +115,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
     payment.kind !== "evaluation" &&
     payment.startsOn !== undefined &&
     payment.startsOn > boliviaCivilDate(new Date())
-      ? formatCivilDayMonth(payment.startsOn)
+      ? formatListDate(payment.startsOn)
       : null;
   const nextPlan = startsLater !== null && payment.nextPlan === true;
   const confirmedNotice: PaymentsNotice =
@@ -262,7 +266,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
         <PaymentBreakdown payment={payment} />
         <IconRowGroup>
           <IconRow icon="credit" label="Transferencia" />
-          <IconRow icon="clock" label={`Enviado el ${formatSubmittedAt(payment.submittedAt)}`} />
+          <IconRow icon="clock" label={`Enviado el ${formatDateTime(payment.submittedAt)}`} />
           {startsLater === null ? null : nextPlan ? (
             <IconRow icon="calendar" label="Plan siguiente" value={`Empieza el ${startsLater}`} />
           ) : (

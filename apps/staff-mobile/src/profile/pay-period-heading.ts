@@ -1,27 +1,7 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { formatMonthHeading } from "@pilates/mobile-core";
 
-const months = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
-
 const civilUtc = (date: string) => new Date(`${date}T00:00:00.000Z`);
-
-const parts = (date: Date) => ({
-  day: date.getUTCDate(),
-  month: months[date.getUTCMonth()] ?? "",
-  year: date.getUTCFullYear(),
-});
 
 /**
  * BKO-009: how S29 names a statement. A whole month keeps its heading
@@ -42,17 +22,10 @@ export function payPeriodHeading(statement: { periodStart: string; periodEnd: st
     const heading = formatMonthHeading(`${statement.periodStart}T12:00:00-04:00`);
     return { heading, label: `Liquidación de ${heading.toLowerCase()}` };
   }
-  const first = parts(start);
-  const last = parts(new Date(end.getTime() - 24 * 60 * 60 * 1_000));
-  let heading: string;
-  if (first.year !== last.year) {
-    heading = `${first.day} de ${first.month} de ${first.year} – ${last.day} de ${last.month} de ${last.year}`;
-  } else if (first.month !== last.month) {
-    heading = `${first.day} de ${first.month} – ${last.day} de ${last.month} de ${last.year}`;
-  } else if (first.day !== last.day) {
-    heading = `${first.day} – ${last.day} de ${last.month} de ${last.year}`;
-  } else {
-    heading = `${first.day} de ${first.month} de ${first.year}`;
-  }
+  // FIX-090: the days in the shared list format, «lun 26 oct – dom 1 nov».
+  const first = statement.periodStart;
+  const last = new Date(end.getTime() - 24 * 60 * 60 * 1_000).toISOString().slice(0, 10);
+  const heading =
+    first === last ? formatListDate(first) : `${formatListDate(first)} – ${formatListDate(last)}`;
   return { heading, label: `Liquidación del ${heading}` };
 }
