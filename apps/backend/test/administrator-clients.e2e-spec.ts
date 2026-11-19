@@ -44,6 +44,8 @@ const directoryPage = {
   studioClientCount: 148,
   activePlanClientCount: 96,
   founderClientCount: 12,
+  expiringClientCount: 4,
+  unbookedClientCount: 9,
 };
 const detail = {
   id: clientId,
@@ -183,6 +185,24 @@ describe('administrator Client endpoints (e2e)', () => {
       { page: 1, pageSize: 20 },
       expect.anything(),
     );
+  });
+
+  // FIX-091 (W8 A): «Por vencer» and «Sin reservar», each with its count.
+  it('takes the «Por vencer» and «Sin reservar» chips and answers their counts', async () => {
+    for (const filter of ['expiring', 'unbooked']) {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/administrator/clients?filter=${filter}`)
+        .set('authorization', bearer)
+        .expect(200);
+      expect(operations.list).toHaveBeenLastCalledWith(
+        { page: 1, pageSize: 20, filter },
+        expect.anything(),
+      );
+      expect(response.body).toMatchObject({
+        expiringClientCount: 4,
+        unbookedClientCount: 9,
+      });
+    }
   });
 
   // FIX-065 (walkthrough finding 91): «Exportar CSV» downloads what the chip

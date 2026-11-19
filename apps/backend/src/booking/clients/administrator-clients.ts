@@ -19,8 +19,12 @@ import {
 // Plan's name, or whether the Client had one before.
 export type DirectorySubscriptionStatus = 'active' | 'expired' | 'none';
 
-/** Clientas › Todas's chips (follow-up 232); «Todas» is no filter. */
-export type ClientDirectoryFilter = DirectorySubscriptionStatus | 'founder';
+/**
+ * Clientas › Todas's chips (follow-up 232); «Todas» is no filter. FIX-091
+ * (W8 A) adds «Por vencer» (`expiring`) and «Sin reservar» (`unbooked`).
+ */
+export type ClientDirectoryFilter =
+  DirectorySubscriptionStatus | 'founder' | 'expiring' | 'unbooked';
 
 export type AdministratorClientRow = {
   id: string;
@@ -64,6 +68,10 @@ export type AdministratorClientPage = {
   activePlanClientCount: number;
   /** Clients of the studio holding a live Fundadora place. */
   founderClientCount: number;
+  /** «Por vencer»: active Plans ending within 3 days (FIX-091). */
+  expiringClientCount: number;
+  /** «Sin reservar»: an active Plan and no class ahead (FIX-091). */
+  unbookedClientCount: number;
 };
 
 export type AdministratorClientRecord = {

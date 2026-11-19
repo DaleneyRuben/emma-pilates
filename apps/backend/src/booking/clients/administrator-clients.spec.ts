@@ -61,6 +61,8 @@ const emptyPage = {
   studioClientCount: 0,
   activePlanClientCount: 0,
   founderClientCount: 0,
+  expiringClientCount: 0,
+  unbookedClientCount: 0,
 };
 
 const directory = (

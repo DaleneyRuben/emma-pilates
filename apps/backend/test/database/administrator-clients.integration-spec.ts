@@ -147,6 +147,9 @@ describe('Administrator Client directory (PostgreSQL)', () => {
       studioClientCount: 3,
       activePlanClientCount: 1,
       founderClientCount: 0,
+      // FIX-091: her active Plan ends later and she has no class ahead.
+      expiringClientCount: 0,
+      unbookedClientCount: 1,
     };
 
     await expect(
