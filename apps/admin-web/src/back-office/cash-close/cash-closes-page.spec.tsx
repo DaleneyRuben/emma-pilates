@@ -175,7 +175,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
     );
     renderAdmin("/dinero/caja?month=2026-10");
 
-    const day = await rowOf("vie 23/10");
+    const day = await rowOf("vie 23 oct");
     expect(
       within(day).getByText("Ventas anuladas (efectivo en caja): Bs 290"),
     ).toBeVisible();
@@ -192,7 +192,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       screen.getByText("Revisa con recepción qué pasó esos días."),
     ).toBeVisible();
 
-    const short = await rowOf("vie 23/10");
+    const short = await rowOf("vie 23 oct");
     expect(within(short).getByText("Cerrada")).toBeVisible();
     expect(within(short).getByRole("cell", { name: "Bs 520" })).toBeVisible();
     expect(within(short).getByRole("cell", { name: "Bs 510" })).toBeVisible();
@@ -205,12 +205,12 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       within(short).getByText("Faltó cambio para un billete de 200"),
     ).toBeVisible();
 
-    const missing = await rowOf("jue 22/10");
+    const missing = await rowOf("jue 22 oct");
     expect(within(missing).getByText("Sin cierre")).toBeVisible();
     expect(within(missing).getByRole("cell", { name: "Bs 300" })).toBeVisible();
     expect(missing).not.toHaveAttribute("data-difference");
 
-    const adjusted = await rowOf("mié 21/10");
+    const adjusted = await rowOf("mié 21 oct");
     expect(within(adjusted).getByText("Bs 0")).toHaveClass(
       "text-texto-secundario",
     );
@@ -219,14 +219,16 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
       "Una venta registrada después del cierre cambió las ventas del día.",
     );
 
-    const over = await rowOf("mar 20/10");
+    const over = await rowOf("mar 20 oct");
     expect(within(over).getByText("+Bs 5")).toHaveClass(
       "text-advertencia-texto",
     );
     expect(over).toHaveAttribute("data-difference", "over");
     expect(over.className).not.toMatch(/bg-error|bg-advertencia/);
 
-    expect(within(await rowOf("sáb 24/10")).getByText("Abierta")).toBeVisible();
+    expect(
+      within(await rowOf("sáb 24 oct")).getByText("Abierta"),
+    ).toBeVisible();
     expect(
       screen.getByText(
         "5 días con ventas en efectivo · 3 cerrados · 1 sin cierre",
@@ -237,7 +239,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
   it("moves to the previous month in the address", async () => {
     server.use(history(() => jsonResponse(october)));
     const { user } = renderAdmin("/dinero/caja?month=2026-10");
-    await rowOf("vie 23/10");
+    await rowOf("vie 23 oct");
 
     await user.click(screen.getByRole("button", { name: "Mes anterior" }));
 
@@ -266,7 +268,7 @@ describe("AW151 Cierres de caja on a narrow browser", () => {
     server.use(history(() => jsonResponse(october)));
     renderAdmin("/dinero/caja?month=2026-10");
 
-    const short = await rowOf("vie 23/10");
+    const short = await rowOf("vie 23 oct");
     const card = compactCard(short);
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(card.detail).toContain("Contado Bs 510");

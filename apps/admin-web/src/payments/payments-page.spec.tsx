@@ -87,7 +87,7 @@ describe("AW28 Pagos on a desktop browser", () => {
       within(sofia).getByRole("cell", { name: "Paquete de 8 clases" }),
     ).toBeInTheDocument();
     expect(
-      within(sofia).getByRole("cell", { name: "21/09/2026 · 14:05" }),
+      within(sofia).getByRole("cell", { name: "lun 21 sept · 14:05" }),
     ).toBeInTheDocument();
     expect(within(sofia).getByText("Pendiente")).toBeInTheDocument();
     const lucia = await rowOf(/Lucía Fernández/);

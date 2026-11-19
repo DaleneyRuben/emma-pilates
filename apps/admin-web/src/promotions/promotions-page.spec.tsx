@@ -69,7 +69,7 @@ describe("AW17 Promociones", () => {
       `${promotionsPath}/${reformer.id}/image?variant=promotion_480&asset=${reformer.image?.imageAssetId}`,
     );
     expect(
-      within(first).getByText("Del 01/09/2026 al 31/10/2026"),
+      within(first).getByText("Del mar 1 sept al sáb 31 oct"),
     ).toBeVisible();
     expect(within(first).getByText("Activa")).toBeVisible();
     expect(within(first).getByText("Posición 1")).toBeInTheDocument();

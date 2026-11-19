@@ -8,7 +8,6 @@ import {
   formatCivilMoment,
   formatDayTab,
   formatMonth,
-  formatSessionMoment,
   formatWeekRange,
   weekStartOf,
 } from "./bolivia-time";
@@ -48,7 +47,7 @@ describe("Bolivia civil time", () => {
     });
   });
 
-  it("labels the week, the day tabs, and a Session in Spanish", () => {
+  it("labels the week, and the day tabs in Spanish", () => {
     expect(formatWeekRange("2026-09-21")).toBe("21 – 27 de septiembre de 2026");
     expect(formatWeekRange("2026-09-28")).toBe(
       "28 de septiembre – 4 de octubre de 2026",
@@ -57,9 +56,6 @@ describe("Bolivia civil time", () => {
       "28 de diciembre de 2026 – 3 de enero de 2027",
     );
     expect(formatDayTab("2026-09-23")).toEqual({ weekday: "Mié", day: "23" });
-    expect(formatSessionMoment("2026-09-23T20:00:00.000Z")).toBe(
-      "Mié 23 sep · 16:00",
-    );
   });
 
   it("writes an instant as its Bolivia date and 24-hour time", () => {

@@ -88,7 +88,7 @@ describe("payout QR in Sueldos' «Aprobar pago»", () => {
         name: "QR de cobro de Emma Vargas",
       }),
     ).toBeInTheDocument();
-    expect(within(dialog).getByText("Vale hasta el 15/12/2026")).toBeVisible();
+    expect(within(dialog).getByText("Vale hasta el mar 15 dic")).toBeVisible();
     const confirm = within(dialog).getByRole("button", {
       name: "Aprobar Bs 297",
     });

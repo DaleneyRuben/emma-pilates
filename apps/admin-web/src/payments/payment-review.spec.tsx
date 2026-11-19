@@ -90,7 +90,7 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     ).toBeInTheDocument();
     expect(await within(panel).findByText("Monto a verificar")).toBeVisible();
     expect(within(panel).getByText("Bs 500")).toBeInTheDocument();
-    expect(within(panel).getByText("21/09/2026 · 14:05")).toBeInTheDocument();
+    expect(within(panel).getByText("lun 21 sept · 14:05")).toBeInTheDocument();
     expect(within(panel).getByText("Transferencia")).toBeInTheDocument();
     const receipt = within(panel).getByRole("img", {
       name: "Comprobante de Sofía Guzmán",

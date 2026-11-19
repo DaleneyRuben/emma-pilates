@@ -57,7 +57,9 @@ describe("AW11 Nómina on a desktop browser", () => {
     const amount = within(row).getByRole("cell", { name: "Bs 3.500" });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
-    expect(within(row).getByRole("cell", { name: "20/09/2026" })).toBeVisible();
+    expect(
+      within(row).getByRole("cell", { name: "dom 20 sept" }),
+    ).toBeVisible();
     expect(
       within(await rowOf("Camila Rojas")).getByText("Bs 2.800,50"),
     ).toBeVisible();
@@ -202,6 +204,6 @@ describe("AW11 Nómina on a narrow browser", () => {
     const row = await rowOf("Emma Vargas");
     const card = compactCard(row);
     expect(card).toMatchObject({ compact: true, labels: 0 });
-    expect(card.detail).toContain("20/09/2026");
+    expect(card.detail).toContain("dom 20 sept");
   });
 });

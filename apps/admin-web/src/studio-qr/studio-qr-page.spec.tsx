@@ -81,7 +81,7 @@ describe("Ajustes › QR del estudio", () => {
     });
     expect(image.getAttribute("src")).toBe("data:image/png;base64,iVBORw==");
     expect(
-      await screen.findByText("Actualizado el 15/10/2026"),
+      await screen.findByText("Actualizado el jue 15 oct"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -103,7 +103,7 @@ describe("Ajustes › QR del estudio", () => {
   it("uploads a new QR, confirms it and shows it again", async () => {
     server.use(...qrHandlers());
     const { user } = renderAdmin("/ajustes/qr-del-estudio");
-    await screen.findByText("Actualizado el 15/10/2026");
+    await screen.findByText("Actualizado el jue 15 oct");
     await waitFor(() => expect(imageReads).toBe(1));
 
     await user.upload(fileInput(), imageFile("qr-banco.png"));
@@ -113,7 +113,7 @@ describe("Ajustes › QR del estudio", () => {
     ).toBeInTheDocument();
     expect(uploads).toEqual([{ contentType: "image/png", byteSize: 8 }]);
     expect(
-      await screen.findByText("Actualizado el 04/11/2026"),
+      await screen.findByText("Actualizado el mié 4 nov"),
     ).toBeInTheDocument();
     await waitFor(() => expect(imageReads).toBe(2));
   });
@@ -123,14 +123,14 @@ describe("Ajustes › QR del estudio", () => {
       ...qrHandlers(() => problemResponse(400, "transfer_qr_invalid_image")),
     );
     const { user } = renderAdmin("/ajustes/qr-del-estudio");
-    await screen.findByText("Actualizado el 15/10/2026");
+    await screen.findByText("Actualizado el jue 15 oct");
 
     await user.upload(fileInput(), imageFile("qr.png"));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Ese archivo no es una imagen que podamos usar. Elige un JPG, PNG o WEBP.",
     );
-    expect(screen.getByText("Actualizado el 15/10/2026")).toBeInTheDocument();
+    expect(screen.getByText("Actualizado el jue 15 oct")).toBeInTheDocument();
   });
 
   it.each([
@@ -141,7 +141,7 @@ describe("Ajustes › QR del estudio", () => {
       ...qrHandlers(() => problemResponse(status, "transfer_qr_too_large")),
     );
     const { user } = renderAdmin("/ajustes/qr-del-estudio");
-    await screen.findByText("Actualizado el 15/10/2026");
+    await screen.findByText("Actualizado el jue 15 oct");
 
     await user.upload(fileInput(), imageFile("qr.png"));
 
@@ -153,7 +153,7 @@ describe("Ajustes › QR del estudio", () => {
   it("refuses more than 5 MB before uploading", async () => {
     server.use(...qrHandlers());
     const { user } = renderAdmin("/ajustes/qr-del-estudio");
-    await screen.findByText("Actualizado el 15/10/2026");
+    await screen.findByText("Actualizado el jue 15 oct");
 
     const big = new File([new Uint8Array(5 * 1024 * 1024 + 1)], "qr.png", {
       type: "image/png",

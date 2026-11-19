@@ -1,7 +1,10 @@
-import type { AdminClientDetailDto } from "@pilates/api-contracts";
+import {
+  formatListDate,
+  type AdminClientDetailDto,
+} from "@pilates/api-contracts";
 import { screen, within } from "@testing-library/react";
 import { http } from "msw";
-import { addDays, boliviaToday, formatCivilDate } from "../../lib/bolivia-time";
+import { addDays, boliviaToday } from "../../lib/bolivia-time";
 import {
   apiUrl,
   jsonResponse,
@@ -131,7 +134,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
 
     expect(
       await within(panel).findByText(
-        `Acceso de prueba activo hasta el ${formatCivilDate(endsOn)}.`,
+        `Acceso de prueba activo hasta el ${formatListDate(endsOn)}.`,
       ),
     ).toBeInTheDocument();
     expect(grants).toEqual([

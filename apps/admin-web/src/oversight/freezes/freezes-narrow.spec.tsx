@@ -38,7 +38,7 @@ describe("Congelamientos on a phone", () => {
     const card = compactCard(row);
     expect(card.compact).toBe(true);
     expect(card.detail).toContain("Viaje");
-    expect(card.detail).toContain("5 feb → 12 feb");
+    expect(card.detail).toContain("vie 5 feb → vie 12 feb");
     expect(within(row).getByRole("button", { name: "Aprobar" })).toBeVisible();
   });
 });

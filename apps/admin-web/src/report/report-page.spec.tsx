@@ -133,7 +133,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       within(accrued).getByText("Clases pendientes de dar hoy: 5"),
     ).toBeVisible();
     expect(
-      screen.getByText("01/08/2026 – 30/09/2026 · Todas las sucursales"),
+      screen.getByText("sáb 1 ago – mié 30 sept · Todas las sucursales"),
     ).toBeVisible();
     expect(screen.getByRole("combobox", { name: "Sucursal" })).toHaveValue(
       "all",
@@ -233,7 +233,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       vista: "reporte",
     });
     expect(
-      screen.getByText("01/08/2026 – 30/09/2026 · Sucursal Centro"),
+      screen.getByText("sáb 1 ago – mié 30 sept · Sucursal Centro"),
     ).toBeVisible();
   });
 
@@ -266,7 +266,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       }),
     );
     expect(
-      await screen.findByText("01/08/2026 – 30/09/2026 · Todas las sucursales"),
+      await screen.findByText("sáb 1 ago – mié 30 sept · Todas las sucursales"),
     ).toBeVisible();
     expect(screen.getByRole("combobox", { name: "Sucursal" })).toHaveValue(
       "all",

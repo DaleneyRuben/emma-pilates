@@ -8,12 +8,12 @@ describe("schedule change notices", () => {
         "2026-10-02",
       ),
     ).toBe(
-      "Serie actualizada desde el 02/10/2026: 4 sesiones nuevas; 4 sin reservas se reemplazaron.",
+      "Serie actualizada desde el vie 2 oct: 4 sesiones nuevas; 4 sin reservas se reemplazaron.",
     );
     expect(
       endedNotice({ cancelledSessions: 1, keptSessions: 0 }, "2026-10-03"),
     ).toBe(
-      "La serie deja de repetirse desde el 03/10/2026: 1 sesión sin reservas se canceló.",
+      "La serie deja de repetirse desde el sáb 3 oct: 1 sesión sin reservas se canceló.",
     );
   });
 
@@ -21,7 +21,7 @@ describe("schedule change notices", () => {
     expect(
       endedNotice({ cancelledSessions: 0, keptSessions: 0 }, "2026-10-03"),
     ).toBe(
-      "La serie deja de repetirse desde el 03/10/2026. No había sesiones futuras que cambiar.",
+      "La serie deja de repetirse desde el sáb 3 oct. No había sesiones futuras que cambiar.",
     );
   });
 });

@@ -60,7 +60,7 @@ describe("payout QR in AW12's Registrar pago", () => {
         name: "QR de cobro de Emma Vargas",
       }),
     ).toHaveAttribute("src", `${emmaQrImage}?variant=readable`);
-    expect(within(panel).getByText("Vale hasta el 15/12/2026")).toBeVisible();
+    expect(within(panel).getByText("Vale hasta el mar 15 dic")).toBeVisible();
 
     await user.selectOptions(
       within(panel).getByLabelText("Empleado"),

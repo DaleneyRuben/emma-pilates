@@ -159,13 +159,13 @@ describe("The Client file's tabs", () => {
     const next = await within(panel).findByRole("region", { name: "Próximas" });
     expect(within(next).getByText("Reformer Pilates")).toBeInTheDocument();
     expect(
-      within(next).getByText("05/11/2026 · 18:30 · Daniela Ortiz · Centro"),
+      within(next).getByText("jue 5 nov · 18:30 · Daniela Ortiz · Centro"),
     ).toBeInTheDocument();
     expect(within(next).getByText("En espera")).toBeInTheDocument();
     const past = within(panel).getByRole("region", { name: "Historial" });
     expect(within(past).getByText("Barre")).toBeInTheDocument();
     expect(
-      within(past).getByText("29/10/2026 · 18:30 · Carla Rojas · Equipetrol"),
+      within(past).getByText("jue 29 oct · 18:30 · Carla Rojas · Equipetrol"),
     ).toBeInTheDocument();
     expect(within(panel).queryByText("5 de 8")).not.toBeInTheDocument();
   });

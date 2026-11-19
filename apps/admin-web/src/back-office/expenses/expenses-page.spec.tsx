@@ -59,7 +59,9 @@ describe("AW13 Gastos on a desktop browser", () => {
     const amount = within(row).getByRole("cell", { name: "Bs 450,50" });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
-    expect(within(row).getByRole("cell", { name: "15/09/2026" })).toBeVisible();
+    expect(
+      within(row).getByRole("cell", { name: "mar 15 sept" }),
+    ).toBeVisible();
     expect(
       within(await rowOf("Mantenimiento")).getByText("Bs 1.200"),
     ).toBeVisible();
@@ -208,6 +210,6 @@ describe("AW13 Gastos on a narrow browser", () => {
     const row = await rowOf("Reparación");
     const card = compactCard(row);
     expect(card).toMatchObject({ compact: true, labels: 0 });
-    expect(card.detail).toContain("15/09/2026");
+    expect(card.detail).toContain("mar 15 sept");
   });
 });

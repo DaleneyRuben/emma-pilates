@@ -20,7 +20,7 @@ describe("PayoutQrCard", () => {
       name: "QR de cobro de Daniela Ortiz",
     });
     expect(image).toHaveAttribute("src", `${imageUrl}?variant=readable`);
-    expect(screen.getByText("Vale hasta el 15/12/2026")).toBeInTheDocument();
+    expect(screen.getByText("Vale hasta el mar 15 dic")).toBeInTheDocument();
     expect(screen.queryByText("Vence pronto")).not.toBeInTheDocument();
     const save = screen.getByRole("link", { name: "Guardar QR" });
     expect(save).toHaveAttribute("href", `${imageUrl}?variant=readable`);
@@ -40,7 +40,7 @@ describe("PayoutQrCard", () => {
       />,
     );
 
-    expect(screen.getByText("Vale hasta el 05/12/2026")).toBeInTheDocument();
+    expect(screen.getByText("Vale hasta el sáb 5 dic")).toBeInTheDocument();
     expect(screen.getByText("Vence pronto")).toBeInTheDocument();
   });
 
@@ -69,7 +69,7 @@ describe("PayoutQrCard", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "El QR de Daniela venció el 15/12/2026. No lo mostramos para que no le transfieras a una cuenta que ya no sirve.",
+        "El QR de Daniela venció el mar 15 dic. No lo mostramos para que no le transfieras a una cuenta que ya no sirve.",
       ),
     ).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();

@@ -1,10 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import {
-  boliviaInstant,
-  formatCivilDate,
-  formatSessionMoment,
-} from "../lib/bolivia-time";
+import { formatDateTime, formatListDate } from "@pilates/api-contracts";
+import { boliviaInstant, formatCivilDate } from "../lib/bolivia-time";
 import { centro } from "../test/booking-handlers";
 import {
   apiUrl,
@@ -37,8 +34,7 @@ import {
 } from "../test/studio-settings-fixtures";
 import { useNarrowViewport } from "../test/viewport";
 
-const civil = (date: string) =>
-  `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+const civil = (date: string) => formatListDate(date);
 
 const openSession = async (name: RegExp) => {
   const view = renderAdmin(`/horario?week=${nextMonday}`);
@@ -71,7 +67,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
 
     expect(
       within(panel).getByText(
-        `${formatSessionMoment(mondayReformer.startsAt)} · 4 de 10 lugares reservados`,
+        `${formatDateTime(mondayReformer.startsAt)} · 4 de 10 lugares reservados`,
       ),
     ).toBeInTheDocument();
     expect(within(panel).getByLabelText("Solo esta sesión")).toBeChecked();
@@ -275,7 +271,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
 
     expect(
       within(panel).getByText(
-        `${formatSessionMoment(wednesdayMat.startsAt)} · 10 de 10 lugares reservados · 3 en lista de espera`,
+        `${formatDateTime(wednesdayMat.startsAt)} · 10 de 10 lugares reservados · 3 en lista de espera`,
       ),
     ).toBeInTheDocument();
     expect(within(panel).queryByLabelText("Esta y las futuras")).toBeNull();

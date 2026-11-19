@@ -61,7 +61,7 @@ describe("AW26 Referidos on a desktop browser", () => {
     ).toHaveAttribute("data-label", "Cliente que refiere");
     expect(within(pending).getByText("3 referidas en total")).toBeVisible();
     expect(
-      within(pending).getByRole("cell", { name: "11/08/2026" }),
+      within(pending).getByRole("cell", { name: "mar 11 ago" }),
     ).toHaveAttribute("data-label", "Fecha de registro");
     expect(within(pending).queryByText("Pendiente")).not.toBeInTheDocument();
     expect(
@@ -105,10 +105,10 @@ describe("AW26 Referidos on a desktop browser", () => {
     const bought = (await screen.findByRole("cell", { name: /Camila Vargas/ }))
       .parentElement as HTMLElement;
     expect(
-      within(bought).getByRole("cell", { name: "04/08/2026" }),
+      within(bought).getByRole("cell", { name: "mar 4 ago" }),
     ).toHaveAttribute("data-label", "Compró");
     expect(
-      within(bought).getByRole("cell", { name: "Sumada el 04/08/2026" }),
+      within(bought).getByRole("cell", { name: "Sumada el mar 4 ago" }),
     ).toHaveAttribute("data-label", "Clase de premio");
     const waiting = screen.getByRole("cell", { name: /Valeria Terceros/ })
       .parentElement as HTMLElement;
@@ -123,7 +123,7 @@ describe("AW26 Referidos on a desktop browser", () => {
       .parentElement as HTMLElement;
     // 19:30 on 15 November in Bolivia.
     expect(
-      within(owed).getByRole("cell", { name: "15/11/2026" }),
+      within(owed).getByRole("cell", { name: "dom 15 nov" }),
     ).toBeVisible();
     expect(
       within(owed).getByRole("cell", {

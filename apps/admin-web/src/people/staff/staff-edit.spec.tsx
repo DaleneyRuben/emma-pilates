@@ -220,7 +220,7 @@ describe("AW24 Editar miembro", () => {
 
     expect(within(panel).getByText("Pendiente de activación")).toBeVisible();
     expect(
-      within(panel).getByText("El enlace vence el 30/09/2026."),
+      within(panel).getByText("El enlace vence el mié 30 sept."),
     ).toBeVisible();
     expect(
       within(panel).getByText(
@@ -237,7 +237,7 @@ describe("AW24 Editar miembro", () => {
       ),
     ).toBeVisible();
     expect(
-      within(panel).getByText("El enlace vence el 02/10/2026."),
+      within(panel).getByText("El enlace vence el vie 2 oct."),
     ).toBeVisible();
 
     await user.click(

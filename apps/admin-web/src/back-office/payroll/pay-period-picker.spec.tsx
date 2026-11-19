@@ -117,7 +117,7 @@ describe("the pay period picker", () => {
     await waitFor(() =>
       expect(lastAsked()).toEqual({ from: "2026-09-15", until: "2026-10-01" }),
     );
-    expect(screen.getByText("Del 07/09/2026 al 13/09/2026")).toBeVisible();
+    expect(screen.getByText("Del lun 7 sept al dom 13 sept")).toBeVisible();
   });
 
   it("refuses a range that ends before it starts", async () => {

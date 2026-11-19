@@ -27,9 +27,9 @@ describe("freeze format (walkthrough findings 52/53)", () => {
   });
 
   it("shows what approving a pending request does to the plan end", () => {
-    expect(freezePendingPlanEnd(base)).toBe("5 feb → 12 feb");
+    expect(freezePendingPlanEnd(base)).toBe("vie 5 feb → vie 12 feb");
     expect(freezePendingPlanEnd({ ...base, planEndsOnAfter: null })).toBe(
-      "5 feb",
+      "vie 5 feb",
     );
     expect(
       freezePendingPlanEnd({
@@ -42,7 +42,7 @@ describe("freeze format (walkthrough findings 52/53)", () => {
 
   it("shows the new end of an approved freeze and the unchanged end of a refused one", () => {
     expect(freezeDecidedPlanEnd({ ...base, state: "approved" })).toBe(
-      "12 feb (antes 5 feb)",
+      "vie 12 feb (antes vie 5 feb)",
     );
     expect(
       freezeDecidedPlanEnd({
@@ -50,14 +50,14 @@ describe("freeze format (walkthrough findings 52/53)", () => {
         state: "refused",
         planEndsOnAfter: null,
       }),
-    ).toBe("5 feb");
+    ).toBe("vie 5 feb");
     expect(
       freezeDecidedPlanEnd({
         ...base,
         state: "approved",
         planEndsOnAfter: undefined,
       }),
-    ).toBe("5 feb");
+    ).toBe("vie 5 feb");
     expect(
       freezeDecidedPlanEnd({ ...base, planEndsOn: undefined }),
     ).toBeUndefined();
@@ -71,10 +71,10 @@ describe("freeze format (walkthrough findings 52/53)", () => {
       decidedByName: "Paola Mendoza",
     };
     expect(freezeDecidedBy(decided)).toBe(
-      "Decidido por Paola Mendoza · 8 nov 10:15",
+      "Decidido por Paola Mendoza · dom 8 nov · 10:15",
     );
     expect(freezeDecidedBy({ ...decided, decidedByName: null })).toBe(
-      "Decidido · 8 nov 10:15",
+      "Decidido · dom 8 nov · 10:15",
     );
     expect(freezeDecidedBy({ ...decided, decidedAt: null })).toBe(
       "Decidido por Paola Mendoza",
@@ -96,8 +96,8 @@ describe("a withdrawn freeze", () => {
       decidedByName: "Valeria Quiroga",
     };
     expect(freezeDecidedBy(withdrawn)).toBe(
-      "Retirado por la clienta · 8 nov 10:15",
+      "Retirado por la clienta · dom 8 nov · 10:15",
     );
-    expect(freezeDecidedPlanEnd(withdrawn)).toBe("5 feb");
+    expect(freezeDecidedPlanEnd(withdrawn)).toBe("vie 5 feb");
   });
 });

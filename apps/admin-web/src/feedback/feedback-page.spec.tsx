@@ -57,7 +57,7 @@ describe("AW38 Comentarios (REL-012)", () => {
     expect(within(row).getByText("Problema")).toBeInTheDocument();
     expect(within(row).getByText("App de clientas")).toBeInTheDocument();
     expect(within(row).getByText("1.0.1 (3) · Android 14")).toBeInTheDocument();
-    expect(within(row).getByText("22/10/2026 · 20:30")).toBeInTheDocument();
+    expect(within(row).getByText("jue 22 oct · 20:30")).toBeInTheDocument();
     expect(within(row).getByText("Nuevo")).toBeInTheDocument();
     const resolved = await rowOf(/Sería útil/);
     expect(within(resolved).getByText("Resuelto")).toBeInTheDocument();

@@ -48,7 +48,7 @@ describe("AW21 and AW22 plan extras and the Plan after a Guest Pass", () => {
     const elenaRow = await rowOf(/Elena Prueba/);
     expect(within(elenaRow).getByText("12 clases")).toBeInTheDocument();
     expect(
-      within(elenaRow).getByText("Empieza el 17/11/2026"),
+      within(elenaRow).getByText("Empieza el mar 17 nov"),
     ).toBeInTheDocument();
     expect(within(elenaRow).getByText("12 de 12")).toBeInTheDocument();
   });
@@ -88,7 +88,7 @@ describe("AW21 and AW22 plan extras and the Plan after a Guest Pass", () => {
     expect(await within(panel).findByText("5 de 8 + 1")).toBeInTheDocument();
     expect(within(panel).getByText("Plan siguiente")).toBeInTheDocument();
     expect(
-      within(panel).getByText("12 clases · empieza el 01/10/2026"),
+      within(panel).getByText("12 clases · empieza el jue 1 oct"),
     ).toBeInTheDocument();
   });
 });

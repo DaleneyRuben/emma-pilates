@@ -77,13 +77,13 @@ describe("AW25 Evaluaciones nutricionales on a desktop browser", () => {
       within(row).getByRole("cell", { name: "Verónica Zambrana" }),
     ).toHaveAttribute("data-label", "Nutricionista");
     expect(
-      within(row).getByRole("cell", { name: "lun 21/09 · 09:00" }),
+      within(row).getByRole("cell", { name: "lun 21 sept · 09:00" }),
     ).toHaveAttribute("data-label", "Fecha y hora");
     const followUp = screen.getByRole("cell", { name: /Daniela Rojas Peña/ })
       .parentElement as HTMLElement;
     expect(within(followUp).getByText("Seguimiento")).toBeInTheDocument();
     expect(
-      within(followUp).getByRole("cell", { name: "jue 24/09 · 16:30" }),
+      within(followUp).getByRole("cell", { name: "jue 24 sept · 16:30" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Sucursal Centro · 2 evaluaciones agendadas"),
@@ -345,7 +345,7 @@ describe("AW25 Evaluaciones nutricionales on a narrow browser", () => {
     renderAdmin(september21);
 
     const card = compactCard(
-      (await screen.findByText("lun 21/09 · 09:00")).closest("tr")!,
+      (await screen.findByText("lun 21 sept · 09:00")).closest("tr")!,
     );
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(

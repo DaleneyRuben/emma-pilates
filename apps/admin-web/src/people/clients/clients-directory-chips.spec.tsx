@@ -115,7 +115,7 @@ describe("Clientas › Todas chips and columns", () => {
       "Le quedan",
     );
     expect(
-      within(row).getByRole("cell", { name: "09/10/2026" }),
+      within(row).getByRole("cell", { name: "vie 9 oct" }),
     ).toHaveAttribute("data-label", "Vence");
     expect(
       within(row).getByRole("cell", { name: "Carla Rojas" }),
@@ -124,7 +124,7 @@ describe("Clientas › Todas chips and columns", () => {
     const expired = screen.getByRole("cell", { name: /Sofía Guzmán Rojas/ })
       .parentElement as HTMLElement;
     expect(
-      within(expired).getByRole("cell", { name: "Venció el 30/06/2026" }),
+      within(expired).getByRole("cell", { name: "Venció el mar 30 jun" }),
     ).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Mariana Peña/ })
       .parentElement as HTMLElement;

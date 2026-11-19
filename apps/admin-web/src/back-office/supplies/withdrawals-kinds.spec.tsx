@@ -54,14 +54,14 @@ describe("AW31 Movimientos de insumos by kind", () => {
     server.use(history((params) => jsonResponse(byKind(params))));
     renderAdmin("/estudio/insumos/retiros?month=2026-11");
 
-    const restockRow = await rowAt("18/11/2026 · 15:00");
+    const restockRow = await rowAt("mié 18 nov · 15:00");
     expect(
       within(restockRow).getByRole("cell", { name: "Reposición" }),
     ).toHaveAttribute("data-label", "Movimiento");
     expect(
       within(restockRow).getByRole("cell", { name: "Carolina Rivas" }),
     ).toHaveAttribute("data-label", "Registró");
-    const withdrawalRowElement = await rowAt("18/11/2026 · 10:00");
+    const withdrawalRowElement = await rowAt("mié 18 nov · 10:00");
     expect(
       within(withdrawalRowElement).getByRole("cell", { name: "Retiro" }),
     ).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("AW31 Movimientos de insumos by kind", () => {
     const { router, user } = renderAdmin(
       "/estudio/insumos/retiros?month=2026-11",
     );
-    await rowAt("18/11/2026 · 15:00");
+    await rowAt("mié 18 nov · 15:00");
 
     const filter = screen.getByLabelText("Movimiento");
     expect(
@@ -125,7 +125,7 @@ describe("AW31 Movimientos de insumos on a narrow browser", () => {
   it("labels who recorded each card", async () => {
     renderAdmin("/estudio/insumos/retiros?month=2026-11");
     // FIX-088: the phone card leaves out who recorded it.
-    const row = (await screen.findByText("18/11/2026 · 10:00")).closest("tr")!;
+    const row = (await screen.findByText("mié 18 nov · 10:00")).closest("tr")!;
     expect(compactCard(row)).toMatchObject({ compact: true, labels: 0 });
     expect(row).not.toHaveTextContent("Paola Mendoza");
   });
