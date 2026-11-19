@@ -28,6 +28,16 @@ export const glyphShapes = {
       <Line x1={16} x2={16} y1={3.5} y2={7} />
     </>
   ),
+  // C2 C: a cancelled class's notice.
+  calendarX: (
+    <>
+      <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />
+      <Line x1={3.5} x2={20.5} y1={10} y2={10} />
+      <Line x1={8} x2={8} y1={3.5} y2={7} />
+      <Line x1={16} x2={16} y1={3.5} y2={7} />
+      <Path d="M10 13.5l4 4M14 13.5l-4 4" />
+    </>
+  ),
   // S10 QR receipt card (design follow-up 254 § 2).
   camera: (
     <>
@@ -182,6 +192,8 @@ export const glyphShapes = {
   share: (
     <Path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13" />
   ),
+  // C2 C: a freeze's notice.
+  snowflake: <Path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9" />,
   sun: (
     <>
       <Path d="M12 3v4M12 17v4M3 12h4M17 12h4" />

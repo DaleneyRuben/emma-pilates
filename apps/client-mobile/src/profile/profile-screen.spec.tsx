@@ -244,7 +244,7 @@ describe("Client Profile", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Sin leer")).toBeOnTheScreen();
+      expect(screen.getByText(/^Nuevas · \d+$/)).toBeOnTheScreen();
     });
     expect(screen.getByText("Tu clase de Reformer Pilates fue cancelada.")).toBeOnTheScreen();
     expect(screen.getByText("Tu plan vence en 3 días.")).toBeOnTheScreen();
