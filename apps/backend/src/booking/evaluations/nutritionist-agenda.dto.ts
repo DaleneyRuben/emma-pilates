@@ -16,6 +16,15 @@ export class NutritionistAgendaEntryDto {
   })
   clientPhoto!: ClientPhotoDto | null;
 
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    example: '+591 70011001',
+    description:
+      'The Client phone as stored, null when she has none; the agenda opens WhatsApp to it (E5). Older builds ignore it.',
+  })
+  clientPhone!: string | null;
+
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;
 

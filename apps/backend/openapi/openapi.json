@@ -18196,6 +18196,12 @@
               }
             ]
           },
+          "clientPhone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+591 70011001",
+            "description": "The Client phone as stored, null when she has none; the agenda opens WhatsApp to it (E5). Older builds ignore it."
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -18232,6 +18238,7 @@
           "evaluationId",
           "clientName",
           "clientPhoto",
+          "clientPhone",
           "startsAt",
           "endsAt",
           "durationMinutes",
