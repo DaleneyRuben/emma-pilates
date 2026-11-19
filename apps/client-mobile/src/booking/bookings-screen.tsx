@@ -73,6 +73,9 @@ export function BookingsScreen({
   const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
     setCancelledShown(false),
   );
+  // FIX-090: leaving the waitlist is confirmed afterwards, like a cancel.
+  const [leftShown, setLeftShown] = useState(false);
+  const leftNotice = useStickyNotice(leftShown ? true : undefined, () => setLeftShown(false));
   const upcoming = useListUpcomingBookings({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -137,9 +140,12 @@ export function BookingsScreen({
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
     setCancelledShown(false);
+    setLeftShown(false);
     try {
       const response = await leaveWaitlist(item.waitlistEntryId, undefined, fetcher);
-      if (response.status !== 204) {
+      if (response.status === 204) {
+        setLeftShown(true);
+      } else {
         setFailure("No pudimos sacarte de la lista de espera. Inténtalo de nuevo.");
       }
     } catch {
@@ -282,6 +288,9 @@ export function BookingsScreen({
           onClose={() => setCancelledShown(false)}
           title="Reserva cancelada"
         />
+      ) : null}
+      {leftNotice !== null && confirmed === null && cancelledNotice === null ? (
+        <BrandToast onClose={() => setLeftShown(false)} title="Saliste de la lista de espera" />
       ) : null}
     </Screen>
   );
