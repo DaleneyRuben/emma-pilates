@@ -25,6 +25,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { durationLabel, planDurations, weeklyClassCaps } from "./plan-format";
@@ -95,6 +96,9 @@ export function PlanPanelForm({
 }) {
   const change = usePlanChange();
   const [failure, setFailure] = useState<string | null>(null);
+  const [hiding, setHiding] = useState(false);
+  const setVisibility = (planId: string, visible: boolean) =>
+    change.mutateAsync({ kind: "visibility", planId, visible });
   const form = useForm<PlanInput, unknown, PlanOutput>({
     resolver: zodResolver(planSchema),
     defaultValues: {
@@ -242,16 +246,16 @@ export function PlanPanelForm({
             <Button
               variant="link"
               className="self-center"
-              busy={change.isPending && change.variables?.kind === "visibility"}
+              busy={
+                change.isPending &&
+                change.variables?.kind === "visibility" &&
+                !hiding
+              }
               disabled={change.isPending}
               onClick={() =>
-                void run(() =>
-                  change.mutateAsync({
-                    kind: "visibility",
-                    planId: plan.id,
-                    visible: plan.hiddenAt !== null,
-                  }),
-                )
+                plan.hiddenAt === null
+                  ? setHiding(true)
+                  : void run(() => setVisibility(plan.id, true))
               }
             >
               {plan.hiddenAt === null
@@ -261,6 +265,28 @@ export function PlanPanelForm({
           )}
         </SidePanelFooter>
       </form>
+      {plan === undefined ? null : (
+        // FIX-090: hiding takes the Plan out of the clients' catalogue, so
+        // it asks first; showing it again does not.
+        <ConfirmDialog
+          open={hiding}
+          onOpenChange={setHiding}
+          title={`¿Ocultar ${plan.name} en la app?`}
+          confirmLabel="Ocultar"
+          tone="primary"
+          busy={change.isPending}
+          onConfirm={() =>
+            void run(() => setVisibility(plan.id, false)).then(() =>
+              setHiding(false),
+            )
+          }
+        >
+          <p>
+            Las clientas dejan de verlo para comprarlo. Quien ya lo tiene lo
+            conserva, y puedes mostrarlo de nuevo cuando quieras.
+          </p>
+        </ConfirmDialog>
+      )}
     </Form>
   );
 }
