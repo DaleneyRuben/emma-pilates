@@ -226,7 +226,7 @@ export function SupplyPanelForm({
         >
           <p>
             Dejará de aparecer en Insumos y en Registrar retiro. Sus movimientos
-            seguirán en «Movimientos de insumos».
+            seguirán en Insumos › Movimientos.
           </p>
         </ConfirmDialog>
       )}

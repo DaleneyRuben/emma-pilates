@@ -157,10 +157,7 @@ function BranchWithdrawals({
         <ChevronLeft size={14} strokeWidth={1.8} aria-hidden="true" />
         Volver a Insumos
       </Link>
-      <PageHeader
-        title="Movimientos de insumos"
-        subtitle={`Sucursal ${branch.name}`}
-      />
+      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
       <div className="flex flex-wrap items-center gap-3">
         <MonthStepper
           month={month}
@@ -257,7 +254,7 @@ export function WithdrawalsPage({
   if (selectedBranch === undefined) {
     return (
       <NoBranchPage
-        title="Movimientos de insumos"
+        title="Insumos"
         pending={status === "pending"}
         loadingMessage="Cargando movimientos…"
         emptyMessage="Todavía no hay sucursales activas."
