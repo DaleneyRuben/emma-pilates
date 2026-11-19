@@ -101,6 +101,21 @@ describe("AW44 Recomendaciones del mes", () => {
     expect(screen.queryByRole("button", { name: "Descartar" })).toBeNull();
   });
 
+  // A resolved finding that holds again comes back as new unless it was
+  // discarded, so Resueltas keeps Descartar for it.
+  it("still discards a resolved finding", async () => {
+    server.use(list([{ ...finding, state: "resolved" }]));
+    renderSection();
+
+    expect(await screen.findByText(finding.detail)).toBeVisible();
+    const kinds = screen.getByRole("group", { name: "Tipo de recomendación" });
+    expect(
+      within(kinds).getByRole("button", { name: "Resueltas" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Resuelta")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Descartar" })).toBeEnabled();
+  });
+
   it("hides Descartar when the page is read only", async () => {
     server.use(list([finding]));
     renderSection(true);
