@@ -1,20 +1,19 @@
 import { Link } from "@tanstack/react-router";
+import { AuthHeading, AuthLayout } from "../auth/auth-layout";
+import { buttonVariants } from "../components/ui/button";
 
+// FIX-090: an unknown address is answered inside the studio's layout, the
+// same for a signed-in person and a visitor, never on a bare page.
 export function NotFoundPage() {
   return (
-    <article className="flex flex-col gap-4">
-      <h1 className="text-titulo-pagina text-texto">Página no encontrada</h1>
-      <section className="rounded-marco border border-borde bg-lino px-6 py-10 text-center">
-        <p className="text-cuerpo text-texto-secundario">
-          La dirección que abriste no corresponde a ninguna sección del panel.
-        </p>
-        <Link
-          to="/"
-          className="mt-3 inline-block text-cuerpo font-medium text-primario underline-offset-4 hover:text-primario-presionado hover:underline"
-        >
-          Volver al inicio
-        </Link>
-      </section>
-    </article>
+    <AuthLayout>
+      <AuthHeading
+        title="Página no encontrada"
+        line="La dirección que abriste no existe o cambió."
+      />
+      <Link to="/" className={buttonVariants({ size: "lg" })}>
+        Volver al inicio
+      </Link>
+    </AuthLayout>
   );
 }
