@@ -22,6 +22,7 @@ import {
 } from "../../test/msw";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
+import { typeDetail } from "../../test/equipment-table";
 
 const bodies: unknown[] = [];
 const record =
@@ -34,21 +35,22 @@ const record =
 const recordPost = record("post");
 const recordPatch = record("patch");
 
-const sectionOf = async (name: RegExp) =>
-  (await screen.findByRole("region", { name })) as HTMLElement;
-
 const openNewType = async () => {
   const { user } = renderAdmin("/estudio/equipos");
-  await sectionOf(/^Reformer ·/);
-  await user.click(screen.getByRole("button", { name: "Nuevo tipo" }));
-  const panel = await screen.findByRole("dialog", { name: "Nuevo tipo" });
+  await screen.findByRole("table", { name: "Equipos" });
+  await user.click(
+    screen.getByRole("button", { name: "Nuevo tipo de equipo" }),
+  );
+  const panel = await screen.findByRole("dialog", {
+    name: "Nuevo tipo de equipo",
+  });
   return { user, panel };
 };
 
-const openEdit = async (section: RegExp, title: string) => {
+const openEdit = async (typeName: string, title: string) => {
   const { user, queryClient } = renderAdmin("/estudio/equipos");
   await user.click(
-    within(await sectionOf(section)).getByRole("button", {
+    within(await typeDetail(user, typeName)).getByRole("button", {
       name: "Editar tipo",
     }),
   );
@@ -161,7 +163,7 @@ describe("AW37 equipment types", () => {
         jsonResponse({ ...ringsType, name: "Aros mágicos" }),
       ),
     );
-    const { user, panel } = await openEdit(/^Aros ·/, "Editar tipo · Aros");
+    const { user, panel } = await openEdit("Aros", "Editar tipo · Aros");
     expect(
       within(panel).getByText("Se lleva por cantidad. No se puede cambiar."),
     ).toBeInTheDocument();
@@ -184,7 +186,7 @@ describe("AW37 equipment types", () => {
       ),
     );
     const { user, queryClient, panel } = await openEdit(
-      /^Aros ·/,
+      "Aros",
       "Editar tipo · Aros",
     );
     const other = { branchId: norte.id };
@@ -209,7 +211,7 @@ describe("AW37 equipment types", () => {
 
   it("keeps Quitar tipo off while the type has units in this Branch", async () => {
     server.use(...equipmentHandlers());
-    const { panel } = await openEdit(/^Reformer ·/, "Editar tipo · Reformer");
+    const { panel } = await openEdit("Reformer", "Editar tipo · Reformer");
     expect(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
     ).toBeDisabled();
@@ -222,7 +224,7 @@ describe("AW37 equipment types", () => {
 
   it("asks to empty a quantity type's count before removing it", async () => {
     server.use(...equipmentHandlers());
-    const { panel } = await openEdit(/^Balones ·/, "Editar tipo · Balones");
+    const { panel } = await openEdit("Balones", "Editar tipo · Balones");
     expect(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
     ).toBeDisabled();
@@ -240,7 +242,7 @@ describe("AW37 equipment types", () => {
         problemResponse(409, "equipment_type_in_use"),
       ),
     );
-    const { user, panel } = await openEdit(/^Aros ·/, "Editar tipo · Aros");
+    const { user, panel } = await openEdit("Aros", "Editar tipo · Aros");
     await user.click(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
     );
@@ -263,7 +265,7 @@ describe("AW37 equipment types", () => {
         jsonResponse(ringsType),
       ),
     );
-    const { user, panel } = await openEdit(/^Aros ·/, "Editar tipo · Aros");
+    const { user, panel } = await openEdit("Aros", "Editar tipo · Aros");
     expect(
       within(panel).getByText(
         "Deja de aparecer en todas las sucursales. Su historial queda.",
@@ -294,7 +296,7 @@ describe("AW37 equipment types", () => {
         problemResponse(409, "equipment_type_in_use"),
       ),
     );
-    const { user, panel } = await openEdit(/^Mat ·/, "Editar tipo · Mat");
+    const { user, panel } = await openEdit("Mat", "Editar tipo · Mat");
     await user.click(
       within(panel).getByRole("button", { name: "Quitar tipo" }),
     );
