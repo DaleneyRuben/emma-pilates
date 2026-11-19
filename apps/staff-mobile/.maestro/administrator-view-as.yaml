@@ -29,7 +29,7 @@ env:
     timeout: 20000
 - extendedWaitUntil:
     visible:
-      text: "Entrenadora · Quedan .* min"
+      text: "Instructora · Quedan .* min"
     timeout: 10000
 # The greeting carries the screen's label, so the label is what Maestro sees.
 - extendedWaitUntil:
