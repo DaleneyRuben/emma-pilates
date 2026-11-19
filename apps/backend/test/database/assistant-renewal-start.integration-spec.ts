@@ -146,6 +146,7 @@ describe('assistant overview renewal start (PostgreSQL)', () => {
         reason: 'Viaje',
         state: 'APPROVED',
         decidedAt: now,
+        decidedByAccountId: assistant.accountId,
       },
     });
 
