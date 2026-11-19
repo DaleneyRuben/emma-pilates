@@ -154,7 +154,11 @@ describe("Client Reservar, palette B", () => {
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((row) => within(row));
     expect(screen.queryByTestId("seat-pill")).toBeNull();
-    const seats = { color: "#93615D", fontFamily: "WorkSans_600SemiBold", fontWeight: "600" };
+    const seats = {
+      color: "#93615D",
+      fontFamily: "WorkSans_600SemiBold",
+      fontWeight: "600" as const,
+    };
     expect(rows[0].getByText("7 cupos")).toHaveStyle(seats);
     expect(rows[1].getByText("Quedan 2 cupos")).toHaveStyle(seats);
     expect(rows[2].getByText("Lleno")).toHaveStyle(seats);
