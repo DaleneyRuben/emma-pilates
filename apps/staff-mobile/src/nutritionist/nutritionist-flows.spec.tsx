@@ -135,13 +135,13 @@ describe("Nutritionist agenda and availability", () => {
       "Editar horario Jueves, 15:00 – 18:00",
       "Editar horario Sábado, 9:00 – 12:00",
     ]);
-    expect(screen.getByText("5 cupos · 2 reservados")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos · 1 reservado")).toBeOnTheScreen();
-    expect(screen.getByText("4 cupos · sin reservas")).toBeOnTheScreen();
+    expect(screen.getByText("5 turnos · 2 con reserva")).toBeOnTheScreen();
+    expect(screen.getByText("4 turnos · 1 con reserva")).toBeOnTheScreen();
+    expect(screen.getByText("4 turnos · sin reservas")).toBeOnTheScreen();
     expect(screen.getByText("Desde el jueves 1 de octubre")).toBeOnTheScreen();
     // v2 S16: a tab root with the fixed «Nuevo horario» under the rows.
     expect(
-      screen.getByText("Las clientas eligen cupos de 45 min dentro de estos rangos."),
+      screen.getByText("Las clientas eligen turnos de 45 min dentro de estos rangos."),
     ).toBeOnTheScreen();
     expect(screen.getByText("Lun")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
@@ -274,7 +274,7 @@ describe("Nutritionist agenda and availability", () => {
     await waitFor(() => {
       expect(screen.getByText("Aplicar cambios desde")).toBeOnTheScreen();
     });
-    expect(screen.getByText("5 turnos de 45 min · 2 ya reservados")).toBeOnTheScreen();
+    expect(screen.getByText("5 turnos de 45 min · 2 ya tienen reserva")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Hora de fin: 13:00" }));
     await pickTime(screen, "12:00");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));

@@ -30,7 +30,7 @@ describe("Staff tab bar", () => {
   it("labels the open tab in Work Sans SemiBold and the others in Medium", async () => {
     const screen = await openLucia(assistantRoutes());
 
-    expect(screen.getByText("Clientes")).toHaveStyle({
+    expect(screen.getByText("Clientas")).toHaveStyle({
       color: "#93615D",
       fontFamily: "WorkSans_600SemiBold",
     });

@@ -36,7 +36,7 @@ const createdAs = (status: "invited" | "verification_pending") => () =>
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
   await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
   await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
@@ -95,7 +95,7 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     });
 
     await submitNewClient(screen);
-    await fireEvent.press(await screen.findByRole("button", { name: "Ver cliente" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver clienta" }));
     await screen.findByLabelText("Ana Nueva");
     const send = await screen.findByRole("button", {
       name: "Enviar enlace de verificación",

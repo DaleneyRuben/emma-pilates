@@ -15,14 +15,14 @@ async function openNewClient(invited = jest.fn()) {
     },
   });
   await fireEvent.press(screen.getByTestId("client-search-new-client"));
-  await waitFor(() => expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen());
   return screen;
 }
 
 // FIX-089 (FormB): labels above Crema fields, examples under the field and
 // never in it, and on a save with data missing a Rubor summary at the top
 // with each field marked by a 2 pt Rosa profundo border and a bold message.
-describe("Nuevo cliente form", () => {
+describe("Nueva clienta form", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();

@@ -37,11 +37,11 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen();
     });
     expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
@@ -51,7 +51,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    expect(screen.getByText("Activo")).toBeOnTheScreen();
+    expect(screen.getByText("Plan activo")).toBeOnTheScreen();
     expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
@@ -151,7 +151,7 @@ describe("Assistant Client flows", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
+      expect(screen.getByText("lugares libres de 12")).toBeOnTheScreen();
     });
     expect(screen.getByText(/^Reservando para Lucía Fernández/)).toBeOnTheScreen();
     expect(
@@ -311,9 +311,9 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("Cobrado en efectivo")).toBeOnTheScreen();
     expect(screen.getByText("22 de octubre de 2026")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientes" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientas" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
     });
     expect(screen.queryByText("¡Pago registrado!")).toBeNull();
   });
@@ -336,7 +336,7 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
     });
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
@@ -349,7 +349,7 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
     });
     expect(screen.queryByRole("button", { name: "Crear cuenta" })).toBeNull();
   });
@@ -383,7 +383,7 @@ describe("Assistant Client flows", () => {
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
     });
     expect(
       screen.getByText("Le enviaremos un enlace de activación al correo. Vence en 7 días."),
@@ -425,7 +425,7 @@ describe("Assistant Client flows", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar invitación" }));
     await waitFor(() => {
-      expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
     });
     expect(cancelledInvitation).toHaveBeenCalledTimes(1);
   });

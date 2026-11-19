@@ -68,7 +68,7 @@ describe("Staff Mis pagos", () => {
       summary.getByText("Liquidación de octubre 2026, ya aprobada. Falta el pago."),
     ).toBeOnTheScreen();
     const october = within(screen.getByRole("button", { name: /^Liquidación de octubre 2026,/ }));
-    expect(october.getByText("Aprobado · por pagar")).toBeOnTheScreen();
+    expect(october.getByText("Aprobada · por pagar")).toBeOnTheScreen();
   });
 
   it("adds up several unpaid statements", async () => {
@@ -143,16 +143,16 @@ describe("Staff Mis pagos", () => {
     expect(detail.getByText("Bs 25,00")).toBeOnTheScreen();
     expect(detail.getByText("Comisiones · 1")).toBeOnTheScreen();
     expect(detail.getByText("Bs 78,50")).toBeOnTheScreen();
-    expect(detail.queryByText("6 alumnas, 2 extra")).toBeNull();
+    expect(detail.queryByText("6 clientas, 2 extra")).toBeNull();
 
     await fireEvent.press(detail.getByRole("button", { name: "Ver cada clase" }));
     expect(detail.getAllByText("Clase")).toHaveLength(2);
-    expect(detail.getByText("6 alumnas, 2 extra")).toBeOnTheScreen();
+    expect(detail.getByText("6 clientas, 2 extra")).toBeOnTheScreen();
     expect(detail.getByText("Bs 81,00")).toBeOnTheScreen();
     expect(detail.getByText("Mínimo no alcanzado")).toBeOnTheScreen();
     expect(detail.getByText("Primer plan")).toBeOnTheScreen();
     await fireEvent.press(detail.getByRole("button", { name: "Ocultar detalle" }));
-    expect(detail.queryByText("6 alumnas, 2 extra")).toBeNull();
+    expect(detail.queryByText("6 clientas, 2 extra")).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => expect(screen.getByTestId("pay-summary")).toBeOnTheScreen());
@@ -166,7 +166,7 @@ describe("Staff Mis pagos", () => {
     });
     const october = within(screen.getByTestId("pay-statement"));
     expect(october.getByText("Por pagar").parent).not.toHaveStyle({ borderRadius: 999 });
-    expect(october.getByText("Aprobado · falta el pago")).toBeOnTheScreen();
+    expect(october.getByText("Aprobada · falta el pago")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await fireEvent.press(
@@ -188,7 +188,7 @@ describe("Staff Mis pagos", () => {
             ...approvedOctober,
             totalCentavos: 16_500,
             lines: [
-              { kind: "class", detail: "3 alumnas", amountCentavos: 6_500 },
+              { kind: "class", detail: "3 clientas", amountCentavos: 6_500 },
               { kind: "holiday_bonus", detail: "Feriado", amountCentavos: 10_000 },
             ],
           },

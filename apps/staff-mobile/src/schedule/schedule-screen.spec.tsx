@@ -46,11 +46,11 @@ describe("Horario (v2 HOR boards)", () => {
     expect(row.getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
     expect(row.getByText("6 de 12")).toHaveStyle({ color: "#93615D", fontWeight: "600" });
     expect(screen.getByTestId("class-list")).toBeOnTheScreen();
-    expect(screen.queryByText("6 cupos")).toBeNull();
+    expect(screen.queryByText("6 lugares libres")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar para una clienta" }));
-    await waitFor(() => expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen());
   });
 
   // FIX-081 (finding 118, owner 2026-11-18): the eyebrow names the person's

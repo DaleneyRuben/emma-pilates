@@ -128,7 +128,7 @@ describe("Client overview cash action", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Vencido")).toBeOnTheScreen();
+      expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeEnabled();
     expect(screen.queryByText(note)).toBeNull();
@@ -169,7 +169,7 @@ describe("Client overview cash action", () => {
         }),
     });
 
-    await waitFor(() => expect(screen.getByText("Vencido")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Plan vencido")).toBeOnTheScreen());
     expect(screen.getByText("clases sin usar")).toBeOnTheScreen();
     expect(screen.queryByText(/disponible/)).toBeNull();
   });

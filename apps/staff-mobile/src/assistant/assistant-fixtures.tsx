@@ -234,7 +234,7 @@ export async function openClientSearch(routes: Parameters<typeof routeFetcher>[0
     <App runtime={createStaffRuntime(routeFetcher(routes), "assistant")} />,
   );
   await waitFor(() => {
-    expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });
   return screen;
 }
@@ -243,9 +243,9 @@ export async function openLucia(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
   await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" }));
   await waitFor(() => {
     expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
   });

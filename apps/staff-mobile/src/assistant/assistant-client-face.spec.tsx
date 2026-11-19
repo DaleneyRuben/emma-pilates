@@ -45,7 +45,7 @@ describe("The Client's face on the Assistant's screens", () => {
     clearMobileQueryCache();
   });
 
-  it("leads each Buscar cliente result with her photo, or her initials", async () => {
+  it("leads each Buscar clienta result with her photo, or her initials", async () => {
     const fetched: string[] = [];
     const screen = await openClientSearch(withPhoto(fetched));
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");

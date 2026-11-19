@@ -21,7 +21,7 @@ const overviewRoutes = {
 async function openForm(screen: Awaited<ReturnType<typeof openClientSearch>>) {
   await fireEvent.press(screen.getByTestId("client-search-new-client"));
   await waitFor(() => {
-    expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
   await fireEvent.changeText(screen.getByLabelText("Celular"), "70000001");

@@ -51,7 +51,7 @@ async function openContactList(routes = coordinatorRoutes()) {
   const fetcher = routeFetcher(routes);
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "coordinator")} />);
   await waitFor(() => {
-    expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });
   await fireEvent.press(screen.getByTestId("tab-contacts"));
   await waitFor(() => {

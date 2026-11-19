@@ -28,10 +28,10 @@ describe("Assistant rows", () => {
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen();
     });
 
-    const row = screen.getByRole("button", { name: "Ver cliente Lucía Fernández" });
+    const row = screen.getByRole("button", { name: "Ver clienta Lucía Fernández" });
     expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
     // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
     expect(screen.getByText("LF")).toHaveStyle({

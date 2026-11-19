@@ -13,7 +13,7 @@ import {
 
 jest.setTimeout(20_000);
 
-const emptyPanel = "Selecciona un cliente para ver sus detalles";
+const emptyPanel = "Selecciona una clienta para ver sus detalles";
 const searchField = "Nombre, teléfono o correo";
 
 async function selectLucia(routes: Parameters<typeof openClientSearch>[0]) {
@@ -21,9 +21,9 @@ async function selectLucia(routes: Parameters<typeof openClientSearch>[0]) {
   expect(screen.getByText(emptyPanel)).toBeOnTheScreen();
   await fireEvent.changeText(screen.getByPlaceholderText(searchField), "luc");
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen();
   });
-  await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" }));
   await waitFor(() => {
     expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
   });
@@ -79,7 +79,7 @@ describe("Assistant flows on a tablet", () => {
     expect(screen.getByPlaceholderText(searchField)).toBeOnTheScreen();
     expect(screen.queryByText(emptyPanel)).toBeNull();
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeSelected();
+    expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeSelected();
 
     await fireEvent.press(screen.getByTestId("client-overview-bookings"));
     await waitFor(() => {
@@ -123,7 +123,7 @@ describe("Assistant flows on a tablet", () => {
     }
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(screen.getByText("cupos libres de 12")).toBeOnTheScreen();
+      expect(screen.getByText("lugares libres de 12")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({
       maxWidth: 640,
@@ -164,7 +164,7 @@ describe("Assistant flows on a tablet", () => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientes" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientas" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
@@ -192,7 +192,7 @@ describe("Assistant flows on a tablet", () => {
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({
       maxWidth: 560,
@@ -247,7 +247,7 @@ describe("Assistant flows on a tablet", () => {
     for (let round = 0; round < 2; round += 1) {
       await fireEvent.press(screen.getByTestId("client-search-new-client"));
       await waitFor(() => {
-        expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+        expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
       });
       await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
       await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");

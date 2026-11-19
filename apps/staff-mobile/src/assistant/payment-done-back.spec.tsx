@@ -9,11 +9,11 @@ const backPress = {} as Parameters<BackListener>[0];
 
 // Seen on the emulator (MOB-074): back from «¡Pago registrado!» reopened
 // «Elige un plan» for a Client whose plan was already active. The result's
-// only way on is «Volver a Clientes», so the Android back button takes it too.
+// only way on is «Volver a Clientas», so the Android back button takes it too.
 describe("PaymentDone and the Android back button", () => {
   afterEach(() => jest.restoreAllMocks());
 
-  it.each(["cash", "transfer"] as const)("returns to Clientes after a %s payment", async (kind) => {
+  it.each(["cash", "transfer"] as const)("returns to Clientas after a %s payment", async (kind) => {
     const listeners: BackListener[] = [];
     jest.spyOn(BackHandler, "addEventListener").mockImplementation((_event, listener) => {
       listeners.push(listener);

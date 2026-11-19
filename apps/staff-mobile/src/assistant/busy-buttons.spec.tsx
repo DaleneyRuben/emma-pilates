@@ -21,7 +21,7 @@ describe("Staff busy buttons", () => {
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => {
-      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen();
     });
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");

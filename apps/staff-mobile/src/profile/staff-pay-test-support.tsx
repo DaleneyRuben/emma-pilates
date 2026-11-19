@@ -24,8 +24,8 @@ export const approvedOctober = {
   totalCentavos: 32_200,
   salaryPaymentId: "payment-october",
   lines: [
-    { kind: "class", detail: "3 alumnas", amountCentavos: 6_500 },
-    { kind: "class", detail: "6 alumnas, 2 extra", amountCentavos: 8_100 },
+    { kind: "class", detail: "3 clientas", amountCentavos: 6_500 },
+    { kind: "class", detail: "6 clientas, 2 extra", amountCentavos: 8_100 },
     { kind: "minimum_not_met", detail: "Mínimo no alcanzado", amountCentavos: 2_500 },
     { kind: "commission", detail: "Primer plan", amountCentavos: 7_850 },
   ],
@@ -40,7 +40,7 @@ export const draftNovember = {
   state: "draft",
   totalCentavos: 6_500,
   salaryPaymentId: null,
-  lines: [{ kind: "class", detail: "4 alumnas", amountCentavos: 6_500 }],
+  lines: [{ kind: "class", detail: "4 clientas", amountCentavos: 6_500 }],
 };
 
 export type PayRoutes = {
