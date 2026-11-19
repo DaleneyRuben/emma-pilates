@@ -1,13 +1,9 @@
-const wholeBolivianos = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 0,
-  minimumFractionDigits: 0,
-});
+import { formatMoney } from "@pilates/api-contracts";
 
 /**
- * Apps show whole bolivianos (UX-010). Stored amounts stay centavos; a leftover
- * fraction rounds half up and is never printed.
+ * FIX-090 (owner 2026-11-19): «Bs 1.534,90», and «Bs 450» when the decimals
+ * are ,00, the one money format of every surface. Amounts are centavos.
  */
 export function formatBolivianos(centavos: number): string {
-  const whole = Math.round(centavos / 100);
-  return `Bs ${wholeBolivianos.format(whole)}`;
+  return formatMoney(centavos);
 }
