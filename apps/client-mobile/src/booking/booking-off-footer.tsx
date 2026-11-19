@@ -42,8 +42,8 @@ export function BookingOffFooter({
 }) {
   return (
     <>
-      <BodyText style={styles.note}>{copy[reason].note}</BodyText>
-      <PrimaryButton disabled label="Reservar" />
+      {/* FIX-089: the reason is the off button's own line, under it. */}
+      <PrimaryButton disabled disabledReason={copy[reason].note} label="Reservar" />
       <TextButton
         label={busy ? "Preparando…" : copy[reason].action}
         onPress={() => {

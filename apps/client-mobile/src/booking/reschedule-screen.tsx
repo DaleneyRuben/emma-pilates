@@ -206,6 +206,8 @@ export function RescheduleScreen({
           <PrimaryButton
             busy={submitting}
             disabled={selectedId === null}
+            // FIX-089: an off button says why on its own line.
+            disabledReason="Elige una clase para continuar"
             label="Confirmar cambio"
             onPress={() => void confirm()}
             testID="reschedule-confirm"

@@ -195,16 +195,16 @@ export function BookEvaluationScreen({
         ) : null}
       </ScrollView>
       <View style={styles.footer}>
-        {slot.included ? null : (
-          <BodyText style={styles.note}>
-            {receipt === null
-              ? "Adjunta tu comprobante para continuar"
-              : "El estudio revisa tu pago y te avisa por la app"}
-          </BodyText>
+        {slot.included || receipt === null ? null : (
+          <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         )}
         <PrimaryButton
           busy={submitting}
           disabled={!slot.included && (receipt === null || uploading)}
+          // FIX-089: the reason is the off button's own line, under it.
+          disabledReason={
+            !slot.included && receipt === null ? "Adjunta tu comprobante para continuar" : undefined
+          }
           label="Confirmar evaluación"
           onPress={() => void confirm()}
         />
