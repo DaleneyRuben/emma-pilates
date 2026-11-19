@@ -13,12 +13,15 @@ type FormFieldProps = TextInputProps & {
   /** An example or a rule under the field, «Ej.: …»; never in the placeholder (FormB). */
   hint?: string;
   label: string;
+  /** Says «(opcional)» after the label, at regular weight (FormB). */
+  optional?: boolean;
 };
 
 export function FormField({
   error,
   hint,
   label,
+  optional = false,
   placeholder,
   secureTextEntry,
   style,
@@ -30,11 +33,14 @@ export function FormField({
 
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+        {optional ? <Text style={styles.optional}> (opcional)</Text> : null}
+      </Text>
       <View>
         <TextInput
           {...inputProps}
-          accessibilityLabel={label}
+          accessibilityLabel={optional ? `${label} (opcional)` : label}
           // A password field never shows dots as its placeholder (FIX-089).
           placeholder={isPassword && dotsOnly.test(placeholder ?? "") ? undefined : placeholder}
           placeholderTextColor={colors.iconQuiet}
@@ -122,6 +128,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
+  optional: { fontFamily: fontFamilies.body, fontWeight: "400" },
   passwordInput: {
     paddingRight: 52,
   },

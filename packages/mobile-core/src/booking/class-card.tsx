@@ -169,7 +169,9 @@ export function CancelledFold({
 }) {
   const [open, setOpen] = useState(false);
   if (count === 0) return null;
-  const summary = `${count} ${count === 1 ? "cancelada" : "canceladas"} ${reason}`;
+  const summary = [count, count === 1 ? "cancelada" : "canceladas", reason]
+    .filter((part) => part !== "")
+    .join(" ");
   return (
     <View style={styles.fold} testID={testID}>
       <Pressable
