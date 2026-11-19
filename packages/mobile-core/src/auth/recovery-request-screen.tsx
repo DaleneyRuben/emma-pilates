@@ -77,7 +77,8 @@ export function RecoveryRequestScreen({
   }
 
   return (
-    <AuthenticationScreen brand={!limited} teamAccess={teamAccess} topBar={topBar}>
+    // FIX-090: the bar names the screen; no wordmark repeats a title under it.
+    <AuthenticationScreen brand={false} teamAccess={teamAccess} topBar={topBar}>
       <BodyText>Te enviaremos un enlace para restablecer tu contraseña.</BodyText>
       {limited ? (
         <WaitNotice

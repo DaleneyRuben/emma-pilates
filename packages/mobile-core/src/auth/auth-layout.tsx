@@ -58,7 +58,7 @@ export function AuthenticationScreen({
         contentContainerStyle={styles.content}
         style={topBar === undefined ? undefined : styles.inset}
       >
-        {brand ? <BrandHeader teamAccess={teamAccess} /> : null}
+        {brand ? <BrandHeader teamAccess={teamAccess} /> : teamAccess ? <TeamAccessBadge /> : null}
         {/* Follow-up 256 § 4: a badge screen is short, so its block sits in
             the middle instead of leaving half the screen empty below it. */}
         <View
