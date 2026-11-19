@@ -168,6 +168,16 @@ describe("the global search", () => {
       expect(router.state.location.search).not.toHaveProperty("cliente");
     });
 
+    it("lists every match in Clientas when Enter comes before any result", async () => {
+      const { user, router } = renderAdmin("/");
+      await heading(/^Buen/);
+
+      await user.type(search(), "va{Enter}");
+
+      await heading("Clientas");
+      expect(router.state.location.search).toMatchObject({ q: "va" });
+    });
+
     it("takes focus with Ctrl K and lets Escape close the results", async () => {
       const { user } = renderAdmin("/");
       await heading(/^Buen/);
