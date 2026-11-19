@@ -52,14 +52,14 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
   test("sends a signed-out visitor to Login and returns them to the address they wanted", async ({
     page,
   }) => {
-    await page.goto("/ajustes/planes?page=2");
+    await page.goto("/ajustes/planes?pageSize=50");
     await expect(page).toHaveURL(/\/iniciar-sesion\?redirect=/);
     await expect(sidebar(page)).toHaveCount(0);
 
-    await signIn(page, "/ajustes/planes?page=2");
+    await signIn(page, "/ajustes/planes?pageSize=50");
 
     await expect(page).toHaveURL(
-      `${webOrigin}/ajustes/planes?page=2&pageSize=20&visibility=all`,
+      `${webOrigin}/ajustes/planes?pageSize=50&page=1&visibility=all`,
     );
     await expect(
       page.getByRole("heading", { level: 1, name: "Planes" }),

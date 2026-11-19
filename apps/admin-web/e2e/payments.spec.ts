@@ -52,7 +52,7 @@ test("confirms one transfer and rejects another with a reason", async ({
     page.getByRole("button", { name: "Mariana Peña", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByText("Todo el estudio · 1 transferencia esperando revisión"),
+    page.getByText("Todo el estudio · 1 pago por QR esperando revisión"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Sofía Guzmán" }).click();

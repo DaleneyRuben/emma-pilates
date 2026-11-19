@@ -4,10 +4,11 @@ import { signIn } from "./support/session";
 // The first «Bs …» a tile shows, as centavos; «−Bs» is a negative Neto.
 const centavosOf = async (tile: Locator): Promise<number> => {
   const text = await tile.innerText();
-  const match = /(−?)Bs ([\d.]+),(\d{2})/.exec(text);
+  // FIX-090: whole amounts drop their ,00.
+  const match = /(−?)Bs ([\d.]+)(?:,(\d{2}))?/.exec(text);
   if (match === null) throw new Error(`No amount in «${text}»`);
   const units = Number((match[2] ?? "").replaceAll(".", ""));
-  const value = units * 100 + Number(match[3]);
+  const value = units * 100 + Number(match[3] ?? 0);
   return match[1] === "−" ? -value : value;
 };
 
@@ -37,7 +38,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   );
 
   const income = tile(page, "Ingresos");
-  await expect(income.getByText(/Bs [\d.]+,\d{2}/).first()).toBeVisible();
+  await expect(income.getByText(/Bs [\d.]+/).first()).toBeVisible();
   const ingresos = await centavosOf(income);
   const gastos = await centavosOf(tile(page, "Gastos"));
   const neto = await centavosOf(tile(page, "Neto"));
