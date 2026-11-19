@@ -52,7 +52,7 @@ describe("Client registration phone (C01b)", () => {
 
     expect(
       screen.getByRole("alert", {
-        name: "Escribe tu celular. Lo necesitamos para escribirte por WhatsApp.",
+        name: "! Escribe tu número",
       }),
     ).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
@@ -67,7 +67,7 @@ describe("Client registration phone (C01b)", () => {
 
     expect(
       screen.getByRole("alert", {
-        name: "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
+        name: "! Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
       }),
     ).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();

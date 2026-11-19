@@ -30,25 +30,27 @@ export const chipStyles = StyleSheet.create({
   },
 });
 
-/** A 38 pt chip whose touch target reaches 44 pt. */
+/** A 38 pt chip whose touch target reaches 44 pt; «radio» for one answer of a group. */
 export function Chip({
   accessibilityLabel,
   label,
   onPress,
+  role = "button",
   selected,
   testID,
 }: {
   accessibilityLabel?: string;
   label: string;
   onPress: () => void;
+  role?: "button" | "radio";
   selected: boolean;
   testID?: string;
 }) {
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityRole={role}
+      accessibilityState={role === "radio" ? { checked: selected } : { selected }}
       hitSlop={{ bottom: 3, left: 0, right: 0, top: 3 }}
       onPress={onPress}
       style={[styles.chip, chipStyles.box, selected && chipStyles.boxSelected]}
