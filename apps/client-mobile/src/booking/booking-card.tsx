@@ -53,9 +53,64 @@ export function DayTile({ startsAt, today }: { startsAt: string; today: string }
   );
 }
 
+type BookingAction = {
+  label: string;
+  onPress: () => void;
+  testID: string;
+};
+
 /**
- * A booking card on v2 (follow-ups 225 §9 and 226): the day tile, the class in
- * Lora 20 over one line of details, then the action as a text button.
+ * What a booking offers: leaving the waitlist, rescheduling inside the
+ * Cancellation Window, or cancelling outside it. Until the window is known
+ * (a Studio Setting, BKM-004) a booking offers neither rather than guess.
+ */
+export function useBookingAction({
+  cancellationWindowMinutes,
+  item,
+  onCancel,
+  onLeave,
+  onReschedule,
+}: {
+  cancellationWindowMinutes: number | undefined;
+  item: UpcomingBookingDto;
+  onCancel: () => void;
+  onLeave: () => void;
+  onReschedule: () => void;
+}): { action: BookingAction | null; insideWindow: boolean } {
+  const mountedAt = useMountedAt();
+  const windowKnown = cancellationWindowMinutes !== undefined;
+  const insideWindow =
+    item.kind === "booking" &&
+    windowKnown &&
+    isInsideCancellationWindow(item.startsAt, new Date(mountedAt), cancellationWindowMinutes);
+  const action =
+    item.kind === "waitlist"
+      ? {
+          label: "Salir de la lista de espera",
+          onPress: onLeave,
+          testID: `booking-leave-waitlist-${item.waitlistEntryId}`,
+        }
+      : !windowKnown
+        ? null
+        : insideWindow
+          ? {
+              label: "Reprogramar",
+              onPress: onReschedule,
+              testID: `booking-reschedule-${item.bookingId}`,
+            }
+          : {
+              label: "Cancelar reserva",
+              onPress: onCancel,
+              testID: `booking-cancel-${item.bookingId}`,
+            };
+  return { action, insideWindow };
+}
+
+/**
+ * A booking card (follow-ups 225 §9 and 226, palette B): the day tile, the
+ * class in Lora 20 over one line of details, then the action as a text
+ * button. Cancelling is the secondary look and asks first (FIX-089); a
+ * waitlist place is said in words, not a pill.
  */
 export function BookingCard({
   cancellationWindowMinutes,
@@ -72,36 +127,14 @@ export function BookingCard({
 }) {
   const mountedAt = useMountedAt();
   const today = boliviaCivilDate(new Date(mountedAt));
-  // The window is a Studio Setting (BKM-004): until it is known, a booking
-  // offers neither Cancelar nor Reprogramar rather than guess.
-  const windowKnown = cancellationWindowMinutes !== undefined;
-  const insideWindow =
-    item.kind === "booking" &&
-    windowKnown &&
-    isInsideCancellationWindow(item.startsAt, new Date(mountedAt), cancellationWindowMinutes);
+  const { action, insideWindow } = useBookingAction({
+    cancellationWindowMinutes,
+    item,
+    onCancel,
+    onLeave,
+    onReschedule,
+  });
   const time = formatTimeRange(item.startsAt, item.endsAt);
-
-  const action =
-    item.kind === "waitlist" ? (
-      <CardActionRow
-        label="Salir de la lista de espera"
-        onPress={onLeave}
-        testID={`booking-leave-waitlist-${item.waitlistEntryId}`}
-      />
-    ) : !windowKnown ? null : insideWindow ? (
-      <CardActionRow
-        label="Reprogramar"
-        onPress={onReschedule}
-        testID={`booking-reschedule-${item.bookingId}`}
-      />
-    ) : (
-      <CardActionRow
-        label="Cancelar reserva"
-        onPress={onCancel}
-        testID={`booking-cancel-${item.bookingId}`}
-        tone="error"
-      />
-    );
 
   return (
     <View style={[styles.card, action !== null && cardWithActionRow]}>
@@ -109,7 +142,10 @@ export function BookingCard({
         <DayTile startsAt={item.startsAt} today={today} />
         <View style={styles.body}>
           <Text style={styles.title}>{item.classTypeName}</Text>
-          {insideWindow ? (
+          {item.kind === "waitlist" ? (
+            <Text style={styles.waitlist}>En lista de espera</Text>
+          ) : null}
+          {insideWindow && cancellationWindowMinutes !== undefined ? (
             <Text style={styles.details}>
               {`${time} · faltan menos de ${formatCancellationWindow(cancellationWindowMinutes)}`}
             </Text>
@@ -117,13 +153,8 @@ export function BookingCard({
             <TrainerDetails item={item} time={time} />
           )}
         </View>
-        {item.kind === "waitlist" ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>En lista de espera</Text>
-          </View>
-        ) : null}
       </View>
-      {action}
+      {action === null ? null : <CardActionRow {...action} />}
     </View>
   );
 }
@@ -146,18 +177,6 @@ export function CancelBookingFacts({ booking }: { booking: UpcomingBookingDto })
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  badgeText: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
   body: { flex: 1, gap: spacing.xxs },
   card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
   day: {
@@ -168,11 +187,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 52,
   },
-  dayNumber: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 20 },
-  details: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   detailsLine: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   factNote: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
     marginLeft: 64,
@@ -183,10 +202,16 @@ const styles = StyleSheet.create({
   header: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
   trainer: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  weekday: {
-    color: colors.primaryOnTint,
+  waitlist: {
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.tabLabel,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
+  weekday: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.label,
     fontWeight: "600",
     textTransform: "uppercase",
   },
