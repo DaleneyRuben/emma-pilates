@@ -236,6 +236,7 @@ export function RecommendationsSection({
         </p>
       ) : (
         <FindingsByKind
+          key={month}
           recommendations={query.data.recommendations}
           readOnly={readOnly}
           pending={dismiss.isPending}
