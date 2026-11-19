@@ -2,13 +2,13 @@ import {
   getListPendingPaymentsQueryKey,
   useListPendingPayments,
   useListRequestedFreezes,
+  formatMoney,
 } from "@pilates/api-contracts";
 import {
   BrandToast,
   ClientFace,
   colors,
   fontFamilies,
-  formatBolivianos,
   formatNotificationTime,
   Glyph,
   IconRowGroup,
@@ -170,13 +170,13 @@ export function PendingPaymentsScreen({
         ) : (
           <View>
             <SectionTitle>
-              {`Por confirmar · ${payments.length} · ${formatBolivianos(total)} en total`}
+              {`Por confirmar · ${payments.length} · ${formatMoney(total)} en total`}
             </SectionTitle>
             <IconRowGroup>
               {payments.map((payment) => (
                 <PersonRow
                   accessibilityLabel={`Revisar pago de ${payment.clientName}`}
-                  amount={formatBolivianos(payment.amountDueCentavos)}
+                  amount={formatMoney(payment.amountDueCentavos)}
                   detail={`${describeSale(payment)} · ${formatNotificationTime(payment.submittedAt, now).toLowerCase()}`}
                   face={
                     <ClientFace

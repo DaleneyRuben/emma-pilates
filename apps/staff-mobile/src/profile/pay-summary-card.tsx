@@ -1,7 +1,7 @@
+import { formatMoney } from "@pilates/api-contracts";
 import { colors, EmphasisCard, fontFamilies } from "@pilates/mobile-core";
 import { StyleSheet, Text } from "react-native";
 
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import type { PaySummary } from "./pay-ledger";
 import { useReceiptViewer } from "./receipt-viewer";
 
@@ -20,7 +20,7 @@ export function PaySummaryCard({ summary }: { summary: PaySummary }) {
         eyebrow={summary.eyebrow}
         testID="pay-summary"
       >
-        <Text style={styles.total}>{formatExactBolivianos(summary.centavos)}</Text>
+        <Text style={styles.total}>{formatMoney(summary.centavos)}</Text>
         <Text style={styles.note}>{summary.note}</Text>
       </EmphasisCard>
       {receipts.error}

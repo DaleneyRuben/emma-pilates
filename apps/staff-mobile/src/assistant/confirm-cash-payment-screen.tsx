@@ -3,12 +3,12 @@ import {
   useGetAssistantClientInvoiceData,
   type AssistantCashPaymentDto,
   type PlanQuoteDto,
+  formatMoney,
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   colors,
   fontFamilies,
-  formatBolivianos,
   FormScrollView,
   IconRowGroup,
   invoiceChoiceFrom,
@@ -114,7 +114,7 @@ export function ConfirmCashPaymentScreen({
     );
   const invoiceData = invoiceDataPayload(invoice);
   const start = renewalStartsOn === undefined ? startsOn : nextStart;
-  const amount = formatBolivianos(quote.priceCentavos);
+  const amount = formatMoney(quote.priceCentavos);
 
   const refuse = (error: unknown, fallback: string, path: Method) => {
     const code = error instanceof AssistantApiError ? error.code : null;
@@ -183,7 +183,7 @@ export function ConfirmCashPaymentScreen({
       <Screen style={styles.screen}>
         <CenteredCard maxWidth={520}>
           <PaymentDone
-            amount={result === null ? amount : formatBolivianos(result.payment.amountDueCentavos)}
+            amount={result === null ? amount : formatMoney(result.payment.amountDueCentavos)}
             classes={describeClasses(result?.payment.classAllowance ?? quote.classAllowance)}
             endsOn={result?.subscription ? formatCivilDate(result.subscription.endsOn) : undefined}
             firstName={firstName(clientName)}
@@ -272,14 +272,10 @@ export function ConfirmCashPaymentScreen({
               <IconRowGroup>
                 <ValueRow
                   label={quote.name}
-                  value={formatBolivianos(quote.listPriceCentavos ?? quote.priceCentavos)}
+                  value={formatMoney(quote.listPriceCentavos ?? quote.priceCentavos)}
                 />
                 {discount > 0 ? (
-                  <ValueRow
-                    label="Descuento"
-                    tone="emphasis"
-                    value={`−${formatBolivianos(discount)}`}
-                  />
+                  <ValueRow label="Descuento" tone="emphasis" value={`−${formatMoney(discount)}`} />
                 ) : null}
                 {/* Credit is retired (PAY-005): the cash collected is the full price. */}
                 <ValueRow label="Total en efectivo" strong value={amount} />

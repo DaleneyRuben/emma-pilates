@@ -1,4 +1,4 @@
-import { recordCashClose, type CashCloseDto } from "@pilates/api-contracts";
+import { recordCashClose, type CashCloseDto, formatMoney } from "@pilates/api-contracts";
 import {
   colors,
   ConfirmationSheet,
@@ -21,7 +21,6 @@ import {
   describeCashSales,
   describeDifference,
   differenceValue,
-  formatCashCloseBolivianos,
   formatSignedBolivianos,
   parseCountedCentavos,
 } from "./cash-close-format";
@@ -128,14 +127,11 @@ export function CashCloseForm({
         <Text style={styles.quiet}>Cuenta los billetes antes de mirar el total esperado.</Text>
       </View>
       <PlainRowGroup>
-        <PlainRow
-          label="Esperado según los pagos"
-          value={formatCashCloseBolivianos(expectedCentavos)}
-        />
+        <PlainRow label="Esperado según los pagos" value={formatMoney(expectedCentavos)} />
         {voidedCashCentavos > 0 ? (
           <PlainRow
             label="Ventas anuladas (efectivo en caja)"
-            value={formatCashCloseBolivianos(voidedCashCentavos)}
+            value={formatMoney(voidedCashCentavos)}
           />
         ) : null}
         <View
@@ -191,7 +187,7 @@ export function CashCloseForm({
         note={
           countedCentavos === null || difference === null
             ? undefined
-            : `Contaste ${formatCashCloseBolivianos(countedCentavos)} en ${branch.name} (${difference.label.toLowerCase()}). Un cierre no se puede deshacer.`
+            : `Contaste ${formatMoney(countedCentavos)} en ${branch.name} (${difference.label.toLowerCase()}). Un cierre no se puede deshacer.`
         }
         onConfirm={() => void close()}
         onDismiss={() => setConfirming(false)}

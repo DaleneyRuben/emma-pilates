@@ -1,4 +1,4 @@
-import { useGetPaymentReview } from "@pilates/api-contracts";
+import { useGetPaymentReview, formatMoney } from "@pilates/api-contracts";
 import {
   CardActionRow,
   cardWithActionRow,
@@ -6,7 +6,6 @@ import {
   colors,
   EmphasisCard,
   fontFamilies,
-  formatBolivianos,
   FormField,
   FormScrollView,
   FullScreenImage,
@@ -194,7 +193,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           {header}
           <IconRowGroup>
             <PersonRow
-              amount={formatBolivianos(payment.amountDueCentavos)}
+              amount={formatMoney(payment.amountDueCentavos)}
               detail={describeSale(payment)}
               face={
                 <ClientFace
@@ -257,7 +256,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           eyebrow="Monto a verificar"
           note={`${payment.clientName} · ${describeSale(payment)}`}
         >
-          <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
+          <Text style={styles.amount}>{formatMoney(payment.amountDueCentavos)}</Text>
           <Text style={styles.state}>{stateLabels[payment.state]}</Text>
         </EmphasisCard>
         <PaymentBreakdown payment={payment} />

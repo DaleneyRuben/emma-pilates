@@ -1,3 +1,4 @@
+import { formatMoney } from "@pilates/api-contracts";
 import type {
   OwnSalaryPaymentDto,
   PayStatementDto,
@@ -17,7 +18,6 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { formatCivilDate, formatCivilDayMonth } from "../assistant/assistant-format";
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
 import { statusTone } from "./pay-history";
 import type { StatementStatus } from "./pay-ledger";
 import { ReceiptThumbnail } from "./receipt-viewer";
@@ -91,7 +91,7 @@ function AmountRow({
         <Text style={styles.rowLabel}>{label}</Text>
         {detail === undefined ? null : <Text style={styles.detail}>{detail}</Text>}
       </View>
-      <Text style={styles.amount}>{formatExactBolivianos(centavos)}</Text>
+      <Text style={styles.amount}>{formatMoney(centavos)}</Text>
     </View>
   );
 }

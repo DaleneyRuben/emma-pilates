@@ -1,8 +1,5 @@
+import { formatMoney } from "@pilates/api-contracts";
 import { colors } from "@pilates/mobile-core";
-
-import { formatExactBolivianos } from "../ui/exact-bolivianos";
-
-export const formatCashCloseBolivianos = formatExactBolivianos;
 
 // «520», «520,5», «520,50», or «520.50» typed into «Efectivo contado», in
 // centavos; anything else (thousands separators included) is unreadable.
@@ -15,8 +12,8 @@ export function parseCountedCentavos(text: string): number | null {
 
 // «Bs 0,00», «+Bs 5,50», «−Bs 10,00» (a true minus sign, as S25 writes it).
 export function formatSignedBolivianos(centavos: number): string {
-  if (centavos === 0) return formatCashCloseBolivianos(0);
-  return `${centavos > 0 ? "+" : "−"}${formatCashCloseBolivianos(Math.abs(centavos))}`;
+  if (centavos === 0) return formatMoney(0);
+  return `${centavos > 0 ? "+" : "−"}${formatMoney(Math.abs(centavos))}`;
 }
 
 export type DifferenceTone = { label: string; text: string; tint: string };
@@ -33,7 +30,7 @@ export function describeDifference(centavos: number): DifferenceTone {
 // «Cuadra», «Falta Bs 10,00», «Sobra Bs 5,50»: the difference as Cerrar caja reads it (FIX-083).
 export function differenceValue(centavos: number): string {
   if (centavos === 0) return "Cuadra";
-  const amount = formatCashCloseBolivianos(Math.abs(centavos));
+  const amount = formatMoney(Math.abs(centavos));
   return centavos < 0 ? `Falta ${amount}` : `Sobra ${amount}`;
 }
 

@@ -3,13 +3,13 @@ import {
   getListStaffInvoicesQueryKey,
   useGetStaffPaymentInvoice,
   type StaffInvoiceDto,
+  formatMoney,
 } from "@pilates/api-contracts";
 import {
   BrandToast,
   ConfirmationSheet,
   EmphasisCard,
   FormScrollView,
-  formatBolivianos,
   IconRow,
   IconRowGroup,
   LoadingState,
@@ -222,7 +222,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
       <FormScrollView contentContainerStyle={styles.content} footer={footer}>
         {header}
         <EmphasisCard eyebrow="Monto" note={`${current.clientName} · ${current.purchaseLabel}`}>
-          <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
+          <Text style={styles.amount}>{formatMoney(current.amountDueCentavos)}</Text>
           <Text style={styles.state}>
             {current.voided ? "Anulado" : current.file === null ? "Confirmado" : "Factura emitida"}
           </Text>

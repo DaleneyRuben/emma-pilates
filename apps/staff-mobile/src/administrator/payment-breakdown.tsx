@@ -1,9 +1,5 @@
-import {
-  discountPercent,
-  formatBolivianos,
-  IconRowGroup,
-  SectionTitle,
-} from "@pilates/mobile-core";
+import { formatMoney } from "@pilates/api-contracts";
+import { discountPercent, IconRowGroup, SectionTitle } from "@pilates/mobile-core";
 import { View } from "react-native";
 
 import { ValueRow } from "../ui/value-row";
@@ -25,13 +21,13 @@ export function PaymentBreakdown({
     <View>
       <SectionTitle>Desglose</SectionTitle>
       <IconRowGroup>
-        <ValueRow label="Precio del plan" value={formatBolivianos(payment.planPriceCentavos)} />
+        <ValueRow label="Precio del plan" value={formatMoney(payment.planPriceCentavos)} />
         <ValueRow
           label={percent === null ? "Descuento" : `Descuento ${percent} %`}
           tone="emphasis"
-          value={`−${formatBolivianos(discount)}`}
+          value={`−${formatMoney(discount)}`}
         />
-        <ValueRow label="Total" strong value={formatBolivianos(payment.amountDueCentavos)} />
+        <ValueRow label="Total" strong value={formatMoney(payment.amountDueCentavos)} />
       </IconRowGroup>
     </View>
   );
