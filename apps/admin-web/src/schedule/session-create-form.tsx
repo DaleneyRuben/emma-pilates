@@ -57,6 +57,9 @@ export function SessionCreateForm({
   onDone: (notice: string) => void;
 }) {
   const today = boliviaToday();
+  // FIX-090: a past slot never proposes a past date; it starts from today.
+  const startDate =
+    start === undefined ? undefined : start.date < today ? today : start.date;
   const change = useScheduleChange(branchId);
   const classTypes = useQuery(activeClassTypesQueryOptions());
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
@@ -70,15 +73,15 @@ export function SessionCreateForm({
       time: start?.time ?? "",
       durationMinutes: startingMinutes,
       capacity: "",
-      date: start?.date ?? "",
+      date: startDate ?? "",
       rows: [
         {
-          weekday: start === undefined ? "" : String(weekdayOf(start.date)),
+          weekday: startDate === undefined ? "" : String(weekdayOf(startDate)),
           time: start?.time ?? "",
           durationMinutes: startingMinutes,
         },
       ],
-      effectiveFrom: start?.date ?? "",
+      effectiveFrom: startDate ?? "",
       effectiveUntil: "",
     },
   });
