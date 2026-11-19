@@ -31,15 +31,15 @@ describe("contactReasonLine", () => {
 
 describe("contactRowMeta", () => {
   it("gives only her start when WhatsApp works", () => {
-    expect(contactRowMeta(item({}))).toBe("Empezó el 6 de noviembre");
+    expect(contactRowMeta(item({}))).toBe("Empezó el vie 6 nov");
   });
 
   it("leads with what is wrong with her phone", () => {
     expect(contactRowMeta(item({ phone: "7000004", startedOn: "2026-11-02" }))).toBe(
-      "Celular incompleto · empezó el 2 de noviembre",
+      "Celular incompleto · empezó el lun 2 nov",
     );
     expect(contactRowMeta(item({ phone: null, startedOn: "2026-11-05" }))).toBe(
-      "Sin teléfono · empezó el 5 de noviembre",
+      "Sin teléfono · empezó el jue 5 nov",
     );
   });
 });

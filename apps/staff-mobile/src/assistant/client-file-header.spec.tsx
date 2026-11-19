@@ -49,15 +49,13 @@ describe("Client file header", () => {
   // Walkthrough finding 95 (b).
   it("says a link still valid expires and a lapsed one expired", async () => {
     const valid = await openLucia(pendingLucia("+591 70011001", "2026-10-14T15:00:00.000Z"));
-    await waitFor(() =>
-      expect(valid.getByText("El enlace vence el 14 de octubre de 2026")).toBeOnTheScreen(),
-    );
+    await waitFor(() => expect(valid.getByText("El enlace vence el mié 14 oct")).toBeOnTheScreen());
     await cleanup();
     clearMobileQueryCache();
 
     const lapsed = await openLucia(pendingLucia("+591 70011001", "2026-09-29T15:00:00.000Z"));
     await waitFor(() =>
-      expect(lapsed.getByText("El enlace venció el 29 de septiembre de 2026")).toBeOnTheScreen(),
+      expect(lapsed.getByText("El enlace venció el mar 29 sept")).toBeOnTheScreen(),
     );
     expect(lapsed.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
   });

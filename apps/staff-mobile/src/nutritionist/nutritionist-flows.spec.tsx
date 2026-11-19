@@ -138,7 +138,7 @@ describe("Nutritionist agenda and availability", () => {
     expect(screen.getByText("5 turnos · 2 con reserva")).toBeOnTheScreen();
     expect(screen.getByText("4 turnos · 1 con reserva")).toBeOnTheScreen();
     expect(screen.getByText("4 turnos · sin reservas")).toBeOnTheScreen();
-    expect(screen.getByText("Desde el jueves 1 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("Desde el jue 1 oct")).toBeOnTheScreen();
     // v2 S16: a tab root with the fixed «Nuevo horario» under the rows.
     expect(
       screen.getByText("Las clientas eligen turnos de 45 min dentro de estos rangos."),

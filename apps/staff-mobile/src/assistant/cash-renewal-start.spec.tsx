@@ -55,7 +55,7 @@ describe("Confirming cash for a renewal", () => {
     await fireEvent.press(screen.getByTestId("start-date-2026-10-20"));
     expect(
       screen.getByText(
-        "El plan actual de Lucía vence el 12 de octubre. El nuevo empieza el 20 de octubre; se puede elegir hasta el 9 de noviembre.",
+        "El plan actual de Lucía vence el lun 12 oct. El nuevo empieza el mar 20 oct; se puede elegir hasta el lun 9 nov.",
       ),
     ).toBeOnTheScreen();
     expect(

@@ -28,4 +28,10 @@ describe("Staff display formats", () => {
   it("print money only through formatMoney", () => {
     expect(filesMatching(/formatBolivianos|formatExactBolivianos|exact-bolivianos/)).toEqual([]);
   });
+
+  // «jue 19 nov», «Jueves 19 de noviembre» and «jue 19 nov · 08:00» come from
+  // the shared formatters; no screen spells a month or a dd/mm date itself.
+  it("write dates only through the shared formatters", () => {
+    expect(filesMatching(/(month|weekday): "(long|short)"|slice\(8, 10\)\}\//)).toEqual([]);
+  });
 });

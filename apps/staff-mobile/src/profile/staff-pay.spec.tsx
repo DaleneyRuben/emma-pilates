@@ -47,7 +47,7 @@ describe("Staff Mis pagos", () => {
     expect(november.getByText("En curso · puede cambiar")).toBeOnTheScreen();
     const october = within(screen.getByRole("button", { name: /^Liquidación de octubre 2026,/ }));
     expect(october.getByText("Octubre 2026")).toBeOnTheScreen();
-    expect(october.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
+    expect(october.getByText("Pagado el dom 1 nov")).toBeOnTheScreen();
     expect(october.getByText("Bs 322")).toBeOnTheScreen();
     // The payment lives on its statement's row, not in a list of its own.
     expect(screen.queryByText("Pagos recibidos")).toBeNull();
@@ -98,7 +98,7 @@ describe("Staff Mis pagos", () => {
     });
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
-    expect(summary.getByText("Último pago · 1 de noviembre")).toBeOnTheScreen();
+    expect(summary.getByText("Último pago · dom 1 nov")).toBeOnTheScreen();
     expect(summary.getByText("Bs 322")).toBeOnTheScreen();
     expect(
       summary.getByText("Liquidación de octubre 2026. Sin comprobante adjunto."),
@@ -118,7 +118,7 @@ describe("Staff Mis pagos", () => {
 
     const others = within(await waitFor(() => screen.getByLabelText("Otros pagos")));
     expect(others.getByText("Bs 150,50")).toBeOnTheScreen();
-    expect(others.getByText("15 de octubre de 2026 · sin comprobante")).toBeOnTheScreen();
+    expect(others.getByText("jue 15 oct · sin comprobante")).toBeOnTheScreen();
     expect(others.queryByText("Bs 322")).toBeNull();
   });
 
@@ -135,7 +135,7 @@ describe("Staff Mis pagos", () => {
     expect(detail.getByText("Pagado")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
     expect(detail.getByText("Pagado").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(detail.getByText("Bs 322")).toHaveStyle({ fontSize: 34 });
-    expect(detail.getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
+    expect(detail.getByText("Pagado el dom 1 nov")).toBeOnTheScreen();
     expect(detail.getByText("Sin comprobante adjunto")).toBeOnTheScreen();
     expect(detail.getByText("Clases dictadas · 2")).toBeOnTheScreen();
     expect(detail.getByText("Bs 146")).toBeOnTheScreen();
@@ -218,12 +218,10 @@ describe("Staff Mis pagos", () => {
     const screen = await openMyPay({ statements: () => jsonResponse([week, day]) });
 
     await waitFor(() => {
-      expect(screen.getByText("26 de octubre – 1 de noviembre de 2026")).toBeOnTheScreen();
+      expect(screen.getByText("lun 26 oct – dom 1 nov")).toBeOnTheScreen();
     });
-    expect(screen.getByText("20 de octubre de 2026")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: /^Liquidación del 20 de octubre de 2026,/ }),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("mar 20 oct")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Liquidación del mar 20 oct,/ })).toBeOnTheScreen();
   });
 
   it("says so when nothing was calculated or paid yet", async () => {

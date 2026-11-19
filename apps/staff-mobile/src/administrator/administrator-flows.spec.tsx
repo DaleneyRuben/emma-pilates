@@ -186,7 +186,7 @@ describe("Administrator payments and Session cancellation", () => {
     // v2 S12: the amount on the hero, the transfer and its time as rows.
     expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
     expect(screen.getByText("Transferencia")).toBeOnTheScreen();
-    expect(screen.getByText(/^Enviado el \d+ de \w+, 19:40$/)).toBeOnTheScreen();
+    expect(screen.getByText(/^Enviado el \S+ \d+ \S+ · 19:40$/)).toBeOnTheScreen();
     expect(screen.getByText("Comprobante")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante de transferencia")).toBeOnTheScreen();

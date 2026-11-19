@@ -55,7 +55,7 @@ describe("Staff Mis pagos receipts", () => {
 
     await waitFor(() => expect(asked).toContain("readable"));
     expect(
-      await screen.findByText("Pago del 1 de noviembre de 2026", { includeHiddenElements: true }),
+      await screen.findByText("Pago del dom 1 nov", { includeHiddenElements: true }),
     ).toBeTruthy();
     expect(screen.getByTestId("full-screen-image")).toBeTruthy();
   });
@@ -70,9 +70,9 @@ describe("Staff Mis pagos receipts", () => {
 
     const detail = within(screen.getByTestId("pay-statement"));
     const strip = detail.getByRole("button", {
-      name: "Ver el comprobante del pago del 1 de noviembre de 2026",
+      name: "Ver el comprobante del pago del dom 1 nov",
     });
-    expect(within(strip).getByText("Pagado el 1 de noviembre")).toBeOnTheScreen();
+    expect(within(strip).getByText("Pagado el dom 1 nov")).toBeOnTheScreen();
     expect(within(strip).getByText("Ver comprobante")).toBeOnTheScreen();
     await waitFor(() => expect(asked).toContain("thumbnail"));
 
@@ -80,7 +80,7 @@ describe("Staff Mis pagos receipts", () => {
 
     await waitFor(() => expect(asked).toContain("readable"));
     expect(
-      await screen.findByText("Pago del 1 de noviembre de 2026", { includeHiddenElements: true }),
+      await screen.findByText("Pago del dom 1 nov", { includeHiddenElements: true }),
     ).toBeTruthy();
   });
 
@@ -97,7 +97,7 @@ describe("Staff Mis pagos receipts", () => {
     });
 
     const strip = screen.getByRole("button", {
-      name: "Ver el comprobante del pago del 1 de noviembre de 2026",
+      name: "Ver el comprobante del pago del dom 1 nov",
     });
     await fireEvent.press(strip);
 
@@ -105,7 +105,7 @@ describe("Staff Mis pagos receipts", () => {
     await fireEvent.press(strip);
     await waitFor(() => expect(readable).toBe(2));
     expect(
-      await screen.findByText("Pago del 1 de noviembre de 2026", { includeHiddenElements: true }),
+      await screen.findByText("Pago del dom 1 nov", { includeHiddenElements: true }),
     ).toBeTruthy();
     expect(screen.queryByText("No pudimos mostrar el comprobante.")).toBeNull();
   });
@@ -116,14 +116,14 @@ describe("Staff Mis pagos receipts", () => {
 
     const others = within(await waitFor(() => screen.getByLabelText("Otros pagos")));
     const row = others.getByRole("button", {
-      name: "Ver el comprobante del pago del 15 de octubre de 2026, Bs 150,50",
+      name: "Ver el comprobante del pago del jue 15 oct, Bs 150,50",
     });
     expect(within(row).getByText(/ · ver comprobante$/)).toBeOnTheScreen();
     await fireEvent.press(row);
 
     await waitFor(() => expect(asked).toContain("hand"));
     expect(
-      await screen.findByText("Pago del 15 de octubre de 2026", { includeHiddenElements: true }),
+      await screen.findByText("Pago del jue 15 oct", { includeHiddenElements: true }),
     ).toBeTruthy();
   });
 });

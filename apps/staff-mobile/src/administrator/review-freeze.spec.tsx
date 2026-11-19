@@ -111,7 +111,7 @@ describe("freeze review", () => {
       paddingHorizontal: 20,
     });
     // v2 CON: the request as rows, the days counted.
-    expect(screen.getByText("Del 27 de octubre al 3 de noviembre")).toBeOnTheScreen();
+    expect(screen.getByText("Del mar 27 oct al mar 3 nov")).toBeOnTheScreen();
     expect(screen.getByText("8 días")).toBeOnTheScreen();
     expect(screen.getByText("Viaje de trabajo")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Aprobar congelamiento" }));
@@ -162,10 +162,10 @@ describe("freeze review", () => {
 
     // Walkthrough finding 52: the days were the dates row's value, crushed
     // into a one-letter column; each now has its own row.
-    const dates = screen.getByText("Del 9 al 15 de noviembre");
+    const dates = screen.getByText("Del lun 9 al dom 15 nov");
     expect(StyleSheet.flatten(dates.props.style)).toMatchObject({ flexShrink: 1 });
     expect(screen.getByText("7 días")).toBeOnTheScreen();
-    expect(screen.getByText("Vence el 5 de febrero → 12 de febrero")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el vie 5 feb → vie 12 feb")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Aprobar congelamiento" })).toBeOnTheScreen();
   });
 
@@ -173,12 +173,10 @@ describe("freeze review", () => {
     const screen = await openReview(approvedFreeze, "Congelamientos", "Ver congelamiento de");
 
     expect(
-      screen.getByText("Aprobada por Paola Mendoza el 8 de noviembre a las 10:15"),
+      screen.getByText("Aprobada por Paola Mendoza el dom 8 nov a las 10:15"),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByText("Ahora vence el 15 de enero (antes, el 10 de enero)"),
-    ).toBeOnTheScreen();
-    expect(screen.getByText("Del 30 de noviembre al 4 de diciembre")).toBeOnTheScreen();
+    expect(screen.getByText("Ahora vence el vie 15 ene (antes, el dom 10 ene)")).toBeOnTheScreen();
+    expect(screen.getByText("Del lun 30 nov al vie 4 dic")).toBeOnTheScreen();
     expect(screen.queryByText("Esta solicitud ya fue decidida.")).toBeNull();
   });
 
@@ -186,9 +184,9 @@ describe("freeze review", () => {
     const screen = await openReview(refusedFreeze, "Congelamientos", "Ver congelamiento de");
 
     expect(
-      screen.getByText("Rechazada por Paola Mendoza el 7 de noviembre a las 18:40"),
+      screen.getByText("Rechazada por Paola Mendoza el sáb 7 nov a las 18:40"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Vence el 1 de marzo")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el lun 1 mar")).toBeOnTheScreen();
   });
 
   it("leaves out the plan end when an older API does not send it", async () => {

@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { formatListDate } from "@pilates/api-contracts";
 import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { formatCivilDayMonth } from "../assistant/assistant-format";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
@@ -96,7 +96,7 @@ describe("Revisar pago names a Plan that starts later", () => {
   it("says it is her next Plan and when it starts, before and after confirming", async () => {
     const startsOn = civilIn(55);
     const screen = await reviewAndConfirm(reviewOf({ startsOn, nextPlan: true }));
-    const day = formatCivilDayMonth(startsOn);
+    const day = formatListDate(startsOn);
 
     expect(screen.getByText("Plan siguiente")).toBeOnTheScreen();
     expect(screen.getByText(`Empieza el ${day}`)).toBeOnTheScreen();
@@ -110,7 +110,7 @@ describe("Revisar pago names a Plan that starts later", () => {
   it("says the chosen later Start Date of a first Plan", async () => {
     const startsOn = civilIn(5);
     const screen = await reviewAndConfirm(reviewOf({ startsOn, nextPlan: false }));
-    const day = formatCivilDayMonth(startsOn);
+    const day = formatListDate(startsOn);
 
     expect(screen.queryByText("Plan siguiente")).toBeNull();
     expect(screen.getByText("Empieza")).toBeOnTheScreen();

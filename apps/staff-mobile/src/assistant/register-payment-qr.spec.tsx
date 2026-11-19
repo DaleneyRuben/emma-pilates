@@ -103,11 +103,11 @@ describe("Registrar pago by QR (S10)", () => {
     await waitFor(() => expect(screen.getByText("Comprobante enviado")).toBeOnTheScreen());
     expect(
       screen.getByText(
-        "Administración lo revisa y programa el plan siguiente de Lucía, que empieza el 20 de octubre. No entra en la caja de hoy.",
+        "Administración lo revisa y programa el plan siguiente de Lucía, que empieza el mar 20 oct. No entra en la caja de hoy.",
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Empieza")).toBeOnTheScreen();
-    expect(screen.getByText("20 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("mar 20 oct")).toBeOnTheScreen();
   });
 
   it("says why the cash is refused while a receipt is in review", async () => {

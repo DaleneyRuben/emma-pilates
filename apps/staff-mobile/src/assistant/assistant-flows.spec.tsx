@@ -49,7 +49,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("5")).toHaveStyle({ fontSize: 40 });
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
-    expect(screen.getByText("5 de 8 del plan · vence el 12 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.getByText("Plan activo")).toBeOnTheScreen();
     expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
@@ -80,7 +80,7 @@ describe("Assistant Client flows", () => {
         }),
     });
     expect(screen.getByText("7")).toBeOnTheScreen();
-    expect(screen.getByText("5 del plan + 2 extra · vence el 12 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("5 del plan + 2 extra · vence el lun 12 oct")).toBeOnTheScreen();
   });
 
   it("lists the Client's Bookings in their three states, cancels one after confirming, and shows the history by month", async () => {
@@ -309,7 +309,7 @@ describe("Assistant Client flows", () => {
     ).toBeOnTheScreen();
     expect(screen.getAllByText("8 clases")).toHaveLength(1);
     expect(screen.getByText("Cobrado en efectivo")).toBeOnTheScreen();
-    expect(screen.getByText("22 de octubre de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("jue 22 oct")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver a Clientas" }));
     await waitFor(() => {
@@ -412,7 +412,7 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByText("Cuenta pendiente de activación")).toBeOnTheScreen();
     });
-    expect(screen.getByText("El enlace venció el 29 de septiembre de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("El enlace venció el mar 29 sept")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cambiar correo" })).toBeNull();
 
