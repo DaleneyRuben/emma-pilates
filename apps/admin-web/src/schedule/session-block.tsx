@@ -1,4 +1,7 @@
-import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
+import {
+  capacityLabel,
+  type AdministratorSessionAvailabilityDto,
+} from "@pilates/api-contracts";
 import { StaffPhoto } from "../components/staff-photo";
 import { boliviaParts } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
@@ -21,7 +24,7 @@ const sessionLabel = (session: Session, flag?: EquipmentFlag): string =>
     session.classTypeName,
     boliviaParts(session.startsAt).time,
     session.trainerName,
-    `${session.bookedCount} de ${session.capacity} lugares`,
+    capacityLabel(session.bookedCount, session.capacity),
     ...(session.waitlistCount > 0
       ? [`${session.waitlistCount} en lista de espera`]
       : []),
@@ -33,7 +36,7 @@ const occupancy = (session: Session): string =>
     ? session.waitlistCount > 0
       ? `Llena · ${session.waitlistCount} en espera`
       : "Llena"
-    : `${session.bookedCount}/${session.capacity}`;
+    : capacityLabel(session.bookedCount, session.capacity);
 
 // FIX-042: a cancelled class keeps its place, with its cause. FIX-084
 // (Horario A): a faint grey dashed outline, the type, the time and the cause.

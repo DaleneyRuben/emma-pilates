@@ -234,7 +234,7 @@ export function ClientsPage({
           filter={search.filter}
         />
       }
-      panelTitles={{ create: "Detalle de cliente", edit: (row) => row.name }}
+      panelTitles={{ create: "Detalle de clienta", edit: (row) => row.name }}
       rangeLabel={({ shown: count }) =>
         `Mostrando ${countFormat.format(count)} de ${clientas(studio ?? 0)}`
       }

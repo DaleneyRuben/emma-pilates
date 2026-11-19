@@ -249,9 +249,9 @@ export function StaffEditForm({
             control={form.control}
             role={role}
             gender={gender}
-            branchNote={`Si sacas una sucursal, sus sesiones ya asignadas no se reasignan solas.${
+            branchNote={`Si sacas una sucursal, sus clases ya asignadas no se reasignan solas.${
               member.role === "trainer"
-                ? " Cámbialas de entrenadora en Horario antes de guardar."
+                ? " Cámbialas de instructora en Horario antes de guardar."
                 : ""
             }`}
           />

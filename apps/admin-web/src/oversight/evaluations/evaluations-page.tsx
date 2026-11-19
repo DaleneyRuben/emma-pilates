@@ -44,7 +44,7 @@ const columns = createColumnHelper<EvaluationRow>();
 // no detail to open; the row is the whole appointment.
 const evaluationColumns = () => [
   columns.accessor("clientName", {
-    header: "Cliente",
+    header: "Clienta",
     cell: ({ row }) => (
       <span className="flex flex-col">
         <span className="font-medium text-texto">

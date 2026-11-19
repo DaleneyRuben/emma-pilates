@@ -29,7 +29,7 @@ const refusals: Record<string, string> = {
   referral_code_in_use: "Ese código ya lo tiene otra clienta o instructora.",
   referral_code_blocked: "Ese código no está permitido.",
   referral_code_malformed: "Usa de 3 a 20 letras, números o guiones.",
-  staff_member_not_trainer: "Solo una entrenadora tiene código personal.",
+  staff_member_not_trainer: "Solo una instructora tiene código personal.",
 };
 
 const failureMessage = (error: unknown): string =>

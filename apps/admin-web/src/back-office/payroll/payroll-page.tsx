@@ -24,7 +24,7 @@ const columns = createColumnHelper<AdminSalaryPaymentDto>();
 
 const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
   columns.accessor("staffMemberName", {
-    header: "Empleado",
+    header: "Persona",
     cell: ({ row }) => (
       <RowOpener
         label={row.original.staffMemberName}
@@ -150,7 +150,7 @@ export function PayrollPage({
       panelTitles={{ create: "Registrar pago", edit: "Editar pago" }}
       filter={
         <ListFilter
-          label="Empleado"
+          label="Persona"
           value={search.staffMemberId ?? "all"}
           options={[
             { value: "all", label: "Todos" },

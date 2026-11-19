@@ -7,9 +7,9 @@ export const statusPills: Record<
   Status,
   { tone: "exito" | "advertencia" | "neutral"; label: string }
 > = {
-  active: { tone: "exito", label: "Activo" },
+  active: { tone: "exito", label: "Activa" },
   pending: { tone: "advertencia", label: "Pendiente" },
-  deactivated: { tone: "neutral", label: "Desactivado" },
+  deactivated: { tone: "neutral", label: "Desactivada" },
 };
 
 /** "Todas" for the Roles that hold every Branch implicitly. */

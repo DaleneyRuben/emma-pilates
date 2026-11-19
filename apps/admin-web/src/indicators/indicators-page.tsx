@@ -68,7 +68,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
               figure={`${current.data.occupancyPercent} %`}
             />
             <Tile
-              name="Alumnas por clase"
+              name="Clientas por clase"
               figure={tenths.format(current.data.averageStudentsTimes10 / 10)}
             />
             <Tile

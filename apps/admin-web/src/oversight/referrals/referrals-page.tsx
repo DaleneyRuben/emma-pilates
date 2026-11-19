@@ -31,7 +31,7 @@ const columns = createColumnHelper<ReferralRow>();
 // The row is the whole record (AW26): no panel, no link.
 const referralColumns = () => [
   columns.accessor("referrerName", {
-    header: "Cliente que refiere",
+    header: "Clienta que refiere",
     cell: ({ row }) => (
       <span className="flex flex-col">
         <span className="font-medium text-texto">
@@ -48,7 +48,7 @@ const referralColumns = () => [
     ),
   }),
   columns.accessor("referredName", {
-    header: "Cliente referido",
+    header: "Clienta referida",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario">{getValue()}</span>
     ),
@@ -144,7 +144,7 @@ export function ReferralsPage({
       emptyMessage={<EmptyReferrals searching={search.q !== undefined} />}
       filter={
         <SearchFilter
-          label="Buscar por nombre de cliente"
+          label="Buscar por nombre de clienta"
           value={search.q ?? ""}
           onChange={(text) =>
             onSearchChange({ q: text === "" ? undefined : text, page: 1 })

@@ -16,7 +16,7 @@ const retry = "No pudimos guardar. Inténtalo de nuevo.";
 // code (ADR-0021), never by the problem's text.
 const problems: Record<string, Omit<BackOfficeProblem, "code">> = {
   back_office_access_denied: {
-    message: "No tienes permiso para cambiar el Back Office.",
+    message: "No tienes permiso para hacer este cambio.",
   },
   branch_not_found: {
     message: "Esta sucursal ya no existe. Elige otra en la barra superior.",

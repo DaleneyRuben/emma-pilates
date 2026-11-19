@@ -87,11 +87,11 @@ export const decidedFreezeColumns = () => [
     header: "Resultado",
     cell: ({ getValue }) =>
       getValue() === "approved" ? (
-        <StatusPill tone="exito">Aprobado</StatusPill>
+        <StatusPill tone="exito">Aprobada</StatusPill>
       ) : getValue() === "withdrawn" ? (
-        <StatusPill tone="neutral">Retirado</StatusPill>
+        <StatusPill tone="neutral">Retirada</StatusPill>
       ) : (
-        <StatusPill tone="error">Rechazado</StatusPill>
+        <StatusPill tone="error">Rechazada</StatusPill>
       ),
   }),
   columns.display({

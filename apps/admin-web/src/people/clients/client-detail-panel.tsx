@@ -70,7 +70,7 @@ function PlanBlock({
         <SummaryRow label="Plan">
           <span className="flex items-center justify-end gap-2">
             <span className="text-texto-muy-tenue">Sin plan activo</span>
-            <StatusPill tone="error">Expirado</StatusPill>
+            <StatusPill tone="error">Plan vencido</StatusPill>
           </span>
         </SummaryRow>
         <p className="px-3 py-2 text-ayuda text-texto-tenue">
@@ -84,7 +84,7 @@ function PlanBlock({
       <SummaryRow label="Plan">
         <span className="flex items-center justify-end gap-2">
           {current.planName}
-          <StatusPill tone="exito">Activo</StatusPill>
+          <StatusPill tone="exito">Activa</StatusPill>
         </span>
       </SummaryRow>
       <SummaryRow label="Vigencia">
@@ -138,7 +138,7 @@ function ClientSummary({
       <div className="flex items-center gap-3">
         <ClientPhoto name={client.name} photo={client.photo} size={40} />
         <p className="text-nota text-texto-tenue">
-          Cliente desde {formatListDate(client.clientSince)}
+          Clienta desde {formatListDate(client.clientSince)}
         </p>
       </div>
       {client.accountStatus === "pending" ? (

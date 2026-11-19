@@ -20,7 +20,7 @@ const problems: Record<string, (name: string) => string> = {
   booking_before_start_date: (name) =>
     `El plan de ${name} empieza después de esta clase.`,
   session_not_found: () =>
-    "Esta sesión ya no existe. Cierra el panel y actualiza el horario.",
+    "Esta clase ya no existe. Cierra el panel y actualiza el horario.",
   booking_access_denied: () =>
     "No tienes permiso para reservar por una clienta.",
 };

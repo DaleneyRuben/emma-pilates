@@ -135,9 +135,9 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     cell: ({ getValue }) => {
       switch (getValue()) {
         case "active":
-          return <StatusPill tone="exito">Activo</StatusPill>;
+          return <StatusPill tone="exito">Activa</StatusPill>;
         case "expired":
-          return <StatusPill tone="error">Expirado</StatusPill>;
+          return <StatusPill tone="error">Plan vencido</StatusPill>;
         default:
           // Never bought a Plan: nothing expired (follow-up 54).
           return <StatusPill tone="neutral">Sin plan</StatusPill>;

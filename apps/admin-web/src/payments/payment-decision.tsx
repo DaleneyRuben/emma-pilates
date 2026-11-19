@@ -173,7 +173,7 @@ export function PaymentDecision({
                     />
                   </FormControl>
                   <FormDescription>
-                    <ExampleHint example="el monto no coincide con la transferencia recibida.">
+                    <ExampleHint example="el monto no coincide con el pago recibido.">
                       La clienta verá este mensaje para corregir y volver a
                       enviar.
                     </ExampleHint>

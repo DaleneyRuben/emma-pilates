@@ -24,9 +24,9 @@ const refusals: Record<string, string> = {
   subscription_not_expired:
     "Ya tiene un plan en uso. Puedes darle acceso de prueba cuando termine.",
   payment_pending_exists:
-    "Tiene un pago por transferencia en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
+    "Tiene un pago por QR en revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.",
   purchase_intent_open_exists:
-    "Tiene una compra por transferencia sin terminar. Vuelve a intentarlo cuando venza.",
+    "Tiene una compra por QR sin terminar. Vuelve a intentarlo cuando venza.",
   courtesy_end_date_invalid: "Elige una fecha entre hoy y un año desde hoy.",
 };
 const failure = "No pudimos dar el acceso. Inténtalo de nuevo.";

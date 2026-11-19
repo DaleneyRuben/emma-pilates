@@ -27,7 +27,7 @@ import { WeekGrid } from "./week-grid";
 
 type Session = AdministratorSessionAvailabilityDto;
 const sessionCount = (count: number) =>
-  count === 1 ? "1 sesión esta semana" : `${count} sesiones esta semana`;
+  count === 1 ? "1 clase esta semana" : `${count} clases esta semana`;
 
 const standingCount = (sessions: readonly Session[]) =>
   sessions.filter((session) => (session.cancellation ?? null) === null).length;
@@ -103,7 +103,7 @@ function BranchSchedule({
                 }}
               >
                 <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-                Nueva sesión
+                Nueva clase
               </Button>
             )
           }
@@ -129,13 +129,12 @@ function BranchSchedule({
           <>
             {standingCount(sessions.data) === 0 ? (
               <p className="text-nota text-texto-tenue">
-                No hay sesiones programadas esta semana.
+                No hay clases programadas esta semana.
               </p>
             ) : null}
             {count >= weekSessionLimit ? (
               <p className="text-nota text-advertencia-texto">
-                Se muestran las primeras {weekSessionLimit} sesiones de la
-                semana.
+                Se muestran las primeras {weekSessionLimit} clases de la semana.
               </p>
             ) : null}
             {narrow ? (

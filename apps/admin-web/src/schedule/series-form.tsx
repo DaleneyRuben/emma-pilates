@@ -45,7 +45,7 @@ import { useScheduleChange } from "./use-schedule-change";
 const seriesSchema = (earliest: string) =>
   z
     .object({
-      trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
+      trainerStaffMemberId: z.string().min(1, "Elige una instructora."),
       weekday: z.string().regex(/^[1-7]$/, "Elige un día."),
       time: z
         .string()
@@ -165,15 +165,15 @@ export function SeriesForm({
             Serie semanal de {schedule.classTypeName}
           </p>
           <p className="text-ayuda text-texto-tenue">
-            Las sesiones que ya tienen reservas o lista de espera se mantienen
-            sin cambios.
+            Las clases que ya tienen reservas o lista de espera se mantienen sin
+            cambios.
           </p>
           <FormField
             control={form.control}
             name="trainerStaffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entrenadora</FormLabel>
+                <FormLabel>Instructora</FormLabel>
                 <FormControl>
                   <Select {...field}>
                     <TrainerOptions trainers={trainers.data ?? []} />
@@ -237,7 +237,7 @@ export function SeriesForm({
                   <CivilDateInput {...field} />
                 </FormControl>
                 <FormDescription>
-                  Fecha en hora de Bolivia. Las sesiones anteriores no cambian.
+                  Fecha en hora de Bolivia. Las clases anteriores no cambian.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

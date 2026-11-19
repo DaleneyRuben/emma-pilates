@@ -126,7 +126,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
           <PhoneFormField
             control={form.control}
             name="phone"
-            description="La recepción lo usa para escribirle por WhatsApp."
+            description="La asistente lo usa para escribirle por WhatsApp."
           />
           <StaffRoleFields control={form.control} role={role} gender={gender} />
           {failure === null ? null : (

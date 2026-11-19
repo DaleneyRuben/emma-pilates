@@ -39,7 +39,7 @@ function MissingNotice({ count }: { count: number }) {
         {`${plural(count, "día", "días")} con ventas en efectivo sin cierre`}
       </p>
       <p className="text-nota text-texto-secundario">
-        Revisa con recepción qué pasó esos días.
+        Revisa con la asistente qué pasó esos días.
       </p>
     </section>
   );

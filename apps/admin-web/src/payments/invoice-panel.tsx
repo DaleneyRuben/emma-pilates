@@ -13,7 +13,7 @@ import { InvoiceUploadField } from "./invoice-upload-field";
 import { paymentInvoiceQueryOptions } from "./invoice-queries";
 
 const methods: Record<StaffInvoiceDto["method"], string> = {
-  transfer: "Transferencia",
+  transfer: "QR",
   cash: "Efectivo",
   credit_only: "Crédito",
   courtesy: "Cortesía",

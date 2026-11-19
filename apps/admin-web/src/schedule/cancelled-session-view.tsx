@@ -42,7 +42,7 @@ export function CancelledSessionView({
       </p>
       <dl className="divide-y divide-divisor rounded-tarjeta border border-borde bg-lino text-celda">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
-          <dt className="text-texto-tenue">Entrenadora</dt>
+          <dt className="text-texto-tenue">Instructora</dt>
           <dd>{session.trainerName}</dd>
         </div>
         <div className="flex items-center justify-between gap-3 px-4 py-3">

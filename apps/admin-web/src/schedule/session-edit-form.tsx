@@ -12,7 +12,7 @@ import { SeriesPauseNotice, SeriesRow } from "./series-row";
 type Scope = "only" | "future";
 
 // AW03 edit mode. A Session a weekly schedule generated asks whether the
-// change is for "Solo esta sesión" or "Esta y las futuras" (follow-up 39),
+// change is for "Solo esta clase" or "Esta y las futuras" (follow-up 39),
 // titled «Aplicar cambios a» right above the fields it scopes; a one-off
 // Session has only itself. Cancellation stays an occurrence action in both,
 // and the series' own actions sit in a row below (FIX-042, proposal A).
@@ -59,7 +59,7 @@ export function SessionEditForm({
             name="scope"
             value={scope}
             options={[
-              ["only", "Solo esta sesión"],
+              ["only", "Solo esta clase"],
               ["future", "Esta y las futuras"],
             ]}
             onChange={(next) => {
@@ -94,7 +94,7 @@ export function SessionEditForm({
         </div>
       ) : (
         <p role="alert" className="px-5 py-4 text-nota text-error-texto">
-          Esta serie semanal ya no está vigente. Cambia solo esta sesión.
+          Esta serie semanal ya no está vigente. Cambia solo esta clase.
         </p>
       )}
       {schedule === undefined ? null : (

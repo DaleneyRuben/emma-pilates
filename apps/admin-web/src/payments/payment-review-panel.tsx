@@ -24,7 +24,7 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
       <SummaryRow label="Fecha">
         <span className="tabular">{formatDateTime(review.submittedAt)}</span>
       </SummaryRow>
-      <SummaryRow label="Método">Transferencia</SummaryRow>
+      <SummaryRow label="Método">QR</SummaryRow>
       <StartRow review={review} />
       {review.state === "pending" ? null : (
         <SummaryRow label="Estado">

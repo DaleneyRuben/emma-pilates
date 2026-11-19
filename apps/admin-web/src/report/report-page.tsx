@@ -233,8 +233,7 @@ export function ReportPage({
       ) : null}
       {finance || branchId === undefined ? null : (
         <p className="text-nota text-texto-tenue">
-          La nómina y los ingresos por transferencia se ven solo en «Todas las
-          sucursales».
+          La nómina y los ingresos por QR se ven solo en «Todas las sucursales».
         </p>
       )}
       <RevenueSection

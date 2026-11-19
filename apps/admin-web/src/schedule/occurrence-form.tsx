@@ -39,7 +39,7 @@ type Session = AdministratorSessionAvailabilityDto;
 
 const occurrenceSchema = (today: string, booked: number) =>
   z.object({
-    trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
+    trainerStaffMemberId: z.string().min(1, "Elige una instructora."),
     date: z
       .string()
       .refine((date) => parseCivilDate(date) !== null, "Elige la fecha.")
@@ -57,7 +57,7 @@ const occurrenceSchema = (today: string, booked: number) =>
 type OccurrenceInput = z.input<ReturnType<typeof occurrenceSchema>>;
 type OccurrenceOutput = z.output<ReturnType<typeof occurrenceSchema>>;
 
-// "Solo esta sesión" (follow-up 39 §1): one occurrence changes its Trainer
+// "Solo esta clase" (follow-up 39 §1): one occurrence changes its Trainer
 // (the Trainer swap), start, duration (follow-up 98), or capacity and becomes
 // an exception; only what changed is sent, and capacity never drops below the
 // booked seats.
@@ -122,7 +122,7 @@ export function OccurrenceForm({
         sessionId: session.id,
         input,
       });
-      onDone("Sesión actualizada.");
+      onDone("Clase actualizada.");
     } catch (error) {
       const problem = scheduleProblem(error);
       if (problem.field === undefined) {
@@ -149,14 +149,14 @@ export function OccurrenceForm({
             name="trainerStaffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entrenadora</FormLabel>
+                <FormLabel>Instructora</FormLabel>
                 <FormControl>
                   <Select {...field}>
                     <TrainerOptions trainers={trainers.data ?? []} />
                   </Select>
                 </FormControl>
                 <FormDescription>
-                  Si cambias de entrenadora, le avisamos a la nueva.
+                  Si cambias de instructora, le avisamos a la nueva.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

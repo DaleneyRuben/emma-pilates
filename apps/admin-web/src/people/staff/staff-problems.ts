@@ -30,7 +30,7 @@ const problems: Record<string, Problem> = {
   },
   trainer_has_upcoming_sessions: {
     message:
-      "Todavía tiene sesiones próximas o un horario semanal en esas sucursales. Cámbiale la entrenadora desde Horario y vuelve a intentarlo.",
+      "Todavía tiene clases próximas o un horario semanal en esas sucursales. Cámbiale la instructora desde Horario y vuelve a intentarlo.",
   },
   last_administrator: {
     message:

@@ -57,7 +57,7 @@ export function pendingRows(
             "pago por revisar",
             "pagos por revisar",
           ),
-          note: "Transferencias y QR",
+          note: "Por QR, desde la app",
           to: "/dinero/pagos",
         },
     counts.freezes === 0

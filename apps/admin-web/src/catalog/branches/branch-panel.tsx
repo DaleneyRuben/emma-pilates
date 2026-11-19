@@ -35,7 +35,7 @@ const failureMessage = (error: unknown): string => {
   if (!isApiError(error)) return "No pudimos guardar. Inténtalo de nuevo.";
   switch (error.code) {
     case "branch_in_use":
-      return "No puedes archivarla: tiene sesiones programadas o un horario semanal vigente.";
+      return "No puedes archivarla: tiene clases programadas o un horario semanal vigente.";
     case "branch_not_found":
       return "Esta sucursal ya no existe. Cierra el panel y vuelve a abrir la lista.";
     case "invalid_request":
@@ -135,8 +135,8 @@ export function BranchPanelForm({
           {branch === undefined ? null : (
             <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
               Esta sucursal ya aparece en el selector de la barra superior y en
-              cada registro del Back Office que depende de ella (sesiones,
-              insumos, gastos); renombrarla no mueve esos datos.
+              cada registro que depende de ella (clases, insumos, gastos);
+              renombrarla no mueve esos datos.
             </p>
           )}
           {failure === null ? null : (
@@ -170,7 +170,7 @@ export function BranchPanelForm({
           onConfirm={() => void archive()}
         >
           <p>
-            Deja de aparecer en el selector y no recibe sesiones nuevas. Su
+            Deja de aparecer en el selector y no recibe clases nuevas. Su
             historial se conserva.
           </p>
         </ConfirmDialog>

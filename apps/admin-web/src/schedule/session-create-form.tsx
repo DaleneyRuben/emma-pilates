@@ -158,8 +158,8 @@ export function SessionCreateForm({
           />
           {frequency === "weekly" ? (
             <p className="text-ayuda text-texto-tenue">
-              Genera las sesiones de los próximos 30 días y las sigue creando
-              cada semana.
+              Genera las clases de los próximos 30 días y las sigue creando cada
+              semana.
             </p>
           ) : null}
           <FormField
@@ -196,14 +196,14 @@ export function SessionCreateForm({
             name="trainerStaffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entrenadora</FormLabel>
+                <FormLabel>Instructora</FormLabel>
                 <FormControl>
                   <Select {...field}>
                     <TrainerOptions trainers={trainers.data ?? []} />
                   </Select>
                 </FormControl>
                 <FormDescription>
-                  Solo entrenadoras asignadas a esta sucursal.
+                  Solo instructoras asignadas a esta sucursal.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

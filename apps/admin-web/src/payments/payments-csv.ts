@@ -7,7 +7,7 @@ import {
 import { csvDocument } from "../lib/csv";
 
 export const methodLabels: Record<AdminPaymentDto["method"], string> = {
-  transfer: "Transferencia",
+  transfer: "QR",
   cash: "Efectivo",
 };
 

@@ -63,7 +63,7 @@ export function ReportTiles({
           <>
             <Line>Pagos confirmados en el rango</Line>
             <p className="text-ayuda text-texto-muy-tenue tabular">
-              {`Efectivo ${formatBolivianos(income.byMethod.cash)} · Transferencias ${formatBolivianos(income.byMethod.transfer)}`}
+              {`Efectivo ${formatBolivianos(income.byMethod.cash)} · QR ${formatBolivianos(income.byMethod.transfer)}`}
             </p>
             <p className="text-ayuda text-texto-muy-tenue tabular">
               {`Planes ${formatBolivianos(income.byKind.plan)} · Evaluaciones ${formatBolivianos(income.byKind.evaluation)}`}

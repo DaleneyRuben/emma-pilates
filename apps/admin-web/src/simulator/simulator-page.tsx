@@ -185,7 +185,7 @@ export function SimulatorPage() {
             onChange={change("classesPerWeek")}
           />
           <Field
-            label="Alumnas por clase"
+            label="Clientas por clase"
             value={draft.studentsPerClass}
             onChange={change("studentsPerClass")}
           />
@@ -200,12 +200,12 @@ export function SimulatorPage() {
             onChange={change("trainerClassPay")}
           />
           <Field
-            label="Alumnas incluidas en el pago"
+            label="Clientas incluidas en el pago"
             value={draft.includedStudents}
             onChange={change("includedStudents")}
           />
           <Field
-            label="Pago por alumna extra (Bs)"
+            label="Pago por clienta extra (Bs)"
             value={draft.extraStudentPay}
             onChange={change("extraStudentPay")}
           />

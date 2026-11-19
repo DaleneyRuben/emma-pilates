@@ -86,8 +86,8 @@ export function CloseClientAccountAction({
             className="flex flex-col gap-1 rounded-control bg-error-tinte px-3 py-2 text-error-texto"
           >
             <span>
-              No se puede cerrar todavía: tiene un pago por transferencia en
-              revisión. Confírmalo o recházalo en Pagos y vuelve a intentarlo.
+              No se puede cerrar todavía: tiene un pago por QR en revisión.
+              Confírmalo o recházalo en Pagos y vuelve a intentarlo.
             </span>
             <Link to="/dinero/pagos" className="font-medium text-primario">
               Ir a Pagos

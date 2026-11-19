@@ -20,7 +20,7 @@ export const createSchema = (today: string) =>
     .object({
       frequency: z.enum(["once", "weekly"]),
       classTypeId: z.string().min(1, "Elige un tipo de clase."),
-      trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
+      trainerStaffMemberId: z.string().min(1, "Elige una instructora."),
       time: z.string(),
       durationMinutes: z.string(),
       capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),

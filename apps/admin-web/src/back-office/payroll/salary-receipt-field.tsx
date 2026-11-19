@@ -176,7 +176,7 @@ export function SalaryReceiptField({
             ? `Sin comprobante no se puede ${action} el pago. JPG, PNG o WebP, hasta 10 MB.`
             : value.kind === "attached"
               ? "Cambiarlo guarda el anterior en el registro."
-              : "La entrenadora lo ve en su app."}
+              : "La instructora lo ve en su app."}
         </p>
       )}
     </div>
