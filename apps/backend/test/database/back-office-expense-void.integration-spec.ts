@@ -155,6 +155,22 @@ describe('voiding a Back Office expense', () => {
     ).resolves.toBe('expense_voided');
   });
 
+  // FIX-091 (W11 B): Gastos shows the standing ones; the eliminated apart.
+  it('lists only the standing or only the eliminated Expenses on request', async () => {
+    const admin = await administrator();
+    const list = (voided: boolean) =>
+      expenses().listExpenses(
+        { branchId: centro, voided, page: 1, pageSize: 50 },
+        admin,
+      );
+    const standing = await list(false);
+    expect(standing.totalItems).toBe(1);
+    expect(standing.items.map(({ id }) => id)).toEqual([waterId]);
+    const eliminated = await list(true);
+    expect(eliminated.totalItems).toBe(1);
+    expect(eliminated.items.map(({ id }) => id)).toEqual([lightId]);
+  });
+
   it('leaves the voided Expense out of the expense report and the month result', async () => {
     const admin = await administrator();
     const report = await createPrismaExpenseReport(world.prisma, {
