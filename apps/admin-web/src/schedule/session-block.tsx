@@ -38,16 +38,19 @@ const occupancy = (session: Session): string =>
       : "Llena"
     : capacityLabel(session.bookedCount, session.capacity);
 
-// FIX-042: a cancelled class keeps its place, with its cause. FIX-084
-// (Horario A): a faint grey dashed outline, the type, the time and the cause.
+// FIX-042: a cancelled class keeps its place, with its cause. FIX-091 (W2,
+// Horario B): one thin line, its cause alone in the week grid, where its
+// place already gives the day and hour; the day list adds the time and type.
 function CancelledBlock({
   session,
   onOpen,
+  layout,
   className,
   style,
 }: {
   session: Session;
   onOpen: (session: Session) => void;
+  layout: "grid" | "list";
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -56,6 +59,7 @@ function CancelledBlock({
   return (
     <button
       type="button"
+      data-cancelled="line"
       aria-label={[
         session.classTypeName,
         start,
@@ -65,15 +69,15 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-start gap-0.5 overflow-hidden rounded-control border border-dashed border-borde bg-transparent px-2 py-1 text-left text-texto-muy-tenue transition-shadow hover:bg-lino focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full items-center overflow-hidden rounded-control border border-divisor bg-crema px-2 text-left text-ayuda leading-tight text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco",
+        layout === "list" && "min-h-11",
         className,
       )}
     >
-      <span className="w-full text-ayuda leading-tight break-words xl:text-nota">
-        {session.classTypeName}
-      </span>
-      <span className="w-full text-ayuda leading-tight tabular">
-        {start} · {causeShortLabel(cause)}
+      <span className="truncate tabular">
+        {layout === "list"
+          ? `${start} · ${session.classTypeName} · ${causeShortLabel(cause)}`
+          : causeShortLabel(cause)}
       </span>
     </button>
   );
@@ -86,6 +90,7 @@ export function SessionBlock({
   session,
   onOpen,
   short = false,
+  layout = "grid",
   className,
   style,
 }: {
@@ -93,6 +98,7 @@ export function SessionBlock({
   onOpen: (session: Session) => void;
   /** A class shorter than an hour puts its places on the time line. */
   short?: boolean;
+  layout?: "grid" | "list";
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -101,6 +107,7 @@ export function SessionBlock({
       <CancelledBlock
         session={session}
         onOpen={onOpen}
+        layout={layout}
         className={className}
         style={style}
       />
