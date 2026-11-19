@@ -30,17 +30,31 @@ describe("The Trainer's face on the Assistant's screens", () => {
     clearMobileQueryCache();
   });
 
-  it("leads each class of S07 with her photo", async () => {
+  // FIX-089 (ClaseE): today's next class leads as the hero; the face leads
+  // the rows after it.
+  it("leads today with the next class hero and each other class with her photo", async () => {
+    const later = {
+      ...session,
+      id: "session-2",
+      startsAt: new Date(Date.parse(session.startsAt) + 60 * minute).toISOString(),
+      endsAt: new Date(Date.parse(session.endsAt) + 60 * minute).toISOString(),
+      trainerPhoto: emmaPhoto,
+    };
     const screen = await openLucia({
       ...assistantRoutes(),
-      [dayList]: () => jsonResponse([{ ...session, trainerPhoto: emmaPhoto }]),
+      [dayList]: () => jsonResponse([session, later]),
       "/api/v1/staff-photos/asset-emma?variant=thumbnail": thumbnail,
     });
     await fireEvent.press(screen.getByRole("button", { name: "Reservar clase" }));
 
     await waitFor(() =>
       expect(
-        within(screen.getByTestId("session-card-session-1")).getByLabelText("Foto de Emma Vargas"),
+        within(screen.getByTestId("next-class-hero")).getByTestId("session-card-session-1"),
+      ).toBeOnTheScreen(),
+    );
+    await waitFor(() =>
+      expect(
+        within(screen.getByTestId("session-card-session-2")).getByLabelText("Foto de Emma Vargas"),
       ).toHaveStyle({ width: 20, height: 20 }),
     );
   });
