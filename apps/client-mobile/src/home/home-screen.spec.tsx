@@ -149,12 +149,14 @@ describe("Client Home", () => {
     });
     const screen = await render(<App runtime={createRuntime(fetcher)} />);
 
+    // FIX-089 (ClaseE): the next class is the Palo de rosa hero.
     await waitFor(() => {
-      expect(screen.getByText("Tu próxima clase")).toBeOnTheScreen();
+      expect(screen.getByText(/^TU PRÓXIMA CLASE · /)).toBeOnTheScreen();
     });
-    expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
-    expect(screen.getByText("08:00 · Daniela Ortiz · Achumani")).toBeOnTheScreen();
-    expect(screen.queryByText("Reformer")).toBeNull();
+    expect(screen.getByTestId("home-next-class")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getByText("Achumani · Daniela Ortiz")).toBeOnTheScreen();
+    expect(screen.queryByText(/Reformer/)).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Tu próxima clase/ }));
     await waitFor(() => {

@@ -159,7 +159,8 @@ describe("Client My Bookings", () => {
     });
   });
 
-  it("leaves the Waitlist without confirmation", async () => {
+  // FIX-089: leaving is destructive, so it asks first like a cancellation.
+  it("leaves the Waitlist after confirming", async () => {
     let upcoming = [waitlisted];
     const left = jest.fn();
     const screen = await openMyBookings({
@@ -175,6 +176,12 @@ describe("Client My Bookings", () => {
       expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Salir de la lista de espera" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("¿Salir de la lista de espera?")).toBeOnTheScreen();
+    });
+    expect(left).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, salir de la lista" }));
 
     await waitFor(() => {
       expect(left).toHaveBeenCalled();
