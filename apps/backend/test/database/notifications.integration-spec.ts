@@ -145,8 +145,8 @@ describe('Notification store', () => {
     expect(notification).toMatchObject({
       category: 'booking_schedule',
       type: 'waitlist_promoted',
-      title: 'Cupo liberado',
-      message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${className}.`,
+      title: 'Lugar liberado',
+      message: `¡Tienes un lugar! Te promovimos de la lista de espera para tu clase de ${className}.`,
       destinationType: 'booking',
     });
   });

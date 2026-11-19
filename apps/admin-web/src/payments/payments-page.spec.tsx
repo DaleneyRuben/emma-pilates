@@ -149,7 +149,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     await rowOf(/Lucía Fernández/);
 
     await user.type(
-      screen.getByRole("searchbox", { name: "Buscar por cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por clienta" }),
       "sofia",
     );
 
@@ -309,7 +309,7 @@ describe("AW28 Pagos on a narrow browser", () => {
     expect(card).toMatchObject({ compact: true, labels: 0 });
     expect(card.detail).toContain("Paquete de 8 clases");
     expect(
-      screen.getByRole("searchbox", { name: "Buscar por cliente" }),
+      screen.getByRole("searchbox", { name: "Buscar por clienta" }),
     ).toBeVisible();
     expect(screen.getByLabelText("Estado")).toHaveValue("pending");
   });
