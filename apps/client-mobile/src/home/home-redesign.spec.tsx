@@ -50,6 +50,17 @@ describe("Client Inicio, option A", () => {
     clearMobileQueryCache();
   });
 
+  // EncabezadoA (FIX-089): a root screen's title is the shared 30 pt Lora 500.
+  it("titles Inicio like every root screen, with a Rosa profundo bell", async () => {
+    const screen = await openHome({ status: "active", subscription: trimestral });
+
+    expect(screen.getByRole("header", { name: "Inicio" })).toHaveStyle({
+      fontFamily: "Lora_500Medium",
+      fontSize: 30,
+    });
+    expect(screen.getByTestId("glyph-bell", hidden)).toHaveProp("stroke", "#93615D");
+  });
+
   it("makes «Reservar una clase» the one solid button", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
