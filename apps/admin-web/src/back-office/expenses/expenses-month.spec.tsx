@@ -4,6 +4,7 @@ import { centro } from "../../test/booking-handlers";
 import {
   categoriesHandler,
   expensePage,
+  expenseRow,
   expenseReportHandler,
   expensesPath,
   maintenance,
@@ -156,6 +157,31 @@ describe("AW13 Gastos by month", () => {
       await screen.findByRole("cell", { name: /Mantenimiento/ }),
     ).toBeVisible();
     expect(router.state.matches.at(-1)?.search).not.toHaveProperty("borrados");
+  });
+
+  it("moves to the month of a new Expense dated in another month", async () => {
+    server.use(
+      standingOrVoided(),
+      http.post(apiUrl(expensesPath), () =>
+        jsonResponse(expenseRow("05", maintenance, 30_000, "2026-09-22"), 201),
+      ),
+    );
+    const { user, router } = renderAdmin("/dinero/gastos?month=2026-10");
+    await screen.findByRole("cell", { name: /Reparación/ });
+    await user.click(screen.getByRole("button", { name: "Nuevo gasto" }));
+    const panel = await screen.findByRole("dialog", { name: "Nuevo gasto" });
+    await user.selectOptions(
+      within(panel).getByLabelText("Categoría"),
+      maintenance.id,
+    );
+    await user.type(within(panel).getByLabelText("Monto"), "300");
+    await user.type(within(panel).getByLabelText("Fecha"), "2026-09-22");
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await screen.findByText(/registrado en Centro/);
+    expect(router.state.matches.at(-1)?.search).toMatchObject({
+      month: "2026-09",
+    });
   });
 
   it("says when the month has no eliminated Expenses", async () => {
