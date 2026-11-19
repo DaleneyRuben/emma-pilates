@@ -89,6 +89,35 @@ describe("AW22 Cerrar cuenta", () => {
     expect(closures).toEqual([]);
   });
 
+  // FIX-090: a Plan already paid that has not started ends too (walkthrough
+  // n.º 78), so the confirmation says it.
+  it("says her prepaid next Plan ends too, without a refund", async () => {
+    const current = luciaDetail.subscription.subscription;
+    if (current == null) throw new Error("Lucía has a Plan");
+    server.use(
+      ...handlers({
+        ...luciaDetail,
+        subscription: {
+          ...luciaDetail.subscription,
+          nextSubscription: {
+            ...current,
+            id: "5b1b2c3d-0000-5000-8000-000000000099",
+            planName: "Mensual 16 clases",
+            startsOn: "2026-12-03",
+            endsOn: "2027-01-01",
+          },
+        },
+      }),
+    );
+    const { dialog } = await openDialog();
+
+    expect(
+      within(dialog).getByText(
+        "Su próximo plan Mensual 16 clases, ya pagado, que empezaba el jue 3 dic, también termina, sin reembolso.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("names only the lines that always apply to a Client with nothing ahead", async () => {
     server.use(
       ...handlers({
