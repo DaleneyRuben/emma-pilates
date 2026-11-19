@@ -4,14 +4,15 @@ import {
   colors,
   fontFamilies,
   formatCountdown,
+  FormErrorSummary,
   FormField,
   FormScrollView,
   bolivia,
   phoneProblem,
   storedPhone,
   type PhoneValue,
-  IconRowGroup,
   NoticeRow,
+  PhoneField,
   PrimaryButton,
   Screen,
   SectionTitle,
@@ -26,8 +27,6 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { GroupedField } from "../ui/grouped-field";
-import { GroupedPhoneField } from "../ui/grouped-phone-field";
 import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
@@ -88,6 +87,14 @@ export function NewClientScreen() {
   const phoneMistake = phoneProblem(phone.country, phone.digits, "theirs");
   const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
   const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
+
+  // FormB (FIX-089): what a save is missing, named at the top of the form.
+  const missing = [
+    nameError === undefined ? null : "Nombre",
+    emailError === undefined ? null : "Correo electrónico",
+    phoneError === undefined ? null : "Celular",
+    channelError === undefined ? null : "¿Cómo nos conoció?",
+  ].filter((label): label is string => label !== null);
 
   const workspace = useAssistantWorkspace();
   const openClient = (clientId: string, reopened = false) => {
@@ -200,39 +207,37 @@ export function NewClientScreen() {
                   waitLabel="Podrás intentarlo en"
                 />
               ) : null}
-              <View>
+              <FormErrorSummary fields={missing} />
+              <View style={styles.fields}>
                 <SectionTitle>Datos</SectionTitle>
-                <IconRowGroup>
-                  <GroupedField
-                    autoCapitalize="words"
-                    error={nameError}
-                    label="Nombre"
-                    onChangeText={setName}
-                    placeholder="Nombre y apellido"
-                    testID="new-client-name"
-                    value={name}
-                  />
-                  <GroupedField
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    error={emailError}
-                    keyboardType="email-address"
-                    label="Correo electrónico"
-                    onChangeText={(value) => {
-                      setEmail(value);
-                      setEmailInUse(false);
-                    }}
-                    placeholder="correo@ejemplo.com"
-                    testID="new-client-email"
-                    value={email}
-                  />
-                  <GroupedPhoneField
-                    error={phoneError}
-                    onChange={setPhone}
-                    testID="new-client-phone"
-                    value={phone}
-                  />
-                </IconRowGroup>
+                <FormField
+                  autoCapitalize="words"
+                  error={nameError}
+                  label="Nombre"
+                  onChangeText={setName}
+                  testID="new-client-name"
+                  value={name}
+                />
+                <FormField
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  error={emailError}
+                  hint="Ej.: lucia@gmail.com"
+                  keyboardType="email-address"
+                  label="Correo electrónico"
+                  onChangeText={(value) => {
+                    setEmail(value);
+                    setEmailInUse(false);
+                  }}
+                  testID="new-client-email"
+                  value={email}
+                />
+                <PhoneField
+                  error={phoneError}
+                  onChange={setPhone}
+                  testID="new-client-phone"
+                  value={phone}
+                />
               </View>
               <View style={styles.channel}>
                 <SectionTitle>¿Cómo nos conoció?</SectionTitle>
@@ -271,6 +276,7 @@ export function NewClientScreen() {
 
 const styles = StyleSheet.create({
   channel: { gap: spacing.md },
+  fields: { gap: spacing.lg },
   footer: { gap: spacing.sm, paddingTop: spacing.md },
   form: { gap: spacing.xl, paddingBottom: spacing.xl },
   note: {

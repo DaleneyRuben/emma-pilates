@@ -212,7 +212,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               label="Motivo del rechazo"
               multiline
               onChangeText={setReason}
-              placeholder="Ej.: El monto no coincide con la transferencia recibida."
+              hint="Ej.: El monto no coincide con la transferencia recibida."
               style={styles.reasonInput}
               testID="review-reject-reason"
               value={reason}

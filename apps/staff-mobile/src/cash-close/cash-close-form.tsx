@@ -161,7 +161,7 @@ export function CashCloseForm({
           multiline
           numberOfLines={3}
           onChangeText={setNote}
-          placeholder="Ej.: faltó cambio para un billete de 200"
+          hint="Ej.: faltó cambio para un billete de 200"
           style={styles.note}
           testID="cash-close-note"
           value={note}
