@@ -80,13 +80,13 @@ describe("Client Inicio, option A", () => {
     expect(row).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     const inRow = within(row);
     expect(inRow.getByText("Trimestral · 25 restantes")).toBeOnTheScreen();
-    expect(inRow.getByText("Esta semana te quedan 3 · vence el 5 de febrero")).toBeOnTheScreen();
+    expect(inRow.getByText("Esta semana te quedan 3 · vence el vie 5 feb")).toBeOnTheScreen();
     expect(inRow.getByTestId("chevron", hidden)).toBeOnTheScreen();
     expect(screen.queryByText("Activo")).toBeNull();
     expect(screen.queryByRole("button", { name: "Mi plan" })).toBeNull();
     expect(
       screen.getByRole("button", {
-        name: "Mi plan, Trimestral, 25 clases restantes, esta semana te quedan 3, vence el 5 de febrero",
+        name: "Mi plan, Trimestral, 25 clases restantes, esta semana te quedan 3, vence el vie 5 feb",
       }),
     ).toBeOnTheScreen();
   });
@@ -122,7 +122,7 @@ describe("Client Inicio, option A", () => {
 
     const inRow = within(screen.getByTestId("home-plan-card"));
     expect(inRow.getByText("Trimestral · 26 restantes")).toBeOnTheScreen();
-    expect(inRow.getByText("25 del plan + 1 de regalo · vence el 5 de febrero")).toBeOnTheScreen();
+    expect(inRow.getByText("25 del plan + 1 de regalo · vence el vie 5 feb")).toBeOnTheScreen();
     expect(screen.queryByText(/esta semana/i)).toBeNull();
   });
 
@@ -135,7 +135,7 @@ describe("Client Inicio, option A", () => {
 
     expect(
       within(screen.getByTestId("home-plan-card")).getByText(
-        "Ya usaste tus clases de esta semana · vence el 5 de febrero",
+        "Ya usaste tus clases de esta semana · vence el vie 5 feb",
       ),
     ).toBeOnTheScreen();
   });
@@ -168,7 +168,7 @@ describe("Client Inicio, option A", () => {
 
     const inRow = within(screen.getByTestId("home-plan-card"));
     expect(inRow.getByText("Trimestral · 1 restante")).toBeOnTheScreen();
-    expect(inRow.getByText("Esta semana te queda 1 · vence el 5 de febrero")).toBeOnTheScreen();
+    expect(inRow.getByText("Esta semana te queda 1 · vence el vie 5 feb")).toBeOnTheScreen();
     // FIX-089: the exception is the one Rubor pill.
     expect(within(inRow.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
   });

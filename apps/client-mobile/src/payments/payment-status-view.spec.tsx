@@ -67,7 +67,7 @@ describe("PaymentStatusView", () => {
       screen.getByText("Tu plan ya está activo. Nos vemos pronto en el estudio."),
     ).toBeOnTheScreen();
     expect(screen.getByText("Vence")).toBeOnTheScreen();
-    expect(screen.getByText("1 de diciembre")).toBeOnTheScreen();
+    expect(screen.getByText("mar 1 dic")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
     await fireEvent.press(screen.getByRole("button", { name: "Ir al inicio" }));
     expect(onPrimary).toHaveBeenCalled();

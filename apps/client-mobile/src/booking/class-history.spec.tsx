@@ -111,7 +111,7 @@ describe("Client Class History", () => {
     expect(screen.getAllByText("Reformer Pilates")).toHaveLength(2);
     expect(screen.getByText("Daniela Ortiz · Urubó")).toBeOnTheScreen();
     expect(
-      screen.getByLabelText("sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
+      screen.getByLabelText("Sábado 5 de septiembre, Mat Pilates, Daniela Ortiz · Urubó"),
     ).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });

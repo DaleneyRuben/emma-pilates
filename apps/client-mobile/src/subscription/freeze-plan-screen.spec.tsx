@@ -3,7 +3,7 @@ import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { dayMonth, weekdayDayMonth } from "./freeze-window";
+import { dayMonth } from "./freeze-window";
 
 // Walkthrough finding 51 (DES-015, follow-up 259 A): Congelar plan picks the
 // dates on a month calendar, says «hasta 15 días» and the moved end, refuses
@@ -56,6 +56,11 @@ async function openFreeze(routes: Parameters<typeof routeFetcher>[0]) {
   return { fetcher, screen };
 }
 
+// The calendar reads each day to a screen reader as «vie 16 de octubre».
+const calendarMonth = new Intl.DateTimeFormat("es-BO", { month: "long", timeZone: "UTC" });
+const calendarDay = (day: string) =>
+  `${Number(day.slice(8))} de ${calendarMonth.format(new Date(`${day}T12:00:00.000Z`))}`;
+
 async function pressDay(
   screen: Awaited<ReturnType<typeof render>>,
   day: string,
@@ -66,7 +71,7 @@ async function pressDay(
     shown.month += 1;
   }
   await fireEvent.press(
-    screen.getByRole("button", { name: new RegExp(`^${weekdayDayMonth(day)}`) }),
+    screen.getByRole("button", { name: new RegExp(`^\\S+ ${calendarDay(day)}`) }),
   );
 }
 
@@ -105,7 +110,7 @@ describe("Congelar plan", () => {
     await pressDay(screen, end, shown);
 
     expect(screen.getByText("7 días")).toBeOnTheScreen();
-    expect(screen.getByText(weekdayDayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
+    expect(screen.getByText(dayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
     expect(screen.getByText(`antes, el ${dayMonth(termEndsOn)}`)).toBeOnTheScreen();
     const left = within(screen.getByTestId("form-error-summary"));
     expect(left.getByText("Falta 1 dato para guardar")).toBeOnTheScreen();
@@ -134,7 +139,7 @@ describe("Congelar plan", () => {
 
     expect(
       screen.getByText(
-        `Puedes congelar hasta 15 días: el último día posible es el ${weekdayDayMonth(addCivilDays(start, 14))}.`,
+        `Puedes congelar hasta 15 días: el último día posible es el ${dayMonth(addCivilDays(start, 14))}.`,
       ),
     ).toBeOnTheScreen();
     expect(screen.queryByText("16 días")).toBeNull();

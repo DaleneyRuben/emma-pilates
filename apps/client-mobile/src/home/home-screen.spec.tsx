@@ -79,7 +79,7 @@ describe("Client Home", () => {
     expect(screen.getByTestId("home-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
     expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «vence el».
-    expect(screen.getByText("Vence el 11 de octubre")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el dom 11 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Activo")).toBeNull();
     expect(screen.queryByText("Ver detalle")).toBeNull();
     expect(screen.queryByRole("button", { name: "Mi plan" })).toBeNull();

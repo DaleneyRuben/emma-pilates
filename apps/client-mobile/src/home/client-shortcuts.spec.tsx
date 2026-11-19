@@ -120,7 +120,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     // The tiles carry no note with a Plan (follow-up 227); the summary is the hint.
     await waitFor(() => {
-      expect(screen.getByHintText("Próxima: 2 de octubre")).toBeOnTheScreen();
+      expect(screen.getByHintText("Próxima: vie 2 oct")).toBeOnTheScreen();
     });
     expect(screen.getByHintText("2 amigas invitadas")).toBeOnTheScreen();
 

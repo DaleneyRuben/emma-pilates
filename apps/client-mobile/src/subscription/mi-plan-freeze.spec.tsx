@@ -3,7 +3,7 @@ import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { dayMonth, freezeRange, weekdayDayMonth } from "./freeze-window";
+import { dayMonth, freezeRange } from "./freeze-window";
 
 // Walkthrough findings 51, 53 and 54 (DES-015, follow-up 259 A): Mi plan
 // keeps the plan card as its one colour, shows the Freeze as a card in each
@@ -78,7 +78,7 @@ describe("Mi plan with a Freeze", () => {
     expect(screen.getByText(freezeRange(start, end))).toBeOnTheScreen();
     await openFreezeRow(screen);
     expect(screen.getByText("Tu plan vencería el")).toBeOnTheScreen();
-    expect(screen.getByText(weekdayDayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
+    expect(screen.getByText(dayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
     expect(screen.queryByText("Tu solicitud de congelamiento está en revisión.")).toBeNull();
     expect(screen.queryByRole("button", { name: /^Congelar plan/ })).toBeNull();
 
@@ -143,13 +143,11 @@ describe("Mi plan with a Freeze", () => {
     });
 
     expect(
-      screen.getByText(
-        `Congelado · vuelves a reservar el ${weekdayDayMonth(addCivilDays(end, 1))}`,
-      ),
+      screen.getByText(`Congelado · vuelves a reservar el ${dayMonth(addCivilDays(end, 1))}`),
     ).toBeOnTheScreen();
-    expect(screen.getByText(`Congelado hasta el ${weekdayDayMonth(end)}`)).toBeOnTheScreen();
+    expect(screen.getByText(`Congelado hasta el ${dayMonth(end)}`)).toBeOnTheScreen();
     await openFreezeRow(screen);
-    expect(screen.getByText(weekdayDayMonth(addCivilDays(end, 1)))).toBeOnTheScreen();
+    expect(screen.getByText(dayMonth(addCivilDays(end, 1)))).toBeOnTheScreen();
   });
 
   it("shows a refused request and offers another", async () => {
@@ -213,7 +211,7 @@ describe("Mi plan with a Freeze", () => {
         ),
     });
 
-    expect(screen.getByText(`Congelado el ${weekdayDayMonth(day)}`)).toBeOnTheScreen();
+    expect(screen.getByText(`Congelado el ${dayMonth(day)}`)).toBeOnTheScreen();
   });
 
   it("re-reads the plan when the request was decided before the withdrawal", async () => {

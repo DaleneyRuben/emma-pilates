@@ -22,7 +22,7 @@ const guestPass = (usedClassStartsAt: string | null) => ({
     guestPass: { usedClassStartsAt },
   },
 });
-// Lun 16 de noviembre, 16:00 in La Paz.
+// Lun lun 16 nov, 16:00 in La Paz.
 const usedOn = "2026-11-16T20:00:00.000Z";
 
 async function openHome(view: ReturnType<typeof guestPass>) {
@@ -58,7 +58,7 @@ describe("Guest Pass copy", () => {
 
     const card = within(screen.getByTestId("home-guest-pass-card"));
     expect(card.getByText("Tu clase gratis de invitada")).toBeOnTheScreen();
-    expect(card.getByText("Úsala antes del 7 de diciembre")).toBeOnTheScreen();
+    expect(card.getByText("Úsala antes del lun 7 dic")).toBeOnTheScreen();
     expect(screen.queryByText(/clases? restantes?/)).toBeNull();
     expect(screen.queryByRole("progressbar")).toBeNull();
 
@@ -67,7 +67,7 @@ describe("Guest Pass copy", () => {
 
     const hero = within(screen.getByTestId("subscription-guest-pass"));
     expect(hero.getByText("Tu clase gratis de invitada")).toBeOnTheScreen();
-    expect(hero.getByText("Úsala antes del 7 de diciembre")).toBeOnTheScreen();
+    expect(hero.getByText("Úsala antes del lun 7 dic")).toBeOnTheScreen();
     expect(screen.queryByText(/clases restantes/)).toBeNull();
     expect(screen.queryByText("Clases extra: 1 · Cortesía")).toBeNull();
     expect(screen.queryByRole("button", { name: /^Renovar mi plan/ })).toBeNull();

@@ -64,11 +64,11 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("5")).toBeOnTheScreen();
     expect(screen.getByText("de 12 clases restantes")).toBeOnTheScreen();
     expect(screen.getByText("Empezó")).toBeOnTheScreen();
-    expect(screen.getByText("25 de agosto")).toBeOnTheScreen();
+    expect(screen.getByText("mar 25 ago")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «Vence», not «Pagado hasta».
     expect(screen.getByText("Vence")).toBeOnTheScreen();
-    expect(screen.getByText("24 de septiembre")).toBeOnTheScreen();
-    expect(screen.getByText("Vence el 24 de septiembre")).toBeOnTheScreen();
+    expect(screen.getByText("jue 24 sept")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el jue 24 sept")).toBeOnTheScreen();
     // Finding 54 (follow-up 259 A): Reservar lives on the tab bar, not here.
     expect(screen.queryByRole("button", { name: "Reservar una clase" })).toBeNull();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
@@ -88,9 +88,7 @@ describe("Client Subscription detail", () => {
     });
 
     expect(
-      screen.getByText(
-        "5 del plan + 1 de regalo (regalo de bienvenida) · vence el 24 de septiembre",
-      ),
+      screen.getByText("5 del plan + 1 de regalo (regalo de bienvenida) · vence el jue 24 sept"),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
   });
@@ -100,8 +98,8 @@ describe("Client Subscription detail", () => {
 
     expect(screen.getByText("Por vencer")).toBeOnTheScreen();
     // FIX-082: the end is said once, on the card and in the details.
-    expect(screen.getByText("Vence el 24 de septiembre")).toBeOnTheScreen();
-    expect(screen.queryByText("Tu plan vence el 24 de septiembre.")).toBeNull();
+    expect(screen.getByText("Vence el jue 24 sept")).toBeOnTheScreen();
+    expect(screen.queryByText("Tu plan vence el jue 24 sept.")).toBeNull();
   });
 
   it("tells the Client when no classes remain", async () => {
@@ -125,9 +123,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
     const screen = await openSubscription(subscription("active", 5));
 
     expect(
-      screen.getByText(
-        "Eliges cuándo empieza el nuevo: entre el 25 de septiembre y el 22 de octubre.",
-      ),
+      screen.getByText("Eliges cuándo empieza el nuevo: entre el vie 25 sept y el jue 22 oct."),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Renovar mi plan" }));
     await waitFor(() => {
@@ -149,7 +145,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
     });
 
     expect(screen.getByText("Siguiente plan")).toBeOnTheScreen();
-    expect(screen.getByText("25 de septiembre")).toBeOnTheScreen();
+    expect(screen.getByText("vie 25 sept")).toBeOnTheScreen();
   });
 
   // Walkthrough finding 98: she already renewed, so the discount is kept.
@@ -168,7 +164,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
     });
 
     expect(screen.queryByText(/Renueva antes del/)).toBeNull();
-    expect(screen.getByText("Tu plan siguiente empieza el 25 de septiembre.")).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan siguiente empieza el vie 25 sept.")).toBeOnTheScreen();
   });
 
   it("names the founder renewal deadline from the current Subscription", async () => {
@@ -179,7 +175,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
 
     // Walkthrough finding 49: the deadline says why, without «fundadora».
     expect(
-      screen.getByText("Renueva antes del 1 de octubre y mantienes tu 15 % de descuento."),
+      screen.getByText("Renueva antes del jue 1 oct y mantienes tu 15 % de descuento."),
     ).toBeOnTheScreen();
     expect(screen.queryByText(/fundadora/i)).toBeNull();
   });
@@ -210,7 +206,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
     });
 
     expect(screen.getByText("Vencido")).toBeOnTheScreen();
-    expect(screen.getByText("Venció el 24 de septiembre")).toBeOnTheScreen();
+    expect(screen.getByText("Venció el jue 24 sept")).toBeOnTheScreen();
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("Elige tu próximo plan")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Renovar mi plan" })).toBeNull();

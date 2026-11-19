@@ -192,7 +192,7 @@ describe("Client Browse Sessions", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
 
-    const offer = `Ver el ${formatSessionDate(laterStart.toISOString()).split(" ").slice(0, 2).join(" ")}`;
+    const offer = `Ver el ${formatSessionDate(laterStart.toISOString()).split(" ").slice(0, 2).join(" ").toLowerCase()}`;
     await waitFor(() => {
       expect(screen.getByRole("button", { name: offer })).toBeOnTheScreen();
     });

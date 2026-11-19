@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
-import { weekdayDayMonth } from "../subscription/freeze-window";
+import { dayMonth } from "../subscription/freeze-window";
 import { jsonResponse } from "../test-support";
 import { detail, openDetail, startsAt, subscription } from "./session-detail-test-support";
 
@@ -40,19 +40,9 @@ describe("Client Session detail on a frozen day", () => {
     expect(button).toHaveProp("accessibilityHint", expect.stringMatching(/^Podrás reservar desde/));
     expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
     expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
-    // Review of FIX-082: the whole weekday in a sentence, «lunes 23».
-    const reopens = weekdayDayMonth(addCivilDays(endsOn, 1)).split(" ");
-    const longDay = {
-      dom: "domingo",
-      lun: "lunes",
-      mar: "martes",
-      mié: "miércoles",
-      jue: "jueves",
-      vie: "viernes",
-      sáb: "sábado",
-    }[reopens[0]!];
+    // FIX-090: the shared list date inside the sentence, «lun 23 nov».
     expect(
-      screen.getByText(`Podrás reservar desde el ${longDay} ${reopens.slice(1).join(" ")}.`),
+      screen.getByText(`Podrás reservar desde el ${dayMonth(addCivilDays(endsOn, 1))}.`),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Se descuenta 1 clase de tu plan")).toBeNull();
   });
