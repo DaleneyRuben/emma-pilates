@@ -14,8 +14,10 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
+  boliviaCivilDate,
   Heading,
   LoadingState,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -28,9 +30,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { approvedFreeze } from "../booking/frozen-day";
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
+import { freezeToAnnounce, HomeFreezeNotice } from "./home-freeze-notice";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
@@ -144,6 +148,8 @@ export function HomeScreen() {
     hasActivePlan && bookings.data?.status === 200
       ? nextBookedClass(bookings.data.data)
       : undefined;
+  const today = boliviaCivilDate(new Date());
+  const freezeNotice = hasActivePlan ? freezeToAnnounce(approvedFreeze(view, today), today) : null;
   const evaluationTile = {
     hint: evaluationShortcut(nextEvaluation?.startsAt),
     icon: "health",
@@ -169,6 +175,30 @@ export function HomeScreen() {
           onProfile={() => navigation.navigate("ProfileTab")}
           profile={loadedProfile.data}
         />
+        {standing.kind === "in_review" ? (
+          <PaymentInReviewCard
+            hasActivePlan={hasActivePlan}
+            onOpen={() => navigation.navigate("PaymentStatus")}
+            payment={standing.payment}
+          />
+        ) : standing.kind === "rejected" ? (
+          <PaymentRejectedCard
+            busy={resendReceipt.busy}
+            error={resendReceipt.error}
+            onResend={() => void resendReceipt.resend(standing.payment.planId)}
+            payment={standing.payment}
+          />
+        ) : null}
+        {freezeNotice === null ? null : (
+          <HomeFreezeNotice
+            freeze={freezeNotice}
+            onOpen={() => navigation.navigate("Subscription")}
+          />
+        )}
+        {nextClass === undefined ? null : (
+          // C7 A (owner 2026-11-19): the next class leads Inicio.
+          <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
+        )}
         <PromotionsCarousel
           loading={promotions.isPending}
           onImageMissing={() => void promotions.refetch()}
@@ -176,13 +206,22 @@ export function HomeScreen() {
         />
         {hasActivePlan && view.subscription?.guestPass === undefined ? (
           // FIX-082 (Inicio option A): the one solid action, under the promotion;
-          // a Guest Pass card carries its own.
+          // a Guest Pass card carries its own. A rejected receipt's block holds
+          // the solid action, so booking turns secondary there (C8 C).
           <View style={styles.underPromotion} testID="home-book-frame">
-            <PrimaryButton
-              label="Reservar una clase"
-              onPress={() => navigation.navigate("Booking")}
-              testID="home-book"
-            />
+            {standing.kind === "rejected" ? (
+              <OutlinedButton
+                label="Reservar una clase"
+                onPress={() => navigation.navigate("Booking")}
+                testID="home-book"
+              />
+            ) : (
+              <PrimaryButton
+                label={nextClass === undefined ? "Reservar una clase" : "Reservar otra clase"}
+                onPress={() => navigation.navigate("Booking")}
+                testID="home-book"
+              />
+            )}
           </View>
         ) : null}
         {hasActivePlan && view.subscription?.guestPass !== undefined ? (
@@ -197,27 +236,12 @@ export function HomeScreen() {
             onPress={() => navigation.navigate("Subscription")}
             subscription={view.subscription!}
           />
-        ) : standing.kind === "in_review" ? (
-          <PaymentInReviewCard
-            onOpen={() => navigation.navigate("PaymentStatus")}
-            payment={standing.payment}
-          />
-        ) : standing.kind === "rejected" ? (
-          <PaymentRejectedCard
-            busy={resendReceipt.busy}
-            error={resendReceipt.error}
-            onResend={() => void resendReceipt.resend(standing.payment.planId)}
-            payment={standing.payment}
-          />
-        ) : (
+        ) : standing.kind === "none" ? (
           <PurchasePlanCard
             onPurchase={() => navigation.navigate("Plans")}
             plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
           />
-        )}
-        {nextClass === undefined ? null : (
-          <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
-        )}
+        ) : null}
         <ShortcutSection>
           {hasActivePlan ? (
             <ShortcutTiles>

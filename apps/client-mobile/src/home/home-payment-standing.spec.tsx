@@ -39,10 +39,11 @@ describe("Client Home with a payment in review or rejected", () => {
       "/api/v1/payments/current": () => jsonResponse(pendingPayment),
     });
 
-    expect(screen.getByText("En revisión")).toBeOnTheScreen();
-    // The card's title and the locked booking row's note.
-    expect(screen.getAllByText("Tu pago está en revisión")).toHaveLength(2);
-    expect(screen.getByText("Paquete de 8 clases · Bs 502")).toBeOnTheScreen();
+    // C8 A: the block's eyebrow, and the locked booking row's note.
+    expect(screen.getByText("TU PAGO ESTÁ EN REVISIÓN")).toBeOnTheScreen();
+    expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 502")).toBeOnTheScreen();
     expect(screen.getByText("Te avisamos apenas el estudio lo confirme.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
     expect(screen.queryByText("Elige tu plan y empieza a moverte")).toBeNull();
@@ -62,10 +63,12 @@ describe("Client Home with a payment in review or rejected", () => {
       "/api/v1/payments/current": () => jsonResponse(rejectedPayment),
     });
 
-    expect(screen.getByText("Pago rechazado")).toBeOnTheScreen();
-    expect(screen.getByText("No pudimos confirmar tu pago")).toBeOnTheScreen();
+    // C8 C: one Palo de rosa block with the reason and what to do.
+    expect(screen.getByText("NO PUDIMOS CONFIRMAR TU PAGO")).toBeOnTheScreen();
     expect(screen.getByText("El monto del comprobante no coincide con el plan.")).toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases · Bs 560")).toBeOnTheScreen();
+    expect(screen.getByText("Sube uno nuevo para activar tu plan.")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Tu pago no se confirmó")).toBeOnTheScreen();
     // Screen readers hear why the row is locked (its label hides the note).
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
@@ -132,6 +135,7 @@ describe("Client Home with a payment in review or rejected", () => {
     });
   });
 
+  // C8 A (owner 2026-11-19): the renewal in review is said on top as well.
   it("keeps the active Plan on Inicio while a renewal is in review", async () => {
     const screen = await openHome({
       "/api/v1/clients/current/subscription": () =>
@@ -150,6 +154,7 @@ describe("Client Home with a payment in review or rejected", () => {
     });
 
     expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen();
-    expect(screen.queryByTestId("home-payment-card")).toBeNull();
+    expect(screen.getByTestId("home-payment-card")).toBeOnTheScreen();
+    expect(screen.getByText(/Mientras, sigues usando tu plan actual\.$/)).toBeOnTheScreen();
   });
 });
