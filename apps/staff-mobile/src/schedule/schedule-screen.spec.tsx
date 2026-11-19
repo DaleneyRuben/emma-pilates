@@ -25,7 +25,7 @@ async function openSchedule(role: "assistant" | "coordinator", profile: unknown)
   );
   await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
   await fireEvent.press(screen.getByTestId("tab-schedule"));
-  await waitFor(() => expect(screen.getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByText("Emma Vargas · 50 min")).toBeOnTheScreen());
   return screen;
 }
 
@@ -39,11 +39,13 @@ describe("Horario (v2 HOR boards)", () => {
     const screen = await openSchedule("assistant", assistant);
 
     expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
-    // FIX-083 (Horario pick A): one plain card for every role, places in grey.
+    // FIX-089 (ClaseE): the shared class row in one card, the places «N de M».
     expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
-    expect(screen.getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen();
-    expect(screen.getByText("6 de 12 lugares")).toHaveStyle({ color: "#7A716D" });
-    expect(screen.getByText("50 min")).toBeOnTheScreen();
+    const row = within(screen.getByTestId("schedule-session-session-1"));
+    expect(row.getByText("Reformer Pilates")).toBeOnTheScreen();
+    expect(row.getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(row.getByText("6 de 12")).toHaveStyle({ color: "#93615D", fontWeight: "600" });
+    expect(screen.getByTestId("class-list")).toBeOnTheScreen();
     expect(screen.queryByText("6 cupos")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
@@ -66,7 +68,7 @@ describe("Horario (v2 HOR boards)", () => {
     expect(
       screen.getByText("Solo lectura. Para reservar, abre la ficha de una clienta."),
     ).toBeOnTheScreen();
-    expect(screen.getByText("6 de 12 lugares")).toBeOnTheScreen();
+    expect(screen.getByText("6 de 12")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar para una clienta" })).toBeNull();
     expect(screen.queryByTestId("icon-row-disc")).toBeNull();
 
@@ -130,7 +132,7 @@ describe("Horario (v2 HOR boards)", () => {
         height: 20,
       }),
     );
-    expect(within(emma).getByText("Reformer Pilates · Emma Vargas")).toBeOnTheScreen();
+    expect(within(emma).getByText("Emma Vargas · 50 min")).toBeOnTheScreen();
     expect(
       within(screen.getByTestId("schedule-session-session-2")).getByText("AS"),
     ).toBeOnTheScreen();
@@ -172,7 +174,7 @@ describe("Horario (v2 HOR boards)", () => {
     const row = await screen.findByTestId("schedule-cancelled-session-2");
     expect(within(row).getByText("Pilates Prenatal")).toBeOnTheScreen();
     expect(within(row).getByText("Cancelada por el estudio")).toBeOnTheScreen();
-    expect(screen.queryByText("12 de 12 lugares")).toBeNull();
+    expect(screen.queryByText("12 de 12")).toBeNull();
     expect(screen.queryByTestId("schedule-session-session-2")).toBeNull();
   });
 
@@ -197,7 +199,10 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    expect(await screen.findByText("12 de 12 · lleno")).toBeOnTheScreen();
+    // A full class is the exception, so it alone takes the pill.
+    expect(await screen.findByTestId("exception-pill")).toBeOnTheScreen();
+    expect(screen.getByText("Completa")).toBeOnTheScreen();
+    expect(screen.queryByText("12 de 12")).toBeNull();
     expect(screen.getByText("2 canceladas por mínimo")).toBeOnTheScreen();
     expect(screen.getByText("Ver")).toBeOnTheScreen();
   });

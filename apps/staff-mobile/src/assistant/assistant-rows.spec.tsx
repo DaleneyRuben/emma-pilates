@@ -53,19 +53,19 @@ describe("Assistant rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    // v2 S07: the start in Lora 20, the class over its Trainer, the seat pill.
+    // FIX-089 (ClaseE): the shared class row, the places «N de M», no pill.
     const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(card.getByText("6 cupos").parent).toHaveStyle({ backgroundColor: "#F2E4E1" });
+    expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(card.getByText("6 de 12")).toHaveStyle({ fontWeight: "600" });
+    expect(card.queryByTestId("exception-pill")).toBeNull();
     expect(
       screen.getByText(/^(Hoy|[A-ZÁÉÍÓÚ][a-záéíóú]+ \d+ de [a-z]+) · 1 clase$/),
     ).toBeOnTheScreen();
   });
 
-  // MOB-047: follow-up 84's seat pill — the seats on Palo de rosa tinte, a
-  // full class on the neutral pill, 12 pt weight 500, never red, no dot.
-  it("draws a full class on the neutral pill", async () => {
+  // FIX-089: a full class is the exception, so only it takes the Rubor pill.
+  it("draws a full class with the exception pill", async () => {
     const full = { ...session, id: "session-full", bookedCount: 12, availableSeats: 0 };
     const screen = await openLucia({
       ...assistantRoutes(),
@@ -80,7 +80,9 @@ describe("Assistant rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
-    expect(cards[0].getByText("6 cupos").parent).toHaveStyle({ backgroundColor: "#F2E4E1" });
-    expect(cards[1].getByText("Completa").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
+    expect(cards[0].getByText("6 de 12")).toBeOnTheScreen();
+    expect(cards[0].queryByTestId("exception-pill")).toBeNull();
+    expect(cards[1].getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(cards[1].getByText("Completa")).toBeOnTheScreen();
   });
 });

@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor, within } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -6,77 +6,106 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support"
 
 jest.setTimeout(20_000);
 
-const hidden = { includeHiddenElements: true };
+const minute = 60_000;
 
-const session = (sessionId: string, classTypeName: string, bookedCount: number) => ({
-  bookedCount,
-  branchName: "Sopocachi",
-  capacity: 8,
-  classTypeName,
-  endsAt: "2026-09-10T15:00:00.000Z",
-  sessionId,
-  startsAt: "2026-09-10T14:00:00.000Z",
-});
+// Starts `offset` minutes from now (10:00 in La Paz under the frozen clock).
+const session = (sessionId: string, classTypeName: string, bookedCount: number, offset: number) => {
+  const startsAt = new Date(Date.now() + offset * minute);
+  return {
+    bookedCount,
+    branchName: "Sopocachi",
+    capacity: 8,
+    classTypeName,
+    endsAt: new Date(startsAt.getTime() + 50 * minute).toISOString(),
+    sessionId,
+    startsAt: startsAt.toISOString(),
+  };
+};
 
-// v2 S02: the start in Lora 20 with its length, the class over «Branch · booked»,
-// a pill, and a chevron.
+const renderAgenda = (sessions: unknown[]) =>
+  render(
+    <App
+      runtime={createStaffRuntime(
+        routeFetcher({
+          "/api/v1/trainer/sessions": () => jsonResponse(sessions),
+          "/api/v1/trainer/sessions/session-2/roster": () =>
+            jsonResponse({
+              sessionId: "session-2",
+              classTypeName: "Reformer Pilates",
+              branchName: "Sopocachi",
+              startsAt: (sessions[1] as { startsAt: string }).startsAt,
+              endsAt: (sessions[1] as { endsAt: string }).endsAt,
+              capacity: 8,
+              bookings: [],
+            }),
+          "/api/v1/staff-members/current": () =>
+            jsonResponse({
+              id: "staff-1",
+              name: "Emma Vargas",
+              email: "emma.vargas@example.com",
+              phone: null,
+              role: "trainer",
+              branches: [],
+            }),
+          "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+        }),
+      )}
+    />,
+  );
+
+// FIX-089 (ClaseE): the next class is the Palo de rosa hero; the others are
+// rows of one card with the places in words, never a «Con cupos» pill.
 describe("Trainer agenda rows", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("draws the agenda card as the frame does", async () => {
-    const screen = await render(
-      <App
-        runtime={createStaffRuntime(
-          routeFetcher({
-            "/api/v1/trainer/sessions": () =>
-              jsonResponse([
-                session("session-1", "Reformer Pilates", 6),
-                session("session-2", "Mat Pilates", 8),
-              ]),
-            "/api/v1/staff-members/current": () =>
-              jsonResponse({
-                id: "staff-1",
-                name: "Emma Vargas",
-                email: "emma.vargas@example.com",
-                phone: null,
-                role: "trainer",
-                branches: [],
-              }),
-            "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
-          }),
-        )}
-      />,
-    );
+  it("puts the day's next class in the hero and the others in one class list", async () => {
+    const screen = await renderAgenda([
+      session("session-1", "Mat Pilates", 3, -90),
+      session("session-2", "Reformer Pilates", 2, 40),
+      session("session-3", "Mat Pilates", 8, 180),
+    ]);
 
-    await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
-    });
-    expect(screen.getByText("Reformer Pilates")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
-    expect(screen.getAllByText("10:00")[0]).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 20,
-    });
-    expect(screen.getAllByText("60 min")[0]).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(screen.getByText("Sopocachi · 6 de 8 reservados")).toHaveStyle({
-      color: "#6F6662",
-      fontSize: 13,
-    });
-    expect(screen.getByText("Hoy · 2 clases")).toBeOnTheScreen();
-    const open = within(
-      screen.getByRole("button", {
-        name: "Reformer Pilates, 10:00 – 11:00, Sopocachi, 6 de 8 reservados, Con cupos",
-      }),
-    );
-    expect(open.getByText("Con cupos").parent).toHaveStyle({ backgroundColor: "#F2E4E1" });
-    const full = within(
-      screen.getByRole("button", {
-        name: "Mat Pilates, 10:00 – 11:00, Sopocachi, 8 de 8 reservados, Completa",
-      }),
-    );
-    expect(full.getByText("Completa").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
-    expect(screen.getAllByTestId("chevron", hidden)).toHaveLength(2);
+    await waitFor(() => expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen());
+    const hero = within(screen.getByTestId("next-class-hero"));
+    expect(hero.getByText("PRÓXIMA · EN 40 MIN")).toBeOnTheScreen();
+    expect(hero.getByText("10:40 · Reformer Pilates")).toBeOnTheScreen();
+    expect(hero.getByText("2 de 8")).toBeOnTheScreen();
+    expect(hero.getByText("Sopocachi")).toBeOnTheScreen();
+
+    const list = within(screen.getByTestId("class-list"));
+    expect(list.getByText("08:30")).toBeOnTheScreen();
+    expect(list.getByText("13:00")).toBeOnTheScreen();
+    expect(list.queryByText("10:40")).toBeNull();
+    expect(list.getByText("3 de 8")).toBeOnTheScreen();
+    expect(list.getByText("8 de 8")).toBeOnTheScreen();
+    expect(screen.getByText("Hoy · 3 clases")).toBeOnTheScreen();
+    expect(screen.queryByText("Con cupos")).toBeNull();
+    expect(screen.queryByText("Completa")).toBeNull();
+    expect(screen.queryByTestId("exception-pill")).toBeNull();
+
+    await fireEvent.press(screen.getByTestId("next-class-hero"));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen());
+  });
+
+  it("says only «Próxima» when the next class is more than an hour away", async () => {
+    const screen = await renderAgenda([
+      session("session-1", "Mat Pilates", 0, 120),
+      session("session-2", "Reformer Pilates", 0, 240),
+    ]);
+
+    await waitFor(() => expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen());
+    expect(within(screen.getByTestId("next-class-hero")).getByText("PRÓXIMA")).toBeOnTheScreen();
+    expect(within(screen.getByTestId("class-list")).getByText("14:00")).toBeOnTheScreen();
+  });
+
+  it("draws no hero once the day's classes have all started", async () => {
+    const screen = await renderAgenda([session("session-1", "Mat Pilates", 3, -90)]);
+
+    await waitFor(() => expect(screen.getByTestId("class-list")).toBeOnTheScreen());
+    expect(screen.queryByTestId("next-class-hero")).toBeNull();
+    expect(screen.getByText("08:30")).toBeOnTheScreen();
   });
 });

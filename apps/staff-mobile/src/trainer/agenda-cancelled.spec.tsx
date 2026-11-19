@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -49,15 +49,15 @@ const renderAgenda = (sessions: unknown[]) => {
   return { fetcher, screen: render(<App runtime={createStaffRuntime(fetcher)} />) };
 };
 
-// FIX-042 (S02 and S02b, follow-up 245): the day's cancelled classes keep
-// their card, muted, with the cause and no way in.
+// FIX-042 (S02 and S02b, follow-up 245) and FIX-089 (ClaseE): the day's
+// cancelled classes wait folded at the end, each with its cause and no way in.
 describe("Trainer agenda with cancelled classes", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("asks for the day's cancelled classes and shows each in place, muted and closed", async () => {
+  it("asks for the day's cancelled classes and folds them at the end, closed", async () => {
     const { fetcher, screen: rendering } = renderAgenda([
       session("s-1", "Reformer Pilates", "11"),
       session("s-2", "Mat Pilates", "16", studio),
@@ -74,10 +74,13 @@ describe("Trainer agenda with cancelled classes", () => {
         (url) => url.includes("/api/v1/trainer/sessions") && url.includes("includeCancelled=true"),
       ),
     ).toBe(true);
+    expect(screen.queryByText("Cancelada por el estudio")).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: /^1 cancelada por el estudio/ }));
     const cancelled = screen.getByLabelText("Mat Pilates, 12:00 – 12:50, Cancelada por el estudio");
     expect(cancelled).not.toHaveProp("accessibilityRole", "button");
     expect(screen.getByText("Cancelada por el estudio")).toBeOnTheScreen();
-    expect(screen.getAllByTestId("chevron", hidden)).toHaveLength(2);
+    // The next class is the hero; the other standing class opens its roster.
+    expect(screen.getAllByTestId("chevron", hidden)).toHaveLength(1);
   });
 
   it("shows a day whose classes were all cancelled instead of «Hoy no tienes clases»", async () => {
@@ -91,6 +94,8 @@ describe("Trainer agenda with cancelled classes", () => {
       expect(screen.getByText("Hoy · 2 canceladas")).toBeOnTheScreen();
     });
     expect(screen.queryByText("Hoy no tienes clases")).toBeNull();
+    expect(screen.queryByTestId("next-class-hero")).toBeNull();
+    await fireEvent.press(screen.getByRole("button", { name: /^2 canceladas por mínimo/ }));
     expect(screen.getAllByText("Cancelada · mínimo no alcanzado")).toHaveLength(2);
     expect(screen.queryAllByTestId("chevron", hidden)).toHaveLength(0);
   });

@@ -34,7 +34,7 @@ describe("Assistant booked Session", () => {
     clearMobileQueryCache();
   });
 
-  it("marks the Client's own booking on the list with the neutral «Ya reservada» pill", async () => {
+  it("marks the Client's own booking on the list with the «Ya reservada» exception pill", async () => {
     const screen = await openBrowse(bookedRoutes());
 
     const card = within(
@@ -45,9 +45,9 @@ describe("Assistant booked Session", () => {
     await waitFor(() => {
       expect(card.getByText("Ya reservada")).toBeOnTheScreen();
     });
-    expect(card.queryByText("6 cupos")).toBeNull();
-    expect(card.getByText("Ya reservada").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
-    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#4A4A4A", fontSize: 12 });
+    expect(card.queryByText("6 de 12")).toBeNull();
+    expect(card.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#93615D", fontSize: 12 });
   });
 
   it("keeps the seat count on a Session she only waits for", async () => {
@@ -58,7 +58,7 @@ describe("Assistant booked Session", () => {
     });
 
     const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    expect(card.getByText("6 cupos")).toBeOnTheScreen();
+    expect(card.getByText("6 de 12")).toBeOnTheScreen();
     expect(card.queryByText("Ya reservada")).toBeNull();
   });
 

@@ -102,8 +102,8 @@ describe("Administrator rows", () => {
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeOnTheScreen();
   });
 
-  // v2 S13: the start in Lora 20, the class over its Trainer, the bookings pill.
-  it("draws each class to cancel as a v2 row with its bookings", async () => {
+  // FIX-089 (ClaseE): the shared class row, its bookings as places, no pill.
+  it("draws each class to cancel as a class row with its places", async () => {
     const empty = { ...session, id: "session-empty", bookedCount: 0, availableSeats: 12 };
     const screen = await openPayments([session, empty]);
 
@@ -114,9 +114,11 @@ describe("Administrator rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
-    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
-    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(cards[0].getByText("6 reservas").parent).toHaveStyle({ backgroundColor: "#E6DBD0" });
-    expect(cards[1].getByText("Sin reservas")).toBeOnTheScreen();
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
+    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(cards[0].getByText("6 de 12")).toHaveStyle({ fontWeight: "600" });
+    expect(cards[1].getByText("0 de 12")).toBeOnTheScreen();
+    expect(screen.queryByTestId("exception-pill")).toBeNull();
+    expect(screen.getByTestId("class-list")).toBeOnTheScreen();
   });
 });
