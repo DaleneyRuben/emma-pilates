@@ -50,7 +50,7 @@ test("serves the security headers and stays within its policy", async ({
   await sidebar(page)
     .getByRole("link", { name: /^Dinero(,|$)/ })
     .click();
-  await page.getByRole("button", { name: "Isabel Arce" }).click();
+  await page.getByRole("button", { name: "Isabel Arce", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "Revisar pago" });
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
   expect(await bodyScrollable(page)).toBe(false);
