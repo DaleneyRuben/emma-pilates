@@ -188,6 +188,8 @@ describe("Client My Bookings", () => {
       expect(left).toHaveBeenCalled();
       expect(screen.queryByText("Pilates Prenatal")).not.toBeOnTheScreen();
     });
+    // FIX-090 (states review Y1): leaving says so afterwards.
+    expect(screen.getByText("Saliste de la lista de espera")).toBeOnTheScreen();
   });
 
   it("reschedules a Booking inside the Cancellation Window to a same-day Session", async () => {
