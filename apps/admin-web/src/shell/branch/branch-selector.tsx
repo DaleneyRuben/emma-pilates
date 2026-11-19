@@ -25,7 +25,7 @@ import { useBranchSelection } from "./use-branch-selection";
 
 // AW34's group label: 10px uppercase, 0.18em, Texto muy tenue.
 const labelClass =
-  "px-4 pt-1 pb-2 font-sans text-[10px] font-medium tracking-[0.18em] text-texto-muy-tenue uppercase";
+  "px-4 pt-1 pb-2 font-sans text-pie font-medium tracking-[0.18em] text-texto-muy-tenue uppercase";
 
 // A listbox with a roving tabindex: Tab reaches the selected Branch, the
 // arrow keys (and Home/End) move between the options, Enter or Space choose.
