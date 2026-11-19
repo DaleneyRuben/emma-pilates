@@ -1,5 +1,12 @@
 import type { ClientEvaluationDto, EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import { BodyText, colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
@@ -11,7 +18,10 @@ const turno = (instant: string) => {
   return `${date.charAt(0).toLowerCase()}${date.slice(1)}, ${clockTime(instant)}`;
 };
 
-/** The band over the turnos while she moves an Evaluation (follow-up 264). */
+/**
+ * The band over the turnos while she moves an Evaluation (follow-up 264): a
+ * Crema card in palette B, not a tint (FIX-089).
+ */
 export function MovingBand({
   evaluation,
   onBack,
@@ -54,9 +64,8 @@ export function NoSlots({
 
 const styles = StyleSheet.create({
   band: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.button,
     flexDirection: "row",
     gap: spacing.sm,
     paddingLeft: spacing.lg,
@@ -64,10 +73,10 @@ const styles = StyleSheet.create({
   },
   bandButton: { justifyContent: "center", minHeight: 44, paddingHorizontal: spacing.md },
   bandButtonLabel: {
-    color: colors.primaryOnTint,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
   },
-  bandText: { color: colors.primaryOnTint, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  bandText: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
 });

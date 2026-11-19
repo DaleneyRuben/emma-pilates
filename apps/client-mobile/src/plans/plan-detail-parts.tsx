@@ -18,7 +18,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { formatBolivianos } from "./plan-format";
 import { planValidity } from "./plans-screen";
 
-/** C09's hero: the Plan, its validity, the price in Lora 32, and the struck list price. */
+/**
+ * C09's hero: its validity, the price in Lora 32, and the struck list price.
+ * The header above names the Plan, so the hero does not repeat it (FIX-089).
+ */
 export function PlanHero({ plan }: { plan: PlanDto }) {
   const percent = discountPercent(plan);
   return (
@@ -26,7 +29,6 @@ export function PlanHero({ plan }: { plan: PlanDto }) {
       note={planValidity(plan)}
       pill={percent === null ? undefined : `${percent} % de descuento`}
       testID="plan-hero"
-      title={plan.name}
     >
       <View style={styles.prices}>
         <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>

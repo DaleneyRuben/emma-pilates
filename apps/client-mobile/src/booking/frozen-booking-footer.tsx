@@ -38,11 +38,13 @@ export function FrozenBookingFooter({
         <Text style={[styles.note, styles.strong]}>
           {`Tu plan está congelado ${range.charAt(0).toLowerCase()}${range.slice(1)}.`}
         </Text>
-        <Text style={styles.note}>
-          {`Podrás reservar desde el ${longWeekdayDayMonth(addCivilDays(endsOn, 1))}.`}
-        </Text>
       </View>
-      <PrimaryButton disabled label="No disponible durante el congelamiento" />
+      {/* Palette B: the reason line sits under the off button (FIX-089). */}
+      <PrimaryButton
+        disabled
+        disabledReason={`Podrás reservar desde el ${longWeekdayDayMonth(addCivilDays(endsOn, 1))}.`}
+        label="No disponible durante el congelamiento"
+      />
       <TextButton label="Elegir otro día" onPress={onOtherDay} />
     </>
   );

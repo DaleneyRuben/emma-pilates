@@ -40,8 +40,9 @@ function capitalized(text: string): string {
 }
 
 /**
- * C04's hero: the date, the class, the time and the seats on Rosa profundo;
- * `quiet` draws them on Lino as plain text, for a day she cannot book
+ * C04's hero: the date, the time and the seats on Palo de rosa; the header
+ * above names the class, so the hero does not repeat it (FIX-089). `quiet`
+ * draws them on a Crema card as plain text, for a day she cannot book
  * (FIX-082, frozen-plan option B).
  */
 export function SessionHero({
@@ -57,7 +58,6 @@ export function SessionHero({
     return (
       <View style={styles.quietHero} testID="session-hero">
         <Text style={styles.quietEyebrow}>{capitalized(formatSessionDate(detail.startsAt))}</Text>
-        <Text style={styles.quietTitle}>{detail.classType.name}</Text>
         <Text style={styles.quietNote}>
           {`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
         </Text>
@@ -73,7 +73,6 @@ export function SessionHero({
       note={`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
       pill={full ? "Lleno" : undefined}
       testID="session-hero"
-      title={detail.classType.name}
     >
       <CapacityBlock
         availableSeats={detail.availableSeats}
@@ -157,7 +156,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   quietEyebrow: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
@@ -165,12 +164,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   quietHero: { ...surfaces.card, gap: spacing.sm, padding: spacing.xlSm },
-  quietNote: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
-  quietTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 24,
-    lineHeight: 29,
-  },
-  value: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  quietNote: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  value: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
 });

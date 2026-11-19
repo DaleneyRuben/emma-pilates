@@ -64,7 +64,9 @@ const scarcityLine = (placesLeft: number) =>
 /**
  * Walkthrough n.º 13: the launch banner while the 15 % applies to this
  * Client, in the strong tone with the count when few places are left (C08b).
- * It never says «Fundadora» nor how many places there were.
+ * It never says «Fundadora» nor how many places there were. Palette B
+ * (FIX-089): a Crema card with a plain icon; the strong tone is the screen's
+ * one Palo de rosa hero.
  */
 function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
   const strong = placesLeft !== null;
@@ -75,7 +77,7 @@ function LaunchBanner({ placesLeft }: { placesLeft: number | null }) {
       testID="plans-launch-banner"
     >
       <Glyph
-        color={strong ? colors.white : colors.primaryOnTint}
+        color={strong ? colors.onEmphasis : colors.text}
         name={strong ? "flame" : "tag"}
         size={20}
         strokeWidth={1.6}
@@ -186,23 +188,22 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
 
 const styles = StyleSheet.create({
   banner: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 14,
     flexDirection: "row",
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  bannerStrong: { backgroundColor: colors.emphasis },
+  bannerStrong: { ...surfaces.emphasis, borderWidth: 0 },
   bannerText: {
-    color: colors.primaryOnTint,
+    color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
   },
-  bannerTextStrong: { color: colors.white },
+  bannerTextStrong: { color: colors.onEmphasis },
   current: {
     color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
   listPrice: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.label,
     textDecorationLine: "line-through",
@@ -243,5 +244,5 @@ const styles = StyleSheet.create({
   },
   rowBody: { flex: 1, gap: spacing.xxs },
   screen: { gap: spacing.lg },
-  terms: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  terms: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

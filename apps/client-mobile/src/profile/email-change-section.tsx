@@ -4,7 +4,15 @@ import {
   resendCurrentAccountEmailChange,
   useGetCurrentAccountEmailChange,
 } from "@pilates/api-contracts";
-import { BodyText, colors, radii, spacing, TextButton, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  spacing,
+  surfaces,
+  TextButton,
+  typography,
+} from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -61,18 +69,8 @@ export function EmailChangeSection() {
         hasta entonces sigues entrando con tu correo actual.
       </BodyText>
       <View style={styles.actions}>
-        <TextButton
-          disabled={busy}
-          label="Reenviar correo"
-          onPress={() => void resend()}
-          tone="onTint"
-        />
-        <TextButton
-          disabled={busy}
-          label="Cancelar cambio"
-          onPress={() => void cancel()}
-          tone="onTint"
-        />
+        <TextButton disabled={busy} label="Reenviar correo" onPress={() => void resend()} />
+        <TextButton disabled={busy} label="Cancelar cambio" onPress={() => void cancel()} />
       </View>
       {notice === null ? null : <BodyText style={styles.notice}>{notice}</BodyText>}
     </View>
@@ -84,12 +82,13 @@ export const normalizeEmail = (email: string): string => email.trim().toLowerCas
 
 const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: spacing.md },
-  card: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.inset,
-    gap: spacing.sm,
-    padding: spacing.lg,
+  // Palette B (FIX-089): a Crema card with an Arcilla outline, not a tint.
+  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
+  notice: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
   },
-  notice: { color: colors.textMuted, fontSize: typography.note },
-  title: { color: colors.primaryOnTint, fontSize: typography.bodyLarge, fontWeight: "500" },
 });
