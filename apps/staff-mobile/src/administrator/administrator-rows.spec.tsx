@@ -61,7 +61,7 @@ async function openPayments(sessions = [session]) {
                 durationMinutes: 50,
               },
             ]),
-          [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+          [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
             () => jsonResponse(sessions),
         }),
         "administrator",

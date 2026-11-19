@@ -27,7 +27,7 @@ describe("the Assistant's booking toast after a cancellation", () => {
     let bookings: unknown[] = [];
     const screen = await openLucia({
       ...assistantRoutes(),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse([{ ...session, ...times }]),
       "/api/v1/sessions/session-1": () => jsonResponse({ ...sessionDetail, ...times }),
       "POST /api/v1/sessions/session-1/bookings": () => {

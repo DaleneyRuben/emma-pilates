@@ -286,7 +286,7 @@ describe("Administrator payments and Session cancellation", () => {
     let sessions = [session];
     const screen = await openPendingPayments({
       ...administratorRoutes(() => []),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse(sessions),
       "POST /api/v1/administrator/sessions/session-1/cancel": () => {
         cancelled();
@@ -347,7 +347,7 @@ describe("Administrator payments and Session cancellation", () => {
   it("searches every Branch at once and names the Branch on each Session", async () => {
     const screen = await openPendingPayments({
       ...administratorRoutes(() => []),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse([session]),
       "/api/v1/administrator/sessions": () =>
         jsonResponse([

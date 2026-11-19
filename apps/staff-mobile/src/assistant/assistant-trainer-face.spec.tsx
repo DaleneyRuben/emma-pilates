@@ -21,7 +21,7 @@ const thumbnail = () =>
     headers: { "Content-Type": "image/jpeg" },
     status: 200,
   });
-const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 
 // FIX-041 (follow-up 242): the Trainer's face wherever the Assistant sees her.
 describe("The Trainer's face on the Assistant's screens", () => {

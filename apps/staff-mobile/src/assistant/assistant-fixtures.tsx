@@ -223,7 +223,7 @@ export function assistantRoutes() {
         },
         { id: "class-mat", name: "Mat Pilates", description: "", durationMinutes: 50 },
       ]),
-    [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+    [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
       () => jsonResponse([session]),
     "/api/v1/sessions/session-1": () => jsonResponse(sessionDetail),
   };

@@ -73,7 +73,7 @@ describe("Assistant rows", () => {
     const full = { ...session, id: "session-full", bookedCount: 12, availableSeats: 0 };
     const screen = await openLucia({
       ...assistantRoutes(),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`]:
         () => jsonResponse([session, full]),
     });
 
