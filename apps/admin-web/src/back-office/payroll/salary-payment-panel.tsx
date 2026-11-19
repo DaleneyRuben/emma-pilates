@@ -11,11 +11,14 @@ import { pastCivilDateField } from "../../components/form/date-field";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import {
   bolivianosField,
   bolivianosText,
@@ -137,6 +140,7 @@ export function SalaryPaymentPanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <FormField
             control={form.control}
             name="staffMemberId"
@@ -173,12 +177,11 @@ export function SalaryPaymentPanelForm({
               <FormItem>
                 <FormLabel>Monto</FormLabel>
                 <FormControl>
-                  <Input
-                    inputMode="decimal"
-                    placeholder="3.500,00"
-                    {...field}
-                  />
+                  <Input inputMode="decimal" {...field} />
                 </FormControl>
+                <FormDescription>
+                  <ExampleHint example="3.500,00" />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

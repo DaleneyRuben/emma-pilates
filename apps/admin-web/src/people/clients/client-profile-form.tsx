@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { PhoneFormField } from "../../components/form/phone-field";
 import {
   phoneValue,
@@ -91,6 +92,7 @@ export function ClientProfileForm({
   return (
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+        <FormErrorSummary />
         <FormField
           control={form.control}
           name="name"

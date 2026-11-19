@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { wholeNumberField } from "../../components/form/number-field";
 import {
   SidePanelBody,
@@ -119,11 +121,7 @@ export function ClassTypePanelForm({
   );
 
   const [nameField, ...numberFields] = textFields;
-  const renderText = ([
-    name,
-    label,
-    placeholder,
-  ]: (typeof textFields)[number]) => (
+  const renderText = ([name, label, example]: (typeof textFields)[number]) => (
     <FormField
       key={name}
       control={form.control}
@@ -133,7 +131,6 @@ export function ClassTypePanelForm({
           <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input
-              placeholder={placeholder}
               inputMode={
                 name === "name" || name === "equipmentNeeds"
                   ? undefined
@@ -143,7 +140,9 @@ export function ClassTypePanelForm({
               value={field.value ?? ""}
             />
           </FormControl>
-          <FormDescription>{helpers[name]}</FormDescription>
+          <FormDescription>
+            <ExampleHint example={example}>{helpers[name]}</ExampleHint>
+          </FormDescription>
           <FormMessage />
         </FormItem>
       )}
@@ -154,6 +153,7 @@ export function ClassTypePanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           {renderText(nameField)}
           <FormField
             control={form.control}

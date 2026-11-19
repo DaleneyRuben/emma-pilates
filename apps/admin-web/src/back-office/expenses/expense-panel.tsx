@@ -18,6 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import {
   bolivianosField,
   bolivianosText,
@@ -128,6 +130,7 @@ export function ExpensePanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
             {expense === undefined
               ? `Se registra en la sucursal ${branch.name}.`
@@ -194,8 +197,11 @@ export function ExpensePanelForm({
               <FormItem>
                 <FormLabel>Monto</FormLabel>
                 <FormControl>
-                  <Input inputMode="decimal" placeholder="450,50" {...field} />
+                  <Input inputMode="decimal" {...field} />
                 </FormControl>
+                <FormDescription>
+                  <ExampleHint example="450,50" />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

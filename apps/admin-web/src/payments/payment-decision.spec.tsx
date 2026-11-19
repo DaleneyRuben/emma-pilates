@@ -129,10 +129,13 @@ describe("AW29 decisions on a desktop browser", () => {
     const reason = within(panel).getByRole("textbox", {
       name: "Motivo del rechazo",
     });
-    expect(reason).toHaveAttribute(
-      "placeholder",
-      "Ej. el monto no coincide con la transferencia recibida.",
-    );
+    // FIX-089 (FormB): the example sits under the field, not inside it.
+    expect(reason).not.toHaveAttribute("placeholder");
+    expect(
+      within(panel).getByText(
+        "Ej.: el monto no coincide con la transferencia recibida.",
+      ),
+    ).toBeInTheDocument();
     expect(
       within(panel).getByText(
         "La clienta verá este mensaje para corregir y volver a enviar.",

@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
@@ -145,6 +146,7 @@ export function CampaignPage() {
           )}
           <Form {...form}>
             <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+              <FormErrorSummary />
               <FormField
                 control={form.control}
                 name="name"

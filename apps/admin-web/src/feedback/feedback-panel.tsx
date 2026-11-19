@@ -116,9 +116,11 @@ export function FeedbackPanel({
             value={note}
             maxLength={2000}
             rows={4}
-            placeholder="Ej.: Arreglamos la lista de reservas en la versión 1.0.2."
             onChange={(event) => setNote(event.target.value)}
           />
+          <p className="text-ayuda text-texto-tenue">
+            Ej.: Arreglamos la lista de reservas en la versión 1.0.2.
+          </p>
           <p className="text-ayuda text-texto-tenue">
             Nota interna: la clienta o el equipo no la ven. Va en el CSV.
           </p>

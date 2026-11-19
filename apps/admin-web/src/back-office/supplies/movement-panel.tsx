@@ -14,6 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { wholeNumberField } from "../../components/form/number-field";
 import {
   SidePanelBody,
@@ -155,6 +157,7 @@ export function SupplyMovementForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <FormField
             control={form.control}
             name="supplyId"
@@ -202,12 +205,14 @@ export function SupplyMovementForm({
               <FormItem>
                 <FormLabel>{copy[kind].quantity}</FormLabel>
                 <FormControl>
-                  <Input inputMode="numeric" placeholder="1" {...field} />
+                  <Input inputMode="numeric" {...field} />
                 </FormControl>
                 <FormDescription>
-                  {kind === "withdrawal" && selected !== undefined
-                    ? `Máximo: ${unitsLabel(selected.quantityOnHand)}`
-                    : undefined}
+                  <ExampleHint example="1">
+                    {kind === "withdrawal" && selected !== undefined
+                      ? `Máximo: ${unitsLabel(selected.quantityOnHand)}`
+                      : undefined}
+                  </ExampleHint>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

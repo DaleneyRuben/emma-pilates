@@ -71,12 +71,12 @@ describe("AW09 Supply form on a desktop browser", () => {
     expect(
       within(panel).getByLabelText("Cantidad en stock"),
     ).toHaveAccessibleDescription(
-      "Solo al crearlo: después cambia con retiros y reposiciones.",
+      "Ej.: 10 Solo al crearlo: después cambia con retiros y reposiciones.",
     );
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(within(panel).getByLabelText("Nombre")).toHaveAccessibleDescription(
-      "Escribe el nombre.",
+      "Ej.: Papel higiénico Escribe el nombre.",
     );
     expect(
       within(panel).getByLabelText("Umbral de alerta"),
@@ -123,7 +123,7 @@ describe("AW09 Supply form on a desktop browser", () => {
       expect(
         within(panel).getByLabelText("Nombre"),
       ).toHaveAccessibleDescription(
-        "Ya hay un insumo activo con ese nombre en esta sucursal.",
+        "Ej.: Papel higiénico Ya hay un insumo activo con ese nombre en esta sucursal.",
       ),
     );
     expect(within(panel).getByLabelText("Nombre")).toHaveValue("detergente");

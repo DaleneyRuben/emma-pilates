@@ -107,7 +107,7 @@ describe("AW10 Registrar retiro on a desktop browser", () => {
     );
     await user.type(quantity, "13");
     expect(quantity).toHaveAccessibleDescription(
-      "Máximo: 12 unid. Solo hay 12 unid. en stock.",
+      "Ej.: 1 Máximo: 12 unid. Solo hay 12 unid. en stock.",
     );
     expect(
       within(panel).getByRole("button", { name: "Registrar" }),
@@ -196,7 +196,7 @@ describe("AW10 Registrar retiro on a desktop browser", () => {
       expect(
         quantityField(panel, "Cantidad retirada"),
       ).toHaveAccessibleDescription(
-        "Máximo: 4 unid. Solo hay 4 unid. en stock.",
+        "Ej.: 1 Máximo: 4 unid. Solo hay 4 unid. en stock.",
       ),
     );
     expect(
@@ -262,7 +262,7 @@ describe("Registrar reposición on a desktop browser", () => {
     expect(quantity).not.toHaveAccessibleDescription(/Máximo/);
     await user.click(within(panel).getByRole("button", { name: "Registrar" }));
     expect(quantity).toHaveAccessibleDescription(
-      "Escribe un número entero desde 1.",
+      "Ej.: 1 Escribe un número entero desde 1.",
     );
     await user.type(quantity, "30");
     await user.click(within(panel).getByRole("button", { name: "Registrar" }));

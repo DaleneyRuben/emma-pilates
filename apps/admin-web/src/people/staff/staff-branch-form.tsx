@@ -8,6 +8,7 @@ import {
   FormItem,
   FormMessage,
 } from "../../components/form/form";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { MultiChoiceChips } from "../../components/form/choice-chips";
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
 import { useQuery } from "@tanstack/react-query";
@@ -96,6 +97,7 @@ export function StaffBranchForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <StaffPhotoBlock member={member} />
           <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
             Puedes cambiar sus sedes y su foto. Invitar y cambiar roles lo hace

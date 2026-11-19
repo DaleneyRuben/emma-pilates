@@ -124,7 +124,9 @@ describe("AW14 Expense form on a desktop browser", () => {
     );
     const name = within(panel).getByLabelText("Nombre de la categoría");
     await user.click(within(panel).getByRole("button", { name: "Agregar" }));
-    expect(name).toHaveAccessibleDescription("Escribe el nombre.");
+    expect(name).toHaveAccessibleDescription(
+      "Ej.: Limpieza Escribe el nombre.",
+    );
 
     await user.type(name, " Limpieza {Enter}");
 
@@ -161,7 +163,9 @@ describe("AW14 Expense form on a desktop browser", () => {
     await waitFor(() =>
       expect(
         within(panel).getByLabelText("Nombre de la categoría"),
-      ).toHaveAccessibleDescription("Ya existe una categoría con ese nombre."),
+      ).toHaveAccessibleDescription(
+        "Ej.: Limpieza Ya existe una categoría con ese nombre.",
+      ),
     );
   });
 

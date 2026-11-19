@@ -16,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { parseCivilDate } from "../components/form/civil-date";
 import { CivilDateInput } from "../components/form/civil-date-input";
 import { CivilTimeInput } from "../components/form/civil-time-input";
@@ -159,6 +160,7 @@ export function SeriesForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <p className="text-nota text-texto">
             Serie semanal de {schedule.classTypeName}
           </p>

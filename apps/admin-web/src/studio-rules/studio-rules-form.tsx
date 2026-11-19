@@ -13,6 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { CivilDateInput } from "../components/form/civil-date-input";
 import { civilDateValue } from "../components/form/civil-date";
 import { wholeNumberField } from "../components/form/number-field";
@@ -140,6 +141,7 @@ export function StudioRulesForm({
   return (
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+        <FormErrorSummary />
         <div className="grid gap-4 md:grid-cols-2">
           {renderField({
             name: "minimumBookings",

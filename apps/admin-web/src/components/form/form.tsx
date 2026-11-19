@@ -1,7 +1,9 @@
 import { Slot } from "radix-ui";
 import {
+  useContext,
   useId,
   useLayoutEffect,
+  useRef,
   useState,
   type ComponentProps,
   type ReactNode,
@@ -12,12 +14,15 @@ import {
   type ControllerProps,
   type FieldPath,
   type FieldValues,
+  type FormProviderProps,
 } from "react-hook-form";
 import { cn } from "../../lib/cn";
 import { Label } from "../ui/label";
 import {
+  createFormLabels,
   FormFieldContext,
   FormItemContext,
+  FormLabelsContext,
   useFormField,
 } from "./form-context";
 
@@ -25,8 +30,20 @@ import {
  * ADR-0041: React Hook Form owns the field lifecycle and Zod validates on the
  * client; every field keeps a programmatic label plus description and error
  * associations, and failed submissions keep the Administrator's values.
+ * FIX-089: it also keeps its labels, for the error summary (FormB).
  */
-export const Form = FormProvider;
+export function Form<
+  TFieldValues extends FieldValues,
+  TContext = unknown,
+  TTransformedValues = TFieldValues,
+>(props: FormProviderProps<TFieldValues, TContext, TTransformedValues>) {
+  const [labels] = useState(createFormLabels);
+  return (
+    <FormLabelsContext.Provider value={labels}>
+      <FormProvider {...props} />
+    </FormLabelsContext.Provider>
+  );
+}
 
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,
@@ -59,10 +76,18 @@ export function FormLabel({
   className,
   ...props
 }: ComponentProps<typeof Label>) {
-  const { error, formItemId } = useFormField();
+  const { error, formItemId, name } = useFormField();
+  const labels = useContext(FormLabelsContext);
+  const ref = useRef<HTMLLabelElement>(null);
+
+  useLayoutEffect(() => {
+    if (labels === null || ref.current === null) return undefined;
+    return labels.register(name, ref.current);
+  }, [labels, name]);
 
   return (
     <Label
+      ref={ref}
       data-slot="form-label"
       data-error={error !== undefined}
       className={cn(error !== undefined && "text-error-texto", className)}
@@ -123,13 +148,17 @@ export function FormDescription({
     <p
       data-slot="form-description"
       id={formDescriptionId}
-      className={cn("text-ayuda text-texto-tenue", className)}
+      className={cn("text-nota text-texto-tenue", className)}
       {...props}
     >
       {children}
     </p>
   );
 }
+
+/** FIX-089 (FormB): an invalid field's message, 13 px bold after a «!». */
+export const fieldMessageClass =
+  "text-nota font-bold text-error-texto before:content-['!_']";
 
 export function FormMessage({
   className,
@@ -147,7 +176,7 @@ export function FormMessage({
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn("text-ayuda text-error-texto", className)}
+      className={cn(fieldMessageClass, className)}
       {...props}
     >
       {body}

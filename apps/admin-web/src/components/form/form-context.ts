@@ -24,6 +24,40 @@ type FormItemContextValue = {
 
 export const FormItemContext = createContext<FormItemContextValue | null>(null);
 
+/**
+ * FIX-089 (FormB): the labels a form draws, by field name, so its error
+ * summary can name the invalid fields as the Administrator reads them.
+ */
+export type FormLabels = {
+  register: (name: string, element: HTMLElement) => () => void;
+  /** Field name → label text, in the order the labels sit on the page. */
+  current: () => ReadonlyMap<string, string>;
+};
+
+export const FormLabelsContext = createContext<FormLabels | null>(null);
+
+export function createFormLabels(): FormLabels {
+  const entries = new Map<string, HTMLElement>();
+  return {
+    register: (name, element) => {
+      entries.set(name, element);
+      return () => {
+        if (entries.get(name) === element) entries.delete(name);
+      };
+    },
+    current: () =>
+      new Map(
+        [...entries]
+          .sort(([, a], [, b]) =>
+            a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
+              ? -1
+              : 1,
+          )
+          .map(([name, element]) => [name, element.textContent?.trim() ?? ""]),
+      ),
+  };
+}
+
 export function useFormField() {
   const fieldContext = useContext(FormFieldContext);
   const itemContext = useContext(FormItemContext);

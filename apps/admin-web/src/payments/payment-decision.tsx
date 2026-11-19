@@ -18,6 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { ExampleHint } from "../components/form/example-hint";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
@@ -156,6 +158,7 @@ export function PaymentDecision({
             noValidate
             className="flex flex-col gap-3"
           >
+            <FormErrorSummary />
             <FormField
               control={form.control}
               name="reason"
@@ -164,15 +167,16 @@ export function PaymentDecision({
                   <FormLabel>Motivo del rechazo</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Ej. el monto no coincide con la transferencia recibida."
                       // The buttons are gone; the reason is the next step.
                       autoFocus
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    La clienta verá este mensaje para corregir y volver a
-                    enviar.
+                    <ExampleHint example="el monto no coincide con la transferencia recibida.">
+                      La clienta verá este mensaje para corregir y volver a
+                      enviar.
+                    </ExampleHint>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
