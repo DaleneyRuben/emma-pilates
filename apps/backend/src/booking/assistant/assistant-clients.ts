@@ -6,6 +6,7 @@ import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { UpcomingClientBooking } from '../client/client-bookings';
 import {
   describeSubscription,
+  type ClientFreezeSummary,
   type ClientSubscriptionSummary,
   type ClientSubscriptionView,
 } from '../client/client-subscription';
@@ -143,6 +144,7 @@ export const readClientOverview = async (
     }): Promise<UpcomingClientBooking[]>;
     findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
     readRenewalStartsOn?(clientId: string): Promise<string | null>;
+    readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
   },
 ): Promise<ClientOverview> => {
   requireAssistant(dependencies.principal);
