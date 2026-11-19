@@ -31,7 +31,7 @@ export function TodayHero({
     <View testID="next-class-hero">
       <NextClassHero
         accessibilityLabel={
-          accessibilityLabel === undefined ? undefined : `${eyebrow}: ${accessibilityLabel}`
+          accessibilityLabel === undefined ? undefined : `${accessibilityLabel}, ${eyebrow}`
         }
         detail={detail}
         eyebrow={eyebrow}
