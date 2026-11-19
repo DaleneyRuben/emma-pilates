@@ -11,6 +11,11 @@ type UpcomingSessionFacts = {
   branchName: string;
   startsAt: Date;
   endsAt: Date;
+  capacity: number;
+  /** Booked places, hers included. */
+  bookedCount: number;
+  /** Who else is coming, in booking order, by initials only. */
+  attendeeInitials: string[];
 };
 
 export type UpcomingClientBooking =

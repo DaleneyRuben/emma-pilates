@@ -23,4 +23,9 @@ export interface UpcomingBookingDto {
   branchName: string;
   startsAt: string;
   endsAt: string;
+  capacity: number;
+  /** Booked places, hers included */
+  bookedCount: number;
+  /** Who else is coming, in booking order, by initials only (never names) */
+  attendeeInitials: string[];
 }
