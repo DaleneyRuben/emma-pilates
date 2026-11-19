@@ -10,6 +10,8 @@ export type TrainerScheduleSession = {
   endsAt: Date;
   capacity: number;
   bookedCount: number;
+  /** Who is coming, in booking order, by initials only. */
+  attendeeInitials: string[];
   cancellation: SessionCancellation | null;
 };
 

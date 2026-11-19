@@ -12249,6 +12249,13 @@
             "type": "number",
             "minimum": 0
           },
+          "attendeeInitials": {
+            "description": "Who is coming, in booking order, by initials only (E1 B, the agenda hero)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "cancellation": {
             "nullable": true,
             "type": "object",
@@ -12266,7 +12273,8 @@
           "startsAt",
           "endsAt",
           "capacity",
-          "bookedCount"
+          "bookedCount",
+          "attendeeInitials"
         ]
       },
       "ClientPhotoDto": {

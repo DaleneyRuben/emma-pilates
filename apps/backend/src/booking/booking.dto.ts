@@ -175,6 +175,14 @@ export class TrainerScheduleSessionDto {
   @ApiProperty({ minimum: 0 })
   bookedCount!: number;
 
+  @ApiProperty({
+    type: String,
+    isArray: true,
+    description:
+      'Who is coming, in booking order, by initials only (E1 B, the agenda hero)',
+  })
+  attendeeInitials!: string[];
+
   @ApiPropertyOptional({
     type: () => SessionCancellationSummaryDto,
     nullable: true,
