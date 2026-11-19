@@ -32,17 +32,17 @@ const concepts: { kind: LineKind; summary: string; line: string; color: string }
     kind: "minimum_not_met",
     summary: "Canceladas por mínimo",
     line: "Clase cancelada por mínimo",
-    color: colors.primary,
+    color: colors.border,
   },
-  { kind: "commission", summary: "Comisiones", line: "Comisión", color: colors.warning },
-  { kind: "base", summary: "Base", line: "Base", color: colors.success },
+  { kind: "commission", summary: "Comisiones", line: "Comisión", color: colors.primary },
+  { kind: "base", summary: "Base", line: "Base", color: colors.primaryTint },
   {
     kind: "new_client",
     summary: "Clientas nuevas",
     line: "Clienta nueva",
-    color: colors.secondaryAccent,
+    color: colors.primary,
   },
-  { kind: "bonus", summary: "Bono", line: "Bono", color: colors.warningText },
+  { kind: "bonus", summary: "Bono", line: "Bono", color: colors.emphasis },
 ];
 
 const lineLabel = (kind: LineKind) => concepts.find((concept) => concept.kind === kind)?.line;
