@@ -65,7 +65,7 @@ export function WeekGrid({
               role="columnheader"
               className={cn(
                 "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto-tenue uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
-                day === today && "text-primario",
+                day === today && "font-bold text-primario",
               )}
             >
               {tab.weekday}
@@ -104,7 +104,8 @@ export function WeekGrid({
             role="cell"
             className={cn(
               "relative border-l border-divisor",
-              day === today && "bg-hover-fila",
+              // FIX-089: today is framed in Arcilla, not filled.
+              day === today && "inset-ring-2 inset-ring-arcilla",
             )}
             style={{
               height,
