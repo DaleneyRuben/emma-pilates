@@ -6,8 +6,14 @@ import { clearMobileQueryCache, MobileQueryProvider } from "./provider";
 
 const banner = "Sin conexión. Mostrando la última información guardada.";
 
-function Screen({ load }: { load: () => Promise<string> }) {
-  const query = useQuery({ queryFn: load, queryKey: ["unreachable-spec"] });
+function Screen({
+  load,
+  name = "unreachable-spec",
+}: {
+  load: () => Promise<string>;
+  name?: string;
+}) {
+  const query = useQuery({ queryFn: load, queryKey: [name] });
   return (
     <Pressable accessibilityRole="button" onPress={() => void query.refetch()}>
       <Text>{query.data ?? "Cargando"}</Text>
@@ -54,5 +60,20 @@ describe("the offline banner when the API cannot be reached", () => {
     });
     expect(screen.getByText("Cargando")).toBeOnTheScreen();
     expect(screen.queryByText(banner)).toBeNull();
+  });
+
+  it("stays while a screen's request still fails, though another got through", async () => {
+    const screen = await render(
+      <MobileQueryProvider>
+        <Screen load={() => Promise.reject(new TypeError("Network request failed"))} />
+        <Screen
+          load={() => new Promise((resolve) => setTimeout(() => resolve("Reglas"), 20))}
+          name="other-spec"
+        />
+      </MobileQueryProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByText("Reglas")).toBeOnTheScreen());
+    expect(screen.getByText(banner)).toBeOnTheScreen();
   });
 });
