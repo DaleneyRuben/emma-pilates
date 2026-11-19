@@ -2,6 +2,7 @@ import {
   cancelBooking,
   getGetCurrentClientSubscriptionQueryKey,
   getListUpcomingBookingsQueryKey,
+  formatDateTime,
   formatListDate,
   leaveWaitlist,
   useGetCurrentClientSubscription,
@@ -248,7 +249,13 @@ export function BookingsScreen({
         title="¿Salir de la lista de espera?"
         visible={leaving !== null}
       />
-      {confirmed !== null ? (
+      {confirmed?.rescheduled === true ? (
+        <BrandToast
+          note={`${confirmed.classTypeName} · ${formatDateTime(confirmed.startsAt)}`}
+          onClose={dismissConfirmed}
+          title="Clase cambiada"
+        />
+      ) : confirmed !== null ? (
         <BrandToast
           note={
             confirmed.planName === "Pase de invitada"

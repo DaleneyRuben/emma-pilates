@@ -118,6 +118,7 @@ export function RescheduleScreen({
             classTypeName: target.classTypeName,
             startsAt: target.startsAt,
             endsAt: target.endsAt,
+            rescheduled: true,
             planName:
               subscription.data?.status === 200
                 ? subscription.data.data.subscription?.planName
