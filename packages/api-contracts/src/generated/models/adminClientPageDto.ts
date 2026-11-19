@@ -35,4 +35,14 @@ export interface AdminClientPageDto {
    * @minimum 0
    */
   founderClientCount: number;
+  /**
+   * Clients of the studio whose active Plan ends within 3 days: «Por vencer» (FIX-091)
+   * @minimum 0
+   */
+  expiringClientCount?: number;
+  /**
+   * Clients of the studio with an active Plan and no class booked ahead: «Sin reservar» (FIX-091)
+   * @minimum 0
+   */
+  unbookedClientCount?: number;
 }

@@ -4834,14 +4834,16 @@
             "name": "filter",
             "required": false,
             "in": "query",
-            "description": "One chip of Clientas › Todas: the plan state or a live Fundadora place",
+            "description": "One chip of Clientas › Todas: the plan state, a live Fundadora place, a Plan ending within 3 days, or an active Plan with no class ahead",
             "schema": {
               "enum": [
                 "all",
                 "active",
                 "expired",
                 "none",
-                "founder"
+                "founder",
+                "expiring",
+                "unbooked"
               ],
               "type": "string"
             }
@@ -4909,7 +4911,9 @@
                 "active",
                 "expired",
                 "none",
-                "founder"
+                "founder",
+                "expiring",
+                "unbooked"
               ],
               "type": "string"
             }
@@ -15921,6 +15925,16 @@
             "type": "number",
             "minimum": 0,
             "description": "Clients of the studio holding a live Fundadora place"
+          },
+          "expiringClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio whose active Plan ends within 3 days: «Por vencer» (FIX-091)"
+          },
+          "unbookedClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio with an active Plan and no class booked ahead: «Sin reservar» (FIX-091)"
           }
         },
         "required": [
