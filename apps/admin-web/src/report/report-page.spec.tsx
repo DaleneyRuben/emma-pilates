@@ -1,75 +1,22 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { http } from "msw";
+import { centro } from "../test/booking-handlers";
 import {
-  boliviaInstant,
-  boliviaToday,
-  formatCivilDate,
-} from "../lib/bolivia-time";
-import {
-  branchesPath,
-  centro,
-  equipetrol,
-  page,
-} from "../test/booking-handlers";
-import {
-  apiUrl,
   jsonResponse,
   problemResponse,
   server,
   useMockServer,
 } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
+import { emptyExpenses, emptyIncome } from "../test/report-fixtures";
 import {
-  centroExpenses,
-  centroIncome,
-  emptyExpenses,
-  emptyIncome,
-  expenseReportPath,
-  incomeReportPath,
-  revenueReportPath,
-  studioExpenses,
-  studioIncome,
-  urubo,
-} from "../test/report-fixtures";
+  clearReportReads,
+  expenseReads,
+  incomeReads,
+  reportHandlers as reports,
+} from "../test/report-handlers";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
-import { defaultReportRange } from "./report-range";
 import { expectBrandedLoading } from "../test/branded-loading";
-
-const incomeReads: URLSearchParams[] = [];
-const expenseReads: URLSearchParams[] = [];
-const reports = (
-  income: (params: URLSearchParams) => Response = (params) =>
-    jsonResponse(params.has("branchId") ? centroIncome : studioIncome),
-  expenses: (params: URLSearchParams) => Response = (params) =>
-    jsonResponse(params.has("branchId") ? centroExpenses : studioExpenses),
-) => [
-  http.get(apiUrl(incomeReportPath), ({ request }) => {
-    const params = new URL(request.url).searchParams;
-    incomeReads.push(params);
-    return income(params);
-  }),
-  http.get(apiUrl(expenseReportPath), ({ request }) => {
-    const params = new URL(request.url).searchParams;
-    expenseReads.push(params);
-    return expenses(params);
-  }),
-  http.get(apiUrl(revenueReportPath), () =>
-    jsonResponse({
-      month: "2026-10",
-      cashCentavos: 30_000,
-      accruedCentavos: 12_000,
-      deferredCentavos: 18_000,
-      classesStillOwed: 5,
-    }),
-  ),
-  // The report's own selector also offers archived Branches (their history).
-  http.get(apiUrl(branchesPath), ({ request }) =>
-    new URL(request.url).searchParams.get("status") === "all"
-      ? jsonResponse(page([centro, equipetrol, urubo], { pageSize: 100 }))
-      : undefined,
-  ),
-];
 
 const path = "/informes/dinero?from=2026-08-01&to=2026-09-30";
 const heading = () =>
@@ -82,8 +29,7 @@ const tile = (name: string) => screen.getByRole("region", { name });
 describe("AW16 Reporte on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
-    incomeReads.length = 0;
-    expenseReads.length = 0;
+    clearReportReads();
     server.use(...signedInHandlers());
   });
 
@@ -96,27 +42,32 @@ describe("AW16 Reporte on a desktop browser", () => {
     expectBrandedLoading("Cargando el ingreso devengado…");
     expect(
       await within(
-        await screen.findByRole("region", { name: "Ingresos" }),
+        await screen.findByRole("region", { name: "Entró" }),
       ).findByText("Bs 2.280"),
     ).toBeVisible();
     expect(
-      within(tile("Ingresos")).getByText("Pagos confirmados en el rango"),
+      within(tile("Entró")).getByText("Pagos confirmados en el rango"),
     ).toBeVisible();
     expect(
-      within(tile("Ingresos")).getByText("Efectivo Bs 780 · QR Bs 1.500"),
+      within(tile("Entró")).getByText("Efectivo Bs 780 · QR Bs 1.500"),
     ).toBeVisible();
     expect(
-      within(tile("Ingresos")).getByText(
-        "Planes Bs 2.210 · Evaluaciones Bs 70",
+      within(tile("Entró")).getByText("Planes Bs 2.210 · Evaluaciones Bs 70"),
+    ).toBeVisible();
+    expect(within(tile("Salió")).getByText("Bs 4.380,50")).toBeVisible();
+    expect(
+      within(tile("Salió")).getByText("Nómina más los gastos de cada sucursal"),
+    ).toBeVisible();
+    expect(within(tile("Quedó")).getByText("−Bs 2.100,50")).toBeVisible();
+    expect(
+      within(tile("Quedó")).getByText("Ingresos menos gastos"),
+    ).toBeVisible();
+    // FIX-091 (W5 B): the break-even of the month the range ends in.
+    expect(
+      await within(tile("Quedó")).findByText(
+        "Punto de equilibrio de septiembre: Bs 25.386,90",
       ),
     ).toBeVisible();
-    expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
-    expect(
-      within(tile("Gastos")).getByText(
-        "Nómina más los gastos de cada sucursal",
-      ),
-    ).toBeVisible();
-    expect(within(tile("Neto")).getByText("−Bs 2.100,50")).toBeVisible();
     const accrued = screen.getByRole("region", { name: "Ingreso devengado" });
     expect(
       within(accrued).getByRole("region", { name: "Caja" }),
@@ -177,7 +128,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       );
     }
     expect(
-      within(tile("Ingresos")).getByRole("heading", { name: "Ingresos" }),
+      within(tile("Entró")).getByRole("heading", { name: "Entró" }),
     ).toHaveClass("whitespace-nowrap");
 
     expect(Object.fromEntries(incomeReads[0] ?? [])).toEqual({
@@ -194,7 +145,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     server.use(...reports());
     const { router } = renderAdmin(path);
     await within(
-      await screen.findByRole("region", { name: "Ingresos" }),
+      await screen.findByRole("region", { name: "Entró" }),
     ).findByText("Bs 2.280");
 
     fireEvent.change(screen.getByRole("combobox", { name: "Sucursal" }), {
@@ -205,12 +156,14 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       await screen.findByText("Pagos en efectivo cobrados en Centro"),
     ).toBeVisible();
-    expect(within(tile("Ingresos")).getByText("Bs 780")).toBeVisible();
-    expect(within(tile("Gastos")).getByText("Bs 480,50")).toBeVisible();
+    expect(within(tile("Entró")).getByText("Bs 780")).toBeVisible();
+    expect(within(tile("Salió")).getByText("Bs 480,50")).toBeVisible();
     expect(
-      within(tile("Gastos")).getByText("Gastos registrados en Centro"),
+      within(tile("Salió")).getByText("Gastos registrados en Centro"),
     ).toBeVisible();
-    expect(within(tile("Neto")).getByText("Bs 299,50")).toBeVisible();
+    expect(within(tile("Quedó")).getByText("Bs 299,50")).toBeVisible();
+    // The month's finance is the whole studio's, so a Branch has none.
+    expect(within(tile("Quedó")).queryByText(/Punto de equilibrio/)).toBeNull();
     expect(
       screen.getByText(
         "La nómina y los ingresos por QR se ven solo en «Todas las sucursales».",
@@ -269,62 +222,11 @@ describe("AW16 Reporte on a desktop browser", () => {
     );
   });
 
-  it("opens on the last six Bolivia months when the address names no range", async () => {
-    server.use(...reports());
-    renderAdmin("/informes/dinero");
-    await heading();
-
-    const range = defaultReportRange(boliviaToday());
-    await waitFor(() => expect(incomeReads).toHaveLength(1));
-    expect(incomeReads[0]?.get("from")).toBe(
-      boliviaInstant(range.from, "00:00"),
-    );
-    expect(screen.getByLabelText("Desde")).toHaveValue(
-      formatCivilDate(range.from),
-    );
-    expect(screen.getByLabelText("Hasta")).toHaveValue(
-      formatCivilDate(range.to),
-    );
-  });
-
-  it("keeps a new range in the address and refuses one that ends before it starts", async () => {
-    server.use(...reports());
-    const { router } = renderAdmin(path);
-    await within(
-      await screen.findByRole("region", { name: "Ingresos" }),
-    ).findByText("Bs 2.280");
-
-    fireEvent.change(screen.getByLabelText("Desde"), {
-      target: { value: "01/09/2026" },
-    });
-    await waitFor(() =>
-      expect(incomeReads.at(-1)?.get("from")).toBe("2026-09-01T04:00:00.000Z"),
-    );
-    expect(router.state.matches.at(-1)?.search).toMatchObject({
-      from: "2026-09-01",
-      to: "2026-09-30",
-    });
-
-    const reads = incomeReads.length;
-    fireEvent.change(screen.getByLabelText("Hasta"), {
-      target: { value: "15/08/2026" },
-    });
-    expect(
-      await screen.findByText(
-        "La fecha inicial no puede ser posterior a la final.",
-      ),
-    ).toBeVisible();
-    expect(incomeReads).toHaveLength(reads);
-    expect(router.state.matches.at(-1)?.search).toMatchObject({
-      to: "2026-09-30",
-    });
-  });
-
   it("reads each month's pair of bars aloud and on hover", async () => {
     server.use(...reports());
     const { user } = renderAdmin(path);
     await within(
-      await screen.findByRole("region", { name: "Ingresos" }),
+      await screen.findByRole("region", { name: "Entró" }),
     ).findByText("Bs 2.280");
 
     const chart = screen.getByRole("figure", { name: "Mes por mes" });
@@ -356,7 +258,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       await screen.findByText("Sin ingresos ni gastos en este rango."),
     ).toBeVisible();
-    expect(within(tile("Neto")).getByText("Bs 0")).toBeVisible();
+    expect(within(tile("Quedó")).getByText("Bs 0")).toBeVisible();
     expect(screen.queryByRole("figure", { name: "Mes por mes" })).toBeNull();
   });
 
@@ -412,7 +314,7 @@ describe("AW16 Reporte on a narrow browser", () => {
 
     expect(
       await within(
-        await screen.findByRole("region", { name: "Neto" }),
+        await screen.findByRole("region", { name: "Quedó" }),
       ).findByText("−Bs 2.100,50"),
     ).toBeVisible();
     const months = screen.getByRole("table", { name: "Totales por mes" });
