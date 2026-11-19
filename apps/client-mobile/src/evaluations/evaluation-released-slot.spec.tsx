@@ -88,7 +88,7 @@ describe("A paid Evaluation whose slot the studio released", () => {
     const screen = await openProfileRow(releasedRoutes(), "Evaluación nutricional");
 
     expect(await screen.findByText("El estudio liberó tu turno")).toBeOnTheScreen();
-    expect(screen.queryByText("Reserva otra evaluación")).toBeNull();
+    expect(screen.queryByText("¿Otra evaluación?")).toBeNull();
     expect(screen.queryByRole("button", { name: "Turno 15:00" })).toBeNull();
     expect(screen.queryByText(/Cuesta Bs 70/)).toBeNull();
   });

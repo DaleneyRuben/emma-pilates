@@ -79,11 +79,11 @@ describe("Client Evaluations", () => {
       }),
     );
     // Follow-up 264: back on the one Evaluación nutricional, the new one on top.
-    expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
+    expect(screen.getByTestId("next-evaluation")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cancelar evaluación" })).toBeOnTheScreen();
   });
 
-  it("offers Reprogramar on a confirmed paid evaluation", async () => {
+  it("offers Cambiar fecha on a confirmed paid evaluation", async () => {
     const paid = upcomingEvaluation("evaluation-paid", boliviaInstant(firstDay, "09:45"), {
       included: false,
       priceCentavos: 7_000,
@@ -99,7 +99,7 @@ describe("Client Evaluations", () => {
       "Evaluación nutricional",
     );
 
-    expect(await screen.findByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(await screen.findByRole("button", { name: "Cambiar fecha" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
   });
 

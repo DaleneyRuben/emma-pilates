@@ -129,6 +129,6 @@ describe("Evaluation appointment block", () => {
     await fireEvent.press(within(block).getByRole("button", { name: "Cambiar fecha" }));
 
     expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Turno 15:00" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
   });
 });

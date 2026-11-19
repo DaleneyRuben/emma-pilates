@@ -79,7 +79,7 @@ describe("One Evaluación nutricional screen", () => {
     const screen = await openProfileRow(fetcherWith([]), "Evaluación nutricional");
 
     expect(await screen.findByText("Reserva tu evaluación")).toBeOnTheScreen();
-    expect(screen.queryByText("Tu próxima evaluación")).toBeNull();
+    expect(screen.queryByTestId("next-evaluation")).toBeNull();
     expect(screen.getByRole("button", { name: "Turno 09:00" })).toBeOnTheScreen();
     expect(await screen.findByText("Anteriores")).toBeOnTheScreen();
   });
@@ -101,12 +101,12 @@ describe("One Evaluación nutricional screen", () => {
 
     const card = await screen.findByTestId("next-evaluation");
     // FIX-089: a normal state is a Crema line on the hero, not a chip.
-    const state = within(card).getByText("Gratis con tu plan");
+    const state = within(card).getByText("Gratis · primera del trimestre · llega 10 min antes");
     expect(state).toHaveStyle({ color: "#F9F4F2" });
     expect(ancestorBackgrounds(state)[0]).toBe("#B78380");
-    expect(within(card).getByText("09:00")).toBeOnTheScreen();
+    expect(within(card).getByText(/ · 09:00$/)).toBeOnTheScreen();
     expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
-    expect(screen.getByText("Reserva otra evaluación")).toBeOnTheScreen();
+    expect(screen.getByText("¿Otra evaluación?")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Sí, cancelar evaluación" }));
@@ -115,18 +115,18 @@ describe("One Evaluación nutricional screen", () => {
     expect(screen.getByText("Reserva tu evaluación")).toBeOnTheScreen();
   });
 
-  it("reads Pago en revisión and still offers Reprogramar", async () => {
+  it("reads Pago en revisión and still offers Cambiar fecha", async () => {
     const screen = await openProfileRow(
       fetcherWith([paid({ paymentState: "pending" })]),
       "Evaluación nutricional",
     );
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pago en revisión")).toBeOnTheScreen();
+    expect(within(card).getByText(/Pago en revisión · llega 10 min antes$/)).toBeOnTheScreen();
     expect(
       screen.getByText("El estudio revisa tu comprobante de Bs 70 y te avisa por la app."),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cambiar fecha" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).toBeNull();
   });
 
@@ -146,8 +146,8 @@ describe("One Evaluación nutricional screen", () => {
     );
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Pagada")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
+    expect(within(card).getByText(/Pagada · llega 10 min antes$/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar fecha" }));
 
     expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
     expect(screen.getByText(/^Cambias tu cita del /)).toBeOnTheScreen();
@@ -156,18 +156,18 @@ describe("One Evaluación nutricional screen", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Sí, mover evaluación" }));
 
     expect(await screen.findByText("Evaluación reprogramada")).toBeOnTheScreen();
-    await waitFor(() => expect(within(card).getByText("15:00")).toBeOnTheScreen());
+    await waitFor(() => expect(within(card).getByText(/ · 15:00$/)).toBeOnTheScreen());
     expect(screen.queryByText("Elige el nuevo horario")).toBeNull();
   });
 
   it("leaves the reschedule with Volver", async () => {
     const screen = await openProfileRow(fetcherWith([paid()]), "Evaluación nutricional");
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar fecha" }));
     expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Volver a tu cita" }));
 
-    expect(await screen.findByText("Reserva otra evaluación")).toBeOnTheScreen();
+    expect(await screen.findByText("¿Otra evaluación?")).toBeOnTheScreen();
   });
 
   it("asks her to choose another slot once the studio released hers", async () => {
