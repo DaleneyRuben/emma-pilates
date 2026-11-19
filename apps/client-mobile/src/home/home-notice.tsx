@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     fontWeight: "700",
   },
-  capped: { alignSelf: "center", maxWidth: promotionCardMaxWidth, width: "100%" },
+  // On a tablet it lines up with Inicio's button and plan row, from the left.
+  capped: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   corner: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyStrong,

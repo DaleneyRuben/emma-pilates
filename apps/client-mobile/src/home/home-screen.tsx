@@ -197,7 +197,9 @@ export function HomeScreen() {
         )}
         {nextClass === undefined ? null : (
           // C7 A (owner 2026-11-19): the next class leads Inicio.
-          <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
+          <View style={styles.underPromotion}>
+            <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
+          </View>
         )}
         <PromotionsCarousel
           loading={promotions.isPending}
@@ -275,7 +277,7 @@ export function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  // On a tablet it lines up with the carousel, which starts at the left edge.
+  // On a tablet the blocks line up with the carousel, which starts at the left edge.
   underPromotion: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
