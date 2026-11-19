@@ -71,7 +71,7 @@ describe("AW13 Gastos by month", () => {
     expect(reportReads[0]?.get("branchId")).toBe(centro.id);
   });
 
-  it("lists the month's dates, categories and amounts in that order", async () => {
+  it("lists the month's dates, categories, details and amounts in that order", async () => {
     server.use(standingOrVoided());
     renderAdmin("/dinero/gastos?month=2026-09");
     const table = await screen.findByRole("table");
@@ -79,7 +79,7 @@ describe("AW13 Gastos by month", () => {
       within(table)
         .getAllByRole("columnheader")
         .map((cell) => cell.textContent),
-    ).toEqual(["Fecha", "Categoría", "Monto", ""]);
+    ).toEqual(["Fecha", "Categoría", "Detalle", "Monto", ""]);
     expect(reads[0]?.get("from")).toBe("2026-09-01");
     expect(reads[0]?.get("to")).toBe("2026-09-30");
   });

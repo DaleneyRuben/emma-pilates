@@ -41,8 +41,8 @@ describe("expense detail", () => {
         .map((header) => header.textContent),
     ).toEqual(["Fecha", "Categoría", "Detalle", "Monto", ""]);
     const rows = within(table).getAllByRole("row");
-    expect(within(rows[1]).getByText("Cambio de resorte")).toBeInTheDocument();
-    expect(within(rows[2]).getByText("—")).toBeInTheDocument();
+    expect(within(rows[1]!).getByText("Cambio de resorte")).toBeInTheDocument();
+    expect(within(rows[2]!).getByText("—")).toBeInTheDocument();
   });
 
   it("records the trimmed detail with a new Expense", async () => {
@@ -60,15 +60,15 @@ describe("expense detail", () => {
     await screen.findByRole("table");
     await user.click(screen.getByRole("button", { name: "Nuevo gasto" }));
     const panel = await screen.findByRole("dialog", { name: "Nuevo gasto" });
-    expect(within(panel).getByLabelText("Detalle")).toHaveAccessibleDescription(
-      "Opcional. Ej.: Productos de limpieza",
-    );
+    expect(
+      within(panel).getByLabelText("Detalle (opcional)"),
+    ).toHaveAccessibleDescription("Ej.: Productos de limpieza");
     await user.selectOptions(
       within(panel).getByLabelText("Categoría"),
       maintenance.id,
     );
     await user.type(
-      within(panel).getByLabelText("Detalle"),
+      within(panel).getByLabelText("Detalle (opcional)"),
       "  Productos de limpieza ",
     );
     await user.type(within(panel).getByLabelText("Monto"), "300");
@@ -101,7 +101,7 @@ describe("expense detail", () => {
     const { user } = renderAdmin("/dinero/gastos");
     await user.click(await screen.findByRole("button", { name: "Reparación" }));
     const panel = await screen.findByRole("dialog", { name: "Editar gasto" });
-    const detail = within(panel).getByLabelText("Detalle");
+    const detail = within(panel).getByLabelText("Detalle (opcional)");
     expect(detail).toHaveValue("Cambio de resorte");
 
     await user.clear(detail);

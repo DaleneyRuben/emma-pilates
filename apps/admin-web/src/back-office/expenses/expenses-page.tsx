@@ -41,7 +41,8 @@ const voidedLine = (expense: AdminExpenseDto) =>
     ...(expense.voidReason === null ? [] : [expense.voidReason]),
   ].join(" · ");
 
-// FIX-091 (W11 B): date, category and amount, in that order.
+// FIX-091 (W11 B): date, category and amount, in that order; W11 A puts
+// the detail between the category and the amount.
 const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
   columns.accessor("incurredOn", {
     header: "Fecha",
@@ -75,6 +76,23 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
           onOpen={() => open(row.original)}
         />
       ),
+  }),
+  columns.accessor("detail", {
+    header: "Detalle",
+    cell: ({ row, getValue }) => {
+      const detail = getValue();
+      return detail === null ? (
+        <span className="text-texto-tenue">—</span>
+      ) : (
+        <span
+          className={cn(
+            isVoided(row.original) ? "text-texto-tenue" : "text-texto",
+          )}
+        >
+          {detail}
+        </span>
+      );
+    },
   }),
   columns.accessor("amountCentavos", {
     header: "Monto",

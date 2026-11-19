@@ -204,10 +204,12 @@ describe("AW14 Expense form on a desktop browser", () => {
         "Guardamos la corrección del gasto de Reparación.",
       ),
     ).toBeInTheDocument();
+    // W11 A: an edit always says its detail, null when there is none.
     expect(updated).toEqual({
       expenseCategoryId: repair.id,
       amountCentavos: 50_000,
       incurredOn: "2026-09-15",
+      detail: null,
     });
   });
 
