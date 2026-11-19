@@ -86,7 +86,9 @@ describe("AW30 Recuperar contraseña", () => {
 
     expect(
       screen.getByRole("textbox", { name: "Correo electrónico" }),
-    ).toHaveAccessibleDescription("Escribe un correo electrónico válido.");
+    ).toHaveAccessibleDescription(
+      "Ej.: tu@correo.com Escribe un correo electrónico válido.",
+    );
   });
 
   it("waits out a broader throttling limit with the server's Retry-After", async () => {
