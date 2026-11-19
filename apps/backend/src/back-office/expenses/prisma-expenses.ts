@@ -18,6 +18,8 @@ export type ExpenseInput = {
   expenseCategoryId: string;
   amountCentavos: number;
   incurredOn: Date;
+  /** W11 A: absent on an edit keeps the current detail. */
+  detail?: string | null;
 };
 export type ExpenseChange = Omit<ExpenseInput, 'branchId'> & {
   expenseId: string;
@@ -29,6 +31,7 @@ export const expenseSelect = {
   expenseCategoryId: true,
   amountCentavos: true,
   incurredOn: true,
+  detail: true,
   voidedAt: true,
   voidReason: true,
   expenseCategory: { select: { name: true } },
@@ -246,6 +249,7 @@ export const createPrismaExpenses = (
               expenseCategoryId: input.expenseCategoryId,
               amountCentavos: input.amountCentavos,
               incurredOn: input.incurredOn,
+              detail: input.detail ?? null,
               recordedByAccountId: actor.accountId,
               createdAt: now,
               updatedAt: now,
@@ -259,6 +263,7 @@ export const createPrismaExpenses = (
               amountCentavos: expense.amountCentavos,
               incurredOn: civilText(expense.incurredOn),
               expenseCategoryId: expense.expenseCategoryId,
+              ...(expense.detail === null ? {} : { detail: expense.detail }),
             },
           });
           const view = toExpenseView(expense);
@@ -299,6 +304,7 @@ export const createPrismaExpenses = (
                 expenseCategoryId: input.expenseCategoryId,
                 amountCentavos: input.amountCentavos,
                 incurredOn: input.incurredOn,
+                ...(input.detail === undefined ? {} : { detail: input.detail }),
                 updatedAt: dependencies.now(),
               },
               select: expenseSelect,
@@ -310,7 +316,7 @@ export const createPrismaExpenses = (
               }
               throw error;
             });
-          const metadata: Record<string, string | number> = {};
+          const metadata: Record<string, string | number | null> = {};
           if (previous.expenseCategoryId !== updated.expenseCategoryId) {
             metadata.previousExpenseCategoryId = previous.expenseCategoryId;
             metadata.expenseCategoryId = updated.expenseCategoryId;
@@ -322,6 +328,10 @@ export const createPrismaExpenses = (
           if (previous.incurredOn.getTime() !== updated.incurredOn.getTime()) {
             metadata.previousIncurredOn = civilText(previous.incurredOn);
             metadata.incurredOn = civilText(updated.incurredOn);
+          }
+          if (previous.detail !== updated.detail) {
+            metadata.previousDetail = previous.detail;
+            metadata.detail = updated.detail;
           }
           if (Object.keys(metadata).length > 0) {
             await audit(transaction, actor, {
