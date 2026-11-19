@@ -29,12 +29,13 @@ describe("EmphasisCard", () => {
       fontSize: 12,
       textTransform: "uppercase",
     });
-    expect(screen.getByText("Desde Bs 80")).toHaveStyle({ color: "#93615D", fontSize: 13 });
-    expect(screen.getByText("Desde Bs 80").parent).toHaveStyle({
-      alignSelf: "flex-start",
-      backgroundColor: "#E7CCBF",
-      borderRadius: 999,
+    // FIX-089: a normal fact on the hero is bold Crema text, not a pill.
+    expect(screen.getByText("Desde Bs 80")).toHaveStyle({
+      color: "#F9F4F2",
+      fontSize: 13,
+      fontWeight: "700",
     });
+    expect(screen.getByText("Desde Bs 80").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(screen.getByText("Elige tu plan y empieza a moverte")).toHaveStyle({
       color: "#F9F4F2",
       fontFamily: "Lora_400Regular",

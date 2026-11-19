@@ -103,6 +103,16 @@ describe("CancelledFold", () => {
   });
 });
 
+describe("ClassRow detail", () => {
+  it("keeps a long detail on one line when asked", async () => {
+    const screen = await render(
+      <ClassRow detail="Achumani · Daniela Ortiz" detailLines={1} time="16:00" title="Reformer" />,
+    );
+
+    expect(screen.getByText("Achumani · Daniela Ortiz")).toHaveProp("numberOfLines", 1);
+  });
+});
+
 describe("CancelledFold without a single reason", () => {
   it("says the count alone when the causes differ", async () => {
     const screen = await render(
