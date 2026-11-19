@@ -45,12 +45,16 @@ export function PaymentRowMenu({
     <>
       <RowMenu label={`Acciones de ${payment.clientName}`} items={items} />
       {voiding ? (
-        <VoidSaleDialog
-          paymentId={payment.id}
-          clientName={payment.clientName}
-          open
-          onOpenChange={setVoiding}
-        />
+        // React events cross the dialog's portal: keep its clicks off the
+        // row, whose click opens the payment's panel.
+        <div className="contents" onClick={(event) => event.stopPropagation()}>
+          <VoidSaleDialog
+            paymentId={payment.id}
+            clientName={payment.clientName}
+            open
+            onOpenChange={setVoiding}
+          />
+        </div>
       ) : null}
     </>
   );
