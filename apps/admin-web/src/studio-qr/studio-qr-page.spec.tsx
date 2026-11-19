@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { imageFile } from "../test/image-stubs";
 import {
@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
+import { classTypesPath } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
 
 const statusPath = "/api/v1/administrator/transfer-qr";
@@ -55,16 +56,26 @@ describe("Ajustes › QR del estudio", () => {
     server.use(...signedInHandlers());
   });
 
-  it("opens from the global search, as an Ajustes tab", async () => {
+  // FIX-091 (W9 B): the global search finds Clientas only; the rail opens it.
+  it("opens from the rail, as an Ajustes tab", async () => {
     server.use(...qrHandlers());
+    // The rail opens Ajustes on its first tab, Tipos de clase.
+    server.use(
+      http.get(apiUrl(classTypesPath), () =>
+        jsonResponse({ items: [], page: 1, pageSize: 20, totalItems: 0 }),
+      ),
+    );
     const { user } = renderAdmin("/");
 
-    await user.type(
-      await screen.findByRole("combobox", { name: "Buscar en todo" }),
-      "qr",
+    await user.click(
+      within(
+        await screen.findByRole("navigation", { name: "Secciones" }),
+      ).getByRole("link", { name: "Ajustes" }),
     );
     await user.click(
-      screen.getByRole("option", { name: "Ajustes · QR del estudio" }),
+      within(
+        await screen.findByRole("navigation", { name: "Páginas de Ajustes" }),
+      ).getByRole("link", { name: "QR del estudio" }),
     );
 
     await heading();

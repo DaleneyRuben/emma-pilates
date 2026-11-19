@@ -1,72 +1,144 @@
 import { screen, within } from "@testing-library/react";
-import { server, useMockServer } from "../../test/msw";
+import { http } from "msw";
+import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
 import { emptyPageHandlers } from "../../test/page-handlers";
+import {
+  acquisitionHandler,
+  clientPage,
+  clientRow,
+  clientsPath,
+  luciaDetail,
+} from "../../test/people-fixtures";
 import { renderAdmin } from "../../test/render-admin";
 import {
   coordinatorHandlers,
   signedInHandlers,
 } from "../../test/session-handlers";
 
-// Follow-up 232: «Buscar una clienta, una clase, un pago o una página»,
-// Ctrl K. Pages answer from the rail itself; a name opens Clientas' search.
+// FIX-091 (W9 B): «Buscar una clienta», Ctrl K. Only Clientas answer, while
+// typing; a result opens her file, the last one lists every match in Clientas.
+const valeria = clientRow("Valeria Quiroga", {
+  phone: "+591 70011001",
+  planName: "Mensual",
+  remainingClassAllowance: 7,
+});
+const valentina = clientRow("Valentina Ríos", {
+  id: "c1000000-0000-5000-8000-000000000777",
+  phone: null,
+  planName: null,
+  subscriptionStatus: "none",
+  remainingClassAllowance: null,
+  originalClassAllowance: null,
+});
+
 describe("the global search", () => {
   useMockServer();
 
+  let searched: URLSearchParams[] = [];
+  const clientHandlers = () => [
+    http.get(apiUrl(clientsPath), ({ request }) => {
+      const params = new URL(request.url).searchParams;
+      searched.push(params);
+      const q = params.get("q") ?? "";
+      if (q === "zz") return jsonResponse(clientPage([]));
+      if (q.includes("@")) return jsonResponse(clientPage([valeria]));
+      return jsonResponse(clientPage([valeria, valentina]));
+    }),
+    http.get(apiUrl(`${clientsPath}/:clientId`), () =>
+      jsonResponse({ ...luciaDetail, id: valeria.id, name: valeria.name }),
+    ),
+    acquisitionHandler(),
+  ];
+
   const heading = (name: string | RegExp) =>
     screen.findByRole("heading", { level: 1, name });
-  const search = () => screen.getByRole("combobox", { name: "Buscar en todo" });
+  const search = () =>
+    screen.getByRole("combobox", { name: "Buscar una clienta" });
+  const optionNames = () =>
+    within(screen.getByRole("listbox", { name: "Clientas" }))
+      .getAllByRole("option")
+      .map((option) => option.textContent);
+
+  beforeEach(() => {
+    searched = [];
+  });
 
   describe("for the Administrator", () => {
-    beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
+    beforeEach(() =>
+      server.use(
+        ...signedInHandlers(),
+        ...emptyPageHandlers(),
+        ...clientHandlers(),
+      ),
+    );
 
-    it("finds a page by its name, accents aside, and opens it with Enter", async () => {
-      const { user, router } = renderAdmin("/");
+    it("asks for a Client", async () => {
+      renderAdmin("/");
       await heading(/^Buen/);
 
-      await user.type(search(), "nutricion");
-
-      const results = screen.getByRole("listbox", { name: "Resultados" });
-      expect(
-        within(results)
-          .getAllByRole("option")
-          .map((option) => option.textContent),
-      ).toEqual(["Horario · Nutrición", "Buscar «nutricion» en Clientas"]);
-      await user.keyboard("{Enter}");
-
-      expect(router.state.location.pathname).toBe("/horario/nutricion");
-      expect(search()).toHaveValue("");
-      expect(
-        screen.queryByRole("listbox", { name: "Resultados" }),
-      ).not.toBeInTheDocument();
+      expect(search()).toHaveAttribute("placeholder", "Buscar una clienta");
     });
 
-    it("searches Clientas for a name", async () => {
+    it("lists the Clients while typing, with her phone and Plan", async () => {
+      const { user } = renderAdmin("/");
+      await heading(/^Buen/);
+
+      await user.type(search(), "val");
+
+      await screen.findByRole("option", { name: /^Valeria Quiroga/ });
+      expect(optionNames()).toEqual([
+        "Valeria Quiroga+591 70011001 · Mensual · 7 restantes",
+        "Valentina RíosSin teléfono · Sin plan",
+        "Ver todas las clientas con «val»",
+      ]);
+      expect(searched.at(-1)?.get("q")).toBe("val");
+      expect(searched.at(-1)?.get("pageSize")).toBe("5");
+    });
+
+    it("offers no page, class or payment", async () => {
+      const { user } = renderAdmin("/");
+      await heading(/^Buen/);
+
+      await user.type(search(), "zz");
+
+      expect(
+        await screen.findByText("Ninguna clienta con «zz»"),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("option")).not.toBeInTheDocument();
+    });
+
+    it("opens her file from a click on her result", async () => {
       const { user, router } = renderAdmin("/");
       await heading(/^Buen/);
 
-      await user.type(search(), "Lucía");
-      expect(
-        screen.getByRole("option", { name: "Buscar «Lucía» en Clientas" }),
-      ).toHaveAttribute("aria-selected", "true");
+      await user.type(search(), "val");
+      await user.click(
+        await screen.findByRole("option", { name: /^Valeria Quiroga/ }),
+      );
+
+      await screen.findByRole("dialog", { name: "Valeria Quiroga" });
+      expect(router.state.location.pathname).toBe("/clientas");
+      expect(search()).toHaveValue("");
+    });
+
+    it("moves through the results with the arrow keys and lists every match with Enter", async () => {
+      const { user, router } = renderAdmin("/");
+      await heading(/^Buen/);
+
+      await user.type(search(), "val");
+      await screen.findByRole("option", { name: /^Valeria Quiroga/ });
+      const options = screen.getAllByRole("option");
+      expect(options[0]).toHaveAttribute("aria-selected", "true");
+
+      await user.keyboard("{ArrowDown}{ArrowDown}");
+      expect(options[2]).toHaveAttribute("aria-selected", "true");
+      expect(search()).toHaveAttribute("aria-activedescendant", options[2]?.id);
       await user.keyboard("{Enter}");
 
       await heading("Clientas");
       expect(router.state.location.pathname).toBe("/clientas");
-      expect(router.state.location.search).toMatchObject({ q: "Lucía" });
-    });
-
-    it("moves through the results with the arrow keys", async () => {
-      const { user } = renderAdmin("/");
-      await heading(/^Buen/);
-
-      await user.type(search(), "pagos");
-      const options = screen.getAllByRole("option");
-      expect(options[0]).toHaveAttribute("aria-selected", "true");
-
-      await user.keyboard("{ArrowDown}");
-      expect(options[0]).toHaveAttribute("aria-selected", "false");
-      expect(options[1]).toHaveAttribute("aria-selected", "true");
-      expect(search()).toHaveAttribute("aria-activedescendant", options[1]?.id);
+      expect(router.state.location.search).toMatchObject({ q: "val" });
+      expect(router.state.location.search).not.toHaveProperty("cliente");
     });
 
     it("takes focus with Ctrl K and lets Escape close the results", async () => {
@@ -75,45 +147,29 @@ describe("the global search", () => {
 
       await user.keyboard("{Control>}k{/Control}");
       expect(search()).toHaveFocus();
-      await user.type(search(), "caja");
-      expect(
-        screen.getByRole("option", { name: "Dinero · Caja" }),
-      ).toBeInTheDocument();
+      await user.type(search(), "val");
+      await screen.findByRole("option", { name: /^Valeria Quiroga/ });
       await user.keyboard("{Escape}");
 
       expect(
-        screen.queryByRole("listbox", { name: "Resultados" }),
+        screen.queryByRole("listbox", { name: "Clientas" }),
       ).not.toBeInTheDocument();
-    });
-
-    it("opens a page from a click on its result", async () => {
-      const { user, router } = renderAdmin("/");
-      await heading(/^Buen/);
-
-      await user.type(search(), "clases");
-      await user.click(
-        screen.getByRole("option", { name: "Horario · Clases" }),
-      );
-
-      await heading("Horario");
-      expect(router.state.location.pathname).toBe("/horario");
+      expect(search()).toHaveValue("");
     });
   });
 
   describe("for the Coordinator", () => {
-    beforeEach(() => server.use(...coordinatorHandlers()));
+    beforeEach(() => server.use(...coordinatorHandlers(), ...clientHandlers()));
 
-    it("never offers a page she cannot open", async () => {
+    it("finds Clients too", async () => {
       const { user } = renderAdmin("/");
       await heading(/^Buen/);
 
-      await user.type(search(), "pagos");
+      await user.type(search(), "val");
 
       expect(
-        within(screen.getByRole("listbox", { name: "Resultados" }))
-          .getAllByRole("option")
-          .map((option) => option.textContent),
-      ).toEqual(["Buscar «pagos» en Clientas"]);
+        await screen.findByRole("option", { name: /^Valeria Quiroga/ }),
+      ).toBeInTheDocument();
     });
   });
 });
