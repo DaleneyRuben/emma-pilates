@@ -36,7 +36,11 @@ describe("Chip", () => {
     const screen = await render(<Chip label="Mañana" onPress={onPress} selected={false} />);
 
     const chip = screen.getByRole("button", { name: "Mañana" });
-    expect(chip).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697", borderWidth: 1 });
+    expect(chip).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderWidth: 1,
+    });
     expect(chip).toHaveProp("hitSlop", { bottom: 3, left: 0, right: 0, top: 3 });
     expect(screen.getByText("Mañana")).toHaveStyle({ color: "#93615D" });
     await fireEvent.press(chip);
@@ -109,7 +113,9 @@ describe("FormField (FormB)", () => {
   });
 
   it("never shows dots as a password placeholder", async () => {
-    const screen = await render(<FormField label="Contraseña" placeholder="••••••" secureTextEntry />);
+    const screen = await render(
+      <FormField label="Contraseña" placeholder="••••••" secureTextEntry />,
+    );
 
     expect(screen.getByLabelText("Contraseña")).not.toHaveProp("placeholder", "••••••");
   });
