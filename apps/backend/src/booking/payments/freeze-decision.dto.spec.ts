@@ -21,6 +21,9 @@ describe('parseDecideFreeze', () => {
     expect(parseDecideFreeze({ decision: 'approved' })).toEqual({
       decision: 'approved',
     });
+    expect(
+      parseDecideFreeze({ decision: 'approved', refusalReason: '   ' }),
+    ).toEqual({ decision: 'approved' });
   });
 
   it('refuses a reason on an approval or longer than 300 characters', () => {
