@@ -115,6 +115,8 @@ describe('requested freezes for review (PostgreSQL)', () => {
       state: 'requested',
       planEndsOn: freeze.endsOn,
       planEndsOnAfter: addDays(freeze.endsOn, 10),
+      // FIX-091 (W16 B): the panel says how many classes her Plan has left.
+      remainingClassAllowance: quarterly.classAllowance,
       decidedAt: null,
       decidedByName: null,
     });
