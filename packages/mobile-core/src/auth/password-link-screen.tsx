@@ -106,7 +106,13 @@ export function PasswordLinkScreen({
           );
         })
         .catch(() => {
-          if (active) setState((shown) => (shown === "activated" ? shown : "expired"));
+          // A failed re-check (no network on return) keeps what she already saw.
+          if (active)
+            setState((shown) =>
+              shown === "activated" || shown === "current" || shown === "removed"
+                ? shown
+                : "expired",
+            );
         });
 
     inspect();
