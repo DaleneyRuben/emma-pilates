@@ -53,6 +53,7 @@ export function SessionRow({
       accessibilityLabel={accessibilityLabel}
       detail={`${session.trainerName} · ${durationMinutes(session.startsAt, session.endsAt)} min`}
       detailLead={trainerFace}
+      detailLines={1}
       onPress={onPress}
       places={seatsLabel(session.availableSeats)}
       testID={testID}

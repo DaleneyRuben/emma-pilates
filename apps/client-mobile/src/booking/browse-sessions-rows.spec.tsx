@@ -120,6 +120,8 @@ describe("Client class list rows", () => {
       color: "#93615D",
       fontSize: 13,
     });
+    // FIX-041 (follow-up 242): the trainer line stays on one line.
+    expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveProp("numberOfLines", 1);
     expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveStyle({
       fontFamily: "WorkSans_600SemiBold",
       fontSize: 15,
