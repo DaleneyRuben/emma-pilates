@@ -33,7 +33,8 @@ import { DayStrip } from "../ui/day-strip";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { countLabel, dayHeading } from "../ui/session-time";
-import { ScheduleCancelledFold, ScheduleClassRow } from "./schedule-class-card";
+import { splitNextClass } from "../trainer/next-class";
+import { ScheduleCancelledFold, ScheduleClassRow, ScheduleNextClass } from "./schedule-class-card";
 
 type ScheduleNavigation = {
   navigate: {
@@ -101,6 +102,8 @@ export function ScheduleScreen() {
   const list = sessions.data?.status === 200 ? sessions.data.data : [];
   const standing = list.filter((session) => (session.cancellation ?? null) === null);
   const cancelled = list.filter((session) => (session.cancellation ?? null) !== null);
+  const now = new Date();
+  const { next, rest } = splitNextClass(standing, selectedDate === today, now);
 
   return (
     <Screen style={styles.screen}>
@@ -149,9 +152,10 @@ export function ScheduleScreen() {
             <SectionTitle>
               {dayCount(selectedDate, today, standing.length, cancelled.length)}
             </SectionTitle>
-            {standing.length === 0 ? null : (
+            {next === undefined ? null : <ScheduleNextClass now={now} session={next} />}
+            {rest.length === 0 ? null : (
               <ClassList>
-                {standing.map((session) => (
+                {rest.map((session) => (
                   <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
                 ))}
               </ClassList>

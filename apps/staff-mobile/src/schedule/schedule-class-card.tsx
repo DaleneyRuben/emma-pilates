@@ -11,6 +11,32 @@ import {
 import { cancelledReason, causeLabel } from "../trainer/agenda-cancellations";
 import { minutesLabel, startTime } from "../ui/session-time";
 import { SessionRow } from "../ui/session-row";
+import { TodayHero } from "../ui/today-hero";
+
+/** Today's next class on Horario (ClaseE): read-only, so it opens nothing. */
+export function ScheduleNextClass({
+  now,
+  session,
+}: {
+  now: Date;
+  session: SessionAvailabilityDto;
+}) {
+  const full = session.availableSeats === 0;
+  const places = placesLabel(session.bookedCount, session.capacity);
+  const minutes = minutesLabel(session.startsAt, session.endsAt);
+  const waitlist = session.waitlistCount > 0 ? ` · ${session.waitlistCount} en espera` : "";
+  return (
+    <TodayHero
+      accessibilityLabel={`${startTime(session.startsAt, session.endsAt)}, ${session.classTypeName} con ${session.trainerName}, ${full ? "Completa" : places}, ${minutes}${waitlist.replace(" ·", ",")}`}
+      detail={`${session.branchName} · ${session.trainerName} · ${minutes}${waitlist}`}
+      now={now}
+      places={full ? "Completa" : places}
+      startsAt={session.startsAt}
+      testID={`schedule-session-${session.id}`}
+      title={`${startTime(session.startsAt, session.endsAt)} · ${session.classTypeName}`}
+    />
+  );
+}
 
 /**
  * FIX-083 (Horario pick A) on the shared class row (ClaseE, FIX-089): the

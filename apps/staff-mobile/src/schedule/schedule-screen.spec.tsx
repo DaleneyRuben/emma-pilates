@@ -25,7 +25,7 @@ async function openSchedule(role: "assistant" | "coordinator", profile: unknown)
   );
   await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
   await fireEvent.press(screen.getByTestId("tab-schedule"));
-  await waitFor(() => expect(screen.getByText("Emma Vargas · 50 min")).toBeOnTheScreen());
+  await waitFor(() => expect(screen.getByTestId("schedule-session-session-1")).toBeOnTheScreen());
   return screen;
 }
 
@@ -104,11 +104,13 @@ describe("Horario (v2 HOR boards)", () => {
           routeFetcher({
             ...routes(coordinator),
             [daySessions]: () =>
+              // Today's next class is the hero; the face leads the other rows.
               jsonResponse([
-                { ...session, trainerPhoto: { imageAssetId: "asset-emma" } },
+                { ...session, trainerName: "Andrea Suárez", trainerPhoto: null },
+                { ...session, id: "session-2", trainerPhoto: { imageAssetId: "asset-emma" } },
                 {
                   ...session,
-                  id: "session-2",
+                  id: "session-3",
                   trainerName: "Andrea Suárez",
                   trainerPhoto: null,
                 },
@@ -126,7 +128,7 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    const emma = await screen.findByTestId("schedule-session-session-1");
+    const emma = await screen.findByTestId("schedule-session-session-2");
     await waitFor(() =>
       expect(within(emma).getByLabelText("Foto de Emma Vargas")).toHaveStyle({
         width: 20,
@@ -135,7 +137,7 @@ describe("Horario (v2 HOR boards)", () => {
     );
     expect(within(emma).getByText("Emma Vargas · 50 min")).toBeOnTheScreen();
     expect(
-      within(screen.getByTestId("schedule-session-session-2")).getByText("AS"),
+      within(screen.getByTestId("schedule-session-session-3")).getByText("AS"),
     ).toBeOnTheScreen();
   });
 
@@ -200,9 +202,9 @@ describe("Horario (v2 HOR boards)", () => {
     await waitFor(() => expect(screen.getByTestId("tab-schedule")).toBeOnTheScreen());
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
-    // A full class is the exception, so it alone takes the pill.
-    expect(await screen.findByTestId("exception-pill")).toBeOnTheScreen();
-    expect(screen.getByText("Completa")).toBeOnTheScreen();
+    // A full class says so; as today's next class it leads as the hero.
+    expect(await screen.findByText("Completa")).toBeOnTheScreen();
+    expect(within(screen.getByTestId("next-class-hero")).getByText("Completa")).toBeOnTheScreen();
     expect(screen.queryByText("12 de 12")).toBeNull();
     expect(screen.getByText("2 canceladas por mínimo")).toBeOnTheScreen();
     expect(screen.getByText("Ver")).toBeOnTheScreen();
