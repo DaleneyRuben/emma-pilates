@@ -26,7 +26,8 @@ const fullType = async (page: Page) => {
 const nowrapFigures = async (page: Page) => {
   const months = page.getByRole("table", { name: "Totales por mes" });
   const month = months.getByText(/de 20\d\d/).first();
-  const amount = months.getByText(/Bs [\d.]+,\d{2}/).first();
+  // FIX-090: whole amounts drop «,00».
+  const amount = months.getByText(/Bs [\d.]+(,\d{2})?$/).first();
   await expect(month).toBeVisible();
   await expect(month).toHaveCSS("white-space", "nowrap");
   await expect(amount).toHaveCSS("white-space", "nowrap");
