@@ -15,7 +15,7 @@ export type EmphasisCardProps = {
   eyebrow?: string;
   /** One line of white 85 % text. */
   note?: string;
-  /** A pill such as «15 % de descuento»: white text on white 18 %. */
+  /** A short fact such as «15 % de descuento», bold Crema text (no pill, FIX-089). */
   pill?: string;
   testID?: string;
   /** A Lora 24 white title. */
@@ -36,7 +36,7 @@ export function EmphasisCard({
     <View style={styles.card} testID={testID}>
       {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
       {pill === undefined ? null : (
-        <View style={styles.pill}>
+        <View>
           <Text style={styles.pillLabel}>{pill}</Text>
         </View>
       )}
@@ -94,18 +94,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
   },
-  pill: {
-    alignSelf: "flex-start",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
   pillLabel: {
-    color: colors.text,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.note,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   pressed: { opacity: 0.85 },
   title: {

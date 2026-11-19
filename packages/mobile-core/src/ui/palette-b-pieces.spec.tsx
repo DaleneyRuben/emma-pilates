@@ -82,7 +82,9 @@ describe("FormErrorSummary (FormB)", () => {
   });
 
   it("names another action than saving", async () => {
-    const screen = await render(<FormErrorSummary action="enviar" fields={["NIT", "Razón social"]} />);
+    const screen = await render(
+      <FormErrorSummary action="enviar" fields={["NIT", "Razón social"]} />,
+    );
 
     expect(screen.getByText("Faltan 2 datos para enviar")).toBeOnTheScreen();
   });

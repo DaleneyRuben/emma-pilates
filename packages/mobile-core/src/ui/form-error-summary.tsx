@@ -3,20 +3,27 @@ import { StyleSheet, Text, View } from "react-native";
 import { fontFamilies } from "./fonts";
 import { colors, radii, spacing, typography } from "./tokens";
 
-/** «Faltan N datos para guardar» (FormB, FIX-089). */
-export function missingFieldsTitle(count: number): string {
-  return count === 1 ? "Falta 1 dato para guardar" : `Faltan ${count} datos para guardar`;
+/** «Faltan N datos para guardar» (FormB, FIX-089); `action` names another verb. */
+export function missingFieldsTitle(count: number, action = "guardar"): string {
+  return count === 1 ? `Falta 1 dato para ${action}` : `Faltan ${count} datos para ${action}`;
 }
 
 /**
  * The Rubor box at the top of a form after a save with fields missing or
  * wrong (FormB): how many, then their labels. The fields themselves are marked.
  */
-export function FormErrorSummary({ fields }: { fields: readonly string[] }) {
+export function FormErrorSummary({
+  action,
+  fields,
+}: {
+  /** The verb after «para», «guardar» unless told otherwise. */
+  action?: string;
+  fields: readonly string[];
+}) {
   if (fields.length === 0) return null;
   return (
     <View accessibilityRole="alert" style={styles.box} testID="form-error-summary">
-      <Text style={styles.title}>{missingFieldsTitle(fields.length)}</Text>
+      <Text style={styles.title}>{missingFieldsTitle(fields.length, action)}</Text>
       <Text style={styles.fields}>{fields.join(" · ")}</Text>
     </View>
   );

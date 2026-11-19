@@ -92,6 +92,7 @@ export function ClassRow({
   accessibilityLabel,
   detail,
   detailLead,
+  detailLines,
   end,
   onPress,
   places,
@@ -104,6 +105,8 @@ export function ClassRow({
   detail?: string;
   /** Something before the quiet line, such as the Trainer's small face. */
   detailLead?: ReactNode;
+  /** Keeps the quiet line to this many lines. */
+  detailLines?: number;
   /** Replaces the places, such as an exception pill. */
   end?: ReactNode;
   onPress?: () => void;
@@ -125,7 +128,9 @@ export function ClassRow({
         {detail === undefined ? null : (
           <View style={styles.detailLine}>
             {detailLead}
-            <Text style={styles.detail}>{detail}</Text>
+            <Text numberOfLines={detailLines} style={styles.detail}>
+              {detail}
+            </Text>
           </View>
         )}
       </View>
