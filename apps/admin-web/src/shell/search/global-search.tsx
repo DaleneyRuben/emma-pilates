@@ -105,12 +105,14 @@ export function GlobalSearch({ className }: { className?: string }) {
             } else if (open && event.key === "ArrowUp") {
               event.preventDefault();
               setActive((current - 1 + results.length) % results.length);
-            } else if (open && event.key === "Enter") {
+            } else if (words !== "" && event.key === "Enter") {
               event.preventDefault();
-              // Matches for older words must not open the wrong Clienta.
-              const result = matches.settled
-                ? results[current]
-                : ({ kind: "all", words } as const);
+              // Before the matches answer these words (none yet, or older
+              // ones), Enter lists every match instead of opening a Clienta.
+              const result =
+                open && matches.settled
+                  ? results[current]
+                  : ({ kind: "all", words } as const);
               if (result !== undefined) choose(result);
             }
           }}
