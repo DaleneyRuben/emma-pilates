@@ -70,6 +70,7 @@ type DecideFreezeDependencies = {
     freezeId: string;
     decidedByAccountId: string;
     decidedAt: Date;
+    refusalReason: string | null;
   }): Promise<void>;
   record(notification: NewNotification): Promise<void>;
   now(): Date;
@@ -82,7 +83,11 @@ const requireOperations = (principal: AuthenticatedPrincipal): void => {
 };
 
 export const decideFreeze = async (
-  command: { freezeId: string; decision: 'approved' | 'refused' },
+  command: {
+    freezeId: string;
+    decision: 'approved' | 'refused';
+    refusalReason?: string;
+  },
   dependencies: DecideFreezeDependencies,
 ): Promise<{ state: 'approved' | 'refused' }> => {
   requireOperations(dependencies.principal);
@@ -100,8 +105,9 @@ export const decideFreeze = async (
     decidedByAccountId: dependencies.principal.accountId,
     decidedAt,
   };
+  const refusalReason = command.refusalReason ?? null;
   if (command.decision === 'approved') await dependencies.approve(input);
-  else await dependencies.refuse(input);
+  else await dependencies.refuse({ ...input, refusalReason });
 
   const approved = command.decision === 'approved';
   await dependencies.record({
@@ -112,7 +118,9 @@ export const decideFreeze = async (
     title: approved ? 'Congelamiento aprobado' : 'Congelamiento rechazado',
     message: approved
       ? approvalMessage(freeze)
-      : 'Tu solicitud de congelamiento fue rechazada.',
+      : refusalReason === null
+        ? 'Tu solicitud de congelamiento fue rechazada.'
+        : `Tu solicitud de congelamiento fue rechazada. Motivo: ${refusalReason}`,
     destination: { type: 'subscription', id: freeze.subscriptionId },
     occurredAt: decidedAt,
   });

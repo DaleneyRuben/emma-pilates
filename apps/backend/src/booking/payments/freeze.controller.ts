@@ -228,7 +228,13 @@ export class AdministratorFreezesController {
     );
     return runFreeze(() =>
       this.commands.decideFreeze(
-        { freezeId: id, decision: parsed.decision },
+        {
+          freezeId: id,
+          decision: parsed.decision,
+          ...(parsed.refusalReason === undefined
+            ? {}
+            : { refusalReason: parsed.refusalReason }),
+        },
         principal,
       ),
     );

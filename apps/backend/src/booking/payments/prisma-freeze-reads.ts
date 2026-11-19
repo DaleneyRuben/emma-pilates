@@ -14,6 +14,7 @@ const reviewSelect = {
   endsOn: true,
   reason: true,
   state: true,
+  refusalReason: true,
   auditRecordId: true,
   decidedAt: true,
   decidedByAccount: { select: { staffMember: { select: { name: true } } } },
@@ -80,6 +81,7 @@ const toReview = (
     endsOn: Date;
     reason: string;
     state: FreezeState;
+    refusalReason: string | null;
     decidedAt: Date | null;
     decidedByAccount: { staffMember: { name: string } | null } | null;
     auditRecordId: string | null;
@@ -125,6 +127,7 @@ const toReview = (
       after === null ? null : (recorded.planEndsOnAfter ?? civil(after)),
     decidedAt: row.decidedAt?.toISOString() ?? null,
     decidedByName,
+    refusalReason: row.refusalReason,
   };
 };
 
