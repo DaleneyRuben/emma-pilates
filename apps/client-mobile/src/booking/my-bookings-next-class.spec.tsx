@@ -1,9 +1,13 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { StyleSheet } from "react-native";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import {
+  ancestorBackgrounds,
+  createClientRuntime,
+  jsonResponse,
+  routeFetcher,
+} from "../test-support";
 
 jest.setTimeout(20_000);
 
@@ -77,17 +81,6 @@ async function openMyBookings(upcoming: unknown[]) {
   return screen;
 }
 
-type Element = ReturnType<Awaited<ReturnType<typeof render>>["getByText"]>;
-
-function backgrounds(element: Element): unknown[] {
-  const found: unknown[] = [];
-  for (let node: Element | null = element; node !== null; node = node.parent) {
-    const style = StyleSheet.flatten(node.props.style as never) as { backgroundColor?: unknown };
-    if (style?.backgroundColor !== undefined) found.push(style.backgroundColor);
-  }
-  return found;
-}
-
 // FIX-089 (ClaseE): the first booked class tops Mis reservas as the Palo de
 // rosa hero, its action right under it; the others stay cards. A waitlist
 // place is a normal state, said in words rather than a pill.
@@ -118,6 +111,6 @@ describe("Client Mis reservas, palette B", () => {
 
     const words = screen.getByText("En lista de espera");
     expect(words).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_600SemiBold" });
-    expect(backgrounds(words)).not.toContain("#E7CCBF");
+    expect(ancestorBackgrounds(words)).not.toContain("#E7CCBF");
   });
 });

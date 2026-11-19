@@ -1,4 +1,6 @@
+import type { render } from "@testing-library/react-native";
 import type { MobileRuntime } from "@pilates/mobile-core";
+import { StyleSheet } from "react-native";
 
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -83,4 +85,20 @@ export function staffPhotoRoute(imageAssetId: string): Record<string, Route> {
         status: 200,
       }),
   };
+}
+
+type Element = ReturnType<Awaited<ReturnType<typeof render>>["getByText"]>;
+
+/**
+ * Every background drawn behind an element, itself first: palette B says a
+ * normal state in words, so its text sits on no pill (FIX-089).
+ */
+export function ancestorBackgrounds(element: Element): unknown[] {
+  const found: unknown[] = [];
+  for (let node: Element | null = element; node !== null; node = node.parent) {
+    const style = StyleSheet.flatten(node.props.style as never) as
+      { backgroundColor?: unknown } | undefined;
+    if (style?.backgroundColor !== undefined) found.push(style.backgroundColor);
+  }
+  return found;
 }
