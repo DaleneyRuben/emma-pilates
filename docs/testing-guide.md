@@ -60,7 +60,7 @@ numbered tests.
 | Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 | Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
-| Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 185) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
+| Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 186) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 
 ## Where each designed screen is tested
@@ -71,14 +71,14 @@ can be found by its design name.
 
 | Client app | Tests |
 | --- | --- |
-| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115, 142, 185 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126, 133, 160, 176, 185 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126, 185 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126, 176, 185 |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 79, 115, 142, 186 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 91, 104, 107, 112, 113, 115, 126, 133, 160, 176, 186 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126, 186 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126, 176, 186 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158, 160 |
-| 13 Evaluación nutricional (with the booked ones since FIX-057, the appointment block since C5), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160, 185 |
+| 13 Evaluación nutricional (with the booked ones since FIX-057, the appointment block since C5), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160, 186 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 185 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 186 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -88,7 +88,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71, 142 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 82, 106, 109, 110, 115 |
 | S26 Reportar una falla (Entrenadora) | 82 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89, 160, 185 H |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 79, 85, 87, 89, 160, 186 H |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 81, 87, 88, 89, 112, 126 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
 | S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
@@ -184,7 +184,7 @@ You should see:
   **Regístrate**".
 
 Tap **Regístrate**. The screen has a back arrow and the title «Crea tu
-cuenta» (C6, Test 185). Confirm that the form asks for name (hint «Ej.: Lucía
+cuenta» (C6, Test 186). Confirm that the form asks for name (hint «Ej.: Lucía
 Mendoza» under the field), email («Ej.: tu@correo.com»), mobile, password
 («Mínimo 8 caracteres»), and password confirmation, then **¿Cómo nos
 conociste?** as chips, plus a collapsed **¿Tienes un código de referido?**
@@ -623,12 +623,12 @@ Keep the backend and Client Expo server running. In the iOS Simulator, open the
 Client app, enter `lucia@example.com` and the fixture password, then tap
 **Iniciar sesión**. The access screens name «Emma Pilates Studio» in Lora,
 with no tagline (follow-up 227); registration has «Crea tu cuenta» with a
-back arrow instead (C6, Test 185 H). The app should open **Inicio** (MOB-074,
+back arrow instead (C6, Test 186 H). The app should open **Inicio** (MOB-074,
 board `C02`): today's date in small capitals over "Hola, Lucía", and on the
 right a Lino bell (with the unread count in a Rosa profundo pill; it opens
 **Notificaciones** with a back arrow) and her avatar (it opens **Perfil**).
 With a booked class, the Palo de rosa «TU PRÓXIMA CLASE · HOY» (or «·
-MAÑANA», «· JUE 19») block leads Inicio, before the promotion (C7, Test 185
+MAÑANA», «· JUE 19») block leads Inicio, before the promotion (C7, Test 186
 A): «08:00 · Reformer Pilates» in Lora, «Branch · Trainer», «N de M libres»
 (or «Último lugar», «Clase llena») top right, and who else is coming as
 Crema initials circles (five at most, then «+N»); it opens **Mis reservas**.
@@ -640,7 +640,7 @@ action, and under it the plan is a light row, tappable as a whole with a «›»
 vencer** near the end). There is no **Mi plan** pill and no **Activo** pill.
 A payment in review or rejected (C8) and an approved Freeze running or
 starting within 7 days (C1) add their own Palo de rosa block at the top
-(Test 185 B–C). «Accesos rápidos» are two Lino tiles with a plain
+(Test 186 B–C). «Accesos rápidos» are two Lino tiles with a plain
 grey icon (Evaluación nutricional, Invita a una amiga). Log in as `mariana@example.com`
 to see the no-plan hero instead: a «Desde Bs …» pill, «Elige tu plan y
 empieza a moverte», «Mat y Reformer · paga por QR o en el estudio», and the
@@ -685,7 +685,7 @@ libres», «Último lugar» or «Clase llena»), and «Cancelas gratis hasta · 
 19 nov · 07:30» (or «Te avisamos si se libera un lugar» when full); «Sobre la
 clase»; and at the bottom **Reservar esta clase** over «Usarás 1 de tus N
 clases.» («Usarás tu última clase.» with one left), or «La lista de espera no
-usa clases de tu plan» over **Unirme a la lista de espera** (C4, Test 185 E).
+usa clases de tu plan» over **Unirme a la lista de espera** (C4, Test 186 E).
 **Reservar esta clase** creates a real Booking and lands on **Mis reservas** with the
 Rosa profundo toast «Reserva confirmada · Te quedan N clases en tu plan»,
 which stays until closed or the screen changes; the permission sheet (Test
@@ -1019,7 +1019,7 @@ Home, class browsing, Plan, and profile screens:
 | `GET /api/v1/sessions/{sessionId}`      | One Session with its Branch, Class Type description, Trainer, and seats   |
 | `GET /api/v1/plans/{planId}`            | One Plan (the app's Detalle del plan); an unknown id answers `404 plan_not_found` |
 | `PATCH /api/v1/clients/current` `{ name, phone }` | Saves the name and phone (Perfil → Editar); an empty name answers `400 client_name_required` |
-| `GET /api/v1/bookings` / `GET /api/v1/bookings/history` | Upcoming Bookings and Waitlist Entries (Mis reservas) / attended classes, newest first (Historial); each upcoming item carries `capacity`, `bookedCount` (hers included) and `attendeeInitials`, the other booked Clients' initials in booking order («VQ», never names; C7, Test 185 A) |
+| `GET /api/v1/bookings` / `GET /api/v1/bookings/history` | Upcoming Bookings and Waitlist Entries (Mis reservas) / attended classes, newest first (Historial); each upcoming item carries `capacity`, `bookedCount` (hers included) and `attendeeInitials`, the other booked Clients' initials in booking order («VQ», never names; C7, Test 186 A) |
 
 The commands behind Reservar and Mis reservas, each with an
 `idempotency-key` UUID where it changes something, are
@@ -1672,7 +1672,7 @@ from system.accounts a where a.email = 'sofia@example.com';
 ```
 
 Pull the Perfil tab again: the badge shows `1`, and **Notificaciones** lists the
-row under **Nuevas · 1** (C2, Test 185 F): its title «Clase cancelada», a
+row under **Nuevas · 1** (C2, Test 186 F): its title «Clase cancelada», a
 topic icon in a Palo de rosa circle, the message, a relative time such as
 "Hace 40 minutos" with a dot next to it (under a minute it reads "Hace un
 momento", never "Hace 0 minutos"; yesterday's rows read "Ayer, 18:05", older
@@ -2223,7 +2223,7 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    **Confirmar evaluación**. You land back on **Evaluación nutricional** with
    the «Evaluación confirmada» toast (a paid one says «Comprobante enviado»);
    since FIX-057 there is no separate Mis evaluaciones (Test 151).
-3. The booked one sits on top in a Palo de rosa block (C5, Test 185 G): «TU
+3. The booked one sits on top in a Palo de rosa block (C5, Test 186 G): «TU
    CITA · EN N DÍAS» (HOY / MAÑANA), «Lun 23 nov · 09:45» in Lora, a Crema
    initials circle with «Nutricionista · Branch · 45 min», «Gratis · primera
    del trimestre · llega 10 min antes» (a paid one: «Bs 70 · Pagada / Pago
@@ -3797,7 +3797,7 @@ The following are not ready for manual product testing:
   was booked), «Pagado Bs … · QR» on Mi plan (the subscription carries no
   payment), and the v2 restyle of the shared recovery and activation
   screens beyond the brand name (registration has its own form since C6,
-  Test 185 H);
+  Test 186 H);
 - the mobile apps were not walked for BKM-014: the invitation screen was
   verified by Jest and the registration rules by curl, not on a device
   (Test 86);
@@ -8199,7 +8199,7 @@ E. **Move a confirmed paid Evaluation (FIX-014, FIX-016, design follow-up
    218).** Once its Payment is confirmed, the appointment block reads «Bs 70 ·
    Pagada · llega 10 min antes», and under it «Puedes reprogramarla hasta 3
    horas antes. El pago sigue con ella.»; it offers **Cambiar fecha**,
-   not **Cancelar** (C5, Test 185 G); `DELETE /api/v1/evaluations/{id}` answers `409`
+   not **Cancelar** (C5, Test 186 G); `DELETE /api/v1/evaluations/{id}` answers `409`
    `evaluation_paid_not_cancellable`. **Cambiar fecha** turns the same
    screen's turnos into «Elige el nuevo horario» with the band «Cambias tu
    cita del …. Elige el nuevo horario.» and **Volver** (FIX-057, Test 151):
@@ -9069,7 +9069,7 @@ review); Sofía does the same and Paola rejects it with the reason «El monto
 del comprobante no coincide con el plan.» (`POST
 /administrator/payments/{id}/reject`). Isabel's Plan has 0 classes left.
 
-A. **In review (C02c, C8 since Test 185 B).** Log in as Mariana. One Palo
+A. **In review (C02c, C8 since Test 186 B).** Log in as Mariana. One Palo
    de rosa block sits at the top of **Inicio**: «TU PAGO ESTÁ EN REVISIÓN»,
    «Paquete de 8 clases» in Lora, the amount she transferred top right
    («Bs 502»), «Te avisamos apenas el estudio lo confirme.» and the Crema
@@ -9109,7 +9109,7 @@ F. **After the decision.** Paola confirms Mariana's payment: the block goes,
    receipt, her block changes to «TU PAGO ESTÁ EN REVISIÓN».
 G. **The deadline's day (walkthrough n.º 27).** As Lucía, open a class: the
    row reads «Cancelas gratis hasta» with the day and time, «jue 19 nov ·
-   05:30», in La Paz time (C4, Test 185 E).
+   05:30», in La Paz time (C4, Test 186 E).
 H. **Tabs reopen on their root (walkthrough n.º 28).** As Lucía, book a
    class: the app lands on **Mis reservas**. Tap **Reservar**: the day strip
    and its classes show (the day chosen before stays chosen), not the class
@@ -9651,7 +9651,7 @@ I. **After approval, the Client (n.º 53).** Carla's notification reads
    el …» over «Congelado · vuelves a reservar el …». A refused request reads
    «No aprobado · puedes pedir otro» and the row **Pedir otro
    congelamiento**.
-J. **No booking on a frozen day (n.º 53c).** Since C1 (Test 185 C) a frozen
+J. **No booking on a frozen day (n.º 53c).** Since C1 (Test 186 C) a frozen
    day on Reservar shows the «Viernes 20: plan congelado» card instead of
    its classes; the footer below shows only on a class opened before the
    Freeze was approved. There the button itself reads **No disponible durante el
@@ -9876,7 +9876,7 @@ B. **Nothing booked.** **Evaluación nutricional** says what her Plan gives
 C. **Book and come back.** Tap a turno, pay with the QR, attach the receipt
    and **Confirmar evaluación**: the app returns to the same screen with the
    toast «Comprobante enviado» (an included one says «Evaluación
-   confirmada»). On top, the Palo de rosa appointment block (C5, Test 185
+   confirmada»). On top, the Palo de rosa appointment block (C5, Test 186
    G): «TU CITA · EN N DÍAS», «Lun 23 nov · 09:45» in Lora, the
    Nutritionist's initials with «Name · Branch · 45 min», «Bs 70 · Pago en
    revisión · llega 10 min antes», and inside it **Cambiar fecha** and
@@ -10749,7 +10749,7 @@ A. **Inicio.** The promotion leads, with no «Novedades del estudio» label
    promotion at the left, 720 pt wide. Without a plan, a payment in review
    or a Guest Pass, Inicio keeps its Rosa profundo card (also at the left),
    and a Guest Pass shows no extra **Reservar una clase** button. Since the
-   2026-11-19 picks (Test 185), a booked class's «TU PRÓXIMA CLASE» block
+   2026-11-19 picks (Test 186), a booked class's «TU PRÓXIMA CLASE» block
    leads before the promotion (the button then reads **Reservar otra
    clase**), and a payment in review or rejected or a coming Freeze sits in a
    Palo de rosa block at the top.
@@ -10763,7 +10763,7 @@ B. **Reservar.** One quiet notice above the days, «Te quedan 3 clases esta
    card split by hairlines, the seats in grey («8 cupos», **Lleno**) and in
    amber only when two or fewer are left («Quedan 2 cupos»). No seat pill, no
    chevron.
-C. **A class on a frozen day.** Since C1 (Test 185 C) Reservar shows the
+C. **A class on a frozen day.** Since C1 (Test 186 C) Reservar shows the
    frozen-day card instead of classes on **vie 20**, so this detail is reached
    only when the Freeze is approved while she is already on a class of that
    day (open the class first, then have the Freeze approved on the admin
@@ -10798,7 +10798,7 @@ F. **Elige tu plan.** From **Renovar mi plan**: a Palo de rosa block on top,
    «RENUEVA TU PLAN» («· 15 % MENOS» with the offer), «Trimestral 24
    clases», «90 días · hasta 3 por semana», the price with the struck
    original, and the Crema **Renovar este plan**, which opens the plan's
-   detail (C3, Test 185 D). The rest sit under «Otros planes», each reading
+   detail (C3, Test 186 D). The rest sit under «Otros planes», each reading
    «Válido por N días» (a capped one «Válido por 90 días · hasta 3 por
    semana»); none says «Válida». A Client whose plan expired sees the same
    block from **Comprar un plan**. A first purchase, or a plan no longer
@@ -11062,7 +11062,7 @@ G. **Forms (Form B).** On Login the email example reads «Ej.: tu@correo.com»
    cambios**: a Rubor box reads «Falta 1 dato para guardar · Nombre», the field
    has a 2 pt Rosa profundo border and «Escribe tu nombre.» in bold. On
    Registro, **Crear cuenta** with nothing filled lists all six fields
-   (under «Revisa 6 datos antes de seguir» since C6, Test 185 H). On the
+   (under «Revisa 6 datos antes de seguir» since C6, Test 186 H). On the
    web, save **Nueva sesión** empty: «Faltan 5 datos para guardar» and the
    labels.
 H. **Phone-width web lists (Lista C).** At 420 px, Clientas and Personal show
@@ -11115,11 +11115,11 @@ E. **Staff fixes.** Cerrar caja asks for the count first; the expected cash
    marks the older QR notices read, so Daniela no longer sees two that
    contradict each other.
 
-## Test 185: client app redesign picks C1–C8
+## Test 186: client app redesign picks C1–C8
 
 The owner's picks for the Client app after the 2026-11-19 design audit
 (`DECISIONES-AUDITORIA-2026-11-19.md`, «App de clientas»; canvas
-https://claude.ai/artifact/J989X9HLwHbnyAHwC7dHVx; design follow-up 281).
+https://claude.ai/artifact/J989X9HLwHbnyAHwC7dHVx; design follow-up 282).
 No migration. `GET /api/v1/bookings` gains `capacity`, `bookedCount` and
 `attendeeInitials`, so restart the API; the phones need only a Metro reload
 or an OTA. Load the fixtures of Test 5A on a copy of your local database
