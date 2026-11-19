@@ -1,4 +1,5 @@
 import { screen, waitFor, within } from "@testing-library/react";
+import type userEvent from "@testing-library/user-event";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../test/msw";
 import {
@@ -45,6 +46,19 @@ const paymentTable = (respond: (params: URLSearchParams) => Response) =>
 
 const rowOf = async (name: RegExp) =>
   (await screen.findByRole("cell", { name })).parentElement as HTMLElement;
+// FIX-091 (W4 B): the row's «⋯» menu, opened, as its items' names.
+const menuItems = async (
+  user: ReturnType<typeof userEvent.setup>,
+  row: HTMLElement,
+  clientName: string,
+) => {
+  await user.click(
+    within(row).getByRole("button", { name: `Acciones de ${clientName}` }),
+  );
+  return (await screen.findAllByRole("menuitem")).map(
+    (item) => item.textContent,
+  );
+};
 const invoiceCell = (row: HTMLElement) =>
   within(row).getByRole("cell", {
     name: (_name, element) => element.getAttribute("data-label") === "Factura",
@@ -79,22 +93,21 @@ describe("AW28 Pagos invoices", () => {
         ),
       ),
     );
-    renderAdmin("/dinero/pagos?status=all");
+    const { user } = renderAdmin("/dinero/pagos?status=all");
 
     const pending = await rowOf(/Sofía Guzmán/);
-    expect(within(pending).getByRole("cell", { name: "QR" })).toBeVisible();
+    expect(within(pending).getByText("Plan · QR")).toBeVisible();
     expect(within(invoiceCell(pending)).getByText("4567891")).toBeVisible();
     expect(
       within(pending).queryByRole("button", { name: /Marcar emitida/ }),
     ).not.toBeInTheDocument();
 
     const cash = await rowOf(/Ana Pérez/);
-    expect(within(cash).getByRole("cell", { name: "Efectivo" })).toBeVisible();
+    expect(within(cash).getByText("Plan · Efectivo")).toBeVisible();
     // FIX-044: «Marcar emitida» is gone; the invoice is uploaded instead.
     expect(within(invoiceCell(cash)).getByText("Por emitir")).toBeVisible();
-    expect(
-      within(cash).getByRole("button", { name: "Subir factura: Ana Pérez" }),
-    ).toBeVisible();
+    expect(await menuItems(user, cash, "Ana Pérez")).toContain("Subir factura");
+    await user.keyboard("{Escape}");
     expect(
       within(cash).queryByRole("button", { name: /Marcar emitida/ }),
     ).not.toBeInTheDocument();
@@ -103,11 +116,10 @@ describe("AW28 Pagos invoices", () => {
     const issued = await rowOf(/Valeria Quiroga/);
     expect(within(invoiceCell(issued)).getByText("Emitida")).toBeVisible();
     expect(within(invoiceCell(issued)).getByText("sin archivo")).toBeVisible();
-    expect(
-      within(issued).getByRole("button", {
-        name: "Subir factura: Valeria Quiroga",
-      }),
-    ).toBeVisible();
+    expect(await menuItems(user, issued, "Valeria Quiroga")).toContain(
+      "Subir factura",
+    );
+    await user.keyboard("{Escape}");
     expect(
       within(issued).queryByRole("button", { name: /Deshacer/ }),
     ).not.toBeInTheDocument();
@@ -131,10 +143,7 @@ describe("AW28 Pagos invoices", () => {
     const { router, user } = renderAdmin("/dinero/pagos");
     await rowOf(/Sofía Guzmán/);
 
-    await user.selectOptions(
-      screen.getByLabelText("Factura"),
-      "Factura por subir",
-    );
+    await user.click(screen.getByRole("button", { name: "Factura por subir" }));
 
     expect(await rowOf(/Ana Pérez/)).toBeInTheDocument();
     expect(reads.at(-1)?.get("invoice")).toBe("unissued");

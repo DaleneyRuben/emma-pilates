@@ -38,6 +38,11 @@ const paymentTable = (respond: (params: URLSearchParams) => Response) =>
     return respond(params);
   });
 
+const statusChip = (name: string) =>
+  within(screen.getByRole("group", { name: "Estado" })).getByRole("button", {
+    name,
+  });
+
 const heading = () => screen.findByRole("heading", { level: 1, name: "Pagos" });
 const rowOf = async (name: RegExp) =>
   (await screen.findByRole("cell", { name })).parentElement as HTMLElement;
@@ -89,14 +94,20 @@ describe("AW28 Pagos on a desktop browser", () => {
     expect(
       within(sofia).getByRole("cell", { name: "lun 21 sept · 14:05" }),
     ).toBeInTheDocument();
-    expect(within(sofia).getByText("Pendiente")).toBeInTheDocument();
+    // FIX-091 (W4 B): the exception pill says «Por revisar».
+    expect(within(sofia).getByText("Por revisar")).toBeInTheDocument();
+    expect(within(sofia).getByText("Plan · QR")).toBeInTheDocument();
     const lucia = await rowOf(/Lucía Fernández/);
     expect(within(lucia).getByText("Bs 1.050")).toBeInTheDocument();
     expect(within(lucia).queryByText(/de crédito/)).not.toBeInTheDocument();
+    expect(screen.getByText("Todo el estudio")).toBeVisible();
+    expect(statusChip("Por revisar · 6")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(
-      screen.getByText("Todo el estudio · 6 pagos por QR esperando revisión"),
+      screen.getByText("Mostrando 2 de 2 pagos por revisar"),
     ).toBeVisible();
-    expect(screen.getByText("Mostrando 2 de 2 pagos pendientes")).toBeVisible();
     expect(
       screen.queryByRole("button", { name: /Nuevo/ }),
     ).not.toBeInTheDocument();
@@ -118,7 +129,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     const { router, user } = renderAdmin("/dinero/pagos");
     await rowOf(/Sofía Guzmán/);
 
-    await user.selectOptions(screen.getByLabelText("Estado"), "Todos");
+    await user.click(statusChip("Todos"));
 
     expect(
       within(await rowOf(/Valeria Quiroga/)).getByText("Confirmado"),
@@ -189,6 +200,28 @@ describe("AW28 Pagos on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
+  // FIX-091 (W4 B): a row's secondary actions live behind «⋯».
+  it("reviews a pending transfer from the row's menu", async () => {
+    server.use(
+      paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))),
+      http.get(apiUrl(`${paymentsPath}/:paymentId`), () =>
+        problemResponse(500, "unexpected_error"),
+      ),
+    );
+    const { user } = renderAdmin("/dinero/pagos");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Acciones de Sofía Guzmán" }),
+    );
+    await user.click(
+      screen.getByRole("menuitem", { name: "Revisar comprobante" }),
+    );
+
+    expect(
+      await screen.findByRole("dialog", { name: "Revisar pago" }),
+    ).toBeInTheDocument();
+  });
+
   it("says when nothing is waiting for review", async () => {
     server.use(
       paymentTable(() => jsonResponse(paymentPage([], { pendingCount: 0 }))),
@@ -204,9 +237,7 @@ describe("AW28 Pagos on a desktop browser", () => {
         "Todo al día. Cuando una clienta envíe un comprobante, aparece aquí.",
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("Todo el estudio · ningún pago por QR por revisar"),
-    ).toBeVisible();
+    expect(statusChip("Por revisar · 0")).toBeVisible();
   });
 
   it("says a search found no Payment and keeps the table header", async () => {
@@ -314,6 +345,9 @@ describe("AW28 Pagos on a narrow browser", () => {
     expect(
       screen.getByRole("searchbox", { name: "Buscar por clienta" }),
     ).toBeVisible();
-    expect(screen.getByLabelText("Estado")).toHaveValue("pending");
+    expect(statusChip("Por revisar · 6")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 });
