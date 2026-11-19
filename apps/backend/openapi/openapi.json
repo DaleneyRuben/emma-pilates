@@ -20999,6 +20999,16 @@
             "type": "number",
             "minimum": 0,
             "description": "Every Feedback still «Nuevo»"
+          },
+          "reviewedCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback «Revisado»"
+          },
+          "resolvedCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback «Resuelto»"
           }
         },
         "required": [
@@ -21006,7 +21016,9 @@
           "page",
           "pageSize",
           "totalItems",
-          "newCount"
+          "newCount",
+          "reviewedCount",
+          "resolvedCount"
         ]
       },
       "AdminFeedbackExportDto": {
