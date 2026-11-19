@@ -92,7 +92,7 @@ async function openBrowse(routes: Parameters<typeof routeFetcher>[0]) {
   await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
   await waitFor(
     () => {
-      expect(screen.getByText("Reservar una clase")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservar")).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );

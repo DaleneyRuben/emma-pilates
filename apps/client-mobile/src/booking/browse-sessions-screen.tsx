@@ -117,7 +117,7 @@ export function BrowseSessionsScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Heading accessibilityLabel="Reservar">Reservar una clase</Heading>
+      <Heading accessibilityLabel="Reservar">Reservar</Heading>
       {selectedBranch ? (
         <BranchLine
           count={branchList.length}

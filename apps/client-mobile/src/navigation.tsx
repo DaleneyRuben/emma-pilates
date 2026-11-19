@@ -191,7 +191,7 @@ const ClientTabs = createBottomTabNavigator({
     },
     Bookings: {
       screen: BookingsStack,
-      options: tabOptions("Mis Reservas", "bookings", tabRoots.Bookings, 3),
+      options: tabOptions("Mis reservas", "bookings", tabRoots.Bookings, 3),
     },
     // The owner removed the Perfil tab's unread pill (2026-11-02): it is on the Inicio bell.
     ProfileTab: {

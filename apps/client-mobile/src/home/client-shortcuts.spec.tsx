@@ -173,7 +173,7 @@ describe("Client Home quick actions and notification destinations", () => {
     });
     await fireEvent.press(screen.getByText("Tu clase de Reformer Pilates fue cancelada."));
     await waitFor(() => {
-      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+      expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
     });
   });
 });

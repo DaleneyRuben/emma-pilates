@@ -14,11 +14,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { formatCivilDate } from "../home/home-format";
 import { planClasses } from "../home/plan-classes";
 
-// FIX-089: a normal state in words; «Por vencer» is the exception, on the pill.
+// FIX-089: a normal state in words; «Por vencer» is the exception, on the
+// pill. FIX-090: an ended plan reads «Plan vencido».
 const statusLabels = {
   active: "Activo",
   expiring_soon: "Por vencer",
-  expired: "Vencido",
+  expired: "Plan vencido",
 } as const;
 
 /**

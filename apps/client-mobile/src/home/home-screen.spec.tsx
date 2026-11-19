@@ -160,7 +160,7 @@ describe("Client Home", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /^Tu próxima clase/ }));
     await waitFor(() => {
-      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+      expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
     });
   });
 

@@ -82,7 +82,7 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
   await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
   await waitFor(
     () => {
-      expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
+      expect(screen.getByRole("header", { name: "Mis reservas" })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
