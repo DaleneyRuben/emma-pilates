@@ -5,6 +5,7 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   colors,
   fontFamilies,
   LoadingState,
@@ -32,7 +33,7 @@ import { DayStrip } from "../ui/day-strip";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { countLabel, dayHeading } from "../ui/session-time";
-import { CancelledFold, ScheduleClassCard } from "./schedule-class-card";
+import { ScheduleCancelledFold, ScheduleClassRow } from "./schedule-class-card";
 
 type ScheduleNavigation = {
   navigate: {
@@ -148,10 +149,14 @@ export function ScheduleScreen() {
             <SectionTitle>
               {dayCount(selectedDate, today, standing.length, cancelled.length)}
             </SectionTitle>
-            {standing.map((session) => (
-              <ScheduleClassCard fetcher={fetcher} key={session.id} session={session} />
-            ))}
-            <CancelledFold key={selectedDate} sessions={cancelled} />
+            {standing.length === 0 ? null : (
+              <ClassList>
+                {standing.map((session) => (
+                  <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
+                ))}
+              </ClassList>
+            )}
+            <ScheduleCancelledFold key={selectedDate} sessions={cancelled} />
           </View>
         )}
         {selling ? null : (

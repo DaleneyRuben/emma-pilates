@@ -57,7 +57,7 @@ describe("Trainer agenda refresh (UX-004)", () => {
     expect(screen.getByTestId("tab-agenda")).toBeOnTheScreen();
     await fireEvent.press(screen.getByTestId("back-bar"));
 
-    await waitFor(() => expect(screen.getByText("Centro · 7 de 8 reservados")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("7 de 8")).toBeOnTheScreen());
   });
 
   it("refetches the agenda on a pull", async () => {

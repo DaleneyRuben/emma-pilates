@@ -2,17 +2,18 @@ import {
   useListBranches,
   useListClassTypes,
   useListSessionAvailability,
-  type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
   bookingStrip,
   bookingWindowDays,
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
   OtherDateSheet,
+  placesLabel,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -23,7 +24,7 @@ import {
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -34,6 +35,7 @@ import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
 import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
 import { TabletGrid } from "./assistant-layout";
+import { useIsTablet } from "../ui/use-is-tablet";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
 import type { ClientContext } from "./client-overview-screen";
@@ -45,16 +47,12 @@ type BrowseNavigation = {
 
 const allClassTypes = "all";
 
-function seatsTag(session: SessionAvailabilityDto): string {
-  if (session.availableSeats === 0) return "Completa";
-  return countLabel(session.availableSeats, "cupo", "cupos");
-}
-
 /** S07 Reservar una clase, for the Client named in the banner (v2). */
 export function BrowseSessionsScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   const today = boliviaCivilDate(new Date());
   const windowDays = bookingWindowDays(useStudioRules(fetcher));
   const dates = useMemo(() => upcomingCivilDates(today, windowDays), [today, windowDays]);
@@ -192,14 +190,17 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
           <SectionTitle>
             {`${dayTitle} · ${countLabel(visible.length, "clase", "clases")}`}
           </SectionTitle>
-          <TabletGrid testID="assistant-session-grid">
+          <SessionList tablet={tablet}>
             {visible.map((session) => {
               const booked = bookedSessionIds.has(session.id);
-              const tag = booked ? "Ya reservada" : seatsTag(session);
+              const full = session.availableSeats === 0;
+              const exception = booked ? "Ya reservada" : full ? "Completa" : undefined;
+              const places = placesLabel(session.bookedCount, session.capacity);
               return (
                 <SessionRow
                   key={session.id}
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${tag}`}
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
+                  exception={exception}
                   onPress={() =>
                     navigation.navigate("SessionDetail", {
                       clientId,
@@ -208,9 +209,8 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                       sessionId: session.id,
                     })
                   }
-                  pill={tag}
-                  // Her own Booking takes the neutral pill, like a full class.
-                  pillTone={booked || session.availableSeats === 0 ? "neutral" : "tint"}
+                  places={places}
+                  standalone={tablet}
                   subtitle={session.trainerName}
                   subtitleLead={
                     <StaffFace
@@ -226,7 +226,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                 />
               );
             })}
-          </TabletGrid>
+          </SessionList>
         </ScrollView>
       )}
       <OtherDateSheet
@@ -241,6 +241,15 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
         visible={choosingDate}
       />
     </Screen>
+  );
+}
+
+// One card of rows on a phone (ClaseE); a grid of lone rows on a tablet.
+function SessionList({ children, tablet }: { children: ReactNode; tablet: boolean }) {
+  return tablet ? (
+    <TabletGrid testID="assistant-session-grid">{children}</TabletGrid>
+  ) : (
+    <ClassList testID="assistant-session-grid">{children}</ClassList>
   );
 }
 

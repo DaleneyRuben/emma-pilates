@@ -8,10 +8,12 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
   OtherDateSheet,
+  placesLabel,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -21,7 +23,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
@@ -44,12 +46,6 @@ const everyBranch = "all";
 const horizonDays = 30;
 // Six days and «Otra» share the strip (S13).
 const stripDays = 6;
-
-function bookings(session: SessionAvailabilityDto): string {
-  return session.bookedCount === 0
-    ? "Sin reservas"
-    : countLabel(session.bookedCount, "reserva", "reservas");
-}
 
 /** S13 Cancelar una clase (v2), for the Administrator and the Coordinator. */
 export function CancelClassScreen() {
@@ -183,7 +179,7 @@ export function CancelClassScreen() {
           <SectionTitle>
             {`${dayHeading(selectedDate)} · ${countLabel(visible.length, "clase", "clases")}`}
           </SectionTitle>
-          <View style={styles.rows}>
+          <ClassList>
             {visible.map((session) => {
               const branchName = allBranches ? session.branchName : branch.name;
               return (
@@ -193,8 +189,7 @@ export function CancelClassScreen() {
                   onPress={() =>
                     navigation.navigate("CancelSession", { session: { ...session, branchName } })
                   }
-                  pill={bookings(session)}
-                  pillTone="neutral"
+                  places={placesLabel(session.bookedCount, session.capacity)}
                   subtitle={
                     allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
                   }
@@ -204,7 +199,7 @@ export function CancelClassScreen() {
                 />
               );
             })}
-          </View>
+          </ClassList>
         </ScrollView>
       )}
       <OtherDateSheet
@@ -224,6 +219,5 @@ export function CancelClassScreen() {
 
 const styles = StyleSheet.create({
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  rows: { gap: spacing.md },
   screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
 });

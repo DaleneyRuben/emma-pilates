@@ -28,3 +28,21 @@ export function agendaHeading(
     ? `${dayName} · ${standingLabel}`
     : `${dayName} · ${standingLabel} · ${cancelledLabel}`;
 }
+
+const causeTails: Record<SessionCancellationSummaryDto["cause"], string> = {
+  minimum_not_met: "por mínimo",
+  schedule_paused: "en pausa",
+  studio: "por el estudio",
+};
+
+/**
+ * The tail of the folded line, «por mínimo» in «2 canceladas por mínimo»
+ * (FIX-083, FIX-089); empty when the causes differ, so it reads «3 canceladas».
+ */
+export function cancelledReason(
+  sessions: readonly { cancellation?: SessionCancellationSummaryDto | null }[],
+): string {
+  const causes = new Set(sessions.map((session) => session.cancellation?.cause));
+  const [only] = [...causes];
+  return causes.size === 1 && only !== undefined ? causeTails[only] : "";
+}

@@ -28,6 +28,7 @@ import {
   surfaces,
   useStickyNotice,
   useStudioRules,
+  ExceptionPill,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -35,7 +36,6 @@ import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { StatusPill } from "../ui/session-row";
 import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
 import { ClientRecordsHeader } from "./client-records-header";
@@ -105,7 +105,7 @@ function BookingCard({
         <View style={styles.cardText}>
           <Text style={styles.cardTitle}>{item.classTypeName}</Text>
           <Text style={styles.line}>{line}</Text>
-          {item.kind === "waitlist" ? <StatusPill label="En lista de espera" /> : null}
+          {item.kind === "waitlist" ? <ExceptionPill>En lista de espera</ExceptionPill> : null}
           {locked ? <Text style={styles.line}>Solo en tus sucursales</Text> : null}
         </View>
       </View>

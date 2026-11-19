@@ -308,7 +308,7 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
-    expect(screen.getByText("6 reservas")).toBeOnTheScreen();
+    expect(screen.getByText("6 de 12")).toBeOnTheScreen();
     expect(screen.getByText(/ · 1 clase$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));

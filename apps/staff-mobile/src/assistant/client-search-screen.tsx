@@ -18,6 +18,7 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
+  ExceptionPill,
 } from "@pilates/mobile-core";
 import { useGetCurrentStaffMemberProfile } from "@pilates/api-contracts";
 import { useNavigation } from "@react-navigation/native";
@@ -33,7 +34,6 @@ import { useStaffRole } from "../staff-role";
 import { PersonRow } from "../ui/person-row";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
-import { StatusPill } from "../ui/session-row";
 import { describeContact } from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { ClientDetailPanel } from "./client-panel";
@@ -195,7 +195,9 @@ export function ClientSearchScreen() {
                 selected={client.id === selectedId}
                 testID={`client-result-${client.id}`}
                 trailing={
-                  client.accountStatus === "pending" ? <StatusPill label="Pendiente" /> : undefined
+                  client.accountStatus === "pending" ? (
+                    <ExceptionPill>Pendiente</ExceptionPill>
+                  ) : undefined
                 }
               />
             ))}
