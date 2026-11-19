@@ -30,26 +30,35 @@ body {
   padding: 32px 16px 56px;
 }
 
+/* FIX-091 (W15 B): the brand and the three pages on a Rubor line, on every
+   page. */
 .cabecera {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
-  align-items: baseline;
+  gap: 8px 28px;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  padding: 24px 80px;
+  box-shadow: inset 0 -1px 0 var(--rubor);
 }
 
 .marca {
   color: var(--rosa-profundo);
-  font: 500 20px/1.2 var(--serif);
+  font: 400 30px/1.2 var(--serif);
   text-decoration: none;
+}
+
+.marca span {
+  font-size: 18px;
 }
 
 .navegacion {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 16px;
-  font-size: 14px;
+  gap: 0 12px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* A 44 px target for each link. */
@@ -57,11 +66,77 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  text-decoration: none;
 }
 
+.navegacion a:hover,
 .navegacion a[aria-current="page"] {
-  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.portada {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+  padding: 96px 16px;
+  text-align: center;
+}
+
+.portada h1 {
+  margin: 0;
+  font-size: 48px;
+}
+
+.portada p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each card as tall as the tallest. */
+.enlaces li {
+  display: flex;
+  margin: 0;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 260px;
+  min-height: 44px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px var(--arcilla);
+  background: var(--crema);
+  line-height: 1.45;
+  text-align: left;
   text-decoration: none;
+}
+
+.tarjeta:hover {
+  background: var(--rubor);
+}
+
+.tarjeta strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.tarjeta span {
+  font-size: 13px;
 }
 
 .hoja {
@@ -131,6 +206,37 @@ strong {
   color: var(--rosa-profundo);
   font-size: 13px;
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  .cabecera {
+    padding: 16px;
+  }
+
+  .marca {
+    font-size: 24px;
+  }
+
+  .marca span {
+    font-size: 16px;
+  }
+
+  .portada {
+    padding: 48px 16px;
+  }
+
+  .portada h1 {
+    font-size: 34px;
+  }
+
+  .tarjeta {
+    width: 100%;
+  }
+
+  .enlaces,
+  .enlaces li {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
