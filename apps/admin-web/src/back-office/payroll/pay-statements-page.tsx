@@ -33,7 +33,7 @@ const noPeriod: PayPeriodQuery = { month: "" };
 // what happened.
 function DoneNotice({ notice }: { notice: ApprovedNotice }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-lino px-4 py-3 text-nota text-texto">
+    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-nota text-texto">
       <p role="status" className="flex min-w-[220px] flex-1 items-start gap-3">
         <CheckCircle2
           size={18}

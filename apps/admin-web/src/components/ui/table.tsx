@@ -10,7 +10,7 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
     <div
       data-slot="table-container"
       // Follow-up 233: a table is a Lino card, with no border or shadow.
-      className="w-full overflow-hidden rounded-marco bg-lino max-md:bg-transparent"
+      className="w-full overflow-hidden rounded-marco border border-borde bg-lino max-md:border-0 max-md:bg-transparent"
     >
       <table
         data-slot="table"

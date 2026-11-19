@@ -109,7 +109,7 @@ export function PhoneCountryList({
 
   return (
     <div className="flex max-h-[inherit] flex-col py-2" onKeyDown={moveFocus}>
-      <label className="mx-3 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-control bg-lino px-3 focus-within:shadow-foco">
+      <label className="mx-3 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-control border border-borde bg-lino px-3 focus-within:shadow-foco">
         <Search
           size={18}
           strokeWidth={1.6}

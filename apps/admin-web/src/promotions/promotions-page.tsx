@@ -18,7 +18,7 @@ type Panel =
 
 function EmptyCarousel() {
   return (
-    <section className="flex flex-col items-center gap-1 rounded-marco bg-lino px-6 py-10 text-center">
+    <section className="flex flex-col items-center gap-1 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
       <p className="text-cuerpo text-texto-secundario">
         Todavía no hay promociones.
       </p>

@@ -27,7 +27,7 @@ import { ClientPhone } from "../clients/client-phone";
 
 function EmptyList() {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-marco bg-lino px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-1 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
       <p className="text-cuerpo text-texto-secundario">
         Nadie para contactar por ahora.
       </p>
@@ -72,7 +72,7 @@ function AlertRow({
         <ClientPhone phone={item.phone} tone="text-texto-secundario" />
       </TableCell>
       <TableCell data-label="Motivo">
-        <span className="flex flex-col text-[13px] text-texto-secundario">
+        <span className="flex flex-col text-nota text-texto-secundario">
           {item.reasons.map((reason) => (
             <span key={reason}>{contactAlertReasons[reason]}</span>
           ))}

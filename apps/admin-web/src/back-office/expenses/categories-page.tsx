@@ -100,7 +100,7 @@ export function ExpenseCategoriesEditor() {
           onRetry={() => void query.refetch()}
         />
       ) : (
-        <section className="flex w-full flex-col overflow-hidden rounded-marco bg-lino">
+        <section className="flex w-full flex-col overflow-hidden rounded-marco border border-borde bg-lino">
           {query.data.length === 0 ? (
             <p className="px-4 py-6 text-center text-nota text-texto-tenue">
               Todavía no hay categorías. Agrega la primera abajo.

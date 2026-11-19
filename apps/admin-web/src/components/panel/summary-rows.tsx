@@ -14,7 +14,7 @@ export function SummaryBlock({
       <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {title}
       </h3>
-      <dl className="flex flex-col divide-y divide-divisor rounded-marco bg-lino">
+      <dl className="flex flex-col divide-y divide-divisor rounded-marco border border-borde bg-lino">
         {children}
       </dl>
     </section>
@@ -37,7 +37,7 @@ export function SummaryRow({
       <dd
         className={
           figure
-            ? "text-right font-serif text-[15px] text-texto tabular"
+            ? "text-right font-serif text-fila text-texto tabular"
             : "text-right text-nota text-texto"
         }
       >

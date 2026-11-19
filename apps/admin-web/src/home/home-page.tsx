@@ -87,7 +87,9 @@ export function HomePage() {
   return (
     <div className="flex max-w-[1080px] flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-titulo-1 text-texto lg:text-[32px]">{title}</h1>
+        <h1 className="text-titulo-1 text-texto lg:text-titulo-pagina-grande">
+          {title}
+        </h1>
         <p className="text-cuerpo text-texto-tenue">
           {selectedBranch === undefined
             ? day

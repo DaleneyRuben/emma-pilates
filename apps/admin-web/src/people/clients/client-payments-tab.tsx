@@ -34,7 +34,7 @@ export function ClientPaymentsTab({
               detail={`${formatCivilMoment(payment.submittedAt)} · ${methodLabels[payment.method]}`}
               aside={
                 <span className="flex flex-col items-end gap-1">
-                  <span className="font-serif text-[15px] text-texto tabular">
+                  <span className="font-serif text-fila text-texto tabular">
                     {formatBolivianos(payment.amountDueCentavos)}
                   </span>
                   <PaymentStatePill state={payment.state} />

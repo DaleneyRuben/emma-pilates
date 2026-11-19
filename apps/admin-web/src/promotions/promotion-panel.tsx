@@ -193,7 +193,7 @@ export function PromotionPanelForm({
         <SidePanelBody>
           <PromotionImageField value={image} onChange={setImage} />
           {wasPublished && imageChanged ? (
-            <p className="rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2 text-ayuda text-advertencia-texto">
+            <p className="rounded-control border border-borde bg-advertencia-tinte px-3 py-2 text-ayuda text-advertencia-texto">
               {imageChangeWarning(image !== null)}
             </p>
           ) : null}

@@ -19,7 +19,9 @@ export function PageHeader({
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex min-w-[240px] flex-1 flex-col gap-1">
-          <h1 className="text-titulo-1 text-texto lg:text-[32px]">{title}</h1>
+          <h1 className="text-titulo-1 text-texto lg:text-titulo-pagina-grande">
+            {title}
+          </h1>
           {subtitle === undefined ? null : (
             <p className="text-cuerpo text-texto-tenue">{subtitle}</p>
           )}

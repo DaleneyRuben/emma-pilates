@@ -172,7 +172,7 @@ export function ClientsPage({
       {exportClients.isError ? (
         <p
           role="alert"
-          className="rounded-control bg-error/10 px-3 py-2 text-nota text-error-texto"
+          className="rounded-control bg-error-tinte px-3 py-2 text-nota text-error-texto"
         >
           No pudimos exportar las clientas. Inténtalo de nuevo.
         </p>

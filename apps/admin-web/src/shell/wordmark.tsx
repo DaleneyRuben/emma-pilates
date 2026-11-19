@@ -11,14 +11,13 @@ export function Wordmark({
 }) {
   return (
     <span className={cn("flex items-baseline gap-2 font-serif", className)}>
-      <span className={cn("text-texto", small ? "text-[20px]" : "text-[22px]")}>
+      <span
+        className={cn("text-texto", small ? "text-[20px]" : "text-titulo-2")}
+      >
         Emma
       </span>
       <span
-        className={cn(
-          "text-rosa-profundo",
-          small ? "text-celda" : "text-[15px]",
-        )}
+        className={cn("text-rosa-profundo", small ? "text-celda" : "text-fila")}
       >
         Pilates Studio
       </span>

@@ -86,7 +86,7 @@ export function GlobalSearch({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative", className)}>
-      <label className="flex h-12 items-center gap-2.5 rounded-[14px] bg-lino px-4 focus-within:shadow-foco">
+      <label className="flex h-12 items-center gap-2.5 rounded-[14px] border border-borde bg-lino px-4 focus-within:shadow-foco">
         <Search
           size={22}
           strokeWidth={1.6}

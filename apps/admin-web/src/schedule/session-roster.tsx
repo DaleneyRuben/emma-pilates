@@ -84,7 +84,7 @@ export function SessionRoster({
           <ol className="divide-y divide-divisor border-y border-divisor">
             {roster.waitlist.map((entry) => (
               <li key={entry.waitlistEntryId} className={rowClass}>
-                <span className="w-6 font-serif text-[18px] text-rosa-profundo tabular">
+                <span className="w-6 font-serif text-titulo-3 text-rosa-profundo tabular">
                   {entry.position}
                 </span>
                 <ClientPhoto

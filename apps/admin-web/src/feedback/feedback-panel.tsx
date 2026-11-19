@@ -75,7 +75,7 @@ export function FeedbackPanel({
       className="flex flex-1 flex-col"
     >
       <SidePanelBody>
-        <blockquote className="rounded-control bg-lino px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
+        <blockquote className="rounded-control border border-borde bg-lino px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
           {feedback.text}
         </blockquote>
         <SummaryBlock title="Datos">

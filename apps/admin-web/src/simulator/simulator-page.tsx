@@ -9,7 +9,8 @@ import { staffProfileQueryOptions } from "../session/staff-profile-query";
 import { ProjectionSection } from "./projection-section";
 import { simulateMonth } from "./simulate-month";
 
-const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
+const cardClass =
+  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
 
 // The owner's opening month: 33 classes a week, 4 students paying about Bs 70
 // a class (diagnosis 3.4), Trainer pay of Bs 65 with up to 4 students and
@@ -73,14 +74,14 @@ function Figure({
     <section
       aria-label={name}
       className={cn(
-        "flex flex-col gap-1.5 rounded-marco border-t-[3px] bg-lino px-5 py-4",
+        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4",
         rule,
       )}
     >
       <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {name}
       </h2>
-      <p className="font-serif text-[32px] leading-tight text-texto tabular">
+      <p className="font-serif text-cifra-grande leading-tight text-texto tabular">
         {figure}
       </p>
       <p className="text-nota text-texto-tenue">{line}</p>
@@ -162,7 +163,7 @@ export function SimulatorPage() {
         <PageHeader title="Simulador" />
         <p
           role="alert"
-          className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
+          className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
         >
           No tienes permiso para ver esta sección.
         </p>

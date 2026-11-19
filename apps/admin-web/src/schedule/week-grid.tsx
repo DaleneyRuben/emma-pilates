@@ -50,7 +50,7 @@ export function WeekGrid({
     <div
       role="table"
       aria-label="Semana"
-      className="overflow-hidden rounded-marco bg-lino"
+      className="overflow-hidden rounded-marco border border-borde bg-lino"
     >
       <div
         role="row"
@@ -69,7 +69,7 @@ export function WeekGrid({
               )}
             >
               {tab.weekday}
-              <span className="font-serif text-[15px] tracking-normal text-texto normal-case tabular">
+              <span className="font-serif text-fila tracking-normal text-texto normal-case tabular">
                 {tab.day}
               </span>
               {day === today ? (

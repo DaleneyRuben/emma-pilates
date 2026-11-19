@@ -18,8 +18,8 @@ function Legend() {
   return (
     <ul className="flex items-center gap-4 text-nota text-texto-secundario">
       {[
-        ["Ingresos", "bg-exito"],
-        ["Gastos", "bg-error"],
+        ["Ingresos", "bg-palo-de-rosa"],
+        ["Gastos", "bg-rosa-profundo"],
       ].map(([label, tone]) => (
         <li key={label} className="flex items-center gap-1.5">
           <span
@@ -36,8 +36,8 @@ function Legend() {
 /**
  * AW16's "Mes por mes": paired flat bars per Bolivia month on one linear
  * scale with three reference lines, no gradients and no value on every bar
- * (design README). The closed palette's Éxito and Error are close for
- * deuteranopes, so the legend names them, a 2 px gap parts each pair, every
+ * (design README). FIX-089: income in Palo de rosa, expenses in Rosa
+ * profundo (never red); the legend names them, a 2 px gap parts each pair, every
  * month reads its figures on hover or focus, and the month table below is
  * the exact view.
  */
@@ -59,7 +59,7 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
   return (
     <figure
       aria-labelledby={titleId}
-      className="m-0 flex flex-col gap-4 rounded-marco bg-lino px-5 py-4"
+      className="m-0 flex flex-col gap-4 rounded-marco border border-borde bg-lino px-5 py-4"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex flex-col gap-0.5">
@@ -111,11 +111,11 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
                   className="flex flex-1 items-end justify-center gap-0.5 rounded-control hover:bg-hover-fila focus-visible:shadow-foco"
                 >
                   <span
-                    className="w-full max-w-6 rounded-t-[4px] bg-exito"
+                    className="w-full max-w-6 rounded-t-[4px] bg-palo-de-rosa"
                     style={{ height: height(month.incomeCentavos) }}
                   />
                   <span
-                    className="w-full max-w-6 rounded-t-[4px] bg-error"
+                    className="w-full max-w-6 rounded-t-[4px] bg-rosa-profundo"
                     style={{ height: height(month.expensesCentavos) }}
                   />
                 </div>
@@ -140,20 +140,20 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
                 left: `${((shownIndex + 0.5) / months.length) * 100}%`,
                 transform: `translateX(-${((shownIndex + 0.5) / months.length) * 100}%)`,
               }}
-              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control bg-lino px-3 py-2 text-nota text-texto shadow-popover tabular"
+              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control border border-borde bg-lino px-3 py-2 text-nota text-texto shadow-popover tabular"
             >
               <span className="font-medium">{formatMonth(shown.month)}</span>
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  className="size-2 rounded-full bg-exito"
+                  className="size-2 rounded-full bg-palo-de-rosa"
                 />
                 {`Ingresos ${formatBolivianos(shown.incomeCentavos)}`}
               </span>
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  className="size-2 rounded-full bg-error"
+                  className="size-2 rounded-full bg-rosa-profundo"
                 />
                 {`Gastos ${formatBolivianos(shown.expensesCentavos)}`}
               </span>

@@ -12,7 +12,8 @@ import {
 import { StudioRulesForm } from "./studio-rules-form";
 import { studioSettingsQueryOptions } from "./studio-rules-queries";
 
-const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
+const cardClass =
+  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
 
 const conflictMessage =
   "Alguien guardó otras reglas mientras editabas. Te mostramos las actuales: revisa y vuelve a guardar.";
@@ -70,7 +71,7 @@ export function StudioRulesPage() {
       ) : notice === "conflict" ? (
         <p
           role="alert"
-          className="rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2 text-nota text-advertencia-texto"
+          className="rounded-control border border-borde bg-advertencia-tinte px-3 py-2 text-nota text-advertencia-texto"
         >
           {conflictMessage}
         </p>

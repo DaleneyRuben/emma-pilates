@@ -10,12 +10,12 @@ function Figure({ name, figure }: { name: string; figure: string }) {
   return (
     <section
       aria-label={name}
-      className="flex flex-col gap-1 rounded-marco bg-lino px-5 py-4"
+      className="flex flex-col gap-1 rounded-marco border border-borde bg-lino px-5 py-4"
     >
       <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {name}
       </h3>
-      <p className="font-serif text-[28px] leading-tight text-texto tabular">
+      <p className="font-serif text-cifra leading-tight text-texto tabular">
         {figure}
       </p>
     </section>

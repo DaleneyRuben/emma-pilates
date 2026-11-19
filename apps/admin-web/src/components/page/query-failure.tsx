@@ -20,7 +20,7 @@ export function QueryFailure({
     return (
       <p
         role="alert"
-        className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
+        className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
       >
         No tienes permiso para ver esta sección.
       </p>
@@ -30,7 +30,7 @@ export function QueryFailure({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-marco bg-lino px-6 py-10 text-center"
+      className="flex flex-col items-center gap-3 rounded-marco border border-borde bg-lino px-6 py-10 text-center"
     >
       <p className="text-cuerpo text-texto-secundario">
         No pudimos cargar {what}.

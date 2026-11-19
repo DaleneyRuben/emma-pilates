@@ -75,7 +75,7 @@ export function StudioQrPage() {
       ) : (
         <section
           aria-labelledby={titleId}
-          className="flex max-w-[1000px] flex-wrap items-center gap-5 rounded-marco bg-lino p-6 max-md:p-4"
+          className="flex max-w-[1000px] flex-wrap items-center gap-5 rounded-marco border border-borde bg-lino p-6 max-md:p-4"
         >
           <QrImage />
           <div className="flex min-w-[200px] flex-1 flex-col items-start gap-2.5">

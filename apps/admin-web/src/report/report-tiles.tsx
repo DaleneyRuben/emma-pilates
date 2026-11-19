@@ -18,14 +18,14 @@ function Tile({
     <section
       aria-label={name}
       className={cn(
-        "flex min-w-0 flex-col gap-1.5 rounded-marco border-t-[3px] bg-lino px-5 py-4 lg:px-3 xl:px-5",
+        "flex min-w-0 flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4 lg:px-3 xl:px-5",
         rule,
       )}
     >
       <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] whitespace-nowrap text-texto-tenue uppercase">
         {name}
       </h2>
-      <p className="font-serif text-[32px] leading-tight whitespace-nowrap text-texto tabular lg:text-[26px] xl:text-[32px]">
+      <p className="font-serif text-cifra-grande leading-tight whitespace-nowrap text-texto tabular lg:text-precio xl:text-cifra-grande">
         {figure}
       </p>
       {children}

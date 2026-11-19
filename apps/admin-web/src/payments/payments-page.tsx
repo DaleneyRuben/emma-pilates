@@ -267,7 +267,7 @@ export function PaymentsPage({
           {exportPayments.isError ? (
             <p
               role="alert"
-              className="w-full rounded-control bg-error/10 px-3 py-2 text-nota text-error-texto"
+              className="w-full rounded-control bg-error-tinte px-3 py-2 text-nota text-error-texto"
             >
               No pudimos exportar los pagos. Inténtalo de nuevo.
             </p>
