@@ -120,6 +120,24 @@ describe("AW39 Indicadores", () => {
     expect(
       screen.getByRole("figure", { name: "Clases dictadas" }),
     ).toBeVisible();
+    // FIX-091 (W6 B): the recommendations follow the four figures; the money,
+    // the chart and the month's report come after them.
+    const recommendations = screen.getByRole("region", {
+      name: "Recomendaciones del mes",
+    });
+    const follows = (node: HTMLElement) =>
+      recommendations.compareDocumentPosition(node) &
+      Node.DOCUMENT_POSITION_FOLLOWING;
+    expect(
+      occupancy.compareDocumentPosition(recommendations) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      follows(screen.getByRole("region", { name: "Cobrado" })),
+    ).toBeTruthy();
+    expect(
+      follows(screen.getByRole("figure", { name: "Clases dictadas" })),
+    ).toBeTruthy();
   });
 
   it("shows the month's report and answers a question for an Administrator", async () => {
