@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   edit: { alignSelf: "flex-start", paddingHorizontal: 0 },
   eyebrow: {
-    color: "rgba(255,255,255,0.75)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",

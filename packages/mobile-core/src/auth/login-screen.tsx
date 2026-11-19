@@ -157,7 +157,7 @@ export function LoginScreen({
 const styles = StyleSheet.create({
   notice: {
     backgroundColor: colors.successTint,
-    borderColor: "rgba(124,148,115,0.30)",
+    borderColor: colors.border,
     borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: spacing.mdLg,

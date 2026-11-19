@@ -43,7 +43,7 @@ export function CancelledSessionRow({
 const styles = StyleSheet.create({
   body: { alignItems: "flex-start", flex: 1, gap: spacing.sm },
   pill: {
-    backgroundColor: "rgba(216, 201, 187, 0.34)",
+    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     paddingHorizontal: spacing.smLg,
     paddingVertical: spacing.xs,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   row: {
     alignItems: "center",
-    borderColor: "#D8C9BB",
+    borderColor: colors.border,
     borderRadius: radii.card,
     borderStyle: "dashed",
     borderWidth: 1,

@@ -70,7 +70,7 @@ export function useStickyNotice<T>(notice: T | undefined, dismiss: () => void): 
 const styles = StyleSheet.create({
   close: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   note: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onPrimary,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
   },

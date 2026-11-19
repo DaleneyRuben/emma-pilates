@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontVariant: ["tabular-nums"],
   },
-  of: { color: "rgba(255,255,255,0.85)", fontFamily: fontFamilies.body, fontSize: 14 },
-  track: { backgroundColor: "rgba(255,255,255,0.25)", borderRadius: radii.pill, height: 6 },
+  of: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
+  track: { backgroundColor: colors.primaryTint, borderRadius: radii.pill, height: 6 },
   wrap: { backgroundColor: colors.emphasis, borderRadius: 20 },
 });

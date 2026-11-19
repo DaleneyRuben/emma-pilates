@@ -16,8 +16,8 @@ export const invoiceStateLabel = (invoice: ClientInvoiceDto): string =>
   invoice.voided ? "Pago anulado" : invoice.state === "ready" ? "Lista" : "En preparación";
 
 const tones = {
-  ready: { background: "rgba(124,148,115,0.16)", text: colors.successText },
-  preparing: { background: "rgba(216,201,187,0.34)", text: colors.textMuted },
+  ready: { background: colors.primaryTint, text: colors.successText },
+  preparing: { background: colors.primaryTint, text: colors.textMuted },
   voided: { background: colors.primaryTint, text: colors.primaryOnTint },
 };
 

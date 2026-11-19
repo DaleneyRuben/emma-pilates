@@ -1,5 +1,5 @@
 import type { ClientSubscriptionDto } from "@pilates/api-contracts";
-import { EmphasisCard, formatBolivianos, spacing, surfaces } from "@pilates/mobile-core";
+import { colors, EmphasisCard, formatBolivianos, spacing, surfaces } from "@pilates/mobile-core";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
@@ -41,7 +41,7 @@ function MatIllustration() {
       fill="none"
       height={64}
       importantForAccessibility="no-hide-descendants"
-      stroke="rgba(255,255,255,0.45)"
+      stroke={colors.primaryTint}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.5}

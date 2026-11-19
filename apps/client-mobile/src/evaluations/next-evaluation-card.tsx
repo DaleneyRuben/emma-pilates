@@ -48,7 +48,7 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
       ...base,
       canCancel,
       chip: "Gratis con tu plan",
-      dot: "rgba(255,255,255,0.7)",
+      dot: colors.onEmphasis,
       line: canCancel ? "Puedes cancelarla hasta 3 horas antes." : "Ya no se puede cancelar.",
     };
   }
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   chip: {
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     flexDirection: "row",
     gap: spacing.xs,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   chipLabelOnLino: { color: colors.text },
   chipOnLino: { backgroundColor: colors.warningTint },
   details: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
   },

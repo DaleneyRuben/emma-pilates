@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   // Marfil at 55 % with the busy ring (follow-up 241 §2), only while uploading.
   veil: {
     alignItems: "center",
-    backgroundColor: "rgba(250, 247, 242, 0.55)",
+    backgroundColor: colors.scrim,
     borderRadius: avatarSize / 2,
     bottom: 0,
     justifyContent: "center",

@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   darkContent: { flexGrow: 1 },
   darkImage: { height: "100%", width: "100%" },
-  darkViewer: { backgroundColor: "#1B1716" },
+  darkViewer: { backgroundColor: colors.text },
   footer: { paddingBottom: spacing.xl, paddingHorizontal: spacing.xlSm },
   lightContent: {
     alignItems: "center",

@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   block: { gap: spacing.md, marginTop: spacing.xs },
   fill: { backgroundColor: colors.white, borderRadius: radii.pill },
   label: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
   },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   row: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
   track: {
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     flexDirection: "row",
     height: 6,

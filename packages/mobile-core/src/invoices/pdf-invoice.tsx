@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
   pendingPage: {
     alignItems: "center",
     aspectRatio: 210 / 297,
-    backgroundColor: "#2F2A28",
+    backgroundColor: colors.text,
     justifyContent: "center",
     width: "100%",
   },
   pill: {
-    backgroundColor: "rgba(74,74,74,0.72)",
+    backgroundColor: colors.scrim,
     borderRadius: radii.pill,
     bottom: spacing.sm,
     paddingHorizontal: spacing.md,
@@ -281,5 +281,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   topRow: { alignItems: "center", flexDirection: "row", paddingHorizontal: spacing.sm },
-  viewer: { backgroundColor: "#1B1716", flex: 1 },
+  viewer: { backgroundColor: colors.text, flex: 1 },
 });

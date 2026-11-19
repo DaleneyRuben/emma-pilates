@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.sm,
   },
-  exitPressed: { backgroundColor: "rgba(255,255,255,0.14)" },
+  exitPressed: { backgroundColor: colors.emphasis },
   exitText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
   row: {
     alignItems: "center",

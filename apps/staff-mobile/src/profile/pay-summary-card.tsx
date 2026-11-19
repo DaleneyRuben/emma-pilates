@@ -1,4 +1,4 @@
-import { EmphasisCard, fontFamilies } from "@pilates/mobile-core";
+import { colors, EmphasisCard, fontFamilies } from "@pilates/mobile-core";
 import { StyleSheet, Text } from "react-native";
 
 import { formatExactBolivianos } from "../ui/exact-bolivianos";
@@ -31,14 +31,14 @@ export function PaySummaryCard({ summary }: { summary: PaySummary }) {
 
 const styles = StyleSheet.create({
   note: {
-    color: "rgba(255,255,255,0.88)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: 14,
     lineHeight: 21,
     marginTop: -6,
   },
   total: {
-    color: "#FFFFFF",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 36,
     fontVariant: ["tabular-nums"],

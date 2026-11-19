@@ -66,7 +66,7 @@ export function InvoiceSourceSheet({
 }
 
 const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(74,58,48,0.32)" },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: colors.scrim },
   cancel: { fontFamily: fontFamilies.bodyStrong },
   choice: {
     alignItems: "center",

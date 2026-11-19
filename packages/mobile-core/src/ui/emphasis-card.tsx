@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   card: { ...surfaces.emphasis, gap: spacing.md, padding: spacing.xlSm },
   eyebrow: {
-    color: "rgba(255,255,255,0.75)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
@@ -89,14 +89,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   note: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: 14,
     lineHeight: 21,
   },
   pill: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     paddingHorizontal: spacing.smLg,
     paddingVertical: spacing.xs,

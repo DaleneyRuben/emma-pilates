@@ -54,7 +54,7 @@ export const usedMonthStyles = StyleSheet.create({
     padding: spacing.lg,
   },
   used: {
-    backgroundColor: "rgba(201,154,78,0.10)",
+    backgroundColor: colors.primaryTint,
     borderRadius: radii.inset,
     gap: spacing.sm,
     padding: spacing.xl,

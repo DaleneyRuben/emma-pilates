@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
   listPrice: {
-    color: "rgba(255,255,255,0.7)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
     textDecorationLine: "line-through",

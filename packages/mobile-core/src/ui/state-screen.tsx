@@ -29,7 +29,7 @@ export type StateScreenProps = {
   title: string;
   /** The glyph alone in Texto tenue, without its disc (FIX-082). */
   plainIcon?: boolean;
-  /** `error` puts the glyph in Error on #F7E5E0. */
+  /** `error` marks the state as an error. */
   tone?: "brand" | "error";
 };
 

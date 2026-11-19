@@ -6,7 +6,7 @@ import { colors, spacing, typography } from "./tokens";
 
 /**
  * A one-line warning (follow-up 225 §7, the system board's «08 ·
- * Advertencia»): an Error alert in an #F7E5E0 disc and the line on Lino. It
+ * Advertencia»): an Error alert in a Rubor disc and the line on Lino. It
  * replaces the amber «Esto no se puede deshacer» block.
  */
 export function NoticeRow({ message, testID }: { message: string; testID?: string }) {
