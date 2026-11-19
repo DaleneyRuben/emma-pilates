@@ -86,7 +86,9 @@ describe("Trainer agenda rows", () => {
     expect(screen.queryByText("Completa")).toBeNull();
     expect(screen.queryByTestId("exception-pill")).toBeNull();
 
-    await fireEvent.press(screen.getByTestId("next-class-hero"));
+    // Maestro's trainer-attendance flow opens the seeded class by its id,
+    // even while it is the hero.
+    await fireEvent.press(screen.getByTestId("agenda-session-session-2"));
     await waitFor(() => expect(screen.getByRole("button", { name: "Volver" })).toBeOnTheScreen());
   });
 
