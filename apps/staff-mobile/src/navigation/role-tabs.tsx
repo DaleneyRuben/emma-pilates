@@ -126,7 +126,7 @@ const clientScreens = {
   Reschedule: AssistantRescheduleScreen,
   ClientHistory: ClientHistoryScreen,
   Notifications: StaffNotificationsScreen,
-  // FIX-044: «Facturas por subir» opens from Clientes for the Assistant and
+  // FIX-044: «Facturas por subir» opens from Clientas for the Assistant and
   // the Coordinator, and from Pagos for the Administrator.
   Invoices: InvoicesScreen,
   Invoice: InvoiceScreen,
@@ -216,7 +216,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
             ...stackConfig,
             screens: { ...clientScreens, ...sellingScreens },
           }),
-          options: tabOptions("Clientes", "clients", "ClientSearch"),
+          options: tabOptions("Clientas", "clients", "ClientSearch"),
         },
         ScheduleTab: {
           screen: createNativeStackNavigator({
@@ -288,7 +288,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
             ...stackConfig,
             screens: { ...clientScreens, ...sellingScreens },
           }),
-          options: tabOptions("Clientes", "clients", "ClientSearch"),
+          options: tabOptions("Clientas", "clients", "ClientSearch"),
         },
         ScheduleTab: {
           screen: createNativeStackNavigator({
@@ -313,7 +313,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
       screens: {
         ClientsTab: {
           screen: createNativeStackNavigator({ ...stackConfig, screens: clientScreens }),
-          options: tabOptions("Clientes", "clients", "ClientSearch"),
+          options: tabOptions("Clientas", "clients", "ClientSearch"),
         },
         ContactsTab: {
           screen: createNativeStackNavigator({

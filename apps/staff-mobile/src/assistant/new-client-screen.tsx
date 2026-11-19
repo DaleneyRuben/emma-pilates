@@ -190,7 +190,7 @@ export function NewClientScreen() {
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={560}>
-        <BackBar onBack={() => navigation.goBack()} title="Nuevo cliente" />
+        <BackBar onBack={() => navigation.goBack()} title="Nueva clienta" />
         <FormScrollView contentContainerStyle={styles.form} footer={footer}>
           {selfRegistered !== null ? (
             <SelfRegisteredNotice

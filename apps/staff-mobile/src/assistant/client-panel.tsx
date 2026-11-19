@@ -56,7 +56,7 @@ export function ClientDetailPanel() {
         <EmptyState
           icon="person"
           message="Busca por nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin perder la lista."
-          title="Selecciona un cliente para ver sus detalles"
+          title="Selecciona una clienta para ver sus detalles"
           variant="panel"
         />
       </View>

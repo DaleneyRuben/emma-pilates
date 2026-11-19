@@ -26,7 +26,7 @@ export function statementStatus(
 /** The row's one line under the period: «Pagado el 18 de noviembre». */
 export function statusLine(status: StatementStatus): string {
   if (status.kind === "open") return "En curso · puede cambiar";
-  if (status.kind === "unpaid") return "Aprobado · por pagar";
+  if (status.kind === "unpaid") return "Aprobada · por pagar";
   return status.payment === undefined
     ? "Pagado"
     : `Pagado el ${formatCivilDayMonth(status.payment.paidOn)}`;

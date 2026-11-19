@@ -48,7 +48,7 @@ export function ClientPlanCard({
         <View style={styles.status}>
           <View style={[styles.dot, !active && styles.dotEnded]} />
           <Text style={[styles.statusLabel, !active && styles.statusEnded]}>
-            {active ? "Activo" : "Vencido"}
+            {active ? "Plan activo" : "Plan vencido"}
           </Text>
         </View>
       </View>

@@ -71,7 +71,7 @@ export function ClientOverviewScreen({
 
   // Beside the search on a tablet there is nowhere to go back to.
   const inPanel = useInClientPanel();
-  const back = inPanel ? null : <BackBar back="Clientes" onBack={() => navigation.goBack()} />;
+  const back = inPanel ? null : <BackBar back="Clientas" onBack={() => navigation.goBack()} />;
 
   if (overview.isPending) {
     return (

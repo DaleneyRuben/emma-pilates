@@ -44,7 +44,7 @@ const blockRange = (block: AvailabilityBlockDto): string =>
 
 const bookedLabel = (count: number): string => {
   if (count === 0) return "sin reservas";
-  return count === 1 ? "1 reservado" : `${count} reservados`;
+  return count === 1 ? "1 con reserva" : `${count} con reserva`;
 };
 
 // A block only carries a date line when it starts later or has an end.
@@ -72,7 +72,7 @@ export function AvailabilityScreen() {
 
   const header = (
     <RootHeader
-      note="Las clientas eligen cupos de 45 min dentro de estos rangos."
+      note="Las clientas eligen turnos de 45 min dentro de estos rangos."
       title="Mi disponibilidad"
     />
   );
@@ -160,7 +160,7 @@ export function AvailabilityScreen() {
                     </Text>
                     <Text style={styles.muted}>
                       {[
-                        `${block.slotsPerWeek} cupos · ${bookedLabel(block.upcomingBookedCount)}`,
+                        `${block.slotsPerWeek} turnos · ${bookedLabel(block.upcomingBookedCount)}`,
                         ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
                       ].join(" · ")}
                     </Text>

@@ -86,7 +86,7 @@ export function CashCloseScreen() {
         )}
         <CashCloseSummary
           close={day.close}
-          doneLabel={root ? "Ir a Clientes" : "Volver"}
+          doneLabel={root ? "Ir a Clientas" : "Volver"}
           onDone={() => (root ? navigation.navigate("ClientsTab") : navigation.goBack())}
         />
       </>

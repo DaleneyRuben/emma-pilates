@@ -55,7 +55,7 @@ function dayCount(date: string, today: string, count: number, cancelled: number)
 
 /**
  * The read-only week of classes (HOR boards). The Assistant books from a
- * Client's file, so «Reservar para una clienta» opens Clientes; the
+ * Client's file, so «Reservar para una clienta» opens Clientas; the
  * Coordinator and the Administrator cancel a class from here instead.
  */
 export function ScheduleScreen() {

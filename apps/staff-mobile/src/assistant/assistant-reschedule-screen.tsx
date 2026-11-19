@@ -142,7 +142,9 @@ export function AssistantRescheduleScreen({
                 accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
                 footerEnd={
                   <SeatPill>
-                    {session.availableSeats === 1 ? "1 cupo" : `${session.availableSeats} cupos`}
+                    {session.availableSeats === 1
+                      ? "1 lugar libre"
+                      : `${session.availableSeats} lugares libres`}
                   </SeatPill>
                 }
                 key={session.id}

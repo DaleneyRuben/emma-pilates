@@ -256,7 +256,7 @@ export function AssistantSessionDetailScreen({
             ) : (
               <>
                 <BodyText style={styles.note}>
-                  {`Si se libera un cupo, le avisamos a ${firstName}.`}
+                  {`Si se libera un lugar, le avisamos a ${firstName}.`}
                 </BodyText>
                 <PrimaryButton
                   busy={submitting}

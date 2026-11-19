@@ -30,7 +30,7 @@ export function SelfRegisteredNotice({
 }: {
   clientId: string;
   email: string;
-  /** S05's «Ver cliente»; S06 already shows her. */
+  /** S05's «Ver clienta»; S06 already shows her. */
   onOpen?: () => void;
   /** «card» inside S06's pending card, «screen» on S05's form. */
   surface?: "card" | "screen";
@@ -98,7 +98,7 @@ export function SelfRegisteredNotice({
         onPress={() => void send()}
         size={surface === "card" ? "compact" : "regular"}
       />
-      {onOpen ? <TextButton label="Ver cliente" onPress={onOpen} /> : null}
+      {onOpen ? <TextButton label="Ver clienta" onPress={onOpen} /> : null}
     </View>
   );
 }

@@ -238,7 +238,9 @@ export function AvailabilityBlockFormScreen({
               icon="clock"
               label={[
                 `${countLabel(turnos, "turno", "turnos")} de 45 min`,
-                ...(booked > 0 ? [countLabel(booked, "ya reservado", "ya reservados")] : []),
+                ...(booked > 0
+                  ? [countLabel(booked, "ya tiene reserva", "ya tienen reserva")]
+                  : []),
               ].join(" · ")}
             />
           </IconRowGroup>

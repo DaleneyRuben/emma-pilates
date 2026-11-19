@@ -182,7 +182,7 @@ export function PaymentStrip({
     return (
       <View style={styles.strip}>
         {icon}
-        <StripText note="Administración ya aprobó este total." title="Aprobado · falta el pago" />
+        <StripText note="Administración ya aprobó este total." title="Aprobada · falta el pago" />
       </View>
     );
   }
