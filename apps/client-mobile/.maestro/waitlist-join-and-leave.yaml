@@ -52,6 +52,9 @@ env:
 - takeScreenshot: client-waitlist-3-bookings
 - tapOn:
     id: "booking-leave-waitlist-.*"
+# FIX-089: leaving the waitlist asks first.
+- tapOn:
+    id: "booking-leave-confirm"
 - extendedWaitUntil:
     notVisible:
       id: "booking-leave-waitlist-.*"
