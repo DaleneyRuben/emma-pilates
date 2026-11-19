@@ -177,7 +177,7 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
     const day = await rowOf("vie 23/10");
     expect(
-      within(day).getByText("Ventas anuladas (efectivo en caja): Bs 290,00"),
+      within(day).getByText("Ventas anuladas (efectivo en caja): Bs 290"),
     ).toBeVisible();
   });
 
@@ -194,15 +194,9 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
     const short = await rowOf("vie 23/10");
     expect(within(short).getByText("Cerrada")).toBeVisible();
-    expect(
-      within(short).getByRole("cell", { name: "Bs 520,00" }),
-    ).toBeVisible();
-    expect(
-      within(short).getByRole("cell", { name: "Bs 510,00" }),
-    ).toBeVisible();
-    expect(within(short).getByText("−Bs 10,00")).toHaveClass(
-      "text-error-texto",
-    );
+    expect(within(short).getByRole("cell", { name: "Bs 520" })).toBeVisible();
+    expect(within(short).getByRole("cell", { name: "Bs 510" })).toBeVisible();
+    expect(within(short).getByText("−Bs 10")).toHaveClass("text-error-texto");
     expect(short).toHaveAttribute("data-difference", "short");
     // FIX-088: every row keeps the same ground; the figure carries the color.
     expect(short.className).not.toMatch(/bg-error|bg-advertencia/);
@@ -213,22 +207,20 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
     const missing = await rowOf("jue 22/10");
     expect(within(missing).getByText("Sin cierre")).toBeVisible();
-    expect(
-      within(missing).getByRole("cell", { name: "Bs 300,00" }),
-    ).toBeVisible();
+    expect(within(missing).getByRole("cell", { name: "Bs 300" })).toBeVisible();
     expect(missing).not.toHaveAttribute("data-difference");
 
     const adjusted = await rowOf("mié 21/10");
-    expect(within(adjusted).getByText("Bs 0,00")).toHaveClass(
+    expect(within(adjusted).getByText("Bs 0")).toHaveClass(
       "text-texto-secundario",
     );
-    expect(within(adjusted).getByText("−Bs 250,00")).toHaveAttribute(
+    expect(within(adjusted).getByText("−Bs 250")).toHaveAttribute(
       "title",
       "Una venta registrada después del cierre cambió las ventas del día.",
     );
 
     const over = await rowOf("mar 20/10");
-    expect(within(over).getByText("+Bs 5,00")).toHaveClass(
+    expect(within(over).getByText("+Bs 5")).toHaveClass(
       "text-advertencia-texto",
     );
     expect(over).toHaveAttribute("data-difference", "over");
@@ -277,7 +269,7 @@ describe("AW151 Cierres de caja on a narrow browser", () => {
     const short = await rowOf("vie 23/10");
     const card = compactCard(short);
     expect(card).toMatchObject({ compact: true, labels: 0 });
-    expect(card.detail).toContain("Contado Bs 510,00");
-    expect(card.detail).toContain("Diferencia −Bs 10,00");
+    expect(card.detail).toContain("Contado Bs 510");
+    expect(card.detail).toContain("Diferencia −Bs 10");
   });
 });

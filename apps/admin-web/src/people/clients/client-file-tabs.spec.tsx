@@ -179,7 +179,7 @@ describe("The Client file's tabs", () => {
     expect(
       await within(panel).findByText("Paquete de 8 clases"),
     ).toBeInTheDocument();
-    expect(within(panel).getByText("Bs 502,00")).toBeInTheDocument();
+    expect(within(panel).getByText("Bs 502")).toBeInTheDocument();
     expect(within(panel).getByText(/Efectivo/)).toBeInTheDocument();
     expect(within(panel).getByText("Confirmado")).toBeInTheDocument();
     expect(new URL(fileReads[0] ?? "").searchParams.get("clientId")).toBe(

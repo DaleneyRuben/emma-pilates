@@ -20,7 +20,7 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
   // Mariana has no earlier Plan, so this sale reserves her founder place
   // and the panel shows the 15 % price.
-  await expect(panel.getByText("Bs 476,00")).toBeVisible();
+  await expect(panel.getByText("Bs 476")).toBeVisible();
   await expect(panel.getByText("Transferencia")).toBeVisible();
   const receipt = panel.getByRole("img", {
     name: "Comprobante de Mariana Peña",

@@ -57,7 +57,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   await expect(
     income.getByText("Pagos en efectivo cobrados en Centro"),
   ).toBeVisible();
-  await expect(income.getByText("Bs 780,00")).toBeVisible();
+  await expect(income.getByText("Bs 780")).toBeVisible();
   await expect(
     tile(page, "Gastos").getByText("Gastos registrados en Centro"),
   ).toBeVisible();
@@ -79,7 +79,7 @@ test("reports the studio's money and narrows it to one Branch", async ({
   await expect(
     page.getByText("La fecha inicial no puede ser posterior a la final."),
   ).toBeVisible();
-  await expect(income.getByText("Bs 780,00")).toBeVisible();
+  await expect(income.getByText("Bs 780")).toBeVisible();
   await page.getByLabel("Desde").fill("2020-01-01");
   await page.getByLabel("Hasta").fill("2020-01-31");
   await expect(

@@ -104,17 +104,17 @@ describe("AW39 Indicadores", () => {
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Cobrado" })).getByText(
-        "Bs 300,00",
+        "Bs 300",
       ),
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Devengado" })).getByText(
-        "Bs 120,00",
+        "Bs 120",
       ),
     ).toBeVisible();
     expect(
       within(screen.getByRole("region", { name: "Diferido" })).getByText(
-        "Bs 270,00",
+        "Bs 270",
       ),
     ).toBeVisible();
     expect(

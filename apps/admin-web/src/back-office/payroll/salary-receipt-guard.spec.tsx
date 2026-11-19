@@ -50,7 +50,7 @@ const openApproval = async () => {
   );
   const dialog = await screen.findByRole("alertdialog");
   const confirm = within(dialog).getByRole("button", {
-    name: "Aprobar Bs 297,00",
+    name: "Aprobar Bs 297",
   });
   return { ...rendered, dialog, confirm };
 };

@@ -83,7 +83,7 @@ test("eliminates an Expense and leaves it out of Informes › Dinero", async ({
   await confirm.getByLabel("Motivo (opcional)").fill("Cargado dos veces");
   await confirm.getByRole("button", { name: "Eliminar", exact: true }).click();
   await expect(
-    page.getByText("Eliminamos el gasto de Bs 350,00 en Luz."),
+    page.getByText("Eliminamos el gasto de Bs 350 en Luz."),
   ).toBeVisible();
   const row = page.getByRole("row", { name: /Luz/ });
   await expect(row.getByText("Eliminado", { exact: true })).toBeVisible();

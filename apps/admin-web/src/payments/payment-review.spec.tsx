@@ -89,7 +89,7 @@ describe("AW29 Revisar pago on a desktop browser", () => {
       within(panel).getByText("Sofía Guzmán · Paquete de 8 clases"),
     ).toBeInTheDocument();
     expect(await within(panel).findByText("Monto a verificar")).toBeVisible();
-    expect(within(panel).getByText("Bs 500,00")).toBeInTheDocument();
+    expect(within(panel).getByText("Bs 500")).toBeInTheDocument();
     expect(within(panel).getByText("21/09/2026 · 14:05")).toBeInTheDocument();
     expect(within(panel).getByText("Transferencia")).toBeInTheDocument();
     const receipt = within(panel).getByRole("img", {
@@ -113,7 +113,7 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     server.use(...answerReviews());
     const { panel } = await open("Sofía Guzmán");
 
-    expect(await within(panel).findByText("Bs 500,00")).toBeInTheDocument();
+    expect(await within(panel).findByText("Bs 500")).toBeInTheDocument();
     expect(
       within(panel).queryByText("Crédito aplicado"),
     ).not.toBeInTheDocument();

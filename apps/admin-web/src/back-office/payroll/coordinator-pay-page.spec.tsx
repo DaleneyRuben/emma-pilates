@@ -73,13 +73,13 @@ describe("the Coordinator's pay statement", () => {
     expect(
       await screen.findByRole("heading", { name: "Carolina Rivas" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Bs 4.030,00")).not.toHaveLength(0);
+    expect(screen.getAllByText("Bs 4.030")).not.toHaveLength(0);
     expect(screen.getByText("Bono de renovación")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /^Aprobar Bs/ }));
     const dialog = await screen.findByRole("alertdialog");
     await attachSalaryReceipt(user, dialog);
     await user.click(
-      within(dialog).getByRole("button", { name: "Aprobar Bs 4.030,00" }),
+      within(dialog).getByRole("button", { name: "Aprobar Bs 4.030" }),
     );
     await waitFor(() => expect(approved).toBe(1));
     // FIX-084: once approved she leaves Por aprobar for Pagados.

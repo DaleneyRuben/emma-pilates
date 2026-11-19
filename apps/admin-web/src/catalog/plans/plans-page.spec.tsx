@@ -80,7 +80,7 @@ describe("AW04 Planes on a desktop browser", () => {
       within(row).getByRole("cell", { name: "12 clases" }),
     ).toBeInTheDocument();
     expect(
-      within(row).getByRole("cell", { name: "Bs 780,00" }),
+      within(row).getByRole("cell", { name: "Bs 780" }),
     ).toBeInTheDocument();
     expect(within(row).getByText("Oculto")).toBeInTheDocument();
     const capped = screen.getByRole("cell", { name: /Bimestral 16 clases/ })

@@ -61,7 +61,7 @@ describe("AW13 Gastos on a desktop browser", () => {
     expect(amount).toHaveClass("md:text-right");
     expect(within(row).getByRole("cell", { name: "15/09/2026" })).toBeVisible();
     expect(
-      within(await rowOf("Mantenimiento")).getByText("Bs 1.200,00"),
+      within(await rowOf("Mantenimiento")).getByText("Bs 1.200"),
     ).toBeVisible();
     expect(screen.getByText("Sucursal Centro")).toBeVisible();
     expect(screen.getByText("Mostrando 1–2 de 2 gastos")).toBeVisible();
@@ -145,7 +145,7 @@ describe("AW13 Gastos on a desktop browser", () => {
         { name: /Equipetrol/ },
       ),
     );
-    expect(await screen.findByText("Bs 99,00")).toBeVisible();
+    expect(await screen.findByText("Bs 99")).toBeVisible();
     expect(screen.getByText("Sucursal Equipetrol")).toBeVisible();
     expect(reads.at(-1)?.get("branchId")).toBe(equipetrol.id);
   });

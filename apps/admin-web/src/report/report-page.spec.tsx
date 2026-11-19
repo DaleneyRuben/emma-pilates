@@ -97,19 +97,19 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       await within(
         await screen.findByRole("region", { name: "Ingresos" }),
-      ).findByText("Bs 2.280,00"),
+      ).findByText("Bs 2.280"),
     ).toBeVisible();
     expect(
       within(tile("Ingresos")).getByText("Pagos confirmados en el rango"),
     ).toBeVisible();
     expect(
       within(tile("Ingresos")).getByText(
-        "Efectivo Bs 780,00 · Transferencias Bs 1.500,00",
+        "Efectivo Bs 780 · Transferencias Bs 1.500",
       ),
     ).toBeVisible();
     expect(
       within(tile("Ingresos")).getByText(
-        "Planes Bs 2.210,00 · Evaluaciones Bs 70,00",
+        "Planes Bs 2.210 · Evaluaciones Bs 70",
       ),
     ).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
@@ -122,13 +122,13 @@ describe("AW16 Reporte on a desktop browser", () => {
     const accrued = screen.getByRole("region", { name: "Ingreso devengado" });
     expect(
       within(accrued).getByRole("region", { name: "Caja" }),
-    ).toHaveTextContent("Bs 300,00");
+    ).toHaveTextContent("Bs 300");
     expect(
       within(accrued).getByRole("region", { name: "Devengado" }),
-    ).toHaveTextContent("Bs 120,00");
+    ).toHaveTextContent("Bs 120");
     expect(
       within(accrued).getByRole("region", { name: "Diferido" }),
-    ).toHaveTextContent("Bs 180,00");
+    ).toHaveTextContent("Bs 180");
     expect(
       within(accrued).getByText("Clases pendientes de dar hoy: 5"),
     ).toBeVisible();
@@ -150,9 +150,9 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       within(payroll).getByText("Viene de Nómina, no de las categorías"),
     ).toBeVisible();
-    expect(
-      within(payroll).getByRole("cell", { name: "Bs 3.500,00" }),
-    ).toHaveClass("md:text-right");
+    expect(within(payroll).getByRole("cell", { name: "Bs 3.500" })).toHaveClass(
+      "md:text-right",
+    );
     expect(
       within(categories).getByRole("cell", { name: "Reparación" }),
     ).toBeVisible();
@@ -166,7 +166,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       name: "septiembre de 2026",
     }).parentElement as HTMLElement;
     expect(
-      within(september).getByRole("cell", { name: "Bs 1.500,00" }),
+      within(september).getByRole("cell", { name: "Bs 1.500" }),
     ).toHaveAttribute("data-label", "Ingresos");
     expect(
       within(september).getByRole("cell", { name: "Bs 3.980,50" }),
@@ -175,7 +175,7 @@ describe("AW16 Reporte on a desktop browser", () => {
       within(september).getByRole("cell", { name: "−Bs 2.480,50" }),
     ).toHaveAttribute("data-label", "Neto");
     // UX-011: a 1024 px «Totales por mes» must not wrap a month or an amount.
-    for (const name of ["septiembre de 2026", "Bs 1.500,00", "−Bs 2.480,50"]) {
+    for (const name of ["septiembre de 2026", "Bs 1.500", "−Bs 2.480,50"]) {
       expect(within(months).getAllByText(name)[0]).toHaveClass(
         "whitespace-nowrap",
       );
@@ -199,7 +199,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     const { router } = renderAdmin(path);
     await within(
       await screen.findByRole("region", { name: "Ingresos" }),
-    ).findByText("Bs 2.280,00");
+    ).findByText("Bs 2.280");
 
     fireEvent.change(screen.getByRole("combobox", { name: "Sucursal" }), {
       target: { value: centro.id },
@@ -209,7 +209,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       await screen.findByText("Pagos en efectivo cobrados en Centro"),
     ).toBeVisible();
-    expect(within(tile("Ingresos")).getByText("Bs 780,00")).toBeVisible();
+    expect(within(tile("Ingresos")).getByText("Bs 780")).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 480,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText("Gastos registrados en Centro"),
@@ -296,7 +296,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     const { router } = renderAdmin(path);
     await within(
       await screen.findByRole("region", { name: "Ingresos" }),
-    ).findByText("Bs 2.280,00");
+    ).findByText("Bs 2.280");
 
     fireEvent.change(screen.getByLabelText("Desde"), {
       target: { value: "01/09/2026" },
@@ -329,22 +329,22 @@ describe("AW16 Reporte on a desktop browser", () => {
     const { user } = renderAdmin(path);
     await within(
       await screen.findByRole("region", { name: "Ingresos" }),
-    ).findByText("Bs 2.280,00");
+    ).findByText("Bs 2.280");
 
     const chart = screen.getByRole("figure", { name: "Mes por mes" });
     expect(within(chart).getByText("Ingresos")).toBeVisible();
     expect(within(chart).getByText("Gastos")).toBeVisible();
-    expect(within(chart).getByText("Bs 0,00")).toBeVisible();
-    expect(within(chart).getByText("Bs 2.500,00")).toBeVisible();
-    expect(within(chart).getByText("Bs 5.000,00")).toBeVisible();
+    expect(within(chart).getByText("Bs 0")).toBeVisible();
+    expect(within(chart).getByText("Bs 2.500")).toBeVisible();
+    expect(within(chart).getByText("Bs 5.000")).toBeVisible();
     const september = within(chart).getByRole("img", {
-      name: "septiembre de 2026: ingresos Bs 1.500,00, gastos Bs 3.980,50",
+      name: "septiembre de 2026: ingresos Bs 1.500, gastos Bs 3.980,50",
     });
 
     await user.hover(september);
     const tooltip = await screen.findByRole("tooltip");
     expect(tooltip).toHaveTextContent("septiembre de 2026");
-    expect(tooltip).toHaveTextContent("Ingresos Bs 1.500,00");
+    expect(tooltip).toHaveTextContent("Ingresos Bs 1.500");
     expect(tooltip).toHaveTextContent("Gastos Bs 3.980,50");
   });
 
@@ -360,7 +360,7 @@ describe("AW16 Reporte on a desktop browser", () => {
     expect(
       await screen.findByText("Sin ingresos ni gastos en este rango."),
     ).toBeVisible();
-    expect(within(tile("Neto")).getByText("Bs 0,00")).toBeVisible();
+    expect(within(tile("Neto")).getByText("Bs 0")).toBeVisible();
     expect(screen.queryByRole("figure", { name: "Mes por mes" })).toBeNull();
   });
 
@@ -421,7 +421,7 @@ describe("AW16 Reporte on a narrow browser", () => {
     ).toBeVisible();
     const months = screen.getByRole("table", { name: "Totales por mes" });
     expect(
-      within(months).getAllByRole("cell", { name: "Bs 1.500,00" })[0],
+      within(months).getAllByRole("cell", { name: "Bs 1.500" })[0],
     ).toHaveAttribute("data-label", "Ingresos");
     expect(screen.getByRole("combobox", { name: "Sucursal" })).toBeVisible();
     expect(

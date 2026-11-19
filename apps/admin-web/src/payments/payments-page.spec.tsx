@@ -78,7 +78,7 @@ describe("AW28 Pagos on a desktop browser", () => {
 
     expectBrandedLoading("Cargando pagos…");
     const sofia = await rowOf(/Sofía Guzmán/);
-    const amount = within(sofia).getByRole("cell", { name: /Bs 500,00/ });
+    const amount = within(sofia).getByRole("cell", { name: /Bs 500/ });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
     // Credit is retired (PAY-005): an older Payment's Credit is not shown.
@@ -91,7 +91,7 @@ describe("AW28 Pagos on a desktop browser", () => {
     ).toBeInTheDocument();
     expect(within(sofia).getByText("Pendiente")).toBeInTheDocument();
     const lucia = await rowOf(/Lucía Fernández/);
-    expect(within(lucia).getByText("Bs 1.050,00")).toBeInTheDocument();
+    expect(within(lucia).getByText("Bs 1.050")).toBeInTheDocument();
     expect(within(lucia).queryByText(/de crédito/)).not.toBeInTheDocument();
     expect(
       screen.getByText("Todo el estudio · 6 transferencias esperando revisión"),

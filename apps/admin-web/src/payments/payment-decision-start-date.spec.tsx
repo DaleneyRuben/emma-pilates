@@ -56,7 +56,7 @@ describe("AW29 names the Plan's real start", () => {
 
     expect(
       within(dialog).getByText(
-        `Verifica que Bs 500,00 llegó a la cuenta del estudio. Al confirmar, su plan Paquete de 8 clases empieza el ${formatLongDay(startsOn)} y le avisamos.`,
+        `Verifica que Bs 500 llegó a la cuenta del estudio. Al confirmar, su plan Paquete de 8 clases empieza el ${formatLongDay(startsOn)} y le avisamos.`,
       ),
     ).toBeInTheDocument();
     await user.click(
@@ -113,7 +113,7 @@ describe("AW29 names the Plan's real start", () => {
     });
     expect(
       within(dialog).getByText(
-        `Verifica que Bs 500,00 llegó a la cuenta del estudio. Al confirmar, su plan siguiente Paquete de 8 clases empieza el ${formatLongDay(startsOn)} y le avisamos.`,
+        `Verifica que Bs 500 llegó a la cuenta del estudio. Al confirmar, su plan siguiente Paquete de 8 clases empieza el ${formatLongDay(startsOn)} y le avisamos.`,
       ),
     ).toBeInTheDocument();
     await user.click(

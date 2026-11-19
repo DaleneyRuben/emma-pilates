@@ -54,7 +54,7 @@ describe("AW11 Nómina on a desktop browser", () => {
 
     expectBrandedLoading("Cargando pagos…");
     const row = await rowOf("Emma Vargas");
-    const amount = within(row).getByRole("cell", { name: "Bs 3.500,00" });
+    const amount = within(row).getByRole("cell", { name: "Bs 3.500" });
     expect(amount).toHaveAttribute("data-label", "Monto");
     expect(amount).toHaveClass("md:text-right");
     expect(within(row).getByRole("cell", { name: "20/09/2026" })).toBeVisible();

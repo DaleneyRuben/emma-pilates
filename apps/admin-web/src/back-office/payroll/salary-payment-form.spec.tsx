@@ -118,7 +118,7 @@ describe("AW12 Salary Payment form on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(
-      await screen.findByText("Pago de Bs 1.500,00 a Camila Rojas registrado."),
+      await screen.findByText("Pago de Bs 1.500 a Camila Rojas registrado."),
     ).toBeInTheDocument();
     expect(sent).toEqual([
       {

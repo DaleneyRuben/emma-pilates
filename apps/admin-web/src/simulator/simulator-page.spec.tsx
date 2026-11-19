@@ -53,14 +53,14 @@ describe("Simulador on a desktop browser", () => {
     // FIX-088: the derivation in words and bolivianos, not a raw formula.
     expect(
       screen.getByText(
-        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 9.295,00) ÷ (1 − 16 % de impuesto) = Bs 36.273,81",
+        "(costos fijos Bs 21.175 + pago a instructoras Bs 9.295) ÷ (1 − 16 % de impuesto) = Bs 36.273,81",
       ),
     ).toBeVisible();
 
     const projection = screen.getByRole("region", { name: "Proyección" });
     expect(within(projection).getByRole("table")).toBeVisible();
     const base = within(projection).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("Bs 120.120,00")).toBeVisible();
+    expect(within(base).getByText("Bs 120.120")).toBeVisible();
     expect(within(base).getByText("Bs 9.490,80")).toBeVisible();
     expect(
       within(projection).getByRole("row", { name: /12 meses Alto/ }),
@@ -87,7 +87,7 @@ describe("Simulador on a desktop browser", () => {
     const base = within(
       screen.getByRole("region", { name: "Proyección" }),
     ).getByRole("row", { name: /3 meses Base/ });
-    expect(within(base).getByText("Bs 4.686,00")).toBeVisible();
+    expect(within(base).getByText("Bs 4.686")).toBeVisible();
   });
 
   // FIX-008 (review 2026-10-28): the Client price and Trainer pay were one
@@ -101,7 +101,7 @@ describe("Simulador on a desktop browser", () => {
     // Trainer pay is 143 × (Bs 65 + 2 × Bs 8) = Bs 11.583.
     expect(
       screen.getByText(
-        "(costos fijos Bs 21.175,00 + pago a instructoras Bs 11.583,00) ÷ (1 − 16 % de impuesto) = Bs 38.997,62",
+        "(costos fijos Bs 21.175 + pago a instructoras Bs 11.583) ÷ (1 − 16 % de impuesto) = Bs 38.997,62",
       ),
     ).toBeVisible();
     expect(

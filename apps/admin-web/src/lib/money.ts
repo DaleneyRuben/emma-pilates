@@ -1,19 +1,12 @@
-/**
- * ADR-0082: every Money Amount is an integer number of BOB centavos; the
- * admin web formats it only here, always with two decimals as the design
- * system writes it (`Bs 1.200,00`). `@pilates/mobile-core` has a formatter
- * too, but it drops whole-boliviano decimals and admin web cannot depend on
- * a React Native package.
- */
-const bolivianos = new Intl.NumberFormat("es-BO", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-  useGrouping: "always",
-});
+import { formatMoney } from "@pilates/api-contracts";
 
-export function formatBolivianos(centavos: number): string {
-  return `Bs ${bolivianos.format(centavos / 100)}`;
-}
+/**
+ * ADR-0082: every Money Amount is an integer number of BOB centavos. FIX-090
+ * (owner 2026-11-19): every screen writes it as the apps do, «Bs 1.534,90»
+ * and «Bs 450» when the decimals are ,00.
+ */
+export const formatBolivianos = (centavos: number): string =>
+  formatMoney(centavos);
 
 /**
  * Reads a typed amount into centavos. The comma is the decimal separator
@@ -32,6 +25,6 @@ export function parseBolivianos(text: string): number | null {
   return whole * 100 + fraction;
 }
 
-/** A net figure: "−Bs 1.200,00" below zero, the plain amount otherwise. */
+/** A net figure: "−Bs 1.200" below zero, the plain amount otherwise. */
 export const formatSignedBolivianos = (centavos: number): string =>
-  centavos < 0 ? `−${formatBolivianos(-centavos)}` : formatBolivianos(centavos);
+  formatMoney(centavos);
