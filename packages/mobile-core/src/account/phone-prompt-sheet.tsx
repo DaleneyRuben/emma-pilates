@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
   disc: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     height: 52,
     justifyContent: "center",

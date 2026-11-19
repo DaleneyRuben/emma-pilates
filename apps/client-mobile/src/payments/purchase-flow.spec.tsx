@@ -182,7 +182,7 @@ describe("Client purchase flow", () => {
     expect(screen.getByTestId("payment-status-facts")).toBeOnTheScreen();
     expect(screen.getByText("Monto")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Volver al inicio" })).toHaveStyle({
-      backgroundColor: "#B78380",
+      backgroundColor: "#93615D",
     });
     await fireEvent.press(screen.getByRole("button", { name: "Volver al inicio" }));
     // Walkthrough n.º 22: Inicio says the payment is in review, never «Comprar un plan».
@@ -290,6 +290,6 @@ describe("Client purchase flow", () => {
     expect(screen.getByRole("button", { name: "Subir otro comprobante" })).toBeOnTheScreen();
     expect(
       screen.getByTestId("state-screen-icon-alert", { includeHiddenElements: true }),
-    ).toHaveProp("stroke", "#A04E3E");
+    ).toHaveProp("stroke", "#93615D");
   });
 });

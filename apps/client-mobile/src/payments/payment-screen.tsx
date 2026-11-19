@@ -74,6 +74,12 @@ export function PaymentScreen() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const offReason =
+    receipt === null
+      ? "Adjunta tu comprobante para continuar"
+      : invoiceData === "incomplete"
+        ? (invoiceIncompleteNote(invoice) ?? undefined)
+        : undefined;
 
   const header = (
     <>
@@ -185,16 +191,14 @@ export function PaymentScreen() {
         )}
       </FormScrollView>
       <View style={styles.footer}>
-        <BodyText style={styles.note}>
-          {receipt === null
-            ? "Adjunta tu comprobante para continuar"
-            : invoiceData === "incomplete"
-              ? (invoiceIncompleteNote(invoice) ?? "")
-              : "El estudio revisa tu pago y te avisa por la app"}
-        </BodyText>
+        {offReason === undefined ? (
+          <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
+        ) : null}
         <PrimaryButton
           busy={submitting}
           disabled={receipt === null || uploading || invoiceData === "incomplete"}
+          // FIX-089: the reason is the off button's own line, under it.
+          disabledReason={offReason}
           label="Enviar comprobante"
           onPress={() => void submit()}
           testID="payment-submit"
@@ -216,6 +220,11 @@ const styles = StyleSheet.create({
   footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.lg },
 });

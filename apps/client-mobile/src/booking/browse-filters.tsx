@@ -1,5 +1,7 @@
 import {
   BranchPickerPill,
+  Chip,
+  chipStyles,
   colors,
   dayChipLabel,
   fontFamilies,
@@ -44,9 +46,10 @@ export function BranchLine({
 }
 
 /**
- * 03's day strip: 60-high Lino chips, today as «Hoy», the chosen day in Palo de
- * rosa. The seven days share the width: 48-wide chips clipped the last one on
- * a 411-wide Android phone (MOB-074).
+ * 03's day strip: 60-high day chips, today as «Hoy», the chosen day in Rosa
+ * profundo with Crema labels (palette B chips, FIX-089). The seven days share
+ * the width: 48-wide chips clipped the last one on a 411-wide Android phone
+ * (MOB-074).
  */
 export function DayStrip({
   dates,
@@ -73,10 +76,10 @@ export function DayStrip({
             accessibilityState={{ selected: isSelected }}
             key={date}
             onPress={() => onSelect(date)}
-            style={[styles.dayChip, isSelected && styles.daySelected]}
+            style={[styles.dayChip, chipStyles.box, isSelected && chipStyles.boxSelected]}
             testID={`browse-day-${date}`}
           >
-            <Text style={[styles.dayWeekday, isSelected && styles.weekdaySelected]}>
+            <Text style={[styles.dayWeekday, isSelected && chipStyles.labelSelected]}>
               {date === today ? "Hoy" : label.weekday}
             </Text>
             <Text style={[styles.dayNumber, isSelected && styles.onSelected]}>{label.day}</Text>
@@ -91,7 +94,7 @@ export function DayStrip({
 /**
  * C03d (FIX-031, follow-up 234): S13's «Otra» at the end of a strip whose
  * booking window is wider than seven days; a later day picked there shows
- * its number in Palo de rosa.
+ * its number on the selected chip.
  */
 export function DayStripOther({
   accessibilityLabel,
@@ -110,7 +113,7 @@ export function DayStripOther({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.dayChip, styles.otherChip, selected && styles.daySelected]}
+      style={[styles.dayChip, chipStyles.box, selected && chipStyles.boxSelected]}
       testID="browse-day-other"
     >
       <Text style={selected ? [styles.dayNumber, styles.onSelected] : styles.otherLabel}>
@@ -120,11 +123,7 @@ export function DayStripOther({
   );
 }
 
-/**
- * 03's Class Type filter. FIX-082 (Reservar option A): tabs over a hairline,
- * the chosen one in text colour over a Palo de rosa underline, so the chosen
- * day stays the screen's one filled accent.
- */
+/** 03's Class Type filter: a row of palette B chips (FIX-089). */
 export function ClassTypeStrip({
   onSelect,
   options,
@@ -142,23 +141,14 @@ export function ClassTypeStrip({
       style={styles.strip}
       testID="browse-class-type-strip"
     >
-      {options.map((option) => {
-        const isSelected = option.id === selected;
-        return (
-          <Pressable
-            accessibilityLabel={option.label}
-            accessibilityRole="button"
-            accessibilityState={{ selected: isSelected }}
-            key={option.id}
-            onPress={() => onSelect(option.id)}
-            style={[styles.tab, isSelected && styles.tabSelected]}
-          >
-            <Text style={[styles.tabLabel, isSelected && styles.tabLabelSelected]}>
-              {option.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+      {options.map((option) => (
+        <Chip
+          key={option.id}
+          label={option.label}
+          onPress={() => onSelect(option.id)}
+          selected={option.id === selected}
+        />
+      ))}
     </ScrollView>
   );
 }
@@ -169,7 +159,6 @@ const styles = StyleSheet.create({
   branchName: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   dayChip: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: radii.button,
     gap: spacing.xxs,
     flex: 1,
@@ -179,38 +168,21 @@ const styles = StyleSheet.create({
   },
   dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   dayRow: { flexDirection: "row", gap: spacing.sm },
-  daySelected: { backgroundColor: colors.primary },
   dayWeekday: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: typography.tabLabel,
+    fontSize: typography.label,
   },
-  onSelected: { color: colors.white },
-  // FIX-082: «Otra» is a plain day, not a second pink.
-  otherChip: { backgroundColor: colors.card },
+  onSelected: { color: colors.onPrimary },
   otherLabel: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
+    fontSize: typography.label,
     fontWeight: "600",
   },
   // Horizontal strips keep their natural height: spare tablet height would
   // stretch them and an open Branch list would squash them.
   strip: { flexGrow: 0, flexShrink: 0 },
-  tab: {
-    borderBottomColor: "transparent",
-    borderBottomWidth: 2,
-    justifyContent: "center",
-    minHeight: 44,
-  },
-  tabLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  tabLabelSelected: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
-  tabRow: {
-    borderBottomColor: colors.hairline,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flexGrow: 1,
-    gap: spacing.lg,
-  },
-  tabSelected: { borderBottomColor: colors.primary },
-  weekdaySelected: { color: colors.white, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  // The chips' 38 pt plus their hit slop reach 44 pt; the row keeps the room.
+  tabRow: { alignItems: "center", flexGrow: 1, gap: spacing.sm, paddingVertical: spacing.xxs },
 });

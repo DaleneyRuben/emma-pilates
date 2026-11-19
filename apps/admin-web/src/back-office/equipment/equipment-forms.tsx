@@ -4,6 +4,8 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
+import { fieldMessageClass } from "../../components/form/form";
+import { FormErrorSummaryBox } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -14,8 +16,6 @@ import {
   branchEquipmentQueryOptions,
   useEquipmentChange,
 } from "./equipment-queries";
-
-export const fieldError = "text-ayuda text-error-texto";
 
 export function Failure({ message }: { message: string | null }) {
   return message === null ? null : (
@@ -101,7 +101,7 @@ export function AddUnitForm({
               key="taken"
               id={`${numberId}-help`}
               role="alert"
-              className={fieldError}
+              className={fieldMessageClass}
             >
               {help}
             </p>
@@ -174,9 +174,13 @@ export function ReportIssueForm({
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
+        <FormErrorSummaryBox
+          announce={false}
+          labels={descriptionError === null ? [] : ["¿Qué pasó?"]}
+        />
         <DescriptionField
           id={descriptionId}
-          placeholder="Ej.: el resorte rojo se soltó"
+          example="el resorte rojo se soltó"
           value={description}
           error={descriptionError}
           onChange={setDescription}
@@ -213,13 +217,13 @@ export function ReportIssueForm({
 /** «¿Qué pasó?», shared by a unit's fault and a stock's damage. */
 export function DescriptionField({
   id,
-  placeholder,
+  example,
   value,
   error,
   onChange,
 }: {
   id: string;
-  placeholder: string;
+  example: string;
   value: string;
   error: string | null;
   onChange: (value: string) => void;
@@ -230,13 +234,16 @@ export function DescriptionField({
       <Textarea
         id={id}
         maxLength={500}
-        placeholder={placeholder}
         value={value}
         aria-invalid={error !== null}
+        aria-describedby={`${id}-example`}
         onChange={(event) => onChange(event.target.value)}
       />
+      <p id={`${id}-example`} className="text-ayuda text-texto-tenue">
+        {`Ej.: ${example}`}
+      </p>
       {error === null ? null : (
-        <p role="alert" className={fieldError}>
+        <p role="alert" className={fieldMessageClass}>
           {error}
         </p>
       )}

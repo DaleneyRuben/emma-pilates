@@ -19,6 +19,7 @@ import {
   spacing,
   TextButton,
   typography,
+  fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -297,9 +298,13 @@ const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   dateStrip: { flexGrow: 0 },
   failure: { color: colors.errorText },
-  muted: { color: colors.textMuted, fontSize: typography.note },
+  muted: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.note },
   pills: pillRow,
-  fixedBranch: { color: colors.text, fontSize: typography.bodyMedium },
+  fixedBranch: {
+    fontFamily: fontFamilies.body,
+    color: colors.text,
+    fontSize: typography.bodyMedium,
+  },
   footer: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
   screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
   timeField: {
@@ -311,9 +316,14 @@ const styles = StyleSheet.create({
     gap: spacing.xxs,
     padding: spacing.md,
   },
-  timeLabel: { color: colors.textMuted, fontSize: typography.label },
+  timeLabel: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.label },
   timePlaceholder: { color: colors.textSubtle },
-  timeValue: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  timeValue: {
+    fontFamily: fontFamilies.bodyMedium,
+    color: colors.text,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
+  },
   times: { flexDirection: "row", gap: spacing.md },
   // v2 S17: the seven day tiles share the width, 6 pt apart.
   weekdays: { flexDirection: "row", gap: 6 },

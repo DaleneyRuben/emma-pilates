@@ -13,7 +13,6 @@ import {
   EmphasisCard,
   fontFamilies,
   formatBolivianos,
-  Heading,
   IconRow,
   IconRowGroup,
   PrimaryButton,
@@ -147,14 +146,8 @@ export function BookEvaluationScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar
-        fullBleed
-        onBack={() => navigation.goBack()}
-        title="Evaluación nutricional"
-        tone="context"
-      />
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirma tu cita" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Heading accessibilityRole="header">Confirma tu cita</Heading>
         <EmphasisCard
           eyebrow={capitalized(evaluationDate(slot.startsAt))}
           note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
@@ -202,16 +195,16 @@ export function BookEvaluationScreen({
         ) : null}
       </ScrollView>
       <View style={styles.footer}>
-        {slot.included ? null : (
-          <BodyText style={styles.note}>
-            {receipt === null
-              ? "Adjunta tu comprobante para continuar"
-              : "El estudio revisa tu pago y te avisa por la app"}
-          </BodyText>
+        {slot.included || receipt === null ? null : (
+          <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         )}
         <PrimaryButton
           busy={submitting}
           disabled={!slot.included && (receipt === null || uploading)}
+          // FIX-089: the reason is the off button's own line, under it.
+          disabledReason={
+            !slot.included && receipt === null ? "Adjunta tu comprobante para continuar" : undefined
+          }
           label="Confirmar evaluación"
           onPress={() => void confirm()}
         />
@@ -229,7 +222,12 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
   group: { ...surfaces.card },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.lg },
   time: {
     color: colors.white,

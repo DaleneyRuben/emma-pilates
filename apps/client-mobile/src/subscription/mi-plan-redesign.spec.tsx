@@ -58,18 +58,17 @@ describe("Mi plan, option A", () => {
     clearMobileQueryCache();
   });
 
-  it("draws the plan on a light card with an «Activo» dot and one detail line", async () => {
+  // FIX-089: «Activo» is a normal state, said in words without a dot.
+  it("draws the plan on a Crema card with «Activo» in words and one detail line", async () => {
     const screen = await openMiPlan(view());
 
     const hero = screen.getByTestId("subscription-hero");
-    expect(hero).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(hero).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     const card = within(hero);
     expect(card.getByText("Trimestral 24 clases")).toBeOnTheScreen();
-    expect(card.getByText("Activo")).toHaveStyle({ color: "#5F7457" });
-    expect(card.getByTestId("subscription-status-dot")).toHaveStyle({
-      backgroundColor: "#7C9473",
-    });
-    expect(card.getByText("25")).toHaveStyle({ color: "#4A4A4A" });
+    expect(card.getByText("Activo")).toHaveStyle({ color: "#93615D" });
+    expect(card.queryByTestId("subscription-status-dot")).toBeNull();
+    expect(card.getByText("25")).toHaveStyle({ color: "#93615D" });
     expect(card.getByText("clases restantes")).toBeOnTheScreen();
     expect(
       card.getByText(`24 del plan + 1 de regalo (campaña) · vence el ${formatCivilDate(endsOn)}`),
@@ -100,7 +99,7 @@ describe("Mi plan, option A", () => {
     const screen = await openMiPlan(view());
 
     expect(screen.getByRole("button", { name: "Renovar mi plan" })).toHaveStyle({
-      backgroundColor: "#B78380",
+      backgroundColor: "#93615D",
     });
     expect(
       screen.getByText(
@@ -114,9 +113,9 @@ describe("Mi plan, option A", () => {
     const screen = await openMiPlan(view({ status: "expiring_soon" }));
 
     expect(screen.queryByText(/^Tu plan vence el/)).toBeNull();
-    expect(within(screen.getByTestId("subscription-hero")).getByText("Por vencer")).toHaveStyle({
-      color: "#9A7434",
-    });
+    // FIX-089: the exception is the one Rubor pill.
+    const hero = within(screen.getByTestId("subscription-hero"));
+    expect(within(hero.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
   });
 
   it("shows the Freeze as one row that opens its detail", async () => {
@@ -145,6 +144,6 @@ describe("Mi plan, option A", () => {
     const screen = await openMiPlan(view());
 
     expect(screen.getByRole("button", { name: "Congelar plan" })).toBeOnTheScreen();
-    expect(screen.getByTestId("glyph-sun", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-sun", hidden)).toHaveProp("stroke", "#93615D");
   });
 });

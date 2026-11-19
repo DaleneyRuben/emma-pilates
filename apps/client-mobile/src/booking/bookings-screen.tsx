@@ -9,6 +9,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   BrandToast,
   colors,
   ConfirmationSheet,
@@ -19,6 +20,8 @@ import {
   SegmentedTabs,
   StateScreen,
   spacing,
+  TextButton,
+  useMountedAt,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
@@ -27,14 +30,15 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
-import { BookingCard, CancelBookingFacts } from "./booking-card";
+import { BookingCard, CancelBookingFacts, useBookingAction } from "./booking-card";
 import { ClassHistoryTab } from "./class-history-tab";
+import { ClientNextClassHero, nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
-import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
+import { formatCancellationWindow, formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
 
 type BookingsTab = "history" | "upcoming";
 
@@ -58,6 +62,7 @@ export function BookingsScreen({
   const confirmed = useStickyNotice(route.params?.confirmed, dismissConfirmed);
   const tab = route.params?.tab ?? "upcoming";
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
+  const [leaving, setLeaving] = useState<UpcomingBookingDto | null>(null);
   const [cancelInFlight, setCancelInFlight] = useState(false);
   const cancelStarted = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
@@ -149,6 +154,16 @@ export function BookingsScreen({
   const planName =
     subscription.data?.status === 200 ? subscription.data.data.subscription?.planName : undefined;
   const items = upcoming.data?.status === 200 ? upcoming.data.data : [];
+  // ClaseE (FIX-089): the first booked class tops the list as the hero.
+  const next = nextBookedClass(items);
+  const today = boliviaCivilDate(new Date(useMountedAt()));
+  const cardProps = (item: UpcomingBookingDto) => ({
+    cancellationWindowMinutes: studioRules?.cancellationWindowMinutes,
+    item,
+    onCancel: () => setCancelling(item),
+    onLeave: () => setLeaving(item),
+    onReschedule: () => navigation.navigate("Reschedule", { booking: item }),
+  });
 
   return (
     <Screen style={styles.screen}>
@@ -196,16 +211,12 @@ export function BookingsScreen({
           refreshControl={refreshControl}
           testID="bookings-scroll"
         >
-          {items.map((item) => (
-            <BookingCard
-              cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
-              item={item}
-              key={item.bookingId ?? item.waitlistEntryId}
-              onCancel={() => setCancelling(item)}
-              onLeave={() => void leave(item)}
-              onReschedule={() => navigation.navigate("Reschedule", { booking: item })}
-            />
-          ))}
+          {next === undefined ? null : <NextBooking {...cardProps(next)} today={today} />}
+          {items
+            .filter((item) => item !== next)
+            .map((item) => (
+              <BookingCard key={item.bookingId ?? item.waitlistEntryId} {...cardProps(item)} />
+            ))}
         </ScrollView>
       )}
       <ConfirmationSheet
@@ -222,6 +233,20 @@ export function BookingsScreen({
       >
         {cancelling !== null ? <CancelBookingFacts booking={cancelling} /> : null}
       </ConfirmationSheet>
+      <ConfirmationSheet
+        confirmLabel="Sí, salir de la lista"
+        confirmTestID="booking-leave-confirm"
+        note="Dejas tu lugar en la lista para que lo tome otra persona."
+        onConfirm={() => {
+          const entry = leaving;
+          setLeaving(null);
+          if (entry !== null) void leave(entry);
+        }}
+        onDismiss={() => setLeaving(null)}
+        testID="booking-leave-sheet"
+        title="¿Salir de la lista de espera?"
+        visible={leaving !== null}
+      />
       {confirmed !== null ? (
         <BrandToast
           note={
@@ -254,9 +279,39 @@ export function BookingsScreen({
   );
 }
 
+/** The next booked class as the hero, its action right under it. */
+function NextBooking({
+  today,
+  ...props
+}: Parameters<typeof useBookingAction>[0] & { today: string }) {
+  const { action, insideWindow } = useBookingAction(props);
+  const { cancellationWindowMinutes: window, item } = props;
+  return (
+    <View style={styles.next}>
+      <ClientNextClassHero
+        booking={item}
+        detail={
+          insideWindow && window !== undefined
+            ? `${formatTimeRange(item.startsAt, item.endsAt)} · faltan menos de ${formatCancellationWindow(window)}`
+            : undefined
+        }
+        testID="bookings-next-class"
+        today={today}
+      />
+      {action === null ? null : (
+        <View style={styles.nextAction}>
+          <TextButton {...action} />
+        </View>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   empty: { flexGrow: 1 },
   failure: { color: colors.errorText },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
+  next: { gap: spacing.xs },
+  nextAction: { alignItems: "flex-end" },
   screen: { gap: spacing.lg },
 });

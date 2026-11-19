@@ -29,13 +29,14 @@ describe("StartDateChooser", () => {
     });
   });
 
-  it("draws the days as v2 Lino tiles", async () => {
+  it("draws the days as Crema tiles with an Arcilla border (FIX-089)", async () => {
     const screen = await renderChooser();
 
     expect(screen.getByTestId("start-date-2026-11-03")).toHaveStyle({
       backgroundColor: colors.card,
-      borderRadius: 14,
-      borderWidth: 0,
+      borderColor: colors.border,
+      borderRadius: 12,
+      borderWidth: 1,
       height: 72,
       minWidth: 52,
     });

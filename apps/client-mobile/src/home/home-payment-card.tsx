@@ -52,13 +52,7 @@ function Card({
           {children}
         </EmphasisCard>
       </View>
-      <Glyph
-        color="rgba(255,255,255,0.45)"
-        name={art}
-        size={64}
-        strokeWidth={0.6}
-        style={styles.art}
-      />
+      <Glyph color={colors.onEmphasis} name={art} size={64} strokeWidth={0.6} style={styles.art} />
     </Pressable>
   );
 }
@@ -136,7 +130,7 @@ const styles = StyleSheet.create({
   card: { ...surfaces.emphasis, flexDirection: "row" },
   error: { color: colors.errorText },
   line: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: 14,
     lineHeight: 21,

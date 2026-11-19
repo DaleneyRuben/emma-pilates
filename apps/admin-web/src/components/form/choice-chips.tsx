@@ -1,8 +1,8 @@
 import { cn } from "../../lib/cn";
+import { chipClass as baseChip, selectedClass } from "../ui/chip";
 
-const chipClass =
-  "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-lino px-3.5 py-2 text-nota text-texto-secundario has-focus-visible:shadow-foco";
-const chosenClass = "bg-primario-tinte font-semibold text-primario-profundo";
+const chipClass = cn(baseChip, "flex flex-1 cursor-pointer");
+const chosenClass = selectedClass;
 
 /**
  * A small exclusive choice drawn as side-by-side chips over native radios,
@@ -93,7 +93,7 @@ export function MultiChoiceChips<Value extends string>({
                     : [...values, option],
                 )
               }
-              className="size-3.5 accent-primario"
+              className="sr-only"
             />
             {label}
           </label>

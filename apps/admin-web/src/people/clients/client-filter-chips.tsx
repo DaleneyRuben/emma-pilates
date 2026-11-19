@@ -1,3 +1,4 @@
+import { chipClass, selectedClass } from "../../components/ui/chip";
 import { cn } from "../../lib/cn";
 import type { ClientFilter } from "../people-search";
 
@@ -34,10 +35,7 @@ export function ClientFilterChips({
             type="button"
             aria-pressed={chosen}
             onClick={() => onChange(chip.value)}
-            className={cn(
-              "inline-flex h-9 items-center rounded-full bg-lino px-3.5 text-celda text-texto hover:bg-rosa-tinte focus-visible:shadow-foco",
-              chosen && "bg-rosa-tinte font-semibold text-rosa-enlace",
-            )}
+            className={cn(chipClass, chosen && selectedClass)}
           >
             {chip.label}
           </button>

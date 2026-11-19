@@ -221,14 +221,11 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
     <Screen style={styles.screen}>
       <FormScrollView contentContainerStyle={styles.content} footer={footer}>
         {header}
-        <EmphasisCard
-          eyebrow="Monto"
-          note={`${current.clientName} · ${current.purchaseLabel}`}
-          pill={
-            current.voided ? "Anulado" : current.file === null ? "Confirmado" : "Factura emitida"
-          }
-        >
+        <EmphasisCard eyebrow="Monto" note={`${current.clientName} · ${current.purchaseLabel}`}>
           <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
+          <Text style={styles.state}>
+            {current.voided ? "Anulado" : current.file === null ? "Confirmado" : "Factura emitida"}
+          </Text>
         </EmphasisCard>
         <View style={styles.section}>
           <SectionTitle>Datos de la factura</SectionTitle>

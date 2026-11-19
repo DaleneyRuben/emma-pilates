@@ -5,7 +5,7 @@ import type {
 import { Download, FileText } from "lucide-react";
 import { useState } from "react";
 import { WarningRow } from "../auth/auth-notices";
-import { Button } from "../components/ui/button";
+import { Button, buttonVariants } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { formatCivilMoment } from "../lib/bolivia-time";
 import { invoiceFileUrl, useRemoveInvoice } from "./invoice-queries";
@@ -39,7 +39,7 @@ export function InvoiceFileCard({
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 rounded-marco bg-lino px-3.5 py-3">
+      <div className="flex items-center gap-3 rounded-marco border border-borde bg-lino px-3.5 py-3">
         <span className="flex size-11 flex-none items-center justify-center rounded-control bg-superficie text-primario">
           <FileText size={22} strokeWidth={1.5} aria-hidden="true" />
         </span>
@@ -57,7 +57,7 @@ export function InvoiceFileCard({
           href={invoiceFileUrl(invoice.paymentId)}
           download={file.fileName}
           aria-label="Descargar factura"
-          className="inline-flex h-[36px] items-center gap-2 rounded-tarjeta bg-primario-tinte px-3.5 text-celda font-semibold text-primario-profundo hover:bg-rosa-empolvado/40"
+          className={buttonVariants({ variant: "secondary", size: "sm" })}
         >
           <Download size={16} strokeWidth={1.8} aria-hidden="true" />
           Descargar

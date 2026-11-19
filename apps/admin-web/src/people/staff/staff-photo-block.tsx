@@ -34,13 +34,13 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
             <span className="absolute inset-0 flex items-center justify-center bg-superficie/55">
               <span
                 aria-hidden="true"
-                className="size-6 animate-[spin_0.9s_linear_infinite] rounded-full border-[3px] border-primario/30 border-t-primario"
+                className="size-6 animate-[spin_0.9s_linear_infinite] rounded-full border-[3px] border-rubor border-t-primario"
               />
             </span>
           ) : null}
         </StaffPhoto>
         <div className="flex min-w-0 flex-col gap-2">
-          <span className="font-serif text-[22px] leading-tight break-words text-texto">
+          <span className="font-serif text-titulo-2 leading-tight break-words text-texto">
             {member.name}
           </span>
           {editable ? (
@@ -96,11 +96,14 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
       {status.kind === "failed" ? (
         <div
           role="alert"
-          className="flex items-center gap-3 rounded-tarjeta bg-lino px-3.5 py-2.5 text-nota text-texto"
+          className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino px-3.5 py-2.5 text-nota text-texto"
         >
-          <span className="flex size-9 flex-none items-center justify-center rounded-full bg-error-tinte text-error">
-            <CircleAlert size={20} strokeWidth={1.6} aria-hidden="true" />
-          </span>
+          <CircleAlert
+            size={20}
+            strokeWidth={1.6}
+            aria-hidden="true"
+            className="flex-none text-rosa-profundo"
+          />
           {status.message}
         </div>
       ) : null}

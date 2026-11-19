@@ -75,7 +75,7 @@ export function FeedbackPanel({
       className="flex flex-1 flex-col"
     >
       <SidePanelBody>
-        <blockquote className="rounded-control bg-lino px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
+        <blockquote className="rounded-control border border-borde bg-lino px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
           {feedback.text}
         </blockquote>
         <SummaryBlock title="Datos">
@@ -116,9 +116,11 @@ export function FeedbackPanel({
             value={note}
             maxLength={2000}
             rows={4}
-            placeholder="Ej.: Arreglamos la lista de reservas en la versión 1.0.2."
             onChange={(event) => setNote(event.target.value)}
           />
+          <p className="text-ayuda text-texto-tenue">
+            Ej.: Arreglamos la lista de reservas en la versión 1.0.2.
+          </p>
           <p className="text-ayuda text-texto-tenue">
             Nota interna: la clienta o el equipo no la ven. Va en el CSV.
           </p>

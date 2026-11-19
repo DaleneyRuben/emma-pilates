@@ -163,7 +163,9 @@ describe("AW01 Login", () => {
 
     expect(
       screen.getByRole("textbox", { name: "Correo electrónico" }),
-    ).toHaveAccessibleDescription("Escribe un correo electrónico válido.");
+    ).toHaveAccessibleDescription(
+      "Ej.: tu@correo.com Escribe un correo electrónico válido.",
+    );
     expect(screen.getByLabelText("Contraseña")).toHaveAccessibleDescription(
       "Escribe tu contraseña.",
     );

@@ -31,7 +31,12 @@ describe("Client Session detail when Reservar is off", () => {
 
     expect(screen.getByText("Necesitas un plan para reservar.")).toBeOnTheScreen();
     expect(screen.queryByText("No te quedan clases en tu plan.")).toBeNull();
+    // FIX-089: the reason is the off button's own line, under it.
     expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reservar" })).toHaveProp(
+      "accessibilityHint",
+      "Necesitas un plan para reservar.",
+    );
 
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
     await waitFor(() => {

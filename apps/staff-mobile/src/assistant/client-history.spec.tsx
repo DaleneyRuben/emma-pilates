@@ -36,7 +36,7 @@ describe("Assistant Client history (S22)", () => {
     });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 26 });
     expect(screen.getByText("Septiembre 2026").parent).toHaveStyle({
-      borderBottomColor: "#D8C9BB",
+      borderBottomColor: "#CDA697",
       borderBottomWidth: 1,
     });
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
@@ -49,7 +49,7 @@ describe("Assistant Client history (S22)", () => {
     expect(rows).toHaveLength(3);
     expect(StyleSheet.flatten(rows[0].props.style)).not.toHaveProperty("backgroundColor");
     expect(StyleSheet.flatten(rows[0].props.style)).toMatchObject({
-      borderBottomColor: "#EFE7DE",
+      borderBottomColor: "#E7CCBF",
       borderBottomWidth: 1,
     });
     expect(StyleSheet.flatten(rows[2].props.style)).not.toHaveProperty("borderBottomWidth");

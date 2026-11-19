@@ -1,7 +1,6 @@
 import {
   colors,
   createTabStackScreenLayout,
-  fontFamilies,
   popTabToRootOnPress,
   tabBarHidden,
 } from "@pilates/mobile-core";
@@ -53,6 +52,7 @@ import { TrainerAgendaScreen } from "../trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "../trainer/trainer-roster-screen";
 import { ContactsTabIcon } from "./contacts-tab-icon";
 import { StaffTabIcon, type StaffTabIconName } from "./staff-tab-icon";
+import { TabLabel } from "./tab-label";
 
 // Design follow-up 254 § 3 (owner, 2026-11-06): the bar stays while browsing
 // and hides only inside these tasks, which end on a button at the bottom.
@@ -149,6 +149,11 @@ const tabOptions =
       ) : (
         <StaffTabIcon color={color} focused={focused} name={icon} />
       ),
+    // A drawn label gives the tab no name of its own.
+    tabBarAccessibilityLabel: title,
+    tabBarLabel: ({ color, focused }: { color: string; focused: boolean }) => (
+      <TabLabel color={color} focused={focused} title={title} />
+    ),
     tabBarStyle: tabBarHidden(taskRoutes, getFocusedRouteNameFromRoute(route), root)
       ? { display: "none" as const }
       : tabBarStyle,
@@ -166,10 +171,10 @@ const tabConfig = {
   screenListeners: popTabToRootOnPress,
   screenOptions: {
     headerShown: false,
-    tabBarActiveTintColor: colors.emphasis,
-    tabBarInactiveTintColor: colors.textMuted,
+    // FIX-089: every label is Rosa profundo; the open tab is the bold one.
+    tabBarActiveTintColor: colors.text,
+    tabBarInactiveTintColor: colors.text,
     tabBarLabelPosition: "below-icon",
-    tabBarLabelStyle: { fontFamily: fontFamilies.bodyMedium, fontSize: 12 },
   },
 } as const;
 

@@ -12,6 +12,7 @@ import {
   boliviaToday,
   formatCivilDate,
 } from "../lib/bolivia-time";
+import { chipClass, selectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { FinancePanel } from "./finance-panel";
 import { MonthChart } from "./month-chart";
@@ -141,12 +142,7 @@ function ReportTabs({
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(tab.value)}
-            className={cn(
-              "rounded-control border px-3 py-1.5 text-nota",
-              selected
-                ? "border-primario bg-primario-tinte font-medium text-primario-profundo"
-                : "border-transparent bg-lino text-texto-secundario",
-            )}
+            className={cn(chipClass, selected && selectedClass)}
           >
             {tab.label}
           </button>
@@ -272,7 +268,7 @@ export function ReportPage({
           />
           {income.data.totalCentavos === 0 &&
           expenses.data.totalCentavos === 0 ? (
-            <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
+            <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
               Sin ingresos ni gastos en este rango.
             </p>
           ) : (

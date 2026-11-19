@@ -34,14 +34,14 @@ function Figure({
     <section
       aria-label={name}
       className={cn(
-        "flex flex-col gap-1.5 rounded-marco border-t-[3px] bg-lino px-5 py-4",
+        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4",
         rule,
       )}
     >
       <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {name}
       </h2>
-      <p className="font-serif text-[32px] leading-tight text-texto tabular">
+      <p className="font-serif text-cifra-grande leading-tight text-texto tabular">
         {figure}
       </p>
       <p className="text-nota text-texto-tenue">{line}</p>
@@ -122,7 +122,7 @@ function EmptyBudget({ month }: { month: string }) {
       }),
   });
   return (
-    <div className="flex flex-col items-center gap-3 rounded-marco bg-lino px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
       <p className="text-cuerpo text-texto-secundario">
         Aún no hay presupuesto.
       </p>

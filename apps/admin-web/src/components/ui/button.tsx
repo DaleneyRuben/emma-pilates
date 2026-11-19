@@ -3,31 +3,34 @@ import { Slot } from "radix-ui";
 import type { ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 
-// Follow-up 225 §4 (the admin boards' .btn): Primary in Palo de rosa,
-// Secondary on Rosa tinte with a Rosa enlace label, Text with no underline,
-// Destructive on its pale ground; no shadows, and no borders but the
-// outline variant's hairline (FIX-084). One solid (primary) button per view.
+// FIX-089 (BotonA, palette B): Primary is the one solid fill, Rosa profundo
+// with a Crema label, one per screen. Secondary, neutral and outline are the
+// same quiet button: Crema with a 1.5 px Rosa profundo border. Destructive
+// looks like Secondary (never red); the action asks first (ConfirmDialog).
+// Disabled is Crema with an Arcilla border and a weight-500 label. A small
+// button is 44 px tall at phone width (audit 8.2) and 36 px from md up.
+const quiet =
+  "border-[1.5px] border-rosa-profundo bg-crema text-rosa-profundo hover:bg-rubor";
+const bare = "disabled:border-0 disabled:bg-transparent disabled:font-semibold";
+
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton font-semibold transition-colors focus-visible:shadow-foco disabled:pointer-events-none disabled:bg-deshabilitado disabled:text-deshabilitado-texto disabled:shadow-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton font-semibold transition-colors focus-visible:shadow-foco disabled:pointer-events-none disabled:border-[1.5px] disabled:border-arcilla disabled:bg-crema disabled:font-medium disabled:text-rosa-profundo disabled:shadow-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary:
-          "bg-primario text-blanco hover:bg-primario-hover focus-visible:shadow-foco-solido active:bg-primario-presionado",
-        secondary:
-          "bg-primario-tinte text-primario-profundo hover:bg-rosa-empolvado/40",
-        // FIX-088: a disabled text link stays text, never a grey block.
-        link: "h-auto px-0 text-primario-profundo hover:text-primario-presionado disabled:bg-transparent",
-        neutral: "bg-lino text-texto hover:bg-primario-tinte",
-        // FIX-084: the quiet companion of the one solid button in a list.
-        outline: "border border-borde bg-blanco text-texto hover:bg-hover-fila",
-        destructive: "bg-error-tinte text-error hover:text-error-texto",
-        ghost: "text-primario-profundo hover:bg-lino",
+        primary: "bg-rosa-profundo text-crema focus-visible:shadow-foco-solido",
+        secondary: quiet,
+        neutral: quiet,
+        outline: quiet,
+        destructive: quiet,
+        // FIX-088: a disabled text link stays text, never a block.
+        link: `h-auto px-0 text-rosa-profundo underline-offset-4 hover:underline ${bare}`,
+        ghost: `text-rosa-profundo hover:bg-rubor ${bare}`,
       },
       size: {
-        sm: "h-[36px] rounded-tarjeta px-3.5 text-celda",
+        sm: "h-[44px] px-3.5 text-celda md:h-[36px]",
         md: "h-[44px] px-[18px] text-cuerpo",
-        lg: "h-[52px] px-5 text-cuerpo",
+        lg: "h-[52px] px-5 text-base",
         icon: "size-[44px] p-0",
       },
     },

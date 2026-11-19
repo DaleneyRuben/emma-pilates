@@ -118,9 +118,12 @@ describe("Staff Perfil photo", () => {
     const screen = await openProfile(routeFetcher(routes(daniela)), "trainer");
 
     expect(screen.getByText("DO")).toBeOnTheScreen();
+    // FIX-089: the secondary button, Crema with a Rosa profundo outline.
     expect(screen.getByRole("button", { name: "Cambiar foto" })).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      height: 40,
+      backgroundColor: "#F9F4F2",
+      borderColor: "#93615D",
+      borderWidth: 1.5,
+      height: 44,
     });
     expect(screen.queryByRole("button", { name: "Quitar foto" })).toBeNull();
     expect(
@@ -242,7 +245,7 @@ describe("Staff Perfil photo", () => {
       uri: "file:///me.jpg",
     });
     expect(screen.getByTestId("photo-veil")).toHaveStyle({
-      backgroundColor: "rgba(250, 247, 242, 0.55)",
+      backgroundColor: "rgba(147,97,93,0.35)",
     });
     expect(screen.queryByRole("button", { name: "Cambiar foto" })).toBeNull();
   });
@@ -265,7 +268,8 @@ describe("Staff Perfil photo", () => {
     await waitFor(() =>
       expect(screen.getByText("No pudimos subir la foto. Inténtalo de nuevo.")).toBeOnTheScreen(),
     );
-    expect(screen.getByTestId("notice-row-disc")).toHaveStyle({ backgroundColor: "#F7E5E0" });
+    // FIX-089: the notice draws no disc.
+    expect(screen.queryByTestId("notice-row-disc")).toBeNull();
     expect(screen.getByText("DO")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
   });

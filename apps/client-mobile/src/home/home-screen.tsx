@@ -15,15 +15,16 @@ import {
 } from "@pilates/api-contracts";
 import {
   colors,
+  fontFamilies,
   Heading,
   LoadingState,
   PrimaryButton,
   QueryFailure,
-  useIsOnline,
   radii,
   Screen,
   spacing,
   typography,
+  useIsOnline,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
@@ -275,6 +276,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  offlineBannerText: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
+  offlineBannerText: {
+    color: colors.white,
+    fontSize: typography.note,
+    fontWeight: "500",
+    fontFamily: fontFamilies.bodyMedium,
+  },
   screen: { paddingBottom: 0 },
 });

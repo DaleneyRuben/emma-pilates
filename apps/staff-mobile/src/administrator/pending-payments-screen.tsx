@@ -35,7 +35,6 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
-import { SectionHeader } from "../ui/section-header";
 
 export type PaymentsNotice =
   | "Pago confirmado"
@@ -170,10 +169,9 @@ export function PendingPaymentsScreen({
           </View>
         ) : (
           <View>
-            <SectionHeader
-              meta={`${formatBolivianos(total)} en total`}
-              title={`Por confirmar · ${payments.length}`}
-            />
+            <SectionTitle>
+              {`Por confirmar · ${payments.length} · ${formatBolivianos(total)} en total`}
+            </SectionTitle>
             <IconRowGroup>
               {payments.map((payment) => (
                 <PersonRow

@@ -6,18 +6,18 @@ import { colors } from "../ui/tokens";
 
 /**
  * FIX-041 (follow-ups 240–242): a person's circle, her photo centre-cropped
- * by it, or her two initials in Lora on Rosa tinte while she has none.
+ * by it, or while she has none her two initials in bold Crema on Palo de rosa
+ * (ListaC, FIX-089).
  */
 export function PersonAvatar({
   name,
   photoUri,
   size,
-  tone = "brand",
 }: {
   name: string;
   photoUri: string | null;
   size: number;
-  /** Walkthrough finding 113: «neutral» puts the initials on the neutral wash. */
+  /** Kept for callers; palette B draws every circle the same (FIX-089). */
   tone?: "brand" | "neutral";
 }) {
   const frame = { borderRadius: size / 2, height: size, width: size };
@@ -32,14 +32,10 @@ export function PersonAvatar({
     );
   }
   return (
-    <View style={[styles.initials, tone === "neutral" && styles.neutral, frame]}>
+    <View style={[styles.initials, frame]}>
       <Text
         allowFontScaling={false}
-        style={[
-          styles.initialsText,
-          tone === "neutral" && styles.neutralText,
-          { fontSize: Math.max(9, Math.round(size * 0.36)) },
-        ]}
+        style={[styles.initialsText, { fontSize: Math.max(9, Math.round(size * 0.36)) }]}
       >
         {initials(name)}
       </Text>
@@ -50,11 +46,13 @@ export function PersonAvatar({
 const styles = StyleSheet.create({
   initials: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.emphasis,
     justifyContent: "center",
   },
-  initialsText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display },
-  neutral: { backgroundColor: colors.neutralPill },
-  neutralText: { color: colors.textMuted },
-  photo: { backgroundColor: colors.primaryTint },
+  initialsText: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontWeight: "700",
+  },
+  photo: { backgroundColor: colors.emphasis },
 });

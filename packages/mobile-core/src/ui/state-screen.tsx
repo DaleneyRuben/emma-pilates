@@ -27,9 +27,9 @@ export type StateScreenProps = {
   testIDPrefix?: string;
   textAction?: Action;
   title: string;
-  /** The glyph alone in Texto tenue, without its disc (FIX-082). */
+  /** Kept for callers: every glyph is plain since FIX-089. */
   plainIcon?: boolean;
-  /** `error` puts the glyph in Error on #F7E5E0. */
+  /** Kept for callers: an error is said in words, never in colour (FIX-089). */
   tone?: "brand" | "error";
 };
 
@@ -39,36 +39,23 @@ export function StateScreen({
   icon,
   layout = "centred",
   note,
-  plainIcon = false,
   primaryAction,
   testID,
   testIDPrefix = "state-screen",
   textAction,
   title,
-  tone = "brand",
 }: StateScreenProps) {
-  const error = tone === "error";
   const hasActions = primaryAction !== undefined || textAction !== undefined;
   return (
     <View style={[styles.block, layouts[layout]]} testID={testID}>
-      {icon === undefined ? null : plainIcon ? (
+      {icon === undefined ? null : (
         <Glyph
-          color={error ? colors.error : colors.textMuted}
+          color={colors.text}
           name={icon}
           size={32}
           strokeWidth={1.5}
           testID={`${testIDPrefix}-icon-${icon}`}
         />
-      ) : (
-        <View style={[styles.disc, error && styles.errorDisc]} testID={`${testIDPrefix}-disc`}>
-          <Glyph
-            color={error ? colors.error : colors.emphasis}
-            name={icon}
-            size={32}
-            strokeWidth={1.5}
-            testID={`${testIDPrefix}-icon-${icon}`}
-          />
-        </View>
       )}
       <Text accessibilityRole="header" style={styles.title}>
         {title}
@@ -90,20 +77,13 @@ const styles = StyleSheet.create({
   block: { alignItems: "center", gap: spacing.md },
   card: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
     borderRadius: radii.card,
+    borderWidth: 1,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xxl,
   },
   centred: { flex: 1, justifyContent: "center", paddingHorizontal: spacing.lg },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 36,
-    height: 72,
-    justifyContent: "center",
-    width: 72,
-  },
-  errorDisc: { backgroundColor: colors.errorSurface },
   inList: { paddingHorizontal: spacing.lg, paddingVertical: spacing.xxl },
   note: {
     color: colors.textMuted,

@@ -104,6 +104,11 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
     );
     await fireEvent.press(screen.getByRole("button", { name: /^Cambiar correo/ }));
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.n@example.com");
+    // FIX-089: «Reservar clase» stays the screen's one solid button.
+    expect(screen.getByRole("button", { name: "Guardar correo" })).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderWidth: 1.5,
+    });
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 
     expect(await screen.findByRole("alert", { name: accountLimit })).toBeOnTheScreen();

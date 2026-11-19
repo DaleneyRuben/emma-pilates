@@ -16,37 +16,20 @@ Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals)
 
 ## Color Palette
 
-Fixed across all three apps: the client mobile app, the staff mobile app (Trainer/Assistant/Administrator/Nutritionist, routed by Role), and the admin desktop web app. **Closed palette — do not introduce colors outside this list.** Tints are the semantic color at low alpha.
+**Palette B (owner, 2026-11-19; [follow-up 280](./prompts/followups/280-base-comun-palette-b.md)).** Fixed across every surface: the client app, the staff app, the admin web and the public site. **Only these five colours — nothing else on any screen**: no greys, no olive, no white, and no status colours.
 
-| Token | Hex | Role |
+| Name | Hex | Role |
 |---|---|---|
-| Arena (page background) | `#F2ECE5` | App/page background |
-| Superficie | `#FAF7F2` | Content area behind cards, inset panels |
-| Blanco | `#FFFFFF` | Cards, tables, panels, inputs |
-| Superficie sutil | `#FDFAF6` | Table headers, field suffixes, inline add rows |
-| Hover de fila | `#FDF7F2` | Table row / card hover |
-| Palo de rosa (primario) | `#B78380` | Primary buttons, active nav, links, focus ring |
-| Palo de rosa hover | `#A87370` | Primary hover |
-| Palo de rosa presionado | `#9C6764` | Primary active |
-| Palo de rosa tinte | `#EFE0DC` | Active nav background, avatars, badges |
-| Palo de rosa profundo | `#8A5D59` | Text/icon on the tint |
-| Rosa empolvado | `#D8BDB8` | Secondary accent, avatar fill |
-| Tinte suave | `#F6EDEB` / `#F7EEE9` | Secondary-button hover |
-| Plomo cálido | `#4A4A4A` | Primary text, neutral summary figures |
-| Texto secundario | `#6E6663` | Body text, table secondary cells |
-| Texto tenue | `#8A807C` | Subtitles, labels, helper text |
-| Texto muy tenue | `#A79E9A` | Placeholders, meta, footnotes |
-| Borde fuerte | `#D8C9BB` | Frame borders, input borders |
-| Borde | `#E4D8CC` | Card and table borders |
-| Divisor | `#F2EBE2` | Row separators inside cards |
-| Éxito | `#7C9473` (texto `#5F7457`) | Confirmed, active, attended, income |
-| Advertencia | `#C99A4E` (texto `#9A7434`) | Pending, low stock |
-| Error | `#B25D4B` (texto `#94493A`) | Cancelled, overdue, no-show, destructive, expenses |
-| Deshabilitado | fondo `#E7DCD8`, texto `#B3A9A5` | Disabled buttons and icons |
+| Crema | `#F9F4F2` | Page background, cards, inputs, text on Rosa profundo and on Palo de rosa |
+| Rubor | `#E7CCBF` | Soft backgrounds: the exception pill, the form summary, the time box in class rows, row dividers |
+| Rosa arcilla | `#CDA697` | 1px borders of cards, inputs, unselected chips and disabled buttons |
+| Palo de rosa | `#B78380` | The hero block (large Crema text only) and initials circles |
+| Rosa profundo | `#93615D` | All text and icons, the primary button, the selected chip, the secondary button's border, an invalid field's border |
 
-Status pills: semantic color at **12–16% alpha** as background, the darker text tone as foreground, a **6px dot** of the full color so state does not depend on color alone, fully rounded, 11.5–12px.
-
-Every screen-generation prompt should reference this palette by name and hex so results stay consistent across surfaces.
+- Text is always Rosa profundo; hierarchy comes from size and weight. Rosa profundo on Crema (about 4.8:1) is the only pair readable at small sizes.
+- State is said with words, weight, a Rubor pill or Rosa profundo — never green, amber or red.
+- The scrim behind sheets is Rosa profundo at 35 % alpha.
+- Token names in `packages/mobile-core/src/ui/tokens.ts`, `apps/admin-web/src/index.css` (`@theme`) and `apps/public-site/estilos.css` predate palette B; each keeps its role and takes one of the five colours.
 
 ## Typography
 
@@ -70,30 +53,33 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 ## Spacing, Radius, Shadow
 
 - Spacing scale: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 26, 32, 40 px.
-- Radius: 8px controls, 10–12px cards and panels, 14–16px outer frames, 999px pills.
-- Shadows: primary button `0 2px 6px rgba(183,131,128,0.22)`; card hover `0 6px 16px rgba(74,58,48,0.10)`; side panel `-14px 0 34px rgba(74,58,48,0.14)`; dragged card `0 16px 32px rgba(74,58,48,0.20)`; popover `0 12px 28px rgba(74,58,48,0.14)`.
-- Focus ring on inputs: `border-color:#B78380; box-shadow:0 0 0 3px rgba(183,131,128,0.15)`.
-- Scrim behind side panels/modals: `rgba(74,58,48,0.22)`.
+- Radius: 10 inputs and the class time box, 12 buttons and insets, 16 cards on every surface, 18 the hero, 999 pills and chips.
+- No shadows on cards: a 1px Arcilla border instead.
 
-## Buttons
+## Buttons and pieces
 
-- Primary: `#B78380` fill, white text, radius 8, min-height 52 mobile / 38–46 desktop, weight 500, shadow above; hover `#A87370`, active `#9C6764`, disabled `#E7DCD8`/`#B3A9A5`.
-- Secondary: 1px `#B78380` border, transparent fill, `#B78380` text; hover tint `#F6EDEB`.
-- Tertiary/link: text only in `#B78380`; hover `#9C6764`.
-- Compact neutral (admin web): 1px `#D8C9BB`, `#FAF7F2` fill, `#4A4A4A` text, height 30–38; hover border `#B78380`.
-- Destructive: Error `#B25D4B` text/border, hover text `#94493A`, hover tint `rgba(178,93,75,0.10)`.
-- **One solid button per view.**
+- **Primary**: Rosa profundo fill, Crema Work Sans 600 label, radius 12, 52 high on mobile (44 on the web). **One per screen.**
+- **Secondary**: Crema with a 1.5px Rosa profundo border and a Rosa profundo label.
+- **Destructive**: the secondary look plus a confirmation step. Never red.
+- **Disabled**: Crema with an Arcilla border and a Rosa profundo 500 label, always with a reason line under it.
+- **Chip**: selected Rosa profundo with a Crema 600 label; unselected Crema with a 1px Arcilla border; 38 high with a 44 target.
+- **Pill**: only for an exception («Por vencer», «Primera clase»): Rubor with bold Rosa profundo 12 px text. Normal states are words. Unread is bold weight.
+- **Icons** stand alone: no tinted discs behind them.
+- **Header (Encabezado A)**: the back arrow on its own row, then the screen's own Lora 500 30 title. Never the parent screen's name.
+- **Class card (Clase E)**: the next class as a Palo de rosa hero; other classes as rows with the time in a Rubor box and «N de M»; cancelled classes folded at the end, «N canceladas por mínimo · Ver».
+- **Forms (Form B)**: label above (14/600); examples as hint text under the field, «Ej.: …», never in the placeholder; no dots in password placeholders; on save, a Rubor box at the top «Faltan N datos para guardar» with the labels, and each field marked with a 2px Rosa profundo border and a bold message.
+- **Phone-width web lists (Lista C)**: a Palo de rosa initials circle, the name, one secondary line and a chevron; filter chips on top; a Rubor pill only for the exception.
 - Mobile hit targets never below 44px.
 
 ## Style Conventions
 
 Applies to every surface unless a surface-specific prompt overrides it.
 
-- **Corners**: soft-rounded — ~12–16px on cards, ~8px on buttons and inputs. Restrained, not maximal.
+- **Corners**: soft-rounded — 16px on cards, 12px on buttons, 10px on inputs. Restrained, not maximal.
 - **Icons**: thin, single-weight line icons only, inline SVG, 24×24 viewBox, `stroke="currentColor"`-style strokes at 1.4–2.1 weight, rendered at 11–22px. No filled glyphs.
 - **Density**: spacious on mobile — generous whitespace between elements. Admin web runs tighter (see Typography above) — dense, scanned/operated desktop work, not a mobile-style card layout.
-- **Buttons/CTAs**: solid fill in Palo de rosa, rounded rectangle, generous mobile-first tap targets.
-- **Cards**: white/Superficie surface, thin Borde, soft shadow.
+- **Buttons/CTAs**: solid fill in Rosa profundo, rounded rectangle, generous mobile-first tap targets.
+- **Cards**: Crema with a 1px Rosa arcilla border, no shadow.
 - **Navigation** (mobile surfaces): bottom tab bar for primary sections (client app only — see Staff App below).
 
 ### Client App Tab Bar

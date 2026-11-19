@@ -1,4 +1,4 @@
-import { colors, EmphasisCard, fontFamilies, radii, spacing } from "@pilates/mobile-core";
+import { colors, EmphasisCard, fontFamilies, radii, spacing, surfaces } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 /**
@@ -42,15 +42,15 @@ export function CapacitySummary({
 }
 
 const styles = StyleSheet.create({
-  bar: { backgroundColor: colors.white, borderRadius: radii.pill, height: 6 },
+  bar: { backgroundColor: colors.onEmphasis, borderRadius: radii.pill, height: 6 },
   count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
   free: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 32,
     fontVariant: ["tabular-nums"],
   },
-  of: { color: "rgba(255,255,255,0.85)", fontFamily: fontFamilies.body, fontSize: 14 },
-  track: { backgroundColor: "rgba(255,255,255,0.25)", borderRadius: radii.pill, height: 6 },
-  wrap: { backgroundColor: colors.emphasis, borderRadius: 20 },
+  of: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
+  track: { backgroundColor: colors.primary, borderRadius: radii.pill, height: 6 },
+  wrap: surfaces.emphasis,
 });

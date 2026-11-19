@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 export const invoiceStyles = StyleSheet.create({
   actions: { gap: spacing.xs, paddingTop: spacing.md },
   amount: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 32,
     fontVariant: ["tabular-nums"],
@@ -19,5 +19,12 @@ export const invoiceStyles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between" },
   screen: { paddingHorizontal: spacing.xlSm },
   section: { gap: spacing.sm },
+  // FIX-089: the state is a word in weight on the hero, not a pill.
+  state: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
   toast: { bottom: spacing.xl * 4, left: 0, position: "absolute", right: 0 },
 });

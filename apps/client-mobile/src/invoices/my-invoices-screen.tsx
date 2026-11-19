@@ -22,7 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { invoiceDate, InvoicePill, invoiceStateLabel } from "./invoice-parts";
+import { invoiceDate, InvoiceState, invoiceStateLabel } from "./invoice-parts";
 
 type InvoicesNavigation = {
   goBack: () => void;
@@ -41,13 +41,13 @@ function InvoiceRow({ invoice, onPress }: { invoice: ClientInvoiceDto; onPress: 
     >
       {/* FIX-082: the glyph alone, no tinted disc. */}
       <View testID="invoice-row-glyph">
-        <Glyph color={colors.textMuted} name="receipt" size={18} strokeWidth={1.5} />
+        <Glyph color={colors.text} name="receipt" size={18} strokeWidth={1.5} />
       </View>
       <View style={styles.text}>
         <Text style={styles.title}>{invoice.purchaseLabel}</Text>
         <Text style={styles.muted}>{`${date} · ${amount}`}</Text>
       </View>
-      <InvoicePill invoice={invoice} />
+      <InvoiceState invoice={invoice} />
     </Pressable>
   );
 }
@@ -115,7 +115,7 @@ export function MyInvoicesScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xl, paddingTop: spacing.md },
   muted: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
     lineHeight: 19,

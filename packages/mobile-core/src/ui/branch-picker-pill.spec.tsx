@@ -15,24 +15,24 @@ describe("BranchPickerPill", () => {
     expect(pill).toHaveStyle({
       alignItems: "center",
       alignSelf: "flex-start",
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 999,
       flexDirection: "row",
       gap: 10,
       minHeight: 44,
       paddingHorizontal: 16,
     });
-    expect(screen.getByText("Sucursal:")).toHaveStyle({ color: "#4A4A4A", fontSize: 14 });
+    expect(screen.getByText("Sucursal:")).toHaveStyle({ color: "#93615D", fontSize: 14 });
     expect(screen.getByText("Centro")).toHaveStyle({
-      color: "#4A4A4A",
+      color: "#93615D",
       fontSize: 14,
       fontWeight: "500",
     });
     const pin = screen.getByTestId("glyph-pin", hidden);
     expect(pin).toHaveProp("width", 17);
-    expect(pin).toHaveProp("stroke", "#B78380");
+    expect(pin).toHaveProp("stroke", "#93615D");
     const chevron = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#6F6662");
+    expect(chevron).toHaveProp("stroke", "#93615D");
     expect(chevron).toHaveProp("width", 16);
     expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
 

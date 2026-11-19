@@ -104,7 +104,6 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
                 setCurrentPasswordError(undefined);
                 field.onChange(value);
               }}
-              placeholder="••••••••"
               secureTextEntry
               value={field.value}
             />
@@ -120,7 +119,6 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
               label="Contraseña nueva"
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="••••••••"
               secureTextEntry
               value={field.value}
             />
@@ -136,7 +134,6 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
               label="Confirmar contraseña"
               onBlur={field.onBlur}
               onChangeText={field.onChange}
-              placeholder="••••••••"
               secureTextEntry
               value={field.value}
             />

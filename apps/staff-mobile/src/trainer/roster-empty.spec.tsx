@@ -38,8 +38,12 @@ async function openRoster(
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
   });
   const screen = await render(<App runtime={createStaffRuntime(fetcher)} />);
-  await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen());
-  await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
+  // A class still to come is the agenda's hero (ClaseE, FIX-089); one already
+  // started is a row of the class list.
+  const opens = await waitFor(() =>
+    screen.getByRole("button", { name: /^(Próxima[^:]*: )?Reformer Pilates,/ }),
+  );
+  await fireEvent.press(opens);
   return { fetcher, screen };
 }
 
@@ -62,7 +66,7 @@ describe("Trainer roster empty state (UX-009)", () => {
       });
     });
     expect(screen.getByText("No hay reservas para esta sesión.")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 15,
     });
     expect(screen.getByTestId("empty-state-icon-calendar", hidden)).toHaveProp("stroke", "#93615D");

@@ -17,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
 import { PasswordInput } from "../../components/ui/password-input";
 import {
@@ -56,7 +57,7 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
     },
     mode: "onChange",
   });
-  const { isSubmitting, isValid } = form.formState;
+  const { isSubmitting } = form.formState;
 
   const submit = form.handleSubmit(async (values) => {
     setFailed(false);
@@ -104,6 +105,7 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
             className="flex flex-1 flex-col justify-between"
           >
             <div className="flex flex-col gap-4 px-5 py-4">
+              <FormErrorSummary />
               {fields.map(([name, label, autoComplete]) => (
                 <FormField
                   key={name}
@@ -131,7 +133,6 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={!isValid}
                 busy={isSubmitting}
               >
                 Guardar contraseña

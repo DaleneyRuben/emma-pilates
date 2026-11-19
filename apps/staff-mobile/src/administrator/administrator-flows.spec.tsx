@@ -166,8 +166,8 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Carla Mendoza")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Por confirmar · 2")).toBeOnTheScreen();
-    expect(screen.getByText("Bs 1.340 en total")).toBeOnTheScreen();
+    // One section title with its figure (the core SectionTitle, FIX-089).
+    expect(screen.getByText("Por confirmar · 2 · Bs 1.340 en total")).toBeOnTheScreen();
     expect(screen.getByText("Paquete de 8 clases · ayer, 19:40")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
@@ -180,7 +180,9 @@ describe("Administrator payments and Session cancellation", () => {
     });
     expect(screen.getByText("Carla Mendoza · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
-    expect(screen.getByText("Pendiente")).toBeOnTheScreen();
+    // FIX-089: the state is a word in weight on the hero, not a pill.
+    expect(screen.getByText("Pendiente")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(screen.getByText("Pendiente").parent).not.toHaveStyle({ borderRadius: 999 });
     // v2 S12: the amount on the hero, the transfer and its time as rows.
     expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 32 });
     expect(screen.getByText("Transferencia")).toBeOnTheScreen();
@@ -219,7 +221,7 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByText("Pago confirmado")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
     await waitFor(() => expect(screen.queryByText("Pago confirmado")).toBeNull());
-    expect(screen.getByText("Bs 780 en total")).toBeOnTheScreen();
+    expect(screen.getByText(/ · Bs 780 en total$/)).toBeOnTheScreen();
   });
 
   it("requires a reason to reject and shows the calm empty state afterwards", async () => {
@@ -307,8 +309,9 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
-    expect(screen.getByText("6 reservas")).toBeOnTheScreen();
+    // Today's only class leads as the hero (ClaseE), the Trainer in its detail.
+    expect(screen.getByText(/ · Emma Vargas$/)).toBeOnTheScreen();
+    expect(screen.getByText("6 de 12")).toBeOnTheScreen();
     expect(screen.getByText(/ · 1 clase$/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));

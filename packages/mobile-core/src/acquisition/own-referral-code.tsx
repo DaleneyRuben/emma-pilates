@@ -58,7 +58,7 @@ export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
         onPress={() => void copy()}
         style={({ pressed }) => [styles.copy, pressed && styles.pressed]}
       >
-        <Glyph color={colors.emphasis} name="copy" size={16} strokeWidth={1.6} />
+        <Glyph color={colors.text} name="copy" size={16} strokeWidth={1.6} />
         <Text style={styles.copyLabel}>Copiar</Text>
       </Pressable>
     </View>
@@ -180,14 +180,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   copyLabel: {
-    color: colors.emphasis,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
   },
   edit: { alignSelf: "flex-start", paddingHorizontal: 0 },
   eyebrow: {
-    color: "rgba(255,255,255,0.75)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",

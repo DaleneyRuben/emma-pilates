@@ -2,17 +2,18 @@ import {
   useListBranches,
   useListClassTypes,
   useListSessionAvailability,
-  type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
   bookingStrip,
   bookingWindowDays,
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
   OtherDateSheet,
+  placesLabel,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -23,7 +24,7 @@ import {
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -32,8 +33,11 @@ import { BranchField } from "../ui/branch-field";
 import { DayStrip, DayStripAction } from "../ui/day-strip";
 import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
+import { TodayHero } from "../ui/today-hero";
+import { splitNextClass } from "../trainer/next-class";
 import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
 import { TabletGrid } from "./assistant-layout";
+import { useIsTablet } from "../ui/use-is-tablet";
 import { ClientBanner } from "./client-banner";
 import { useClientBookedSessionIds } from "./client-booked-sessions";
 import type { ClientContext } from "./client-overview-screen";
@@ -45,16 +49,12 @@ type BrowseNavigation = {
 
 const allClassTypes = "all";
 
-function seatsTag(session: SessionAvailabilityDto): string {
-  if (session.availableSeats === 0) return "Completa";
-  return countLabel(session.availableSeats, "cupo", "cupos");
-}
-
 /** S07 Reservar una clase, for the Client named in the banner (v2). */
 export function BrowseSessionsScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   const today = boliviaCivilDate(new Date());
   const windowDays = bookingWindowDays(useStudioRules(fetcher));
   const dates = useMemo(() => upcomingCivilDates(today, windowDays), [today, windowDays]);
@@ -118,6 +118,20 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   );
   const nextDate = dates[dates.indexOf(selectedDate) + 1];
   const dayTitle = selectedDate === today ? "Hoy" : dayHeading(selectedDate);
+  const { next, rest } = splitNextClass(visible, selectedDate === today, now);
+  const exceptionOf = (session: (typeof visible)[number]) =>
+    bookedSessionIds.has(session.id)
+      ? "Ya reservada"
+      : session.availableSeats === 0
+        ? "Completa"
+        : undefined;
+  const openSession = (session: (typeof visible)[number]) =>
+    navigation.navigate("SessionDetail", {
+      clientId,
+      clientName,
+      clientPhoto,
+      sessionId: session.id,
+    });
 
   return (
     <Screen style={styles.screen}>
@@ -192,41 +206,48 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
           <SectionTitle>
             {`${dayTitle} · ${countLabel(visible.length, "clase", "clases")}`}
           </SectionTitle>
-          <TabletGrid testID="assistant-session-grid">
-            {visible.map((session) => {
-              const booked = bookedSessionIds.has(session.id);
-              const tag = booked ? "Ya reservada" : seatsTag(session);
-              return (
-                <SessionRow
-                  key={session.id}
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${tag}`}
-                  onPress={() =>
-                    navigation.navigate("SessionDetail", {
-                      clientId,
-                      clientName,
-                      clientPhoto,
-                      sessionId: session.id,
-                    })
-                  }
-                  pill={tag}
-                  // Her own Booking takes the neutral pill, like a full class.
-                  pillTone={booked || session.availableSeats === 0 ? "neutral" : "tint"}
-                  subtitle={session.trainerName}
-                  subtitleLead={
-                    <StaffFace
-                      fetcher={fetcher}
-                      name={session.trainerName}
-                      photo={session.trainerPhoto}
-                      size={20}
-                    />
-                  }
-                  testID={`session-card-${session.id}`}
-                  time={startTime(session.startsAt, session.endsAt)}
-                  title={session.classTypeName}
-                />
-              );
-            })}
-          </TabletGrid>
+          {next === undefined ? null : (
+            <TodayHero
+              accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}, ${exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}`}
+              detail={`${next.branchName} · ${next.trainerName}`}
+              now={now}
+              onPress={() => openSession(next)}
+              places={exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}
+              startsAt={next.startsAt}
+              testID={`session-card-${next.id}`}
+              title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
+            />
+          )}
+          {rest.length === 0 ? null : (
+            <SessionList tablet={tablet}>
+              {rest.map((session) => {
+                const exception = exceptionOf(session);
+                const places = placesLabel(session.bookedCount, session.capacity);
+                return (
+                  <SessionRow
+                    key={session.id}
+                    accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
+                    exception={exception}
+                    onPress={() => openSession(session)}
+                    places={places}
+                    standalone={tablet}
+                    subtitle={session.trainerName}
+                    subtitleLead={
+                      <StaffFace
+                        fetcher={fetcher}
+                        name={session.trainerName}
+                        photo={session.trainerPhoto}
+                        size={20}
+                      />
+                    }
+                    testID={`session-card-${session.id}`}
+                    time={startTime(session.startsAt, session.endsAt)}
+                    title={session.classTypeName}
+                  />
+                );
+              })}
+            </SessionList>
+          )}
         </ScrollView>
       )}
       <OtherDateSheet
@@ -241,6 +262,15 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
         visible={choosingDate}
       />
     </Screen>
+  );
+}
+
+// One card of rows on a phone (ClaseE); a grid of lone rows on a tablet.
+function SessionList({ children, tablet }: { children: ReactNode; tablet: boolean }) {
+  return tablet ? (
+    <TabletGrid testID="assistant-session-grid">{children}</TabletGrid>
+  ) : (
+    <ClassList testID="assistant-session-grid">{children}</ClassList>
   );
 }
 

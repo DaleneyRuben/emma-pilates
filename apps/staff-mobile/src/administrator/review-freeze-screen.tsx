@@ -2,6 +2,7 @@ import { decideFreeze, useGetFreezeReview } from "@pilates/api-contracts";
 import {
   BrandToast,
   ClientFace,
+  ConfirmationSheet,
   colors,
   fontFamilies,
   IconRow,
@@ -42,6 +43,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
   const fetcher = useStaffFetcher();
   const review = useGetFreezeReview(route.params.freezeId, { fetcher });
   const [pending, setPending] = useState<"approved" | "refused" | null>(null);
+  const [refusing, setRefusing] = useState(false);
   const [notice, setNotice] = useState<{ text: string; tone: "success" | "error" } | null>(null);
   const queryClient = useQueryClient();
 
@@ -135,11 +137,24 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
           <TextButton
             disabled={pending !== null}
             label="Rechazar"
-            onPress={() => void decide("refused")}
+            onPress={() => setRefusing(true)}
             tone="error"
           />
         </View>
       ) : null}
+      {/* FIX-089: a destructive decision takes a confirmation step. */}
+      <ConfirmationSheet
+        busy={pending === "refused"}
+        confirmLabel="Sí, rechazar"
+        note={`${freeze.clientName} sigue con su plan como estaba.`}
+        onConfirm={() => {
+          setRefusing(false);
+          void decide("refused");
+        }}
+        onDismiss={() => setRefusing(false)}
+        title="¿Rechazar este congelamiento?"
+        visible={refusing}
+      />
       {notice?.tone === "success" ? (
         <BrandToast onClose={() => navigation.goBack()} title={notice.text} />
       ) : null}

@@ -55,4 +55,61 @@ describe("the compact phone card", () => {
     expect(detail.querySelectorAll(":scope > span")).toHaveLength(3);
     expect(detail.querySelector("[data-card-label]")).toHaveTextContent("Dif.");
   });
+
+  // FIX-089 (ListaC): a person list's phone row.
+  it("leads a person row with her circle and ends an opening row with a chevron", () => {
+    const open = jest.fn();
+    render(
+      <DataTable
+        rowId={(row) => row.id}
+        rows={[{ id: "1", name: "Lucía", plan: "8 clases", total: "Bs 10" }]}
+        avatar={(row) => <span data-testid="circle">{row.name[0]}</span>}
+        onRowClick={open}
+        columns={[
+          columns.accessor("name", {
+            header: "Nombre",
+            cell: ({ getValue }) => (
+              <span>
+                <span data-photo="">L</span>
+                {getValue()}
+              </span>
+            ),
+          }),
+          columns.accessor("plan", { header: "Plan" }),
+        ]}
+      />,
+    );
+    const row = screen.getByText("Lucía").closest("tr")!;
+
+    expect(row.querySelector('[data-part="avatar"]')).toContainElement(
+      screen.getByTestId("circle"),
+    );
+    expect(row.querySelector('[data-part="title"]')).toHaveClass(
+      "text-fila",
+      "font-medium",
+      "[&_[data-photo]]:hidden",
+    );
+    expect(row.querySelector('[data-part="chevron"]')).toBeInTheDocument();
+    expect(row.querySelector('[data-part="detail"]')).toHaveClass(
+      "text-nota",
+      "truncate",
+    );
+  });
+
+  it("keeps a row that opens nothing without circle or chevron", () => {
+    render(
+      <DataTable
+        rowId={(row) => row.id}
+        rows={[{ id: "1", name: "Papel", plan: "4 unid.", total: "" }]}
+        columns={[
+          columns.accessor("name", { header: "Nombre" }),
+          columns.accessor("plan", { header: "Stock" }),
+        ]}
+      />,
+    );
+    const row = screen.getByText("Papel").closest("tr")!;
+
+    expect(row.querySelector('[data-part="avatar"]')).toBeNull();
+    expect(row.querySelector('[data-part="chevron"]')).toBeNull();
+  });
 });

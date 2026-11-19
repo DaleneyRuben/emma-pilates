@@ -72,7 +72,12 @@ describe("AW33 user menu on a desktop browser", () => {
     const save = within(panel).getByRole("button", {
       name: "Guardar contraseña",
     });
-    expect(save).toBeDisabled();
+    // FIX-089 (FormB): saving early names what is missing instead of a
+    // silently disabled button.
+    await user.click(save);
+    expect(await within(panel).findByRole("alert")).toHaveTextContent(
+      "Faltan 3 datos para guardar",
+    );
 
     await user.type(
       within(panel).getByLabelText("Contraseña actual"),

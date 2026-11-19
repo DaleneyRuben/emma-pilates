@@ -1,4 +1,11 @@
-import { BodyText, colors, PrimaryButton, TextButton, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  PrimaryButton,
+  TextButton,
+  typography,
+} from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import type { PaymentStanding } from "../payments/payment-standing";
@@ -35,8 +42,8 @@ export function BookingOffFooter({
 }) {
   return (
     <>
-      <BodyText style={styles.note}>{copy[reason].note}</BodyText>
-      <PrimaryButton disabled label="Reservar" />
+      {/* FIX-089: the reason is the off button's own line, under it. */}
+      <PrimaryButton disabled disabledReason={copy[reason].note} label="Reservar" />
       <TextButton
         label={busy ? "Preparando…" : copy[reason].action}
         onPress={() => {
@@ -54,5 +61,10 @@ export function BookingOffFooter({
 
 const styles = StyleSheet.create({
   error: { color: colors.errorText, textAlign: "center" },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
 });

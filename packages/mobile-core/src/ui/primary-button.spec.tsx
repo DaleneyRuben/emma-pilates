@@ -8,8 +8,8 @@ describe("PrimaryButton while busy", () => {
     const screen = await render(<PrimaryButton busy label="Iniciar sesión" />);
 
     const button = screen.getByRole("button", { name: "Iniciar sesión" });
-    // Follow-up 225: radius 14 and a 600 label.
-    expect(button).toHaveStyle({ backgroundColor: "#B78380", borderRadius: 14, minHeight: 52 });
+    // FIX-089: Rosa profundo, radius 12.
+    expect(button).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 12, minHeight: 52 });
     expect(screen.getByTestId("primary-button-spinner")).toBeOnTheScreen();
     expect(screen.getByText("Iniciar sesión")).toHaveStyle({ opacity: 0 });
   });
@@ -42,5 +42,57 @@ describe("PrimaryButton testID", () => {
     expect(screen.getByTestId("login-submit")).toBe(
       screen.getByRole("button", { name: "Iniciar sesión" }),
     );
+  });
+});
+
+// FIX-089 (palette B): Rosa profundo with a Crema Work Sans label; destructive
+// actions take the secondary look; disabled says why.
+describe("PrimaryButton palette B", () => {
+  it("labels in Crema Work Sans SemiBold 16", async () => {
+    const screen = await render(<PrimaryButton label="Reservar clase" />);
+
+    expect(screen.getByText("Reservar clase")).toHaveStyle({
+      color: "#F9F4F2",
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 16,
+    });
+  });
+
+  it("draws the error tone as the secondary button, never red", async () => {
+    const screen = await render(<PrimaryButton label="Sí, cancelar" tone="error" />);
+
+    expect(screen.getByRole("button", { name: "Sí, cancelar" })).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#93615D",
+      borderWidth: 1.5,
+    });
+    expect(screen.getByText("Sí, cancelar")).toHaveStyle({ color: "#93615D" });
+  });
+
+  it("draws disabled as Crema with an Arcilla border and shows the reason", async () => {
+    const screen = await render(
+      <PrimaryButton
+        disabled
+        disabledReason="No disponible: tu plan está congelado ese día"
+        label="Reservar clase"
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Reservar clase" })).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderWidth: 1.5,
+    });
+    expect(screen.getByText("Reservar clase")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_500Medium",
+    });
+    expect(screen.getByText("No disponible: tu plan está congelado ese día")).toBeOnTheScreen();
+  });
+
+  it("hides the reason while the button can be pressed", async () => {
+    const screen = await render(<PrimaryButton disabledReason="Motivo" label="Reservar clase" />);
+
+    expect(screen.queryByText("Motivo")).toBeNull();
   });
 });

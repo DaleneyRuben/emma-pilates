@@ -57,7 +57,7 @@ describe("Trainer agenda and attendance", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
-      expect(screen.getByText("Sopocachi · 6 de 8 reservados")).toBeOnTheScreen();
+      expect(screen.getByText("6 de 8")).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
 
@@ -67,9 +67,10 @@ describe("Trainer agenda and attendance", () => {
         { selected: true },
       ),
     );
-    // v2 S03: back to «Mi agenda», how many are marked, and who is missing.
-    expect(screen.getByTestId("back-bar")).toHaveTextContent("Mi agenda");
-    expect(screen.getByText("2 de 2 marcadas")).toBeOnTheScreen();
+    // EncabezadoA (FIX-089): the back arrow alone, never the parent's name.
+    expect(screen.getByTestId("back-bar")).not.toHaveTextContent("Mi agenda");
+    // One section title with its figure (the core SectionTitle, FIX-089).
+    expect(screen.getByText("Asistencia · 2 de 2 marcadas")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
@@ -129,7 +130,7 @@ describe("Trainer agenda and attendance", () => {
         { selected: true },
       ),
     );
-    expect(screen.getByText("1 de 2 marcadas")).toBeOnTheScreen();
+    expect(screen.getByText("Asistencia · 1 de 2 marcadas")).toBeOnTheScreen();
     expect(screen.getByText("Falta marcar a 1 clienta.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>

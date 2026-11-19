@@ -10,6 +10,7 @@ import {
   bookingWindowDays,
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   colors,
   fontFamilies,
   formatSessionDate,
@@ -20,7 +21,6 @@ import {
   OtherDateSheet,
   PickerCheck,
   QueryFailure,
-  radii,
   Screen,
   spacing,
   StaffFace,
@@ -216,11 +216,10 @@ export function BrowseSessionsScreen() {
               {visibleSessions.length === 1 ? "1 clase" : `${visibleSessions.length} clases`}
             </Text>
           </View>
-          <View style={styles.group} testID="browse-session-group">
-            {visibleSessions.map((session, position) => (
+          <ClassList testID="browse-session-group">
+            {visibleSessions.map((session) => (
               <SessionRow
                 accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.trainerName}, ${seatsTag(session.availableSeats)}`}
-                divided={position > 0}
                 key={session.id}
                 onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                 session={session}
@@ -235,7 +234,7 @@ export function BrowseSessionsScreen() {
                 }
               />
             ))}
-          </View>
+          </ClassList>
         </ScrollView>
       )}
       <OtherDateSheet
@@ -254,9 +253,10 @@ export function BrowseSessionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  branchAddress: { fontSize: typography.note },
-  branchName: { color: colors.text, fontSize: typography.body },
-  branchNameSelected: { color: colors.primaryDeep },
+  branchAddress: { fontFamily: fontFamilies.body, fontSize: typography.note },
+  branchName: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  // Palette B marks the chosen Branch by weight, not another colour (FIX-089).
+  branchNameSelected: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   branchRow: {
     alignItems: "center",
     flexDirection: "row",
@@ -265,13 +265,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   branchText: { flex: 1, gap: spacing.xxs },
-  branchSheet: {
-    backgroundColor: colors.card,
-    borderRadius: radii.frame,
-    gap: spacing.xs,
-    padding: spacing.lg,
-  },
-  dayCount: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  branchSheet: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
+  dayCount: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   dayHeader: {
     alignItems: "baseline",
     flexDirection: "row",
@@ -279,7 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   dayTitle: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
@@ -287,8 +282,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   empty: { flexGrow: 1 },
-  group: { ...surfaces.card, overflow: "hidden" },
   list: { gap: spacing.sm, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
   screen: { gap: spacing.lg },
-  sheetTitle: { color: colors.textMuted, fontSize: typography.label },
+  sheetTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.label },
 });

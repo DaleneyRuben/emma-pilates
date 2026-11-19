@@ -6,13 +6,13 @@ import {
   Screen,
   spacing,
   StateScreen,
+  SectionTitle,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { SectionHeader } from "../ui/section-header";
 import { freezeDecidedDetail } from "./freeze-format";
 import { FreezeRow } from "./freeze-row";
 
@@ -78,7 +78,7 @@ export function FreezesScreen() {
           />
         ) : (
           <View>
-            <SectionHeader title={`Por revisar · ${freezes.length}`} />
+            <SectionTitle>{`Por revisar · ${freezes.length}`}</SectionTitle>
             <IconRowGroup>
               {freezes.map((freeze) => (
                 <FreezeRow
@@ -94,7 +94,7 @@ export function FreezesScreen() {
         )}
         {decidedFreezes.length === 0 ? null : (
           <View>
-            <SectionHeader title="Decididas" />
+            <SectionTitle>Decididas</SectionTitle>
             <IconRowGroup>
               {decidedFreezes.map((freeze) => (
                 <FreezeRow

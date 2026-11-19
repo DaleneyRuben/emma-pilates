@@ -59,7 +59,7 @@ export function HomeHeader({
         style={({ pressed }) => [styles.bell, pressed && styles.pressed]}
         testID="home-bell"
       >
-        <Glyph color={colors.emphasis} name="bell" size={20} strokeWidth={1.6} />
+        <Glyph color={colors.text} name="bell" size={20} strokeWidth={1.6} />
         <View pointerEvents="none" style={styles.badge}>
           <UnreadCountPill count={count} testID="home-bell-badge" />
         </View>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     width: 44,
   },
   date: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
@@ -98,9 +98,11 @@ const styles = StyleSheet.create({
   greeting: { flex: 1, gap: spacing.xs },
   pressed: { opacity: 0.7 },
   row: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  // EncabezadoA (FIX-089): the root title in the shared 30 pt Lora 500.
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.display,
+    fontFamily: fontFamilies.heading,
     fontSize: typography.title,
+    fontWeight: "500",
   },
 });

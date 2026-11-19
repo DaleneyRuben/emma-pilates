@@ -5,7 +5,7 @@ import type { PhoneCountry } from "../account/phone-number";
 import { Chevron } from "./chevron";
 import { CountryPicker } from "./country-picker";
 import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, spacing, typography } from "./tokens";
 
 export type PhoneValue = { country: PhoneCountry; digits: string };
 
@@ -37,7 +37,10 @@ export function PhoneField({
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
-      <View style={[styles.box, error === undefined ? null : styles.boxError]}>
+      <View
+        style={[styles.box, error === undefined ? null : styles.boxError]}
+        testID="phone-field-box"
+      >
         <Pressable
           accessibilityLabel={`País: ${country.name}, +${country.dial}`}
           accessibilityRole="button"
@@ -55,7 +58,7 @@ export function PhoneField({
           keyboardType="phone-pad"
           onChangeText={(typed) => onChange({ country, digits: typed })}
           placeholder={`${country.lengths[0]} dígitos`}
-          placeholderTextColor={colors.textSubtle}
+          placeholderTextColor={colors.iconQuiet}
           style={styles.input}
           testID={testID}
           textContentType="telephoneNumber"
@@ -87,22 +90,23 @@ export function PhoneField({
 const styles = StyleSheet.create({
   box: {
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
+    borderColor: colors.border,
+    borderRadius: 10,
     borderWidth: 1,
     flexDirection: "row",
-    minHeight: 52,
+    minHeight: 48,
     overflow: "hidden",
   },
-  boxError: { borderColor: colors.error, borderWidth: 1.5 },
+  boxError: { borderColor: colors.error, borderWidth: 2 },
   code: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 16 },
   error: {
     color: colors.errorText,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
+    fontWeight: "700",
     fontSize: typography.note,
     lineHeight: 20,
   },
-  field: { gap: spacing.sm },
+  field: { gap: spacing.smd },
   flag: { fontSize: 20 },
   helper: {
     color: colors.textMuted,
@@ -119,11 +123,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
   },
   label: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 1.54,
-    textTransform: "uppercase",
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
   },
   prefix: {
     alignItems: "center",

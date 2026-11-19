@@ -14,6 +14,7 @@ import {
   TextButton,
   typography,
   useStaffPhoto,
+  radii,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -146,7 +147,7 @@ export function StaffPhotoSummary({
   );
 }
 
-/** The v2 secondary button: Rosa enlace on Rosa tinte, 40 high. */
+/** The secondary button (FIX-089): Crema with a Rosa profundo outline. */
 function TintButton({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.xs,
     marginTop: spacing.sm,
-    minHeight: 40,
+    minHeight: 44,
   },
   block: { gap: spacing.md },
   body: { flex: 1, gap: spacing.xxs },
@@ -176,16 +177,19 @@ const styles = StyleSheet.create({
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
   summary: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
+  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
   tint: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 12,
-    height: 40,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderWidth: 1.5,
+    borderRadius: radii.button,
+    height: 44,
     justifyContent: "center",
     paddingHorizontal: 14,
   },
   tintLabel: {
-    color: colors.primaryOnTint,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 15,
     fontWeight: "600",
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
   // Marfil at 55 % with the busy ring (follow-up 241 §2), only while uploading.
   veil: {
     alignItems: "center",
-    backgroundColor: "rgba(250, 247, 242, 0.55)",
+    backgroundColor: colors.scrim,
     borderRadius: avatarSize / 2,
     bottom: 0,
     justifyContent: "center",

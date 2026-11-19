@@ -66,7 +66,7 @@ function Finding({
   pending: boolean;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 rounded-marco bg-lino px-5 py-4">
+    <li className="flex flex-wrap items-center justify-between gap-3 rounded-marco border border-borde bg-lino px-5 py-4">
       <div className="flex min-w-0 flex-col gap-1">
         <Subject item={item} />
         <p className="text-cuerpo text-texto">{item.detail}</p>
@@ -162,7 +162,7 @@ export function RecommendationsSection({
       ) : query.data === undefined ? (
         <LoadingNotice>Cargando las recomendaciones…</LoadingNotice>
       ) : query.data.recommendations.length === 0 ? (
-        <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
+        <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
           Nada que revisar este mes.
         </p>
       ) : (

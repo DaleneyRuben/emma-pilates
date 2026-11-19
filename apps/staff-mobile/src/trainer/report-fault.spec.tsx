@@ -50,7 +50,9 @@ describe("Trainer fault report", () => {
       expect(screen.getByRole("button", { name: "Reformer 3" })).toBeOnTheScreen(),
     );
     expect(screen.getByRole("button", { name: "Reformer 5, fuera de servicio" })).toBeOnTheScreen();
-    expect(screen.getByPlaceholderText("Ej.: el resorte rojo se soltó")).toBeOnTheScreen();
+    // FormB (FIX-089): the example goes under the field, never in it.
+    expect(screen.getByText("Ej.: el resorte rojo se soltó")).toBeOnTheScreen();
+    expect(screen.queryByPlaceholderText("Ej.: el resorte rojo se soltó")).toBeNull();
     expect(screen.queryByRole("button", { name: "Uno más" })).toBeNull();
     expect(screen.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
 

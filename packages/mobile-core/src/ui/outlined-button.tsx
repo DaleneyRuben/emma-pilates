@@ -1,11 +1,13 @@
 import { Pressable, StyleSheet } from "react-native";
 
 import { ButtonLabel } from "./button-label";
+import { fontFamilies } from "./fonts";
 import { colors, radii, typography } from "./tokens";
 
 /**
- * The outlined action of the cards and confirmation sheets: Palo de rosa by
- * default, the Error outline for a destructive confirmation (05, S06, S15, S17).
+ * The secondary action of the cards and confirmation sheets (palette B,
+ * FIX-089): Crema with a Rosa profundo outline. The destructive tone looks the
+ * same; a confirmation guards it instead of red.
  */
 export function OutlinedButton({
   busy = false,
@@ -13,7 +15,6 @@ export function OutlinedButton({
   label,
   onPress,
   testID,
-  tone = "primary",
 }: {
   busy?: boolean;
   disabled?: boolean;
@@ -29,40 +30,35 @@ export function OutlinedButton({
       accessibilityState={{ busy, disabled: disabled || busy }}
       disabled={disabled || busy}
       onPress={onPress}
-      style={[
-        styles.outlined,
-        tone === "error" && styles.outlinedError,
-        disabled && !busy && styles.outlinedDisabled,
-      ]}
+      style={[styles.outlined, disabled && !busy && styles.outlinedDisabled]}
       testID={testID}
     >
       <ButtonLabel
         busy={busy}
         label={label}
-        spinnerColor={tone === "error" ? colors.errorText : colors.primaryOnTint}
-        style={[
-          styles.outlinedLabel,
-          tone === "error" && styles.outlinedLabelError,
-          disabled && !busy && styles.disabledLabel,
-        ]}
+        spinnerColor={colors.primary}
+        style={[styles.outlinedLabel, disabled && !busy && styles.disabledLabel]}
       />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  disabledLabel: { color: colors.disabledText },
-  // Follow-up 225: the secondary action is filled, never outlined.
+  disabledLabel: { fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   outlined: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
     borderRadius: radii.button,
-    borderWidth: 0,
+    borderWidth: 1.5,
     justifyContent: "center",
-    minHeight: 52,
+    minHeight: 48,
   },
-  outlinedDisabled: { backgroundColor: colors.disabledBackground },
-  outlinedError: { backgroundColor: colors.errorSurface },
-  outlinedLabel: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
-  outlinedLabelError: { color: colors.errorText },
+  outlinedDisabled: { borderColor: colors.border },
+  outlinedLabel: {
+    color: colors.primary,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
 });

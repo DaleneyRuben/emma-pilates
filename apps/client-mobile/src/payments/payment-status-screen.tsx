@@ -1,11 +1,11 @@
 import { useGetCurrentClientSubscription, useGetCurrentPayment } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   LoadingState,
   QueryFailure,
   Screen,
+  ScreenTopBar,
   spacing,
 } from "@pilates/mobile-core";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -63,7 +63,7 @@ export function PaymentStatusScreen() {
   if (payment.isError || payment.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
-        <BackLink onPress={() => navigation.goBack()} />
+        <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Tu pago" />
         <QueryFailure label="No encontramos tu pago." onRetry={() => void payment.refetch()} />
       </Screen>
     );

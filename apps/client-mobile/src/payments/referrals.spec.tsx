@@ -114,17 +114,17 @@ describe("Invita a una amiga (BKM-014)", () => {
     const screen = await openInvita(routeFetcher(routes([])));
 
     const card = await screen.findByTestId("referral-code-card");
-    expect(card).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(card).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     expect(screen.getByText("Tu código")).toBeOnTheScreen();
     expect(screen.getByText("LUCIA")).toHaveStyle({
-      color: "#4A4A4A",
+      color: "#93615D",
       fontFamily: "Lora_400Regular",
     });
     const copy = screen.getByRole("button", { name: "Copiar código" });
     expect(copy).toHaveStyle({ borderWidth: 1, height: 44, width: 44 });
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Compartir tu código" })).toHaveStyle({
-      backgroundColor: "#B78380",
+      backgroundColor: "#93615D",
     });
 
     await fireEvent.press(copy);

@@ -4,7 +4,6 @@ import {
   fontFamilies,
   LoadingState,
   QueryFailure,
-  radii,
   Screen,
   SectionTitle,
   spacing,
@@ -24,11 +23,8 @@ import { PaymentStrip, StatementBreakdown } from "./pay-statement-card";
 import { useReceiptViewer } from "./receipt-viewer";
 import { useOwnPay } from "./use-own-pay";
 
-const pills = {
-  paid: { label: "Pagado", fill: colors.successTint, text: colors.successText },
-  unpaid: { label: "Por pagar", fill: colors.warningTint, text: colors.warningText },
-  open: { label: "En curso", fill: colors.primaryTint, text: colors.primaryOnTint },
-} as const;
+// FIX-089: the state is a word in weight; palette B keeps pills for exceptions.
+const stateWords = { paid: "Pagado", unpaid: "Por pagar", open: "En curso" } as const;
 
 // Finding 111, proposal B: one statement, opened from «Historial». It reads
 // the same lists as «Mis pagos», so it opens from the cache.
@@ -75,7 +71,7 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
 
   const { heading } = payPeriodHeading(statement);
   const status = statementStatus(statement, pay.loaded.payments);
-  const pill = pills[status.kind];
+  const stateWord = stateWords[status.kind];
   return (
     <Screen style={styles.screen}>
       <ScrollView
@@ -96,9 +92,7 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
           <View style={styles.card}>
             <View style={styles.cardTop}>
               <Text style={styles.totalLabel}>Total</Text>
-              <View style={[styles.pill, { backgroundColor: pill.fill }]}>
-                <Text style={[styles.pillText, { color: pill.text }]}>{pill.label}</Text>
-              </View>
+              <Text style={styles.state}>{stateWord}</Text>
             </View>
             <Text style={styles.total}>{formatExactBolivianos(statement.totalCentavos)}</Text>
             <PaymentStrip onReceipt={receipts.show} status={status} />
@@ -118,8 +112,12 @@ const styles = StyleSheet.create({
   cardTop: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   heading: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 26, lineHeight: 32 },
-  pill: { borderRadius: radii.pill, paddingHorizontal: spacing.sm, paddingVertical: spacing.xxs },
-  pillText: { fontFamily: fontFamilies.bodyMedium, fontSize: typography.note },
+  state: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   titles: { gap: spacing.xs },

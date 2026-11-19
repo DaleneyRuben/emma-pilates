@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
@@ -49,7 +50,8 @@ const failureMessage = (error: unknown): string => {
   return "No pudimos dar las clases. Inténtalo de nuevo.";
 };
 
-const cardClass = "flex flex-col gap-4 rounded-marco bg-lino p-6 max-md:p-4";
+const cardClass =
+  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
 
 // AW21 (BKM-015): the Administrator grants extra classes for a campaign, a
 // start of year or a holiday, to every active Client, founders included
@@ -144,6 +146,7 @@ export function CampaignPage() {
           )}
           <Form {...form}>
             <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+              <FormErrorSummary />
               <FormField
                 control={form.control}
                 name="name"
@@ -157,7 +160,7 @@ export function CampaignPage() {
                     {repeated === null ? null : (
                       <p
                         role="status"
-                        className="rounded-tarjeta bg-advertencia/12 px-4 py-3 text-celda text-advertencia-texto"
+                        className="rounded-tarjeta bg-advertencia-tinte px-4 py-3 text-celda text-advertencia-texto"
                       >
                         {repeated}
                       </p>

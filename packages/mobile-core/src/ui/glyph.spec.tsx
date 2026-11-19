@@ -12,7 +12,7 @@ describe("Glyph", () => {
     const screen = await render(<Glyph name="calendar" size={22} />);
 
     const icon = screen.getByTestId("glyph-calendar", hidden);
-    expect(icon).toHaveProp("stroke", "#B78380");
+    expect(icon).toHaveProp("stroke", "#93615D");
     expect(icon).toHaveProp("strokeWidth", 1.3);
     expect(icon).toHaveProp("width", 22);
     expect(icon).toHaveProp("height", 22);
@@ -21,11 +21,11 @@ describe("Glyph", () => {
 
   it("takes another colour and stroke for the disabled tile and the empty states", async () => {
     const screen = await render(
-      <Glyph color="#B3A9A5" name="calendar" size={22} strokeWidth={1.1} testID="tile" />,
+      <Glyph color="#93615D" name="calendar" size={22} strokeWidth={1.1} testID="tile" />,
     );
 
     const icon = screen.getByTestId("tile", hidden);
-    expect(icon).toHaveProp("stroke", "#B3A9A5");
+    expect(icon).toHaveProp("stroke", "#93615D");
     expect(icon).toHaveProp("strokeWidth", 1.1);
   });
 

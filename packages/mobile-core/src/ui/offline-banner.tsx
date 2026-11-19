@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { fontFamilies } from "./fonts";
 import { colors, spacing, typography } from "./tokens";
 
 export function useIsOnline(): boolean {
@@ -31,11 +32,16 @@ export function OfflineBanner() {
 }
 
 const styles = StyleSheet.create({
-  area: { backgroundColor: colors.warning },
+  area: { backgroundColor: colors.primary },
   banner: {
     alignItems: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  text: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
+  text: {
+    color: colors.onPrimary,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.note,
+    fontWeight: "500",
+  },
 });

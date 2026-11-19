@@ -22,7 +22,8 @@ function createAuthenticationApiMock() {
 // UX-016 findings A1 and A2. The tab item grows with the label, the payment
 // disc grows with the glyph, and a heading line box stays taller than the font.
 describe("Dynamic Type on Client screens", () => {
-  it("gives the tab item room above the 11 pt label", async () => {
+  // FIX-089: no text under 12 pt, the tab labels included.
+  it("gives the tab item room above the 12 pt label", async () => {
     const screen = await render(
       <ClientNavigation
         authenticationApi={createAuthenticationApiMock()}
@@ -35,7 +36,7 @@ describe("Dynamic Type on Client screens", () => {
     const label = within(screen.getByRole("button", { name: /^Inicio, tab/ })).getByText("Inicio");
     const style = StyleSheet.flatten(label.props.style);
 
-    expect(style.fontSize).toBe(11);
+    expect(style.fontSize).toBe(12);
     expect(style.lineHeight).toBeUndefined();
   });
 

@@ -1,6 +1,6 @@
 import type { ClientInvoiceDto } from "@pilates/api-contracts";
-import { colors, fontFamilies } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { colors, ExceptionPill, fontFamilies, typography } from "@pilates/mobile-core";
+import { StyleSheet, Text } from "react-native";
 
 const dateFormat = new Intl.DateTimeFormat("es-BO", {
   day: "numeric",
@@ -15,23 +15,21 @@ export const invoiceDate = (instant: string): string => dateFormat.format(new Da
 export const invoiceStateLabel = (invoice: ClientInvoiceDto): string =>
   invoice.voided ? "Pago anulado" : invoice.state === "ready" ? "Lista" : "En preparación";
 
-const tones = {
-  ready: { background: "rgba(124,148,115,0.16)", text: colors.successText },
-  preparing: { background: "rgba(216,201,187,0.34)", text: colors.textMuted },
-  voided: { background: colors.primaryTint, text: colors.primaryOnTint },
-};
-
-// K2's state pill: «Lista» (Éxito), «En preparación» (neutral), «Pago anulado».
-export function InvoicePill({ invoice }: { invoice: ClientInvoiceDto }) {
-  const tone = tones[invoice.voided ? "voided" : invoice.state];
+/**
+ * K2's state in palette B (FIX-089): «Lista» and «En preparación» are words,
+ * the one still being prepared in weight; a voided sale is the exception, on
+ * the Rubor pill.
+ */
+export function InvoiceState({ invoice }: { invoice: ClientInvoiceDto }) {
+  if (invoice.voided) return <ExceptionPill>{invoiceStateLabel(invoice)}</ExceptionPill>;
   return (
-    <View style={[styles.pill, { backgroundColor: tone.background }]}>
-      <Text style={[styles.label, { color: tone.text }]}>{invoiceStateLabel(invoice)}</Text>
-    </View>
+    <Text style={[styles.label, invoice.state !== "ready" && styles.pending]}>
+      {invoiceStateLabel(invoice)}
+    </Text>
   );
 }
 
 const styles = StyleSheet.create({
-  label: { fontFamily: fontFamilies.bodyStrong, fontSize: 12 },
-  pill: { borderRadius: 999, height: 24, justifyContent: "center", paddingHorizontal: 9 },
+  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  pending: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
 });

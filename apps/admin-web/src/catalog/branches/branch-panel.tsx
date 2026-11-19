@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import {
   SidePanelBody,
   SidePanelFooter,
@@ -96,6 +98,7 @@ export function BranchPanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <FormField
             control={form.control}
             name="name"
@@ -103,12 +106,14 @@ export function BranchPanelForm({
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Equipetrol" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormDescription>
-                  {branch === undefined
-                    ? "Aparecerá en el selector de sucursal al guardarla."
-                    : undefined}
+                  <ExampleHint example="Equipetrol">
+                    {branch === undefined
+                      ? "Aparecerá en el selector de sucursal al guardarla."
+                      : undefined}
+                  </ExampleHint>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

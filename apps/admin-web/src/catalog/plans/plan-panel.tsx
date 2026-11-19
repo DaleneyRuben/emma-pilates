@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import {
   bolivianosField,
   bolivianosText,
@@ -136,7 +138,7 @@ export function PlanPanelForm({
   const renderText = ([
     name,
     label,
-    placeholder,
+    example,
     inputMode,
   ]: (typeof textFields)[number]) => (
     <FormField
@@ -147,9 +149,11 @@ export function PlanPanelForm({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input placeholder={placeholder} inputMode={inputMode} {...field} />
+            <Input inputMode={inputMode} {...field} />
           </FormControl>
-          <FormDescription>{helpers[name]}</FormDescription>
+          <FormDescription>
+            <ExampleHint example={example}>{helpers[name]}</ExampleHint>
+          </FormDescription>
           <FormMessage />
         </FormItem>
       )}
@@ -160,6 +164,7 @@ export function PlanPanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           {renderText(nameField)}
           <FormField
             control={form.control}

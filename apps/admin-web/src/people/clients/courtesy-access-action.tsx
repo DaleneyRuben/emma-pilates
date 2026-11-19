@@ -122,7 +122,7 @@ export function CourtesyAccessAction({
         {problem === null ? null : (
           <div
             role="alert"
-            className="flex flex-col gap-1 rounded-control bg-error/10 px-3 py-2 text-error-texto"
+            className="flex flex-col gap-1 rounded-control bg-error-tinte px-3 py-2 text-error-texto"
           >
             <span>{problem}</span>
             {problem === refusals.payment_pending_exists ? (

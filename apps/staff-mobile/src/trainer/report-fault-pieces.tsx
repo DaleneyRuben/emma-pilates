@@ -1,5 +1,5 @@
 import type { EquipmentDto } from "@pilates/api-contracts";
-import { colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
+import { chipStyles, colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 // S26's pieces (FIX-067, FIX-076): the labelled numbered tiles and the switch of a per-unit
@@ -34,9 +34,14 @@ export function UnitTiles({
               accessibilityState={{ selected }}
               key={piece.id}
               onPress={() => onChoose(piece)}
-              style={[styles.tile, out && styles.tileWithNote, selected && styles.tileSelected]}
+              style={[
+                styles.tile,
+                chipStyles.box,
+                out && styles.tileWithNote,
+                selected && chipStyles.boxSelected,
+              ]}
             >
-              <Text style={[styles.tileNumber, selected && styles.tileNumberSelected]}>
+              <Text style={[styles.tileNumber, selected && chipStyles.labelSelected]}>
                 {`N.º ${piece.number}`}
               </Text>
               {out ? (
@@ -190,6 +195,8 @@ export function OutOfServiceSwitch({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,
@@ -203,23 +210,33 @@ const styles = StyleSheet.create({
   },
   helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  onSelected: { color: colors.white },
+  onSelected: { color: colors.onPrimary },
   question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
   step: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderWidth: 1.5,
+    borderRadius: radii.button,
     height: 48,
     justifyContent: "center",
     width: 48,
   },
   stepDisabled: { opacity: 0.4 },
-  stepSymbol: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 24 },
+  stepSymbol: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 24,
+    fontWeight: "600",
+  },
   stepper: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
   switchLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
   switchRow: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
@@ -234,7 +251,6 @@ const styles = StyleSheet.create({
   },
   tile: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: radii.inset,
     height: 44,
     justifyContent: "center",
@@ -245,17 +261,16 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.body,
+    fontWeight: "500",
   },
-  tileNumberSelected: { color: colors.white, fontFamily: fontFamilies.bodyStrong },
-  tileOut: { color: colors.error, fontFamily: fontFamilies.body, fontSize: 11 },
-  tileSelected: { backgroundColor: colors.primary },
+  tileOut: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 12 },
   tileWithNote: { height: 52 },
   tiles: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   unitGroup: { gap: spacing.sm },
   unitHeading: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.54,
     textTransform: "uppercase",
   },

@@ -1,78 +1,79 @@
+// FIX-089 (palette B, owner 2026-11-19): every screen uses only these five
+// colours. Text is always Rosa profundo; hierarchy comes from size and weight.
+export const brand = {
+  rubor: "#E7CCBF",
+  arcilla: "#CDA697",
+  paloDeRosa: "#B78380",
+  rosaProfundo: "#93615D",
+  crema: "#F9F4F2",
+} as const;
+
+const { rubor, arcilla, paloDeRosa, rosaProfundo, crema } = brand;
+
+// Token names predate palette B; each keeps its role and takes one of the five
+// colours so every screen picks the palette up.
 export const colors = {
-  background: "#F2ECE5",
-  surface: "#FAF7F2",
-  white: "#FFFFFF",
-  // Lino: every card, list group and input fill; replaces Blanco as a surface
-  // (follow-up 225).
-  card: "#F5EFE9",
-  // Rosa profundo: the one emphasis surface per screen (hero card, selected
-  // segment, toast); white text on it is 5.1:1 (follow-up 225).
-  emphasis: "#93615D",
-  // Arena hairline between rows of a group and around inputs (follow-up 225).
-  hairline: "#E6DBD0",
-  surfaceSubtle: "#FDFAF6",
-  rowHover: "#FDF7F2",
-  primary: "#B78380",
-  primaryHover: "#A87370",
-  primaryPressed: "#9C6764",
-  // Rosa tinte: icon discs, secondary buttons, selected chips (follow-up 225).
-  primaryTint: "#F2E4E1",
-  // The outcome badge's circle on a link that did not work (MOB-035).
-  primaryWash: "rgba(183,131,128,0.14)",
-  // Text on Palo de rosa tinte: badges, initials, and pending cards (follow-up 70).
-  primaryOnTint: "#7D4F4B",
-  primaryDeep: "#8A5D59",
-  secondaryAccent: "#D8BDB8",
-  secondaryTint: "#F6EDEB",
-  text: "#4A4A4A",
-  textSecondary: "#6F6662",
-  textMuted: "#6F6662",
-  textSubtle: "#7A716D",
-  borderStrong: "#D8C9BB",
-  border: "#E4D8CC",
-  divider: "#F2EBE2",
-  // The rule under a screen's header in the mobile frames (MOB-038).
-  rule: "#EFE7DE",
-  success: "#7C9473",
-  successText: "#5F7457",
-  warning: "#C99A4E",
-  warningText: "#9A7434",
-  error: "#A04E3E",
-  errorText: "#A04E3E",
-  // The disc and fill behind a destructive or error state (follow-up 225).
-  errorSurface: "#F7E5E0",
-  // 24's destructive button while it cannot be pressed (MOB-066).
-  errorDisabledBorder: "#E7CFC8",
-  errorDisabledText: "#D4A99F",
-  // 24's pending-payment notice on Advertencia tint (MOB-066).
-  warningTitle: "#7C5D2A",
-  warningBody: "#6E5A36",
-  successTint: "rgba(124,148,115,0.14)",
-  warningTint: "rgba(201,154,78,0.12)",
-  // The rule between a pending card's notes (S06).
-  warningRule: "rgba(201,154,78,0.28)",
-  errorTint: "rgba(178,93,75,0.08)",
-  // The Error status pill, such as S06's «Vencida» (MOB-066).
-  errorPill: "rgba(178,93,75,0.12)",
-  // The dashed empty-state box on Superficie (S06 «Sin plan activo»).
-  neutralTint: "rgba(216,201,187,0.14)",
-  // The circle behind an empty panel's icon (S04's tablet split view).
-  neutralWash: "rgba(216,201,187,0.18)",
-  // S02's «Con cupos» pill (MOB-042).
-  neutralPill: "rgba(216,201,187,0.34)",
-  // Tints of the accent `#D8BDB8`: 02's shortcut tile and 03's seat pill
-  // (0.28), the S04 and S11 avatars (0.4) (MOB-042).
-  accentTint: "rgba(216,189,184,0.28)",
-  accentWash: "rgba(216,189,184,0.4)",
-  // The tile of 02's disabled shortcut: Plomo cálido at low alpha (MOB-042).
-  inkTint: "rgba(74,74,74,0.05)",
-  disabledBackground: "#E7DCD8",
-  disabledText: "#B3A9A5",
-  // The frames' quiet icon: the 34 pt empty-state glyphs of 07, 19, S20,
-  // S21, and S22 and the row chevrons of 02, 18, and S23 (MOB-040).
-  iconQuiet: "#C4BAB6",
-  // The design system's scrim behind sheets and modals (MOB-066).
-  scrim: "rgba(74,58,48,0.22)",
+  background: crema,
+  surface: crema,
+  white: crema,
+  card: crema,
+  // The hero block: Palo de rosa with large Crema text only.
+  emphasis: paloDeRosa,
+  onEmphasis: crema,
+  // Dividers between rows of a group.
+  hairline: rubor,
+  surfaceSubtle: crema,
+  rowHover: rubor,
+  // The primary button and the selected chip: Rosa profundo with Crema labels.
+  primary: rosaProfundo,
+  onPrimary: crema,
+  primaryHover: paloDeRosa,
+  primaryPressed: paloDeRosa,
+  // Soft backgrounds: exception pills, the form summary, the class time box.
+  primaryTint: rubor,
+  primaryWash: rubor,
+  primaryOnTint: rosaProfundo,
+  primaryDeep: rosaProfundo,
+  // Initials circles.
+  secondaryAccent: paloDeRosa,
+  secondaryTint: rubor,
+  text: rosaProfundo,
+  textSecondary: rosaProfundo,
+  textMuted: rosaProfundo,
+  textSubtle: rosaProfundo,
+  borderStrong: arcilla,
+  border: arcilla,
+  divider: rubor,
+  rule: rubor,
+  // States are said with words and weight, never with green, amber or red.
+  success: rosaProfundo,
+  successText: rosaProfundo,
+  warning: rosaProfundo,
+  warningText: rosaProfundo,
+  error: rosaProfundo,
+  errorText: rosaProfundo,
+  errorSurface: rubor,
+  errorDisabledBorder: arcilla,
+  errorDisabledText: rosaProfundo,
+  warningTitle: rosaProfundo,
+  warningBody: rosaProfundo,
+  successTint: rubor,
+  warningTint: rubor,
+  warningRule: arcilla,
+  errorTint: rubor,
+  errorPill: rubor,
+  neutralTint: crema,
+  neutralWash: crema,
+  neutralPill: rubor,
+  accentTint: rubor,
+  accentWash: rubor,
+  inkTint: crema,
+  // Disabled: Crema with an Arcilla border, always with a reason line.
+  disabledBackground: crema,
+  disabledText: rosaProfundo,
+  // Quiet icons (chevrons, empty-state glyphs) meet 3:1 on Crema.
+  iconQuiet: paloDeRosa,
+  scrim: "rgba(147,97,93,0.35)",
 } as const;
 
 export const spacing = {
@@ -92,11 +93,11 @@ export const spacing = {
   xxxl: 40,
 } as const;
 
-// The frames round cards at 16 (MOB-039); chips, tinted notices, insets,
-// and sheets keep 12.
+// Cards round at 16 on every surface (web too, FIX-089); the hero at 18;
+// chips, notices, insets and sheets keep 12.
 export const radii = {
-  // Follow-up 225: primary and secondary buttons round at 14.
-  button: 14,
+  // FIX-089: primary and secondary buttons round at 12.
+  button: 12,
   control: 8,
   inset: 12,
   card: 16,
@@ -121,33 +122,31 @@ export const typography = {
   tabLabel: 11,
 } as const;
 
+// FIX-089: flat surfaces. Cards carry a 1px Arcilla border instead of a shadow.
+const noShadow = {
+  elevation: 0,
+  shadowColor: rosaProfundo,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0,
+  shadowRadius: 0,
+} as const;
+
 export const shadows = {
-  button: {
-    elevation: 2,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.22,
-    shadowRadius: 6,
-  },
-  // The frames' `0 2px 8px rgba(74,74,74,0.05)` under most cards (MOB-039).
-  card: {
-    elevation: 1,
-    shadowColor: "#4A4A4A",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-  },
+  button: noShadow,
+  card: noShadow,
 } as const;
 
 const cardBox = {
   backgroundColor: colors.card,
+  borderColor: colors.border,
   borderRadius: radii.card,
+  borderWidth: 1,
 } as const;
 
-/** Follow-up 225: cards are Lino with no border and no shadow; the screen's one
- * emphasis card is Rosa profundo, radius 20. */
+/** Cards are Crema with a 1px Arcilla border; the screen's one hero block is
+ * Palo de rosa, radius 18, with large Crema text. */
 export const surfaces = {
   card: cardBox,
   flatCard: cardBox,
-  emphasis: { backgroundColor: colors.emphasis, borderRadius: 20 },
+  emphasis: { backgroundColor: colors.emphasis, borderRadius: 18 },
 } as const;

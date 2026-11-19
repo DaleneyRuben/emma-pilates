@@ -90,9 +90,10 @@ async function openBrowse(sessions: unknown[], windowDays = 7) {
 }
 
 // FIX-082 (design audit 2026-11-18, Reservar option A): the weekly cap is
-// said once above the days, seats are grey text with a pill-free warning
-// only when few are left, and the chosen day is the screen's one accent.
-describe("Client Reservar, option A", () => {
+// said once above the days. FIX-089 (palette B, ClaseE): the classes are rows
+// of one Crema card with a Rubor time box and the seats in bold Rosa profundo,
+// «Quedan N» included; the chosen day and Class Type are Rosa profundo chips.
+describe("Client Reservar, palette B", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
@@ -102,10 +103,10 @@ describe("Client Reservar, option A", () => {
     const screen = await openBrowse([session("s-1", 1, 7, 3), session("s-2", 2, 8, 3)]);
 
     const notice = screen.getByTestId("browse-week-notice");
-    expect(notice).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(notice).toHaveStyle({ backgroundColor: "#F9F4F2" });
     expect(within(notice).getByText("Te quedan 3 clases esta semana")).toBeOnTheScreen();
     expect(screen.getAllByText(/clases esta semana/)).toHaveLength(1);
-    expect(within(notice).getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(within(notice).getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#93615D");
   });
 
   it("says the week is used up instead of «0 clases»", async () => {
@@ -135,7 +136,7 @@ describe("Client Reservar, option A", () => {
     expect(screen.queryByTestId("browse-week-notice")).toBeNull();
   });
 
-  it("groups the classes in one card with grey seats and a warning only when few remain", async () => {
+  it("draws the classes as rows of one card with bold seats, «Quedan N» included", async () => {
     const screen = await openBrowse([
       session("s-1", 1, 7, 3),
       session("s-2", 2, 2, 3),
@@ -143,44 +144,55 @@ describe("Client Reservar, option A", () => {
     ]);
 
     expect(screen.getByTestId("browse-session-group")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
       borderRadius: 16,
+      borderWidth: 1,
     });
+    expect(screen.getAllByTestId("class-list-divider")).toHaveLength(2);
     const rows = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((row) => within(row));
     expect(screen.queryByTestId("seat-pill")).toBeNull();
-    expect(rows[0].getByText("7 cupos")).toHaveStyle({ color: "#6F6662" });
-    expect(rows[1].getByText("Quedan 2 cupos")).toHaveStyle({ color: "#9A7434" });
-    expect(rows[2].getByText("Lleno")).toHaveStyle({ color: "#6F6662" });
-    expect(rows[0].queryByTestId("chevron", hidden)).toBeNull();
-    expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })[0]).not.toHaveStyle({
-      backgroundColor: "#F5EFE9",
-    });
+    const seats = {
+      color: "#93615D",
+      fontFamily: "WorkSans_600SemiBold",
+      fontWeight: "600" as const,
+    };
+    expect(rows[0].getByText("7 cupos")).toHaveStyle(seats);
+    expect(rows[1].getByText("Quedan 2 cupos")).toHaveStyle(seats);
+    expect(rows[2].getByText("Lleno")).toHaveStyle(seats);
+    expect(rows[0].getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(rows[0].getByTestId("chevron", hidden)).toBeOnTheScreen();
   });
 
-  it("marks the chosen Class Type with an underline, not a second pink", async () => {
+  it("marks the chosen Class Type as a Rosa profundo chip", async () => {
     const screen = await openBrowse([session("s-1", 1, 7, 3)]);
 
     const strip = within(screen.getByTestId("browse-class-type-strip"));
     expect(strip.getByRole("button", { name: "Todas" })).toHaveStyle({
-      borderBottomColor: "#B78380",
-      borderBottomWidth: 2,
-    });
-    expect(strip.getByRole("button", { name: "Todas" })).not.toHaveStyle({
       backgroundColor: "#93615D",
+      minHeight: 38,
     });
-    expect(strip.getByText("Todas")).toHaveStyle({ color: "#4A4A4A" });
-    expect(strip.getByText("Mat Pilates")).toHaveStyle({ color: "#6F6662" });
+    expect(strip.getByText("Todas")).toHaveStyle({ color: "#F9F4F2" });
+    expect(strip.getByRole("button", { name: "Mat Pilates" })).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderWidth: 1,
+    });
+    expect(strip.getByText("Mat Pilates")).toHaveStyle({ color: "#93615D" });
   });
 
-  it("draws «Otra» as a plain day, without the pink tint", async () => {
+  it("draws the days as chips, the chosen one Rosa profundo", async () => {
     const screen = await openBrowse([session("s-1", 1, 7, 3)], 14);
 
-    expect(screen.getByTestId("browse-day-other")).toHaveStyle({ backgroundColor: "#F5EFE9" });
-    expect(screen.getByText("Otra")).toHaveStyle({ color: "#6F6662" });
-    expect(screen.getByTestId(`browse-day-${addCivilDays(today, 0)}`)).toHaveStyle({
-      backgroundColor: "#B78380",
+    expect(screen.getByTestId("browse-day-other")).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
     });
+    expect(screen.getByText("Otra")).toHaveStyle({ color: "#93615D" });
+    const chosen = screen.getByTestId(`browse-day-${addCivilDays(today, 0)}`);
+    expect(chosen).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(within(chosen).getByText("Hoy")).toHaveStyle({ color: "#F9F4F2", fontSize: 12 });
   });
 });

@@ -36,7 +36,7 @@ describe("Assistant Client Bookings empty state", () => {
     expect(calendar).toHaveProp("width", 32);
     expect(
       screen.getByText("Puedes reservarle una clase desde el horario del estudio."),
-    ).toHaveStyle({ color: "#6F6662", fontSize: 15 });
+    ).toHaveStyle({ color: "#93615D", fontSize: 15 });
     const action = screen.getByTestId("empty-state-action");
     expect(action).toHaveStyle({ marginTop: 8, minWidth: 220 });
 

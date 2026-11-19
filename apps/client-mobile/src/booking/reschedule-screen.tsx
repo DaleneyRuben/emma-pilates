@@ -206,6 +206,8 @@ export function RescheduleScreen({
           <PrimaryButton
             busy={submitting}
             disabled={selectedId === null}
+            // FIX-089: an off button says why on its own line.
+            disabledReason="Elige una clase para continuar"
             label="Confirmar cambio"
             onPress={() => void confirm()}
             testID="reschedule-confirm"
@@ -226,17 +228,31 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   currentBody: { flex: 1, gap: spacing.xxs },
-  currentDetails: { color: colors.textMuted, fontSize: typography.note },
+  currentDetails: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    fontFamily: fontFamilies.body,
+  },
   currentTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
   failure: { color: colors.errorText },
   footer: { gap: spacing.sm, paddingBottom: spacing.sm },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   replaced: {
     backgroundColor: colors.hairline,
     borderRadius: radii.pill,
     paddingHorizontal: spacing.smLg,
     paddingVertical: spacing.xs,
   },
-  replacedText: { color: colors.text, fontSize: typography.label, fontWeight: "600" },
+  replacedText: {
+    color: colors.text,
+    fontSize: typography.label,
+    fontWeight: "600",
+    fontFamily: fontFamilies.bodyStrong,
+  },
   screen: { gap: spacing.md },
 });

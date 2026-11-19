@@ -4,13 +4,16 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
+import { fieldMessageClass } from "../../components/form/form";
+import { FormErrorSummaryBox } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { selectedClass } from "../../components/ui/chip";
 import { cn } from "../../lib/cn";
 import { backOfficeProblem } from "../back-office-problems";
-import { Failure, fieldError } from "./equipment-forms";
+import { Failure } from "./equipment-forms";
 import { parseQuantity, trackingLong, typeInUse } from "./equipment-format";
 import { useEquipmentChange } from "./equipment-queries";
 
@@ -51,7 +54,7 @@ function NameField({
         onChange={(event) => onChange(event.target.value)}
       />
       {error === null ? null : (
-        <p role="alert" className={fieldError}>
+        <p role="alert" className={fieldMessageClass}>
           {error}
         </p>
       )}
@@ -121,6 +124,15 @@ export function NewTypeForm({
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
+        <FormErrorSummaryBox
+          announce={false}
+          labels={[
+            ...(nameError === null ? [] : ["Nombre"]),
+            ...(quantityError === null
+              ? []
+              : [`Cantidad en Sucursal ${branch.name}`]),
+          ]}
+        />
         <NameField
           id={nameId}
           value={name}
@@ -136,7 +148,7 @@ export function NewTypeForm({
               key={value}
               className={cn(
                 "flex cursor-pointer items-start gap-3 rounded-tarjeta border border-borde bg-superficie px-4 py-3 has-focus-visible:shadow-foco",
-                value === tracking && "border-primario bg-primario-tinte",
+                value === tracking && selectedClass,
               )}
             >
               <input
@@ -164,14 +176,20 @@ export function NewTypeForm({
             <Input
               id={quantityId}
               inputMode="numeric"
-              placeholder="0"
               className="w-[140px]"
               value={quantity}
               aria-invalid={quantityError !== null}
+              aria-describedby={`${quantityId}-example`}
               onChange={(event) => setQuantity(event.target.value.trim())}
             />
+            <p
+              id={`${quantityId}-example`}
+              className="text-ayuda text-texto-tenue"
+            >
+              Ej.: 0
+            </p>
             {quantityError === null ? null : (
-              <p role="alert" className={fieldError}>
+              <p role="alert" className={fieldMessageClass}>
                 {quantityError}
               </p>
             )}
@@ -255,6 +273,10 @@ export function EditTypeForm({
     <>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummaryBox
+            announce={false}
+            labels={nameError === null ? [] : ["Nombre"]}
+          />
           <NameField
             id={nameId}
             value={name}

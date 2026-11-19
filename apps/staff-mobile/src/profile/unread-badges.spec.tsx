@@ -25,7 +25,8 @@ const runtime = (unread: number) =>
     }),
   );
 
-// v2: the bell on the root carries the count; S23's row repeats it as a pill.
+// v2: the bell on the root carries the count; S23's row repeats it. An unread
+// count is the one badge palette B keeps: Rosa profundo with Crema (FIX-089).
 describe("Staff unread language", () => {
   afterEach(async () => {
     await cleanup();
@@ -40,6 +41,9 @@ describe("Staff unread language", () => {
     });
     expect(screen.getByTestId("notification-bell-count")).toHaveStyle({
       backgroundColor: "#93615D",
+      color: "#F9F4F2",
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 12,
     });
   });
 
@@ -53,8 +57,9 @@ describe("Staff unread language", () => {
       expect(screen.getByTestId("notifications-row-badge")).toBeOnTheScreen();
     });
     expect(screen.getByTestId("notifications-row-badge")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
+      backgroundColor: "#93615D",
     });
+    expect(screen.getAllByText("9+").at(-1)).toHaveStyle({ color: "#F9F4F2" });
     expect(screen.getAllByText("9+").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("button", {

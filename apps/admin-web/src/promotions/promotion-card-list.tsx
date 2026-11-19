@@ -20,7 +20,7 @@ export function PromotionCardList({
     <li aria-hidden="true" className="relative h-0">
       <span className="absolute inset-x-0 -top-[6px] flex items-center gap-2">
         <span className="h-0.5 flex-1 rounded-full bg-primario" />
-        <span className="rounded-full bg-primario px-2 py-0.5 text-[10.5px] font-medium text-blanco">
+        <span className="inline-flex h-[24px] items-center rounded-full bg-rubor px-2.5 text-pie font-bold text-rosa-profundo">
           {order.insertion?.label}
         </span>
       </span>

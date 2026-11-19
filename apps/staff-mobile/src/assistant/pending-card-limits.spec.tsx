@@ -158,7 +158,7 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
 
     // v2 S06: a Lino card, never the amber block.
     expect(screen.getByTestId("pending-card")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
     });
     expect(title).toHaveStyle({ fontSize: 16 });

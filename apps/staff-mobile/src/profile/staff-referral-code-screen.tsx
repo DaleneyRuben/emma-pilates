@@ -6,7 +6,6 @@ import {
   fontFamilies,
   LoadingState,
   QueryFailure,
-  radii,
   ReferralCodeCard,
   Screen,
   SectionTitle,
@@ -98,15 +97,9 @@ export function StaffReferralCodeScreen() {
 const styles = StyleSheet.create({
   codeBlock: { gap: spacing.sm },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  discText: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 16 },
+  // FIX-089: the step number stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 36 },
+  discText: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
   group: { ...surfaces.card },
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },

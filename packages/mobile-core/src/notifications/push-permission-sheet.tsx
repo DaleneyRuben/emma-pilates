@@ -29,7 +29,7 @@ export function PushPermissionSheet({
         <View style={styles.sheet} testID="push-permission-sheet">
           <View style={styles.handle} />
           <View style={styles.disc} testID="push-permission-disc">
-            <Glyph color={colors.emphasis} name="bell" size={32} strokeWidth={1.5} />
+            <Glyph color={colors.text} name="bell" size={32} strokeWidth={1.5} />
           </View>
           <Text accessibilityRole="header" style={styles.title}>
             {title}
@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
   },
   disc: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
     height: 72,
     justifyContent: "center",

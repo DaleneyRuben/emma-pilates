@@ -17,6 +17,7 @@ import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { TextButton } from "../ui/text-button";
+import { fontFamilies } from "../ui/fonts";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
 import { usePushNotifications } from "./push-notifications";
@@ -109,11 +110,11 @@ function NotificationRow({
       accessibilityLabel={message}
       accessibilityRole="button"
       onPress={onPress}
-      style={[styles.row, unread && styles.rowUnread]}
+      style={styles.row}
     >
       {unread ? <View style={styles.dot} /> : <View style={styles.dotSpace} />}
       <View style={styles.rowBody}>
-        <Text style={[styles.message, !unread && styles.messageRead]}>{message}</Text>
+        <Text style={[styles.message, unread && styles.messageUnread]}>{message}</Text>
         <BodyText style={styles.time}>
           {formatNotificationTime(notification.createdAt, now)}
         </BodyText>
@@ -259,11 +260,19 @@ const styles = StyleSheet.create({
   },
   divider: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.xl + spacing.lg },
   dotSpace: { width: 8 },
-  message: { color: colors.text, fontSize: typography.body, lineHeight: 22 },
-  messageRead: { color: colors.textSecondary },
+  message: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    lineHeight: 22,
+  },
+  // FIX-089: unread is said by weight, not by a tinted row.
+  messageUnread: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   notice: {
     alignItems: "flex-start",
-    backgroundColor: colors.secondaryTint,
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.inset,
     gap: spacing.sm,
     padding: spacing.lg,
@@ -277,17 +286,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   rowBody: { flex: 1, gap: spacing.xs },
-  rowUnread: {
-    backgroundColor: colors.secondaryTint,
-    borderColor: colors.border,
-    borderWidth: 1,
-  },
   screen: { gap: spacing.lg },
   sectionTitle: {
     color: colors.textMuted,
-    fontSize: 11,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.label,
     letterSpacing: 1.54,
     textTransform: "uppercase",
   },
-  time: { color: colors.textMuted, fontSize: typography.note },
+  time: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -135,6 +136,7 @@ export function SessionCreateForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <FormField
             control={form.control}
             name="frequency"

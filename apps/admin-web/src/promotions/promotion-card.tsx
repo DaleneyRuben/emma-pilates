@@ -62,7 +62,7 @@ export function PromotionCard({
           : { transform: `translateY(${card.offsetY}px) rotate(-0.6deg)` }
       }
       className={cn(
-        "relative flex cursor-pointer items-center gap-3 rounded-marco bg-lino py-3 pr-4 pl-1 transition-shadow hover:bg-primario-tinte/40",
+        "relative flex cursor-pointer items-center gap-3 rounded-marco border border-borde bg-lino py-3 pr-4 pl-1 transition-shadow hover:bg-primario-tinte",
         card.dragging && "z-10 border-primario shadow-arrastre",
         card.dimmed && "opacity-[0.55]",
       )}
@@ -82,7 +82,7 @@ export function PromotionCard({
       >
         <GripVertical size={18} strokeWidth={1.6} aria-hidden="true" />
       </button>
-      <span className="inline-flex size-[26px] shrink-0 items-center justify-center rounded-full bg-primario-tinte text-ayuda font-medium text-primario-profundo tabular">
+      <span className="inline-flex w-6 shrink-0 justify-center font-serif text-fila font-medium text-rosa-profundo tabular">
         <span className="sr-only">Posición {position}</span>
         <span aria-hidden="true">{position}</span>
       </span>

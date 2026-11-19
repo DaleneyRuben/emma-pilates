@@ -12,6 +12,8 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { wholeNumberField } from "../../components/form/number-field";
 import {
   SidePanelBody,
@@ -123,6 +125,7 @@ export function SupplyPanelForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           <FormField
             control={form.control}
             name="name"
@@ -130,8 +133,11 @@ export function SupplyPanelForm({
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Papel higiénico" {...field} />
+                  <Input {...field} />
                 </FormControl>
+                <FormDescription>
+                  <ExampleHint example="Papel higiénico" />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -144,10 +150,13 @@ export function SupplyPanelForm({
                 <FormItem>
                   <FormLabel>Cantidad en stock</FormLabel>
                   <FormControl>
-                    <Input inputMode="numeric" placeholder="10" {...field} />
+                    <Input inputMode="numeric" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Solo al crearlo: después cambia con retiros y reposiciones.
+                    <ExampleHint example="10">
+                      Solo al crearlo: después cambia con retiros y
+                      reposiciones.
+                    </ExampleHint>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -173,10 +182,12 @@ export function SupplyPanelForm({
               <FormItem>
                 <FormLabel>Umbral de alerta</FormLabel>
                 <FormControl>
-                  <Input inputMode="numeric" placeholder="4" {...field} />
+                  <Input inputMode="numeric" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Con esta cantidad o menos, Insumos lo marca con stock bajo.
+                  <ExampleHint example="4">
+                    Con esta cantidad o menos, Insumos lo marca con stock bajo.
+                  </ExampleHint>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

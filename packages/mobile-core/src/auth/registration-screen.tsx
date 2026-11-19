@@ -8,6 +8,7 @@ import {
 } from "../acquisition/acquisition-channel-field";
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
 import { fontFamilies } from "../ui/fonts";
+import { FormErrorSummary } from "../ui/form-error-summary";
 import { FormField } from "../ui/form-field";
 import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
@@ -58,11 +59,24 @@ export function RegistrationScreen({
   const phoneError = submitted && phoneMistake !== null ? phoneMistake : undefined;
   const passwordError =
     submitted && password.length < minimumPasswordLength ? "Mínimo 8 caracteres." : undefined;
-  const confirmationError =
-    submitted && passwordError === undefined && password !== confirmation
-      ? "Las contraseñas no coinciden."
-      : undefined;
+  const confirmationError = !submitted
+    ? undefined
+    : confirmation === ""
+      ? "Repite la contraseña."
+      : passwordError === undefined && password !== confirmation
+        ? "Las contraseñas no coinciden."
+        : undefined;
   const channelError = submitted && channel === null ? acquisitionChannelRequired : undefined;
+  const missing = [
+    [nameError, "Nombre"],
+    [emailError, "Correo electrónico"],
+    [phoneError, "Celular"],
+    [passwordError, "Contraseña"],
+    [confirmationError, "Confirmar contraseña"],
+    [channelError, "Cómo nos conociste"],
+  ]
+    .filter(([problem]) => problem !== undefined)
+    .map(([, label]) => label as string);
 
   async function submit() {
     setSubmitted(true);
@@ -115,6 +129,7 @@ export function RegistrationScreen({
       }
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
+      <FormErrorSummary fields={missing} />
       {waitSeconds > 0 ? (
         <WaitNotice
           message={limitKeepsAnyLink}
@@ -135,9 +150,9 @@ export function RegistrationScreen({
         autoComplete="email"
         error={emailError}
         keyboardType="email-address"
+        hint="Ej.: tu@correo.com"
         label="Correo electrónico"
         onChangeText={setEmail}
-        placeholder="tu@correo.com"
         value={email}
       />
       <PhoneField
@@ -171,9 +186,9 @@ export function RegistrationScreen({
             autoCapitalize="characters"
             autoCorrect={false}
             error={referralError ? "Revisa el código de referido." : undefined}
+            hint="Ej.: EMMA-2026"
             label="Código de referido"
             onChangeText={setReferralCode}
-            placeholder="Ej. EMMA-2026"
             value={referralCode}
           />
           <Text style={styles.referralHelp}>De una amiga o de tu instructora.</Text>

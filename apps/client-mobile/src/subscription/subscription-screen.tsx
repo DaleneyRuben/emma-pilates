@@ -9,6 +9,7 @@ import {
   BrandToast,
   colors,
   EmphasisCard,
+  fontFamilies,
   formatBolivianos,
   LoadingState,
   nextPlanStartWindowDays,
@@ -207,9 +208,14 @@ function purchaseNote(fromCentavos: number | null | undefined): string {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   renew: { gap: spacing.smd },
-  renewNote: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  renewNote: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+    fontFamily: fontFamilies.body,
+  },
   screen: { gap: spacing.lg },
   section: { gap: spacing.md },
 });

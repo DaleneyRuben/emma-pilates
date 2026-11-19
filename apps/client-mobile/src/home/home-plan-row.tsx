@@ -1,5 +1,13 @@
 import type { ClientSubscriptionDto } from "@pilates/api-contracts";
-import { Chevron, colors, fontFamilies, spacing, surfaces, typography } from "@pilates/mobile-core";
+import {
+  Chevron,
+  colors,
+  ExceptionPill,
+  fontFamilies,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { formatCivilDate } from "./home-format";
@@ -74,7 +82,7 @@ export function PlanRow({
         </Text>
         <Text style={styles.detail}>{detail}</Text>
       </View>
-      {expiringSoon ? <Text style={styles.expiring}>Por vencer</Text> : null}
+      {expiringSoon ? <ExceptionPill>Por vencer</ExceptionPill> : null}
       <Chevron size={16} strokeWidth={1.5} tone="muted" />
     </Pressable>
   );
@@ -83,13 +91,7 @@ export function PlanRow({
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
   count: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  expiring: {
-    color: colors.warningText,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
+  detail: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
   row: {
     ...surfaces.card,

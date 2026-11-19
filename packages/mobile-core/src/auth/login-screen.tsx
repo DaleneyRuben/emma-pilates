@@ -5,7 +5,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { BrandHeader } from "./auth-layout";
-import { emailPlaceholder, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import { emailHint, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
@@ -104,7 +104,7 @@ export function LoginScreen({
                   label="Correo electrónico"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  placeholder={emailPlaceholder(teamAccess)}
+                  hint={emailHint(teamAccess)}
                   testID="login-email"
                   value={value}
                 />
@@ -120,7 +120,6 @@ export function LoginScreen({
                   label="Contraseña"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  placeholder="••••••••"
                   secureTextEntry
                   testID="login-password"
                   value={value}
@@ -157,7 +156,7 @@ export function LoginScreen({
 const styles = StyleSheet.create({
   notice: {
     backgroundColor: colors.successTint,
-    borderColor: "rgba(124,148,115,0.30)",
+    borderColor: colors.border,
     borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: spacing.mdLg,

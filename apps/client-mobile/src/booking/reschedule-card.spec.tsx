@@ -100,29 +100,32 @@ describe("Client reschedule option card", () => {
     return { button, card: within(button), screen };
   }
 
-  // C06: the options are rows of one Lino group, the start in Lora 20 and
-  // «Trainer · N cupos» under the class, with a radio at the end.
-  it("draws the option as a row of the Lino group with its radio", async () => {
+  // C06 in palette B (ClaseE, FIX-089): the options are rows of one Crema
+  // card, the start in a Rubor box and «Trainer · N cupos» under the class,
+  // with a radio at the end.
+  it("draws the option as a class row of the card with its radio", async () => {
     const { button, card, screen } = await openReschedule();
 
     expect(screen.getByTestId("reschedule-options")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
       borderRadius: 16,
     });
     expect(button).toHaveStyle({ minHeight: 64 });
+    expect(card.getByTestId("reschedule-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
     expect(card.getByText(/^\d\d:\d\d$/)).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 20,
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 15,
     });
     expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
     expect(card.getByText("Emma Vargas · 8 cupos")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
-    expect(card.getByTestId("reschedule-radio")).toBeOnTheScreen();
+    expect(card.getByTestId("reschedule-radio")).toHaveStyle({ borderColor: "#CDA697" });
   });
 
-  it("marks the selected option on Rosa tinte with a filled radio", async () => {
+  it("marks the selected option with a filled Rosa profundo radio only", async () => {
     const { button, screen } = await openReschedule();
 
     await fireEvent.press(button);
@@ -132,10 +135,10 @@ describe("Client reschedule option card", () => {
         { selected: true },
       );
     });
-    expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveStyle({
-      backgroundColor: "#F2E4E1",
+    expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).not.toHaveStyle({
+      backgroundColor: "#E7CCBF",
     });
-    expect(screen.getByTestId("reschedule-radio")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("reschedule-radio")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(
       screen.getByText(/^Tu lugar de las \d\d:\d\d se libera al confirmar$/),
     ).toBeOnTheScreen();

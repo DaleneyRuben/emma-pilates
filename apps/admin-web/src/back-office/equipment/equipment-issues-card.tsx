@@ -34,11 +34,11 @@ function IssueRow({
           {issueTitle(issue)}
         </p>
         <p className="text-cuerpo text-texto">{issue.description}</p>
-        <p className="text-[12.5px] text-texto-tenue tabular">
+        <p className="text-nota text-texto-tenue tabular">
           {`Reportó ${issue.reportedByName} · ${formatCivilMoment(issue.reportedAt)}`}
         </p>
         {issue.resolvedAt === null ? null : (
-          <p className="text-[12.5px] text-texto-tenue tabular">
+          <p className="text-nota text-texto-tenue tabular">
             {`${issue.writtenOff ? "Dada de baja" : "Resuelta"} por ${issue.resolvedByName ?? ""} · ${formatCivilMoment(issue.resolvedAt)}`}
           </p>
         )}
@@ -124,7 +124,7 @@ export function EquipmentIssuesCard({
   return (
     <section
       aria-labelledby={titleId}
-      className="flex flex-col rounded-marco bg-lino"
+      className="flex flex-col rounded-marco border border-borde bg-lino"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisor px-4 py-3">
         <h2 id={titleId} className="font-serif text-[19px] text-texto">

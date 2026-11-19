@@ -2,7 +2,6 @@ import { IconRowGroup, StateScreen } from "@pilates/mobile-core";
 import { useEffect, useEffectEvent } from "react";
 import { BackHandler, StyleSheet, View } from "react-native";
 
-import { StatusPill } from "../ui/session-row";
 import { ValueRow } from "../ui/value-row";
 
 /** S10 «¡Pago registrado!» and «Comprobante enviado»: centred states (follow-up 225 §6). */
@@ -65,7 +64,7 @@ export function PaymentDone({
               <ValueRow label="Vence" value={endsOn} />
             )
           ) : (
-            <ValueRow label="Estado" value={<StatusPill label="En revisión" />} />
+            <ValueRow label="Estado" value="En revisión" />
           )}
         </IconRowGroup>
       </View>

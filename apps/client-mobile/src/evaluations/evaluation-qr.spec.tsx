@@ -61,6 +61,11 @@ describe("The studio QR on a paid Evaluation", () => {
     expect(await screen.findByLabelText("Código QR del estudio")).toBeOnTheScreen();
     expect(screen.getByText("Adjunta tu comprobante para continuar")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toBeDisabled();
+    // FIX-089: the reason is the off button's own line, under it.
+    expect(screen.getByRole("button", { name: "Confirmar evaluación" })).toHaveProp(
+      "accessibilityHint",
+      "Adjunta tu comprobante para continuar",
+    );
 
     await fireEvent.press(
       screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),

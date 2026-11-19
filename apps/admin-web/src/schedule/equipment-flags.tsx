@@ -18,7 +18,7 @@ export function EquipmentDot() {
 /** FIX-084: the panel's sentence for a class short of Equipment. */
 export function EquipmentFlagNote({ flag }: { flag: EquipmentFlag }) {
   return (
-    <p className="flex items-start gap-2 rounded-tarjeta bg-lino px-4 py-3 text-celda text-texto-secundario">
+    <p className="flex items-start gap-2 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-celda text-texto-secundario">
       <span className="mt-[7px] flex">
         <EquipmentDot />
       </span>

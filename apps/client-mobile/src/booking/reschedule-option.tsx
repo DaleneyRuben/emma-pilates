@@ -16,7 +16,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { seatsTag } from "./session-row";
 
-/** C06's «Otras clases de hoy»: one Lino group, hairlines inset 80. */
+/** C06's «Otras clases de hoy»: one Crema card, Rubor hairlines inset 88 (ClaseE). */
 export function RescheduleOptions({ children }: { children: ReactNode }) {
   return (
     <View style={styles.group} testID="reschedule-options">
@@ -30,7 +30,11 @@ export function RescheduleOptions({ children }: { children: ReactNode }) {
   );
 }
 
-/** One alternative: the start in Lora 20, the class over «Trainer · N cupos», and a radio. */
+/**
+ * One alternative as a class row (ClaseE, FIX-089): the start in its Rubor
+ * box, the class over «Trainer · N cupos», and a radio filled in Rosa
+ * profundo once chosen.
+ */
 export function RescheduleOption({
   onPress,
   selected,
@@ -46,12 +50,14 @@ export function RescheduleOption({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.row, selected && styles.selected]}
+      style={styles.row}
       testID={`reschedule-option-${session.id}`}
     >
-      <Text numberOfLines={1} style={styles.time}>
-        {formatStartTime(session.startsAt)}
-      </Text>
+      <View style={styles.timeBox} testID="reschedule-time">
+        <Text numberOfLines={1} style={styles.time}>
+          {formatStartTime(session.startsAt)}
+        </Text>
+      </View>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
         <Text style={styles.details}>
@@ -59,7 +65,9 @@ export function RescheduleOption({
         </Text>
       </View>
       <View style={[styles.radio, selected && styles.radioOn]} testID="reschedule-radio">
-        {selected ? <Glyph color={colors.white} name="check" size={14} strokeWidth={2} /> : null}
+        {selected ? (
+          <Glyph color={colors.onPrimary} name="check" size={14} strokeWidth={2} />
+        ) : null}
       </View>
     </Pressable>
   );
@@ -67,12 +75,12 @@ export function RescheduleOption({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  details: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   group: { ...surfaces.card, overflow: "hidden" },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 80 },
+  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 88 },
   radio: {
     alignItems: "center",
-    borderColor: colors.hairline,
+    borderColor: colors.border,
     borderRadius: radii.pill,
     borderWidth: 1.5,
     height: 24,
@@ -87,14 +95,22 @@ const styles = StyleSheet.create({
     minHeight: 64,
     paddingHorizontal: spacing.lg,
   },
-  selected: { backgroundColor: colors.primaryTint },
   time: {
     color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 20,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
     fontVariant: ["tabular-nums"],
-    // Lora's digits run wider on Android: a fixed width wrapped «09:00».
-    minWidth: 52,
+    fontWeight: "700",
+  },
+  // ClaseE's time box: 62 × 36, wider when Android's digits need it.
+  timeBox: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: 10,
+    height: 36,
+    justifyContent: "center",
+    minWidth: 62,
+    paddingHorizontal: spacing.sm,
   },
   title: {
     color: colors.text,

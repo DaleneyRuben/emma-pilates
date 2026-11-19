@@ -44,7 +44,7 @@ function Notice({
       className={cn(
         "flex flex-col gap-2 rounded-marco border border-dashed p-5 text-celda",
         tone === "error"
-          ? "border-error/40 bg-error-tinte"
+          ? "border-borde bg-error-tinte"
           : "border-borde-fuerte bg-lino",
       )}
     >
@@ -102,7 +102,7 @@ export function PayoutQrCard({
   );
 
   return (
-    <div className="flex flex-col items-center gap-2.5 rounded-marco border border-borde-fuerte bg-blanco p-[22px] shadow-[0_2px_10px_rgba(74,58,48,0.06)]">
+    <div className="flex flex-col items-center gap-2.5 rounded-marco border border-borde bg-crema p-[22px]">
       <button
         type="button"
         onClick={() => setEnlarged(true)}

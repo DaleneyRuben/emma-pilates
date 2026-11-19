@@ -98,14 +98,8 @@ export function InvoiceFileCard({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
   drop: {
     alignItems: "center",
     borderColor: colors.borderStrong,

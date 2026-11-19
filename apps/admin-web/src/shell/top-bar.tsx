@@ -29,7 +29,7 @@ export function BranchCell() {
   }
   if (item?.studioWide === true) {
     return (
-      <span className="flex h-11 items-center gap-2 rounded-tarjeta bg-lino px-3.5 text-cuerpo text-texto">
+      <span className="flex h-11 items-center gap-2 rounded-tarjeta border border-borde bg-lino px-3.5 text-cuerpo text-texto">
         <Building2
           size={20}
           strokeWidth={1.6}
@@ -61,7 +61,7 @@ export function TopBar() {
             aria-label="Buscar"
             aria-expanded={searching}
             onClick={() => setSearching((open) => !open)}
-            className="inline-flex size-11 items-center justify-center rounded-tarjeta bg-lino text-primario focus-visible:shadow-foco"
+            className="inline-flex size-11 items-center justify-center rounded-tarjeta border border-borde bg-lino text-primario focus-visible:shadow-foco"
           >
             <Search size={22} strokeWidth={1.6} aria-hidden="true" />
           </button>

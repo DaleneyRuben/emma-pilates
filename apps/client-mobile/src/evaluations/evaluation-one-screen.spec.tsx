@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
-import { jsonResponse, routeFetcher } from "../test-support";
+import { ancestorBackgrounds, jsonResponse, routeFetcher } from "../test-support";
 import {
   baseRoutes,
   boliviaInstant,
@@ -100,7 +100,10 @@ describe("One Evaluación nutricional screen", () => {
     );
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("Gratis con tu plan")).toBeOnTheScreen();
+    // FIX-089: a normal state is a Crema line on the hero, not a chip.
+    const state = within(card).getByText("Gratis con tu plan");
+    expect(state).toHaveStyle({ color: "#F9F4F2" });
+    expect(ancestorBackgrounds(state)[0]).toBe("#B78380");
     expect(within(card).getByText("09:00")).toBeOnTheScreen();
     expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
     expect(screen.getByText("Reserva otra evaluación")).toBeOnTheScreen();
@@ -174,7 +177,10 @@ describe("One Evaluación nutricional screen", () => {
     );
 
     const card = await screen.findByTestId("next-evaluation");
-    expect(within(card).getByText("El estudio liberó tu turno")).toBeOnTheScreen();
+    // A released slot is the exception: the one Rubor pill (FIX-089).
+    expect(
+      within(within(card).getByTestId("exception-pill")).getByText("El estudio liberó tu turno"),
+    ).toBeOnTheScreen();
     expect(
       screen.getByText("Tu pago de Bs 70 sigue vigente: elige otro turno y no pagas de nuevo."),
     ).toBeOnTheScreen();

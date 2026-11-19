@@ -134,6 +134,9 @@ export function StaffPage({
       }
       query={query}
       columns={staffColumns(names)}
+      avatar={(member) => (
+        <StaffPhoto name={member.name} photo={member.photo} size={40} />
+      )}
       renderForm={(member, done) => (
         <StaffPanelForm member={member} onDone={done} />
       )}

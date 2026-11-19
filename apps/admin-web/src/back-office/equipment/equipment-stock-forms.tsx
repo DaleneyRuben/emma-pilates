@@ -5,11 +5,13 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
+import { fieldMessageClass } from "../../components/form/form";
+import { FormErrorSummaryBox } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { backOfficeProblem } from "../back-office-problems";
-import { DescriptionField, Failure, fieldError } from "./equipment-forms";
+import { DescriptionField, Failure } from "./equipment-forms";
 import { damagedLabel, parseQuantity } from "./equipment-format";
 import { useBranchStock, useEquipmentChange } from "./equipment-queries";
 
@@ -124,10 +126,14 @@ export function DamageForm({
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
+        <FormErrorSummaryBox
+          announce={false}
+          labels={descriptionError === null ? [] : ["¿Qué pasó?"]}
+        />
         <Stepper value={count} max={stock.usable} onChange={setCount} />
         <DescriptionField
           id={descriptionId}
-          placeholder="Ej.: uno se pinchó"
+          example="uno se pinchó"
           value={description}
           error={descriptionError}
           onChange={setDescription}
@@ -203,6 +209,10 @@ export function QuantityForm({
   return (
     <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
       <SidePanelBody>
+        <FormErrorSummaryBox
+          announce={false}
+          labels={error === null ? [] : [`Cantidad en Sucursal ${branch.name}`]}
+        />
         <div className="flex flex-col gap-1.5">
           <Label
             htmlFor={quantityId}
@@ -221,7 +231,7 @@ export function QuantityForm({
             número.
           </p>
           {error === null ? null : (
-            <p role="alert" className={fieldError}>
+            <p role="alert" className={fieldMessageClass}>
               {error}
             </p>
           )}

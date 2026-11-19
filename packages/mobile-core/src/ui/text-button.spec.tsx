@@ -26,7 +26,7 @@ describe("TextButton v2 look", () => {
 
     const label = screen.getByText("Ahora no");
     expect(label).toHaveStyle({
-      color: "#7D4F4B",
+      color: "#93615D",
       fontFamily: "WorkSans_600SemiBold",
       fontSize: 15,
       fontWeight: "600",
@@ -35,11 +35,11 @@ describe("TextButton v2 look", () => {
     expect(screen.getByRole("button", { name: "Ahora no" })).toHaveStyle({ minHeight: 44 });
   });
 
-  it("draws the Error tone in #A04E3E", async () => {
+  it("draws the Error tone in #93615D", async () => {
     const screen = await render(
       <TextButton label="Cancelar reserva" onPress={jest.fn()} tone="error" />,
     );
 
-    expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#93615D" });
   });
 });

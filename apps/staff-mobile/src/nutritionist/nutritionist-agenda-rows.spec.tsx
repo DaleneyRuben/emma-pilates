@@ -36,10 +36,10 @@ describe("Nutritionist agenda rows", () => {
     });
     // MOB-074 walk: the time never wraps in its column.
     expect(screen.getByText("09:00")).toHaveProp("numberOfLines", 1);
-    expect(screen.getByText("45 min")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(screen.getByText("Valeria Áñez")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
-    expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
+    expect(screen.getByText("45 min")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(screen.getByText("Valeria Áñez")).toHaveStyle({ color: "#93615D", fontSize: 16 });
+    expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(screen.getByLabelText("09:00 Valeria Áñez")).toBeOnTheScreen();
-    expect(screen.getByText("Cancelar evaluación")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.getByText("Cancelar evaluación")).toHaveStyle({ color: "#93615D" });
   });
 });

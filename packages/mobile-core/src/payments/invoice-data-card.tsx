@@ -142,7 +142,7 @@ export function InvoiceDataCard({
 const styles = StyleSheet.create({
   card: { ...surfaces.flatCard, gap: spacing.mdLg, padding: spacing.xlSm },
   fields: { gap: spacing.md },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pill: {
     alignItems: "center",
     borderColor: colors.borderStrong,

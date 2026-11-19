@@ -16,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelBody } from "../components/panel/side-panel";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
@@ -191,9 +192,10 @@ export function PromotionPanelForm({
         className="flex flex-1 flex-col"
       >
         <SidePanelBody>
+          <FormErrorSummary />
           <PromotionImageField value={image} onChange={setImage} />
           {wasPublished && imageChanged ? (
-            <p className="rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2 text-ayuda text-advertencia-texto">
+            <p className="rounded-control border border-borde bg-advertencia-tinte px-3 py-2 text-ayuda text-advertencia-texto">
               {imageChangeWarning(image !== null)}
             </p>
           ) : null}

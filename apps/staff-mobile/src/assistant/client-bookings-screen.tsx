@@ -28,6 +28,7 @@ import {
   surfaces,
   useStickyNotice,
   useStudioRules,
+  ExceptionPill,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -35,7 +36,6 @@ import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { StatusPill } from "../ui/session-row";
 import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
 import { ClientRecordsHeader } from "./client-records-header";
@@ -105,7 +105,7 @@ function BookingCard({
         <View style={styles.cardText}>
           <Text style={styles.cardTitle}>{item.classTypeName}</Text>
           <Text style={styles.line}>{line}</Text>
-          {item.kind === "waitlist" ? <StatusPill label="En lista de espera" /> : null}
+          {item.kind === "waitlist" ? <ExceptionPill>En lista de espera</ExceptionPill> : null}
           {locked ? <Text style={styles.line}>Solo en tus sucursales</Text> : null}
         </View>
       </View>
@@ -276,16 +276,15 @@ const styles = StyleSheet.create({
   cardBody: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
   cardText: { alignItems: "flex-start", flex: 1, gap: spacing.xs },
   cardTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 14,
-    height: 52,
-    justifyContent: "center",
-    width: 48,
+  // FIX-089: the date stands alone, with no tinted box behind it.
+  disc: { alignItems: "center", height: 52, justifyContent: "center", width: 48 },
+  discDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  discWeekday: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: 12,
+    fontWeight: "500",
   },
-  discDay: { color: colors.primaryOnTint, fontFamily: fontFamilies.display, fontSize: 18 },
-  discWeekday: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyMedium, fontSize: 11 },
   line: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },

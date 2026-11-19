@@ -8,10 +8,10 @@ const options = [
   { key: "history", label: "Historial" },
 ] as const;
 
-// Follow-up 225 §9 as the staff canvas draws it (S21, S22): one emphasis per
-// screen, so the selected segment is Rosa tinte with a Palo de rosa ring.
+// Follow-up 225 §9; FIX-089 (palette B): the selected segment is Rosa profundo
+// with a Crema label, the others bare on a Crema track with an Arcilla border.
 describe("SegmentedTabs", () => {
-  it("draws a Lino track at padding 4 and radius 14", async () => {
+  it("draws a Crema track at padding 4 and radius 14 with an Arcilla border", async () => {
     const screen = await render(
       <SegmentedTabs
         accessibilityLabel="Reservas"
@@ -23,8 +23,10 @@ describe("SegmentedTabs", () => {
     );
 
     expect(screen.getByTestId("tabs")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
       borderRadius: 14,
+      borderWidth: 1,
       flexDirection: "row",
       gap: 4,
       padding: 4,
@@ -32,7 +34,7 @@ describe("SegmentedTabs", () => {
     expect(screen.getByTestId("tabs")).toHaveProp("accessibilityRole", "tablist");
   });
 
-  it("rings the selected 40 pt segment and leaves the other bare, both Rosa enlace", async () => {
+  it("fills the selected 44 pt segment in Rosa profundo and leaves the other bare", async () => {
     const screen = await render(
       <SegmentedTabs onSelect={jest.fn()} options={options} selected="upcoming" />,
     );
@@ -40,23 +42,24 @@ describe("SegmentedTabs", () => {
     const selected = screen.getByRole("tab", { name: "Próximas" });
     expect(selected).toHaveProp("accessibilityState", { selected: true });
     expect(selected).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      borderColor: "#B78380",
+      backgroundColor: "#93615D",
       borderRadius: 10,
-      borderWidth: 1.5,
       flex: 1,
-      height: 40,
+      height: 44,
     });
     const other = screen.getByRole("tab", { name: "Historial" });
     expect(other).toHaveProp("accessibilityState", { selected: false });
     expect(StyleSheet.flatten(other.props.style)).not.toHaveProperty("backgroundColor");
-    for (const label of ["Próximas", "Historial"]) {
-      expect(screen.getByText(label)).toHaveStyle({
-        color: "#7D4F4B",
-        fontFamily: "WorkSans_600SemiBold",
-        fontSize: 15,
-      });
-    }
+    expect(screen.getByText("Próximas")).toHaveStyle({
+      color: "#F9F4F2",
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 15,
+    });
+    expect(screen.getByText("Historial")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_500Medium",
+      fontSize: 15,
+    });
   });
 
   it("reports the segment pressed", async () => {
@@ -84,6 +87,6 @@ describe("SegmentedTabs", () => {
     expect(off).toHaveProp("accessibilityState", { disabled: true, selected: false });
     await fireEvent.press(off);
     expect(onSelect).not.toHaveBeenCalled();
-    expect(screen.getByText("Historial")).toHaveStyle({ color: "#B3A9A5" });
+    expect(screen.getByText("Historial")).toHaveStyle({ color: "#93615D" });
   });
 });

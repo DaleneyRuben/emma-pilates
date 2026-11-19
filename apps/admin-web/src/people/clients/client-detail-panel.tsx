@@ -143,7 +143,7 @@ function ClientSummary({
         </p>
       </div>
       {client.accountStatus === "pending" ? (
-        <div className="flex flex-col gap-1 rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2">
+        <div className="flex flex-col gap-1 rounded-control border border-borde bg-advertencia-tinte px-3 py-2">
           <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
           <p className="text-ayuda text-advertencia-texto">
             Todavía no abrió el enlace del correo para crear su contraseña.
@@ -162,7 +162,7 @@ function ClientSummary({
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-control bg-lino px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
+          <span className="rounded-control border border-borde bg-lino px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
             {client.referralCode}
           </span>
         </SummaryRow>

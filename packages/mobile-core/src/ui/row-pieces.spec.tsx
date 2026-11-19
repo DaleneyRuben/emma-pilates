@@ -11,28 +11,28 @@ const hidden = { includeHiddenElements: true };
 describe("DetailLine", () => {
   it("puts a glyph before a short line of text, 8 pt apart", async () => {
     const screen = await render(
-      <DetailLine icon="person" iconSize={17} style={{ color: "#6F6662", fontSize: 14 }}>
+      <DetailLine icon="person" iconSize={17} style={{ color: "#93615D", fontSize: 14 }}>
         Emma Vargas
       </DetailLine>,
     );
 
     const text = screen.getByText("Emma Vargas");
-    expect(text).toHaveStyle({ color: "#6F6662", fontSize: 14 });
+    expect(text).toHaveStyle({ color: "#93615D", fontSize: 14 });
     expect(text.parent).toHaveStyle({ alignItems: "center", flexDirection: "row", gap: 8 });
     const icon = screen.getByTestId("glyph-person", hidden);
     expect(icon).toHaveProp("width", 17);
-    expect(icon).toHaveProp("stroke", "#B78380");
+    expect(icon).toHaveProp("stroke", "#93615D");
   });
 
   it("takes another icon colour for S11's amber clock", async () => {
     const screen = await render(
-      <DetailLine icon="clock" iconColor="#C99A4E" iconSize={15}>
+      <DetailLine icon="clock" iconColor="#93615D" iconSize={15}>
         Hace 20 minutos
       </DetailLine>,
     );
 
     const icon = screen.getByTestId("glyph-clock", hidden);
-    expect(icon).toHaveProp("stroke", "#C99A4E");
+    expect(icon).toHaveProp("stroke", "#93615D");
     expect(icon).toHaveProp("width", 15);
   });
 });
@@ -48,7 +48,7 @@ describe("CardFooter", () => {
 
     expect(screen.getByTestId("card-footer")).toHaveStyle({
       alignItems: "center",
-      borderTopColor: "#EFE7DE",
+      borderTopColor: "#E7CCBF",
       borderTopWidth: 1,
       flexDirection: "row",
       gap: 12,
@@ -69,13 +69,13 @@ describe("CardFooter", () => {
 });
 
 describe("AvatarCircle", () => {
-  it("draws the first letter in Lora on the accent wash", async () => {
+  it("draws the first letter on the Rubor wash", async () => {
     const screen = await render(<AvatarCircle fontSize={16} name="valeria áñez" size={42} />);
 
     const letter = screen.getByText("V");
-    expect(letter).toHaveStyle({ color: "#8A5D59", fontFamily: "Lora_400Regular", fontSize: 16 });
+    expect(letter).toHaveStyle({ color: "#93615D", fontFamily: "Lora_400Regular", fontSize: 16 });
     expect(screen.getByTestId("avatar-circle")).toHaveStyle({
-      backgroundColor: "rgba(216,189,184,0.4)",
+      backgroundColor: "#E7CCBF",
       borderRadius: 21,
       height: 42,
       width: 42,

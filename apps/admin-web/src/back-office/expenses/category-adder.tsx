@@ -5,11 +5,13 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import { ExampleHint } from "../../components/form/example-hint";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { backOfficeProblem } from "../back-office-problems";
@@ -60,7 +62,6 @@ export function CategoryAdder({
               <FormControl>
                 <Input
                   autoFocus={autoFocus}
-                  placeholder="Limpieza"
                   {...field}
                   onKeyDown={(event) => {
                     if (event.key !== "Enter") return;
@@ -78,6 +79,9 @@ export function CategoryAdder({
                 Agregar
               </Button>
             </div>
+            <FormDescription>
+              <ExampleHint example="Limpieza" />
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}

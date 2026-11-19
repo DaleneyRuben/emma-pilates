@@ -34,7 +34,10 @@ describe("Client Session detail on a frozen day", () => {
 
     const button = screen.getByRole("button", { name: "No disponible durante el congelamiento" });
     expect(button).toBeDisabled();
-    expect(button).toHaveStyle({ backgroundColor: "#E7DCD8" });
+    // Palette B's disabled look, with the day she can book as its reason
+    // line right under it (FIX-089).
+    expect(button).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(button).toHaveProp("accessibilityHint", expect.stringMatching(/^Podrás reservar desde/));
     expect(screen.queryByRole("button", { name: "Reservar" })).toBeNull();
     expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
     // Review of FIX-082: the whole weekday in a sentence, «lunes 23».
@@ -57,7 +60,10 @@ describe("Client Session detail on a frozen day", () => {
   it("draws a neutral header and drops the free cancellation line", async () => {
     const { screen } = await openDetail(frozen(classDay, classDay));
 
-    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByTestId("session-hero")).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+    });
     expect(screen.getByText("3 de 12 cupos libres")).toBeOnTheScreen();
     expect(screen.queryByText(/^Cancela sin costo/)).toBeNull();
     // FIX-082: the facts' icons stand alone, no tinted disc.

@@ -1,21 +1,10 @@
-import {
-  Children,
-  createContext,
-  Fragment,
-  isValidElement,
-  type ReactNode,
-  useContext,
-} from "react";
+import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Chevron } from "./chevron";
 import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
 import { colors, radii, spacing, typography } from "./tokens";
-
-// FIX-082 (design audit 2026-11-18): a plain group draws each glyph alone, no
-// tinted disc. Opt-in, so a screen changes only when its own pass says so.
-const PlainContext = createContext(false);
 
 export type IconRowProps = {
   /** A quiet chevron at the end, for a row that opens something. */
@@ -32,9 +21,9 @@ export type IconRowProps = {
 };
 
 /**
- * A fact as a row instead of a paragraph (follow-up 225 §3): an 18 pt Palo de
- * rosa line glyph in a 36 pt Rosa tinte disc, the label in Work Sans 16, an
- * optional value and chevron; «error» draws it in Error. Put rows in an
+ * A fact as a row instead of a paragraph (follow-up 225 §3): an 18 pt line
+ * glyph alone, never in a disc (FIX-089), the label in Work Sans 16, an
+ * optional value and chevron; «error» says it in weight. Put rows in an
  * `IconRowGroup`.
  */
 export function IconRow({
@@ -47,24 +36,9 @@ export function IconRow({
   value,
 }: IconRowProps) {
   const error = tone === "error";
-  const plain = useContext(PlainContext);
-  const glyph = (
-    <Glyph
-      color={error ? colors.error : plain ? colors.textMuted : colors.primary}
-      name={icon}
-      size={18}
-      strokeWidth={1.5}
-    />
-  );
   const content = (
     <>
-      {plain ? (
-        glyph
-      ) : (
-        <View style={[styles.disc, error && styles.errorDisc]} testID="icon-row-disc">
-          {glyph}
-        </View>
-      )}
+      <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.5} />
       <Text
         style={[styles.label, value === undefined && styles.labelAlone, error && styles.errorLabel]}
       >
@@ -94,55 +68,41 @@ export function IconRow({
   );
 }
 
-/** Lino rows at radius 16 with an Arena hairline inset 64 between them (follow-up 225 §2). */
+/** Rows on a Crema card with an Arcilla outline and Rubor dividers (FIX-089). */
 export function IconRowGroup({
   children,
-  plain = false,
   style,
   testID,
 }: {
   children: ReactNode;
-  /** Each glyph alone, without its tinted disc (FIX-082). */
+  /** Kept for callers: every group is plain since FIX-089. */
   plain?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
   const rows = Children.toArray(children).filter(isValidElement);
   return (
-    <PlainContext.Provider value={plain}>
-      <View style={[styles.group, style]} testID={testID}>
-        {rows.map((row, index) => (
-          <Fragment key={row.key ?? index}>
-            {index === 0 ? null : (
-              <View
-                style={[styles.hairline, plain && styles.hairlinePlain]}
-                testID="icon-row-hairline"
-              />
-            )}
-            {row}
-          </Fragment>
-        ))}
-      </View>
-    </PlainContext.Provider>
+    <View style={[styles.group, style]} testID={testID}>
+      {rows.map((row, index) => (
+        <Fragment key={row.key ?? index}>
+          {index === 0 ? null : <View style={styles.hairline} testID="icon-row-hairline" />}
+          {row}
+        </Fragment>
+      ))}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
+  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  group: {
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderRadius: radii.card,
+    borderWidth: 1,
   },
-  errorDisc: { backgroundColor: colors.errorSurface },
-  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
-  group: { backgroundColor: colors.card, borderRadius: radii.card },
-  // 16 side padding + 36 disc + 12 gap.
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
   // 16 side padding + 18 glyph + 12 gap.
-  hairlinePlain: { marginLeft: 46 },
+  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 46 },
   // The label keeps its width; a long value wraps under itself instead.
   label: {
     color: colors.text,

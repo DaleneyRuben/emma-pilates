@@ -45,7 +45,7 @@ function ClientResults({
     );
   }
   return (
-    <ul className="divide-y divide-divisor rounded-tarjeta bg-lino">
+    <ul className="divide-y divide-divisor rounded-tarjeta border border-borde bg-lino">
       {results.data.items.map((client) => (
         <li
           key={client.id}
@@ -113,7 +113,7 @@ export function BookClientForm({
   return (
     <div className="flex flex-1 flex-col gap-5 px-7 py-4">
       {full ? (
-        <p className="rounded-tarjeta bg-advertencia/12 px-4 py-3 text-celda text-advertencia-texto">
+        <p className="rounded-tarjeta bg-advertencia-tinte px-4 py-3 text-celda text-advertencia-texto">
           La clase está llena: la clienta entra a la lista de espera en el
           puesto {nextPosition}.
         </p>

@@ -11,7 +11,7 @@ describe("cn", () => {
     );
   });
 
-  it("keeps white text on the primary button at every size", () => {
+  it("keeps the Crema label on the primary button at every size", () => {
     render(
       <>
         <Button size="lg">Grande</Button>
@@ -20,11 +20,11 @@ describe("cn", () => {
     );
 
     expect(screen.getByRole("button", { name: "Grande" })).toHaveClass(
-      "text-blanco",
-      "text-cuerpo",
+      "text-crema",
+      "text-base",
     );
     expect(screen.getByRole("button", { name: "Chico" })).toHaveClass(
-      "text-blanco",
+      "text-crema",
       "text-celda",
     );
   });

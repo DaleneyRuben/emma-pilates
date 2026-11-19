@@ -4,26 +4,46 @@ import type { TextInputProps } from "react-native";
 
 import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, spacing, typography } from "./tokens";
+
+const dotsOnly = /^[\s•·*.●]+$/;
 
 type FormFieldProps = TextInputProps & {
   error?: string;
+  /** An example or a rule under the field, «Ej.: …»; never in the placeholder (FormB). */
+  hint?: string;
   label: string;
+  /** Says «(opcional)» after the label, at regular weight (FormB). */
+  optional?: boolean;
 };
 
-export function FormField({ error, label, secureTextEntry, style, ...inputProps }: FormFieldProps) {
+export function FormField({
+  error,
+  hint,
+  label,
+  optional = false,
+  placeholder,
+  secureTextEntry,
+  style,
+  ...inputProps
+}: FormFieldProps) {
   const [shown, setShown] = useState(false);
   const isPassword = secureTextEntry === true;
   const disabled = inputProps.editable === false;
 
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+        {optional ? <Text style={styles.optional}> (opcional)</Text> : null}
+      </Text>
       <View>
         <TextInput
           {...inputProps}
-          accessibilityLabel={label}
-          placeholderTextColor={colors.textSubtle}
+          accessibilityLabel={optional ? `${label} (opcional)` : label}
+          // A password field never shows dots as its placeholder (FIX-089).
+          placeholder={isPassword && dotsOnly.test(placeholder ?? "") ? undefined : placeholder}
+          placeholderTextColor={colors.iconQuiet}
           secureTextEntry={isPassword && !shown}
           style={[
             styles.input,
@@ -49,6 +69,7 @@ export function FormField({ error, label, secureTextEntry, style, ...inputProps 
           </Pressable>
         ) : null}
       </View>
+      {hint === undefined ? null : <Text style={styles.hint}>{hint}</Text>}
       {error === undefined ? null : (
         <Text accessibilityRole="alert" style={styles.error}>
           {error}
@@ -61,8 +82,9 @@ export function FormField({ error, label, secureTextEntry, style, ...inputProps 
 const styles = StyleSheet.create({
   error: {
     color: colors.errorText,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.note,
+    fontWeight: "700",
     lineHeight: 20,
   },
   eye: {
@@ -76,29 +98,37 @@ const styles = StyleSheet.create({
     width: 44,
   },
   field: {
-    gap: spacing.sm,
+    gap: spacing.smd,
   },
+  hint: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
+  // FormB: Crema, a 1 pt Arcilla outline, radius 10, at least 48 pt to touch.
   input: {
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.control,
+    borderColor: colors.border,
+    borderRadius: 10,
     borderWidth: 1,
     color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: 16,
-    minHeight: 52,
-    paddingHorizontal: spacing.lg,
+    minHeight: 48,
+    paddingHorizontal: spacing.mdLg,
   },
   inputError: {
     borderColor: colors.error,
+    borderWidth: 2,
   },
   label: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 1.54,
-    textTransform: "uppercase",
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
   },
+  optional: { fontFamily: fontFamilies.body, fontWeight: "400" },
   passwordInput: {
     paddingRight: 52,
   },

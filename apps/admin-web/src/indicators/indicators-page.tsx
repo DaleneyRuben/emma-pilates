@@ -19,12 +19,12 @@ function Tile({ name, figure }: { name: string; figure: string }) {
   return (
     <section
       aria-label={name}
-      className="flex flex-col gap-1 rounded-marco bg-lino px-5 py-4"
+      className="flex flex-col gap-1 rounded-marco border border-borde bg-lino px-5 py-4"
     >
       <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
         {name}
       </h2>
-      <p className="font-serif text-[28px] leading-tight text-texto tabular">
+      <p className="font-serif text-cifra leading-tight text-texto tabular">
         {figure}
       </p>
     </section>
@@ -97,7 +97,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
             </div>
           ) : null}
           {current.data.sessionsHeld === 0 ? (
-            <p className="rounded-marco bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
+            <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
               Sin clases dictadas en este mes.
             </p>
           ) : (

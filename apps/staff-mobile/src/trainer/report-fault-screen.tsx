@@ -226,7 +226,7 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
           maxLength={500}
           multiline
           onChangeText={setDescription}
-          placeholder={byQuantity ? "Ej.: uno se pinchó" : "Ej.: el resorte rojo se soltó"}
+          hint={byQuantity ? "Ej.: uno se pinchó" : "Ej.: el resorte rojo se soltó"}
           style={styles.textArea}
           testID="report-fault-description"
           value={description}

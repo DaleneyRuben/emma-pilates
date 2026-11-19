@@ -10,7 +10,7 @@ describe("SectionTitle", () => {
 
     const title = screen.getByText("Qué incluye");
     expect(title).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontFamily: "WorkSans_500Medium",
       fontSize: 12,
       fontWeight: "500",

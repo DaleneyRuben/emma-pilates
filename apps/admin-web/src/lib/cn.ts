@@ -8,6 +8,8 @@ const emmaFontSizes = [
   "display",
   "titulo-1",
   "titulo-2",
+  "titulo-3",
+  "seccion",
   "precio",
   "cuerpo-grande",
   "cuerpo",
@@ -21,6 +23,10 @@ const emmaFontSizes = [
   "ayuda",
   "fila-menu",
   "pie",
+  "titulo-pagina-grande",
+  "cifra",
+  "cifra-grande",
+  "fila",
 ];
 
 const twMerge = extendTailwindMerge({

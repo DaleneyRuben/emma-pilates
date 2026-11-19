@@ -263,9 +263,11 @@ describe("Client Browse Sessions", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Sucursal: Centro" }));
 
     expect(screen.getByRole("button", { name: "Centro" })).toBeSelected();
-    // The picker pill names the Branch too (MOB-042), so read the sheet row's label.
+    // The picker pill names the Branch too (MOB-042), so read the sheet row's
+    // label: palette B marks it by weight, not by another colour (FIX-089).
     expect(within(screen.getByRole("button", { name: "Centro" })).getByText("Centro")).toHaveStyle({
-      color: "#8A5D59",
+      color: "#93615D",
+      fontFamily: "WorkSans_600SemiBold",
     });
     expect(
       screen.getByTestId("picker-check-branch-centro", { includeHiddenElements: true }),

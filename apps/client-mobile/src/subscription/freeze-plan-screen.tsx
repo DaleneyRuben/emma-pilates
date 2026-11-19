@@ -9,6 +9,7 @@ import {
   Calendar,
   colors,
   fontFamilies,
+  FormErrorSummary,
   FormField,
   Glyph,
   LoadingState,
@@ -50,6 +51,8 @@ export function FreezePlanScreen() {
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // FormB (FIX-089): what is missing shows only once she tries to send.
+  const [attempted, setAttempted] = useState(false);
   const header = (
     <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Congelar plan" />
   );
@@ -121,7 +124,10 @@ export function FreezePlanScreen() {
   };
 
   const submit = async () => {
-    if (start === null || end === null) return;
+    if (start === null || end === null || reason.trim().length === 0) {
+      setAttempted(true);
+      return;
+    }
     setSubmitting(true);
     setMessage(null);
     try {
@@ -169,12 +175,16 @@ export function FreezePlanScreen() {
     }
   };
 
-  const ready = summary !== null && reason.trim().length > 0 && open;
+  const missing = [
+    ...(summary === null ? ["Fechas"] : []),
+    ...(reason.trim().length === 0 ? ["Motivo"] : []),
+  ];
 
   return (
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        {attempted && open ? <FormErrorSummary fields={missing} /> : null}
         <BodyText style={styles.lead}>
           Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
         </BodyText>
@@ -204,6 +214,7 @@ export function FreezePlanScreen() {
           </View>
         )}
         <FormField
+          error={attempted && reason.trim().length === 0 ? "Falta este dato" : undefined}
           label="Motivo"
           maxLength={300}
           onChangeText={setReason}
@@ -221,7 +232,7 @@ export function FreezePlanScreen() {
       <View style={styles.footer}>
         <PrimaryButton
           busy={submitting}
-          disabled={!ready || submitting}
+          disabled={!open || submitting}
           label="Enviar solicitud"
           onPress={() => void submit()}
         />
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   lead: { color: colors.textMuted },
-  prompt: { color: colors.textMuted, fontSize: typography.note },
+  prompt: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
   range: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleSmall },
   reason: {
     alignItems: "flex-start",

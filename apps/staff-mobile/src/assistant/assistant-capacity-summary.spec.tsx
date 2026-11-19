@@ -35,10 +35,11 @@ describe("Assistant Session detail capacity summary", () => {
   }
 
   // v2 S08: the class is the screen's hero, the free seats in Lora 32 over a bar.
-  it("puts the free seats on the Rosa profundo hero with its progress bar", async () => {
+  // FIX-089: the hero is Palo de rosa, radius 18.
+  it("puts the free seats on the Palo de rosa hero with its progress bar", async () => {
     const { box, screen, summary } = await openDetail(sessionDetail);
 
-    expect(box).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 20 });
+    expect(box).toHaveStyle({ backgroundColor: "#B78380", borderRadius: 18 });
     expect(summary.getByText("6")).toHaveStyle({ fontSize: 32 });
     expect(summary.getByText("cupos libres de 12")).toBeOnTheScreen();
     expect(summary.getByTestId("capacity-bar")).toBeOnTheScreen();

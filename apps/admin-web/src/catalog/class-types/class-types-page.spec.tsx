@@ -204,7 +204,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
       expect(
         within(panel).getByLabelText("Nombre"),
       ).toHaveAccessibleDescription(
-        "Ya existe un tipo de clase activo con ese nombre.",
+        "Ej.: Reformer Pilates Ya existe un tipo de clase activo con ese nombre.",
       ),
     );
   });

@@ -10,8 +10,8 @@ import {
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 /**
- * A Perfil settings row (S23): `IconRow`'s shape with the unread count as a
- * Rosa tinte pill, and «Cerrar sesión» as the Error last row (follow-up 225,
+ * A Perfil settings row (S23): `IconRow`'s shape with the unread count in
+ * Rosa profundo, and «Cerrar sesión» as the Error last row (follow-up 225,
  * walkthrough 19) instead of a separate button.
  */
 export function ProfileRow({
@@ -53,13 +53,8 @@ export function ProfileRow({
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       testID={testID}
     >
-      <View style={[styles.disc, error && styles.errorDisc]}>
-        <Glyph
-          color={error ? colors.error : colors.primary}
-          name={icon}
-          size={18}
-          strokeWidth={1.5}
-        />
+      <View style={styles.disc}>
+        <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.5} />
       </View>
       <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
       {badge > 0 ? (
@@ -85,9 +80,10 @@ export function ProfileRow({
 }
 
 const styles = StyleSheet.create({
+  // FIX-089: an unread count is the one badge kept, Rosa profundo with Crema.
   badge: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.primary,
     borderRadius: radii.pill,
     height: 24,
     justifyContent: "center",
@@ -95,21 +91,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
   badgeLabel: {
-    color: colors.primaryOnTint,
+    color: colors.onPrimary,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 13,
     fontWeight: "600",
   },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  errorDisc: { backgroundColor: colors.errorSurface },
-  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
+  errorLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 16 },
   pressed: { opacity: 0.7 },
   row: {

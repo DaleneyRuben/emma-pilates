@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -44,6 +44,10 @@ const booking = (bookingId: string, classTypeName: string, offsetHours: number) 
 const reformer = booking("booking-1", "Reformer Pilates", 26);
 const frontDesk = booking("booking-2", "Mat Pilates", 50);
 
+// The first booked class tops Mis reservas as the hero (FIX-089).
+const nextClass = (screen: Awaited<ReturnType<typeof render>>) =>
+  within(screen.getByTestId("bookings-next-class")).getByText(/· Reformer Pilates$/);
+
 async function openMyBookings(upcoming: () => unknown[]) {
   const fetcher = routeFetcher({
     "/api/v1/clients/current": () => jsonResponse(profile),
@@ -57,9 +61,7 @@ async function openMyBookings(upcoming: () => unknown[]) {
     { timeout: 10_000 },
   );
   await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
-  await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen(), {
-    timeout: 5_000,
-  });
+  await waitFor(() => expect(nextClass(screen)).toBeOnTheScreen(), { timeout: 5_000 });
   return screen;
 }
 
@@ -81,10 +83,10 @@ describe("Mis reservas refresh (UX-004)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
 
-    expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+    expect(nextClass(screen)).toBeOnTheScreen();
     expect(screen.queryByLabelText("Cargando reservas")).not.toBeOnTheScreen();
     await waitFor(() => expect(screen.getByText("Mat Pilates")).toBeOnTheScreen());
-    expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+    expect(nextClass(screen)).toBeOnTheScreen();
   });
 
   it("refetches the list on a pull", async () => {

@@ -8,6 +8,7 @@ import {
   weekdayName,
   weekdayOf,
 } from "../../lib/bolivia-time";
+import { selectedClass } from "../ui/chip";
 import { cn } from "../../lib/cn";
 
 /** Where a day sits in a drawn range, for the Rosa tinte band. */
@@ -229,9 +230,7 @@ export function MonthCalendar({
                 onClick={() => pick(date)}
                 className={cn(
                   "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent text-celda tabular focus-visible:shadow-foco",
-                  picked
-                    ? "bg-rosa-profundo font-semibold text-blanco"
-                    : "text-texto hover:bg-primario-tinte",
+                  picked ? selectedClass : "text-texto hover:bg-primario-tinte",
                   isToday && !picked && "border-rosa-profundo font-semibold",
                   refused &&
                     "cursor-not-allowed text-deshabilitado-texto line-through hover:bg-transparent",

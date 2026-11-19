@@ -24,6 +24,7 @@ import {
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
+  SectionTitle,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,7 +33,6 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { SectionHeader } from "../ui/section-header";
 import { dayHeading } from "../ui/session-time";
 import {
   agendaDayLabel,
@@ -158,10 +158,7 @@ export function NutritionistAgendaScreen() {
         ) : (
           groups.map((group) => (
             <View key={group.date}>
-              <SectionHeader
-                meta={countLabel(group.entries.length, "evaluación", "evaluaciones")}
-                title={agendaDayLabel(group.date, today)}
-              />
+              <SectionTitle>{`${agendaDayLabel(group.date, today)} · ${countLabel(group.entries.length, "evaluación", "evaluaciones")}`}</SectionTitle>
               <View style={styles.cards}>
                 {group.entries.map((entry) => {
                   // A started Evaluation can no longer be cancelled (evaluation_started).

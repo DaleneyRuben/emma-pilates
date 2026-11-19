@@ -128,7 +128,7 @@ function SourceButton({
       style={({ pressed }) => [styles.source, pressed && styles.pressed]}
       testID={testID}
     >
-      <Glyph color={colors.primaryOnTint} name={icon} size={18} strokeWidth={1.6} />
+      <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       <Text style={styles.sourceLabel}>{label}</Text>
     </Pressable>
   );
@@ -141,6 +141,8 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.xlSm,
@@ -148,18 +150,14 @@ const styles = StyleSheet.create({
   centred: { textAlign: "center" },
   choice: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,
   },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
   head: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   qr: { height: undefined, width: "100%" },
@@ -175,6 +173,8 @@ const styles = StyleSheet.create({
   receipt: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
@@ -183,16 +183,24 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   pressed: { opacity: 0.85 },
+  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
   source: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.inset,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderRadius: radii.button,
+    borderWidth: 1.5,
     flexDirection: "row",
     gap: spacing.sm,
     justifyContent: "center",
     minHeight: 48,
     paddingHorizontal: spacing.lg,
   },
-  sourceLabel: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 15 },
+  sourceLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 15,
+    fontWeight: "600",
+  },
   title: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
 });

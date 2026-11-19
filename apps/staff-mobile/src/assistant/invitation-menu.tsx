@@ -28,13 +28,8 @@ function MenuRow({ detail, disabled = false, label, onPress, tone }: Option) {
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed, disabled && styles.disabled]}
     >
-      <View style={[styles.disc, error && styles.errorDisc]}>
-        <Glyph
-          color={error ? colors.error : colors.primary}
-          name={error ? "cross" : "message"}
-          size={18}
-          strokeWidth={1.5}
-        />
+      <View style={styles.disc}>
+        <Glyph color={colors.text} name={error ? "cross" : "message"} size={18} strokeWidth={1.5} />
       </View>
       <View style={styles.body}>
         <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
@@ -96,19 +91,12 @@ const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
   detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   disabled: { opacity: 0.5 },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  errorDisc: { backgroundColor: colors.errorSurface },
-  errorLabel: { color: colors.error },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
+  errorLabel: { color: colors.text },
   grabber: {
     alignSelf: "center",
-    backgroundColor: colors.hairline,
+    backgroundColor: colors.border,
     borderRadius: radii.pill,
     height: 4,
     width: 36,

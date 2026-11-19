@@ -46,7 +46,7 @@ describe("Client Home with a payment in review or rejected", () => {
     expect(screen.getByText("Te avisamos apenas el estudio lo confirme.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Comprar un plan" })).toBeNull();
     expect(screen.queryByText("Elige tu plan y empieza a moverte")).toBeNull();
-    expect(screen.getByTestId("home-payment-card")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByTestId("home-payment-card")).toHaveStyle({ backgroundColor: "#B78380" });
     // The locked booking row says why.
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Necesitas un plan activo")).toBeNull();

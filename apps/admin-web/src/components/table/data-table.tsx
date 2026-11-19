@@ -53,6 +53,8 @@ type DataTableProps<Row> = {
   onRowClick?: (row: Row) => void;
   /** Rows the click opens; the others stay plain (every row by default). */
   canClickRow?: (row: Row) => boolean;
+  /** FIX-089 (ListaC): a person list's 40 px circle in the phone card. */
+  avatar?: (row: Row) => ReactNode;
   /** Extra attributes for a row, such as AW151's tint for a difference. */
   rowProps?: (row: Row) => ComponentProps<"tr">;
   /** A month view (AW151) shows every row and its own summary instead. */
@@ -75,6 +77,7 @@ export function DataTable<Row>({
   emptyMessage = "No hay registros.",
   onRowClick,
   canClickRow = () => true,
+  avatar,
   rowProps,
   pagination,
 }: DataTableProps<Row>) {
@@ -148,6 +151,7 @@ export function DataTable<Row>({
                     key={row.id}
                     row={row}
                     extra={extra}
+                    avatar={avatar?.(row.original)}
                     onClick={clickRow}
                   />
                 );

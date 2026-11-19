@@ -1,18 +1,9 @@
-import { cn } from "../../lib/cn";
+type Tone = "advertencia" | "error" | "exito" | "neutral";
 
-const exceptions = {
-  advertencia:
-    "bg-advertencia/15 text-advertencia-texto [&>span]:bg-advertencia",
-  error: "bg-error/15 text-error-texto [&>span]:bg-error",
-} as const;
-
-type Tone = keyof typeof exceptions | "exito" | "neutral";
-
-// Design system → Status pills: a tint of the semantic color, its darker
-// text tone, and a 6 px dot so the state never rests on color alone.
 // FIX-088 (design audit, round 2): a pill only for an exception (Advertencia,
-// Error); a normal state («Activo», «Confirmado», «Revisado») is plain grey
-// text.
+// Error); a normal state («Activo», «Confirmado», «Revisado») is plain text.
+// FIX-089 (palette B): every exception pill is the same Rubor pill with a
+// bold 12 px Rosa profundo word; the word carries the state, not a colour.
 export function StatusPill({
   tone,
   children,
@@ -22,7 +13,7 @@ export function StatusPill({
 }) {
   if (tone === "exito" || tone === "neutral") {
     return (
-      <span className="text-pie whitespace-nowrap text-texto-tenue">
+      <span className="text-pie whitespace-nowrap text-rosa-profundo">
         {children}
       </span>
     );
@@ -30,12 +21,8 @@ export function StatusPill({
   return (
     <span
       data-status-pill=""
-      className={cn(
-        "inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 text-pie font-semibold whitespace-nowrap",
-        exceptions[tone],
-      )}
+      className="inline-flex h-[24px] items-center rounded-full bg-rubor px-2.5 text-pie font-bold whitespace-nowrap text-rosa-profundo"
     >
-      <span aria-hidden="true" className="size-1.5 rounded-full" />
       {children}
     </span>
   );

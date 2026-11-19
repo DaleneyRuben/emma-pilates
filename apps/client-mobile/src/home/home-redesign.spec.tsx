@@ -50,11 +50,22 @@ describe("Client Inicio, option A", () => {
     clearMobileQueryCache();
   });
 
+  // EncabezadoA (FIX-089): a root screen's title is the shared 30 pt Lora 500.
+  it("titles Inicio like every root screen, with a Rosa profundo bell", async () => {
+    const screen = await openHome({ status: "active", subscription: trimestral });
+
+    expect(screen.getByRole("header", { name: "Inicio" })).toHaveStyle({
+      fontFamily: "Lora_500Medium",
+      fontSize: 30,
+    });
+    expect(screen.getByTestId("glyph-bell", hidden)).toHaveProp("stroke", "#93615D");
+  });
+
   it("makes «Reservar una clase» the one solid button", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     const book = screen.getByRole("button", { name: "Reservar una clase" });
-    expect(book).toHaveStyle({ backgroundColor: "#B78380", minHeight: 52 });
+    expect(book).toHaveStyle({ backgroundColor: "#93615D", minHeight: 52 });
     expect(screen.queryByTestId("shortcut-disc")).toBeNull();
 
     await fireEvent.press(book);
@@ -66,7 +77,7 @@ describe("Client Inicio, option A", () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     const row = screen.getByTestId("home-plan-card");
-    expect(row).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(row).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
     const inRow = within(row);
     expect(inRow.getByText("Trimestral · 25 restantes")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te quedan 3 · vence el 5 de febrero")).toBeOnTheScreen();
@@ -158,7 +169,8 @@ describe("Client Inicio, option A", () => {
     const inRow = within(screen.getByTestId("home-plan-card"));
     expect(inRow.getByText("Trimestral · 1 restante")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te queda 1 · vence el 5 de febrero")).toBeOnTheScreen();
-    expect(inRow.getByText("Por vencer")).toHaveStyle({ color: "#9A7434" });
+    // FIX-089: the exception is the one Rubor pill.
+    expect(within(inRow.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
   });
 
   it("keeps the other shortcuts quiet, without a tinted disc", async () => {
@@ -166,10 +178,10 @@ describe("Client Inicio, option A", () => {
 
     for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
       expect(screen.getByRole("button", { name: label })).toHaveStyle({
-        backgroundColor: "#F5EFE9",
+        backgroundColor: "#F9F4F2",
       });
     }
-    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.queryByTestId("glyph-calendar", hidden)).toBeNull();
   });
 });

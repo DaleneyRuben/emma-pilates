@@ -95,14 +95,15 @@ export function StatementCard({
                 Su bono espera las renovaciones
               </span>
             ) : null}
-            <Button disabled>
+            <Button variant="secondary" disabled>
               {`Se aprueba desde el ${formatDayMonth(statement.approvableOn)}`}
             </Button>
           </span>
         ) : (
-          <Button
-            onClick={() => setConfirming(true)}
-          >{`Aprobar ${total}`}</Button>
+          // FIX-089: one card per member, so no solid button.
+          <Button variant="secondary" onClick={() => setConfirming(true)}>
+            {`Aprobar ${total}`}
+          </Button>
         )}
       </div>
       <ApproveStatementDialog

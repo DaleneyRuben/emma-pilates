@@ -45,16 +45,16 @@ describe("Assistant reschedule option card", () => {
     return { button, card: within(button), screen };
   }
 
-  it("draws the option as the frame's card with the seat pill in the footer", async () => {
+  it("draws the option as the frame's card with the seats in the footer", async () => {
     const { button, card } = await openReschedule();
 
     expect(button).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
       padding: 18,
     });
     expect(card.getByText(/^\d\d:\d\d – \d\d:\d\d$/)).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 12,
       fontWeight: "500",
       letterSpacing: 1.2,
@@ -64,25 +64,23 @@ describe("Assistant reschedule option card", () => {
       fontSize: 19,
     });
     expect(card.getByTestId("card-footer")).toHaveStyle({
-      borderTopColor: "#EFE7DE",
+      borderTopColor: "#E7CCBF",
       paddingTop: 12,
     });
     // FIX-041: her face (here her initials) leads her name.
     expect(card.getByText("EV")).toBeOnTheScreen();
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
-    expect(card.getByTestId("seat-pill")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      borderRadius: 999,
-    });
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
+    // FIX-089: the seats are a normal state, so bold words and no pill.
+    expect(card.getByTestId("seat-pill")).not.toHaveStyle({ borderRadius: 999 });
     expect(card.getByText("6 cupos")).toHaveStyle({
-      color: "#7D4F4B",
-      fontSize: 12,
-      fontWeight: "500",
+      color: "#93615D",
+      fontSize: 13,
+      fontWeight: "600",
     });
     expect(card.queryByTestId("chevron", hidden)).toBeNull();
   });
 
-  it("marks the selected option by its 2px Palo de rosa border", async () => {
+  it("marks the selected option by its 2px Rosa profundo border", async () => {
     const { button, screen } = await openReschedule();
 
     await fireEvent.press(button);
@@ -93,7 +91,7 @@ describe("Assistant reschedule option card", () => {
       );
     });
     expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveStyle({
-      borderColor: "#B78380",
+      borderColor: "#93615D",
       borderWidth: 2,
     });
   });

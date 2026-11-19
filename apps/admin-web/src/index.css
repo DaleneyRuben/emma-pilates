@@ -9,60 +9,71 @@
 @theme {
   --color-*: initial;
 
-  --color-arena: #f2ece5;
-  --color-superficie: #faf7f2;
-  --color-blanco: #ffffff;
-  --color-superficie-sutil: #fdfaf6;
-  --color-hover-fila: #fdf7f2;
-
-  --color-primario: #b78380;
-  --color-primario-hover: #a87370;
-  --color-primario-presionado: #9c6764;
-  /* Follow-up 225 renames it Rosa tinte and warms it. */
-  --color-primario-tinte: #f2e4e1;
-  /* Follow-up 225: Rosa enlace, 5.9:1 on Lino. */
-  --color-primario-profundo: #7d4f4b;
-  /* Follow-up 104: text on Palo de rosa tinte (AW35's «Activa» pill), as the
-     mobile apps' primaryOnTint. */
-  --color-primario-sobre-tinte: #7a4f4b;
-  --color-rosa-empolvado: #d8bdb8;
-  --color-tinte-suave: #f6edeb;
-  --color-tinte-suave-calido: #f7eee9;
-
-  --color-texto: #4a4a4a;
-  --color-texto-secundario: #6e6663;
-  --color-texto-tenue: #6f6662;
-  --color-texto-muy-tenue: #7a716d;
-
-  /* Follow-up 225: one hairline, Arena, for dividers and input borders. */
-  --color-borde-fuerte: #e6dbd0;
-  --color-borde: #e6dbd0;
-  --color-divisor: #e6dbd0;
-
-  --color-exito: #7c9473;
-  --color-exito-texto: #5f7457;
-  --color-advertencia: #c99a4e;
-  --color-advertencia-texto: #9a7434;
-  --color-error: #a04e3e;
-  /* Follow-up 225: the Destructive button's ground. */
-  --color-error-tinte: #f7e5e0;
-  --color-error-texto: #94493a;
-  --color-deshabilitado: #e7dcd8;
-  --color-deshabilitado-texto: #b3a9a5;
-
-  /* Follow-up 225 (visual system v2), the admin web's new shell first:
-     Lino surfaces without border or shadow, Rosa profundo as the one
-     emphasis, Rosa enlace for text buttons, and the hairline Arena. */
-  --color-lino: #f5efe9;
-  --color-rosa-tinte: #f2e4e1;
+  /*
+   * FIX-089 (base común, palette B): five colours and nothing else. Every
+   * older token name stays, pointing at one of the five, so a screen keeps
+   * its role names while the palette is closed.
+   */
+  --color-rubor: #e7ccbf;
+  --color-arcilla: #cda697;
+  --color-palo-de-rosa: #b78380;
   --color-rosa-profundo: #93615d;
-  --color-rosa-enlace: #7d4f4b;
-  --color-tenue: #6f6662;
-  --color-arena-linea: #e6dbd0;
+  --color-crema: #f9f4f2;
 
-  --color-scrim: rgba(74, 58, 48, 0.22);
+  /* Surfaces: Crema. */
+  --color-arena: var(--color-crema);
+  --color-superficie: var(--color-crema);
+  --color-blanco: var(--color-crema);
+  --color-superficie-sutil: var(--color-crema);
+  --color-lino: var(--color-crema);
+  /* A soft background: a hovered row, a tint, an exception's ground. */
+  --color-hover-fila: var(--color-rubor);
+
+  /* The one solid fill (primary button, selected chip) is Rosa profundo. */
+  --color-primario: var(--color-rosa-profundo);
+  --color-primario-hover: var(--color-rosa-profundo);
+  --color-primario-presionado: var(--color-rosa-profundo);
+  --color-primario-tinte: var(--color-rubor);
+  --color-primario-profundo: var(--color-rosa-profundo);
+  --color-primario-sobre-tinte: var(--color-rosa-profundo);
+  --color-rosa-empolvado: var(--color-rubor);
+  --color-tinte-suave: var(--color-rubor);
+  --color-tinte-suave-calido: var(--color-rubor);
+  --color-rosa-tinte: var(--color-rubor);
+  --color-rosa-enlace: var(--color-rosa-profundo);
+  /* The hero block and the initials circle (Crema large text only). */
+  --color-enfasis: var(--color-palo-de-rosa);
+
+  /* All text is Rosa profundo; hierarchy is size and weight. */
+  --color-texto: var(--color-rosa-profundo);
+  --color-texto-secundario: var(--color-rosa-profundo);
+  --color-texto-tenue: var(--color-rosa-profundo);
+  --color-texto-muy-tenue: var(--color-rosa-profundo);
+  --color-tenue: var(--color-rosa-profundo);
+
+  /* Borders Arcilla, dividers Rubor. */
+  --color-borde-fuerte: var(--color-arcilla);
+  --color-borde: var(--color-arcilla);
+  --color-divisor: var(--color-rubor);
+  --color-arena-linea: var(--color-rubor);
+
+  /* No green, amber or red: state is words, weight, or a Rubor pill. */
+  --color-exito: var(--color-rosa-profundo);
+  --color-exito-texto: var(--color-rosa-profundo);
+  --color-advertencia: var(--color-rosa-profundo);
+  --color-advertencia-texto: var(--color-rosa-profundo);
+  --color-advertencia-tinte: var(--color-rubor);
+  --color-error: var(--color-rosa-profundo);
+  --color-error-tinte: var(--color-rubor);
+  --color-error-texto: var(--color-rosa-profundo);
+  --color-alerta: var(--color-rosa-profundo);
+  /* Disabled: Crema with an Arcilla border (the button adds it). */
+  --color-deshabilitado: var(--color-crema);
+  --color-deshabilitado-texto: var(--color-rosa-profundo);
+
+  --color-scrim: rgba(147, 97, 93, 0.35);
   /* Follow-up 21: the enlarged receipt, the one overlay above another. */
-  --color-scrim-fuerte: rgba(74, 58, 48, 0.55);
+  --color-scrim-fuerte: rgba(147, 97, 93, 0.6);
   --color-transparent: transparent;
   --color-current: currentColor;
 
@@ -76,6 +87,12 @@
   --text-titulo-1--line-height: 1.2;
   --text-titulo-2: 22px;
   --text-titulo-2--line-height: 1.3;
+  /* FIX-089 (audit 1.2): the steps the month narrative and the revenue
+     section already asked for. */
+  --text-titulo-3: 18px;
+  --text-titulo-3--line-height: 1.35;
+  --text-seccion: 18px;
+  --text-seccion--line-height: 1.35;
   --text-precio: 26px;
   --text-precio--line-height: 1.2;
   --text-cuerpo-grande: 17px;
@@ -101,7 +118,8 @@
   --text-etiqueta-campo: 10.5px;
   --text-etiqueta-campo--line-height: 1.2;
   --text-etiqueta-campo--letter-spacing: 0.14em;
-  --text-ayuda: 11.5px;
+  /* FIX-089 (FormB): hints and secondary lines at 13 px. */
+  --text-ayuda: 13px;
   --text-ayuda--line-height: 1.4;
   --text-fila-menu: 13.5px;
   --text-fila-menu--line-height: 1.4;
@@ -109,23 +127,34 @@
      no tracking (Etiqueta is the tracked uppercase label). */
   --text-pie: 12px;
   --text-pie--line-height: 1.3;
+  /* FIX-089: the page title, KPI figures and a phone row's name. */
+  --text-titulo-pagina-grande: 32px;
+  --text-titulo-pagina-grande--line-height: 1.15;
+  --text-cifra: 28px;
+  --text-cifra--line-height: 1.15;
+  --text-cifra-grande: 32px;
+  --text-cifra-grande--line-height: 1.15;
+  --text-fila: 15px;
+  --text-fila--line-height: 1.4;
 
   --radius-control: 8px;
-  --radius-tarjeta: 12px;
+  /* FIX-089: a card's 16, as on mobile. */
+  --radius-tarjeta: 16px;
   --radius-panel: 10px;
   --radius-marco: 16px;
-  /* Follow-up 225 §4 on the admin boards: a 44 px button. */
-  --radius-boton: 14px;
-  --radius-hero: 20px;
+  /* FIX-089: a button's 12 (BotonA); the hero's 18. */
+  --radius-boton: 12px;
+  --radius-hero: 18px;
 
-  --shadow-boton: 0 2px 6px rgba(183, 131, 128, 0.22);
-  --shadow-tarjeta-hover: 0 6px 16px rgba(74, 58, 48, 0.1);
-  --shadow-panel: -14px 0 34px rgba(74, 58, 48, 0.14);
-  --shadow-arrastre: 0 16px 32px rgba(74, 58, 48, 0.2);
-  --shadow-popover: 0 12px 28px rgba(74, 58, 48, 0.14);
-  --shadow-foco: 0 0 0 3px rgba(183, 131, 128, 0.15);
-  /* 59 §1: a solid button's focus ring, readable on its Palo de rosa fill. */
-  --shadow-foco-solido: 0 0 0 2px #ffffff, 0 0 0 4px rgba(74, 74, 74, 0.55);
+  /* FIX-089: cards carry no shadow; only overlays lift, in Rosa profundo. */
+  --shadow-boton: none;
+  --shadow-tarjeta-hover: none;
+  --shadow-panel: -14px 0 34px rgba(147, 97, 93, 0.16);
+  --shadow-arrastre: 0 16px 32px rgba(147, 97, 93, 0.2);
+  --shadow-popover: 0 12px 28px rgba(147, 97, 93, 0.16);
+  --shadow-foco: 0 0 0 3px rgba(147, 97, 93, 0.25);
+  /* 59 §1: a solid button's focus ring, readable on its Rosa profundo fill. */
+  --shadow-foco-solido: 0 0 0 2px #f9f4f2, 0 0 0 4px #93615d;
 }
 
 @layer base {
@@ -148,7 +177,7 @@
   h2,
   h3 {
     font-family: var(--font-serif);
-    font-weight: 400;
+    font-weight: 500;
     margin: 0;
   }
 
@@ -194,10 +223,10 @@
 /*
  * The browser's own select arrow paints in black, outside the closed
  * palette; a native select draws the same chevron as the Branch cell, in
- * Texto tenue; the select keeps room for it on the right (`pr-9`).
+ * Rosa profundo; the select keeps room for it on the right (`pr-9`).
  */
 @utility select-chevron {
   appearance: none;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23766D69' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393615D' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
     right 12px center / 16px no-repeat;
 }

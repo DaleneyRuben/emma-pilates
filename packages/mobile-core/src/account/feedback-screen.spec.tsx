@@ -96,7 +96,7 @@ describe("FeedbackScreen (REL-012)", () => {
     expect(
       screen.getByText("Lo recibió el equipo de Emma Pilates Studio y lo vamos a revisar."),
     ).toBeOnTheScreen();
-    expect(screen.getByTestId("state-screen-disc")).toBeOnTheScreen();
+    expect(screen.queryByTestId("state-screen-disc")).toBeNull();
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher).toHaveBeenCalledWith(
       "/api/v1/feedback",

@@ -74,7 +74,7 @@ describe("Cerrar caja (S25)", () => {
 
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "520");
     expect(screen.getByLabelText("Diferencia · Bs 0,00 · Cuadra")).toBeOnTheScreen();
-    expect(screen.getByText("Cuadra")).toHaveStyle({ color: "#5F7457" });
+    expect(screen.getByText("Cuadra")).toHaveStyle({ color: "#93615D" });
     expect(screen.queryByLabelText("Nota (opcional)")).toBeNull();
     await fireEvent.changeText(screen.getByLabelText("¿Cuánto efectivo hay en la caja?"), "525,50");
     expect(screen.getByLabelText("Diferencia · +Bs 5,50 · Sobra efectivo")).toBeOnTheScreen();

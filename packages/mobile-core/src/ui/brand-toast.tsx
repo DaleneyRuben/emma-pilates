@@ -70,20 +70,20 @@ export function useStickyNotice<T>(notice: T | undefined, dismiss: () => void): 
 const styles = StyleSheet.create({
   close: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   note: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onPrimary,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
   },
   text: { flex: 1, gap: spacing.xxs },
   title: {
-    color: colors.white,
+    color: colors.onPrimary,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
   },
   toast: {
     alignItems: "center",
-    backgroundColor: colors.emphasis,
+    backgroundColor: colors.primary,
     borderRadius: 14,
     bottom: spacing.lg,
     elevation: 6,

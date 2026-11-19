@@ -1,5 +1,5 @@
 import type { EvaluationSlotDto } from "@pilates/api-contracts";
-import { BodyText, ConfirmationSheet, colors } from "@pilates/mobile-core";
+import { BodyText, colors, ConfirmationSheet, fontFamilies } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
@@ -54,5 +54,5 @@ export function RescheduleConfirmSheet({
 }
 
 const styles = StyleSheet.create({
-  now: { color: colors.text, fontWeight: "500" },
+  now: { color: colors.text, fontWeight: "500", fontFamily: fontFamilies.bodyMedium },
 });

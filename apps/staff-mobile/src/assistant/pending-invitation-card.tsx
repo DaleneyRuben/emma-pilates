@@ -10,7 +10,6 @@ import {
   FormField,
   NoticeRow,
   OutlinedButton,
-  PrimaryButton,
   radii,
   spacing,
   TextButton,
@@ -207,7 +206,8 @@ export function PendingInvitationCard({
               onChangeText={setEmail}
               value={email}
             />
-            <PrimaryButton
+            {/* «Reservar clase» stays the screen's one solid button (FIX-089). */}
+            <OutlinedButton
               busy={busy}
               disabled={accountWaiting}
               label="Guardar correo"
@@ -257,6 +257,17 @@ const styles = StyleSheet.create({
   block: { gap: spacing.md },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   more: { alignItems: "center", height: 36, justifyContent: "center", width: 36 },
-  moreDots: { color: colors.textMuted, fontSize: 22, lineHeight: 24 },
-  pendingCard: { backgroundColor: colors.card, borderRadius: radii.card, padding: spacing.lg },
+  moreDots: {
+    fontFamily: fontFamilies.body,
+    color: colors.textMuted,
+    fontSize: 22,
+    lineHeight: 24,
+  },
+  pendingCard: {
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radii.card,
+    padding: spacing.lg,
+  },
 });

@@ -67,7 +67,7 @@ function UnitRows({
   onAction: OnAction;
 }) {
   return (
-    <ul className="rounded-marco bg-lino">
+    <ul className="rounded-marco border border-borde bg-lino">
       {units.map((piece) => {
         const pill = statusPills[piece.status];
         return (
@@ -99,7 +99,7 @@ function UnitTable({
   const narrow = useIsNarrowViewport();
   if (units.length === 0) {
     return (
-      <p className="rounded-marco bg-lino px-4 py-3 text-nota text-texto-tenue">
+      <p className="rounded-marco border border-borde bg-lino px-4 py-3 text-nota text-texto-tenue">
         Sin unidades en esta sucursal.
       </p>
     );
@@ -146,9 +146,9 @@ function QuantityCard({
   onAction: OnAction;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-marco bg-lino px-5 py-4 max-md:p-4">
+    <div className="flex flex-wrap items-center gap-3 rounded-marco border border-borde bg-lino px-5 py-4 max-md:p-4">
       <p className="flex items-baseline gap-2 max-md:w-full">
-        <span className="font-serif text-[28px] leading-none text-texto tabular">
+        <span className="font-serif text-cifra leading-none text-texto tabular">
           {stock.quantity}
         </span>
         <span className="text-nota text-texto-tenue">en esta sucursal</span>
@@ -249,7 +249,7 @@ export function EquipmentSections({
 }) {
   if (holdings.length === 0) {
     return (
-      <p className="rounded-marco bg-lino px-4 py-3 text-nota text-texto-tenue">
+      <p className="rounded-marco border border-borde bg-lino px-4 py-3 text-nota text-texto-tenue">
         Todavía no hay tipos de equipo.
       </p>
     );

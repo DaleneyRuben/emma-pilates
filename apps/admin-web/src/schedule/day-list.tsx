@@ -1,5 +1,6 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { addDays, boliviaParts, formatDayTab } from "../lib/bolivia-time";
+import { selectedClass, unselectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { SessionBlock } from "./session-block";
 
@@ -45,13 +46,11 @@ export function DayList({
               onClick={() => onDayChange(date)}
               className={cn(
                 "flex min-w-[52px] shrink-0 flex-col items-center rounded-control border px-2 py-1.5 text-ayuda",
-                selected
-                  ? "border-primario bg-primario-tinte font-medium text-primario-profundo"
-                  : "border-transparent bg-lino text-texto-secundario",
+                selected ? selectedClass : unselectedClass,
               )}
             >
               <span>{tab.weekday}</span>
-              <span className="font-serif text-[15px] tabular">{tab.day}</span>
+              <span className="font-serif text-fila tabular">{tab.day}</span>
               {date === today ? (
                 <span className="text-[10px] leading-none">hoy</span>
               ) : null}
@@ -61,7 +60,7 @@ export function DayList({
       </div>
       <div role="tabpanel" className="flex flex-col gap-2">
         {ofDay.length === 0 ? (
-          <p className="rounded-marco bg-lino px-4 py-6 text-center text-nota text-texto-tenue">
+          <p className="rounded-marco border border-borde bg-lino px-4 py-6 text-center text-nota text-texto-tenue">
             Sin sesiones este día.
           </p>
         ) : (

@@ -32,7 +32,7 @@ export function PayoutQrSlot({
     return (
       <div
         aria-hidden="true"
-        className="h-[290px] animate-pulse rounded-marco bg-lino"
+        className="h-[290px] animate-pulse rounded-marco border border-borde bg-lino"
       />
     );
   }

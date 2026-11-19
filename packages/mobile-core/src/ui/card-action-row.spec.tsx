@@ -14,12 +14,12 @@ describe("CardActionRow", () => {
     const button = screen.getByTestId("reschedule");
     expect(button).toHaveStyle({ minHeight: 44, paddingHorizontal: 12 });
     expect(button.parent).toHaveStyle({
-      borderTopColor: "#E6DBD0",
+      borderTopColor: "#E7CCBF",
       borderTopWidth: 1,
       flexDirection: "row",
       justifyContent: "flex-end",
     });
-    expect(screen.getByText("Reprogramar")).toHaveStyle({ color: "#7D4F4B", fontSize: 15 });
+    expect(screen.getByText("Reprogramar")).toHaveStyle({ color: "#93615D", fontSize: 15 });
     await fireEvent.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -29,7 +29,7 @@ describe("CardActionRow", () => {
       <CardActionRow label="Cancelar reserva" onPress={jest.fn()} tone="error" />,
     );
 
-    expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#93615D" });
   });
 
   it("gives the card a bottom padding of 4", () => {

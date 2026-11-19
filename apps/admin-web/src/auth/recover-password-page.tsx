@@ -10,11 +10,13 @@ import { isApiError } from "../api/problem";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../components/form/form";
+import { ExampleHint } from "../components/form/example-hint";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { emailField } from "./auth-fields";
@@ -96,13 +98,11 @@ export function RecoverPasswordPage() {
               <FormItem>
                 <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    autoComplete="email"
-                    placeholder="tu@correo.com"
-                    {...field}
-                  />
+                  <Input type="email" autoComplete="email" {...field} />
                 </FormControl>
+                <FormDescription>
+                  <ExampleHint example="tu@correo.com" />
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

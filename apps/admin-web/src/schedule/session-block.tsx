@@ -66,7 +66,7 @@ function CancelledBlock({
         className,
       )}
     >
-      <span className="w-full text-ayuda leading-tight break-words xl:text-[12.5px]">
+      <span className="w-full text-ayuda leading-tight break-words xl:text-nota">
         {session.classTypeName}
       </span>
       <span className="w-full text-ayuda leading-tight tabular">
@@ -145,7 +145,7 @@ function StandingBlock({
         className,
       )}
     >
-      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium whitespace-nowrap xl:text-[12.5px]">
+      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium whitespace-nowrap xl:text-nota">
         {flag === undefined ? null : <EquipmentDot />}
         {session.classTypeName}
       </span>

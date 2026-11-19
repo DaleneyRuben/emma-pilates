@@ -1,9 +1,14 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { openProfile, readRoutes } from "../profile/profile-test-support";
 import { clientNotificationDestination } from "../notifications/notification-destinations";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import {
+  ancestorBackgrounds,
+  createClientRuntime,
+  jsonResponse,
+  routeFetcher,
+} from "../test-support";
 
 const mockDownloadInvoice = jest.fn();
 jest.mock("./invoice-download", () => ({
@@ -101,6 +106,14 @@ describe("Mis facturas", () => {
     ).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: /Paquete de 8 clases, 6 oct 2026, Bs 502, Pago anulado/ }),
+    ).toBeOnTheScreen();
+    // FIX-089: «Lista» and «En preparación» are words; a voided sale is the
+    // exception, on the one Rubor pill.
+    expect(ancestorBackgrounds(screen.getByText("Lista"))).not.toContain("#E7CCBF");
+    expect(ancestorBackgrounds(screen.getByText("En preparación"))).not.toContain("#E7CCBF");
+    expect(screen.getByText("En preparación")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(
+      within(screen.getByTestId("exception-pill")).getByText("Pago anulado"),
     ).toBeOnTheScreen();
     expect(
       screen.getByText(

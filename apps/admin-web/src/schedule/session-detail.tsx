@@ -55,7 +55,7 @@ export function SessionDetail({
         {notice === null ? null : <PageNotice>{notice}</PageNotice>}
         {flag === undefined ? null : <EquipmentFlagNote flag={flag} />}
         {past ? (
-          <p className="flex items-center gap-2 rounded-tarjeta bg-lino px-4 py-3 text-celda text-texto-secundario">
+          <p className="flex items-center gap-2 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-celda text-texto-secundario">
             <Lock size={16} aria-hidden="true" className="text-rosa-profundo" />
             Clase pasada: solo lectura.
           </p>

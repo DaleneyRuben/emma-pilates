@@ -1,7 +1,7 @@
 import { useGetCurrentStaffMemberProfile, useListBranches } from "@pilates/api-contracts";
-import { BodyText, colors, radii, spacing, typography } from "@pilates/mobile-core";
+import { BodyText, Chip, colors, fontFamilies, spacing } from "@pilates/mobile-core";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -59,24 +59,15 @@ export function BranchChips({
     <View style={styles.branches}>
       <BodyText style={styles.label}>{label}</BodyText>
       <View style={styles.chips}>
-        {options.map((branch) => {
-          const selected = branch.id === selectedId;
-          return (
-            <Pressable
-              accessibilityLabel={branch.name}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              key={branch.id}
-              onPress={() => onSelect(branch.id)}
-              style={[styles.chip, selected && styles.chipSelected]}
-              testID={`${testIDPrefix}-${branch.id}`}
-            >
-              <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-                {branch.name}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {options.map((branch) => (
+          <Chip
+            key={branch.id}
+            label={branch.name}
+            onPress={() => onSelect(branch.id)}
+            selected={branch.id === selectedId}
+            testID={`${testIDPrefix}-${branch.id}`}
+          />
+        ))}
       </View>
     </View>
   );
@@ -84,16 +75,11 @@ export function BranchChips({
 
 const styles = StyleSheet.create({
   branches: { gap: spacing.sm },
-  chip: {
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  chipLabel: { color: colors.textSecondary, fontSize: typography.note },
-  chipLabelSelected: { color: colors.white },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  label: { color: colors.textMuted, fontSize: typography.note },
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });

@@ -19,9 +19,9 @@ describe("ClientBanner", () => {
 
     expect(screen.getByText("LF")).toBeOnTheScreen();
     expect(screen.getByText("Reservando para Lucía Fernández · 8 clases en su plan")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
     });
-    expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#4A4A4A" });
-    expect(screen.getByTestId("client-banner")).toHaveStyle({ backgroundColor: "#F5EFE9" });
+    expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#93615D" });
+    expect(screen.getByTestId("client-banner")).toHaveStyle({ backgroundColor: "#F9F4F2" });
   });
 });

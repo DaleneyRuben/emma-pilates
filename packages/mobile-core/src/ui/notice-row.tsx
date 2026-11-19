@@ -5,30 +5,19 @@ import { Glyph } from "./glyph";
 import { colors, spacing, typography } from "./tokens";
 
 /**
- * A one-line warning (follow-up 225 §7, the system board's «08 ·
- * Advertencia»): an Error alert in an #F7E5E0 disc and the line on Lino. It
- * replaces the amber «Esto no se puede deshacer» block.
+ * A one-line warning (follow-up 225 §7): the alert glyph alone, no disc
+ * (FIX-089), and the line on a Crema card with an Arcilla outline.
  */
 export function NoticeRow({ message, testID }: { message: string; testID?: string }) {
   return (
     <View style={styles.row} testID={testID}>
-      <View style={styles.disc} testID="notice-row-disc">
-        <Glyph color={colors.error} name="alert" size={18} strokeWidth={1.6} />
-      </View>
+      <Glyph color={colors.error} name="alert" size={20} strokeWidth={1.6} />
       <Text style={styles.message}>{message}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.errorSurface,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
   message: {
     color: colors.text,
     flex: 1,
@@ -39,7 +28,9 @@ const styles = StyleSheet.create({
   row: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
     borderRadius: 14,
+    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.md,
     paddingHorizontal: spacing.lg,

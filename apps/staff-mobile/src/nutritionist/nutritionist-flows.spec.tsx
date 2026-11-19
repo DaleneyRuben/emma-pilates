@@ -127,7 +127,7 @@ describe("Nutritionist agenda and availability", () => {
     const screen = await openAvailability(fetcher);
 
     await waitFor(() => {
-      expect(screen.getByText("3 horarios")).toBeOnTheScreen();
+      expect(screen.getByText("Horarios semanales · 3 horarios")).toBeOnTheScreen();
     });
     const cards = screen.getAllByRole("button", { name: /^Editar horario/ });
     expect(cards.map((card) => card.props.accessibilityLabel)).toEqual([

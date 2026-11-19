@@ -86,7 +86,6 @@ function CodeEditor({ current }: { current: TrainerReferralCodeDto }) {
           autoComplete="off"
           aria-invalid={save.isError}
           className="font-mono tracking-wider"
-          placeholder="Ej. CARLA"
           value={code}
           onChange={(event) => {
             setCode(event.target.value);
@@ -104,6 +103,7 @@ function CodeEditor({ current }: { current: TrainerReferralCodeDto }) {
           Guardar código
         </Button>
       </div>
+      <p className="text-ayuda text-texto-tenue">Ej.: CARLA</p>
       {save.isError ? (
         <p role="alert" className="text-ayuda text-error-texto">
           {failureMessage(save.error)}

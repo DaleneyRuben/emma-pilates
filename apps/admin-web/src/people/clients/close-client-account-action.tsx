@@ -83,7 +83,7 @@ export function CloseClientAccountAction({
         {refused ? (
           <div
             role="alert"
-            className="flex flex-col gap-1 rounded-control bg-error/10 px-3 py-2 text-error-texto"
+            className="flex flex-col gap-1 rounded-control bg-error-tinte px-3 py-2 text-error-texto"
           >
             <span>
               No se puede cerrar todavía: tiene un pago por transferencia en

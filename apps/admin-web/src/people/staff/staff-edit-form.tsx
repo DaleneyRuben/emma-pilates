@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Form } from "../../components/form/form";
+import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { PhoneFormField } from "../../components/form/phone-field";
 import { phoneValue } from "../../components/form/phone-value";
 import {
@@ -207,6 +208,7 @@ export function StaffEditForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          <FormErrorSummary />
           {/* A limit notice stays first in the body (AW24). */}
           <EmailLimitNotice limit={limit} />
           <StaffPhotoBlock member={member} />

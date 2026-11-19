@@ -112,7 +112,7 @@ function BranchRows({
                 <span
                   className={cn(
                     "truncate text-ayuda font-normal text-texto-muy-tenue",
-                    selected && "text-primario-profundo/70",
+                    selected && "text-primario-profundo",
                   )}
                 >
                   {branch.address}
@@ -154,7 +154,7 @@ function BranchTrigger({
     <button
       type="button"
       className={cn(
-        "flex h-11 items-center gap-2 rounded-tarjeta bg-lino px-3.5 text-cuerpo text-texto hover:bg-rosa-tinte",
+        "flex h-11 items-center gap-2 rounded-tarjeta border border-borde bg-lino px-3.5 text-cuerpo text-texto hover:bg-rosa-tinte",
         open && "bg-rosa-tinte",
         className,
       )}

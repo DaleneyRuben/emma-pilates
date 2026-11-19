@@ -122,6 +122,41 @@ describe("freeze review", () => {
     );
   });
 
+  // FIX-089: a destructive action goes through a confirmation step.
+  it("asks before refusing a freeze and refuses only once confirmed", async () => {
+    const decisions: string[] = [];
+    const fetcher = routeFetcher({
+      "/api/v1/staff-members/current": () => jsonResponse(profile),
+      "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
+      "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+      "/api/v1/administrator/freezes": () => jsonResponse([requestedFreeze]),
+      "/api/v1/administrator/freezes/decided": () => jsonResponse([]),
+      [`/api/v1/administrator/freezes/${requestedFreeze.id}`]: () => jsonResponse(requestedFreeze),
+      [`POST /api/v1/administrator/freezes/${requestedFreeze.id}/decision`]: (init) => {
+        decisions.push(String(init?.body));
+        return jsonResponse({ ...requestedFreeze, state: "refused" });
+      },
+    });
+    const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /^Congelamientos/ })).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Congelamientos/ }));
+    const row = `Revisar congelamiento de ${requestedFreeze.clientName}`;
+    await waitFor(() => expect(screen.getByRole("button", { name: row })).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole("button", { name: row }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Rechazar" })).toBeOnTheScreen());
+
+    await fireEvent.press(screen.getByRole("button", { name: "Rechazar" }));
+    expect(decisions).toEqual([]);
+    await waitFor(() =>
+      expect(screen.getByText("¿Rechazar este congelamiento?")).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, rechazar" }));
+    await waitFor(() => expect(decisions).toHaveLength(1));
+    expect(decisions[0]).toContain("refused");
+  });
+
   it("shows the dates, the days and where the plan end moves on their own rows", async () => {
     const screen = await openReview(requestedFreeze, "Congelamientos, 1 por revisar");
 

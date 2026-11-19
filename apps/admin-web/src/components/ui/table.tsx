@@ -9,8 +9,9 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      // Follow-up 233: a table is a Lino card, with no border or shadow.
-      className="w-full overflow-hidden rounded-marco bg-lino max-md:bg-transparent"
+      // FIX-089: a table is a Crema block with an Arcilla border; at phone
+      // width it stays one block and its rows are divided (ListaC).
+      className="w-full overflow-hidden rounded-marco border border-borde bg-lino"
     >
       <table
         data-slot="table"
@@ -38,7 +39,7 @@ export function TableBody({ className, ...props }: ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
-      className={cn("max-md:flex max-md:flex-col max-md:gap-2", className)}
+      className={cn("max-md:flex max-md:flex-col", className)}
       {...props}
     />
   );
@@ -49,7 +50,7 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-t border-divisor transition-colors hover:bg-hover-fila max-md:block max-md:rounded-tarjeta max-md:border max-md:border-borde max-md:bg-blanco max-md:px-3.5 max-md:py-3",
+        "border-t border-divisor transition-colors hover:bg-hover-fila max-md:block max-md:first:border-t-0 max-md:px-3.5 max-md:py-3",
         className,
       )}
       {...props}

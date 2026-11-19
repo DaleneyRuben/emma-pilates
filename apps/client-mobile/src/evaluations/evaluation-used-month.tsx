@@ -1,5 +1,12 @@
 import type { EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import { BodyText, colors, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 import { evaluationDayAndTime, followingMonth, monthName, monthPhrase } from "./evaluation-format";
@@ -42,7 +49,8 @@ export function UsedMonth({ availability }: { availability: EvaluationAvailabili
 
 export const usedMonthStyles = StyleSheet.create({
   label: {
-    color: colors.textMuted,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.label,
     fontWeight: "600",
     letterSpacing: 0.6,
@@ -53,11 +61,12 @@ export const usedMonthStyles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.lg,
   },
-  used: {
-    backgroundColor: "rgba(201,154,78,0.10)",
-    borderRadius: radii.inset,
-    gap: spacing.sm,
-    padding: spacing.xl,
+  // Palette B (FIX-089): a Crema card, not a tint.
+  used: { ...surfaces.card, gap: spacing.sm, padding: spacing.xl },
+  usedTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
   },
-  usedTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
 });

@@ -8,10 +8,12 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
+  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
   OtherDateSheet,
+  placesLabel,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -21,7 +23,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
@@ -29,6 +31,8 @@ import { BranchField } from "../ui/branch-field";
 import { DayStrip, DayStripAction } from "../ui/day-strip";
 import { FilterChips } from "../ui/filter-chips";
 import { SessionRow } from "../ui/session-row";
+import { TodayHero } from "../ui/today-hero";
+import { splitNextClass } from "../trainer/next-class";
 import { countLabel, dayHeading, noClassesOfType, startTime } from "../ui/session-time";
 
 export type CancellableSession = SessionAvailabilityDto & { branchName: string };
@@ -44,12 +48,6 @@ const everyBranch = "all";
 const horizonDays = 30;
 // Six days and «Otra» share the strip (S13).
 const stripDays = 6;
-
-function bookings(session: SessionAvailabilityDto): string {
-  return session.bookedCount === 0
-    ? "Sin reservas"
-    : countLabel(session.bookedCount, "reserva", "reservas");
-}
 
 /** S13 Cancelar una clase (v2), for the Administrator and the Coordinator. */
 export function CancelClassScreen() {
@@ -115,6 +113,13 @@ export function CancelClassScreen() {
   const later = days.slice(stripDays);
   const pickedLater = later.includes(selectedDate);
   const isToday = selectedDate === today;
+  const { next, rest } = splitNextClass(visible, isToday, now);
+  const branchNameOf = (session: (typeof visible)[number]) =>
+    allBranches ? session.branchName : branch.name;
+  const openSession = (session: (typeof visible)[number]) =>
+    navigation.navigate("CancelSession", {
+      session: { ...session, branchName: branchNameOf(session) },
+    });
 
   return (
     <Screen style={styles.screen}>
@@ -183,28 +188,39 @@ export function CancelClassScreen() {
           <SectionTitle>
             {`${dayHeading(selectedDate)} · ${countLabel(visible.length, "clase", "clases")}`}
           </SectionTitle>
-          <View style={styles.rows}>
-            {visible.map((session) => {
-              const branchName = allBranches ? session.branchName : branch.name;
-              return (
-                <SessionRow
-                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${branchName}` : ""}`}
-                  key={session.id}
-                  onPress={() =>
-                    navigation.navigate("CancelSession", { session: { ...session, branchName } })
-                  }
-                  pill={bookings(session)}
-                  pillTone="neutral"
-                  subtitle={
-                    allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
-                  }
-                  testID={`cancel-class-card-${session.id}`}
-                  time={startTime(session.startsAt, session.endsAt)}
-                  title={session.classTypeName}
-                />
-              );
-            })}
-          </View>
+          {next === undefined ? null : (
+            <TodayHero
+              accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}${allBranches ? ` · ${branchNameOf(next)}` : ""}`}
+              detail={`${branchNameOf(next)} · ${next.trainerName}`}
+              now={now}
+              onPress={() => openSession(next)}
+              places={placesLabel(next.bookedCount, next.capacity)}
+              startsAt={next.startsAt}
+              testID={`cancel-class-card-${next.id}`}
+              title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
+            />
+          )}
+          {rest.length === 0 ? null : (
+            <ClassList>
+              {rest.map((session) => {
+                const branchName = allBranches ? session.branchName : branch.name;
+                return (
+                  <SessionRow
+                    accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${branchName}` : ""}`}
+                    key={session.id}
+                    onPress={() => openSession(session)}
+                    places={placesLabel(session.bookedCount, session.capacity)}
+                    subtitle={
+                      allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
+                    }
+                    testID={`cancel-class-card-${session.id}`}
+                    time={startTime(session.startsAt, session.endsAt)}
+                    title={session.classTypeName}
+                  />
+                );
+              })}
+            </ClassList>
+          )}
         </ScrollView>
       )}
       <OtherDateSheet
@@ -224,6 +240,5 @@ export function CancelClassScreen() {
 
 const styles = StyleSheet.create({
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  rows: { gap: spacing.md },
   screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
 });

@@ -57,7 +57,8 @@ const session = (
 
 // Follow-up 227: with one Branch, 03 shows it fixed without a chevron
 // (walkthrough n.º 7); each Session is a row with the start in Lora 20.
-// FIX-082 (Reservar option A): the rows share one Lino card, no chevron.
+// FIX-089 (ClaseE): the rows share one Crema card; the start sits in a Rubor
+// box and a chevron says the row opens the class.
 describe("Client class list rows", () => {
   afterEach(async () => {
     await cleanup();
@@ -108,23 +109,25 @@ describe("Client class list rows", () => {
     expect(screen.queryByTestId("branch-picker-chevron", hidden)).toBeNull();
 
     expect(screen.getByTestId("browse-session-group")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
     });
-    expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })[0]).toHaveStyle({
-      minHeight: 72,
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
+      fontFamily: "WorkSans_500Medium",
+      fontSize: 15,
     });
-    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
     expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
-    expect(cards[0].getByTestId("session-row-time")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 20,
+    // FIX-041 (follow-up 242): the trainer line stays on one line.
+    expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveProp("numberOfLines", 1);
+    expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveStyle({
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 15,
     });
     for (const card of cards) {
-      expect(card.queryByTestId("chevron", hidden)).toBeNull();
+      expect(card.getByTestId("chevron", hidden)).toBeOnTheScreen();
     }
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
   });
@@ -137,7 +140,6 @@ describe("Client class list rows", () => {
       expect(cards[0].getByLabelText("Foto de Emma Vargas")).toHaveStyle({ height: 20, width: 20 });
     });
     expect(fetcher).toHaveBeenCalledWith("/api/v1/staff-photos/asset-emma?variant=thumbnail");
-    expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveProp("numberOfLines", 1);
     expect(cards[1].getByText("EV")).toBeOnTheScreen();
     expect(cards[1].queryByLabelText("Foto de Emma Vargas")).toBeNull();
   });
@@ -146,18 +148,17 @@ describe("Client class list rows", () => {
   // «0» on the iPhone 16 Pro.
   it("keeps the start time on one line", async () => {
     const { cards } = await openClassList();
-    const time = cards[0].getByTestId("session-row-time");
-
-    expect(time).toHaveProp("numberOfLines", 1);
-    expect(time).not.toHaveStyle({ width: 56 });
-    expect(time).toHaveStyle({ minWidth: 56 });
+    expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveProp("numberOfLines", 1);
+    const box = cards[0].getByTestId("class-row-time");
+    expect(box).not.toHaveStyle({ width: 62 });
+    expect(box).toHaveStyle({ minWidth: 62 });
   });
 
-  it("writes the seats as grey text, without a pill", async () => {
+  it("writes the seats as bold text, without a pill", async () => {
     const { cards } = await openClassList();
 
     expect(cards[0].queryByTestId("seat-pill")).toBeNull();
-    expect(cards[0].getByText("3 cupos")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
-    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
+    expect(cards[0].getByText("3 cupos")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#93615D", fontSize: 13 });
   });
 });

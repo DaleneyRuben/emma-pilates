@@ -9,7 +9,7 @@ import {
 import {
   EmptyState,
   LoadingState,
-  PrimaryButton,
+  OutlinedButton,
   QueryFailure,
   Screen,
   ScreenTopBar,
@@ -107,7 +107,7 @@ export function StaffNotificationsScreen() {
         {header()}
         <DeniedNotice />
         <EmptyState
-          action={<PrimaryButton label={back.label} onPress={back.onPress} />}
+          action={<OutlinedButton label={back.label} onPress={back.onPress} />}
           icon="bell"
           message="Te avisaremos aquí cuando haya algo que necesite tu atención."
           title="No tienes notificaciones."

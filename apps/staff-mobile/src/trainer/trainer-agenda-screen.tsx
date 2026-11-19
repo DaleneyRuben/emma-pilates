@@ -9,7 +9,6 @@ import {
   boliviaCivilDate,
   colors,
   fontFamilies,
-  formatTimeRange,
   LoadingState,
   QueryFailure,
   radii,
@@ -26,12 +25,11 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { CancelledSessionRow } from "../ui/cancelled-session-row";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";
-import { SessionRow } from "../ui/session-row";
-import { dayHeading, minutesLabel, startTime } from "../ui/session-time";
-import { agendaHeading, causeLabel } from "./agenda-cancellations";
+import { dayHeading } from "../ui/session-time";
+import { agendaHeading } from "./agenda-cancellations";
+import { AgendaDay } from "./agenda-day";
 import { requireOk } from "./require-ok";
 
 type TrainerAgendaNavigation = {
@@ -84,6 +82,7 @@ export function TrainerAgendaScreen() {
           accessibilityLabel="Hoy"
           accessibilityRole="button"
           onPress={() => setSelectedDate(today)}
+          hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
           style={styles.todayButton}
           testID="agenda-today"
         >
@@ -149,44 +148,12 @@ export function TrainerAgendaScreen() {
         ) : (
           <View>
             <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
-            <View style={styles.list}>
-              {sessions.map((session) => {
-                const cancellation = session.cancellation ?? null;
-                if (cancellation !== null) {
-                  const cause = causeLabel(cancellation.cause);
-                  return (
-                    <CancelledSessionRow
-                      accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
-                      cause={cause}
-                      duration={minutesLabel(session.startsAt, session.endsAt)}
-                      key={session.sessionId}
-                      testID={`agenda-cancelled-${session.sessionId}`}
-                      time={startTime(session.startsAt, session.endsAt)}
-                      title={session.classTypeName}
-                    />
-                  );
-                }
-                const full = session.bookedCount >= session.capacity;
-                const booked =
-                  session.bookedCount === 0
-                    ? "sin reservas"
-                    : `${session.bookedCount} de ${session.capacity} reservados`;
-                return (
-                  <SessionRow
-                    accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${session.branchName}, ${session.bookedCount} de ${session.capacity} reservados, ${full ? "Completa" : "Con cupos"}`}
-                    duration={minutesLabel(session.startsAt, session.endsAt)}
-                    key={session.sessionId}
-                    onPress={() => navigation.navigate("Roster", { sessionId: session.sessionId })}
-                    pill={full ? "Completa" : "Con cupos"}
-                    pillTone={full ? "neutral" : "tint"}
-                    subtitle={`${session.branchName} · ${booked}`}
-                    testID={`agenda-session-${session.sessionId}`}
-                    time={startTime(session.startsAt, session.endsAt)}
-                    title={session.classTypeName}
-                  />
-                );
-              })}
-            </View>
+            <AgendaDay
+              isToday={isToday}
+              now={new Date()}
+              onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
+              sessions={sessions}
+            />
           </View>
         )}
       </ScrollView>
@@ -196,18 +163,20 @@ export function TrainerAgendaScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  list: { gap: spacing.md },
   screen: { gap: spacing.xl, paddingHorizontal: spacing.xlSm },
+  // FIX-089: a secondary chip, Crema with a Rosa profundo outline.
   todayButton: {
     alignItems: "center",
-    backgroundColor: colors.primaryTint,
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderWidth: 1.5,
     borderRadius: radii.pill,
     height: 36,
     justifyContent: "center",
     paddingHorizontal: spacing.mdLg,
   },
   todayLabel: {
-    color: colors.primaryOnTint,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: 14,
     fontWeight: "600",

@@ -1,4 +1,11 @@
-import { BodyText, colors, LineIcon, spacing, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  fontFamilies,
+  LineIcon,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
@@ -53,8 +60,13 @@ const styles = StyleSheet.create({
     width: 22,
   },
   boxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
-  helper: { color: colors.textMuted, fontSize: typography.note },
-  label: { color: colors.text, fontSize: typography.body, lineHeight: 21 },
+  helper: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
+  label: {
+    color: colors.text,
+    fontSize: typography.body,
+    lineHeight: 21,
+    fontFamily: fontFamilies.body,
+  },
   row: {
     alignItems: "flex-start",
     flexDirection: "row",

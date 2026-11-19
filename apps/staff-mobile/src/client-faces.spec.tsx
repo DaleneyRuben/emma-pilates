@@ -58,8 +58,9 @@ describe("Client faces on the staff screens", () => {
         }),
     });
     const screen = await render(<App runtime={createStaffRuntime(fetcher)} />);
-    await waitFor(() => expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen());
-    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
+    // The day's next class is the hero (ClaseE, FIX-089); it opens the roster.
+    await waitFor(() => expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByTestId("agenda-session-session-1"));
 
     await waitFor(() =>
       expect(screen.getByLabelText("Foto de Ana Pérez")).toHaveStyle({ width: 36, height: 36 }),

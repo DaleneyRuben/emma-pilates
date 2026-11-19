@@ -3,8 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 /**
  * 04's seats on the hero card (follow-up 227, C04): the free count in Lora 32
- * white over «de M cupos libres», then a white bar by the booked share on
- * white 25 %.
+ * Crema over «de M cupos libres», then a Crema bar by the booked share on
+ * Rubor (palette B, FIX-089).
  */
 export function CapacityBlock({
   availableSeats,
@@ -40,21 +40,21 @@ export function CapacityBlock({
 
 const styles = StyleSheet.create({
   block: { gap: spacing.md, marginTop: spacing.xs },
-  fill: { backgroundColor: colors.white, borderRadius: radii.pill },
+  fill: { backgroundColor: colors.onEmphasis, borderRadius: radii.pill },
   label: {
-    color: "rgba(255,255,255,0.85)",
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
   },
   number: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 32,
     fontVariant: ["tabular-nums"],
   },
   row: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
   track: {
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: colors.primary,
     borderRadius: radii.pill,
     flexDirection: "row",
     height: 6,
