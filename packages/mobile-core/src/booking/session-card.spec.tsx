@@ -24,30 +24,30 @@ describe("SessionCard", () => {
 
     const card = screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" });
     expect(card).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
       borderRadius: 16,
       gap: 12,
       padding: 18,
     });
     expect(screen.getByText("07:00 – 07:50")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 12,
       fontVariant: ["tabular-nums"],
       fontWeight: "500",
       letterSpacing: 1.2,
     });
     expect(screen.getByText("Reformer Pilates")).toHaveStyle({
-      color: "#4A4A4A",
+      color: "#93615D",
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
     expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
     const footer = screen.getByTestId("card-footer");
-    expect(footer).toHaveStyle({ borderTopColor: "#EFE7DE", paddingTop: 12 });
+    expect(footer).toHaveStyle({ borderTopColor: "#E7CCBF", paddingTop: 12 });
     const chevron = screen.getByTestId("chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#B78380");
+    expect(chevron).toHaveProp("stroke", "#93615D");
     expect(chevron).toHaveProp("width", 19);
 
     fireEvent.press(card);
@@ -70,13 +70,13 @@ describe("SessionCard", () => {
     );
 
     const card = screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" });
-    expect(card).toHaveStyle({ borderColor: "#B78380", borderWidth: 2 });
+    expect(card).toHaveStyle({ borderColor: "#93615D", borderWidth: 2 });
     expect(card).toHaveProp("accessibilityState", { selected: true });
     expect(screen.queryByTestId("chevron", hidden)).toBeNull();
     const footer = screen.getByTestId("card-footer");
-    expect(footer).toHaveStyle({ borderTopColor: "#EFE7DE", paddingTop: 12 });
+    expect(footer).toHaveStyle({ borderTopColor: "#E7CCBF", paddingTop: 12 });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6F6662", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
   });
 });
 

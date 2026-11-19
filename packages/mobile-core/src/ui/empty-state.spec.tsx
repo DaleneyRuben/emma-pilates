@@ -15,9 +15,9 @@ function svgShapes(instance: Instance): Record<string, unknown>[] {
   );
 }
 
-// Follow-up 225 §6: every empty state draws the v2 block of `StateScreen`: a
-// 72 pt Rosa tinte disc with a 32 pt Rosa profundo glyph, a Lora 24 title, and
-// a Texto tenue 15 note. The variants keep where it stands.
+// Follow-up 225 §6: every empty state draws the block of `StateScreen`: a
+// 32 pt glyph alone (no disc since FIX-089), a Lora 24 title, and a 15 note,
+// all Rosa profundo. The variants keep where it stands.
 describe("EmptyState", () => {
   it("draws the framed variant as the in-list block on Lino", async () => {
     const screen = await render(
@@ -31,20 +31,20 @@ describe("EmptyState", () => {
     const title = screen.getByText("Sin plan activo");
     expect(title).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 24, textAlign: "center" });
     const block = title.parent;
-    expect(block).toHaveStyle({ backgroundColor: "#F5EFE9", borderRadius: 16 });
-    const flat = StyleSheet.flatten(block?.props.style);
-    expect(flat).not.toHaveProperty("borderWidth");
-    expect(flat).not.toHaveProperty("flex");
-    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      height: 72,
-      width: 72,
+    expect(block).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderRadius: 16,
+      borderWidth: 1,
     });
+    const flat = StyleSheet.flatten(block?.props.style);
+    expect(flat).not.toHaveProperty("flex");
+    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
     const icon = screen.getByTestId("empty-state-icon-card", hidden);
     expect(icon).toHaveProp("stroke", "#93615D");
     expect(icon).toHaveProp("width", 32);
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 15,
       textAlign: "center",
     });
@@ -65,7 +65,7 @@ describe("EmptyState", () => {
     );
     expect(flat).not.toHaveProperty("backgroundColor");
     expect(flat).not.toHaveProperty("flex");
-    expect(screen.getByTestId("empty-state-disc")).toHaveStyle({ height: 72, width: 72 });
+    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toHaveProp("stroke", "#93615D");
   });
 });

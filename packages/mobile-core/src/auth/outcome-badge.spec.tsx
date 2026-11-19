@@ -18,16 +18,12 @@ const api = (inspection?: Inspection) =>
 const hidden = { includeHiddenElements: true };
 
 // MOB-035: the outcome frames of 20, 21, 22, S18, S19 draw a 76 pt badge over
-// a centred title: a sage check for success, a Palo de rosa icon otherwise.
-const expectBadge = (screen: Screen, tone: "success" | "primary", icon: string, title: string) => {
-  expect(screen.getByTestId("outcome-badge", hidden)).toHaveStyle({
-    backgroundColor: tone === "success" ? colors.successTint : colors.primaryWash,
-    borderRadius: 38,
-    height: 76,
-    width: 76,
-  });
+// a centred title. FIX-089: the glyph stands alone in Rosa profundo, no disc.
+const expectBadge = (screen: Screen, _tone: "success" | "primary", icon: string, title: string) => {
+  expect(screen.getByTestId("outcome-badge", hidden)).toHaveStyle({ height: 76, width: 76 });
+  expect(screen.getByTestId("outcome-badge", hidden)).not.toHaveStyle({ borderRadius: 38 });
   const drawn = screen.getByTestId(`outcome-icon-${icon}`, hidden);
-  expect(drawn).toHaveProp("stroke", tone === "success" ? colors.success : colors.primary);
+  expect(drawn).toHaveProp("stroke", colors.text);
   expect(drawn).toHaveProp("width", 34);
   expect(screen.getByText(title)).toHaveStyle({ textAlign: "center" });
 };

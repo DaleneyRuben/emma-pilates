@@ -34,12 +34,12 @@ const icons = {
 
 export type OutcomeBadgeProps = {
   icon: keyof typeof icons;
+  /** Kept for callers: success is said in words, never green (FIX-089). */
   tone: "primary" | "success";
 };
 
-/** The 76 pt circle over a confirmation's title: sage for success, Palo de rosa otherwise. */
-export function OutcomeBadge({ icon, tone }: OutcomeBadgeProps) {
-  const success = tone === "success";
+/** The glyph over a confirmation's title, alone with no disc (FIX-089). */
+export function OutcomeBadge({ icon }: OutcomeBadgeProps) {
   return (
     <View
       accessibilityElementsHidden
@@ -47,20 +47,13 @@ export function OutcomeBadge({ icon, tone }: OutcomeBadgeProps) {
       style={{
         alignItems: "center",
         alignSelf: "center",
-        backgroundColor: success ? colors.successTint : colors.primaryWash,
-        borderRadius: 38,
         height: 76,
         justifyContent: "center",
         width: 76,
       }}
       testID="outcome-badge"
     >
-      <LineIcon
-        color={success ? colors.success : colors.primary}
-        size={34}
-        strokeWidth={1.2}
-        testID={`outcome-icon-${icon}`}
-      >
+      <LineIcon color={colors.text} size={34} strokeWidth={1.2} testID={`outcome-icon-${icon}`}>
         {icons[icon]}
       </LineIcon>
     </View>

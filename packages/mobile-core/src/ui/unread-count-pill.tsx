@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { fontFamilies } from "./fonts";
 import { colors, radii } from "./tokens";
 
 // Follow-up 73: «9+» above nine.
@@ -34,13 +35,14 @@ export function UnreadCountPill({
 
 const styles = StyleSheet.create({
   label: {
-    color: colors.white,
-    fontSize: 11,
+    color: colors.onPrimary,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 12,
     fontWeight: "600",
   },
   pill: {
     alignItems: "center",
-    backgroundColor: colors.primaryDeep,
+    backgroundColor: colors.primary,
     borderRadius: radii.pill,
     justifyContent: "center",
     minHeight: 18,
@@ -48,7 +50,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   ring: {
-    borderColor: colors.white,
+    borderColor: colors.background,
     borderWidth: 2,
     minHeight: 22,
     minWidth: 22,

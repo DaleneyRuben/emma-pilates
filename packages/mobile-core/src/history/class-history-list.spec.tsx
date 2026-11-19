@@ -35,7 +35,7 @@ describe("ClassHistoryList", () => {
   it("opens with the lead and the count since the oldest month", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
-    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#6F6662", fontSize: 13 });
+    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 26,
@@ -47,8 +47,8 @@ describe("ClassHistoryList", () => {
 
     const heading = screen.getByText("Agosto 2026");
     expect(heading).toHaveStyle({ fontSize: 11, textTransform: "uppercase" });
-    expect(heading.parent).toHaveStyle({ borderBottomColor: "#D8C9BB", borderBottomWidth: 1 });
-    expect(screen.getByText("2 clases")).toHaveStyle({ color: "#7A716D", fontSize: 12 });
+    expect(heading.parent).toHaveStyle({ borderBottomColor: "#CDA697", borderBottomWidth: 1 });
+    expect(screen.getByText("2 clases")).toHaveStyle({ color: "#93615D", fontSize: 12 });
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
   });
 
@@ -63,12 +63,12 @@ describe("ClassHistoryList", () => {
       expect(flat(row)).toMatchObject({ paddingVertical: 16, gap: 16 });
     }
     // The last row of a group has no rule under it.
-    expect(flat(rows[1])).toMatchObject({ borderBottomColor: "#EFE7DE", borderBottomWidth: 1 });
+    expect(flat(rows[1])).toMatchObject({ borderBottomColor: "#E7CCBF", borderBottomWidth: 1 });
     expect(flat(rows[2])).not.toHaveProperty("borderBottomWidth");
 
     expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
     expect(screen.getByText("sáb")).toHaveStyle({
-      color: "#7A716D",
+      color: "#93615D",
       fontSize: 10,
       textTransform: "uppercase",
     });
@@ -77,7 +77,7 @@ describe("ClassHistoryList", () => {
       fontSize: 17,
     });
     expect(screen.getByText("Daniela Ortiz · Urubó")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
   });

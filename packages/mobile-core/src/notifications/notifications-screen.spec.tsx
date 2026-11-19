@@ -242,7 +242,7 @@ describe("NotificationsScreen", () => {
     expect(bell).toHaveProp("width", 32);
     expect(
       screen.getByText("Aquí te avisaremos sobre tus clases, pagos y evaluaciones."),
-    ).toHaveStyle({ color: "#6F6662", fontSize: 15 });
+    ).toHaveStyle({ color: "#93615D", fontSize: 15 });
     expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
   });
 

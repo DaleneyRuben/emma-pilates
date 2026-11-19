@@ -50,7 +50,13 @@ export function SegmentedTabs<Key extends string>({
             style={[styles.segment, isSelected && styles.selected]}
             testID={option.testID}
           >
-            <Text style={[styles.label, option.disabled === true && styles.disabled]}>
+            <Text
+              style={[
+                styles.label,
+                isSelected && styles.labelSelected,
+                option.disabled === true && styles.disabled,
+              ]}
+            >
               {option.label}
             </Text>
           </Pressable>
@@ -63,26 +69,29 @@ export function SegmentedTabs<Key extends string>({
 const styles = StyleSheet.create({
   disabled: { color: colors.disabledText },
   label: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.body,
+    fontWeight: "500",
+  },
+  labelSelected: {
+    color: colors.onPrimary,
+    fontFamily: fontFamilies.bodyStrong,
     fontWeight: "600",
   },
   segment: {
     alignItems: "center",
     borderRadius: 10,
     flex: 1,
-    height: 40,
+    height: 44,
     justifyContent: "center",
   },
-  // RN draws a border inside the box, which is the canvas's inset ring.
-  selected: {
-    backgroundColor: colors.primaryTint,
-    borderColor: colors.primary,
-    borderWidth: 1.5,
-  },
+  // FIX-089: the chosen segment is Rosa profundo with a Crema label.
+  selected: { backgroundColor: colors.primary },
   track: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: 14,
     flexDirection: "row",
     gap: spacing.xs,

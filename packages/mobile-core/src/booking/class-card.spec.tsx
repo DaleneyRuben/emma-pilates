@@ -57,10 +57,18 @@ describe("ClassRow in a ClassList", () => {
   it("is one button for a screen reader when it opens something", async () => {
     const onPress = jest.fn();
     const screen = await render(
-      <ClassRow detail="Achumani" onPress={onPress} places="1 de 8" time="16:00" title="Reformer" />,
+      <ClassRow
+        detail="Achumani"
+        onPress={onPress}
+        places="1 de 8"
+        time="16:00"
+        title="Reformer"
+      />,
     );
 
-    await fireEvent.press(screen.getByRole("button", { name: "16:00, Reformer, Achumani, 1 de 8" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "16:00, Reformer, Achumani, 1 de 8" }),
+    );
     expect(onPress).toHaveBeenCalled();
   });
 });

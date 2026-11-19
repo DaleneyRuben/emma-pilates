@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
   lightViewer: { backgroundColor: colors.surface },
   note: {
     color: colors.textMuted,
+    fontFamily: fontFamilies.body,
     fontSize: 14,
     lineHeight: 22,
     maxWidth: 300,

@@ -22,8 +22,8 @@ describe("ConfirmationSheet", () => {
       />,
     );
 
-  // Follow-up 226: inside the sheet the destructive confirmation is solid Error.
-  it("draws the Lora title, the note, the solid Error action and the quiet dismiss link", async () => {
+  // FIX-089: the destructive confirmation takes the secondary look, never red.
+  it("draws the Lora title, the note, the outlined destructive action and the quiet dismiss link", async () => {
     const screen = await renderSheet();
 
     const sheet = within(screen.getByTestId("logout-sheet"));
@@ -35,8 +35,8 @@ describe("ConfirmationSheet", () => {
     ).toBeOnTheScreen();
     const confirm = sheet.getByTestId("logout-confirm");
     expect(confirm).toBe(sheet.getByRole("button", { name: "Cerrar sesión" }));
-    expect(confirm).toHaveStyle({ backgroundColor: "#A04E3E" });
-    expect(sheet.getByText("Cerrar sesión")).toHaveStyle({ color: "#FFFFFF" });
+    expect(confirm).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#93615D" });
+    expect(sheet.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
     expect(sheet.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 
@@ -48,7 +48,7 @@ describe("ConfirmationSheet", () => {
     });
 
     expect(screen.getByRole("button", { name: "Ver como Emma" })).toHaveStyle({
-      backgroundColor: "#B78380",
+      backgroundColor: "#93615D",
     });
   });
 

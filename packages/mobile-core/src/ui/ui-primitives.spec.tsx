@@ -30,7 +30,7 @@ describe("mobile UI primitives", () => {
     const screen = await render(<Screen testID="app-screen" />);
 
     expect(screen.getByTestId("app-screen")).toHaveStyle({
-      backgroundColor: "#FAF7F2",
+      backgroundColor: "#F9F4F2",
     });
   });
 

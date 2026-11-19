@@ -76,14 +76,14 @@ const styles = StyleSheet.create({
   },
   text: { flex: 1, gap: spacing.xxs },
   title: {
-    color: colors.white,
+    color: colors.onPrimary,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
   },
   toast: {
     alignItems: "center",
-    backgroundColor: colors.emphasis,
+    backgroundColor: colors.primary,
     borderRadius: 14,
     bottom: spacing.lg,
     elevation: 6,

@@ -6,6 +6,8 @@ import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
 import { colors, spacing, typography } from "./tokens";
 
+const dotsOnly = /^[\s•·*.●]+$/;
+
 type FormFieldProps = TextInputProps & {
   error?: string;
   /** An example or a rule under the field, «Ej.: …»; never in the placeholder (FormB). */
@@ -34,7 +36,7 @@ export function FormField({
           {...inputProps}
           accessibilityLabel={label}
           // A password field never shows dots as its placeholder (FIX-089).
-          placeholder={isPassword ? undefined : placeholder}
+          placeholder={isPassword && dotsOnly.test(placeholder ?? "") ? undefined : placeholder}
           placeholderTextColor={colors.iconQuiet}
           secureTextEntry={isPassword && !shown}
           style={[

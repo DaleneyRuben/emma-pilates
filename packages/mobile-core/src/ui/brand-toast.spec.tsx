@@ -26,7 +26,7 @@ function fakeNavigation() {
 // Follow-up 225 §7 and C05's «Reserva confirmada»: a Rosa profundo toast 16
 // above the tab bar that stays until closed or the screen changes.
 describe("BrandToast", () => {
-  it("draws white text and a check on Rosa profundo, 16 above the tab bar", async () => {
+  it("draws Crema text and a check on Rosa profundo, 16 above the tab bar", async () => {
     const screen = await render(
       <BrandToast
         note="Te quedan 9 clases en tu plan"
@@ -48,16 +48,16 @@ describe("BrandToast", () => {
       right: 16,
     });
     expect(screen.getByText("Reserva confirmada")).toHaveStyle({
-      color: "#FFFFFF",
+      color: "#F9F4F2",
       fontFamily: "WorkSans_600SemiBold",
       fontSize: 15,
     });
     expect(screen.getByText("Te quedan 9 clases en tu plan")).toHaveStyle({
-      color: "rgba(255,255,255,0.85)",
+      color: "#F9F4F2",
       fontSize: 13,
     });
     const check = screen.getByTestId("glyph-check", hidden);
-    expect(check).toHaveProp("stroke", "#FFFFFF");
+    expect(check).toHaveProp("stroke", "#F9F4F2");
     expect(check).toHaveProp("width", 20);
   });
 
@@ -67,7 +67,7 @@ describe("BrandToast", () => {
 
     const close = screen.getByRole("button", { name: "Cerrar aviso" });
     expect(close).toHaveStyle({ height: 44, width: 44 });
-    expect(screen.getByTestId("glyph-cross", hidden)).toHaveProp("stroke", "#FFFFFF");
+    expect(screen.getByTestId("glyph-cross", hidden)).toHaveProp("stroke", "#F9F4F2");
     await fireEvent.press(close);
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId("glyph-check", hidden)).toBeOnTheScreen();

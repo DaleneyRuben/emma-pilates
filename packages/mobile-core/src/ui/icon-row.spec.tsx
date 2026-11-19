@@ -1,5 +1,4 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
 
 import { IconRow, IconRowGroup } from "./icon-row";
 
@@ -7,14 +6,14 @@ const hidden = { includeHiddenElements: true };
 
 // Follow-up 225 §3 and the system board's «05 · Filas con ícono».
 describe("IconRow", () => {
-  it("puts an 18 pt Palo de rosa glyph in a 36 pt Rosa tinte disc before a Work Sans 16 label", async () => {
+  it("puts an 18 pt Rosa profundo glyph alone, no disc, before a Work Sans 16 label", async () => {
     const screen = await render(
       <IconRow icon="calendar" label="30 días desde la fecha de inicio" />,
     );
 
     const label = screen.getByText("30 días desde la fecha de inicio");
     expect(label).toHaveStyle({
-      color: "#4A4A4A",
+      color: "#93615D",
       fontFamily: "WorkSans_400Regular",
       fontSize: 16,
     });
@@ -25,15 +24,10 @@ describe("IconRow", () => {
       minHeight: 56,
       paddingHorizontal: 16,
     });
-    expect(screen.getByTestId("icon-row-disc")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      borderRadius: 18,
-      height: 36,
-      width: 36,
-    });
+    expect(screen.queryByTestId("icon-row-disc", hidden)).toBeNull();
     const glyph = screen.getByTestId("glyph-calendar", hidden);
     expect(glyph).toHaveProp("width", 18);
-    expect(glyph).toHaveProp("stroke", "#B78380");
+    expect(glyph).toHaveProp("stroke", "#93615D");
     expect(glyph).toHaveProp("strokeWidth", 1.5);
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.queryByTestId("chevron", hidden)).toBeNull();
@@ -45,9 +39,9 @@ describe("IconRow", () => {
       <IconRow chevron icon="bell" label="Notificaciones" onPress={onPress} value="Activadas" />,
     );
 
-    expect(screen.getByText("Activadas")).toHaveStyle({ color: "#6F6662", fontSize: 15 });
+    expect(screen.getByText("Activadas")).toHaveStyle({ color: "#93615D", fontSize: 15 });
     const chevron = screen.getByTestId("chevron", hidden);
-    expect(chevron).toHaveProp("stroke", "#6F6662");
+    expect(chevron).toHaveProp("stroke", "#93615D");
     expect(chevron).toHaveProp("width", 16);
     const row = screen.getByRole("button", { name: "Notificaciones, Activadas" });
     await fireEvent.press(row);
@@ -84,7 +78,7 @@ describe("IconRowGroup", () => {
     });
   });
 
-  it("draws Lino at radius 16 with no border and a hairline inset 64 between rows", async () => {
+  it("draws Crema at radius 16 with an Arcilla border and a Rubor hairline inset 46", async () => {
     const screen = await render(
       <IconRowGroup testID="group">
         <IconRow icon="calendar" label="Uno" />
@@ -95,22 +89,26 @@ describe("IconRowGroup", () => {
     );
 
     const group = screen.getByTestId("group");
-    expect(group).toHaveStyle({ backgroundColor: "#F5EFE9", borderRadius: 16 });
-    expect(StyleSheet.flatten(group.props.style)).not.toHaveProperty("borderWidth");
+    expect(group).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderRadius: 16,
+      borderWidth: 1,
+    });
     const hairlines = screen.getAllByTestId("icon-row-hairline");
     expect(hairlines).toHaveLength(2);
-    expect(hairlines[0]).toHaveStyle({ backgroundColor: "#E6DBD0", height: 1, marginLeft: 64 });
+    expect(hairlines[0]).toHaveStyle({ backgroundColor: "#E7CCBF", height: 1, marginLeft: 46 });
   });
 
   // Verification n.º 44 (follow-up 256 § 2): «Cerrar sesión» is the Error last
   // row in both apps, as S23 draws it.
-  it("draws an Error row with an Error disc and label and no chevron", async () => {
+  it("draws an error row in weight, without a disc or chevron", async () => {
     const screen = await render(
       <IconRow chevron icon="logout" label="Cerrar sesión" onPress={jest.fn()} tone="error" />,
     );
 
-    expect(screen.getByTestId("icon-row-disc")).toHaveStyle({ backgroundColor: "#F7E5E0" });
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04E3E" });
+    expect(screen.queryByTestId("icon-row-disc", hidden)).toBeNull();
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D", fontWeight: "600" });
     expect(screen.queryByTestId("chevron", hidden)).toBeNull();
   });
 });
@@ -128,8 +126,8 @@ describe("IconRowGroup plain", () => {
     );
 
     expect(screen.queryByTestId("icon-row-disc", hidden)).toBeNull();
-    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("stroke", "#6F6662");
-    expect(screen.getByTestId("glyph-logout", hidden)).toHaveProp("stroke", "#A04E3E");
+    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("stroke", "#93615D");
+    expect(screen.getByTestId("glyph-logout", hidden)).toHaveProp("stroke", "#93615D");
     expect(screen.getByTestId("icon-row-hairline")).toHaveStyle({ marginLeft: 46 });
   });
 });

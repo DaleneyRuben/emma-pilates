@@ -48,7 +48,7 @@ export function EmphasisCard({
   );
 }
 
-/** The white pill action on an emphasis card, 44 high (follow-up 225 §4). */
+/** The Crema pill action on the hero block, 44 high (follow-up 225 §4). */
 export function OnEmphasisButton({ label, onPress, testID }: Action) {
   return (
     <Pressable
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
   },
   buttonLabel: {
-    color: colors.emphasis,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
@@ -102,14 +102,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   pillLabel: {
-    color: colors.white,
+    color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.note,
     fontWeight: "600",
   },
   pressed: { opacity: 0.85 },
   title: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 24,
     lineHeight: 29,

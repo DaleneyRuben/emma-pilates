@@ -20,7 +20,7 @@ describe("PushPermissionSheet", () => {
     expect(screen.getByText("Texto")).toBeOnTheScreen();
   });
 
-  it("takes the app's own title and draws the v2 bell disc", async () => {
+  it("takes the app's own title and draws the bell alone, with no disc", async () => {
     const screen = await render(
       <PushPermissionSheet
         onAccept={jest.fn()}
@@ -36,16 +36,15 @@ describe("PushPermissionSheet", () => {
       textAlign: "center",
     });
     expect(screen.getByText("Te avisamos antes de cada clase.")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       textAlign: "center",
     });
     expect(screen.getByTestId("push-permission-sheet")).toHaveStyle({
-      backgroundColor: "#FAF7F2",
+      backgroundColor: "#F9F4F2",
       borderTopLeftRadius: 24,
     });
-    expect(screen.getByTestId("push-permission-disc")).toHaveStyle({
-      backgroundColor: "#F2E4E1",
-      height: 72,
+    expect(screen.getByTestId("push-permission-disc")).not.toHaveStyle({
+      backgroundColor: "#E7CCBF",
     });
     expect(screen.getByTestId("glyph-bell", hidden)).toHaveProp("stroke", "#93615D");
   });

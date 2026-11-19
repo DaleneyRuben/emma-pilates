@@ -383,6 +383,7 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSecondary,
   },
   small: {
+    fontFamily: fontFamilies.body,
     fontSize: typography.note,
   },
 });

@@ -47,7 +47,7 @@ describe("ClientFace", () => {
   });
 
   // Walkthrough finding 113: S28's calm list draws initials without Rosa tinte.
-  it("draws her initials on the neutral wash when asked", async () => {
+  it("draws her initials in Crema on Palo de rosa even when the neutral tone is asked", async () => {
     const client = new QueryClient();
 
     await render(
@@ -56,7 +56,7 @@ describe("ClientFace", () => {
     );
 
     const letters = screen.getByText("SP");
-    expect(letters).toHaveStyle({ color: "#6F6662" });
-    expect(letters.parent).toHaveStyle({ backgroundColor: "rgba(216,201,187,0.34)" });
+    expect(letters).toHaveStyle({ color: "#F9F4F2" });
+    expect(letters.parent).toHaveStyle({ backgroundColor: "#B78380" });
   });
 });

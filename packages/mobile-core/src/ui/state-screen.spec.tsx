@@ -8,7 +8,7 @@ const hidden = { includeHiddenElements: true };
 // Follow-up 225 §6: an empty, pending, success, or error state centred in the
 // space between the top bar and the tab bar (C05b, C11, C11c).
 describe("StateScreen", () => {
-  it("centres a 72 pt Rosa tinte disc, a Lora 24 title, and a Texto tenue note", async () => {
+  it("centres the glyph alone, a Lora 24 title, and a note, all Rosa profundo", async () => {
     const screen = await render(
       <StateScreen
         icon="calendar"
@@ -24,39 +24,32 @@ describe("StateScreen", () => {
       gap: 12,
       justifyContent: "center",
     });
-    expect(screen.getByTestId("state-screen-disc")).toHaveStyle({
-      alignItems: "center",
-      backgroundColor: "#F2E4E1",
-      borderRadius: 36,
-      height: 72,
-      justifyContent: "center",
-      width: 72,
-    });
+    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
     const glyph = screen.getByTestId("state-screen-icon-calendar", hidden);
     expect(glyph).toHaveProp("stroke", "#93615D");
     expect(glyph).toHaveProp("strokeWidth", 1.5);
     expect(glyph).toHaveProp("width", 32);
     expect(screen.getByText("Aún no tienes reservas")).toHaveStyle({
-      color: "#4A4A4A",
+      color: "#93615D",
       fontFamily: "Lora_400Regular",
       fontSize: 24,
       textAlign: "center",
     });
     expect(screen.getByText("Cuando reserves una clase, aparecerá aquí.")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 15,
       textAlign: "center",
     });
     expect(screen.getByText("Aún no tienes reservas")).toHaveProp("accessibilityRole", "header");
   });
 
-  it("draws the error disc on #F7E5E0 with an Error glyph", async () => {
+  it("says an error in words, with the same plain glyph", async () => {
     const screen = await render(
       <StateScreen icon="cross" title="No pudimos confirmar tu pago" tone="error" />,
     );
 
-    expect(screen.getByTestId("state-screen-disc")).toHaveStyle({ backgroundColor: "#F7E5E0" });
-    expect(screen.getByTestId("state-screen-icon-cross", hidden)).toHaveProp("stroke", "#A04E3E");
+    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
+    expect(screen.getByTestId("state-screen-icon-cross", hidden)).toHaveProp("stroke", "#93615D");
   });
 
   it("puts a primary button and an optional text button under the note", async () => {
@@ -75,10 +68,10 @@ describe("StateScreen", () => {
     );
 
     const primary = screen.getByTestId("go-home");
-    expect(primary).toHaveStyle({ backgroundColor: "#B78380", borderRadius: 14 });
+    expect(primary).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 12 });
     await fireEvent.press(primary);
     expect(home).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Ver mis pagos")).toHaveStyle({ color: "#7D4F4B" });
+    expect(screen.getByText("Ver mis pagos")).toHaveStyle({ color: "#93615D" });
     await fireEvent.press(screen.getByRole("button", { name: "Ver mis pagos" }));
     expect(book).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Detalles")).toBeOnTheScreen();
@@ -97,22 +90,24 @@ describe("StateScreen", () => {
     expect(bare).not.toHaveProperty("flex");
     expect(bare).not.toHaveProperty("backgroundColor");
     expect(screen.getByTestId("card")).toHaveStyle({
-      backgroundColor: "#F5EFE9",
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
       borderRadius: 16,
+      borderWidth: 1,
       paddingHorizontal: 24,
       paddingVertical: 32,
     });
   });
 });
 
-// FIX-082: the same state with its glyph alone, no Rosa tinte disc.
+// FIX-082, FIX-089: `plainIcon` is kept for callers; every glyph is plain.
 describe("StateScreen with a plain icon", () => {
-  it("draws the glyph in Texto tenue without the disc", async () => {
+  it("draws the glyph without the disc", async () => {
     const screen = await render(
       <StateScreen icon="receipt" plainIcon title="Aún no tienes facturas" />,
     );
 
     expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
-    expect(screen.getByTestId("state-screen-icon-receipt", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("state-screen-icon-receipt", hidden)).toHaveProp("stroke", "#93615D");
   });
 });
