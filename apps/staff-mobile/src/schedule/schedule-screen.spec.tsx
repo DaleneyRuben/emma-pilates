@@ -39,13 +39,14 @@ describe("Horario (v2 HOR boards)", () => {
     const screen = await openSchedule("assistant", assistant);
 
     expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen();
-    // FIX-089 (ClaseE): the shared class row in one card, the places «N de M».
+    // FIX-089 (ClaseE): today's next class leads as the Palo de rosa hero,
+    // with the places «N de M».
     expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
-    const row = within(screen.getByTestId("schedule-session-session-1"));
-    expect(row.getByText("Reformer Pilates")).toBeOnTheScreen();
-    expect(row.getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
-    expect(row.getByText("6 de 12")).toHaveStyle({ color: "#93615D", fontWeight: "600" });
-    expect(screen.getByTestId("class-list")).toBeOnTheScreen();
+    const hero = within(screen.getByTestId("next-class-hero"));
+    expect(hero.getByText(/^PRÓXIMA/)).toBeOnTheScreen();
+    expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(hero.getByText("6 de 12")).toBeOnTheScreen();
+    expect(hero.getByTestId("schedule-session-session-1")).toBeOnTheScreen();
     expect(screen.queryByText("6 cupos")).toBeNull();
     expect(screen.queryByRole("button", { name: /Reformer Pilates/ })).not.toBeOnTheScreen();
 
