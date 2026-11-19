@@ -2,6 +2,7 @@ import type { PrismaClient } from '../../generated/prisma/client';
 import { dateTriggeredPushInstant } from '../../notifications/date-triggered-push';
 import {
   recordNotification as defaultNotificationRecorder,
+  settleReviewNotices,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import { addCivilDays, boliviaDate } from '../../time/bolivia-time';
@@ -65,11 +66,18 @@ export const createPayoutQrReminderJob = (
             select: { businessEventKey: true },
           })
         ).map((notification) => notification.businessEventKey),
-      // The push is queued in the same transaction as the inbox entry.
-      record: (notification) =>
-        prisma.$transaction((transaction) =>
-          recordNotification(transaction, notification),
-        ),
+      // The push is queued in the same transaction as the inbox entry, and
+      // the notices it supersedes are settled there too.
+      record: (notification, settles) =>
+        prisma.$transaction(async (transaction) => {
+          await recordNotification(transaction, notification);
+          for (const businessEventKey of settles) {
+            await settleReviewNotices(transaction, {
+              businessEventKey,
+              settledAt: notification.occurredAt,
+            });
+          }
+        }),
     });
   },
 });

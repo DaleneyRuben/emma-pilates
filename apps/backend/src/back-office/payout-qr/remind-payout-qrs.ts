@@ -12,7 +12,8 @@ export const remindPayoutQrs = async (dependencies: {
   occurredAt: Date;
   findCurrentQrs: () => Promise<PayoutQrReminderCandidate[]>;
   findAlreadySent: (keys: string[]) => Promise<string[]>;
-  record: (notification: NewNotification) => Promise<void>;
+  // `settles`: the earlier notices this one supersedes (FIX-090).
+  record: (notification: NewNotification, settles: string[]) => Promise<void>;
 }): Promise<{ reminded: number }> => {
   const due = (await dependencies.findCurrentQrs()).flatMap((qr) => {
     const reminder = payoutQrReminderFor(qr, dependencies.today);
@@ -25,10 +26,15 @@ export const remindPayoutQrs = async (dependencies: {
   );
   const pending = due.filter((r) => !sent.has(r.businessEventKey));
   for (const reminder of pending) {
-    await dependencies.record({
-      ...reminder,
-      occurredAt: dependencies.occurredAt,
-    });
+    // An expired QR's notice settles its «vence pronto» one (audit S10).
+    const settles =
+      reminder.type === 'payout_qr_expired'
+        ? [reminder.businessEventKey.replace('expired', 'expiring')]
+        : [];
+    await dependencies.record(
+      { ...reminder, occurredAt: dependencies.occurredAt },
+      settles,
+    );
   }
   return { reminded: pending.length };
 };
