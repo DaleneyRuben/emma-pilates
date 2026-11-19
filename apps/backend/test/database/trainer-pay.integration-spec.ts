@@ -158,9 +158,9 @@ describe('trainer pay statements', () => {
     });
     // Finding 105: each line names its class (Bolivia time) or its Client.
     expect(emmaStatement!.lines.map((line) => line.detail)).toEqual([
-      'lun 7 sep · 10:00 · Centro · Reformer Pilates · 3 alumnas',
-      'lun 7 sep · 12:00 · Centro · Reformer Pilates · 6 alumnas, 2 extra',
-      'lun 7 sep · 16:00 · Centro · Reformer Pilates · 5 alumnas, 1 extra',
+      'lun 7 sep · 10:00 · Centro · Reformer Pilates · 3 clientas',
+      'lun 7 sep · 12:00 · Centro · Reformer Pilates · 6 clientas, 2 extra',
+      'lun 7 sep · 16:00 · Centro · Reformer Pilates · 5 clientas, 1 extra',
       'lun 7 sep · 18:00 · Centro · Reformer Pilates',
       'Nora Pay · Mensual · 10 % de Bs 780',
     ]);
@@ -231,7 +231,7 @@ describe('trainer pay statements', () => {
 
   // Walkthrough 2026-11-04 n.º 2: with the worker down, a class with nobody
   // booked kept its window-close snapshot of 0 but never had its Minimum
-  // Bookings check, and was paid as «0 alumnas». Only a checked class pays.
+  // Bookings check, and was paid as «0 clientas». Only a checked class pays.
   it('pays no class whose Minimum Bookings check never ran', async () => {
     const emmaId = deterministicId('staff-member:emma');
     const create = (day: string, checked: boolean, students: number) =>

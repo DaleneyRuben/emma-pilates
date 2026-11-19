@@ -36,7 +36,7 @@ describe('recommend from facts', () => {
         subject: 'trainer-ana:2',
         period: '2026-10-01',
         detail:
-          'Revisa el horario del martes: promedia 1,7 alumnas en 3 clases.',
+          'Revisa el horario del martes: promedia 1,7 clientas en 3 clases.',
       },
     ]);
   });
@@ -78,7 +78,7 @@ describe('recommend from facts', () => {
       'trainer-bea:1',
     ]);
     expect(findings[0]?.detail).toBe(
-      'Revisa el horario del lunes: promedia 1 alumna en 3 clases.',
+      'Revisa el horario del lunes: promedia 1 clienta en 3 clases.',
     );
     expect(findings.every((finding) => !finding.detail.includes('@'))).toBe(
       true,
@@ -196,7 +196,7 @@ describe('recommend from facts', () => {
         subject: 'trainer-daniela:2',
         period: '2026-10-01',
         detail:
-          'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,7 alumnas.',
+          'Revisa el horario del martes: de 3 clases, 2 se cancelaron por mínimo; promedia 0,7 clientas.',
       },
     ]);
   });
@@ -217,7 +217,7 @@ describe('recommend from facts', () => {
     });
 
     expect(findings[0]?.detail).toBe(
-      'Revisa el horario del lunes: de 3 clases, 1 se canceló por mínimo; promedia 1 alumna.',
+      'Revisa el horario del lunes: de 3 clases, 1 se canceló por mínimo; promedia 1 clienta.',
     );
   });
 });

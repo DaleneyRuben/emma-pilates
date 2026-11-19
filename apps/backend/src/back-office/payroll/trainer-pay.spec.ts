@@ -34,26 +34,27 @@ describe('trainer pay', () => {
     expect(pay.lines).toEqual([
       {
         kind: 'class',
-        detail: 'lun 2 nov · 10:45 · Sopocachi · Reformer · 3 alumnas',
+        detail: 'lun 2 nov · 10:45 · Sopocachi · Reformer · 3 clientas',
         amountCentavos: 6_500,
       },
       {
         kind: 'class',
-        detail: 'lun 2 nov · 10:45 · Sopocachi · Reformer · 6 alumnas, 2 extra',
+        detail:
+          'lun 2 nov · 10:45 · Sopocachi · Reformer · 6 clientas, 2 extra',
         amountCentavos: 8_100,
       },
     ]);
     expect(pay.totalCentavos).toBe(14_600);
   });
 
-  it('says «1 alumna» for a class of one', () => {
+  it('says «1 clienta» for a class of one', () => {
     const pay = trainerPay(openingRates, {
       sessions: [session(1)],
       firstPlans: [],
     });
 
     expect(pay.lines[0].detail).toBe(
-      'lun 2 nov · 10:45 · Sopocachi · Reformer · 1 alumna',
+      'lun 2 nov · 10:45 · Sopocachi · Reformer · 1 clienta',
     );
   });
 
@@ -66,7 +67,8 @@ describe('trainer pay', () => {
     expect(pay.lines).toEqual([
       {
         kind: 'class',
-        detail: 'lun 2 nov · 10:45 · Sopocachi · Reformer · 5 alumnas, 1 extra',
+        detail:
+          'lun 2 nov · 10:45 · Sopocachi · Reformer · 5 clientas, 1 extra',
         amountCentavos: 7_300,
       },
     ]);
