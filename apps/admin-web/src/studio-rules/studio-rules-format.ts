@@ -1,5 +1,6 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { StudioSettingsDto } from "@pilates/api-contracts";
-import { boliviaParts, formatCivilDate } from "../lib/bolivia-time";
+import { boliviaParts } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 
 // The Cancellation Window as the apps write it: «2 h 30», «3 h», «45 min».
@@ -81,13 +82,13 @@ export const configurableRules = (settings: StudioSettingsDto): Rule[] => [
     value:
       settings.openingDate === null
         ? "Todavía sin fecha"
-        : formatCivilDate(settings.openingDate),
+        : formatListDate(settings.openingDate),
   },
 ];
 
 export const versionLine = (settings: StudioSettingsDto): string =>
   settings.updatedByName === null
     ? `Versión ${settings.version} · valores iniciales`
-    : `Versión ${settings.version} · guardada el ${formatCivilDate(
+    : `Versión ${settings.version} · guardada el ${formatListDate(
         boliviaParts(settings.updatedAt).date,
       )} por ${settings.updatedByName}`;

@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminPaymentDto } from "@pilates/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -8,7 +9,6 @@ import { ListFilter } from "../components/table/list-filter";
 import { countFormat } from "../components/table/pagination";
 import { SearchFilter } from "../components/table/search-filter";
 import { Button } from "../components/ui/button";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { ClientPhoto } from "../components/client-photo";
 import { formatBolivianos } from "../lib/money";
 import { saveFile } from "../lib/save-file";
@@ -155,7 +155,7 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilMoment(getValue())}
+        {formatDateTime(getValue())}
       </span>
     ),
   }),

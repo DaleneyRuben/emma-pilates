@@ -135,37 +135,18 @@ export function formatLongDay(date: string): string {
   return `${weekdayName(weekdayOf(date))} ${day} de ${month}`;
 }
 
-export function formatSessionMoment(instant: string): string {
-  const parts = boliviaParts(instant);
-  const { day, month } = dayMonth(parts.date);
-  return `${shortWeekdays[parts.weekday - 1]} ${day} ${month.slice(0, 3)} · ${parts.time}`;
-}
-
-/** `dd/mm/aaaa`, the design system's date format. */
+/**
+ * `dd/mm/aaaa`: what a date field shows and a CSV export writes. Screens
+ * write dates with `formatListDate` and `formatTitleDate` from
+ * `@pilates/api-contracts` (FIX-090).
+ */
 export const formatCivilDate = (date: string): string =>
   `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
 
-/** `dd/mm/aaaa · hh:mm` in Bolivia time, e.g. when a Payment was sent. */
+/** `dd/mm/aaaa · hh:mm` in Bolivia time, for a CSV export. */
 export function formatCivilMoment(instant: string): string {
   const parts = boliviaParts(instant);
   return `${formatCivilDate(parts.date)} · ${parts.time}`;
-}
-
-/** "lun 21/09 · 09:00": a moment inside a week already on screen (AW25). */
-export function formatWeekdayMoment(instant: string): string {
-  const parts = boliviaParts(instant);
-  const weekday = (shortWeekdays[parts.weekday - 1] ?? "").toLocaleLowerCase(
-    "es",
-  );
-  return `${weekday} ${parts.date.slice(8, 10)}/${parts.date.slice(5, 7)} · ${parts.time}`;
-}
-
-/** "vie 23/10": a civil day inside a month already on screen (AW151). */
-export function formatWeekdayDay(date: string): string {
-  const weekday = (shortWeekdays[weekdayOf(date) - 1] ?? "").toLocaleLowerCase(
-    "es",
-  );
-  return `${weekday} ${date.slice(8, 10)}/${date.slice(5, 7)}`;
 }
 
 /** The Bolivia month `YYYY-MM` an instant falls in. */

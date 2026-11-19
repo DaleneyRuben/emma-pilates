@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminFeedbackDto } from "@pilates/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -7,7 +8,6 @@ import type { SearchChange } from "../catalog/catalog-search";
 import { ListFilter } from "../components/table/list-filter";
 import { countFormat } from "../components/table/pagination";
 import { Button } from "../components/ui/button";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { saveFile } from "../lib/save-file";
 import {
   appLabels,
@@ -73,7 +73,7 @@ const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
     meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
       <span className="whitespace-nowrap text-texto-secundario tabular">
-        {formatCivilMoment(getValue())}
+        {formatDateTime(getValue())}
       </span>
     ),
   }),

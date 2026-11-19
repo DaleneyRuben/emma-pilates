@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { QrCode, Upload } from "lucide-react";
 import { useId, useState } from "react";
@@ -5,7 +6,7 @@ import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { QueryFailure } from "../components/page/query-failure";
 import { buttonVariants } from "../components/ui/button";
-import { boliviaParts, formatCivilDate } from "../lib/bolivia-time";
+import { boliviaParts } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
 import {
   acceptedQrTypes,
@@ -18,7 +19,7 @@ import {
 const updatedLine = (updatedAt: string | null): string =>
   updatedAt === null
     ? "Es el QR de prueba del servidor"
-    : `Actualizado el ${formatCivilDate(boliviaParts(updatedAt).date)}`;
+    : `Actualizado el ${formatListDate(boliviaParts(updatedAt).date)}`;
 
 function QrImage() {
   const image = useQuery(studioQrImageQueryOptions());

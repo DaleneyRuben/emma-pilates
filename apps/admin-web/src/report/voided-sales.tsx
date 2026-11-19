@@ -1,5 +1,5 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { VoidedIncomeDto } from "@pilates/api-contracts";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 
 type VoidedSale = VoidedIncomeDto;
@@ -26,7 +26,7 @@ export function VoidedSales({ sales }: { sales: VoidedSale[] }) {
             <span>{sale.voidReason}</span>
             <span className="text-texto-tenue tabular">
               {formatBolivianos(sale.amountDueCentavos)} ·{" "}
-              {formatCivilMoment(sale.voidedAt)}
+              {formatDateTime(sale.voidedAt)}
             </span>
           </li>
         ))}

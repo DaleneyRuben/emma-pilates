@@ -1,9 +1,10 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { CashDayDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Info } from "lucide-react";
 import type { ComponentProps } from "react";
 import { StatusPill } from "../../components/ui/status-pill";
-import { boliviaParts, formatWeekdayDay } from "../../lib/bolivia-time";
+import { boliviaParts } from "../../lib/bolivia-time";
 import { cn } from "../../lib/cn";
 import { formatBolivianos } from "../../lib/money";
 
@@ -49,7 +50,7 @@ export const cashDayColumns = [
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="font-medium text-texto tabular">
-        {formatWeekdayDay(getValue())}
+        {formatListDate(getValue())}
       </span>
     ),
   }),

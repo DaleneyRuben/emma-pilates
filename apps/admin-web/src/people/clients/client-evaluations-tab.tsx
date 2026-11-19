@@ -1,7 +1,7 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilMoment } from "../../lib/bolivia-time";
 import { clientEvaluationsQueryOptions } from "./client-file-queries";
 import { ClientFileItem, ClientFileSection } from "./client-file-list";
 
@@ -26,7 +26,7 @@ export function ClientEvaluationsTab({ clientId }: { clientId: string }) {
             title={
               evaluation.kind === "first" ? "Primera evaluación" : "Seguimiento"
             }
-            detail={`${formatCivilMoment(evaluation.startsAt)} · ${evaluation.nutritionistName} · ${evaluation.branchName}`}
+            detail={`${formatDateTime(evaluation.startsAt)} · ${evaluation.nutritionistName} · ${evaluation.branchName}`}
             aside={
               Date.parse(evaluation.startsAt) > now ? (
                 <StatusPill tone="exito">Próxima</StatusPill>

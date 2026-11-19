@@ -1,10 +1,11 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CatalogPage } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
-import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
+import { boliviaParts } from "../../lib/bolivia-time";
 import type { NameSearch } from "../oversight-search";
 import {
   referralTableQueryOptions,
@@ -23,7 +24,7 @@ const studioSummary = (total: number) =>
     : count(total, "referido", "referidos");
 
 const civilDate = (instant: string) =>
-  formatCivilDate(boliviaParts(instant).date);
+  formatListDate(boliviaParts(instant).date);
 
 const columns = createColumnHelper<ReferralRow>();
 

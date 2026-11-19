@@ -1,4 +1,5 @@
-import { formatCivilDate, formatLongDay } from "../lib/bolivia-time";
+import { formatListDate } from "@pilates/api-contracts";
+import { formatLongDay } from "../lib/bolivia-time";
 import type { ScheduleChangeResult } from "./use-schedule-change";
 
 // What the page says after a change, so the Administrator sees how many
@@ -51,14 +52,14 @@ export const replacedNotice = (
     result.keptSessions > 0 && keptNote(result.keptSessions, " sin cambios"),
   ]);
   const created = count(result.created, "sesión nueva", "sesiones nuevas");
-  return `Serie actualizada desde el ${formatCivilDate(effectiveFrom)}: ${created}${changed === "" ? "" : `; ${changed}`}.${skippedNote(result.skipped)}`;
+  return `Serie actualizada desde el ${formatListDate(effectiveFrom)}: ${created}${changed === "" ? "" : `; ${changed}`}.${skippedNote(result.skipped)}`;
 };
 
 export const endedNotice = (
   result: { cancelledSessions: number; keptSessions: number },
   effectiveFrom: string,
 ): string => {
-  const date = formatCivilDate(effectiveFrom);
+  const date = formatListDate(effectiveFrom);
   const changed = clauses([
     result.cancelledSessions > 0 &&
       count(

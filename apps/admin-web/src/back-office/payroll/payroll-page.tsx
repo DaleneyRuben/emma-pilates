@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { AdminSalaryPaymentDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Image as ImageIcon, ImagePlus } from "lucide-react";
@@ -9,7 +10,6 @@ import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
 import { useKnownOption } from "../../components/table/use-known-option";
 import { Button } from "../../components/ui/button";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import { staffOptionLabel } from "./payroll-format";
 import {
@@ -43,7 +43,7 @@ const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
     header: "Fecha",
     cell: ({ getValue }) => (
       <span className="text-texto-secundario tabular">
-        {formatCivilDate(getValue())}
+        {formatListDate(getValue())}
       </span>
     ),
   }),

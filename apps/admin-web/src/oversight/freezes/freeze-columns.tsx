@@ -1,8 +1,8 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { FreezeReviewDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { ClientPhoto } from "../../components/client-photo";
 import { StatusPill } from "../../components/ui/status-pill";
-import { formatCivilDate } from "../../lib/bolivia-time";
 import { DecisionCell } from "./decision-cell";
 import {
   freezeDayCount,
@@ -39,11 +39,11 @@ const periodColumns = [
   }),
   columns.accessor("startsOn", {
     header: "Desde",
-    cell: ({ getValue }) => quiet(formatCivilDate(getValue())),
+    cell: ({ getValue }) => quiet(formatListDate(getValue())),
   }),
   columns.accessor("endsOn", {
     header: "Hasta",
-    cell: ({ getValue }) => quiet(formatCivilDate(getValue())),
+    cell: ({ getValue }) => quiet(formatListDate(getValue())),
   }),
   columns.display({
     id: "days",

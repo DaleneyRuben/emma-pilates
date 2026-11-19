@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type {
   StaffMemberDto,
   StaffPendingEmailDto,
@@ -15,11 +16,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
-import {
-  boliviaParts,
-  formatDayMonth,
-  formatWeekdayDay,
-} from "../../lib/bolivia-time";
+import { boliviaParts, formatDayMonth } from "../../lib/bolivia-time";
 import { isApiError } from "../../api/problem";
 import type { StaffFormInput, StaffFormOutput } from "./staff-form-schema";
 import { isAccountEmailLimit, staffProblem } from "./staff-problems";
@@ -35,7 +32,7 @@ import type { EmailLimit } from "./use-email-limit";
 /** «vie 6 de noviembre a las 11:40», in La Paz. */
 const linkDeadline = (instant: string): string => {
   const { date, time } = boliviaParts(instant);
-  const weekday = formatWeekdayDay(date).split(" ")[0] ?? "";
+  const weekday = formatListDate(date).split(" ")[0] ?? "";
   return `${weekday} ${formatDayMonth(date)} a las ${time}`;
 };
 

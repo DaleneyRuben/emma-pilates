@@ -1,3 +1,4 @@
+import { formatDateTime } from "@pilates/api-contracts";
 import type { AdminPaymentDto, StaffInvoiceDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -6,7 +7,6 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanelBody } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
 import { StatusPill } from "../components/ui/status-pill";
-import { formatCivilMoment } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
 import { InvoiceFileCard } from "./invoice-file-card";
 import { InvoiceUploadField } from "./invoice-upload-field";
@@ -54,7 +54,7 @@ function InvoiceBody({ invoice }: { invoice: StaffInvoiceDto }) {
         {invoice.confirmedAt === null ? null : (
           <SummaryRow label="Confirmado">
             <span className="tabular">
-              {formatCivilMoment(invoice.confirmedAt)}
+              {formatDateTime(invoice.confirmedAt)}
             </span>
           </SummaryRow>
         )}

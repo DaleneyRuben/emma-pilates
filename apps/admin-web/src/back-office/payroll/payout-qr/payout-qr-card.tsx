@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { AlertCircle, Download, Maximize2, QrCode, X } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useState } from "react";
@@ -5,7 +6,6 @@ import { BodyScrollLock } from "../../../components/ui/body-scroll-lock";
 import { buttonVariants } from "../../../components/ui/button";
 import { closeButtonClass } from "../../../components/ui/sheet";
 import { StatusPill } from "../../../components/ui/status-pill";
-import { formatCivilDate } from "../../../lib/bolivia-time";
 import { cn } from "../../../lib/cn";
 
 export type PayoutQrView =
@@ -88,7 +88,7 @@ export function PayoutQrCard({
   if (qr.standing === "expired") {
     return (
       <Notice tone="error" title="QR vencido · pídele uno nuevo">
-        {`El QR de ${name} venció el ${formatCivilDate(qr.validUntil)}. No lo mostramos para que no le transfieras a una cuenta que ya no sirve.`}
+        {`El QR de ${name} venció el ${formatListDate(qr.validUntil)}. No lo mostramos para que no le transfieras a una cuenta que ya no sirve.`}
       </Notice>
     );
   }
@@ -123,7 +123,7 @@ export function PayoutQrCard({
       </div>
       <span className="flex flex-col items-center text-center text-nota text-texto-tenue">
         <span>{label}</span>
-        <span>{`Vale hasta el ${formatCivilDate(qr.validUntil)}`}</span>
+        <span>{`Vale hasta el ${formatListDate(qr.validUntil)}`}</span>
       </span>
       {qr.standing === "expiring" ? (
         <StatusPill tone="advertencia">Vence pronto</StatusPill>
@@ -149,7 +149,7 @@ export function PayoutQrCard({
               className="size-[min(520px,100%)] object-contain"
             />
             <span className="text-nota text-texto-tenue">
-              {`Vale hasta el ${formatCivilDate(qr.validUntil)}`}
+              {`Vale hasta el ${formatListDate(qr.validUntil)}`}
             </span>
             <a
               href={src}

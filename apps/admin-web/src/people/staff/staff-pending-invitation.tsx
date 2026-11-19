@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useId, useState } from "react";
 import { isApiError } from "../../api/problem";
@@ -6,7 +7,7 @@ import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { StatusPill } from "../../components/ui/status-pill";
-import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
+import { boliviaParts } from "../../lib/bolivia-time";
 import { cn } from "../../lib/cn";
 import type { EmailLimit } from "./use-email-limit";
 import { isAccountEmailLimit, staffProblem } from "./staff-problems";
@@ -124,7 +125,7 @@ export function PendingInvitation({
       <p className="text-nota leading-normal text-texto-secundario">
         {expiresAt === null || expiresAt === undefined
           ? "El último enlace ya no es válido; envía uno nuevo."
-          : `El enlace vence el ${formatCivilDate(boliviaParts(expiresAt).date)}.`}
+          : `El enlace vence el ${formatListDate(boliviaParts(expiresAt).date)}.`}
       </p>
       <p className="text-ayuda text-texto-muy-tenue">
         Si no activa su cuenta en 30 días desde el último envío o cambio, la
