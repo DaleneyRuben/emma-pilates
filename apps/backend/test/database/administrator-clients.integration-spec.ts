@@ -9,6 +9,7 @@ import {
 import { attachClientPhoto } from './client-photo-test-support';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
+const now = new Date('2026-09-21T15:00:00.000Z');
 
 describe('Administrator Client directory (PostgreSQL)', () => {
   let context: DatabaseTestContext;
@@ -149,7 +150,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     };
 
     await expect(
-      directory().list({ page: 1, pageSize: 2, today }),
+      directory().list({ page: 1, pageSize: 2, today, now }),
     ).resolves.toEqual({
       items: [
         {
@@ -170,6 +171,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           // Registered before the acquisition question: the Referral names her.
           invitedByName: 'Lucía Fernández',
           clientSince: expect.any(Date) as Date,
+          lastClassOn: null,
         },
         {
           id: ids.lucia,
@@ -189,6 +191,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
           invitedByName: null,
           // 2025-07-02 23:00 in Bolivia (FIX-065's CSV «Desde»).
           clientSince: new Date('2025-07-02T00:00:00.000Z'),
+          lastClassOn: null,
         },
       ],
       page: 1,
@@ -197,7 +200,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
       ...counts,
     });
     await expect(
-      directory().list({ page: 2, pageSize: 2, today }),
+      directory().list({ page: 2, pageSize: 2, today, now }),
     ).resolves.toMatchObject({
       items: [
         expect.objectContaining({
@@ -216,7 +219,9 @@ describe('Administrator Client directory (PostgreSQL)', () => {
 
   it('searches names and emails without accents or case, phones by digits, and wildcards literally', async () => {
     const found = async (query: string) =>
-      (await directory().list({ page: 1, pageSize: 20, query, today })).items
+      (
+        await directory().list({ page: 1, pageSize: 20, query, today, now })
+      ).items
         .map(({ id }) => id)
         .sort();
 
@@ -227,7 +232,7 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     expect(await found('%_')).toEqual([]);
     expect(await found('beatriz')).toEqual([]);
     await expect(
-      directory().list({ page: 1, pageSize: 20, query: 'nadie', today }),
+      directory().list({ page: 1, pageSize: 20, query: 'nadie', today, now }),
     ).resolves.toMatchObject({
       items: [],
       totalItems: 0,
@@ -282,10 +287,16 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     });
 
     await expect(
-      directory().list({ page: 1, pageSize: 50, today }),
+      directory().list({ page: 1, pageSize: 50, today, now }),
     ).resolves.toMatchObject({ totalItems: 3, studioClientCount: 3 });
     await expect(
-      directory().list({ page: 1, pageSize: 50, query: 'Retirada', today }),
+      directory().list({
+        page: 1,
+        pageSize: 50,
+        query: 'Retirada',
+        today,
+        now,
+      }),
     ).resolves.toMatchObject({ items: [], totalItems: 0 });
     await expect(directory().read(removedId)).resolves.toBeNull();
   });

@@ -130,6 +130,7 @@ describe('plan summary with extra classes and the Plan after a Guest Pass', () =
       pageSize: 50,
       query: 'Extra',
       today: classDay,
+      now: classDay,
     });
     expect(page.items).toEqual([
       expect.objectContaining({
@@ -145,6 +146,7 @@ describe('plan summary with extra classes and the Plan after a Guest Pass', () =
       pageSize: 50,
       query: 'Invitada Pagada',
       today: classDay,
+      now: classDay,
     });
     expect(friends.items).toEqual([
       expect.objectContaining({

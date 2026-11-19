@@ -9,6 +9,7 @@ import {
 } from './database-test-context';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
+const now = new Date('2026-09-21T15:00:00.000Z');
 
 // WEB-040 (follow-up 232): Clientas › Todas filters by one chip and shows
 // «Le quedan», «Vence», «Invitada por», and the Fundadora number.
@@ -140,6 +141,7 @@ describe('Administrator Client directory chips and columns (PostgreSQL)', () => 
         page: 1,
         pageSize: 20,
         today,
+        now,
         ...(filter === undefined ? {} : { filter }),
         ...(query === undefined ? {} : { query }),
       })
@@ -156,7 +158,7 @@ describe('Administrator Client directory chips and columns (PostgreSQL)', () => 
 
   it('counts the matches for the chip and the studio whatever the chip', async () => {
     await expect(
-      directory().list({ page: 1, pageSize: 1, today, filter: 'none' }),
+      directory().list({ page: 1, pageSize: 1, today, now, filter: 'none' }),
     ).resolves.toMatchObject({
       totalItems: 2,
       studioClientCount: 4,
@@ -166,7 +168,12 @@ describe('Administrator Client directory chips and columns (PostgreSQL)', () => 
   });
 
   it('reads what is left, when it ends, the Fundadora number, and who invited her', async () => {
-    const { items } = await directory().list({ page: 1, pageSize: 20, today });
+    const { items } = await directory().list({
+      page: 1,
+      pageSize: 20,
+      today,
+      now,
+    });
     const byName = new Map(items.map((item) => [item.name, item]));
 
     expect(byName.get('Isabel Arce')).toMatchObject({
@@ -196,7 +203,12 @@ describe('Administrator Client directory chips and columns (PostgreSQL)', () => 
   // FIX-065 (walkthrough finding 91): the CSV's «Desde» and the audit of
   // Clientas › «Exportar CSV».
   it('reads the day she joined and audits an export', async () => {
-    const { items } = await directory().list({ page: 1, pageSize: 20, today });
+    const { items } = await directory().list({
+      page: 1,
+      pageSize: 20,
+      today,
+      now,
+    });
     const isabel = await prisma.client.findUniqueOrThrow({
       where: { id: ids.activa },
       select: { createdAt: true },

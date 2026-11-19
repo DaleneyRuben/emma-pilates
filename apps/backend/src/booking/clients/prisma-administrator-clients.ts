@@ -8,6 +8,7 @@ import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { clientPhotoOf } from '../client/client-photo-of';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import { containsPattern } from '../search-pattern';
+import { readLastClassDates } from './directory-last-class';
 import { directoryPlan, directoryPlanSelect } from './directory-plan';
 import type {
   AdministratorClientDirectory,
@@ -64,7 +65,7 @@ export const createPrismaAdministratorClients = (
   const catalog = createCatalogRepository(prisma);
 
   const directory: AdministratorClientDirectory = {
-    list: async ({ page, pageSize, query, filter, today }) => {
+    list: async ({ page, pageSize, query, filter, today, now }) => {
       const search = Prisma.sql`${searchCondition(query)} ${directoryFilterCondition(filter, today)}`;
       const [
         matches,
@@ -94,7 +95,7 @@ export const createPrismaAdministratorClients = (
         }),
       ]);
       const pageIds = matches.map(({ id }) => id);
-      const [rows, lastEnds, nextPlans] = await Promise.all([
+      const [rows, lastEnds, nextPlans, lastClasses] = await Promise.all([
         prisma.client.findMany({
           where: { id: { in: pageIds } },
           select: {
@@ -140,6 +141,7 @@ export const createPrismaAdministratorClients = (
           orderBy: [{ startsOn: 'desc' }, { id: 'desc' }],
           select: { clientId: true, ...directoryPlanSelect },
         }),
+        readLastClassDates(prisma, pageIds, now),
       ]);
       // The earliest later Plan wins: rows come latest first.
       const nextPlanOf = new Map(
@@ -194,6 +196,7 @@ export const createPrismaAdministratorClients = (
                   row.referralReceived?.referrer.name ??
                   null,
                 clientSince: boliviaDate(row.createdAt),
+                lastClassOn: lastClasses.get(row.id) ?? null,
               },
             ],
           ];

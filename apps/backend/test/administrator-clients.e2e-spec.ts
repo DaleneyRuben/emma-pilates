@@ -33,6 +33,8 @@ const row = {
   founderNumber: 3,
   invitedByName: 'Sofía Guzmán',
   clientSince: new Date('2025-07-02T00:00:00.000Z'),
+  // FIX-091 (W8 A): «Última clase», her latest class already started.
+  lastClassOn: new Date('2026-09-18T00:00:00.000Z'),
 };
 const directoryPage = {
   items: [row],
@@ -139,7 +141,12 @@ describe('administrator Client endpoints (e2e)', () => {
         expect(body).toEqual({
           ...directoryPage,
           items: [
-            { ...row, planEndsOn: '2026-09-30', clientSince: '2025-07-02' },
+            {
+              ...row,
+              planEndsOn: '2026-09-30',
+              clientSince: '2025-07-02',
+              lastClassOn: '2026-09-18',
+            },
           ],
         }),
       );
@@ -196,6 +203,7 @@ describe('administrator Client endpoints (e2e)', () => {
               email: 'lucia@example.com',
               phone: '+591 70011001',
               clientSince: '2025-07-02',
+              lastClassOn: '2026-09-18',
             },
           ],
         }),

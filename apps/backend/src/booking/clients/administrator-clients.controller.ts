@@ -78,6 +78,7 @@ const toPageDto = (page: AdministratorClientPage): AdminClientPageDto => ({
     planEndsOn: item.planEndsOn === null ? null : civil(item.planEndsOn),
     planStartsOn: item.planStartsOn === null ? null : civil(item.planStartsOn),
     clientSince: civil(item.clientSince),
+    lastClassOn: item.lastClassOn === null ? null : civil(item.lastClassOn),
   })),
 });
 
@@ -199,6 +200,7 @@ export class AdministratorClientsController {
         email: row.email,
         phone: row.phone,
         clientSince: civil(row.clientSince),
+        lastClassOn: row.lastClassOn === null ? null : civil(row.lastClassOn),
       })),
     };
   }

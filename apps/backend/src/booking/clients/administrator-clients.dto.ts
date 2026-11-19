@@ -123,6 +123,16 @@ export class AdminClientDto {
     description: 'Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)',
   })
   clientSince!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Bolivia civil date of the latest class she kept that already started, not counting a no-show; null if none (FIX-091)',
+  })
+  lastClassOn?: string | null;
 }
 
 export class AdminClientPageDto {
@@ -261,6 +271,16 @@ export class AdminClientExportRowDto {
 
   @ApiProperty({ format: 'date', description: 'Bolivia civil date she joined' })
   clientSince!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Bolivia civil date of her latest class kept, as the list’s «Última clase»; null if none (FIX-091)',
+  })
+  lastClassOn?: string | null;
 }
 
 export class AdminClientExportDto {
