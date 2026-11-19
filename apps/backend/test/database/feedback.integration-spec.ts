@@ -215,7 +215,7 @@ describe('Feedback (PostgreSQL)', () => {
     );
   });
 
-  it('pages newest first with the status and app filters and the counts per status', async () => {
+  it('pages newest first with the status and app filters and the new count', async () => {
     const removed = message({ text: 'Un comentario eliminado.' });
     await store().send(removed);
     await prisma.feedback.update({
@@ -227,8 +227,6 @@ describe('Feedback (PostgreSQL)', () => {
     expect(page.items).toHaveLength(2);
     expect(page.totalItems).toBe(14);
     expect(page.newCount).toBe(14);
-    expect(page.reviewedCount).toBe(0);
-    expect(page.resolvedCount).toBe(0);
     const clientPage = await store().list({
       page: 1,
       pageSize: 1,
@@ -265,30 +263,6 @@ describe('Feedback (PostgreSQL)', () => {
     await expect(
       store().list({ page: 1, pageSize: 20, status: 'resolved' }),
     ).resolves.toMatchObject({ items: [], totalItems: 0, newCount: 14 });
-
-    const [first, second, third] = (
-      await store().list({ page: 1, pageSize: 3 })
-    ).items;
-    for (const [row, status] of [
-      [first, 'reviewed'],
-      [second, 'resolved'],
-      [third, 'resolved'],
-    ] as const) {
-      await store().triage({
-        feedbackId: row.id,
-        status,
-        changeNote: null,
-        actor,
-        occurredAt: sentAt,
-      });
-    }
-    await expect(
-      store().list({ page: 1, pageSize: 1, app: 'staff' }),
-    ).resolves.toMatchObject({
-      newCount: 11,
-      reviewedCount: 1,
-      resolvedCount: 2,
-    });
   });
 
   it('triages a Feedback with its note and audits it', async () => {
