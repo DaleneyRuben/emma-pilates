@@ -205,7 +205,7 @@ describe("Refreshed Mi plan (Client 12)", () => {
       expect(screen.getByText("Último plan · Paquete de 12 clases")).toBeOnTheScreen();
     });
 
-    expect(screen.getByText("Vencido")).toBeOnTheScreen();
+    expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
     expect(screen.getByText("Venció el jue 24 sept")).toBeOnTheScreen();
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("Elige tu próximo plan")).toBeOnTheScreen();

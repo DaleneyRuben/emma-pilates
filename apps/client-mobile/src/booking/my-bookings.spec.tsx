@@ -75,11 +75,11 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
 
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
@@ -124,8 +124,9 @@ describe("Client My Bookings", () => {
     expect(screen.getByText("Cuando reserves una clase, aparecerá aquí.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
 
+    // FIX-090: the screen's title is its tab's label.
     await waitFor(() => {
-      expect(screen.getByText("Reservar una clase")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Reservar")).toHaveTextContent("Reservar");
     });
   });
 

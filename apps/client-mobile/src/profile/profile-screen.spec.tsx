@@ -187,7 +187,7 @@ describe("Client Profile", () => {
 
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
     expect(screen.getByText("🇧🇴 +591 70011004")).toBeOnTheScreen();
-    expect(screen.getByText("Vencido")).toBeOnTheScreen();
+    expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Mi plan, Vencido" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
   });
@@ -200,7 +200,7 @@ describe("Client Profile", () => {
     await waitFor(() => {
       expect(screen.getByText(/^Último plan · /)).toBeOnTheScreen();
     });
-    expect(screen.getByText("Vencido")).toBeOnTheScreen();
+    expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
   });
 

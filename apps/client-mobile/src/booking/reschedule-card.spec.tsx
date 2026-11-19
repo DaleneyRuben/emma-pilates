@@ -82,11 +82,11 @@ describe("Client reschedule option card", () => {
     );
     await waitFor(
       () => {
-        expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
+        expect(screen.getByRole("button", { name: /Mis reservas, tab/ })).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );
-    await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     });
