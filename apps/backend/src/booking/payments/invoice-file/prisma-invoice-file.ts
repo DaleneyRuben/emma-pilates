@@ -12,7 +12,7 @@ import { retrySerializable } from '../../../database/retry-serializable';
 import type { NotificationRecorder } from '../../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../../system-identity/authentication/resolve-authenticated-principal';
-import { saleLabel } from '../payment-label';
+import { invoiceReadyMessage } from '../payment-label';
 import { imageMediaTypes } from '../../../uploads/image-asset-attachments';
 import {
   InvoiceFileError,
@@ -99,17 +99,17 @@ const notifyInvoiceReady = async (
     select: { account: { select: { id: true } } },
   });
   if (client.account === null) return;
-  const label = saleLabel({
+  const sale = {
     kind: input.payment.kind,
     planNameSnapshot: input.payment.plan_name_snapshot,
-  });
+  };
   await recordNotification(transaction, {
     accountId: client.account.id,
     category: 'subscription_payment',
     type: 'invoice_ready',
     businessEventKey: `invoice-ready:${input.invoiceId}`,
     title: 'Tu factura está lista',
-    message: `La factura de tu ${label} ya está en Mis facturas.`,
+    message: invoiceReadyMessage(sale),
     destination: { type: 'invoice', id: input.paymentId },
     occurredAt: input.now,
   });
