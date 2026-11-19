@@ -233,7 +233,12 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  hint: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  hint: {
+    fontFamily: fontFamilies.body,
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   input: {
     color: colors.text,
     flex: 1,

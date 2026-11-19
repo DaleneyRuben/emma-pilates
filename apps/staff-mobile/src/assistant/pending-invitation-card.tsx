@@ -257,6 +257,11 @@ const styles = StyleSheet.create({
   block: { gap: spacing.md },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   more: { alignItems: "center", height: 36, justifyContent: "center", width: 36 },
-  moreDots: { color: colors.textMuted, fontSize: 22, lineHeight: 24 },
+  moreDots: {
+    fontFamily: fontFamilies.body,
+    color: colors.textMuted,
+    fontSize: 22,
+    lineHeight: 24,
+  },
   pendingCard: { backgroundColor: colors.card, borderRadius: radii.card, padding: spacing.lg },
 });

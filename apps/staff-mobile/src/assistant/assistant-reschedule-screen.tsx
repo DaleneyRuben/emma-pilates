@@ -20,6 +20,7 @@ import {
   spacing,
   StaffFace,
   typography,
+  fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
@@ -188,8 +189,16 @@ const styles = StyleSheet.create({
     opacity: 0.85,
     padding: spacing.lg,
   },
-  currentLabel: { color: colors.textMuted, fontSize: typography.label },
-  currentTitle: { color: colors.textSecondary, fontSize: typography.bodyLarge },
+  currentLabel: {
+    fontFamily: fontFamilies.body,
+    color: colors.textMuted,
+    fontSize: typography.label,
+  },
+  currentTitle: {
+    fontFamily: fontFamilies.body,
+    color: colors.textSecondary,
+    fontSize: typography.bodyLarge,
+  },
   failure: { color: colors.errorText },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
   screen: { gap: spacing.md },

@@ -7,6 +7,7 @@ import {
   colors,
   radii,
   spacing,
+  fontFamilies,
 } from "@pilates/mobile-core";
 import { useMemo, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -111,7 +112,7 @@ export function PayoutQrDateSheet({
 }
 
 const styles = StyleSheet.create({
-  failure: { color: colors.errorText, fontSize: 14 },
+  failure: { fontFamily: fontFamilies.body, color: colors.errorText, fontSize: 14 },
   lead: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   thumb: {
     backgroundColor: colors.white,

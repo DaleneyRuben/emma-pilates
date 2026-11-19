@@ -22,6 +22,7 @@ import {
   StaffFace,
   TextButton,
   typography,
+  fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -300,6 +301,11 @@ export function AssistantSessionDetailScreen({
 const styles = StyleSheet.create({
   actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
   content: { gap: spacing.lg, paddingBottom: spacing.lg },
-  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  note: {
+    fontFamily: fontFamilies.body,
+    color: colors.textMuted,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });

@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
   list: { paddingBottom: spacing.xxl },
   planName: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
   originalPrice: {
+    fontFamily: fontFamilies.body,
     color: colors.textSubtle,
     fontSize: typography.note,
     textDecorationLine: "line-through",

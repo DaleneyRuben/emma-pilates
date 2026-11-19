@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
   insetTitle: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 11 * 0.12,
+    fontSize: 12,
+    letterSpacing: 12 * 0.12,
     textTransform: "uppercase",
   },
   meta: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },

@@ -7,6 +7,7 @@ import {
   typography,
   useCountdown,
   WaitNotice,
+  fontFamilies,
 } from "@pilates/mobile-core";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -103,9 +104,9 @@ export function SelfRegisteredNotice({
 }
 
 const styles = StyleSheet.create({
-  email: { color: colors.text, fontWeight: "500" },
+  email: { fontFamily: fontFamilies.bodyMedium, color: colors.text, fontWeight: "500" },
   failure: { color: colors.errorText },
-  note: { color: colors.textMuted, fontSize: typography.note },
+  note: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.note },
   notice: { gap: spacing.md },
-  success: { color: colors.successText, fontSize: typography.note },
+  success: { fontFamily: fontFamilies.body, color: colors.successText, fontSize: typography.note },
 });

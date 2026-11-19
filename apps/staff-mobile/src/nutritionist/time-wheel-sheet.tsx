@@ -225,15 +225,16 @@ const styles = StyleSheet.create({
     height: 5,
     width: 36,
   },
-  note: { color: colors.textMuted, fontSize: typography.body },
+  note: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.body },
   readout: { alignItems: "center", gap: spacing.xs },
   row: { alignItems: "center", height: row, justifyContent: "center" },
   rowText: {
+    fontFamily: fontFamilies.display,
     color: colors.textMuted,
     fontSize: 22,
     fontVariant: ["tabular-nums"],
   },
-  rowTextChosen: { color: colors.text, fontWeight: "600" },
+  rowTextChosen: { fontFamily: fontFamilies.bodyStrong, color: colors.text, fontWeight: "600" },
   rowTextOff: { color: colors.borderStrong },
   sheet: {
     backgroundColor: colors.white,
@@ -250,6 +251,11 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontVariant: ["tabular-nums"],
   },
-  title: { color: colors.textMuted, fontSize: typography.body, fontWeight: "500" },
+  title: {
+    fontFamily: fontFamilies.bodyMedium,
+    color: colors.textMuted,
+    fontSize: typography.body,
+    fontWeight: "500",
+  },
   wheel: { flexDirection: "row", gap: spacing.sm },
 });

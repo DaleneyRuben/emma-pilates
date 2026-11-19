@@ -1,4 +1,11 @@
-import { colors, Glyph, type MobileImpersonation, spacing, typography } from "@pilates/mobile-core";
+import {
+  colors,
+  Glyph,
+  type MobileImpersonation,
+  spacing,
+  typography,
+  fontFamilies,
+} from "@pilates/mobile-core";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -64,7 +71,12 @@ export function ImpersonationBanner({
 }
 
 const styles = StyleSheet.create({
-  detail: { color: colors.white, fontSize: typography.label, opacity: 0.85 },
+  detail: {
+    fontFamily: fontFamilies.body,
+    color: colors.white,
+    fontSize: typography.label,
+    opacity: 0.85,
+  },
   exit: {
     alignItems: "center",
     borderRadius: 8,
@@ -73,7 +85,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
   exitPressed: { backgroundColor: colors.emphasis },
-  exitText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
+  exitText: {
+    fontFamily: fontFamilies.bodyStrong,
+    color: colors.white,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -85,5 +102,10 @@ const styles = StyleSheet.create({
   // plus the strip, so their own safe-area views add nothing more.
   strip: { backgroundColor: colors.primaryDeep, left: 0, position: "absolute", right: 0, top: 0 },
   text: { flex: 1, gap: 2 },
-  title: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
+  title: {
+    fontFamily: fontFamilies.bodyMedium,
+    color: colors.white,
+    fontSize: typography.note,
+    fontWeight: "500",
+  },
 });

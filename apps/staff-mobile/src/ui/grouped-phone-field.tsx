@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.smd,
     paddingHorizontal: spacing.lg,
   },
-  flag: { fontSize: 20 },
+  flag: { fontFamily: fontFamilies.body, fontSize: 20 },
   input: {
     color: colors.text,
     fontFamily: fontFamilies.body,

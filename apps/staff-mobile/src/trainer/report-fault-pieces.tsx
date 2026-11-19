@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   unitHeading: {
     color: colors.textMuted,
     fontFamily: fontFamilies.bodyMedium,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.54,
     textTransform: "uppercase",
   },
