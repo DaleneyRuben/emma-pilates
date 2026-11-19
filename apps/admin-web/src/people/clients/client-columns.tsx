@@ -79,7 +79,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
       return (
         <span className="text-texto-muy-tenue">
           {row.original.subscriptionStatus === "expired"
-            ? "Plan vencido"
+            ? "Vencido"
             : "Sin plan"}
         </span>
       );

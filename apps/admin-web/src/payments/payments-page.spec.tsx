@@ -225,7 +225,10 @@ describe("AW28 Pagos on a desktop browser", () => {
     expect(
       within(table).getByRole("columnheader", { name: "Estado" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
   });
 
   it("offers a retry when the list cannot load", async () => {

@@ -96,11 +96,11 @@ describe("AW21 Clientes on a desktop browser", () => {
     const expired = (await screen.findByRole("cell", { name: /Sofía Guzmán/ }))
       .parentElement as HTMLElement;
     // UX-012 / A5: an expired Plan is «Vencido»; never bought stays the neutral pill.
-    expect(within(expired).getByText("Plan vencido")).toBeInTheDocument();
+    expect(within(expired).getByText("Vencido")).toBeInTheDocument();
     expect(
       within(expired).queryByText("Sin plan activo"),
     ).not.toBeInTheDocument();
-    expect(within(expired).getByText("Plan vencido")).toBeInTheDocument();
+    expect(within(expired).getByText("Vencido")).toBeInTheDocument();
     const never = screen.getByRole("cell", { name: /Ana Quiroga/ })
       .parentElement as HTMLElement;
     expect(within(never).getAllByText("Sin plan")).toHaveLength(2);
@@ -163,8 +163,13 @@ describe("AW21 Clientes on a desktop browser", () => {
       within(table).getByRole("columnheader", { name: "Estado" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Mostrando 0 de 148 clientas")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    // FIX-090: an empty list draws no page count or page buttons.
+    expect(
+      screen.queryByRole("button", { name: "Anterior" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Siguiente" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("searchbox", {
         name: "Buscar por nombre, correo o teléfono",
