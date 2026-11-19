@@ -1,3 +1,4 @@
+import { capacityLabel } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   colors,
@@ -123,6 +124,7 @@ export function CancelSessionScreen({
           <Text style={styles.title}>{session.classTypeName}</Text>
           <Text style={styles.muted}>{`${day} · ${time}`}</Text>
           <Text style={styles.muted}>{`${session.trainerName} · ${session.branchName}`}</Text>
+          <Text style={styles.muted}>{capacityLabel(session.bookedCount, session.capacity)}</Text>
         </View>
         {empty ? null : (
           <View>
