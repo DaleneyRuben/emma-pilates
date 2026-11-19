@@ -68,6 +68,8 @@ export const clientPage = (
     studioClientCount: number;
     activePlanClientCount: number;
     founderClientCount: number;
+    expiringClientCount: number;
+    unbookedClientCount: number;
   }> = {},
 ) => ({
   items,
@@ -77,6 +79,8 @@ export const clientPage = (
   studioClientCount: extra.studioClientCount ?? 148,
   activePlanClientCount: extra.activePlanClientCount ?? 96,
   founderClientCount: extra.founderClientCount ?? 12,
+  expiringClientCount: extra.expiringClientCount ?? 4,
+  unbookedClientCount: extra.unbookedClientCount ?? 9,
 });
 
 export const luciaDetail: AdminClientDetailDto = {

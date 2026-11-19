@@ -9,10 +9,12 @@ const isabel: AdminClientExportRowDto = {
   email: "isabel@example.com",
   phone: "+591 70011003",
   clientSince: "2026-09-02",
+  lastClassOn: "2026-11-19",
 };
 
 // FIX-065 (walkthrough finding 91): Clientas › «Exportar CSV», the columns
-// the owner asked for: Nombre, Estado, Correo, Teléfono, Desde.
+// the owner asked for: Nombre, Estado, Correo, Teléfono, Desde; FIX-091 adds
+// the list's «Última clase» to the live Clients' file.
 describe("the Clientas CSV", () => {
   it("writes each live Client with her row's state and the day she joined", () => {
     expect(
@@ -23,14 +25,15 @@ describe("the Clientas CSV", () => {
           name: "Sofía Guzmán",
           subscriptionStatus: "expired",
           phone: null,
+          lastClassOn: null,
         },
         { ...isabel, name: "Mariana Peña", subscriptionStatus: "none" },
       ]),
     ).toBe(
-      "﻿Nombre,Estado,Correo,Teléfono,Desde\r\n" +
-        "Isabel Arce,Activo,isabel@example.com,+591 70011003,02/09/2026\r\n" +
-        "Sofía Guzmán,Expirado,isabel@example.com,,02/09/2026\r\n" +
-        "Mariana Peña,Sin plan,isabel@example.com,+591 70011003,02/09/2026\r\n",
+      "﻿Nombre,Estado,Correo,Teléfono,Desde,Última clase\r\n" +
+        "Isabel Arce,Activo,isabel@example.com,+591 70011003,02/09/2026,19/11/2026\r\n" +
+        "Sofía Guzmán,Expirado,isabel@example.com,,02/09/2026,\r\n" +
+        "Mariana Peña,Sin plan,isabel@example.com,+591 70011003,02/09/2026,19/11/2026\r\n",
     );
   });
 
@@ -48,7 +51,7 @@ describe("the Clientas CSV", () => {
         { ...isabel, name: 'Ana "Anita" Rojas, hija', phone: "a\nb" },
       ]).split("\r\n")[1],
     ).toBe(
-      '"Ana ""Anita"" Rojas, hija",Activo,isabel@example.com,"a\nb",02/09/2026',
+      '"Ana ""Anita"" Rojas, hija",Activo,isabel@example.com,"a\nb",02/09/2026,19/11/2026',
     );
   });
 
@@ -68,6 +71,8 @@ describe("the Clientas CSV", () => {
     ["none", "clientas-sin-plan-2026-10-20.csv"],
     ["expired", "clientas-expirado-2026-10-20.csv"],
     ["founder", "clientas-fundadora-2026-10-20.csv"],
+    ["expiring", "clientas-por-vencer-2026-10-20.csv"],
+    ["unbooked", "clientas-sin-reservar-2026-10-20.csv"],
     ["closed", "clientas-cuenta-cerrada-2026-10-20.csv"],
   ] as const)(
     "names the file after the chip %s and the Bolivia date",
