@@ -14,7 +14,7 @@ const planLine = (client: AdminClientDto): string => {
 };
 
 /** «+591 70011001 · Mensual · 7 restantes», under her name. */
-export const clientLine = (client: AdminClientDto): string =>
+const clientLine = (client: AdminClientDto): string =>
   `${client.phone === null || client.phone.trim() === "" ? "Sin teléfono" : client.phone} · ${planLine(client)}`;
 
 // FIX-091 (W9 B): one match, her circle, name and the line to tell her apart.
