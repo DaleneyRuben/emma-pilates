@@ -7,6 +7,8 @@ import {
   NextClassHero,
 } from "@pilates/mobile-core";
 
+import { freePlacesLabel } from "./free-places";
+
 /** The first booked class (not a waitlist place), or none. */
 export function nextBookedClass(items: readonly UpcomingBookingDto[]) {
   return items.find((item) => item.kind === "booking");
@@ -23,7 +25,8 @@ export function classDayWord(startsAt: string, today: string): string {
 
 /**
  * The Client's next class as the shared Palo de rosa hero (ClaseE, FIX-089):
- * «PRÓXIMA · HOY», «08:00 · Mat Pilates», then the branch and the trainer.
+ * «PRÓXIMA · HOY», «08:00 · Mat Pilates», then the branch and the trainer,
+ * the free places and who else is coming by initials.
  */
 export function ClientNextClassHero({
   accessibilityLabel,
@@ -46,9 +49,16 @@ export function ClientNextClassHero({
   return (
     <NextClassHero
       accessibilityLabel={accessibilityLabel}
+      attendees={booking.attendeeInitials ?? []}
       detail={detail ?? `${booking.branchName} · ${booking.trainerName}`}
       eyebrow={`${lead} · ${classDayWord(booking.startsAt, today)}`}
       onPress={onPress}
+      places={
+        // A server older than the attendee read leaves the places out.
+        booking.capacity === undefined || booking.bookedCount === undefined
+          ? undefined
+          : freePlacesLabel(booking.bookedCount, booking.capacity)
+      }
       testID={testID}
       title={`${formatStartTime(booking.startsAt)} · ${booking.classTypeName}`}
     />
