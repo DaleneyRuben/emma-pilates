@@ -9,9 +9,11 @@ import {
   IconRowGroup,
   NoticeRow,
   PersonAvatar,
+  PhoneField,
   SeatPill,
   StateScreen,
 } from "../index";
+import { bolivia } from "../account/phone-number";
 
 const hidden = { includeHiddenElements: true };
 
@@ -118,6 +120,34 @@ describe("FormField (FormB)", () => {
     );
 
     expect(screen.getByLabelText("Contraseña")).not.toHaveProp("placeholder", "••••••");
+  });
+});
+
+describe("optional fields (FormB)", () => {
+  it("draws «(opcional)» at weight 400 after the label", async () => {
+    const screen = await render(<FormField label="Nota" optional />);
+
+    expect(screen.getByText("(opcional)")).toHaveStyle({ fontWeight: "400" });
+    expect(screen.getByLabelText("Nota (opcional)")).toBeOnTheScreen();
+  });
+});
+
+describe("PhoneField (FormB)", () => {
+  it("labels like every field and marks an error with 2 pt and a bold message", async () => {
+    const screen = await render(
+      <PhoneField
+        error="Escribe 8 dígitos."
+        onChange={jest.fn()}
+        value={{ country: bolivia, digits: "7" }}
+      />,
+    );
+
+    expect(screen.getByText("Celular")).toHaveStyle({ fontSize: 14, fontWeight: "600" });
+    expect(screen.getByText("Escribe 8 dígitos.")).toHaveStyle({ fontWeight: "700" });
+    expect(screen.getByTestId("phone-field-box")).toHaveStyle({
+      borderColor: "#93615D",
+      borderWidth: 2,
+    });
   });
 });
 

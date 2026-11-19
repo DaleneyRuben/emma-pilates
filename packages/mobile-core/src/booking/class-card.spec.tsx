@@ -103,6 +103,18 @@ describe("CancelledFold", () => {
   });
 });
 
+describe("CancelledFold without a single reason", () => {
+  it("says the count alone when the causes differ", async () => {
+    const screen = await render(
+      <CancelledFold count={2} reason="">
+        <Text>x</Text>
+      </CancelledFold>,
+    );
+
+    expect(screen.getByRole("button", { name: "2 canceladas, Ver" })).toBeOnTheScreen();
+  });
+});
+
 describe("placesLabel", () => {
   it("says the places as «N de M»", () => {
     expect(placesLabel(2, 8)).toBe("2 de 8");
