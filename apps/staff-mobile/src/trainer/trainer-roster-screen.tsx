@@ -20,6 +20,7 @@ import {
   radii,
   Screen,
   spacing,
+  chipStyles,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -172,21 +173,15 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
                           onPress={() =>
                             setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
                           }
+                          hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
                           style={[
                             styles.choice,
-                            selected && (outcome === "attended" ? styles.attended : styles.noShow),
+                            chipStyles.box,
+                            selected && chipStyles.boxSelected,
                           ]}
                           testID={`roster-${outcome}-${booking.bookingId}`}
                         >
-                          <Text
-                            style={[
-                              styles.choiceLabel,
-                              selected &&
-                                (outcome === "attended"
-                                  ? styles.attendedLabel
-                                  : styles.noShowLabel),
-                            ]}
-                          >
+                          <Text style={[styles.choiceLabel, selected && chipStyles.labelSelected]}>
                             {label}
                           </Text>
                         </Pressable>
@@ -239,8 +234,6 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 }
 
 const styles = StyleSheet.create({
-  attended: { backgroundColor: colors.primaryTint },
-  attendedLabel: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong },
   attendanceRow: {
     alignItems: "center",
     flexDirection: "row",
@@ -252,7 +245,6 @@ const styles = StyleSheet.create({
   centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
   choice: {
     alignItems: "center",
-    backgroundColor: colors.surface,
     borderRadius: radii.pill,
     height: 36,
     justifyContent: "center",
@@ -268,7 +260,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
   },
-  noShow: { backgroundColor: colors.errorSurface },
-  noShowLabel: { color: colors.error, fontFamily: fontFamilies.bodyStrong },
   screen: { paddingHorizontal: spacing.xlSm },
 });

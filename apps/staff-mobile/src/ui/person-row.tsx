@@ -1,4 +1,12 @@
-import { Chevron, colors, fontFamilies, initials, radii, spacing } from "@pilates/mobile-core";
+import {
+  Chevron,
+  chipStyles,
+  colors,
+  fontFamilies,
+  initials,
+  radii,
+  spacing,
+} from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -42,16 +50,23 @@ export function PersonRow({
     <>
       {face ?? <InitialsDisc name={name} />}
       <View style={styles.body}>
-        <Text style={styles.name}>{name}</Text>
+        <Text style={[styles.name, selected && chipStyles.labelSelected]}>{name}</Text>
         {detail === undefined ? null : (
-          <Text ellipsizeMode="tail" numberOfLines={1} style={styles.detail}>
+          <Text
+            ellipsizeMode="tail"
+            numberOfLines={1}
+            style={[styles.detail, selected && styles.onSelected]}
+          >
             {detail}
           </Text>
         )}
       </View>
       {trailing}
       {amount === undefined ? null : <Text style={styles.amount}>{amount}</Text>}
-      {onPress === undefined ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
+      {/* The open row needs no way in: its panel already shows it. */}
+      {onPress === undefined || selected ? null : (
+        <Chevron size={16} strokeWidth={1.5} tone="muted" />
+      )}
     </>
   );
   if (onPress === undefined) {
@@ -67,7 +82,11 @@ export function PersonRow({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={({ pressed }) => [styles.row, selected && styles.selected, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.row,
+        selected && [chipStyles.boxSelected, styles.selected],
+        pressed && styles.pressed,
+      ]}
       testID={testID}
     >
       {content}
@@ -101,5 +120,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  selected: { backgroundColor: colors.primaryTint, borderRadius: radii.card },
+  onSelected: { color: colors.onPrimary },
+  selected: { borderRadius: radii.card },
 });

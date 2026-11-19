@@ -1,5 +1,6 @@
 import {
   agendaDayChipLabel,
+  chipStyles,
   colors,
   fontFamilies,
   radii,
@@ -51,9 +52,9 @@ export function Pill({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.pill, fill && styles.fill, selected && styles.pillSelected]}
+      style={[styles.pill, chipStyles.box, fill && styles.fill, selected && chipStyles.boxSelected]}
     >
-      <Text style={[styles.pillText, selected && styles.pillTextSelected]}>{label}</Text>
+      <Text style={[chipStyles.label, selected && chipStyles.labelSelected]}>{label}</Text>
     </Pressable>
   );
 }
@@ -79,12 +80,12 @@ export function DateTile({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.tile, selected && styles.pillSelected]}
+      style={[styles.tile, chipStyles.box, selected && chipStyles.boxSelected]}
     >
-      <Text style={[styles.tileWeekday, selected && styles.pillTextSelected]}>
+      <Text style={[styles.tileWeekday, selected && chipStyles.labelSelected]}>
         {date === today ? "Hoy" : weekday.toLowerCase()}
       </Text>
-      <Text style={[styles.tileDay, selected && styles.pillTextSelected]}>{day}</Text>
+      <Text style={[styles.tileDay, selected && styles.tileDaySelected]}>{day}</Text>
     </Pressable>
   );
 }
@@ -96,9 +97,10 @@ export function SectionLabel({ children }: { children: string }) {
 export const pillRow = { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm } as const;
 
 const styles = StyleSheet.create({
-  // v2 S17: the 12 pt section title and Lino chips, the chosen one Palo de rosa.
+  // S17's 12 pt section title; the chips are palette B's (FIX-089).
   label: {
-    color: colors.textMuted,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.label,
     fontWeight: "500",
     letterSpacing: typography.label * 0.12,
@@ -107,7 +109,6 @@ const styles = StyleSheet.create({
   },
   pill: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: radii.button,
     justifyContent: "center",
     minHeight: 44,
@@ -115,12 +116,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   fill: { flex: 1, minWidth: 0, paddingHorizontal: 0 },
-  pillSelected: { backgroundColor: colors.primary },
-  pillText: { color: colors.text, fontSize: 14 },
-  pillTextSelected: { color: colors.white },
   tile: {
     alignItems: "center",
-    backgroundColor: colors.card,
     borderRadius: 14,
     gap: spacing.xxs,
     height: 60,
@@ -128,5 +125,11 @@ const styles = StyleSheet.create({
     width: 52,
   },
   tileDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  tileWeekday: { color: colors.textMuted, fontFamily: fontFamilies.bodyMedium, fontSize: 11 },
+  tileDaySelected: { color: colors.onPrimary },
+  tileWeekday: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: 12,
+    fontWeight: "500",
+  },
 });
