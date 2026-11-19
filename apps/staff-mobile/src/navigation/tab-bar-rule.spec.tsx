@@ -25,6 +25,22 @@ describe("Staff tab bar", () => {
     });
   });
 
+  // FIX-089: the tab labels are Work Sans in Rosa profundo; the open tab is
+  // told apart by weight.
+  it("labels the open tab in Work Sans SemiBold and the others in Medium", async () => {
+    const screen = await openLucia(assistantRoutes());
+
+    expect(screen.getByText("Clientes")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_600SemiBold",
+    });
+    expect(screen.getByText("Horario")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_500Medium",
+      fontSize: 12,
+    });
+  });
+
   it("hides inside Reservar para…", async () => {
     const screen = await openLucia(assistantRoutes());
 
