@@ -36,7 +36,9 @@ describe("Trainer damage report for a quantity type", () => {
 
     expect(screen.getByText("Hay 3 que se pueden usar")).toBeOnTheScreen();
     expect(screen.getByText("¿Cuántos se dañaron?")).toBeOnTheScreen();
-    expect(screen.getByPlaceholderText("Ej.: uno se pinchó")).toBeOnTheScreen();
+    // FormB (FIX-089): the example goes under the field, never in it.
+    expect(screen.getByText("Ej.: uno se pinchó")).toBeOnTheScreen();
+    expect(screen.queryByPlaceholderText("Ej.: uno se pinchó")).toBeNull();
     expect(screen.queryByRole("checkbox", { name: "No se puede usar" })).toBeNull();
     expect(screen.getByTestId("report-fault-count")).toHaveTextContent("1");
     expect(screen.getByRole("button", { name: "Uno menos" })).toBeDisabled();
