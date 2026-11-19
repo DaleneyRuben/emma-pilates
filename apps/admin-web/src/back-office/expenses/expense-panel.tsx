@@ -58,10 +58,13 @@ export function ExpensePanelForm({
   branch,
   expense,
   onDone,
+  onSavedOn,
 }: {
   branch: Branch;
   expense: AdminExpenseDto | undefined;
   onDone: (notice?: string) => void;
+  /** The saved Expense's date, so the page can show its month. */
+  onSavedOn?: (incurredOn: string) => void;
 }) {
   const categories = useQuery(expenseCategoriesQueryOptions());
   const change = useExpenseChange(branch.id);
@@ -97,6 +100,7 @@ export function ExpensePanelForm({
           input: record,
           idempotencyKey: keyFor(record),
         });
+        onSavedOn?.(input.incurredOn);
         onDone(
           `Gasto de ${formatBolivianos(input.amountCentavos)} en ${categoryName} registrado en ${branch.name}.`,
         );
@@ -115,6 +119,7 @@ export function ExpensePanelForm({
         expenseId: expense.id,
         input,
       });
+      onSavedOn?.(input.incurredOn);
       onDone(`Guardamos la corrección del gasto de ${categoryName}.`);
     } catch (error) {
       const problem = backOfficeProblem(error);

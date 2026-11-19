@@ -208,7 +208,18 @@ function BranchExpenses({
       query={query}
       columns={expenseColumns}
       renderForm={(expense, done) => (
-        <ExpensePanelForm branch={branch} expense={expense} onDone={done} />
+        <ExpensePanelForm
+          branch={branch}
+          expense={expense}
+          onDone={done}
+          onSavedOn={(incurredOn) => {
+            // A date in another month would leave the new row out of sight.
+            const saved = incurredOn.slice(0, 7);
+            if (saved !== month) {
+              onSearchChange({ month: saved, borrados: undefined, page: 1 });
+            }
+          }}
+        />
       )}
     />
   );
