@@ -64,7 +64,9 @@ describe("W7 the Client file's actions at the end", () => {
       .map((button) => button.textContent)
       .filter(
         (name) =>
-          !["Resumen", "Reservas", "Pagos", "Evaluaciones", "Cerrar"].includes(
+          // The close icon has no text.
+          name !== "" &&
+          !["Resumen", "Reservas", "Pagos", "Evaluaciones"].includes(
             name ?? "",
           ),
       );

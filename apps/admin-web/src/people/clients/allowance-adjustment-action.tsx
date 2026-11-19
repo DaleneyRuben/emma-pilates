@@ -6,13 +6,13 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
-import { Button } from "../../components/ui/button";
+import { ActionRow } from "../../components/panel/action-rows";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 
 const forms = {
   courtesy: {
-    open: "Agregar clase de cortesía",
+    open: "Dar clase de cortesía",
     title: "¿Agregar una clase de cortesía?",
     confirm: "Registrar cortesía",
     note: "La clase se suma al plan vigente. No es un pago.",
@@ -64,18 +64,13 @@ export function AllowanceAdjustmentAction({
   };
 
   return (
-    <>
-      <Button
-        variant="neutral"
-        size="sm"
-        className="self-start"
-        onClick={() => {
-          setFailure(null);
-          setOpen(true);
-        }}
-      >
-        {copy.open}
-      </Button>
+    <ActionRow
+      label={copy.open}
+      onClick={() => {
+        setFailure(null);
+        setOpen(true);
+      }}
+    >
       <ConfirmDialog
         open={open}
         onOpenChange={setOpen}
@@ -105,6 +100,6 @@ export function AllowanceAdjustmentAction({
           </p>
         )}
       </ConfirmDialog>
-    </>
+    </ActionRow>
   );
 }
