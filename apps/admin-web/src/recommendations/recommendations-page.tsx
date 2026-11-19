@@ -74,7 +74,8 @@ function Finding({
         <p className="text-cuerpo text-texto">{item.detail}</p>
         <p className="text-nota text-texto-tenue">{stateLabel[item.state]}</p>
       </div>
-      {readOnly || settled(item) ? null : (
+      {/* A resolved finding that holds again comes back unless discarded. */}
+      {readOnly || item.state === "dismissed" ? null : (
         <button
           type="button"
           disabled={pending}
