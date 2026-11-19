@@ -58,14 +58,8 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     padding: spacing.lg,
   },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   title: {

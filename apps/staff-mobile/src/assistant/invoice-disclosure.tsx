@@ -56,14 +56,8 @@ export function InvoiceDisclosure({
 const styles = StyleSheet.create({
   block: { gap: spacing.md },
   body: { flex: 1, gap: spacing.xxs },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   row: {
     alignItems: "center",

@@ -33,13 +33,17 @@ describe("Assistant rows", () => {
 
     const row = screen.getByRole("button", { name: "Ver cliente Lucía Fernández" });
     expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
-    expect(screen.getByText("LF")).toHaveStyle({ fontFamily: "Lora_400Regular" });
-    expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
+    // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
+    expect(screen.getByText("LF")).toHaveStyle({
+      color: "#F9F4F2",
+      fontFamily: "WorkSans_600SemiBold",
+    });
+    expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#93615D", fontSize: 16 });
     expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
-    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#6F6662");
+    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#93615D");
   });
 
   it("draws the picker pill and the Session card on the booking screen", async () => {

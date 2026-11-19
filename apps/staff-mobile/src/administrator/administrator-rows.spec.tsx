@@ -86,10 +86,14 @@ describe("Administrator rows", () => {
   it("draws the payment as a person row with its amount and the Accesos", async () => {
     const screen = await openPayments();
 
-    expect(screen.getByText("CM")).toHaveStyle({ fontFamily: "Lora_400Regular" });
-    expect(screen.getByText("Carla Mendoza")).toHaveStyle({ color: "#4A4A4A", fontSize: 16 });
+    // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
+    expect(screen.getByText("CM")).toHaveStyle({
+      color: "#F9F4F2",
+      fontFamily: "WorkSans_600SemiBold",
+    });
+    expect(screen.getByText("Carla Mendoza")).toHaveStyle({ color: "#93615D", fontSize: 16 });
     expect(screen.getByText("Paquete de 8 clases · hace 20 minutos")).toHaveStyle({
-      color: "#6F6662",
+      color: "#93615D",
       fontSize: 13,
     });
     expect(screen.getByText("Bs 560")).toHaveStyle({

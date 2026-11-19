@@ -53,13 +53,8 @@ export function ProfileRow({
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       testID={testID}
     >
-      <View style={[styles.disc, error && styles.errorDisc]}>
-        <Glyph
-          color={error ? colors.error : colors.primary}
-          name={icon}
-          size={18}
-          strokeWidth={1.5}
-        />
+      <View style={styles.disc}>
+        <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.5} />
       </View>
       <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
       {badge > 0 ? (
@@ -101,16 +96,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  errorDisc: { backgroundColor: colors.errorSurface },
-  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
+  // FIX-089: the icon stands alone, with no tinted disc behind it.
+  disc: { alignItems: "center", justifyContent: "center", width: 24 },
+  errorLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 16 },
   pressed: { opacity: 0.7 },
   row: {

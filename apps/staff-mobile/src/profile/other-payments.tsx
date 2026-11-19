@@ -79,14 +79,8 @@ const styles = StyleSheet.create({
   date: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   divider: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   group: { ...surfaces.flatCard, overflow: "hidden" },
-  icon: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 10,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
+  // FIX-089: the icon stands alone, with no tinted box behind it.
+  icon: { alignItems: "center", height: 40, justifyContent: "center", width: 40 },
   pressed: { backgroundColor: colors.background },
   row: {
     alignItems: "center",

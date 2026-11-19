@@ -183,7 +183,7 @@ export function AvailabilityScreen() {
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  dates: { color: colors.primaryOnTint, fontFamily: fontFamilies.body, fontSize: typography.note },
+  dates: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   footer: { paddingBottom: spacing.lg, paddingTop: spacing.md },
   list: { gap: spacing.xl, paddingBottom: spacing.xl },
   muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
@@ -198,13 +198,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   screen: { paddingHorizontal: spacing.xlSm },
-  tag: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 18,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
+  // FIX-089: the weekday is a word in weight, with no tinted disc behind it.
+  tag: { justifyContent: "center", width: 40 },
+  tagText: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
   },
-  tagText: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 12 },
 });

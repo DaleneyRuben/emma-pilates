@@ -11,14 +11,17 @@ const noop = () => undefined;
 
 type Node = { children?: (Node | string)[] | null; props?: { style?: unknown } } | string | null;
 
-// Every background drawn under the node, to say no icon sits on a tinted disc.
+// Every background drawn under the node but the 1 pt Rubor dividers, to say
+// no icon sits on a tinted disc.
 function backgrounds(node: Node | Node[]): string[] {
   if (node === null || typeof node === "string") return [];
   if (Array.isArray(node)) return node.flatMap(backgrounds);
   const style = Object.assign({}, ...[node.props?.style].flat(Infinity).filter(Boolean)) as {
     backgroundColor?: string;
+    height?: number;
   };
-  const own = style.backgroundColor === undefined ? [] : [style.backgroundColor];
+  const own =
+    style.backgroundColor === undefined || style.height === 1 ? [] : [style.backgroundColor];
   return [...own, ...(node.children ?? []).flatMap((child) => backgrounds(child))];
 }
 
