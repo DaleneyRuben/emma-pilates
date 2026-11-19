@@ -12,6 +12,7 @@ import { Fragment, type ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { freePlacesLabel } from "./free-places";
 
 type Detail = {
   availableSeats: number;
@@ -25,10 +26,8 @@ type Detail = {
 };
 
 /** The places a Client sees: «5 de 8 libres», «Último lugar» or «Clase llena». */
-export function freePlacesLabel(availableSeats: number, capacity: number, full: boolean) {
-  if (full || availableSeats === 0) return "Clase llena";
-  if (availableSeats === 1) return "Último lugar";
-  return `${availableSeats} de ${capacity} libres`;
+function placesLabel(availableSeats: number, capacity: number, full: boolean) {
+  return freePlacesLabel(full ? 0 : availableSeats, capacity);
 }
 
 type Fact = { key: string; label: string; value?: ReactNode };
@@ -87,7 +86,7 @@ export function SessionFacts({
     {
       key: "places",
       label: "Lugares",
-      value: freePlacesLabel(detail.availableSeats, detail.capacity, full),
+      value: placesLabel(detail.availableSeats, detail.capacity, full),
     },
     ...(lastRow === null ? [] : [lastRow]),
   ];

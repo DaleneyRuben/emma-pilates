@@ -57,7 +57,7 @@ export function ClientNextClassHero({
         // A server older than the attendee read leaves the places out.
         booking.capacity === undefined || booking.bookedCount === undefined
           ? undefined
-          : freePlacesLabel(booking.bookedCount, booking.capacity)
+          : freePlacesLabel(booking.capacity - booking.bookedCount, booking.capacity)
       }
       testID={testID}
       title={`${formatStartTime(booking.startsAt)} · ${booking.classTypeName}`}
