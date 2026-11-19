@@ -39,14 +39,17 @@ export function AgendaDay({
   return (
     <View style={styles.day}>
       {next === undefined ? null : (
-        <NextClassHero
-          accessibilityLabel={`${nextClassEyebrow(next.startsAt, now)}: ${label(next)}`}
-          detail={next.branchName}
-          eyebrow={nextClassEyebrow(next.startsAt, now)}
-          onPress={() => onOpen(next.sessionId)}
-          places={placesLabel(next.bookedCount, next.capacity)}
-          title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
-        />
+        <View testID="next-class-hero">
+          <NextClassHero
+            accessibilityLabel={`${nextClassEyebrow(next.startsAt, now)}: ${label(next)}`}
+            detail={next.branchName}
+            eyebrow={nextClassEyebrow(next.startsAt, now)}
+            onPress={() => onOpen(next.sessionId)}
+            places={placesLabel(next.bookedCount, next.capacity)}
+            testID={`agenda-session-${next.sessionId}`}
+            title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
+          />
+        </View>
       )}
       {others.length === 0 ? null : (
         <ClassList>
