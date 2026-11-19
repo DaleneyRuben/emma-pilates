@@ -21,17 +21,15 @@ const count = (value: number, singular: string, plural: string) =>
 type Rule = { label: string; value: string };
 
 // The Paid Evaluation's price and fee, which the Coordinator reads as null
-// (ADR-0108): no row then.
-const evaluationRule = (settings: StudioSettingsDto): Rule[] =>
-  settings.evaluationPriceCentavos === null ||
-  settings.nutritionistFeeCentavos === null
-    ? []
-    : [
-        {
-          label: "Evaluación nutricional pagada",
-          value: `${formatBolivianos(settings.evaluationPriceCentavos)} · ${formatBolivianos(settings.nutritionistFeeCentavos)} para la nutricionista`,
-        },
-      ];
+// (ADR-0108). FIX-090: she still sees the rule, without the amounts.
+const evaluationRule = (settings: StudioSettingsDto): Rule => ({
+  label: "Evaluación nutricional pagada",
+  value:
+    settings.evaluationPriceCentavos === null ||
+    settings.nutritionistFeeCentavos === null
+      ? "Con precio · el monto y el pago a la nutricionista los ve la administración"
+      : `${formatBolivianos(settings.evaluationPriceCentavos)} · ${formatBolivianos(settings.nutritionistFeeCentavos)} para la nutricionista`,
+});
 
 // AW36's «Reglas fijas»: the Studio Settings only a release changes.
 export const fixedRules = (settings: StudioSettingsDto): Rule[] => [
@@ -55,7 +53,7 @@ export const fixedRules = (settings: StudioSettingsDto): Rule[] => [
     label: "Invita a una amiga",
     value: `${count(settings.guestPassesPerClient, "clase de invitada", "clases de invitada")} por persona · ${count(settings.invitesPerHostPerMonth, "invitación", "invitaciones")} al mes · +${count(settings.inviteRewardClasses, "clase", "clases")} cuando la amiga compra`,
   },
-  ...evaluationRule(settings),
+  evaluationRule(settings),
 ];
 
 // The configurable rules as the Coordinator reads them, without the form
