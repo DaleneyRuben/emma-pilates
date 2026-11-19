@@ -296,6 +296,11 @@ export const parseExpenseQuery = (value: unknown) =>
       expenseCategoryId: uuid.optional(),
       from: civilDate.optional(),
       to: civilDate.optional(),
+      // FIX-091 (W11 B): only the standing or only the eliminated ones.
+      voided: z
+        .enum(['true', 'false'])
+        .transform((flag) => flag === 'true')
+        .optional(),
       ...paging,
     })
     .safeParse(value);

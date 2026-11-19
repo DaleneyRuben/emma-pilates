@@ -178,6 +178,7 @@ export const createPrismaExpenses = (
         expenseCategoryId?: string;
         from?: Date;
         to?: Date;
+        voided?: boolean;
         page: number;
         pageSize: number;
       },
@@ -193,6 +194,9 @@ export const createPrismaExpenses = (
           ...(query.from === undefined ? {} : { gte: query.from }),
           ...(query.to === undefined ? {} : { lte: query.to }),
         },
+        ...(query.voided === undefined
+          ? {}
+          : { voidedAt: query.voided ? { not: null } : null }),
       };
       const [rows, totalItems] = await Promise.all([
         prisma.expense.findMany({
