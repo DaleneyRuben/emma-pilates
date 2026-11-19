@@ -43,7 +43,7 @@ describe("Rechazar un congelamiento", () => {
     ) as HTMLElement;
     await user.click(within(row).getByRole("button", { name: "Rechazar" }));
 
-    const dialog = await screen.findByRole("dialog", {
+    const dialog = await screen.findByRole("alertdialog", {
       name: "¿Rechazar el congelamiento de Valeria Quiroga?",
     });
     expect(decisions).toEqual([]);
