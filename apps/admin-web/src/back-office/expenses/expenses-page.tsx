@@ -81,7 +81,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
     header: "Detalle",
     cell: ({ row, getValue }) => {
       const detail = getValue();
-      return detail === null ? (
+      return detail == null ? (
         <span className="text-texto-tenue">—</span>
       ) : (
         <span
