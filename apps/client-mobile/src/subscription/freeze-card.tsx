@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { dayMonth, freezeRange, freezeSummary, weekdayDayMonth } from "./freeze-window";
+import { dayMonth, freezeRange, freezeSummary } from "./freeze-window";
 
 type CardState = "requested" | "approved" | "running" | "refused";
 
@@ -106,23 +106,23 @@ export function FreezeCard({
     approved: {
       title:
         freeze.startsOn === freeze.endsOn
-          ? `Congelado el ${weekdayDayMonth(freeze.startsOn)}`
+          ? `Congelado el ${dayMonth(freeze.startsOn)}`
           : `Congelado d${range.slice(1)}`,
       rows: [
         ["Días", summary.days],
-        ["Ahora vence el", weekdayDayMonth(planEndsOn)],
+        ["Ahora vence el", dayMonth(planEndsOn)],
       ],
       note: "Esos días no puedes reservar. Tus reservas de esos días se cancelaron y las clases volvieron a tu plan.",
       line: "esos días no puedes reservar",
     },
     running: {
-      title: `Congelado hasta el ${weekdayDayMonth(freeze.endsOn)}`,
+      title: `Congelado hasta el ${dayMonth(freeze.endsOn)}`,
       rows: [
-        ["Vuelves a reservar", weekdayDayMonth(addCivilDays(freeze.endsOn, 1))],
-        ["Ahora vence el", weekdayDayMonth(planEndsOn)],
+        ["Vuelves a reservar", dayMonth(addCivilDays(freeze.endsOn, 1))],
+        ["Ahora vence el", dayMonth(planEndsOn)],
       ],
       note: "Tus clases y tus días quedan guardados mientras tanto.",
-      line: `vuelves a reservar el ${weekdayDayMonth(addCivilDays(freeze.endsOn, 1))}`,
+      line: `vuelves a reservar el ${dayMonth(addCivilDays(freeze.endsOn, 1))}`,
     },
     refused: {
       title: range,

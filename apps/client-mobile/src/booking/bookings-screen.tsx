@@ -2,6 +2,7 @@ import {
   cancelBooking,
   getGetCurrentClientSubscriptionQueryKey,
   getListUpcomingBookingsQueryKey,
+  formatListDate,
   leaveWaitlist,
   useGetCurrentClientSubscription,
   useListUpcomingBookings,
@@ -38,7 +39,7 @@ import { BookingCard, CancelBookingFacts, useBookingAction } from "./booking-car
 import { ClassHistoryTab } from "./class-history-tab";
 import { ClientNextClassHero, nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
-import { formatCancellationWindow, formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
+import { formatCancellationWindow, formatTimeRange } from "@pilates/mobile-core";
 
 type BookingsTab = "history" | "upcoming";
 
@@ -254,7 +255,7 @@ export function BookingsScreen({
               ? "Tu pase de invitada ya se usó."
               : remaining !== undefined
                 ? `Te quedan ${remaining} clases en tu plan`
-                : `${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
+                : `${confirmed.classTypeName} · ${formatListDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
           }
           onClose={dismissConfirmed}
           title="Reserva confirmada"

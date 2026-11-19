@@ -1,47 +1,18 @@
-import type { ClientSubscriptionDtoStatus } from "@pilates/api-contracts";
-
-const civilDateFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-});
-
-const badgeCopy: Record<Exclude<ClientSubscriptionDtoStatus, "none">, string> = {
-  active: "Activa",
-  expiring_soon: "Por vencer",
-  expired: "Vencida",
-};
+import { formatListDate } from "@pilates/api-contracts";
 
 export function firstName(fullName: string): string {
   return fullName.trim().split(/\s+/)[0] ?? "";
 }
 
+/** «dom 8 feb»: FIX-090's list date, also inside a sentence («vence el dom 8 feb»). */
 export function formatCivilDate(civilDate: string): string {
-  return civilDateFormatter.format(new Date(`${civilDate}T00:00:00.000Z`));
+  return formatListDate(civilDate);
 }
-
-const civilDateWithYearFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-  year: "numeric",
-});
-
-// "25 de agosto de 2026", as Mi plan (Client 12) writes its dates.
-export function formatCivilDateWithYear(civilDate: string): string {
-  return civilDateWithYearFormatter.format(new Date(`${civilDate}T00:00:00.000Z`));
-}
-
-const dayMonthFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "America/La_Paz",
-});
 
 export function evaluationShortcut(nextStartsAt: string | undefined): string {
   return nextStartsAt === undefined
     ? "Agenda tu cita del mes"
-    : `Próxima: ${dayMonthFormatter.format(new Date(nextStartsAt))}`;
+    : `Próxima: ${formatListDate(nextStartsAt)}`;
 }
 
 // BKM-014: the reward is one class, not credit. The count still names the tile.
@@ -52,8 +23,4 @@ export function referralShortcut(count: number | undefined): string {
 
 export function describeAllowance(remaining: number, original: number): string {
   return `${remaining} de ${original} clases`;
-}
-
-export function subscriptionBadge(status: Exclude<ClientSubscriptionDtoStatus, "none">): string {
-  return badgeCopy[status];
 }

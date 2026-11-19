@@ -1,4 +1,4 @@
-import type { UpcomingBookingDto } from "@pilates/api-contracts";
+import { formatDateTime, type UpcomingBookingDto } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   CardActionRow,
@@ -7,8 +7,6 @@ import {
   dayChipLabel,
   fontFamilies,
   formatCancellationWindow,
-  formatSessionDate,
-  formatStartTime,
   formatTimeRange,
   IconRow,
   IconRowGroup,
@@ -161,13 +159,12 @@ export function BookingCard({
 
 /** C05c's facts inside the cancel sheet: the class, then that it returns to the Plan. */
 export function CancelBookingFacts({ booking }: { booking: UpcomingBookingDto }) {
-  const date = formatSessionDate(booking.startsAt).split(" ").slice(0, 2).join(" ");
   return (
     <IconRowGroup>
       <View style={styles.factRow}>
         <IconRow
           icon="calendar"
-          label={`${booking.classTypeName} · ${date}, ${formatStartTime(booking.startsAt)}`}
+          label={`${booking.classTypeName} · ${formatDateTime(booking.startsAt)}`}
         />
         <Text style={styles.factNote}>{`${booking.trainerName} · ${booking.branchName}`}</Text>
       </View>

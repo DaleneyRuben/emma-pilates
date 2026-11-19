@@ -29,7 +29,7 @@ import { AccessibilityInfo, ScrollView, StyleSheet, Text, View } from "react-nat
 
 import { useClientFetcher } from "../client-fetcher";
 import { freezeRequestFailure } from "./freeze-refusal-copy";
-import { freezeRefusal, freezeSummary, freezeWindow, weekdayDayMonth } from "./freeze-window";
+import { dayMonth, freezeRefusal, freezeSummary, freezeWindow } from "./freeze-window";
 
 const genericRefusal =
   "No pudimos congelar tu plan con esas fechas. Revisa las fechas e inténtalo de nuevo.";
@@ -100,7 +100,7 @@ export function FreezePlanScreen() {
     start === null
       ? "Toca el primer día."
       : end === null
-        ? `Ahora toca el último día: puede ser hasta el ${weekdayDayMonth(
+        ? `Ahora toca el último día: puede ser hasta el ${dayMonth(
             addDays(start, window.maxDays(start) - 1),
           )}. Toca el mismo día para congelar solo uno.`
         : null;

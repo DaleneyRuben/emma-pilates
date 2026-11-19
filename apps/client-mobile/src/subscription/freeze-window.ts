@@ -1,3 +1,4 @@
+import { formatListDate } from "@pilates/api-contracts";
 import { addCivilDays } from "@pilates/mobile-core";
 
 // Walkthrough finding 51: the Freeze rules of booking ADR-0010 and the
@@ -7,21 +8,6 @@ import { addCivilDays } from "@pilates/mobile-core";
 export const maxFreezeDays = 15;
 
 const weekdays = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-const months = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
-
 const asDate = (civil: string) => new Date(`${civil}T12:00:00.000Z`);
 
 /** Whole days from one civil date to another. */
@@ -29,15 +15,9 @@ export function civilDaysBetween(from: string, to: string): number {
   return Math.round((asDate(to).getTime() - asDate(from).getTime()) / 86_400_000);
 }
 
-/** «30 de enero». */
+/** «sáb 30 ene», FIX-090's list date, also inside a sentence. */
 export function dayMonth(civil: string): string {
-  const date = asDate(civil);
-  return `${date.getUTCDate()} de ${months[date.getUTCMonth()]}`;
-}
-
-/** «lun 16 de noviembre». */
-export function weekdayDayMonth(civil: string): string {
-  return `${weekdays[asDate(civil).getUTCDay()]} ${dayMonth(civil)}`;
+  return formatListDate(civil);
 }
 
 export type FreezeTerm = {
@@ -88,7 +68,7 @@ export function freezeWindow(term: FreezeTerm): FreezeWindow {
       if (civilDaysBetween(start, day) + 1 <= max) return null;
       if (max === queuedCap && queuedCap < maxFreezeDays) return queuedReason(max);
       if (max === civilDaysBetween(start, term.termEndsOn) + 1) return endReason;
-      return `Puedes congelar hasta ${maxFreezeDays} días: el último día posible es el ${weekdayDayMonth(addCivilDays(start, maxFreezeDays - 1))}.`;
+      return `Puedes congelar hasta ${maxFreezeDays} días: el último día posible es el ${dayMonth(addCivilDays(start, maxFreezeDays - 1))}.`;
     },
   };
 }
@@ -111,19 +91,19 @@ export function freezeSummary(termEndsOn: string, start: string, end: string): F
     days: frozenDays === 1 ? "1 día" : `${frozenDays} días`,
     frozenDays,
     newEndsOn,
-    newEnd: weekdayDayMonth(newEndsOn),
+    newEnd: dayMonth(newEndsOn),
     was: `antes, el ${dayMonth(termEndsOn)}`,
   };
 }
 
-/** «Del lun 16 al dom 22 de noviembre», both months when it crosses one. */
+/** «Del lun 16 al dom 22 nov», both months when it crosses one. */
 export function freezeRange(start: string, end: string): string {
-  if (start === end) return `El ${weekdayDayMonth(start)}`;
+  if (start === end) return `El ${dayMonth(start)}`;
   const sameMonth = start.slice(0, 7) === end.slice(0, 7);
   const first = sameMonth
     ? `${weekdays[asDate(start).getUTCDay()]} ${asDate(start).getUTCDate()}`
-    : weekdayDayMonth(start);
-  return `Del ${first} al ${weekdayDayMonth(end)}`;
+    : dayMonth(start);
+  return `Del ${first} al ${dayMonth(end)}`;
 }
 
 /**
