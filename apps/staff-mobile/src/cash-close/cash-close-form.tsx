@@ -156,7 +156,8 @@ export function CashCloseForm({
       <Text style={styles.quiet}>{describeCashSales(cashPaymentCount, branch.name)}</Text>
       {differenceCentavos === null || differenceCentavos === 0 ? null : (
         <FormField
-          label="Nota (opcional)"
+          label="Nota"
+          optional
           maxLength={500}
           multiline
           numberOfLines={3}
