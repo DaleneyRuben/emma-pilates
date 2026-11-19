@@ -28,16 +28,27 @@ import {
   refreshAfterCategoryChange,
   refreshAfterExpense,
 } from "../back-office-cache";
+import { addDays, addMonths } from "../../lib/bolivia-time";
 import type { ExpenseSearch } from "./expense-search";
 
+/** A Bolivia month `YYYY-MM` as its first and last civil dates. */
+export const monthRange = (month: string) => ({
+  from: `${month}-01`,
+  to: addDays(`${addMonths(month, 1)}-01`, -1),
+});
+
 // ADR-0042: the key names the Branch, so another Branch's Expenses never
-// show and a change refreshes only its own Branch.
+// show and a change refreshes only its own Branch. FIX-091 (W11 B): one
+// month, its standing Expenses or, under «borrados», its eliminated ones.
 export const expenseTableQueryOptions = (
   branchId: string,
+  month: string,
   search: ExpenseSearch,
 ) => {
   const params: ListAdminExpensesParams = {
     branchId,
+    ...monthRange(month),
+    voided: search.borrados === true,
     page: search.page,
     pageSize: search.pageSize,
     ...(search.expenseCategoryId === undefined
@@ -90,7 +101,8 @@ export function useExpenseChange(branchId: string) {
   });
 }
 
-// Finding 104: «Eliminar gasto» voids the Expense; the list keeps it, marked.
+// Finding 104: «Eliminar gasto» voids the Expense; FIX-091 moves it to the
+// month's «Ver gastos borrados», marked.
 export function useExpenseVoid(branchId: string) {
   const queryClient = useQueryClient();
 

@@ -9571,6 +9571,15 @@
             }
           },
           {
+            "name": "voided",
+            "required": false,
+            "in": "query",
+            "description": "Only eliminated (true) or only standing (false); both when absent",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "to",
             "required": false,
             "in": "query",

@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import {
   apiUrl,
@@ -31,6 +31,7 @@ const openMember = async (name: string) => {
 };
 
 // BKM-011 (follow-up 143): the Administrator gives each Trainer her code.
+// FIX-091 (W14 A): it saves with the panel's one «Guardar cambios».
 describe("AW24 «Código personal» of a Trainer", () => {
   useMockServer();
   beforeEach(() => {
@@ -45,7 +46,7 @@ describe("AW24 «Código personal» of a Trainer", () => {
     );
   });
 
-  it("saves a new code for a Trainer", async () => {
+  it("saves a new code with the panel's one «Guardar cambios»", async () => {
     server.use(
       http.put(apiUrl(codePath), async ({ request }) => {
         saved.push(await request.json());
@@ -56,19 +57,43 @@ describe("AW24 «Código personal» of a Trainer", () => {
     const code = await within(panel).findByLabelText("Código personal");
 
     expect(code).toHaveValue("");
+    expect(
+      within(panel).queryByRole("button", { name: "Guardar código" }),
+    ).not.toBeInTheDocument();
     await user.type(code, "emma");
     await user.click(
-      within(panel).getByRole("button", { name: "Guardar código" }),
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
     );
 
     expect(
-      await within(panel).findByText("Código guardado: EMMA."),
-    ).toBeInTheDocument();
+      await screen.findByText("Guardamos los cambios de Emma Vargas."),
+    ).toBeVisible();
     expect(saved).toEqual([{ referralCode: "emma" }]);
-    expect(code).toHaveValue("EMMA");
+    expect(
+      screen.queryByRole("dialog", { name: "Editar miembro" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("shows the current code and removes it when emptied", async () => {
+  it("saves the code on Enter, as the rest of the form", async () => {
+    server.use(
+      http.put(apiUrl(codePath), async ({ request }) => {
+        saved.push(await request.json());
+        return jsonResponse({ staffMemberId: emma.id, referralCode: "EMMA" });
+      }),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+    await user.type(
+      await within(panel).findByLabelText("Código personal"),
+      "emma{Enter}",
+    );
+
+    await waitFor(() => expect(saved).toEqual([{ referralCode: "emma" }]));
+    expect(
+      await screen.findByText("Guardamos los cambios de Emma Vargas."),
+    ).toBeVisible();
+  });
+
+  it("removes the current code when emptied", async () => {
     server.use(
       referralCodeHandler("EMMA"),
       http.put(apiUrl(codePath), async ({ request }) => {
@@ -82,13 +107,35 @@ describe("AW24 «Código personal» of a Trainer", () => {
     expect(await within(panel).findByDisplayValue("EMMA")).toBe(code);
     await user.clear(code);
     await user.click(
-      within(panel).getByRole("button", { name: "Guardar código" }),
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
     );
 
     expect(
-      await within(panel).findByText("Quitamos el código."),
-    ).toBeInTheDocument();
+      await screen.findByText("Guardamos los cambios de Emma Vargas."),
+    ).toBeVisible();
     expect(saved).toEqual([{ referralCode: null }]);
+  });
+
+  it("sends no code when it did not change", async () => {
+    server.use(
+      referralCodeHandler("EMMA"),
+      http.put(apiUrl(codePath), async ({ request }) => {
+        saved.push(await request.json());
+        return jsonResponse({ staffMemberId: emma.id, referralCode: "EMMA" });
+      }),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+    await within(panel).findByDisplayValue("EMMA");
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", { name: "Editar miembro" }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(saved).toEqual([]);
   });
 
   it.each([
@@ -112,10 +159,15 @@ describe("AW24 «Código personal» of a Trainer", () => {
       "LUZ",
     );
     await user.click(
-      within(panel).getByRole("button", { name: "Guardar código" }),
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
     );
 
+    // The panel stays open on the refusal, under the field.
     expect(await within(panel).findByText(message)).toBeInTheDocument();
+    expect(within(panel).getByLabelText("Código personal")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
   });
 
   it("offers no code to other Roles", async () => {

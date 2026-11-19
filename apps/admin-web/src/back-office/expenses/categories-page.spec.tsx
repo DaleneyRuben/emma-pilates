@@ -8,6 +8,7 @@ import {
   expensesPath,
   maintenance,
   repair,
+  expenseReportHandler,
 } from "../../test/expense-fixtures";
 import {
   apiUrl,
@@ -38,7 +39,7 @@ const list = () => screen.findByRole("list", { name: "Categorías de gasto" });
 
 describe("AW15 Categorías de gasto in the Gastos panel on a desktop browser", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), expenseReportHandler()));
 
   it("lists the studio's labels and lets only an unused one be deleted", async () => {
     server.use(categoriesHandler());
@@ -201,7 +202,7 @@ describe("AW15 Categorías de gasto in the Gastos panel on a desktop browser", (
 describe("AW15 Categorías de gasto in the Gastos panel on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), expenseReportHandler()));
 
   it("keeps the list and the inline row usable", async () => {
     server.use(categoriesHandler());

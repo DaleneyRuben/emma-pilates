@@ -8,6 +8,10 @@
 export type ListAdminExpensesParams = {
   pageSize?: number;
   page?: number;
+  /**
+   * Only eliminated (true) or only standing (false); both when absent
+   */
+  voided?: boolean;
   to?: unknown;
   from?: unknown;
   expenseCategoryId?: unknown;
