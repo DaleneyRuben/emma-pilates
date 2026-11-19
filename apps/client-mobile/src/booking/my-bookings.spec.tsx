@@ -244,6 +244,11 @@ describe("Client My Bookings", () => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Confirmar cambio" })).toBeDisabled();
+    // FIX-089: an off button says why on its own line.
+    expect(screen.getByRole("button", { name: "Confirmar cambio" })).toHaveProp(
+      "accessibilityHint",
+      "Elige una clase para continuar",
+    );
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveProp(

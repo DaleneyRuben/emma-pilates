@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { addCivilDays, boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -92,7 +92,13 @@ describe("Congelar plan", () => {
     });
 
     expect(screen.getByText(/hasta 15 días/)).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Enviar solicitud" })).toBeDisabled();
+    // FormB (FIX-089): sending early lists what is missing at the top.
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));
+    expect(
+      within(screen.getByTestId("form-error-summary")).getByText("Faltan 2 datos para guardar"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Fechas · Motivo")).toBeOnTheScreen();
+    expect(screen.getByText("Falta este dato")).toBeOnTheScreen();
 
     const shown = { month: 0 };
     await pressDay(screen, start, shown);
@@ -101,7 +107,10 @@ describe("Congelar plan", () => {
     expect(screen.getByText("7 días")).toBeOnTheScreen();
     expect(screen.getByText(weekdayDayMonth(addCivilDays(termEndsOn, 7)))).toBeOnTheScreen();
     expect(screen.getByText(`antes, el ${dayMonth(termEndsOn)}`)).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Enviar solicitud" })).toBeDisabled();
+    expect(screen.getByText("Motivo", { exact: true })).toBeOnTheScreen();
+    expect(
+      within(screen.getByTestId("form-error-summary")).getByText("Falta 1 dato para guardar"),
+    ).toBeOnTheScreen();
 
     await fireEvent.changeText(screen.getByLabelText("Motivo"), "Viaje familiar");
     await fireEvent.press(screen.getByRole("button", { name: "Enviar solicitud" }));
@@ -109,6 +118,7 @@ describe("Congelar plan", () => {
     await waitFor(() => {
       expect(screen.getByText(/^En revisión · /)).toBeOnTheScreen();
     });
+    expect(requests).toHaveLength(1);
     expect(requests).toEqual([
       { subscriptionId: "subscription-1", startsOn: start, endsOn: end, reason: "Viaje familiar" },
     ]);

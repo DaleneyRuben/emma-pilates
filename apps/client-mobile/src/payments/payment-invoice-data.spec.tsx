@@ -145,6 +145,11 @@ describe("Client payment invoice data", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "¿Necesitas factura?" }));
     expect(screen.getByText("Completa el NIT o CI, o cierra la factura")).toBeOnTheScreen();
+    // FIX-089: the reason is the off button's own line, under it.
+    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toHaveProp(
+      "accessibilityHint",
+      "Completa el NIT o CI, o cierra la factura",
+    );
     expect(screen.queryByText("El estudio revisa tu pago y te avisa por la app")).toBeNull();
 
     await fireEvent.changeText(screen.getByLabelText("NIT o CI"), "1020304050");
