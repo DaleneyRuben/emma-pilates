@@ -3,7 +3,6 @@ import {
   boliviaCivilDate,
   civilDateRange,
   clearMobileQueryCache,
-  colors,
   fontFamilies,
 } from "@pilates/mobile-core";
 
@@ -93,21 +92,27 @@ async function openDetail(availableSeats: number) {
   return { screen, block: within(screen.getByTestId("capacity-block")) };
 }
 
-// Follow-up 227 (C04): the seats sit on the hero card, the free count in
-// Lora 32 white over «de M cupos libres», a white bar by the booked share on
-// white 25 %, and the «Lleno» pill on the hero when the class is full.
+// Follow-up 227 (C04) in palette B (FIX-089): the seats sit on the Palo de
+// rosa hero, the free count in Lora 32 Crema over «de M cupos libres», a
+// Crema bar by the booked share on Rubor, and the «Lleno» pill when full. The
+// header names the class, so the hero does not repeat it.
 describe("Client Session detail capacity block", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("draws the free seats in Lora 32 white and the white bar on the hero", async () => {
+  it("draws the free seats in Lora 32 Crema and the Crema bar on the hero", async () => {
     const { screen, block } = await openDetail(3);
 
-    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#93615D" });
+    const hero = screen.getByTestId("session-hero");
+    expect(hero).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(within(hero).queryByText("Reformer Pilates")).not.toBeOnTheScreen();
+    expect(
+      within(screen.getByTestId("screen-top-bar")).getByLabelText("Reformer Pilates"),
+    ).toBeOnTheScreen();
     expect(block.getByText("3")).toHaveStyle({
-      color: colors.white,
+      color: "#F9F4F2",
       fontFamily: fontFamilies.display,
       fontSize: 32,
     });
@@ -116,9 +121,9 @@ describe("Client Session detail capacity block", () => {
 
     const bar = block.getByRole("progressbar");
     expect(bar).toHaveProp("accessibilityValue", { max: 12, min: 0, now: 9 });
-    expect(bar).toHaveStyle({ backgroundColor: "rgba(255,255,255,0.25)", height: 6 });
+    expect(bar).toHaveStyle({ backgroundColor: "#E7CCBF", height: 6 });
     expect(block.getByTestId("capacity-fill")).toHaveStyle({
-      backgroundColor: colors.white,
+      backgroundColor: "#F9F4F2",
       flex: 0.75,
     });
   });

@@ -79,13 +79,14 @@ describe("Client Plans", () => {
     expect(screen.getByText("90 días desde la fecha de inicio")).toBeOnTheScreen();
     expect(screen.getByText("Hasta 4 clases por semana")).toBeOnTheScreen();
     expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
-    // C09's bar names where it opened from; the hero names the Plan.
+    // EncabezadoA (FIX-089): the header names the Plan, so the hero below it
+    // does not say it a second time.
     expect(
-      within(screen.getByTestId("screen-top-bar")).getByLabelText("Elige tu plan"),
+      within(screen.getByTestId("screen-top-bar")).getByLabelText("Trimestral 36 clases"),
     ).toBeOnTheScreen();
     expect(
-      within(screen.getByTestId("plan-hero")).getByText("Trimestral 36 clases"),
-    ).toBeOnTheScreen();
+      within(screen.getByTestId("plan-hero")).queryByText("Trimestral 36 clases"),
+    ).not.toBeOnTheScreen();
     expect(screen.getByText("36 clases")).toBeOnTheScreen();
     expect(screen.getByText("Total")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Pagar Bs 2.100" })).toBeOnTheScreen();
@@ -124,6 +125,11 @@ describe("Client Plans", () => {
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
     // Walkthrough n.º 13: the launch banner, never «fundadora».
     expect(screen.getByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeOnTheScreen();
+    // FIX-089: the offer is a Crema card with a plain icon, not a tinted block.
+    expect(screen.getByTestId("plans-launch-banner")).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+    });
     expect(screen.queryByText(/fundadora/i)).toBeNull();
     expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
 
@@ -137,7 +143,7 @@ describe("Client Plans", () => {
     ).toBeOnTheScreen();
     expect(screen.getByText("Precio del plan")).toBeOnTheScreen();
     expect(screen.getByText("Descuento 15 %")).toBeOnTheScreen();
-    expect(screen.getByText("−Bs 84")).toHaveStyle({ color: "#7D4F4B" });
+    expect(screen.getByText("−Bs 84")).toHaveStyle({ color: "#93615D" });
     expect(screen.getAllByText("Bs 476").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Bs 560").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Pagar Bs 476" })).toBeOnTheScreen();

@@ -86,9 +86,18 @@ describe("Client email change", () => {
     await waitFor(() => {
       expect(screen.getByText("Revisa tu correo nuevo")).toBeOnTheScreen();
     });
-    // Follow-up 70: the pending card's title and links read on the tint.
-    expect(screen.getByText("Revisa tu correo nuevo")).toHaveStyle({ color: "#7D4F4B" });
-    expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#7D4F4B" });
+    // FIX-089: the pending notice is a Crema card with an Arcilla outline;
+    // Rubor is kept for pills, the form summary and the class time box.
+    expect(screen.getByLabelText("Cambio de correo pendiente")).toHaveStyle({
+      backgroundColor: "#F9F4F2",
+      borderColor: "#CDA697",
+      borderWidth: 1,
+    });
+    expect(screen.getByText("Revisa tu correo nuevo")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_500Medium",
+    });
+    expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#93615D" });
     // The card sits under the fields: the keyboard must not hide it.
     expect(dismiss).toHaveBeenCalled();
     dismiss.mockRestore();
