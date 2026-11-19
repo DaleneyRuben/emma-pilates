@@ -15,7 +15,7 @@ import {
   until,
 } from "./assistant-fixtures";
 
-const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
+const dayList = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100&includeCancelled=true`;
 // Today's next class leads as the hero (ClaseE); the later one fills the grid.
 const later = {
   ...session,
