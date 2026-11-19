@@ -62,6 +62,8 @@ const styles = StyleSheet.create({
   row: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

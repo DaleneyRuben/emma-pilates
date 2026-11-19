@@ -54,6 +54,8 @@ const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
   card: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.lg,
     padding: spacing.lg,

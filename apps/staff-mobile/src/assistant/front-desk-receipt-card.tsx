@@ -141,6 +141,8 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.xlSm,
@@ -148,6 +150,8 @@ const styles = StyleSheet.create({
   centred: { textAlign: "center" },
   choice: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,
@@ -169,6 +173,8 @@ const styles = StyleSheet.create({
   receipt: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

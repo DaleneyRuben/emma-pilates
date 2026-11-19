@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
   notice: {
     alignItems: "flex-start",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.inset,
     gap: spacing.sm,
     padding: spacing.lg,

@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
   banner: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.button,
     flexDirection: "row",
     gap: spacing.md,

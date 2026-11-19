@@ -242,6 +242,8 @@ const styles = StyleSheet.create({
   strip: {
     alignItems: "center",
     backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: 14,
     flexDirection: "row",
     gap: spacing.md,

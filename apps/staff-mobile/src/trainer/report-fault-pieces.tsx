@@ -195,6 +195,8 @@ export function OutOfServiceSwitch({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,
@@ -233,6 +235,8 @@ const styles = StyleSheet.create({
   switchRow: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

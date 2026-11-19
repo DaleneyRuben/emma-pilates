@@ -154,6 +154,8 @@ const styles = StyleSheet.create({
   dot: { backgroundColor: colors.iconQuiet, borderRadius: 3, height: 5, width: 5 },
   inset: {
     backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderWidth: 1,
     borderRadius: radii.inset,
     gap: spacing.sm,
     paddingHorizontal: spacing.mdLg,

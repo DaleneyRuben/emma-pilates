@@ -263,5 +263,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 24,
   },
-  pendingCard: { backgroundColor: colors.card, borderRadius: radii.card, padding: spacing.lg },
+  pendingCard: {
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: radii.card,
+    padding: spacing.lg,
+  },
 });
