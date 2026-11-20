@@ -134,7 +134,8 @@ export const ensureStaff = async (
 };
 
 // The Nutritionist's weekly availability, published as she would from the
-// Staff app; skipped while she has any availability that has not ended.
+// Staff app, one block a day; a day she already has availability on is
+// skipped, so a rerun finishes a run that stopped halfway.
 export const ensureNutritionistAvailability = async (
   run: StudioRun,
   nutritionistId: string | undefined,
@@ -142,23 +143,27 @@ export const ensureNutritionistAvailability = async (
 ): Promise<void> => {
   const { prisma, dryRun, log, now } = run.context;
   const today = boliviaDate(now());
-  const existing =
+  const covered =
     nutritionistId === undefined
-      ? 0
-      : await prisma.availabilityBlock.count({
+      ? []
+      : await prisma.availabilityBlock.findMany({
           where: {
             nutritionistStaffMemberId: nutritionistId,
             OR: [{ effectiveUntil: null }, { effectiveUntil: { gt: today } }],
           },
+          select: { weekday: true },
         });
+  const missing = nutritionistWeekdays.filter(
+    (weekday) => !covered.some((block) => block.weekday === weekday),
+  );
   log('android_test_nutritionist_availability', {
-    action: existing > 0 ? 'exists' : 'publish',
-    weekdays: nutritionistWeekdays,
+    action: missing.length === 0 ? 'exists' : 'publish',
+    weekdays: missing,
     ...nutritionistHours,
   });
-  if (existing > 0 || dryRun) return;
+  if (missing.length === 0 || dryRun) return;
   const principal = await nutritionistPrincipal(prisma, nutritionistId!);
-  for (const weekday of nutritionistWeekdays) {
+  for (const weekday of missing) {
     await run.services.evaluations.createAvailabilityBlock(
       {
         branchId: branchId!,
