@@ -107,12 +107,26 @@ export function collectTexts(page: Page): Promise<MeasuredText[]> {
   return page.evaluate(() => {
     const clear = (c: string) =>
       c === "rgba(0, 0, 0, 0)" || c === "transparent";
+    // The painted ground: translucent layers (a row's hover fill, a scrim)
+    // are blended over what is under them, as the eye sees them.
     const backgroundOf = (el: Element) => {
+      const layers: number[][] = [];
       for (let e: Element | null = el; e; e = e.parentElement) {
         const c = getComputedStyle(e).backgroundColor;
-        if (c && !clear(c)) return c;
+        if (!c || clear(c)) continue;
+        const [r = 0, g = 0, b = 0, a = 1] = (c.match(/[\d.]+/g) ?? []).map(
+          Number,
+        );
+        layers.push([r, g, b, a]);
+        if (a >= 1) break;
       }
-      return "rgb(255, 255, 255)";
+      let ground = [255, 255, 255];
+      for (const [r = 0, g = 0, b = 0, a = 1] of layers.reverse()) {
+        ground = [r, g, b].map((v, i) =>
+          Math.round(v * a + ground[i]! * (1 - a)),
+        );
+      }
+      return `rgb(${ground.join(", ")})`;
     };
     const opacityOf = (el: Element) => {
       let o = 1;
@@ -159,6 +173,9 @@ export function collectTexts(page: Page): Promise<MeasuredText[]> {
       // Skips hidden text and the 1 px screen-reader-only text.
       if (rect.width <= 1 || rect.height <= 1) continue;
       if (cs.visibility === "hidden" || cs.display === "none") continue;
+      // Text drawn fully transparent at rest (a slot's «+ 07:00» before
+      // hover) is not seen.
+      if (opacityOf(el) === 0) continue;
       out.push({
         text: text.slice(0, 50),
         family: cs.fontFamily,

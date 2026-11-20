@@ -46,6 +46,10 @@ const publicRoutes = [
 ];
 
 async function audit(page: Page, narrow: boolean): Promise<string[]> {
+  // Nothing hovered: a row's hover fill would be measured half-way through
+  // its transition.
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(300);
   const texts = await collectTexts(page);
   const type = findTypeProblems(texts, narrow).map(
     ({ text, problems }) => `«${text}» ${problems.join("; ")}`,
