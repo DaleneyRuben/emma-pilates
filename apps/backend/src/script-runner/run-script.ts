@@ -1,5 +1,15 @@
+import type { PgBoss } from 'pg-boss';
 import type { PrismaClient } from '../generated/prisma/client';
 import type { ScriptCommand } from '../deployment/script-command';
+import type { EncryptedAuthenticationLink } from '../system-identity/security/authentication-link-cipher';
+
+// What a script needs to queue the Activation Link email the API queues:
+// present only when the job carries the secret group's authentication keys.
+export type ScriptAuthenticationEmail = {
+  boss: Pick<PgBoss, 'send'>;
+  digestEmail(email: string): Uint8Array;
+  linkCipher: { encrypt: (secret: string) => EncryptedAuthenticationLink };
+};
 
 export type ScriptContext = {
   prisma: PrismaClient;
@@ -7,6 +17,7 @@ export type ScriptContext = {
   dryRun: boolean;
   now: () => Date;
   log: (event: string, fields?: Record<string, unknown>) => void;
+  authenticationEmail?: ScriptAuthenticationEmail;
 };
 
 export type ScriptDefinition = {
@@ -77,6 +88,7 @@ export const runScript = async (input: {
   prisma: PrismaClient;
   now: () => Date;
   log: ScriptContext['log'];
+  authenticationEmail?: ScriptAuthenticationEmail;
 }): Promise<ScriptOutcome> => {
   const { command, store } = input;
   const script = Object.hasOwn(input.scripts, command.scriptName)
@@ -117,6 +129,7 @@ export const runScript = async (input: {
       dryRun: command.dryRun,
       now: input.now,
       log: input.log,
+      authenticationEmail: input.authenticationEmail,
     });
   } catch (error) {
     const detail = describe(error);
