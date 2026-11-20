@@ -81,8 +81,8 @@ async function openMyBookings(upcoming: unknown[]) {
   return screen;
 }
 
-// FIX-089 (ClaseE): the first booked class tops Mis reservas as the Palo de
-// rosa hero, its action right under it; the others stay cards. A waitlist
+// FIX-089 (ClaseE, Rosa Emma C05): the first booked class tops Mis reservas as
+// the 600 hero, its action at the hero's foot; the others stay white cards. A waitlist
 // place is a normal state, said in words rather than a pill.
 describe("Client Mis reservas, palette B", () => {
   afterEach(async () => {
@@ -90,17 +90,18 @@ describe("Client Mis reservas, palette B", () => {
     clearMobileQueryCache();
   });
 
-  it("puts the next booked class on top as the hero, with its action under it", async () => {
+  it("puts the next booked class on top as the hero, with its action inside it", async () => {
     const screen = await openMyBookings([waitlisted, soon, later]);
 
     const hero = screen.getByTestId("bookings-next-class");
-    expect(hero).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(hero).toHaveStyle({ backgroundColor: "#93615D" });
     expect(within(hero).getByText(/^\d\d:\d\d · Mat Pilates$/)).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
     });
     expect(within(hero).getByText("Urubó · Daniela Ortiz")).toBeOnTheScreen();
     expect(within(hero).getByText(/^PRÓXIMA · /)).toBeOnTheScreen();
     expect(screen.getAllByRole("button", { name: "Cancelar reserva" })).toHaveLength(2);
+    expect(within(hero).getByRole("button", { name: "Cancelar reserva" })).toBeOnTheScreen();
     // The hero's class is not repeated as a card below it.
     expect(screen.getAllByText(/Mat Pilates/)).toHaveLength(1);
     expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
@@ -110,7 +111,7 @@ describe("Client Mis reservas, palette B", () => {
     const screen = await openMyBookings([waitlisted, soon]);
 
     const words = screen.getByText("En lista de espera");
-    expect(words).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_600SemiBold" });
+    expect(words).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_700Bold" });
     expect(ancestorBackgrounds(words)).not.toContain("#E7CCBF");
   });
 });

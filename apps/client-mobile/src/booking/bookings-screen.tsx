@@ -15,14 +15,16 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
-  Heading,
+  fontFamilies,
+  Glyph,
   LoadingState,
   QueryFailure,
   Screen,
+  ScreenHeader,
   SegmentedTabs,
   StateScreen,
   spacing,
-  TextButton,
+  surfaces,
   useMountedAt,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -36,11 +38,12 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
-import { BookingCard, CancelBookingFacts, useBookingAction } from "./booking-card";
+import { BookingCard, CancelBookingFacts } from "./booking-card";
 import { ClassHistoryTab } from "./class-history-tab";
-import { ClientNextClassHero, nextBookedClass } from "./next-class-hero";
+import { NextBookingHero } from "./next-booking-hero";
+import { nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
-import { formatCancellationWindow, formatTimeRange } from "@pilates/mobile-core";
+import { formatTimeRange } from "@pilates/mobile-core";
 
 type BookingsTab = "history" | "upcoming";
 
@@ -175,22 +178,26 @@ export function BookingsScreen({
 
   return (
     <Screen style={styles.screen}>
-      <Heading accessibilityLabel="Mis reservas" accessibilityRole="header">
-        Mis reservas
-      </Heading>
-      <SegmentedTabs
-        accessibilityLabel="Reservas"
-        onSelect={(key) => navigation.setParams({ tab: key })}
-        options={[
-          { key: "upcoming", label: "Próximas", testID: "bookings-tab-upcoming" },
-          { key: "history", label: "Historial", testID: "bookings-tab-history" },
-        ]}
-        selected={tab}
-      />
+      {/* C05: the Próximas and Historial tabs ride in the band. */}
+      <ScreenHeader testID="bookings-header" title="Mis reservas">
+        <SegmentedTabs
+          accessibilityLabel="Reservas"
+          onSelect={(key) => navigation.setParams({ tab: key })}
+          options={[
+            { key: "upcoming", label: "Próximas", testID: "bookings-tab-upcoming" },
+            { key: "history", label: "Historial", testID: "bookings-tab-history" },
+          ]}
+          selected={tab}
+        />
+      </ScreenHeader>
       {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
+        // C05i: the refusal on a soft notice with the alert glyph.
+        <View style={styles.failureBox} testID="bookings-failure">
+          <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.5} />
+          <BodyText accessibilityRole="alert" style={styles.failure}>
+            {failure}
+          </BodyText>
+        </View>
       ) : null}
       {tab === "history" ? (
         <ClassHistoryTab />
@@ -219,7 +226,7 @@ export function BookingsScreen({
           refreshControl={refreshControl}
           testID="bookings-scroll"
         >
-          {next === undefined ? null : <NextBooking {...cardProps(next)} today={today} />}
+          {next === undefined ? null : <NextBookingHero {...cardProps(next)} today={today} />}
           {items
             .filter((item) => item !== next)
             .map((item) => (
@@ -296,39 +303,25 @@ export function BookingsScreen({
   );
 }
 
-/** The next booked class as the hero, its action right under it. */
-function NextBooking({
-  today,
-  ...props
-}: Parameters<typeof useBookingAction>[0] & { today: string }) {
-  const { action, insideWindow } = useBookingAction(props);
-  const { cancellationWindowMinutes: window, item } = props;
-  return (
-    <View style={styles.next}>
-      <ClientNextClassHero
-        booking={item}
-        detail={
-          insideWindow && window !== undefined
-            ? `${formatTimeRange(item.startsAt, item.endsAt)} · faltan menos de ${formatCancellationWindow(window)}`
-            : undefined
-        }
-        testID="bookings-next-class"
-        today={today}
-      />
-      {action === null ? null : (
-        <View style={styles.nextAction}>
-          <TextButton {...action} />
-        </View>
-      )}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  empty: { flexGrow: 1 },
-  failure: { color: colors.errorText },
+  empty: { flexGrow: 1, paddingBottom: spacing.xxl },
+  failure: {
+    color: colors.errorText,
+    flex: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  failureBox: {
+    ...surfaces.soft,
+    alignItems: "flex-start",
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  next: { gap: spacing.xs },
-  nextAction: { alignItems: "flex-end" },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.md },
 });

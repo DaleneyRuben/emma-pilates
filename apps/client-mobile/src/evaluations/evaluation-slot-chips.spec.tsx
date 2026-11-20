@@ -33,12 +33,12 @@ describe("The Evaluation day and turno chips", () => {
       .getAllByRole("button")
       .filter((button) => button.props.accessibilityState?.selected !== undefined);
     expect(chosen).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(within(chosen!).getByText("1")).toHaveStyle({ color: "#F9F4F2" });
-    expect(other).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(within(chosen!).getByText("1")).toHaveStyle({ color: "#FFFBFB" });
+    expect(other).toHaveStyle({ backgroundColor: "#FFFBFB", borderColor: "#CDA697" });
     expect(screen.getByRole("button", { name: /^Turno 09:00/ })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FEF6F2",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderWidth: 1.5,
     });
   });
 });

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { evaluationDayAndTime } from "./evaluation-format";
 
-/** «Anteriores» as one Lino group of rows, at the foot of C13 (follow-up 264). */
+/** «Anteriores» as one white card of rows, at the foot of C13 (follow-up 264). */
 export function PastEvaluations({
   evaluations,
   label,
@@ -31,21 +31,27 @@ export function PastEvaluations({
 }
 
 const styles = StyleSheet.create({
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 52,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.mdLg,
   },
   rowLabel: {
     color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  rowValue: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  rowValue: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
 });

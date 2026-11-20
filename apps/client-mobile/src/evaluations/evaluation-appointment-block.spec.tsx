@@ -69,7 +69,7 @@ describe("Evaluation appointment block", () => {
     const screen = await open([included(4)]);
 
     const block = await screen.findByTestId("next-evaluation");
-    expect(block).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(block).toHaveStyle({ backgroundColor: "#93615D" });
     expect(within(block).getByText("Tu cita · en 4 días")).toBeOnTheScreen();
     expect(within(block).getByText(/^[A-ZÁÉ][a-zé]{2} \d+ [a-z]{3} · 09:45$/)).toBeOnTheScreen();
     expect(within(block).getByText("GR")).toBeOnTheScreen();
@@ -95,7 +95,7 @@ describe("Evaluation appointment block", () => {
     expect(await screen.findByText("¿Otra evaluación?")).toBeOnTheScreen();
     expect(screen.getByText("Próximos horarios con Gabriela · Gratis")).toBeOnTheScreen();
     const first = screen.getByRole("button", { name: /^Turno .+ 09:00$/ });
-    expect(first).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(first).toHaveStyle({ backgroundColor: "#FEF6F2", borderColor: "#CDA697" });
     expect(screen.getByRole("button", { name: /^Turno .+ 09:45$/ })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: /^Turno .+ 15:00$/ })).toBeOnTheScreen();
     // The full calendar waits behind Ver más días.

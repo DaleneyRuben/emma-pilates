@@ -34,7 +34,10 @@ type Fact = { key: string; label: string; value?: ReactNode };
 
 function FactRow({ fact }: { fact: Fact }) {
   return (
-    <View style={styles.row} testID={`session-fact-${fact.key}`}>
+    <View
+      style={[styles.row, fact.key === "trainer" && styles.trainerRow]}
+      testID={`session-fact-${fact.key}`}
+    >
       <Text style={[styles.label, fact.value === undefined && styles.wide]}>{fact.label}</Text>
       {typeof fact.value === "string" ? <Text style={styles.value}>{fact.value}</Text> : fact.value}
     </View>
@@ -53,7 +56,7 @@ function Trainer({ name, photo }: { name: string; photo: Detail["trainerPhoto"] 
 }
 
 /**
- * C4 A's quiet table: the Trainer, the Branch, the free places, and when the
+ * C4 A's facts on a white card (C04): the Trainer, the Branch, the free places, and when the
  * free cancellation ends (or, for a full class, that a freed place is
  * announced). A limit already past, or unknown, leaves its row out.
  */
@@ -104,7 +107,7 @@ export function SessionFacts({
 
 const styles = StyleSheet.create({
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -112,17 +115,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     minHeight: 48,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
   },
-  table: { ...surfaces.card },
+  table: { ...surfaces.card, overflow: "hidden" },
   trainer: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: spacing.sm },
+  trainerRow: { paddingVertical: spacing.smLg },
   value: {
     color: colors.text,
     flexShrink: 1,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "600",
+    fontWeight: "700",
     textAlign: "right",
   },
-  wide: { flex: 1 },
+  // «Te avisamos si se libera un lugar» says itself across the row.
+  wide: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
 });

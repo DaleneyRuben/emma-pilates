@@ -44,7 +44,7 @@ export function DayTile({ startsAt, today }: { startsAt: string; today: string }
   const civil = boliviaCivilDate(new Date(startsAt));
   const day = dayChipLabel(civil);
   return (
-    <View style={styles.day}>
+    <View style={styles.day} testID="booking-day-tile">
       <Text style={styles.weekday}>{civil === today ? "Hoy" : day.weekday}</Text>
       <Text style={styles.dayNumber}>{day.day}</Text>
     </View>
@@ -105,8 +105,8 @@ export function useBookingAction({
 }
 
 /**
- * A booking card (follow-ups 225 §9 and 226, palette B): the day tile, the
- * class in Lora 20 over one line of details, then the action as a text
+ * A booking card (follow-ups 225 §9 and 226, Rosa Emma C05): a white card
+ * with the soft day tile, the class in Lora 22 over one line of details, then the action as a text
  * button. Cancelling is the secondary look and asks first (FIX-089); a
  * waitlist place is said in words, not a pill.
  */
@@ -175,16 +175,24 @@ export function CancelBookingFacts({ booking }: { booking: UpcomingBookingDto })
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
+  card: {
+    ...surfaces.card,
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
   day: {
     alignItems: "center",
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.button,
+    borderColor: colors.borderSoft,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+    flexShrink: 0,
     height: 52,
     justifyContent: "center",
     width: 52,
   },
-  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20, lineHeight: 22 },
   details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   detailsLine: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   factNote: {
@@ -196,20 +204,26 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   factRow: {},
-  header: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  header: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    lineHeight: 25,
+  },
   trainer: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   waitlist: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.note,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   weekday: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.08,
     textTransform: "uppercase",
   },
 });

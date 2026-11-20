@@ -24,7 +24,7 @@ export function classDayWord(startsAt: string, today: string): string {
 }
 
 /**
- * The Client's next class as the shared Palo de rosa hero (ClaseE, FIX-089):
+ * The Client's next class as the shared 600 hero (ClaseE, FIX-089):
  * «PRÓXIMA · HOY», «08:00 · Mat Pilates», then the branch and the trainer,
  * the free places and who else is coming by initials.
  */

@@ -18,6 +18,7 @@ import {
   PrimaryButton,
   Screen,
   ScreenTopBar,
+  shadows,
   SectionTitle,
   spacing,
   surfaces,
@@ -189,12 +190,15 @@ export function BookEvaluationScreen({
           </>
         )}
         {message !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {message}
-          </BodyText>
+          <View style={styles.failureBox}>
+            <BodyText accessibilityRole="alert" style={styles.failure}>
+              {message}
+            </BodyText>
+          </View>
         ) : null}
       </ScrollView>
-      <View style={styles.footer}>
+      {/* C14: the button and its line sit on the white footer. */}
+      <View style={styles.footer} testID="evaluation-footer">
         {slot.included || receipt === null ? null : (
           <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         )}
@@ -218,19 +222,34 @@ function capitalized(text: string): string {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  failure: { color: colors.errorText },
-  footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
+  failure: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  failureBox: {
+    ...surfaces.soft,
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
+  // A white panel from edge to edge with the card shadow cast upward.
+  footer: {
+    ...shadows.footer,
+    backgroundColor: colors.card,
+    gap: spacing.sm,
+    marginHorizontal: -spacing.lg,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.mdLg,
+  },
   group: { ...surfaces.card },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontSize: typography.note,
     textAlign: "center",
     fontFamily: fontFamilies.body,
   },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.md, paddingBottom: 0 },
   time: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
     fontSize: 40,
     fontVariant: ["tabular-nums"],

@@ -33,14 +33,16 @@ export function UsedMonth({ availability }: { availability: EvaluationAvailabili
         {`Ya usaste tu evaluación de ${usedMonth === undefined ? "este mes" : monthPhrase(usedMonth.month)}.`}
       </Text>
       {next !== null ? (
-        <BodyText>
+        <BodyText style={usedMonthStyles.note}>
           {`Podrás agendar la de ${monthName(next)} desde el 1 de ${monthName(next)}.`}
         </BodyText>
       ) : null}
       {last ? (
         <View style={usedMonthStyles.lastCard}>
           <Text style={usedMonthStyles.label}>Tu última evaluación</Text>
-          <BodyText>{evaluationDayAndTime(last.startsAt)}</BodyText>
+          <BodyText style={usedMonthStyles.lastWhen}>
+            {evaluationDayAndTime(last.startsAt)}
+          </BodyText>
         </View>
       ) : null}
     </View>
@@ -48,25 +50,35 @@ export function UsedMonth({ availability }: { availability: EvaluationAvailabili
 }
 
 export const usedMonthStyles = StyleSheet.create({
+  // An 11 pt uppercase label inside a white card or a soft inset.
   label: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: 0.6,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
   },
+  // C13u: the last Evaluation on a soft 50 inset inside the white card.
   lastCard: {
-    ...surfaces.flatCard,
-    gap: spacing.xs,
-    padding: spacing.lg,
+    ...surfaces.soft,
+    gap: spacing.smd,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
-  // Palette B (FIX-089): a Crema card, not a tint.
-  used: { ...surfaces.card, gap: spacing.sm, padding: spacing.xl },
+  lastWhen: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  // Rosa Emma (C13n, C13u): a white card with a Lora title.
+  used: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lgXl },
   usedTitle: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 27,
   },
 });

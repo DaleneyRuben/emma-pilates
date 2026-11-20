@@ -58,12 +58,12 @@ describe("Client Session detail on a frozen day", () => {
 
     const button = screen.getByRole("button", { name: "No disponible durante el congelamiento" });
     expect(button).toBeDisabled();
-    // Palette B's disabled look, with the day she can book as its reason
-    // line right under it (FIX-089).
-    expect(button).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    // Rosa Emma's disabled look (50 with a 400 outline), with the day she can
+    // book as its reason line right under it (FIX-089, C04j).
+    expect(button).toHaveStyle({ backgroundColor: "#FEF6F2", borderColor: "#CDA697" });
     expect(button).toHaveProp("accessibilityHint", expect.stringMatching(/^Podrás reservar desde/));
     expect(screen.queryByRole("button", { name: "Reservar esta clase" })).toBeNull();
-    expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "600" });
+    expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "700" });
     // FIX-090: the shared list date inside the sentence, «lun 23 nov».
     expect(
       screen.getByText(`Podrás reservar desde el ${dayMonth(addCivilDays(endsOn, 1))}.`),
@@ -75,8 +75,8 @@ describe("Client Session detail on a frozen day", () => {
     const { screen } = await openFrozen(classDay, classDay);
 
     expect(screen.getByTestId("session-hero")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     expect(
       within(screen.getByTestId("session-fact-places")).getByText("3 de 12 libres"),

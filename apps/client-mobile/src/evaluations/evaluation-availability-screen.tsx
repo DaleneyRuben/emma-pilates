@@ -13,6 +13,8 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
+  fontFamilies,
+  Glyph,
   LoadingState,
   QueryFailure,
   Screen,
@@ -20,8 +22,10 @@ import {
   SectionTitle,
   spacing,
   StateScreen,
+  surfaces,
   usePullToRefresh,
   useRefetchOnFocus,
+  typography,
   useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -67,7 +71,7 @@ const toastTitle = (notice: Notice) =>
  * C13, walkthrough finding 70 (follow-up 264, option A): one «Evaluación
  * nutricional» with the next Evaluation and its actions on top, the slots
  * to book (or to move it to) below, and «Anteriores» at the foot. Since C5
- * pick C the appointment is one Palo de rosa block with its actions inside,
+ * pick C the appointment is the 600 hero with its actions inside,
  * and «¿Otra evaluación?» offers the next three slots before the calendar.
  */
 export function EvaluationAvailabilityScreen({
@@ -170,9 +174,11 @@ export function EvaluationAvailabilityScreen({
       : setTarget({ slot, from: movingNow.startsAt });
   const failure =
     commands.failure === null ? null : (
-      <BodyText accessibilityRole="alert" style={styles.failure}>
-        {commands.failure}
-      </BodyText>
+      <View style={styles.failureBox}>
+        <BodyText accessibilityRole="alert" style={styles.failure}>
+          {commands.failure}
+        </BodyText>
+      </View>
     );
   const confirmMove = async () => {
     if (movingNow === null || target === null) return;
@@ -191,14 +197,20 @@ export function EvaluationAvailabilityScreen({
         refreshControl={refreshControl}
         testID="evaluation-scroll"
       >
-        {items.length === 0 && offer !== null ? <BodyText>{offer}</BodyText> : null}
+        {items.length === 0 && offer !== null ? (
+          // C13: her Plan's offer on a white card with the tag glyph.
+          <View style={styles.offer} testID="evaluation-offer">
+            <Glyph color={colors.text} name="tag" size={18} strokeWidth={1.5} />
+            <BodyText style={styles.offerText}>{offer}</BodyText>
+          </View>
+        ) : null}
         {movingNow === null ? failure : null}
         {items.length > 0 ? (
           <View>
             {/* One appointment names itself in its block («Tu cita»). */}
             {items.length > 1 ? <SectionTitle>Tus próximas evaluaciones</SectionTitle> : null}
             <View style={styles.cards}>
-              {items.map((evaluation) => (
+              {items.map((evaluation, index) => (
                 <NextEvaluationCard
                   evaluation={evaluation}
                   key={evaluation.id}
@@ -212,6 +224,7 @@ export function EvaluationAvailabilityScreen({
                     commands.clearFailure();
                     setMoving(evaluation);
                   }}
+                  secondary={index > 0}
                   uploading={commands.uploadingId === evaluation.id}
                 />
               ))}
@@ -303,8 +316,31 @@ export function EvaluationAvailabilityScreen({
 }
 
 const styles = StyleSheet.create({
-  cards: { gap: spacing.xl },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  failure: { color: colors.errorText },
-  screen: { gap: spacing.lg },
+  cards: { gap: spacing.md },
+  content: { gap: spacing.md, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
+  failure: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  failureBox: {
+    ...surfaces.soft,
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
+  offer: {
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  offerText: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+    lineHeight: 21,
+  },
+  screen: { gap: spacing.md },
 });

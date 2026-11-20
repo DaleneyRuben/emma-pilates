@@ -5,7 +5,6 @@ import {
   useListSessionAvailability,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   bookingStrip,
   bookingWindowDays,
   boliviaCivilDate,
@@ -16,12 +15,11 @@ import {
   formatSessionDate,
   formatTimeRange,
   hasStarted,
-  Heading,
   LoadingState,
   OtherDateSheet,
-  PickerCheck,
   QueryFailure,
   Screen,
+  ScreenHeader,
   spacing,
   StaffFace,
   surfaces,
@@ -33,11 +31,11 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BrowseEmptyState } from "./browse-empty-state";
-import { BranchLine, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
+import { BranchLine, BranchSheet, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
 import { SessionRow, seatsTag } from "./session-row";
 import { WeekNotice, weekOf } from "./browse-week-notice";
 import {
@@ -129,63 +127,47 @@ export function BrowseSessionsScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Heading accessibilityLabel="Reservar">Reservar</Heading>
-      {selectedBranch ? (
-        <BranchLine
-          count={branchList.length}
-          name={selectedBranch.name}
-          onToggle={() => setChoosingBranch((open) => !open)}
-          open={choosingBranch}
+      {/* C03: the band holds the Branch, the week's notice and the days. */}
+      <ScreenHeader testID="browse-header" title="Reservar">
+        {selectedBranch ? (
+          <BranchLine
+            count={branchList.length}
+            name={selectedBranch.name}
+            onToggle={() => setChoosingBranch((open) => !open)}
+            open={choosingBranch}
+          />
+        ) : null}
+        <WeekNotice classesLeft={classesLeft} selectedDate={selectedDate} today={today} />
+        <DayStrip
+          dates={strip}
+          frozen={(date) => isFrozen(date, freeze)}
+          onSelect={setSelectedDate}
+          selected={selectedDate}
+          today={today}
+          trailing={
+            later.length === 0 ? undefined : (
+              <DayStripOther
+                accessibilityLabel={`Elegir otra fecha, hasta ${windowDays} días`}
+                label={pickedLater ? String(Number(selectedDate.slice(8, 10))) : "Otra"}
+                onPress={() => setChoosingDate(true)}
+                selected={pickedLater}
+              />
+            )
+          }
         />
-      ) : null}
+        {freeze !== null && !frozenDay && dates.some((date) => isFrozen(date, freeze)) ? (
+          <FrozenLegend freeze={freeze} />
+        ) : null}
+      </ScreenHeader>
       {choosingBranch ? (
-        <View style={styles.branchSheet}>
-          <BodyText style={styles.sheetTitle}>Elige una sucursal</BodyText>
-          {branchList.map((branch) => (
-            <Pressable
-              accessibilityLabel={branch.name}
-              accessibilityRole="button"
-              accessibilityState={{ selected: branch.id === branchId }}
-              key={branch.id}
-              onPress={() => {
-                setSelectedBranchId(branch.id);
-                setChoosingBranch(false);
-              }}
-              style={styles.branchRow}
-            >
-              <View style={styles.branchText}>
-                <Text
-                  style={[styles.branchName, branch.id === branchId && styles.branchNameSelected]}
-                >
-                  {branch.name}
-                </Text>
-                <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
-              </View>
-              <PickerCheck selected={branch.id === branchId} testID={`picker-check-${branch.id}`} />
-            </Pressable>
-          ))}
-        </View>
-      ) : null}
-      <WeekNotice classesLeft={classesLeft} selectedDate={selectedDate} today={today} />
-      <DayStrip
-        dates={strip}
-        frozen={(date) => isFrozen(date, freeze)}
-        onSelect={setSelectedDate}
-        selected={selectedDate}
-        today={today}
-        trailing={
-          later.length === 0 ? undefined : (
-            <DayStripOther
-              accessibilityLabel={`Elegir otra fecha, hasta ${windowDays} días`}
-              label={pickedLater ? String(Number(selectedDate.slice(8, 10))) : "Otra"}
-              onPress={() => setChoosingDate(true)}
-              selected={pickedLater}
-            />
-          )
-        }
-      />
-      {freeze !== null && !frozenDay && dates.some((date) => isFrozen(date, freeze)) ? (
-        <FrozenLegend freeze={freeze} />
+        <BranchSheet
+          branches={branchList}
+          onSelect={(id) => {
+            setSelectedBranchId(id);
+            setChoosingBranch(false);
+          }}
+          selectedId={branchId}
+        />
       ) : null}
       <ClassTypeStrip
         onSelect={setClassTypeId}
@@ -234,7 +216,7 @@ export function BrowseSessionsScreen() {
           refreshControl={refreshControl}
           testID="browse-sessions-scroll"
         >
-          <View style={styles.dayHeader}>
+          <View style={styles.dayHeader} testID="browse-day-header">
             <Text style={styles.dayTitle}>
               {capitalized(formatSessionDate(civilDateRange(selectedDate).from))}
             </Text>
@@ -279,36 +261,31 @@ export function BrowseSessionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  branchAddress: { fontFamily: fontFamilies.body, fontSize: typography.note },
-  branchName: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  // Palette B marks the chosen Branch by weight, not another colour (FIX-089).
-  branchNameSelected: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  branchRow: {
+  dayCount: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.note,
+    fontWeight: "700",
+  },
+  // C03: the day's date is a white strip card above its classes.
+  dayHeader: {
+    ...surfaces.card,
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.md,
     justifyContent: "space-between",
-    paddingVertical: spacing.sm,
-  },
-  branchText: { flex: 1, gap: spacing.xxs },
-  branchSheet: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
-  dayCount: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  dayHeader: {
-    alignItems: "baseline",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   dayTitle: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    flexShrink: 1,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
   },
-  empty: { flexGrow: 1 },
-  list: { gap: spacing.sm, paddingBottom: spacing.xxl, paddingTop: spacing.sm },
-  screen: { gap: spacing.lg },
-  sheetTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.label },
+  empty: { flexGrow: 1, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
+  list: { gap: spacing.md, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
+  screen: { gap: spacing.md },
 });

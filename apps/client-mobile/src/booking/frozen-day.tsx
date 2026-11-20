@@ -4,13 +4,12 @@ import {
   colors,
   fontFamilies,
   Glyph,
-  PrimaryButton,
+  radii,
   spacing,
   surfaces,
-  TextButton,
   typography,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { dayMonth, freezeRange } from "../subscription/freeze-window";
 
@@ -64,7 +63,10 @@ function rangeInSentence(freeze: ApprovedFreeze): string {
   return `${range.charAt(0).toLowerCase()}${range.slice(1)}`;
 }
 
-/** One quiet line under the day strip that names the frozen days. */
+/**
+ * One quiet line under the day strip that names the frozen days, on a white
+ * capsule because small text never sits on the band.
+ */
 export function FrozenLegend({ freeze }: { freeze: ApprovedFreeze }) {
   return (
     <View style={styles.legend} testID="browse-frozen-legend">
@@ -76,7 +78,8 @@ export function FrozenLegend({ freeze }: { freeze: ApprovedFreeze }) {
 
 /**
  * C1 B (owner 2026-11-19): a frozen day on Reservar explains the Freeze and
- * offers the first day she can book, instead of greyed-out classes.
+ * offers the first day she can book, instead of greyed-out classes. C03g
+ * draws it as the screen's 600 hero with a white button and a white link.
  */
 export function FrozenDayCard({
   backOn,
@@ -102,14 +105,30 @@ export function FrozenDayCard({
       <Text
         style={styles.body}
       >{`Pediste congelar tu plan ${rangeInSentence(freeze)}.${moved}`}</Text>
-      {backOn === null ? null : (
-        <PrimaryButton
-          label={`Ver clases del ${weekdayAndDay(backOn).toLowerCase()}`}
-          onPress={() => onShowDay(backOn)}
-          testID="browse-frozen-back-on"
-        />
-      )}
-      <TextButton label="Ver mi congelamiento" onPress={onOpenFreeze} style={styles.link} />
+      <View style={styles.actions}>
+        {backOn === null ? null : (
+          <Pressable
+            accessibilityLabel={`Ver clases del ${weekdayAndDay(backOn).toLowerCase()}`}
+            accessibilityRole="button"
+            onPress={() => onShowDay(backOn)}
+            style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+            testID="browse-frozen-back-on"
+          >
+            <Text style={styles.buttonLabel}>
+              {`Ver clases del ${weekdayAndDay(backOn).toLowerCase()}`}
+            </Text>
+          </Pressable>
+        )}
+        <Pressable
+          accessibilityLabel="Ver mi congelamiento"
+          accessibilityRole="button"
+          hitSlop={spacing.sm}
+          onPress={onOpenFreeze}
+          style={styles.link}
+        >
+          <Text style={styles.linkLabel}>Ver mi congelamiento</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -121,15 +140,52 @@ export function dayBackFromFreeze(freeze: ApprovedFreeze, dates: readonly string
 }
 
 const styles = StyleSheet.create({
+  actions: { gap: spacing.smLg, marginTop: spacing.sm },
   body: {
-    color: colors.text,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  legend: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
+  button: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.button,
+    justifyContent: "center",
+    minHeight: 48,
+    paddingHorizontal: spacing.lgXl,
+  },
+  buttonLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+  },
+  card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
+  legend: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    flexDirection: "row",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.smd,
+  },
   legendText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  link: { alignSelf: "flex-start" },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
+  link: { alignSelf: "flex-start", justifyContent: "center", minHeight: 32 },
+  linkLabel: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
+  pressed: { opacity: 0.85 },
+  title: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: 26,
+    lineHeight: 29,
+  },
 });
