@@ -143,7 +143,6 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
-
 const tabCount = 4;
 
 const tabOptions =
