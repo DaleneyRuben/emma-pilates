@@ -26,15 +26,17 @@ const cancelled = {
   },
 };
 
-// FIX-091 W2 (Horario B): today's column in Rubor, and each cancelled class
-// as one thin line in its place, still opening its read-only view.
-describe("W2 Horario: today in Rubor, cancelled classes as a thin line", () => {
+// FIX-091 W2 (Horario B), verification 2026-11-20 and Rosa Emma (RW-horario):
+// today's header solid Rosa profundo over a soft 50 column (no strong Rubor
+// fill), each class in two lines, and each cancelled class as one thin line
+// in its place, still opening its read-only view.
+describe("W2 Horario: today marked softly, compact classes, cancelled lines", () => {
   useMockServer();
   beforeEach(() => {
     server.use(...signedInHandlers(), ...sessionFormHandlers());
   });
 
-  it("fills today's column and its header in Rubor", async () => {
+  it("marks today with a solid header over a soft column", async () => {
     server.use(http.get(apiUrl(sessionsPath), () => jsonResponse([])));
     renderAdmin(`/horario?week=${weekStartOf(boliviaToday())}`);
 
@@ -45,11 +47,41 @@ describe("W2 Horario: today in Rubor, cancelled classes as a thin line", () => {
       header.textContent?.includes("hoy"),
     );
     expect(todayIndex).toBeGreaterThanOrEqual(0);
-    expect(headers[todayIndex]).toHaveClass("bg-rubor");
-    expect(cells[todayIndex]).toHaveClass("bg-rubor");
+    expect(headers[todayIndex]).toHaveClass("bg-primario", "text-blanco");
+    expect(cells[todayIndex]).toHaveClass("bg-superficie-hundida");
+    expect(cells[todayIndex]).not.toHaveClass("bg-rosa-200");
     const otherDay = (todayIndex + 1) % 7;
-    expect(headers[otherDay]).not.toHaveClass("bg-rubor");
-    expect(cells[otherDay]).not.toHaveClass("bg-rubor");
+    expect(headers[otherDay]).toHaveClass("bg-superficie");
+    expect(cells[otherDay]).not.toHaveClass("bg-superficie-hundida");
+  });
+
+  it("draws a class in two lines: its type, then the trainer and the places", async () => {
+    server.use(
+      http.get(apiUrl(sessionsPath), () =>
+        jsonResponse([mondayReformer, wednesdayMat]),
+      ),
+    );
+    renderAdmin(`/horario?week=${nextMonday}`);
+
+    const reformer = await screen.findByRole("button", {
+      name: /^Reformer Pilates, 07:00/,
+    });
+    const lines = within(reformer).getAllByText(/./, {
+      selector: "span[data-line]",
+    });
+    expect(lines.map((line) => line.textContent)).toEqual([
+      "Reformer Pilates",
+      `${mondayReformer.trainerName.split(" ")[0]} · 4 de 8`,
+    ]);
+    const full = screen.getByRole("button", { name: /^Mat Pilates, 16:00/ });
+    expect(
+      within(full)
+        .getAllByText(/./, { selector: "span[data-line]" })
+        .map((line) => line.textContent),
+    ).toEqual([
+      "Mat Pilates",
+      `${wednesdayMat.trainerName.split(" ")[0]} · Llena · 3 en espera`,
+    ]);
   });
 
   it("draws a cancelled class as one thin line that still opens it", async () => {
@@ -106,7 +138,7 @@ describe("W2 Horario: today in Rubor, cancelled classes as a thin line", () => {
       );
     });
 
-    it("tints today's day tab in Rubor while another day is shown", async () => {
+    it("rings today's day tab on 50 while another day is shown", async () => {
       server.use(http.get(apiUrl(sessionsPath), () => jsonResponse([])));
       const today = boliviaToday();
       const { user } = renderAdmin(`/horario?week=${weekStartOf(today)}`);
@@ -116,7 +148,8 @@ describe("W2 Horario: today in Rubor, cancelled classes as a thin line", () => {
       if (todayTab === undefined || other === undefined) throw new Error();
       await user.click(other);
       expect(todayTab).toHaveAttribute("aria-selected", "false");
-      expect(todayTab).toHaveClass("bg-rubor");
+      expect(todayTab).toHaveClass("bg-superficie-hundida");
+      expect(todayTab).not.toHaveClass("bg-rosa-200");
     });
   });
 });
