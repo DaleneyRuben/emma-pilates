@@ -1,20 +1,15 @@
 import { decideFreeze, useGetFreezeReview } from "@pilates/api-contracts";
 import {
   BrandToast,
-  ClientFace,
-  ConfirmationSheet,
   colors,
   fontFamilies,
-  IconRow,
-  IconRowGroup,
   LoadingState,
   NoticeRow,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
-  TextButton,
   typography,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,7 +19,10 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar, backBarScroll } from "../ui/back-bar";
-import { freezeDays, freezeDecision, freezePlanEnd, freezeRange } from "./freeze-format";
+import { useIsTablet } from "../ui/use-is-tablet";
+import { freezeDecision } from "./freeze-format";
+import { FreezeReviewCard } from "./freeze-review-card";
+import { RefuseFreezeStep } from "./refuse-freeze-step";
 
 type ReviewNavigation = { goBack: () => void };
 
@@ -38,19 +36,27 @@ const decisionNotice = (body: unknown): string => {
   return "No pudimos guardar la decisión.";
 };
 
+/**
+ * E9 A + B (owner 2026-11-19): the review ends with «Aprobar»; «Rechazar con
+ * un motivo» opens the refusal step on the same screen, and «Volver» or the
+ * back arrow returns to the review.
+ */
 export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: string } } }) {
   const navigation = useNavigation<ReviewNavigation>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   const review = useGetFreezeReview(route.params.freezeId, { fetcher });
   const [pending, setPending] = useState<"approved" | "refused" | null>(null);
   const [refusing, setRefusing] = useState(false);
   const [notice, setNotice] = useState<{ text: string; tone: "success" | "error" } | null>(null);
   const queryClient = useQueryClient();
 
-  const decide = async (decision: "approved" | "refused") => {
+  const decide = async (decision: "approved" | "refused", refusalReason?: string) => {
     setPending(decision);
+    setNotice(null);
     try {
-      const response = await decideFreeze(route.params.freezeId, { decision }, undefined, fetcher);
+      const body = refusalReason === undefined ? { decision } : { decision, refusalReason };
+      const response = await decideFreeze(route.params.freezeId, body, undefined, fetcher);
       setNotice(
         response.status === 200
           ? { text: "Listo. La clienta ya fue avisada.", tone: "success" }
@@ -64,7 +70,13 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
     }
   };
 
-  const header = <BackBar onBack={() => navigation.goBack()} title="Revisar congelamiento" />;
+  const back = () => {
+    if (refusing) {
+      setRefusing(false);
+      setNotice(null);
+    } else navigation.goBack();
+  };
+  const header = <BackBar onBack={back} title="Revisar congelamiento" />;
   if (review.isPending) {
     return (
       <Screen style={styles.screen}>
@@ -85,89 +97,85 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
     );
   }
   const freeze = review.data.data;
-
+  const firstName = freeze.clientName.trim().split(/\s+/)[0] ?? freeze.clientName;
   const requested = freeze.state === "requested";
-  const planEnd = freezePlanEnd(freeze);
   const decision = freezeDecision(freeze);
+  const error =
+    notice?.tone === "error" ? (
+      <View accessibilityLabel={notice.text} accessibilityRole="alert">
+        <NoticeRow message={notice.text} />
+      </View>
+    ) : null;
+  const toast =
+    notice?.tone === "success" ? (
+      <BrandToast onClose={() => navigation.goBack()} title={notice.text} />
+    ) : null;
+
+  if (refusing && requested && notice?.tone !== "success") {
+    return (
+      <Screen style={styles.screen}>
+        <View style={[styles.column, tablet && styles.tablet]}>
+          <RefuseFreezeStep
+            busy={pending === "refused"}
+            error={error}
+            firstName={firstName}
+            header={
+              <BackBar
+                onBack={back}
+                subtitle={`${firstName} recibirá este motivo en su app.`}
+                title="Rechazar congelamiento"
+              />
+            }
+            onBack={back}
+            onRefuse={(refusalReason) => void decide("refused", refusalReason)}
+          />
+        </View>
+      </Screen>
+    );
+  }
+
   return (
     <Screen style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
-        style={backBarScroll.scroll}
-      >
-        {header}
-        <View style={styles.identity}>
-          <ClientFace
-            fetcher={fetcher}
-            name={freeze.clientName}
-            photo={freeze.clientPhoto}
-            size={56}
-          />
-          <View style={styles.identityBody}>
-            <Text style={styles.name}>{freeze.clientName}</Text>
-            <Text style={styles.muted}>{freeze.planName}</Text>
-          </View>
-        </View>
-        <View>
-          <SectionTitle>Solicitud</SectionTitle>
-          <IconRowGroup>
-            {/* Walkthrough finding 52: the days as the dates' value were
-                crushed into a one-letter column, so each has its own row. */}
-            <IconRow icon="calendar" label={`Del ${freezeRange(freeze.startsOn, freeze.endsOn)}`} />
-            <IconRow icon="hourglass" label={freezeDays(freeze.startsOn, freeze.endsOn)} />
-            {planEnd === undefined ? null : <IconRow icon="clock" label={planEnd} />}
-            <IconRow icon="message" label={freeze.reason} />
-          </IconRowGroup>
-        </View>
-        {notice?.tone === "error" ? (
-          <View accessibilityLabel={notice.text} accessibilityRole="alert">
-            <NoticeRow message={notice.text} />
+      <View style={[styles.column, tablet && styles.tablet]}>
+        <ScrollView
+          contentContainerStyle={[styles.content, backBarScroll.content]}
+          style={backBarScroll.scroll}
+        >
+          {header}
+          <FreezeReviewCard fetcher={fetcher} freeze={freeze} />
+          {error}
+          {decision === undefined ? null : <Text style={styles.muted}>{decision}</Text>}
+        </ScrollView>
+        {requested && notice?.tone !== "success" ? (
+          <View style={styles.actions}>
+            <PrimaryButton
+              busy={pending === "approved"}
+              disabled={pending !== null}
+              label="Aprobar"
+              onPress={() => void decide("approved")}
+            />
+            <OutlinedButton
+              disabled={pending !== null}
+              label="Rechazar con un motivo"
+              onPress={() => {
+                setNotice(null);
+                setRefusing(true);
+              }}
+            />
           </View>
         ) : null}
-        {decision === undefined ? null : <Text style={styles.muted}>{decision}</Text>}
-      </ScrollView>
-      {requested && notice?.tone !== "success" ? (
-        <View style={styles.actions}>
-          <PrimaryButton
-            busy={pending === "approved"}
-            disabled={pending !== null}
-            label="Aprobar congelamiento"
-            onPress={() => void decide("approved")}
-          />
-          <TextButton
-            disabled={pending !== null}
-            label="Rechazar"
-            onPress={() => setRefusing(true)}
-            tone="error"
-          />
-        </View>
-      ) : null}
-      {/* FIX-089: a destructive decision takes a confirmation step. */}
-      <ConfirmationSheet
-        busy={pending === "refused"}
-        confirmLabel="Sí, rechazar"
-        note={`${freeze.clientName} sigue con su plan como estaba.`}
-        onConfirm={() => {
-          setRefusing(false);
-          void decide("refused");
-        }}
-        onDismiss={() => setRefusing(false)}
-        title="¿Rechazar este congelamiento?"
-        visible={refusing}
-      />
-      {notice?.tone === "success" ? (
-        <BrandToast onClose={() => navigation.goBack()} title={notice.text} />
-      ) : null}
+      </View>
+      {toast}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  // iPad: the review keeps a phone-like column instead of stretching.
+  column: { alignSelf: "center", flex: 1, width: "100%" },
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  identity: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
-  identityBody: { flex: 1, gap: spacing.xxs },
   muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
   screen: { paddingHorizontal: spacing.xlSm },
+  tablet: { maxWidth: 560 },
 });
