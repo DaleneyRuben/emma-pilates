@@ -1,12 +1,25 @@
-import { createDatabasePrisma } from './database/database-clients';
-import { runScript } from './script-runner/run-script';
+import { createHmac } from 'node:crypto';
+import type { PgBoss } from 'pg-boss';
+import {
+  createDatabasePgBoss,
+  createDatabasePrisma,
+} from './database/database-clients';
+import { startInstalledPgBoss } from './jobs/pg-boss-runtime';
+import {
+  runScript,
+  type ScriptAuthenticationEmail,
+} from './script-runner/run-script';
 import {
   parseScriptCommand,
   ScriptCommandError,
 } from './deployment/script-command';
 import { createPrismaScriptRunStore } from './script-runner/prisma-script-run-store';
 import { scripts } from './script-runner/scripts';
-import { validateScriptEnvironment } from './script-runner/script-environment';
+import {
+  scriptAuthenticationKeys,
+  validateScriptEnvironment,
+} from './script-runner/script-environment';
+import { AuthenticationLinkCipher } from './system-identity/security/authentication-link-cipher';
 
 // REL-016: runs one script from src/script-runner/scripts as a Northflank
 // job run, started by the Run Script workflow (docs/runbooks/run-script.md).
@@ -17,8 +30,26 @@ const log = (event: string, fields: Record<string, unknown> = {}): void =>
 async function main(): Promise<void> {
   const command = parseScriptCommand(process.argv.slice(2));
   const environment = validateScriptEnvironment(process.env);
+  const keys = scriptAuthenticationKeys(process.env);
   const prisma = createDatabasePrisma('script-runner', environment);
+  // Like the administrator bootstrap: pg-boss only checks its schema here,
+  // and the Activation Link email is sent inside Prisma's transaction.
+  let boss: PgBoss | undefined;
+  let authenticationEmail: ScriptAuthenticationEmail | undefined;
   try {
+    if (keys !== null) {
+      boss = createDatabasePgBoss('script-runner', environment);
+      await startInstalledPgBoss(boss);
+      authenticationEmail = {
+        boss,
+        digestEmail: (email) =>
+          createHmac('sha256', keys.emailDigestKey).update(email).digest(),
+        linkCipher: new AuthenticationLinkCipher(
+          keys.linkEncryptionKeyId,
+          keys.linkEncryptionKey,
+        ),
+      };
+    }
     log('script_started', {
       script: command.scriptName,
       dryRun: command.dryRun,
@@ -32,10 +63,12 @@ async function main(): Promise<void> {
       prisma,
       now: () => new Date(),
       log,
+      authenticationEmail,
     });
     log(`script_${result.outcome}`, { script: command.scriptName, ...result });
     process.exitCode = result.outcome === 'success' ? 0 : 1;
   } finally {
+    await boss?.stop({ graceful: true });
     await prisma.$disconnect();
   }
 }
