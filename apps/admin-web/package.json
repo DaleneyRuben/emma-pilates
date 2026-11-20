@@ -76,7 +76,8 @@
     ],
     "testMatch": [
       "<rootDir>/src/**/*.spec.ts?(x)",
-      "<rootDir>/e2e/support/*.test.ts"
+      "<rootDir>/e2e/support/*.test.ts",
+      "<rootDir>/eslint-rules/*.spec.js"
     ],
     "transform": {
       "^.+\\.(mjs|cjs|[tj]sx?)$": [
