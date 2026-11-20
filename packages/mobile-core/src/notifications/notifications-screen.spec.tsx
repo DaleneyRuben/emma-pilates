@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { clearMobileQueryCache, MobileQueryProvider } from "../query/provider";
-import { NotificationsScreen } from "./notifications-screen";
+import { NotificationsScreen, type NotificationsScreenProps } from "./notifications-screen";
 import { PushNotificationsContext } from "./push-notifications";
 
 const now = () => new Date("2026-09-22T15:00:00.000Z");
@@ -78,10 +78,12 @@ async function renderScreen(
   fetcher: typeof globalThis.fetch,
   onOpen = jest.fn(),
   emptyAction?: { label: string; onPress: () => void },
+  actionFor?: NotificationsScreenProps["actionFor"],
 ) {
   const screen = await render(
     <MobileQueryProvider>
       <NotificationsScreen
+        actionFor={actionFor}
         emptyAction={emptyAction}
         emptySupport="Aquí te avisaremos sobre tus clases, pagos y evaluaciones."
         fetcher={fetcher}
@@ -100,11 +102,11 @@ describe("NotificationsScreen", () => {
     clearMobileQueryCache();
   });
 
-  it("groups unread and earlier notifications with relative times", async () => {
+  it("groups new and earlier notifications with relative times (C2 C)", async () => {
     const screen = await renderScreen(createFetcher([{ items, hasMore: false, nextCursor: null }]));
 
     await waitFor(() => {
-      expect(screen.getByText("Sin leer")).toBeOnTheScreen();
+      expect(screen.getByText("Nuevas · 2")).toBeOnTheScreen();
     });
     expect(screen.getByText("Anteriores")).toBeOnTheScreen();
     expect(screen.getByText("Hace 40 minutos")).toBeOnTheScreen();
@@ -152,13 +154,13 @@ describe("NotificationsScreen", () => {
       ]),
     );
     await waitFor(() => expect(screen.getByText("Anteriores")).toBeOnTheScreen());
-    expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
+    expect(screen.queryByText(/^Nuevas/)).not.toBeOnTheScreen();
 
     const [control] = screen.getByTestId("notifications-scroll").children;
     if (typeof control === "string") throw new Error("The control is the first child");
     await fireEvent(control, "refresh");
 
-    await waitFor(() => expect(screen.getByText("Sin leer")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Nuevas · 2")).toBeOnTheScreen());
   });
 
   it("marks a notification read when opened and reports its destination", async () => {
@@ -180,6 +182,28 @@ describe("NotificationsScreen", () => {
     expect(onOpen).toHaveBeenCalledWith(
       expect.objectContaining({ id: "n1", destinationType: "session" }),
     );
+  });
+
+  // C2 C: the app gives a notice its direct action; using it reads the notice.
+  it("offers the app's direct action under a notice and marks it read", async () => {
+    const fetcher = createFetcher([{ items, hasMore: false, nextCursor: null }]);
+    const onPress = jest.fn();
+    const onOpen = jest.fn();
+    const screen = await renderScreen(fetcher, onOpen, undefined, (item) =>
+      item.id === "n1" ? { label: "Reservar otra clase", onPress } : null,
+    );
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Reservar otra clase" }));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onOpen).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(fetcher).toHaveBeenCalledWith(
+        "/api/v1/notifications/n1/read",
+        expect.objectContaining({ method: "POST" }),
+      );
+    });
+    expect(screen.getAllByRole("button", { name: "Reservar otra clase" })).toHaveLength(1);
   });
 
   it("marks every notification read and hides the action once nothing is unread", async () => {
@@ -207,7 +231,7 @@ describe("NotificationsScreen", () => {
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
     });
-    expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
+    expect(screen.queryByText(/^Nuevas/)).not.toBeOnTheScreen();
   });
 
   it("offers the app's own action from the empty state (C19b)", async () => {
@@ -274,7 +298,7 @@ describe("NotificationsScreen", () => {
     const screen = await renderScreen(createFetcher([{ items, hasMore: false, nextCursor: null }]));
 
     await waitFor(() => {
-      expect(screen.getByText("Sin leer")).toBeOnTheScreen();
+      expect(screen.getByText("Nuevas · 2")).toBeOnTheScreen();
     });
     expect(screen.queryByRole("button", { name: "Abrir Ajustes" })).not.toBeOnTheScreen();
   });

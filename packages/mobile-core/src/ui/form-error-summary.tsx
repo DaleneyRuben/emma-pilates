@@ -15,15 +15,20 @@ export function missingFieldsTitle(count: number, action = "guardar"): string {
 export function FormErrorSummary({
   action,
   fields,
+  title,
 }: {
   /** The verb after «para», «guardar» unless told otherwise. */
   action?: string;
   fields: readonly string[];
+  /** A screen's own line for the count, such as «Revisa 2 datos antes de seguir». */
+  title?: (count: number) => string;
 }) {
   if (fields.length === 0) return null;
   return (
     <View accessibilityRole="alert" style={styles.box} testID="form-error-summary">
-      <Text style={styles.title}>{missingFieldsTitle(fields.length, action)}</Text>
+      <Text style={styles.title}>
+        {title === undefined ? missingFieldsTitle(fields.length, action) : title(fields.length)}
+      </Text>
       <Text style={styles.fields}>{fields.join(" · ")}</Text>
     </View>
   );

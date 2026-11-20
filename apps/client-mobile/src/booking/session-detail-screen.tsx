@@ -16,6 +16,7 @@ import {
   PrimaryButton,
   QueryFailure,
   Screen,
+  ScreenHeader,
   ScreenTopBar,
   SectionTitle,
   spacing,
@@ -36,7 +37,8 @@ import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
 import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
 import { FrozenBookingFooter } from "./frozen-booking-footer";
-import { SessionFacts, SessionHero } from "./session-facts";
+import { SessionFacts } from "./session-facts";
+import { SessionHero } from "./session-hero";
 
 export type ConfirmedBooking = {
   bookingId: string;
@@ -74,6 +76,14 @@ function problemMessage(body: unknown): string | null {
   return typeof code === "string" ? bookingRejectionMessage(code) : null;
 }
 
+/** C4 A: what Reservar takes, from the Subscription that covers the class. */
+function usesLine(covering: { remainingClassAllowance: number; extraClasses?: number } | null) {
+  const classes = (covering?.remainingClassAllowance ?? 0) + (covering?.extraClasses ?? 0);
+  if (classes === 1) return "Usarás tu última clase.";
+  if (classes > 1) return `Usarás 1 de tus ${classes} clases.`;
+  return "Se descuenta 1 clase de tu plan";
+}
+
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useClientFetcher();
@@ -92,14 +102,14 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const [forcedFull, setForcedFull] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
 
-  // The header names the class itself, never the screen it was opened from (FIX-089).
-  const header = (
-    <ScreenTopBar
-      fullBleed
-      onBack={() => navigation.goBack()}
-      title={session.data?.status === 200 ? session.data.data.classType.name : "Clase"}
-    />
-  );
+  // Until the class is known the header says «Clase»; then C4 A's block names
+  // it, so the header is only the arrow (FIX-089: never the screen before).
+  const header =
+    session.data?.status === 200 ? (
+      <ScreenHeader fullBleed inset onBack={() => navigation.goBack()} testID="screen-top-bar" />
+    ) : (
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Clase" />
+    );
 
   if (session.isPending) {
     return (
@@ -250,7 +260,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <SessionHero detail={detail} full={full} quiet={frozenOnClassDay} />
+        <SessionHero detail={detail} quiet={frozenOnClassDay} />
         <SessionFacts
           // A frozen day books nothing, so there is nothing to cancel (FIX-082).
           cancellationWindowMinutes={
@@ -301,22 +311,22 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           )
         ) : hasAllowance ? (
           <>
-            <BodyText style={styles.note}>
-              {view?.subscription?.guestPass?.usedClassStartsAt === null
-                ? "Es tu clase gratis de invitada"
-                : "Se descuenta 1 clase de tu plan"}
-            </BodyText>
             <PrimaryButton
               busy={submitting}
-              label="Reservar"
+              label="Reservar esta clase"
               onPress={() => void book()}
               testID="session-book"
             />
+            <BodyText style={styles.note}>
+              {view?.subscription?.guestPass?.usedClassStartsAt === null
+                ? "Es tu clase gratis de invitada"
+                : usesLine(nextCovers ? next : (view?.subscription ?? null))}
+            </BodyText>
           </>
         ) : paymentPending ? (
           // The reason waits for the Payment, so «Necesitas un plan» never
           // flashes for a Client whose receipt is in review.
-          <PrimaryButton disabled label="Reservar" />
+          <PrimaryButton disabled label="Reservar esta clase" />
         ) : (
           <BookingOffFooter
             busy={resendReceipt.busy}

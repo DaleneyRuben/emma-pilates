@@ -30,9 +30,11 @@ import {
   type ReceiptStorage,
   streamSalaryReceipt,
 } from '../back-office-http';
+import { ownSalaryPayment } from './own-pay-views';
 import { OwnSalaryPaymentDto } from './pay-statements.dto';
 
-// «Mis pagos»: a Trainer reads the Salary Payments recorded for her in Nómina.
+// «Mis pagos»: the released Staff app reads the Salary Payments recorded for
+// her here; the current one reads `staff-members/current` (ADR-0111).
 @Controller({ path: 'trainer/salary-payments', version: '1' })
 @ApiBearerAuth()
 export class TrainerSalaryPaymentsController extends BackOfficeController {
@@ -55,14 +57,9 @@ export class TrainerSalaryPaymentsController extends BackOfficeController {
     const payments = await run(() =>
       this.operations.salaryPayments.listOwnSalaryPayments(principal),
     );
-    return payments.map(({ receiptImageAssetId, ...payment }) => ({
-      ...payment,
-      paidOn: payment.paidOn.toISOString().slice(0, 10),
-      receiptUrl:
-        receiptImageAssetId === null
-          ? null
-          : `/api/v1/trainer/salary-payments/${payment.id}/receipt`,
-    }));
+    return payments.map((payment) =>
+      ownSalaryPayment(payment, '/api/v1/trainer/salary-payments'),
+    );
   }
 
   // BKO-008: `readable` fits the enlarged viewer, `thumbnail` a list row.

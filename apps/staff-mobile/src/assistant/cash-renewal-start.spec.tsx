@@ -53,10 +53,10 @@ describe("Confirming cash for a renewal", () => {
     expect(screen.queryByTestId("start-date-2026-11-10")).toBeNull();
     expect(screen.queryByText(/al terminar el actual/)).toBeNull();
     await fireEvent.press(screen.getByTestId("start-date-2026-10-20"));
+    // Staff pick E3 C: the current end beside «Empieza», the rest under the days.
+    expect(screen.getByText("el actual vence el lun 12 oct")).toBeOnTheScreen();
     expect(
-      screen.getByText(
-        "El plan actual de Lucía vence el lun 12 oct. El nuevo empieza el mar 20 oct; se puede elegir hasta el lun 9 nov.",
-      ),
+      screen.getByText("El nuevo empieza el mar 20 oct; se puede elegir hasta el lun 9 nov."),
     ).toBeOnTheScreen();
     expect(
       screen.getByText(
@@ -64,7 +64,7 @@ describe("Confirming cash for a renewal", () => {
       ),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
 
     await waitFor(() => {
       expect(paid).toHaveBeenCalledWith(expect.objectContaining({ startsOn: "2026-10-20" }));
@@ -132,7 +132,7 @@ describe("Confirming cash for a renewal", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Registrar pago" }));
     await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
     await fireEvent.press(
-      await screen.findByRole("button", { name: "Confirmar pago en efectivo" }),
+      await screen.findByRole("button", { name: "Confirmar Bs 560 en efectivo" }),
     );
 
     expect(

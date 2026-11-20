@@ -48,4 +48,21 @@ describe("TodayHero", () => {
     await fireEvent.press(screen.getByTestId("schedule-session-b"));
     expect(onPress).toHaveBeenCalled();
   });
+
+  it("shows who is coming by initials under the class (E7)", async () => {
+    const screen = await render(
+      <TodayHero
+        attendees={["LF", "EP", "MP"]}
+        now={now}
+        places="3 de 8"
+        startsAt={at("12:00")}
+        testID="today-session-b"
+        title="12:00 · Mat Pilates"
+      />,
+    );
+
+    expect(screen.getAllByTestId("hero-attendee")).toHaveLength(3);
+    expect(screen.getByText("EP")).toBeOnTheScreen();
+    expect(screen.getByLabelText(/Vienen 3 más/)).toBeOnTheScreen();
+  });
 });

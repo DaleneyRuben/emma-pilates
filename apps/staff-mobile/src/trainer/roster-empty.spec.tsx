@@ -97,7 +97,7 @@ describe("Trainer roster empty state (UX-009)", () => {
     );
   });
 
-  it("keeps an upcoming Session with bookings on the current roster and note", async () => {
+  it("keeps an upcoming Session with bookings on who is coming and «Tomar asistencia»", async () => {
     const { screen } = await openRoster(
       [{ bookingId: "booking-1", clientName: "Ana Pérez" }],
       "2099-09-10T11:00:00.000Z",
@@ -107,7 +107,7 @@ describe("Trainer roster empty state (UX-009)", () => {
     await waitFor(() => {
       expect(screen.getByText("Ana Pérez")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Podrás marcar asistencia cuando empiece la clase.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Tomar asistencia" })).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Guardar asistencia" })).toBeNull();
     expect(screen.queryByText("Sin reservas")).toBeNull();
   });
@@ -123,7 +123,7 @@ describe("Trainer roster empty state (UX-009)", () => {
     );
 
     expect(await screen.findByRole("button", { name: "Guardar asistencia" })).toBeOnTheScreen();
-    expect(screen.queryByText(/Podrás marcar asistencia/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Tomar asistencia" })).toBeNull();
   });
 
   // A Trainer who opens the roster just before the class keeps it open: the
@@ -137,9 +137,7 @@ describe("Trainer roster empty state (UX-009)", () => {
       startsAt,
     );
 
-    expect(
-      await screen.findByText("Podrás marcar asistencia cuando empiece la clase."),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole("button", { name: "Tomar asistencia" })).toBeOnTheScreen();
     expect(
       await screen.findByRole("button", { name: "Guardar asistencia" }, { timeout: 5000 }),
     ).toBeOnTheScreen();

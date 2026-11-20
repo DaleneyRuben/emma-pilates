@@ -63,6 +63,26 @@ export class AssistantClientBookingDto extends UpcomingBookingDto {
   actionable!: boolean;
 }
 
+export class ClientContactDto {
+  @ApiProperty({
+    description: 'Whether she has an open Contact Alert (Para contactar)',
+  })
+  onContactList!: boolean;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description: 'When a Staff Member last marked her contacted',
+  })
+  lastContactedAt!: string | null;
+
+  @ApiProperty({
+    description: 'Whether the signed-in Staff Member marked that last contact',
+  })
+  lastContactedByYou!: boolean;
+}
+
 export class ClientOverviewDto {
   @ApiProperty({ type: AssistantClientDto })
   client!: AssistantClientDto;
@@ -82,6 +102,13 @@ export class ClientOverviewDto {
     description: 'Deprecated (PAY-005): Credit was retired; always 0',
   })
   creditAvailableCentavos!: number;
+
+  @ApiPropertyOptional({
+    type: ClientContactDto,
+    description:
+      'Her contact state, only for the Coordinator and the Administrator (BKM-013, ADR-0102)',
+  })
+  contact?: ClientContactDto;
 }
 
 export class PlanQuoteDto extends PlanDto {

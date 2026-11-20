@@ -12,5 +12,7 @@ export interface TrainerSessionRosterDto {
   branchName: string;
   startsAt: string;
   endsAt: string;
+  /** @minimum 1 */
+  capacity: number;
   bookings: TrainerRosterBookingDto[];
 }

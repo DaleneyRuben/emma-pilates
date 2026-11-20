@@ -40,9 +40,19 @@ import { BrowseEmptyState } from "./browse-empty-state";
 import { BranchLine, ClassTypeStrip, DayStrip, DayStripOther } from "./browse-filters";
 import { SessionRow, seatsTag } from "./session-row";
 import { WeekNotice, weekOf } from "./browse-week-notice";
+import {
+  dayBackFromFreeze,
+  FrozenDayCard,
+  FrozenLegend,
+  isFrozen,
+  useApprovedFreeze,
+} from "./frozen-day";
 
 type BrowseNavigation = {
-  navigate: (screen: "SessionDetail", params: { sessionId: string }) => void;
+  navigate: {
+    (screen: "SessionDetail", params: { sessionId: string }): void;
+    (screen: "Subscription"): void;
+  };
 };
 
 const allClassTypes = "all";
@@ -63,6 +73,8 @@ export function BrowseSessionsScreen() {
   // A day chosen before the rules arrived may lie past a shorter window.
   const selectedDate = dates.includes(chosenDate) ? chosenDate : today;
   const pickedLater = later.includes(selectedDate);
+  const freeze = useApprovedFreeze(fetcher, today);
+  const frozenDay = isFrozen(selectedDate, freeze);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const [classTypeId, setClassTypeId] = useState(allClassTypes);
   const [choosingBranch, setChoosingBranch] = useState(false);
@@ -157,6 +169,7 @@ export function BrowseSessionsScreen() {
       <WeekNotice classesLeft={classesLeft} selectedDate={selectedDate} today={today} />
       <DayStrip
         dates={strip}
+        frozen={(date) => isFrozen(date, freeze)}
         onSelect={setSelectedDate}
         selected={selectedDate}
         today={today}
@@ -171,6 +184,9 @@ export function BrowseSessionsScreen() {
           )
         }
       />
+      {freeze !== null && !frozenDay && dates.some((date) => isFrozen(date, freeze)) ? (
+        <FrozenLegend freeze={freeze} />
+      ) : null}
       <ClassTypeStrip
         onSelect={setClassTypeId}
         options={[
@@ -179,7 +195,17 @@ export function BrowseSessionsScreen() {
         ]}
         selected={classTypeId}
       />
-      {loading ? (
+      {frozenDay && freeze !== null ? (
+        <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
+          <FrozenDayCard
+            backOn={dayBackFromFreeze(freeze, dates)}
+            day={selectedDate}
+            freeze={freeze}
+            onOpenFreeze={() => navigation.navigate("Subscription")}
+            onShowDay={setSelectedDate}
+          />
+        </ScrollView>
+      ) : loading ? (
         <LoadingState label="Cargando clases" />
       ) : failed ? (
         <QueryFailure

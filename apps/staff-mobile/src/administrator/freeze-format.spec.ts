@@ -4,7 +4,8 @@ import {
   freezeDays,
   freezeDecidedDetail,
   freezeDecision,
-  freezePlanEnd,
+  freezePlanEndRow,
+  freezeRequestLine,
   freezeRange,
 } from "./freeze-format";
 
@@ -48,22 +49,37 @@ describe("freeze format", () => {
     expect(freezeRange("2026-11-30", "2026-12-04")).toBe("lun 30 nov al vie 4 dic");
   });
 
-  it("shows where the plan end moves while requested", () => {
-    expect(freezePlanEnd(base)).toBe("Vence el vie 5 feb → vie 12 feb");
+  // E9 A: the plan end as a table row, the earlier end in brackets.
+  it("shows where the plan end would move while requested", () => {
+    expect(freezePlanEndRow(base)).toEqual({
+      label: "Vencería",
+      value: "vie 12 feb (antes vie 5 feb)",
+    });
   });
 
   it("shows the new plan end once approved", () => {
-    expect(freezePlanEnd(approved)).toBe("Ahora vence el vie 12 feb (antes, el vie 5 feb)");
+    expect(freezePlanEndRow(approved)).toEqual({
+      label: "Vence",
+      value: "vie 12 feb (antes vie 5 feb)",
+    });
   });
 
   it("keeps the plan end of a refused freeze", () => {
-    expect(freezePlanEnd(refused)).toBe("Vence el vie 5 feb");
+    expect(freezePlanEndRow(refused)).toEqual({ label: "Vence", value: "vie 5 feb" });
   });
 
   it("draws no plan end when an older API leaves it out", () => {
     const { planEndsOn: _before, planEndsOnAfter: _after, ...older } = base;
-    expect(freezePlanEnd(older)).toBeUndefined();
-    expect(freezePlanEnd({ ...base, planEndsOnAfter: undefined })).toBe("Vence el vie 5 feb");
+    expect(freezePlanEndRow(older)).toBeUndefined();
+    expect(freezePlanEndRow({ ...base, planEndsOnAfter: undefined })).toEqual({
+      label: "Vence",
+      value: "vie 5 feb",
+    });
+  });
+
+  it("says what she asks for, with the days counted", () => {
+    expect(freezeRequestLine(base)).toBe("Pide congelar del lun 9 al dom 15 nov (7 días)");
+    expect(freezeRequestLine(approved)).toBe("Pidió congelar del lun 9 al dom 15 nov (7 días)");
   });
 
   it("names who decided and when, in La Paz time", () => {
@@ -102,6 +118,6 @@ describe("a withdrawn freeze", () => {
   it("reads «Retirada por la clienta», with its day and time", () => {
     expect(freezeDecision(withdrawn)).toBe("Retirada por la clienta el dom 8 nov a las 10:15");
     expect(freezeDecidedDetail(withdrawn)).toBe("Retirada");
-    expect(freezePlanEnd(withdrawn)).toBe("Vence el vie 5 feb");
+    expect(freezePlanEndRow(withdrawn)).toEqual({ label: "Vence", value: "vie 5 feb" });
   });
 });

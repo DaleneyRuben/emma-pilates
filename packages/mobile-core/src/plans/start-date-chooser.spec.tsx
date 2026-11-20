@@ -1,7 +1,8 @@
 import { render } from "@testing-library/react-native";
 
 import { colors } from "../ui/tokens";
-import { StartDateChooser } from "./start-date-chooser";
+import { StartDateChooser, StartDateStrip } from "./start-date-chooser";
+import { startDateOptions } from "./start-date-options";
 
 // C09 (Detalle del plan) and S10 (Registrar pago) on v2: «Fecha de inicio» is
 // the section title, once, and the days are 60-high Lino tiles with the day in
@@ -44,5 +45,27 @@ describe("StartDateChooser", () => {
       backgroundColor: colors.primary,
     });
     expect(screen.getByText("3")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 18 });
+  });
+
+  // Staff pick E3 C: Registrar pago titles the days «Empieza» and notes the
+  // current Plan's end beside the title.
+  it("takes another title and a note beside it", async () => {
+    const screen = await render(
+      <StartDateStrip
+        aside="el actual vence el lun 8 feb"
+        onSelect={jest.fn()}
+        options={startDateOptions({
+          today: "2026-11-02",
+          startDateLimitDays: 3,
+          openingDate: null,
+        })}
+        selected="2026-11-02"
+        title="Empieza"
+      />,
+    );
+
+    expect(screen.getByRole("header", { name: "Empieza" })).toBeOnTheScreen();
+    expect(screen.queryByText("Fecha de inicio")).toBeNull();
+    expect(screen.getByText("el actual vence el lun 8 feb")).toBeOnTheScreen();
   });
 });

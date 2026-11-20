@@ -1107,6 +1107,15 @@
         "operationId": "listSessionAvailability",
         "parameters": [
           {
+            "name": "includeAttendees",
+            "required": false,
+            "in": "query",
+            "description": "E7: Staff also get who is coming, by initials only; ignored for a Client",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "includeCancelled",
             "required": false,
             "in": "query",
@@ -10210,6 +10219,128 @@
         ]
       }
     },
+    "/api/v1/staff-members/current/pay-statements": {
+      "get": {
+        "operationId": "listCurrentStaffPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/salary-payments": {
+      "get": {
+        "operationId": "listCurrentStaffSalaryPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSalaryPaymentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/salary-payments/{salaryPaymentId}/receipt": {
+      "get": {
+        "operationId": "getCurrentStaffSalaryPaymentReceipt",
+        "parameters": [
+          {
+            "name": "salaryPaymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
     "/api/v1/cash-closes/today": {
       "get": {
         "operationId": "getTodayCashClose",
@@ -12143,6 +12274,13 @@
                 "$ref": "#/components/schemas/SessionCancellationSummaryDto"
               }
             ]
+          },
+          "attendeeInitials": {
+            "description": "E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -12262,6 +12400,13 @@
             "type": "number",
             "minimum": 0
           },
+          "attendeeInitials": {
+            "description": "Who is coming, in booking order, by initials only (E1 B, the agenda hero)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "cancellation": {
             "nullable": true,
             "type": "object",
@@ -12279,7 +12424,8 @@
           "startsAt",
           "endsAt",
           "capacity",
-          "bookedCount"
+          "bookedCount",
+          "attendeeInitials"
         ]
       },
       "ClientPhotoDto": {
@@ -12321,12 +12467,18 @@
               "no_show"
             ],
             "nullable": true
+          },
+          "classNumber": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Her n-th class, counting earlier held classes she did not miss: 1 is her first class (E6 B)"
           }
         },
         "required": [
           "bookingId",
           "clientName",
-          "clientPhoto"
+          "clientPhoto",
+          "classNumber"
         ]
       },
       "TrainerSessionRosterDto": {
@@ -12350,6 +12502,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
           "bookings": {
             "type": "array",
             "items": {
@@ -12363,6 +12519,7 @@
           "branchName",
           "startsAt",
           "endsAt",
+          "capacity",
           "bookings"
         ]
       },
@@ -12839,6 +12996,20 @@
           "endsAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "bookedCount": {
+            "type": "number",
+            "description": "Booked places, hers included"
+          },
+          "attendeeInitials": {
+            "description": "Who else is coming, in booking order, by initials only (never names)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -12850,7 +13021,10 @@
           "trainerPhoto",
           "branchName",
           "startsAt",
-          "endsAt"
+          "endsAt",
+          "capacity",
+          "bookedCount",
+          "attendeeInitials"
         ]
       },
       "StaffBranchDto": {
@@ -15414,6 +15588,13 @@
               }
             ]
           },
+          "attendeeInitials": {
+            "description": "E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "sessionScheduleId": {
             "type": "string",
             "format": "uuid",
@@ -15499,6 +15680,30 @@
           "accountStatus"
         ]
       },
+      "ClientContactDto": {
+        "type": "object",
+        "properties": {
+          "onContactList": {
+            "type": "boolean",
+            "description": "Whether she has an open Contact Alert (Para contactar)"
+          },
+          "lastContactedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When a Staff Member last marked her contacted"
+          },
+          "lastContactedByYou": {
+            "type": "boolean",
+            "description": "Whether the signed-in Staff Member marked that last contact"
+          }
+        },
+        "required": [
+          "onContactList",
+          "lastContactedAt",
+          "lastContactedByYou"
+        ]
+      },
       "ClientOverviewDto": {
         "type": "object",
         "properties": {
@@ -15528,6 +15733,14 @@
             "minimum": 0,
             "deprecated": true,
             "description": "Deprecated (PAY-005): Credit was retired; always 0"
+          },
+          "contact": {
+            "description": "Her contact state, only for the Coordinator and the Administrator (BKM-013, ADR-0102)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientContactDto"
+              }
+            ]
           }
         },
         "required": [
@@ -15590,6 +15803,20 @@
             "format": "date-time",
             "type": "string"
           },
+          "capacity": {
+            "type": "number"
+          },
+          "bookedCount": {
+            "type": "number",
+            "description": "Booked places, hers included"
+          },
+          "attendeeInitials": {
+            "description": "Who else is coming, in booking order, by initials only (never names)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "actionable": {
             "type": "boolean",
             "description": "Whether the signed-in Staff Member may cancel, reschedule, or leave this item"
@@ -15605,6 +15832,9 @@
           "branchName",
           "startsAt",
           "endsAt",
+          "capacity",
+          "bookedCount",
+          "attendeeInitials",
           "actionable"
         ]
       },
@@ -18212,6 +18442,12 @@
               }
             ]
           },
+          "clientPhone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+591 70011001",
+            "description": "The Client phone as stored, null when she has none; the agenda opens WhatsApp to it (E5). Older builds ignore it."
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -18248,6 +18484,7 @@
           "evaluationId",
           "clientName",
           "clientPhoto",
+          "clientPhone",
           "startsAt",
           "endsAt",
           "durationMinutes",

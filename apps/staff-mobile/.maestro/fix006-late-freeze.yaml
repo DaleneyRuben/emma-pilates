@@ -74,10 +74,10 @@ env:
 - takeScreenshot: fix006-late-inbox
 - tapOn: ".*[Cc]ongelamiento.*"
 - extendedWaitUntil:
-    visible: "Aprobar congelamiento"
+    visible: "Aprobar"
     timeout: 20000
 - takeScreenshot: fix006-late-review
-- tapOn: "Aprobar congelamiento"
+- tapOn: "Aprobar"
 - extendedWaitUntil:
     visible: "El congelamiento ya empezó.*"
     timeout: 15000

@@ -73,7 +73,9 @@ describe("Trainer fault report", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver a la lista" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Reportar una falla" })).toBeOnTheScreen(),
+      expect(
+        screen.getByRole("button", { name: "Reportar una falla de equipo" }),
+      ).toBeOnTheScreen(),
     );
   });
 

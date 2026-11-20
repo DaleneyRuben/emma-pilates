@@ -92,8 +92,6 @@ export function InvoiceDataCard({
   /** `S10`'s cards carry the soft shadow; `10`'s are flat. */
   raised?: boolean;
 }) {
-  const taxIdInvalid = !taxIdCharacters.test(value.taxId);
-
   return (
     <View style={[raised ? styles.raised : styles.card]} testID="invoice-data-card">
       <Text style={styles.title}>Datos para la factura</Text>
@@ -110,31 +108,50 @@ export function InvoiceDataCard({
         />
       </View>
       {value.wantsInvoice ? (
-        <View style={styles.fields}>
-          <FormField
-            autoCapitalize="characters"
-            autoCorrect={false}
-            error={taxIdInvalid ? "Usa solo números, letras y guiones." : undefined}
-            label="NIT o CI"
-            maxLength={taxIdMaxLength}
-            onChangeText={(taxId) => onChange({ ...value, taxId })}
-            testID="invoice-tax-id"
-            value={value.taxId}
-          />
-          <FormField
-            autoCapitalize="words"
-            autoCorrect={false}
-            label="Nombre o razón social"
-            maxLength={nameMaxLength}
-            onChangeText={(name) => onChange({ ...value, name })}
-            testID="invoice-name"
-            value={value.name}
-          />
-          {value.prefilled ? <BodyText style={styles.note}>{prefilledNote}</BodyText> : null}
-        </View>
+        <InvoiceDataFields onChange={onChange} prefilledNote={prefilledNote} value={value} />
       ) : (
         <BodyText style={styles.note}>{noInvoiceNote}</BodyText>
       )}
+    </View>
+  );
+}
+
+/**
+ * The NIT or CI and the name of an invoice, and whose last sale filled them:
+ * the card above and the staff «Pide factura» switch (pick E3 C) both draw it.
+ */
+export function InvoiceDataFields({
+  onChange,
+  prefilledNote,
+  value,
+}: {
+  value: InvoiceChoice;
+  onChange: (choice: InvoiceChoice) => void;
+  prefilledNote: string;
+}) {
+  const taxIdInvalid = !taxIdCharacters.test(value.taxId);
+  return (
+    <View style={styles.fields}>
+      <FormField
+        autoCapitalize="characters"
+        autoCorrect={false}
+        error={taxIdInvalid ? "Usa solo números, letras y guiones." : undefined}
+        label="NIT o CI"
+        maxLength={taxIdMaxLength}
+        onChangeText={(taxId) => onChange({ ...value, taxId })}
+        testID="invoice-tax-id"
+        value={value.taxId}
+      />
+      <FormField
+        autoCapitalize="words"
+        autoCorrect={false}
+        label="Nombre o razón social"
+        maxLength={nameMaxLength}
+        onChangeText={(name) => onChange({ ...value, name })}
+        testID="invoice-name"
+        value={value.name}
+      />
+      {value.prefilled ? <BodyText style={styles.note}>{prefilledNote}</BodyText> : null}
     </View>
   );
 }

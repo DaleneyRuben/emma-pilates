@@ -5,37 +5,34 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  ClientFace,
   colors,
   EmptyState,
   fontFamilies,
-  formatSessionDate,
-  formatTimeRange,
-  IconRow,
   IconRowGroup,
   LoadingState,
   NoticeRow,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   spacing,
-  chipStyles,
   SectionTitle,
+  TextButton,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
 import { BackBar, backBarScroll } from "../ui/back-bar";
 import { useHasStarted } from "../ui/use-has-started";
-import { PersonRow } from "../ui/person-row";
+import { useMinuteClock } from "../ui/use-minute-clock";
+import { useIsTablet } from "../ui/use-is-tablet";
 import { countLabel } from "../ui/session-time";
+import { RosterBlock } from "./roster-block";
+import { AttendanceRow, ComingRow, countNewClients, type AttendanceOutcome } from "./roster-rows";
 import { requireOk } from "./require-ok";
 
-type AttendanceOutcome = "attended" | "no_show";
 type TrainerRosterNavigation = {
   goBack: () => void;
   navigate: (screen: "ReportFault", params: { sessionId: string }) => void;
@@ -51,10 +48,16 @@ function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, Atte
   );
 }
 
-// S03: the attendance list of a Session the Trainer leads.
+/**
+ * S03, E6 B + A (board E6C): before the class, who is coming and «Tomar
+ * asistencia»; once the class starts, or on that tap, the same screen takes
+ * attendance with «Vino» / «No vino». Saving waits for the start (owner,
+ * 2026-11-03), which the backend enforces too.
+ */
 export function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   const roster = useGetTrainerSessionRoster(route.params.sessionId, {
     fetcher,
     query: {
@@ -67,13 +70,15 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
   });
   // The Trainer's taps sit over the saved outcomes, so a refetch never undoes a tap.
   const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
+  const [taking, setTaking] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
   // Owner, 2026-11-03: attendance opens when the class starts, with no closing
   // time; a roster opened before the start opens it by itself at the start.
-  const attendanceOpen = useHasStarted(
+  const started = useHasStarted(
     roster.data?.status === 200 ? roster.data.data.startsAt : undefined,
   );
+  const now = useMinuteClock();
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
 
   if (roster.isPending)
@@ -95,6 +100,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
   const session = roster.data.data;
   const outcomes = { ...savedOutcomes(session.bookings), ...edits };
   const empty = session.bookings.length === 0;
+  const attendance = started || taking;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
     setSaveError(false);
@@ -116,29 +122,33 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
     (booking) => outcomes[booking.bookingId] !== undefined,
   ).length;
   const missing = session.bookings.length - marked;
+  const reportFault = (
+    <TextButton
+      label="Reportar una falla de equipo"
+      onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
+      style={styles.reportFault}
+      testID="roster-report-fault"
+    />
+  );
 
   return (
     <Screen style={styles.screen}>
       <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
+        contentContainerStyle={[styles.content, backBarScroll.content, tablet && styles.tablet]}
         style={backBarScroll.scroll}
       >
-        <BackBar
-          back="Mi agenda"
-          onBack={() => navigation.goBack()}
-          subtitle={`${session.branchName} · ${formatSessionDate(session.startsAt)} · ${formatTimeRange(session.startsAt, session.endsAt)}`}
-          title={session.classTypeName}
+        <BackBar back="Mi agenda" onBack={() => navigation.goBack()} />
+        <RosterBlock
+          booked={session.bookings.length}
+          branchName={session.branchName}
+          capacity={session.capacity}
+          classTypeName={session.classTypeName}
+          endsAt={session.endsAt}
+          marked={attendance ? marked : undefined}
+          newClients={countNewClients(session.bookings)}
+          now={now}
+          startsAt={session.startsAt}
         />
-        {/* Follow-up 171: a fault can be found at any time, before or after the class. */}
-        <IconRowGroup>
-          <IconRow
-            chevron
-            icon="alert"
-            label="Reportar una falla"
-            onPress={() => navigation.navigate("ReportFault", { sessionId: session.sessionId })}
-            testID="roster-report-fault"
-          />
-        </IconRowGroup>
         {empty ? (
           <EmptyState
             icon="calendar"
@@ -148,107 +158,69 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
           />
         ) : (
           <View>
-            <SectionTitle>{`${attendanceOpen ? "Asistencia" : "Reservas"} · ${
-              attendanceOpen
-                ? `${marked} de ${session.bookings.length} marcadas`
-                : countLabel(session.bookings.length, "reserva", "reservas")
-            }`}</SectionTitle>
+            <SectionTitle>
+              {attendance
+                ? "Asistencia"
+                : `Quién viene · ${countLabel(session.bookings.length, "clienta", "clientas")}`}
+            </SectionTitle>
             <IconRowGroup>
               {session.bookings.map((booking) =>
-                attendanceOpen ? (
-                  <View key={booking.bookingId} style={styles.attendanceRow}>
-                    <Text style={styles.clientName}>{booking.clientName}</Text>
-                    {(["attended", "no_show"] as const).map((outcome) => {
-                      const label = outcome === "attended" ? "Asistió" : "No asistió";
-                      const selected = outcomes[booking.bookingId] === outcome;
-                      return (
-                        <Pressable
-                          accessibilityLabel={`${booking.clientName}: ${label}`}
-                          accessibilityRole="button"
-                          accessibilityState={{ selected }}
-                          key={outcome}
-                          onPress={() =>
-                            setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
-                          }
-                          hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
-                          style={[
-                            styles.choice,
-                            chipStyles.box,
-                            selected && chipStyles.boxSelected,
-                          ]}
-                          testID={`roster-${outcome}-${booking.bookingId}`}
-                        >
-                          <Text style={[styles.choiceLabel, selected && chipStyles.labelSelected]}>
-                            {label}
-                          </Text>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                ) : (
-                  <PersonRow
-                    face={
-                      <ClientFace
-                        fetcher={fetcher}
-                        name={booking.clientName}
-                        photo={booking.clientPhoto}
-                        size={36}
-                      />
-                    }
+                attendance ? (
+                  <AttendanceRow
+                    booking={booking}
+                    fetcher={fetcher}
                     key={booking.bookingId}
-                    name={booking.clientName}
+                    onChoose={(outcome) =>
+                      setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
+                    }
+                    outcome={outcomes[booking.bookingId]}
                   />
+                ) : (
+                  <ComingRow booking={booking} fetcher={fetcher} key={booking.bookingId} />
                 ),
               )}
             </IconRowGroup>
           </View>
         )}
-        {!attendanceOpen ? (
-          <IconRowGroup>
-            <IconRow icon="clock" label="Podrás marcar asistencia cuando empiece la clase." />
-          </IconRowGroup>
-        ) : null}
         {saveError ? <NoticeRow message="No pudimos guardar la asistencia." /> : null}
       </ScrollView>
-      {attendanceOpen ? (
-        <View style={styles.footer}>
-          {missing > 0 && !empty ? (
-            <Text style={styles.missing}>
-              {`Falta marcar a ${countLabel(missing, "clienta", "clientas")}.`}
-            </Text>
-          ) : null}
+      <View style={[styles.footer, tablet && styles.tablet]} testID="roster-footer">
+        {attendance ? (
+          <>
+            {missing > 0 && !empty ? (
+              <Text style={styles.missing}>
+                {`Falta marcar a ${countLabel(missing, "clienta", "clientas")}.`}
+              </Text>
+            ) : null}
+            <PrimaryButton
+              disabled={empty || !complete || !started}
+              disabledReason={
+                started || empty
+                  ? undefined
+                  : "Podrás guardar la asistencia cuando empiece la clase."
+              }
+              label="Guardar asistencia"
+              onPress={() => void saveAttendance()}
+              testID="roster-save"
+            />
+          </>
+        ) : null}
+        {!attendance && !empty ? (
           <PrimaryButton
-            disabled={empty || !complete}
-            label="Guardar asistencia"
-            onPress={() => void saveAttendance()}
-            testID="roster-save"
+            label="Tomar asistencia"
+            onPress={() => setTaking(true)}
+            testID="roster-take-attendance"
           />
-        </View>
-      ) : null}
+        ) : null}
+        {reportFault}
+      </View>
       {saved ? <BrandToast onClose={() => setSaved(false)} title="Asistencia guardada" /> : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  attendanceRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.sm,
-    minHeight: 60,
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.md,
-  },
   centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
-  choice: {
-    alignItems: "center",
-    borderRadius: radii.pill,
-    height: 36,
-    justifyContent: "center",
-    paddingHorizontal: spacing.md,
-  },
-  choiceLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13 },
-  clientName: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 15 },
   content: { gap: spacing.xl, paddingBottom: spacing.xl },
   footer: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
   missing: {
@@ -257,5 +229,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
   },
+  reportFault: { alignSelf: "flex-start", paddingHorizontal: 0 },
   screen: { paddingHorizontal: spacing.xlSm },
+  // On a tablet the roster keeps a phone's column, so the block never stretches.
+  tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

@@ -51,6 +51,14 @@ const shapes = {
       <Path d="M12 7.5V12l3 2" />
     </>
   ),
+  // The Assistant's «Hoy» (E7): the calendar with today's square marked.
+  today: (
+    <>
+      <Rect height="15" rx="2.5" width="17" x="3.5" y="5" />
+      <Path d="M3.5 10h17M8 3v4M16 3v4" />
+      <Rect height="3.5" rx="0.8" width="3.5" x="7.5" y="13" />
+    </>
+  ),
 } as const;
 
 export type StaffTabIconName = keyof typeof shapes;

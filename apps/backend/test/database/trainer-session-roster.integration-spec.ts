@@ -14,6 +14,8 @@ import {
   startDatabaseTestContext,
 } from './database-test-context';
 
+const hour = 60 * 60 * 1_000;
+
 const asClient = (client: { accountId: string; clientId: string }) => ({
   accountId: client.accountId,
   authenticationSessionId: randomUUID(),
@@ -67,6 +69,70 @@ describe('the Trainer’s Session roster on PostgreSQL', () => {
           clientPhoto: { imageAssetId: photo },
           attendanceOutcome: null,
         },
+      ],
+    });
+  });
+
+  // E6 B: the places and each Client's class number, so a first class shows.
+  it('gives the places and each Client’s class number, no-shows aside', async () => {
+    const fixture = await createFixture(prisma, { capacity: 8, now: clock });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const session = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+    });
+    const earlier = (hoursBefore: number) =>
+      prisma.session.create({
+        data: {
+          branchId: session.branchId,
+          classTypeId: session.classTypeId,
+          trainerStaffMemberId: session.trainerStaffMemberId,
+          startsAt: new Date(session.startsAt.getTime() - hoursBefore * hour),
+          endsAt: new Date(session.endsAt.getTime() - hoursBefore * hour),
+          capacity: 8,
+        },
+      });
+    const before = await earlier(2);
+    const second = await createClientWithSubscription(prisma);
+    const regular = await commands.create(
+      { sessionId: before.id },
+      asClient(fixture),
+    );
+    const missed = await commands.create(
+      { sessionId: before.id },
+      asClient(second),
+    );
+    const trainerAccount = await prisma.account.create({
+      data: {
+        email: `${randomUUID()}@example.com`,
+        staffMemberId: fixture.trainerId,
+      },
+    });
+    await prisma.attendanceRecord.createMany({
+      data: [
+        { bookingId: regular.id, outcome: 'ATTENDED' as const },
+        { bookingId: missed.id, outcome: 'NO_SHOW' as const },
+      ].map((record) => ({
+        ...record,
+        recordedByAccountId: trainerAccount.id,
+        recordedAt: clock,
+      })),
+    });
+    const ana = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(fixture),
+    );
+    const bea = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(second),
+    );
+
+    await expect(
+      findTrainerSessionRoster(prisma)(fixture.sessionId),
+    ).resolves.toMatchObject({
+      capacity: 8,
+      bookings: [
+        { bookingId: ana.id, classNumber: 2 },
+        { bookingId: bea.id, classNumber: 1 },
       ],
     });
   });

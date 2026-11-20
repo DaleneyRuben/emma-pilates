@@ -4,7 +4,7 @@ import { boliviaDate } from '../../time/bolivia-time';
 import {
   BackOfficeError,
   requireAdministrator,
-  requireTrainer,
+  requirePayee,
   type BackOfficeActor,
 } from '../back-office-errors';
 import { civilText, recordBackOfficeAudit } from '../prisma-audit';
@@ -101,10 +101,10 @@ export const createPrismaSalaryPayments = (
     });
 
   return {
-    // «Mis pagos»: only the signed-in Trainer's own payments, never a filter
+    // «Mis pagos»: only the signed-in Staff Member's own payments, never a filter
     // the caller chooses.
     listOwnSalaryPayments: async (principal: AuthenticatedPrincipal) => {
-      const staffMemberId = requireTrainer(principal);
+      const staffMemberId = requirePayee(principal);
       return prisma.salaryPayment.findMany({
         where: { staffMemberId },
         orderBy: [{ paidOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],

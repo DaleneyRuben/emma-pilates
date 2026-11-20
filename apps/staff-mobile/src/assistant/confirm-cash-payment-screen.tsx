@@ -11,20 +11,15 @@ import {
   colors,
   fontFamilies,
   FormScrollView,
-  IconRowGroup,
   invoiceChoiceFrom,
   invoiceDataPayload,
-  NextPlanStartChooser,
+  invoiceIncompleteNote,
   type InvoiceChoice,
   NoticeRow,
   PrimaryButton,
   Screen,
-  SectionTitle,
-  SegmentedTabs,
   spacing,
-  StartDateChooser,
   typography,
-  useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,12 +29,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { BranchChips, useCashBranches } from "../ui/branch-chips";
-import { ValueRow } from "../ui/value-row";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses } from "./assistant-format";
-import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 import {
   FrontDeskReceiptCard,
@@ -47,17 +40,19 @@ import {
   type FrontDeskReceipt,
   type ReceiptSource,
 } from "./front-desk-receipt-card";
-import { InvoiceDisclosure } from "./invoice-disclosure";
+import { InvoiceSwitch } from "./invoice-switch";
 import { loadReceiptUpload } from "./load-receipt-upload";
+import { PaymentChargeBlock } from "./payment-charge-block";
 import { PaymentDone } from "./payment-done";
+import { PaymentMethodOptions, type PaymentMethod } from "./payment-method-options";
+import { PaymentStartDays } from "./payment-start-days";
 
 type ConfirmNavigation = {
   goBack: () => void;
-  // Back to the search, dropping plan and payment (S10 «Volver a Clientas»).
-  popTo: (screen: "ClientSearch") => void;
+  // Back to the tab's root, dropping plan and payment (S10 «Volver a Clientas»).
+  popToTop: () => void;
 };
 
-type Method = "cash" | "qr";
 type Sent = { kind: "cash"; result: AssistantCashPaymentDto } | { kind: "transfer" };
 
 const paymentProblems: Record<string, string> = {
@@ -75,9 +70,11 @@ const paymentProblems: Record<string, string> = {
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 
 /**
- * S10 «Registrar pago» (walkthrough 21): «¿Cómo paga?» Efectivo or QR. Cash
- * confirms at once; QR shows the studio QR, takes a photo, and sends it on
- * its own button. Once one way is pending the other is off (FIX-028).
+ * S10 «Registrar pago», staff pick E3 C: what is collected on top, Efectivo
+ * or QR as large options, «Empieza» as a strip of days, «Pide factura» as a
+ * switch, and one button. Cash confirms at once; QR shows the studio QR,
+ * takes a photo, and sends it from the same button. Once one way is pending
+ * the other is off (FIX-028).
  */
 export function ConfirmCashPaymentScreen({
   route,
@@ -92,13 +89,12 @@ export function ConfirmCashPaymentScreen({
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
   const branches = useCashBranches();
   const branchId = branches.branch?.id ?? null;
-  const [method, setMethod] = useState<Method>("cash");
+  const [method, setMethod] = useState<PaymentMethod>("cash");
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   // The path the API holds as pending, from this screen or before it.
-  const [lockedTo, setLockedTo] = useState<Method | null>(null);
+  const [lockedTo, setLockedTo] = useState<PaymentMethod | null>(null);
   const [sent, setSent] = useState<Sent | null>(null);
-  const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
   // booking ADR-0013: a next Plan picks its day too, the day after by default.
@@ -117,7 +113,7 @@ export function ConfirmCashPaymentScreen({
   const start = renewalStartsOn === undefined ? startsOn : nextStart;
   const amount = formatMoney(quote.priceCentavos);
 
-  const refuse = (error: unknown, fallback: string, path: Method) => {
+  const refuse = (error: unknown, fallback: string, path: PaymentMethod) => {
     const code = error instanceof AssistantApiError ? error.code : null;
     // The API already holds a pending payment: the other path is closed too.
     if (code === "payment_pending_exists") setLockedTo(path === "cash" ? "qr" : "cash");
@@ -191,7 +187,8 @@ export function ConfirmCashPaymentScreen({
             kind={sent.kind}
             onBack={() => {
               if (workspace.split) workspace.show({ view: "overview", clientId });
-              navigation.popTo("ClientSearch");
+              // Back to the tab's root: Clientas' search, or Hoy when the sale began there (E7).
+              navigation.popToTop();
             }}
             scheduled={renewalStartsOn !== undefined}
             startsOn={nextStart === undefined ? undefined : formatListDate(nextStart)}
@@ -201,10 +198,8 @@ export function ConfirmCashPaymentScreen({
     );
   }
 
-  const discount =
-    quote.listPriceCentavos !== undefined && quote.listPriceCentavos > quote.priceCentavos
-      ? quote.listPriceCentavos - quote.priceCentavos
-      : 0;
+  const cash = method === "cash";
+  const branchMissing = branchId === null ? "Elige la sucursal de la venta" : undefined;
   const footer = (
     <View style={styles.footer}>
       {failure !== null ? (
@@ -213,7 +208,7 @@ export function ConfirmCashPaymentScreen({
         </View>
       ) : null}
       <Text style={styles.note}>
-        {method === "cash"
+        {cash
           ? `Confirma con el efectivo en mano: ${
               renewalStartsOn === undefined
                 ? "el plan se activa al instante."
@@ -221,11 +216,12 @@ export function ConfirmCashPaymentScreen({
             }`
           : "Queda pendiente hasta que administración lo apruebe. No entra en la caja."}
       </Text>
-      {method === "cash" ? (
+      {cash ? (
         <PrimaryButton
           busy={submitting}
           disabled={branchId === null || invoiceData === "incomplete" || lockedTo === "qr"}
-          label="Confirmar pago en efectivo"
+          disabledReason={branchMissing ?? invoiceIncompleteNote(invoice) ?? undefined}
+          label={`Confirmar ${amount} en efectivo`}
           onPress={() => void confirm()}
           testID="cash-confirm"
         />
@@ -233,7 +229,10 @@ export function ConfirmCashPaymentScreen({
         <PrimaryButton
           busy={submitting}
           disabled={branchId === null || receipt === null || lockedTo === "cash"}
-          label="Enviar comprobante"
+          disabledReason={
+            branchMissing ?? (receipt === null ? "Primero fotografía el comprobante" : undefined)
+          }
+          label={`Confirmar ${amount} por QR`}
           onPress={() => void sendReceipt()}
           testID="front-desk-send"
         />
@@ -246,43 +245,16 @@ export function ConfirmCashPaymentScreen({
       <CenteredCard maxWidth={520}>
         <BackBar onBack={() => navigation.goBack()} title="Registrar pago" />
         <FormScrollView contentContainerStyle={styles.content} footer={footer}>
-          <ClientBanner
-            action="Para"
-            clientName={clientName}
-            clientPhoto={clientPhoto}
-            detail={`plan de ${describeClasses(quote.classAllowance)}`}
+          <PaymentChargeBlock clientName={clientName} clientPhoto={clientPhoto} quote={quote} />
+          <PaymentMethodOptions
+            lockedTo={lockedTo}
+            onSelect={(next) => {
+              setMethod(next);
+              setFailure(null);
+            }}
+            selected={method}
           />
-          <View>
-            <SectionTitle>¿Cómo paga?</SectionTitle>
-            <SegmentedTabs
-              accessibilityLabel="¿Cómo paga?"
-              onSelect={(next) => {
-                setMethod(next);
-                setFailure(null);
-              }}
-              options={[
-                { key: "cash", label: "Efectivo", disabled: lockedTo === "qr" },
-                { key: "qr", label: "QR", disabled: lockedTo === "cash" },
-              ]}
-              selected={method}
-            />
-          </View>
-          {method === "cash" ? (
-            <View>
-              <SectionTitle>A cobrar</SectionTitle>
-              <IconRowGroup>
-                <ValueRow
-                  label={quote.name}
-                  value={formatMoney(quote.listPriceCentavos ?? quote.priceCentavos)}
-                />
-                {discount > 0 ? (
-                  <ValueRow label="Descuento" tone="emphasis" value={`−${formatMoney(discount)}`} />
-                ) : null}
-                {/* Credit is retired (PAY-005): the cash collected is the full price. */}
-                <ValueRow label="Total en efectivo" strong value={amount} />
-              </IconRowGroup>
-            </View>
-          ) : (
+          {cash ? null : (
             <>
               <StudioQrCard amount={amount} />
               <FrontDeskReceiptCard
@@ -291,35 +263,21 @@ export function ConfirmCashPaymentScreen({
               />
             </>
           )}
-          {renewalStartsOn !== undefined ? (
-            <NextPlanStartChooser
-              currentPlan={`El plan actual de ${firstName(clientName)}`}
-              firstDay={renewalStartsOn}
-              onSelect={setNextStart}
-              selected={nextStart ?? renewalStartsOn}
-            />
-          ) : studioRules === undefined ? null : (
-            <StartDateChooser
-              openingDate={studioRules.openingDate}
-              selected={startsOn}
-              startDateLimitDays={studioRules.startDateLimitDays}
-              today={today}
-              onSelect={setStartsOn}
-            />
-          )}
+          <PaymentStartDays
+            onSelect={renewalStartsOn === undefined ? setStartsOn : setNextStart}
+            renewalStartsOn={renewalStartsOn}
+            selected={start ?? startsOn}
+            today={today}
+          />
+          {/* The transfer API takes no invoice data, so the switch is for cash only. */}
+          {cash ? <InvoiceSwitch onChange={setInvoiceEdit} value={invoice} /> : null}
           <BranchChips
-            label={
-              method === "cash" ? "Sucursal donde recibes el efectivo" : "Sucursal de la venta"
-            }
+            label={cash ? "Sucursal donde recibes el efectivo" : "Sucursal de la venta"}
             onSelect={branches.select}
             options={branches.options}
             selectedId={branchId}
             testIDPrefix="cash-branch"
           />
-          {/* The transfer API takes no invoice data, so the fold is for cash only. */}
-          {method === "cash" ? (
-            <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
-          ) : null}
         </FormScrollView>
       </CenteredCard>
     </Screen>

@@ -79,6 +79,20 @@ export class UpcomingBookingDto {
 
   @ApiProperty({ format: 'date-time' })
   endsAt!: Date;
+
+  @ApiProperty()
+  capacity!: number;
+
+  @ApiProperty({ description: 'Booked places, hers included' })
+  bookedCount!: number;
+
+  @ApiProperty({
+    type: String,
+    isArray: true,
+    description:
+      'Who else is coming, in booking order, by initials only (never names)',
+  })
+  attendeeInitials!: string[];
 }
 
 @Controller({ path: 'bookings', version: '1' })

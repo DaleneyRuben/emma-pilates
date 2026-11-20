@@ -7,8 +7,8 @@ import {
   type NotificationDto,
 } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Fragment, type ReactNode } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import type { ReactNode } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { EmptyState } from "../ui/empty-state";
@@ -16,18 +16,26 @@ import { PrimaryButton } from "../ui/primary-button";
 import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
+import { SectionTitle } from "../ui/section-title";
 import { TextButton } from "../ui/text-button";
-import { fontFamilies } from "../ui/fonts";
-import { colors, radii, spacing, typography } from "../ui/tokens";
-import { formatNotificationTime } from "./notification-time";
+import { colors, radii, spacing } from "../ui/tokens";
+import { NotificationGroup, type NotificationActionFor } from "./notification-row";
 import { usePushNotifications } from "./push-notifications";
 import { LoadingState } from "../ui/loading-state";
 import { usePullToRefresh } from "../query/pull-to-refresh";
 import { useRefetchOnFocus } from "../query/refetch-on-focus";
 
+export {
+  readableNotificationMessage,
+  type NotificationAction,
+  type NotificationActionFor,
+} from "./notification-row";
+
 const pageSize = 50;
 
-type NotificationsScreenProps = {
+export type NotificationsScreenProps = {
+  /** C2 C: a notice's direct action, which only the app knows how to open. */
+  actionFor?: NotificationActionFor;
   /** The empty state's button, such as the client's «Volver al inicio» (C19b). */
   emptyAction?: { label: string; onPress: () => void };
   emptySupport: string;
@@ -57,73 +65,13 @@ function DeniedNotice() {
   );
 }
 
-const isoDayFormatter = new Intl.DateTimeFormat("es-BO", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-});
-
 /**
- * FIX-082: notices stored before the backend formatted its dates still hold
- * «2026-11-15»; they read «15 de noviembre» like the rest.
+ * The Client inbox (C2 C, owner 2026-11-19): «Nuevas · N» and «Anteriores»
+ * on Crema cards, each notice with its topic icon and, where the app gives
+ * one, a direct action.
  */
-export function readableNotificationMessage(message: string): string {
-  return message.replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, (iso) =>
-    isoDayFormatter.format(new Date(`${iso}T00:00:00.000Z`)),
-  );
-}
-
-function NotificationList({
-  items,
-  now,
-  onOpen,
-}: {
-  items: readonly NotificationDto[];
-  now: Date;
-  onOpen: (notification: NotificationDto) => void;
-}) {
-  return (
-    <>
-      {items.map((item, index) => (
-        <Fragment key={item.id}>
-          {index === 0 ? null : <View style={styles.divider} testID="notification-divider" />}
-          <NotificationRow notification={item} now={now} onPress={() => onOpen(item)} />
-        </Fragment>
-      ))}
-    </>
-  );
-}
-
-function NotificationRow({
-  notification,
-  now,
-  onPress,
-}: {
-  notification: NotificationDto;
-  now: Date;
-  onPress: () => void;
-}) {
-  const unread = !notification.readAt;
-  const message = readableNotificationMessage(notification.message);
-  return (
-    <Pressable
-      accessibilityLabel={message}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.row}
-    >
-      {unread ? <View style={styles.dot} /> : <View style={styles.dotSpace} />}
-      <View style={styles.rowBody}>
-        <Text style={[styles.message, unread && styles.messageUnread]}>{message}</Text>
-        <BodyText style={styles.time}>
-          {formatNotificationTime(notification.createdAt, now)}
-        </BodyText>
-      </View>
-    </Pressable>
-  );
-}
-
 export function NotificationsScreen({
+  actionFor,
   emptyAction,
   emptySupport,
   fetcher,
@@ -188,12 +136,27 @@ export function NotificationsScreen({
   const earlier = items.filter((item) => Boolean(item.readAt));
   const currentTime = now();
 
-  const open = (notification: NotificationDto) => {
+  const read = (notification: NotificationDto) => {
     if (!notification.readAt) {
       markRead.mutate({ notificationId: notification.id });
     }
+  };
+  const open = (notification: NotificationDto) => {
+    read(notification);
     onOpen?.(notification);
   };
+  const section = (title: string, sectionItems: readonly NotificationDto[]) => (
+    <View>
+      <SectionTitle>{title}</SectionTitle>
+      <NotificationGroup
+        actionFor={actionFor}
+        items={sectionItems}
+        now={currentTime}
+        onAction={read}
+        onOpen={open}
+      />
+    </View>
+  );
 
   if (items.length === 0) {
     return (
@@ -232,42 +195,15 @@ export function NotificationsScreen({
         testID="notifications-scroll"
       >
         <DeniedNotice />
-        {unread.length > 0 ? (
-          <>
-            <Text style={styles.sectionTitle}>Sin leer</Text>
-            <NotificationList items={unread} now={currentTime} onOpen={open} />
-          </>
-        ) : null}
-        {earlier.length > 0 ? (
-          <>
-            <Text style={styles.sectionTitle}>Anteriores</Text>
-            <NotificationList items={earlier} now={currentTime} onOpen={open} />
-          </>
-        ) : null}
+        {unread.length > 0 ? section(`Nuevas · ${unread.length}`, unread) : null}
+        {earlier.length > 0 ? section("Anteriores", earlier) : null}
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  dot: {
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-    height: 8,
-    marginTop: spacing.smd,
-    width: 8,
-  },
-  divider: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.xl + spacing.lg },
-  dotSpace: { width: 8 },
-  message: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
-  },
-  // FIX-089: unread is said by weight, not by a tinted row.
-  messageUnread: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   notice: {
     alignItems: "flex-start",
     backgroundColor: colors.card,
@@ -277,22 +213,5 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.lg,
   },
-  row: {
-    alignItems: "flex-start",
-    borderRadius: radii.inset,
-    flexDirection: "row",
-    gap: spacing.md,
-    minHeight: 60,
-    padding: spacing.lg,
-  },
-  rowBody: { flex: 1, gap: spacing.xs },
   screen: { gap: spacing.lg },
-  sectionTitle: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    letterSpacing: 1.54,
-    textTransform: "uppercase",
-  },
-  time: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

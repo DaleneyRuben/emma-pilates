@@ -62,18 +62,19 @@ describe("Trainer agenda and attendance", () => {
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
+      expect(screen.getByRole("button", { name: "Ana Pérez: Vino" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
     );
     // EncabezadoA (FIX-089): the back arrow alone, never the parent's name.
     expect(screen.getByTestId("back-bar")).not.toHaveTextContent("Mi agenda");
-    // One section title with its figure (the core SectionTitle, FIX-089).
-    expect(screen.getByText("Asistencia · 2 de 2 marcadas")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
+    // E6 A: the block counts the marked Clients under a plain «Asistencia».
+    expect(screen.getByText("Marcadas 2 de 2")).toBeOnTheScreen();
+    expect(screen.getByText("Asistencia")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Vino" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
+      expect(screen.getByRole("button", { name: "Luis Flores: Vino" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
@@ -125,16 +126,16 @@ describe("Trainer agenda and attendance", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
+      expect(screen.getByRole("button", { name: "Ana Pérez: Vino" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
     );
-    expect(screen.getByText("Asistencia · 1 de 2 marcadas")).toBeOnTheScreen();
+    expect(screen.getByText("Marcadas 1 de 2")).toBeOnTheScreen();
     expect(screen.getByText("Falta marcar a 1 clienta.")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Vino" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
+      expect(screen.getByRole("button", { name: "Luis Flores: Vino" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
@@ -150,12 +151,12 @@ describe("Trainer agenda and attendance", () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Ana Pérez: No asistió" })).toHaveProp(
+      expect(screen.getByRole("button", { name: "Ana Pérez: No vino" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
     );
-    expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
+    expect(screen.getByRole("button", { name: "Luis Flores: Vino" })).toHaveProp(
       "accessibilityState",
       { selected: true },
     );

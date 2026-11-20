@@ -1,33 +1,23 @@
 import {
   colors,
-  EmphasisCard,
   fontFamilies,
-  formatSessionDate,
-  formatSessionMinutes,
-  formatCancellationDeadline,
-  formatTimeRange,
-  IconRow,
-  IconRowGroup,
-  SectionTitle,
   spacing,
   StaffFace,
   surfaces,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { capacityLabel, staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
+import { formatDateTime, staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
+import { Fragment, type ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { CapacityBlock } from "./capacity-block";
+import { freePlacesLabel } from "./free-places";
 
 type Detail = {
   availableSeats: number;
-  bookedCount: number;
   branch: { name: string };
   capacity: number;
-  classType: { name: string };
-  endsAt: string;
   startsAt: string;
   trainerName: string;
   trainerPhoto: { imageAssetId: string } | null;
@@ -35,78 +25,37 @@ type Detail = {
   trainerGender?: StaffGenderCode;
 };
 
-function capitalized(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+/** The places a Client sees: «5 de 8 libres», «Último lugar» or «Clase llena». */
+function placesLabel(availableSeats: number, capacity: number, full: boolean) {
+  return freePlacesLabel(full ? 0 : availableSeats, capacity);
 }
 
-/**
- * C04's hero: the date, the time and the seats on Palo de rosa; the header
- * above names the class, so the hero does not repeat it (FIX-089). `quiet`
- * draws them on a Crema card as plain text, for a day she cannot book
- * (FIX-082, frozen-plan option B).
- */
-export function SessionHero({
-  detail,
-  full,
-  quiet = false,
-}: {
-  detail: Detail;
-  full: boolean;
-  quiet?: boolean;
-}) {
-  if (quiet) {
-    return (
-      <View style={styles.quietHero} testID="session-hero">
-        <Text style={styles.quietEyebrow}>{capitalized(formatSessionDate(detail.startsAt))}</Text>
-        <Text style={styles.quietNote}>
-          {`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
-        </Text>
-        <Text style={styles.quietNote}>
-          {capacityLabel(full ? detail.capacity : detail.bookedCount, detail.capacity)}
-        </Text>
-      </View>
-    );
-  }
+type Fact = { key: string; label: string; value?: ReactNode };
+
+function FactRow({ fact }: { fact: Fact }) {
   return (
-    <EmphasisCard
-      eyebrow={capitalized(formatSessionDate(detail.startsAt))}
-      note={`${formatTimeRange(detail.startsAt, detail.endsAt)} · ${formatSessionMinutes(detail.startsAt, detail.endsAt)}`}
-      pill={full ? "Lleno" : undefined}
-      testID="session-hero"
-    >
-      <CapacityBlock
-        availableSeats={detail.availableSeats}
-        bookedCount={detail.bookedCount}
-        capacity={detail.capacity}
-        full={full}
-      />
-    </EmphasisCard>
+    <View style={styles.row} testID={`session-fact-${fact.key}`}>
+      <Text style={[styles.label, fact.value === undefined && styles.wide]}>{fact.label}</Text>
+      {typeof fact.value === "string" ? <Text style={styles.value}>{fact.value}</Text> : fact.value}
+    </View>
   );
 }
 
 /** Her 36 px face (FIX-041, follow-up 242), or her initials while she has none. */
-function TrainerRow({
-  name,
-  photo,
-  gender,
-}: {
-  name: string;
-  photo: Detail["trainerPhoto"];
-  gender: Detail["trainerGender"];
-}) {
+function Trainer({ name, photo }: { name: string; photo: Detail["trainerPhoto"] }) {
   const fetcher = useClientFetcher();
   return (
-    <View style={styles.row}>
+    <View style={styles.trainer}>
       <StaffFace fetcher={fetcher} name={name} photo={photo} size={36} />
-      <Text style={styles.label}>{name}</Text>
-      <Text style={styles.value}>{staffRoleLabel("trainer", gender)}</Text>
+      <Text style={styles.value}>{name}</Text>
     </View>
   );
 }
 
 /**
- * C04's «La clase»: the Trainer, the Branch, and when the free cancellation
- * ends (or, for a full class, that a freed seat is announced).
+ * C4 A's quiet table: the Trainer, the Branch, the free places, and when the
+ * free cancellation ends (or, for a full class, that a freed place is
+ * announced). A limit already past, or unknown, leaves its row out.
  */
 export function SessionFacts({
   cancellationWindowMinutes,
@@ -122,48 +71,58 @@ export function SessionFacts({
     cancellationWindowMinutes === undefined
       ? undefined
       : new Date(new Date(detail.startsAt).getTime() - cancellationWindowMinutes * 60_000);
-  const lastRow = full
-    ? { icon: "bell" as const, label: "Te avisamos si se libera un lugar" }
+  const lastRow: Fact | null = full
+    ? { key: "waitlist", label: "Te avisamos si se libera un lugar" }
     : deadline === undefined || deadline.getTime() <= mountedAt
       ? null
-      : {
-          icon: "undo" as const,
-          label: `Cancela sin costo hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}`,
-        };
+      : { key: "cancel", label: "Cancelas gratis hasta", value: formatDateTime(deadline) };
+  const facts: Fact[] = [
+    {
+      key: "trainer",
+      label: staffRoleLabel("trainer", detail.trainerGender),
+      value: <Trainer name={detail.trainerName} photo={detail.trainerPhoto} />,
+    },
+    { key: "branch", label: "Sucursal", value: detail.branch.name },
+    {
+      key: "places",
+      label: "Lugares",
+      value: placesLabel(detail.availableSeats, detail.capacity, full),
+    },
+    ...(lastRow === null ? [] : [lastRow]),
+  ];
   return (
-    <View>
-      <SectionTitle>La clase</SectionTitle>
-      <IconRowGroup plain testID="session-facts">
-        <TrainerRow
-          gender={detail.trainerGender}
-          name={detail.trainerName}
-          photo={detail.trainerPhoto}
-        />
-        <IconRow icon="pin" label="Sucursal" value={detail.branch.name} />
-        {lastRow === null ? null : <IconRow icon={lastRow.icon} label={lastRow.label} />}
-      </IconRowGroup>
+    <View style={styles.table} testID="session-facts">
+      {facts.map((fact, index) => (
+        <Fragment key={fact.key}>
+          {index === 0 ? null : <View style={styles.hairline} />}
+          <FactRow fact={fact} />
+        </Fragment>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    minHeight: 56,
+    justifyContent: "space-between",
+    minHeight: 48,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
-  quietEyebrow: {
+  table: { ...surfaces.card },
+  trainer: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: spacing.sm },
+  value: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
+    flexShrink: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+    textAlign: "right",
   },
-  quietHero: { ...surfaces.card, gap: spacing.sm, padding: spacing.xlSm },
-  quietNote: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  value: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
+  wide: { flex: 1 },
 });

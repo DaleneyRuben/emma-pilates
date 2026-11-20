@@ -39,7 +39,8 @@ const renewFrom = async (view: object) => {
   );
   await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
   await fireEvent.press(await screen.findByRole("button", { name: "Renovar mi plan" }));
-  await fireEvent.press(await screen.findByRole("button", { name: /^Paquete de 8 clases,/ }));
+  // C3 A: her Plan sits on top, to renew.
+  await fireEvent.press(await screen.findByRole("button", { name: "Renovar este plan" }));
   expect(await screen.findByText("Desglose")).toBeOnTheScreen();
   return { created, screen };
 };

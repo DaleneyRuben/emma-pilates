@@ -76,6 +76,8 @@ export async function openDetail(
   availableSeats = 3,
   runtime: Parameters<typeof createClientRuntime>[1] = {},
   sessionStartsAt = startsAt,
+  /** Runs right before the class is tapped, such as a Freeze approved meanwhile. */
+  onOpen: () => void = () => undefined,
 ) {
   let subscriptionRemaining = remaining;
   const fetcher = routeFetcher({
@@ -114,6 +116,7 @@ export async function openDetail(
     },
     { timeout: 5_000 },
   );
+  onOpen();
   await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
   await waitFor(() => {
     expect(screen.getByText("Sobre la clase")).toBeOnTheScreen();

@@ -14,8 +14,9 @@ env:
     timeout: 30000
 - runFlow: subflows/park-dev-gear.yaml
 # The parked developer gear sits on the Perfil tab's right half; tap its left.
+# The Assistant has five tabs (E7: Hoy first), so Perfil spans 80–100 %.
 - tapOn:
-    point: "78%,95%"
+    point: "85%,95%"
 - extendedWaitUntil:
     visible: "Cambiar foto"
     timeout: 15000

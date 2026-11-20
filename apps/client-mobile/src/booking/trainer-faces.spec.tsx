@@ -48,6 +48,9 @@ const booking = (
   branchName: "Achumani",
   startsAt: new Date(Date.now() + startsIn).toISOString(),
   endsAt: new Date(Date.now() + startsIn + hour).toISOString(),
+  capacity: 8,
+  bookedCount: 1,
+  attendeeInitials: [],
 });
 
 const bookingCard = (item: UpcomingBookingDto) => (

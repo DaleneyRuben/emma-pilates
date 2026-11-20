@@ -25,7 +25,7 @@ The dated rates a Pay Statement is calculated with ([ADR-0105](../docs/adr/0105-
 _Avoid_: Tarifa (in code), salary scale
 
 **Pay Statement**:
-A Trainer's or the Coordinator's pay for a period, drafted by the system from the Pay Rate Rules with one line per item, approved by the Administrator, and then paid as a Salary Payment. A Trainer's period is a day, a week, a date range, or a month; the Coordinator's is always a month ([ADR-0109](../docs/adr/0109-pay-statements-for-any-period.md)). Two live statements of one Staff Member never overlap, so a class or a commission is never paid twice. A commission belongs to the period its Payment was confirmed in. A Trainer sees only her own statement; the Coordinator sees none, not even her own.
+A Trainer's or the Coordinator's pay for a period, drafted by the system from the Pay Rate Rules with one line per item, approved by the Administrator, and then paid as a Salary Payment. A Trainer's period is a day, a week, a date range, or a month; the Coordinator's is always a month ([ADR-0109](../docs/adr/0109-pay-statements-for-any-period.md)). Two live statements of one Staff Member never overlap, so a class or a commission is never paid twice. A commission belongs to the period its Payment was confirmed in. Each Staff Member sees only her own statement in the Staff app ([ADR-0111](../docs/adr/0111-every-paid-staff-member-reads-her-own-pay.md)).
 _Avoid_: Payslip, nómina (in code)
 
 **Renewal Rate**:

@@ -126,7 +126,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Evaluación nutricional" }));
     await waitFor(() => {
-      expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
+      expect(screen.getByTestId("next-evaluation")).toBeOnTheScreen();
     });
   });
 
@@ -164,7 +164,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
     await fireEvent.press(screen.getByText("El estudio canceló tu evaluación nutricional."));
     await waitFor(() => {
-      expect(screen.getByText("Tu próxima evaluación")).toBeOnTheScreen();
+      expect(screen.getByTestId("next-evaluation")).toBeOnTheScreen();
     });
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));

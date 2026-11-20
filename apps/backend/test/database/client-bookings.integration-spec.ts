@@ -86,6 +86,61 @@ describe('Client upcoming bookings', () => {
     });
   });
 
+  it('tells who else is coming and the places, by initials only', async () => {
+    const sessionId = futureSessions()[3].id;
+    const valeria = fixtures.clients.find(
+      (c) => c.email === 'valeria@example.com',
+    )!;
+    const valeriaAccount = await prisma.account.findFirstOrThrow({
+      where: { email: valeria.email, deletedAt: null },
+      select: { id: true },
+    });
+    const commands = new PrismaBookingCommands(prisma, () => now);
+    await commands.create(
+      { sessionId },
+      {
+        accountId: valeriaAccount.id,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client' as const, clientId: valeria.id },
+      },
+    );
+    await commands.create({ sessionId }, await principal());
+    const booked = await prisma.booking.findMany({
+      where: { sessionId, state: 'BOOKED' },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      select: { clientId: true, client: { select: { name: true } } },
+    });
+    const session = await prisma.session.findUniqueOrThrow({
+      where: { id: sessionId },
+      select: { capacity: true },
+    });
+
+    const upcoming = await createCatalogRepository(
+      prisma,
+    ).findUpcomingClientBookings({ clientId: lucia.id, from: now });
+
+    const item = upcoming.find((entry) => entry.sessionId === sessionId)!;
+    const othersInitials = booked
+      .filter((row) => row.clientId !== lucia.id)
+      .map((row) =>
+        row.client.name
+          .trim()
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part.charAt(0).toUpperCase())
+          .join(''),
+      );
+    expect(othersInitials.length).toBeGreaterThan(0);
+    expect(item).toMatchObject({
+      capacity: session.capacity,
+      bookedCount: booked.length,
+      attendeeInitials: othersInitials,
+    });
+    for (const row of booked) {
+      expect(JSON.stringify(item)).not.toContain(row.client.name);
+    }
+  });
+
   it('closes an active Waitlist Entry as left and hides it afterwards', async () => {
     const [, , third] = futureSessions();
     const entry = await prisma.waitlistEntry.create({

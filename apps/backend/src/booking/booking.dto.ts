@@ -140,6 +140,14 @@ export class SessionAvailabilityDto {
       'The cancelled class and its cause, null for a class that stands. The Session availability list sends it only when Staff ask for includeCancelled; the Administrator search always does.',
   })
   cancellation?: SessionCancellationSummaryDto | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    isArray: true,
+    description:
+      'E7: who is coming, by initials only, in booking order. Sent only when Staff ask for includeAttendees.',
+  })
+  attendeeInitials?: string[];
 }
 
 // The Administrator's projection (API-002, WEB-003): the same Session plus
@@ -175,6 +183,14 @@ export class TrainerScheduleSessionDto {
   @ApiProperty({ minimum: 0 })
   bookedCount!: number;
 
+  @ApiProperty({
+    type: String,
+    isArray: true,
+    description:
+      'Who is coming, in booking order, by initials only (E1 B, the agenda hero)',
+  })
+  attendeeInitials!: string[];
+
   @ApiPropertyOptional({
     type: () => SessionCancellationSummaryDto,
     nullable: true,
@@ -198,6 +214,13 @@ export class TrainerRosterBookingDto {
 
   @ApiPropertyOptional({ enum: ['attended', 'no_show'], nullable: true })
   attendanceOutcome!: 'attended' | 'no_show' | null;
+
+  @ApiProperty({
+    minimum: 1,
+    description:
+      'Her n-th class, counting earlier held classes she did not miss: 1 is her first class (E6 B)',
+  })
+  classNumber!: number;
 }
 
 export class TrainerSessionRosterDto {
@@ -215,6 +238,9 @@ export class TrainerSessionRosterDto {
 
   @ApiProperty({ format: 'date-time' })
   endsAt!: Date;
+
+  @ApiProperty({ minimum: 1 })
+  capacity!: number;
 
   @ApiProperty({ type: TrainerRosterBookingDto, isArray: true })
   bookings!: TrainerRosterBookingDto[];
@@ -239,6 +265,7 @@ const availabilityQuerySchema = z
     until: z.iso.datetime(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
     includeCancelled: z.enum(['true', 'false']).optional(),
+    includeAttendees: z.enum(['true', 'false']).optional(),
   })
   .refine(({ from, until }) => new Date(from) < new Date(until), {
     message: 'until must be after from',
@@ -269,6 +296,7 @@ export const parseAvailabilityQuery = (
   until: Date;
   limit: number;
   includeCancelled?: true;
+  includeAttendees?: true;
 } | null => {
   const result = availabilityQuerySchema.safeParse(value);
   if (!result.success) return null;
@@ -280,6 +308,9 @@ export const parseAvailabilityQuery = (
     limit: result.data.limit,
     ...(result.data.includeCancelled === 'true'
       ? { includeCancelled: true as const }
+      : {}),
+    ...(result.data.includeAttendees === 'true'
+      ? { includeAttendees: true as const }
       : {}),
   };
 };

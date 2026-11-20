@@ -11,6 +11,7 @@ import {
   type ClientSubscriptionView,
 } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { ClientContactRecord } from '../first-90-days/client-contact';
 import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import type { PaymentView } from '../payments/prisma-payment-commands';
 
@@ -38,12 +39,21 @@ export type AssistantClientBooking = UpcomingClientBooking & {
   actionable: boolean;
 };
 
+/** What the ficha says about contacting her (staff pick E4 A). */
+export type ClientContactSummary = {
+  onContactList: boolean;
+  lastContactedAt: Date | null;
+  lastContactedByYou: boolean;
+};
+
 export type ClientOverview = {
   client: AssistantClientSummary;
   subscription: ClientSubscriptionView;
   nextBooking: UpcomingClientBooking | null;
   recentHistory: ClassHistoryEntry[];
   creditAvailableCentavos: number;
+  /** Only for the roles that own the contact list (ADR-0102). */
+  contact?: ClientContactSummary;
 };
 
 export type PlanQuote = PlanSummary & {
@@ -145,17 +155,21 @@ export const readClientOverview = async (
     findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
     readRenewalStartsOn?(clientId: string): Promise<string | null>;
     readFreeze?(subscriptionId: string): Promise<ClientFreezeSummary | null>;
+    readContact?(clientId: string): Promise<ClientContactRecord>;
   },
 ): Promise<ClientOverview> => {
-  requireAssistant(dependencies.principal);
+  const identity = requireAssistant(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
-  const [subscription, upcoming, history] = await Promise.all([
+  // The contact list is the Coordinator's and the Administrator's (ADR-0102).
+  const readsContact = identity.role !== 'assistant';
+  const [subscription, upcoming, history, contact] = await Promise.all([
     describeSubscription(client.id, dependencies),
     dependencies.findUpcoming({
       clientId: client.id,
       from: dependencies.now(),
     }),
     dependencies.findAttendedBookings(client.id),
+    readsContact ? dependencies.readContact?.(client.id) : undefined,
   ]);
 
   return {
@@ -165,6 +179,18 @@ export const readClientOverview = async (
     recentHistory: history.slice(0, recentHistoryLength),
     // Credit is retired (booking ADR-0009); store builds still read it.
     creditAvailableCentavos: 0,
+    ...(contact === undefined
+      ? {}
+      : {
+          contact: {
+            onContactList: contact.onContactList,
+            lastContactedAt: contact.lastContactedAt,
+            lastContactedByYou:
+              contact.lastContactedByAccountId !== null &&
+              contact.lastContactedByAccountId ===
+                dependencies.principal.accountId,
+          },
+        }),
   };
 };
 

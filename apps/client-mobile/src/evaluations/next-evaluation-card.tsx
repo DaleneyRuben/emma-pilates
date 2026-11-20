@@ -1,79 +1,58 @@
 import type { ClientEvaluationDto } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   colors,
-  EmphasisCard,
   ExceptionPill,
   fontFamilies,
-  formatBolivianos,
+  initials,
   OutlinedButton,
   PrimaryButton,
+  radii,
   spacing,
   surfaces,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { clockTime, evaluationDate, paidEvaluationLabel } from "./evaluation-format";
+import {
+  appointmentLead,
+  appointmentPayment,
+  appointmentWhen,
+} from "./evaluation-appointment-format";
+import { clockTime, evaluationDate } from "./evaluation-format";
+import { nextEvaluationState } from "./next-evaluation-state";
 
-type CardState = {
-  chip: string;
-  line: string;
-  released: boolean;
-  canCancel: boolean;
-  canMove: boolean;
-  needsReceipt: boolean;
-};
-
-/** What the card says and offers for one booked Evaluation (follow-up 264 §1). */
-export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: number): CardState {
-  // The server's flags are a snapshot; the 3-hour limit is judged again here.
-  const open = new Date(evaluation.cancellableUntil).getTime() > shownAt;
-  const amount = formatBolivianos(evaluation.priceCentavos);
-  const base = { canCancel: false, canMove: false, needsReceipt: false, released: false };
-  if (evaluation.slotReleased === true) {
-    return {
-      ...base,
-      chip: "El estudio liberó tu turno",
-      line: `Tu pago de ${amount} sigue vigente: elige otro turno y no pagas de nuevo.`,
-      released: true,
-    };
-  }
-  if (evaluation.included) {
-    const canCancel = evaluation.cancellable && open;
-    return {
-      ...base,
-      canCancel,
-      chip: "Gratis con tu plan",
-      line: canCancel ? "Puedes cancelarla hasta 3 horas antes." : "Ya no se puede cancelar.",
-    };
-  }
-  // Finding 64: the server says what a paid one allows; with the transfer in
-  // review she may move it and, while the studio has not confirmed, cancel it.
-  const canMove = evaluation.reschedulable === true && open;
-  const canCancel = evaluation.cancellable && open;
-  const needsReceipt = evaluation.receiptUploadable === true;
-  const chip = paidEvaluationLabel(evaluation.paymentState);
-  const line = needsReceipt
-    ? `Sube tu comprobante de ${amount} para que el estudio revise tu pago.`
-    : evaluation.paymentState === "pending"
-      ? `El estudio revisa tu comprobante de ${amount} y te avisa por la app.`
-      : evaluation.paymentState === "rejected"
-        ? `El estudio no aprobó tu comprobante de ${amount}.`
-        : canMove
-          ? "Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella."
-          : canCancel
-            ? "Puedes cancelarla hasta 3 horas antes."
-            : "Ya no se puede reprogramar.";
-  return { ...base, canCancel, canMove, chip, line, needsReceipt };
+/** A Crema-outlined action inside the Palo de rosa block. */
+function BlockButton({
+  accessibilityLabel,
+  label,
+  onPress,
+}: {
+  accessibilityLabel: string;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.blockButton, pressed && styles.pressed]}
+    >
+      <Text style={styles.blockButtonLabel}>{label}</Text>
+    </Pressable>
+  );
 }
 
 /**
- * Option A's «Tu próxima evaluación»: C14's hero with its state as a Crema
- * line (palette B: a normal state is words, FIX-089), one line under it and
- * full-width actions. A slot the studio released draws the card in Crema
- * with the time struck through and the exception on the Rubor pill.
+ * C5 pick C «Todo en la cita»: the appointment in one Palo de rosa block,
+ * «Tu cita · en N días», the date and time in Lora, the Nutritionist's
+ * initials with the Branch and the duration, what she pays and «llega 10 min
+ * antes», with «Cambiar fecha» and «Cancelar» inside. The state's line stays
+ * under it. A slot the studio released draws the card in Crema with the time
+ * struck through and the exception on the Rubor pill.
  */
 export function NextEvaluationCard({
   evaluation,
@@ -91,57 +70,139 @@ export function NextEvaluationCard({
   onMove: () => void;
   uploading: boolean;
 }) {
-  const state = nextEvaluationState(evaluation, useMountedAt());
-  const eyebrow = evaluationDate(evaluation.startsAt);
-  const time = clockTime(evaluation.startsAt);
-  const details = `${evaluation.durationMinutes} minutos · ${evaluation.nutritionistName} · ${evaluation.branchName}`;
+  const shownAt = useMountedAt();
+  const state = nextEvaluationState(evaluation, shownAt);
 
-  return (
-    <View style={styles.block}>
-      {state.released ? (
+  if (state.released) {
+    return (
+      <View style={styles.wrapper}>
         <View style={styles.releasedCard} testID="next-evaluation">
-          <Text style={styles.releasedEyebrow}>{eyebrow}</Text>
-          <Text style={[styles.time, styles.releasedTime]}>{time}</Text>
-          <Text style={styles.releasedDetails}>{details}</Text>
+          <Text style={styles.releasedEyebrow}>{evaluationDate(evaluation.startsAt)}</Text>
+          <Text style={styles.releasedTime}>{clockTime(evaluation.startsAt)}</Text>
+          <Text style={styles.releasedDetails}>
+            {`${evaluation.durationMinutes} minutos · ${evaluation.nutritionistName} · ${evaluation.branchName}`}
+          </Text>
           <ExceptionPill>{state.chip}</ExceptionPill>
         </View>
-      ) : (
-        <EmphasisCard eyebrow={eyebrow} testID="next-evaluation">
-          <Text style={styles.time}>{time}</Text>
-          <Text style={styles.details}>{details}</Text>
-          <Text style={styles.state}>{state.chip}</Text>
-        </EmphasisCard>
-      )}
-      <BodyText style={styles.line}>{state.line}</BodyText>
-      {moving ? null : (
-        <View style={styles.actions}>
-          {state.released ? <PrimaryButton label="Elegir turno" onPress={onMove} /> : null}
-          {state.needsReceipt ? (
-            <OutlinedButton
-              busy={uploading}
-              label="Sube tu comprobante de transferencia"
-              onPress={onAttachReceipt}
-            />
-          ) : null}
-          {state.canMove ? <OutlinedButton label="Reprogramar" onPress={onMove} /> : null}
-          {state.canCancel ? (
-            <OutlinedButton label="Cancelar evaluación" onPress={onCancel} tone="error" />
-          ) : null}
+        <BodyText style={styles.line}>{state.line}</BodyText>
+        {moving ? null : <PrimaryButton label="Elegir turno" onPress={onMove} />}
+      </View>
+    );
+  }
+
+  const today = boliviaCivilDate(new Date(shownAt));
+  const showActions = !moving && (state.needsReceipt || state.canMove || state.canCancel);
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.block} testID="next-evaluation">
+        <Text style={styles.eyebrow}>{appointmentLead(evaluation.startsAt, today)}</Text>
+        <Text style={styles.when}>{appointmentWhen(evaluation.startsAt)}</Text>
+        <View style={styles.person}>
+          <View style={styles.initials}>
+            <Text allowFontScaling={false} style={styles.initialsText}>
+              {initials(evaluation.nutritionistName)}
+            </Text>
+          </View>
+          <Text style={styles.personText}>
+            {`${evaluation.nutritionistName} · ${evaluation.branchName} · ${evaluation.durationMinutes} min`}
+          </Text>
         </View>
-      )}
+        <Text
+          style={styles.payment}
+        >{`${appointmentPayment(evaluation)} · llega 10 min antes`}</Text>
+        {showActions ? (
+          <View style={styles.actions}>
+            {state.needsReceipt ? (
+              <OutlinedButton
+                busy={uploading}
+                label="Sube tu comprobante de transferencia"
+                onPress={onAttachReceipt}
+              />
+            ) : null}
+            {state.canMove || state.canCancel ? (
+              <View style={styles.actionRow}>
+                {state.canMove ? (
+                  <BlockButton
+                    accessibilityLabel="Cambiar fecha"
+                    label="Cambiar fecha"
+                    onPress={onMove}
+                  />
+                ) : null}
+                {state.canCancel ? (
+                  <BlockButton
+                    accessibilityLabel="Cancelar evaluación"
+                    label="Cancelar"
+                    onPress={onCancel}
+                  />
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+      <BodyText style={styles.line}>{state.line}</BodyText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm },
-  block: { gap: spacing.md },
-  details: {
+  actionRow: { flexDirection: "row", gap: spacing.sm },
+  actions: { gap: spacing.sm, marginTop: spacing.sm },
+  block: { ...surfaces.emphasis, gap: spacing.smd, padding: spacing.xlSm },
+  blockButton: {
+    alignItems: "center",
+    borderColor: colors.onEmphasis,
+    borderRadius: radii.button,
+    borderWidth: 1.5,
+    flex: 1,
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
+  },
+  blockButtonLabel: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  eyebrow: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.label,
+    fontWeight: "600",
+    textTransform: "uppercase",
+  },
+  initials: {
+    alignItems: "center",
+    backgroundColor: colors.onEmphasis,
+    borderRadius: 15,
+    height: 30,
+    justifyContent: "center",
+    width: 30,
+  },
+  initialsText: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.label,
+    fontWeight: "700",
   },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
+  payment: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.note,
+    fontWeight: "600",
+    lineHeight: 18,
+  },
+  person: { alignItems: "center", flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs },
+  personText: {
+    color: colors.onEmphasis,
+    flex: 1,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  pressed: { opacity: 0.85 },
   releasedCard: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
   releasedDetails: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15 },
   releasedEyebrow: {
@@ -152,18 +213,20 @@ const styles = StyleSheet.create({
     letterSpacing: typography.label * 0.12,
     textTransform: "uppercase",
   },
-  releasedTime: { color: colors.text, textDecorationLine: "line-through" },
-  state: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-  time: {
-    color: colors.onEmphasis,
+  releasedTime: {
+    color: colors.text,
     fontFamily: fontFamilies.display,
     fontSize: 40,
     fontVariant: ["tabular-nums"],
     lineHeight: 44,
+    textDecorationLine: "line-through",
   },
+  when: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: 26,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 30,
+  },
+  wrapper: { gap: spacing.md },
 });

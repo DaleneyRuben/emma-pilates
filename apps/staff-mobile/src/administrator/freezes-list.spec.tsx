@@ -118,7 +118,7 @@ describe("freezes list", () => {
         screen.getByText("Aprobada por Paola Mendoza el dom 8 nov a las 10:15"),
       ).toBeOnTheScreen(),
     );
-    expect(screen.queryByRole("button", { name: "Aprobar congelamiento" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Aprobar" })).toBeNull();
   });
 
   it("keeps the decided section when nothing waits for review", async () => {

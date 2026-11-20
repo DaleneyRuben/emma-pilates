@@ -74,9 +74,8 @@ import {
 } from './evaluation-rules';
 import { materializationHorizon } from '../materialization-horizon';
 import {
-  clientNameAndPhoto,
-  clientNameSelect,
-  type ClientPhotoRef,
+  clientContactSelect,
+  clientNamePhotoAndPhone,
 } from '../client/client-photo-of';
 
 type Transaction = Prisma.TransactionClient;
@@ -165,16 +164,15 @@ export type ClientEvaluationView = {
 
 export type NutritionistAgendaEntry = {
   evaluationId: string;
-  clientName: string;
-  clientPhoto: ClientPhotoRef;
-  startsAt: Date;
-  endsAt: Date;
-  durationMinutes: number;
-  branchId: string;
-  branchName: string;
-  kind: 'first' | 'follow_up';
-  paymentConfirmed: boolean;
-};
+} & ReturnType<typeof clientNamePhotoAndPhone> & {
+    startsAt: Date;
+    endsAt: Date;
+    durationMinutes: number;
+    branchId: string;
+    branchName: string;
+    kind: 'first' | 'follow_up';
+    paymentConfirmed: boolean;
+  };
 
 export type Page<Item> = {
   items: Item[];
@@ -1739,7 +1737,7 @@ export const createPrismaEvaluationCommands = (
       select: {
         id: true,
         clientId: true,
-        client: clientNameSelect,
+        client: clientContactSelect,
         slot: { select: slotSelect },
         payment: { select: { state: true } },
       },
@@ -1753,7 +1751,7 @@ export const createPrismaEvaluationCommands = (
     return pageOf(
       rows.map((row) => ({
         evaluationId: row.id,
-        ...clientNameAndPhoto(row.client),
+        ...clientNamePhotoAndPhone(row.client),
         startsAt: row.slot.startsAt,
         endsAt: row.slot.endsAt,
         durationMinutes: evaluationSlotMinutes,

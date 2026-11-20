@@ -1,4 +1,5 @@
 import { staffPhotoOf } from './staff/photo/staff-photo-of';
+import { nameInitials } from './client/name-initials';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import type {
   AdministratorSessionAvailabilityDto,
@@ -18,6 +19,8 @@ export type SessionAvailabilityHandler = (input: {
   limit: number;
   /** FIX-052: the Staff Horario shows cancelled classes in place. */
   includeCancelled?: boolean;
+  /** E7: the Assistant's «Hoy» shows who is coming, by initials only. */
+  includeAttendees?: boolean;
 }) => Promise<SessionAvailabilityDto[]>;
 
 const findScheduledSessions = async (
@@ -89,15 +92,44 @@ const findScheduledSessions = async (
   }));
 };
 
+// Booked Clients' initials per Session, in booking order; never their names.
+const findAttendeeInitials = async (
+  prisma: PrismaClient,
+  sessionIds: string[],
+): Promise<Map<string, string[]>> => {
+  const bookings = await prisma.booking.findMany({
+    where: { sessionId: { in: sessionIds }, state: 'BOOKED' },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    select: { sessionId: true, client: { select: { name: true } } },
+  });
+  const initials = new Map<string, string[]>();
+  for (const booking of bookings) {
+    const list = initials.get(booking.sessionId) ?? [];
+    list.push(nameInitials(booking.client.name));
+    initials.set(booking.sessionId, list);
+  }
+  return initials;
+};
+
 export const listSessionAvailability =
   (prisma: PrismaClient): SessionAvailabilityHandler =>
-  async (input) =>
-    (await findScheduledSessions(prisma, input)).map(
-      ({ availability, cancellation }) =>
-        input.includeCancelled === true
-          ? { ...availability, cancellation }
-          : availability,
-    );
+  async (input) => {
+    const sessions = await findScheduledSessions(prisma, input);
+    const attendees =
+      input.includeAttendees === true
+        ? await findAttendeeInitials(
+            prisma,
+            sessions.map(({ availability }) => availability.id),
+          )
+        : undefined;
+    return sessions.map(({ availability, cancellation }) => ({
+      ...availability,
+      ...(input.includeCancelled === true ? { cancellation } : {}),
+      ...(attendees === undefined
+        ? {}
+        : { attendeeInitials: attendees.get(availability.id) ?? [] }),
+    }));
+  };
 
 // API-002: every Branch at once, for the Administrator's Session search;
 // WEB-003's week grid narrows it to the selected Branch and needs to know

@@ -23,6 +23,11 @@ export interface AssistantClientBookingDto {
   branchName: string;
   startsAt: string;
   endsAt: string;
+  capacity: number;
+  /** Booked places, hers included */
+  bookedCount: number;
+  /** Who else is coming, in booking order, by initials only (never names) */
+  attendeeInitials: string[];
   /** Whether the signed-in Staff Member may cancel, reschedule, or leave this item */
   actionable: boolean;
 }

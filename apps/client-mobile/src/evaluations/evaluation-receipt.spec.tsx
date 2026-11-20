@@ -68,7 +68,7 @@ describe("Paid Evaluation receipt", () => {
       }),
     );
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
-    await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:45" }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Turno .+ 09:45$/ }));
     await fireEvent.press(
       await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
     );

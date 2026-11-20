@@ -9,11 +9,14 @@ export type TrainerSessionRoster = {
   branchName: string;
   startsAt: Date;
   endsAt: Date;
+  capacity: number;
   bookings: {
     bookingId: string;
     clientName: string;
     clientPhoto: ClientPhotoRef;
     attendanceOutcome: 'attended' | 'no_show' | null;
+    /** Her n-th class: 1 for a first class (E6 B). */
+    classNumber: number;
   }[];
 };
 
@@ -53,6 +56,7 @@ export const loadTrainerSessionRoster = async (
     branchName: roster.branchName,
     startsAt: roster.startsAt,
     endsAt: roster.endsAt,
+    capacity: roster.capacity,
     bookings: roster.bookings,
   };
 };

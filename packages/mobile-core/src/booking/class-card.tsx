@@ -2,6 +2,7 @@ import { Children, Fragment, isValidElement, useState, type ReactNode } from "re
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Chevron } from "../ui/chevron";
+import { attendeesLabel, HeroAttendees } from "./hero-attendees";
 import { fontFamilies } from "../ui/fonts";
 import { colors, spacing, surfaces, typography } from "../ui/tokens";
 
@@ -16,6 +17,7 @@ export function placesLabel(booked: number, capacity: number): string {
  */
 export function NextClassHero({
   accessibilityLabel,
+  attendees = [],
   detail,
   eyebrow,
   onPress,
@@ -24,6 +26,8 @@ export function NextClassHero({
   title,
 }: {
   accessibilityLabel?: string;
+  /** Who else is coming, by initials. */
+  attendees?: readonly string[];
   detail?: string;
   eyebrow: string;
   onPress?: () => void;
@@ -39,9 +43,15 @@ export function NextClassHero({
       </View>
       <Text style={styles.heroTitle}>{title}</Text>
       {detail === undefined ? null : <Text style={styles.heroDetail}>{detail}</Text>}
+      <HeroAttendees initials={attendees} />
     </>
   );
-  const label = accessibilityLabel ?? [eyebrow, title, places, detail].filter(Boolean).join(", ");
+  const label = [
+    accessibilityLabel ?? [eyebrow, title, places, detail].filter(Boolean).join(", "),
+    attendees.length === 0 ? undefined : attendeesLabel(attendees.length),
+  ]
+    .filter(Boolean)
+    .join(", ");
   if (onPress === undefined) {
     return (
       <View accessibilityLabel={label} accessible style={styles.hero} testID={testID}>

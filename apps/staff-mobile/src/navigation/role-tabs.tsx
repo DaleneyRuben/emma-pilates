@@ -31,6 +31,7 @@ import { ClientSearchScreen } from "../assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "../assistant/confirm-cash-payment-screen";
 import { NewClientScreen } from "../assistant/new-client-screen";
 import { SelectPlanScreen } from "../assistant/select-plan-screen";
+import { TodayScreen } from "../assistant/today-screen";
 import { CashCloseScreen } from "../cash-close/cash-close-screen";
 import { ContactListScreen } from "../coordinator/contact-list-screen";
 import { ViewAsScreen } from "../impersonation/view-as-screen";
@@ -43,6 +44,7 @@ import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
 import { PayoutQrScreen } from "../profile/payout-qr/payout-qr-screen";
 import { StaffReferralCodeScreen } from "../profile/staff-referral-code-screen";
+import { PayGroupScreen } from "../profile/pay-group-screen";
 import { PayStatementScreen } from "../profile/pay-statement-screen";
 import { StaffPayScreen } from "../profile/staff-pay-screen";
 import { StaffProfileScreen } from "../profile/staff-profile-screen";
@@ -84,6 +86,7 @@ const taskRoutes: ReadonlySet<string> = new Set([
 // Every tab's root. The Assistant's Caja is Cerrar caja itself, a root that
 // keeps its bar although the Administrator opens it as a task from Pagos.
 const tabRoots: ReadonlySet<string> = new Set([
+  "Today",
   "Agenda",
   "MyPay",
   "Profile",
@@ -135,6 +138,13 @@ const sellingScreens = {
   SelectPlan: SelectPlanScreen,
   ConfirmCashPayment: ConfirmCashPaymentScreen,
 };
+// Finding 111 and E2 B: a statement opens from «Historial» over the tab bar,
+// and each of its concepts opens by day.
+const payScreens = {
+  MyPay: StaffPayScreen,
+  PayStatement: PayStatementScreen,
+  PayGroup: PayGroupScreen,
+};
 const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: CancelSessionScreen };
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
@@ -162,6 +172,24 @@ const tabOptions =
 
 const profileTab = {
   screen: createNativeStackNavigator({ ...stackConfig, screens: profileScreens }),
+  options: tabOptions("Perfil", "profile", "Profile"),
+};
+
+// E8 (ADR-0111): «Mis pagos» is a tab for the Trainer, the Coordinator and the
+// Nutritionist, with «Mi QR de cobro» one tap away; the Assistant, whose bar
+// is full, opens it from Perfil.
+const payTab = {
+  screen: createNativeStackNavigator({
+    ...stackConfig,
+    screens: { ...payScreens, PayoutQr: PayoutQrScreen },
+  }),
+  options: tabOptions("Mis pagos", "pay", "MyPay"),
+};
+const assistantProfileTab = {
+  screen: createNativeStackNavigator({
+    ...stackConfig,
+    screens: { ...profileScreens, ...payScreens },
+  }),
   options: tabOptions("Perfil", "profile", "Profile"),
 };
 
@@ -195,14 +223,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Agenda", "agenda", "Agenda"),
         },
-        PayTab: {
-          screen: createNativeStackNavigator({
-            ...stackConfig,
-            // Finding 111: a statement opens from «Historial» over the tab bar.
-            screens: { MyPay: StaffPayScreen, PayStatement: PayStatementScreen },
-          }),
-          options: tabOptions("Mis pagos", "pay", "MyPay"),
-        },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),
@@ -211,6 +232,14 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
     createBottomTabNavigator({
       ...tabConfig,
       screens: {
+        // E7 pick A: «Hoy» leads; a Client's file opens inside it on a phone.
+        TodayTab: {
+          screen: createNativeStackNavigator({
+            ...stackConfig,
+            screens: { Today: TodayScreen, ...clientScreens, ...sellingScreens },
+          }),
+          options: tabOptions("Hoy", "today", "Today"),
+        },
         ClientsTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
@@ -232,7 +261,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Caja", "cash", "CashClose"),
         },
-        ProfileTab: profileTab,
+        ProfileTab: assistantProfileTab,
       },
     }),
   ),
@@ -257,6 +286,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Disponibilidad", "availability", "Availability"),
         },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),
@@ -329,6 +359,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Horario", "schedule", "Schedule"),
         },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),

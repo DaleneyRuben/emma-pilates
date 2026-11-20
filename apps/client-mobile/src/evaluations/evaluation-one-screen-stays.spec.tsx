@@ -62,7 +62,7 @@ describe("One Evaluación nutricional across commands", () => {
     });
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
     const moveTo = async (civilDate: string, time: string) => {
-      await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
+      await fireEvent.press(await screen.findByRole("button", { name: "Cambiar fecha" }));
       await fireEvent.press(await screen.findByRole("button", { name: dayName(civilDate) }));
       await fireEvent.press(screen.getByRole("button", { name: `Turno ${time}` }));
       await fireEvent.press(await screen.findByRole("button", { name: "Sí, mover evaluación" }));
@@ -121,7 +121,7 @@ describe("One Evaluación nutricional across commands", () => {
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
 
     expect(await screen.findByTestId("next-evaluation")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cambiar fecha" })).toBeOnTheScreen();
     expect(screen.getByText("No pudimos cargar los horarios de evaluación.")).toBeOnTheScreen();
   });
 
@@ -178,7 +178,7 @@ describe("One Evaluación nutricional across commands", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar evaluación" }));
     expect(await screen.findByText("Comprobante enviado")).toBeOnTheScreen();
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Reprogramar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar fecha" }));
 
     expect(await screen.findByText("Elige el nuevo horario")).toBeOnTheScreen();
     expect(screen.queryByText("Comprobante enviado")).toBeNull();

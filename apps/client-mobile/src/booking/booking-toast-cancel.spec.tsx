@@ -104,8 +104,10 @@ describe("the booking toast after a cancellation", () => {
       { timeout: 5_000 },
     );
     await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d/ }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Reservar" })).toBeOnTheScreen());
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
     await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
 
     const notNow = screen.queryByRole("button", { name: "Ahora no" });

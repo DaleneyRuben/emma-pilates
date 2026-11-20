@@ -46,7 +46,7 @@ async function openConfirmation(prefill: typeof company | null) {
   });
   await fireEvent.press(screen.getByRole("button", { name: /^Paquete de 8 clases,/ }));
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: /^¿Necesita factura\?/ })).toBeOnTheScreen();
+    expect(screen.getByRole("switch", { name: "Pide factura" })).toBeOnTheScreen();
   });
   return { screen, paid };
 }
@@ -64,13 +64,13 @@ describe("Cash payment invoice data", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("NIT o CI")).toHaveProp("value", "1020304050");
     });
-    expect(screen.getByRole("button", { name: "Con factura" })).toBeSelected();
+    expect(screen.getByRole("switch", { name: "Pide factura" })).toBeChecked();
     expect(screen.getByLabelText("Nombre o razón social")).toHaveProp("value", "Estudio Ana SRL");
     expect(
       screen.getByText("Datos de su última compra. Confírmalos con la clienta."),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
 
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
@@ -86,11 +86,11 @@ describe("Cash payment invoice data", () => {
   it("records «Sin factura» when the Client has no earlier invoice data", async () => {
     const { screen, paid } = await openConfirmation(null);
 
-    // v2 S10: the invoice folds away, without one by default.
-    expect(screen.getByText("Por defecto, sin factura")).toBeOnTheScreen();
-    expect(screen.queryByText("Datos para la factura")).toBeNull();
+    // Staff pick E3 C: «Pide factura» is off, without an invoice by default.
+    expect(screen.getByRole("switch", { name: "Pide factura" })).not.toBeChecked();
+    expect(screen.queryByLabelText("NIT o CI")).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
 
     await waitFor(() => {
       expect(paid).toHaveBeenCalledWith({
@@ -102,13 +102,12 @@ describe("Cash payment invoice data", () => {
     });
   });
 
-  it("waits for the NIT or CI and the name once «Con factura» is chosen", async () => {
+  it("waits for the NIT or CI and the name once «Pide factura» is on", async () => {
     const { screen, paid } = await openConfirmation(null);
 
-    await fireEvent.press(screen.getByRole("button", { name: /^¿Necesita factura\?/ }));
-    await fireEvent.press(screen.getByRole("button", { name: "Con factura" }));
+    await fireEvent.press(screen.getByRole("switch", { name: "Pide factura" }));
 
-    expect(screen.getByRole("button", { name: "Confirmar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" })).toBeDisabled();
     expect(paid).not.toHaveBeenCalled();
   });
 });

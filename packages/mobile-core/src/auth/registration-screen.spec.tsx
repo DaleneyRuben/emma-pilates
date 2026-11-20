@@ -45,9 +45,12 @@ describe("Client registration (01)", () => {
   it("draws the designed fields, button, and way back to Login", async () => {
     const screen = await openRegistration(createApiMock());
 
-    expect(screen.getByPlaceholderText("Tu nombre y apellido")).toBeOnTheScreen();
-    expect(screen.getByPlaceholderText("Mínimo 8 caracteres")).toBeOnTheScreen();
-    expect(screen.getByPlaceholderText("Repite la contraseña")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Nombre")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Correo electrónico")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Celular")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Contraseña")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Confirmar contraseña")).toBeOnTheScreen();
+    expect(screen.getAllByRole("button", { name: "Mostrar contraseña" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Crear cuenta" })).toBeOnTheScreen();
     expect(screen.getByText("¿Ya tienes una cuenta?")).toBeOnTheScreen();
 
@@ -63,11 +66,11 @@ describe("Client registration (01)", () => {
     await fillForm(screen, "pilates202");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(screen.getByRole("alert", { name: "Las contraseñas no coinciden." })).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "! Las contraseñas no coinciden" })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
   });
 
-  it("asks for at least eight characters, as the placeholder says", async () => {
+  it("asks for at least eight characters, as the rule under the field says", async () => {
     const api = createApiMock();
     const screen = await openRegistration(api);
 
@@ -78,7 +81,7 @@ describe("Client registration (01)", () => {
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "corta");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(screen.getByRole("alert", { name: "Mínimo 8 caracteres." })).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "! Usa al menos 8 caracteres" })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
   });
 
@@ -118,7 +121,7 @@ describe("Client registration (01)", () => {
     await fillForm(screen);
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(screen.getByRole("alert", { name: "Revisa el código de referido." })).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "! Revisa el código de referido" })).toBeOnTheScreen();
   });
 });
 
@@ -162,7 +165,7 @@ describe("Client registration (01) acquisition channel", () => {
     await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "pilates2026");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(screen.getByRole("alert", { name: "Elige cómo nos conociste." })).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "! Elige una opción" })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
   });
 
