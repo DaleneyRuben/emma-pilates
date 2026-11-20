@@ -156,7 +156,12 @@ export function CatalogPage<Row extends { id: string }>({
     }
   }, [lastPage, search.page, onPageClamp]);
 
-  const listing = query.isPending ? (
+  // W4: an empty page kept from the previous filter is not the new filter's
+  // answer, so it reads as loading rather than as that filter's empty state.
+  const waiting =
+    query.isPending ||
+    (query.isPlaceholderData && query.data.items.length === 0);
+  const listing = waiting ? (
     <LoadingNotice>{loadingMessage}</LoadingNotice>
   ) : query.isError ? (
     <QueryFailure
