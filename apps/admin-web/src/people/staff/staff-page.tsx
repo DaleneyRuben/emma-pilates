@@ -49,7 +49,7 @@ const staffColumns =
       header: "Rol",
       // A category, not a state: never a status pill (AW23, follow-up 52).
       cell: ({ getValue, row }) => (
-        <span className="inline-flex rounded-control border border-borde-fuerte bg-borde px-2 py-0.5 text-ayuda text-texto">
+        <span className="inline-flex rounded-full bg-superficie-hundida px-2.5 py-0.5 text-pie font-semibold text-texto inset-ring inset-ring-borde">
           {staffRoleLabel(getValue() as StaffRole, row.original.gender)}
         </span>
       ),

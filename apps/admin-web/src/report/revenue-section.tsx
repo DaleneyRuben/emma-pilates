@@ -83,7 +83,7 @@ export function RevenueSection({
               figure={formatBolivianos(revenue.data.deferredCentavos)}
             />
           </div>
-          <p className="text-nota text-texto">
+          <p className="rounded-tarjeta bg-superficie px-[18px] py-3 text-nota font-bold text-texto shadow-tarjeta">
             {`Clases pendientes de dar hoy: ${countFormat.format(revenue.data.classesStillOwed)}`}
           </p>
         </>

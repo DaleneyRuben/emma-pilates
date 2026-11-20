@@ -32,7 +32,11 @@ function TypeRow({
   const summary = holdingSummary(holding);
   return (
     <Fragment>
-      <TableRow className={open ? "bg-rosa-200 hover:bg-rosa-200" : undefined}>
+      <TableRow
+        className={
+          open ? "bg-superficie-hundida hover:bg-superficie-hundida" : undefined
+        }
+      >
         <TableCell data-label="Equipo">
           <span className="flex flex-col">
             <span className="font-medium">{type.name}</span>
@@ -102,7 +106,7 @@ export function EquipmentTable({
   }
   return (
     <Table aria-label="Equipos">
-      <TableHeader className="bg-rosa-200">
+      <TableHeader>
         <TableRow className="hover:bg-transparent">
           <TableHead>Equipo</TableHead>
           <TableHead>Unidades</TableHead>

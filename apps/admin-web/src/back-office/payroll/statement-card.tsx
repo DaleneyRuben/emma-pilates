@@ -50,61 +50,65 @@ export function StatementCard({
   return (
     <article
       aria-labelledby={headingId}
-      className="flex flex-col gap-3.5 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-5 md:px-6"
+      // Rosa Emma (RW-sueldos): a Rosa profundo head with her name and the
+      // total in Lora over the white card with its lines.
+      className="flex flex-col overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <h2 id={headingId} className="font-serif text-titulo-2 text-texto">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-destacado px-5 py-[18px] text-blanco md:px-[22px]">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h2 id={headingId} className="font-serif text-titulo-1 leading-tight">
             {statement.staffMemberName}
           </h2>
-          <p className="text-nota text-texto">
+          <p className="text-nota font-medium">
             {role === undefined ? periodText : `${role} · ${periodText}`}
           </p>
         </div>
-        <p className="font-serif text-precio whitespace-nowrap text-texto tabular">
+        <p className="font-serif text-[32px] leading-tight whitespace-nowrap tabular">
           {total}
         </p>
       </div>
-      <ConceptRows lines={statement.lines} />
-      {showLines ? (
-        <StatementLines id={linesId} lines={statement.lines} />
-      ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {count === 0 ? (
-          <span />
-        ) : (
-          <button
-            type="button"
-            aria-expanded={showLines}
-            aria-controls={showLines ? linesId : undefined}
-            onClick={() => setShowLines((open) => !open)}
-            className="rounded-control text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco"
-          >
-            {showLines
-              ? "Ocultar las líneas"
-              : count === 1
-                ? "Ver la línea"
-                : `Ver las ${count} líneas`}
-          </button>
-        )}
-        {waits ? (
-          <span className="flex flex-wrap items-center justify-end gap-3">
-            {/* BKO-007: her approval waits for the renewals. */}
-            {member?.role === "coordinator" ? (
-              <span className="text-nota text-texto">
-                Su bono espera las renovaciones
-              </span>
-            ) : null}
-            <Button variant="secondary" disabled>
-              {`Se aprueba desde el ${formatDayMonth(statement.approvableOn)}`}
+      <div className="flex flex-col gap-3.5 px-5 pt-2 pb-5 md:px-[22px]">
+        <ConceptRows lines={statement.lines} />
+        {showLines ? (
+          <StatementLines id={linesId} lines={statement.lines} />
+        ) : null}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {count === 0 ? (
+            <span />
+          ) : (
+            <button
+              type="button"
+              aria-expanded={showLines}
+              aria-controls={showLines ? linesId : undefined}
+              onClick={() => setShowLines((open) => !open)}
+              className="rounded-control text-celda font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco"
+            >
+              {showLines
+                ? "Ocultar las líneas"
+                : count === 1
+                  ? "Ver la línea"
+                  : `Ver las ${count} líneas`}
+            </button>
+          )}
+          {waits ? (
+            <span className="flex flex-wrap items-center justify-end gap-3">
+              {/* BKO-007: her approval waits for the renewals. */}
+              {member?.role === "coordinator" ? (
+                <span className="text-nota text-texto">
+                  Su bono espera las renovaciones
+                </span>
+              ) : null}
+              <Button variant="secondary" disabled>
+                {`Se aprueba desde el ${formatDayMonth(statement.approvableOn)}`}
+              </Button>
+            </span>
+          ) : (
+            // FIX-089: one card per member, so no solid button.
+            <Button variant="secondary" onClick={() => setConfirming(true)}>
+              {`Aprobar ${total}`}
             </Button>
-          </span>
-        ) : (
-          // FIX-089: one card per member, so no solid button.
-          <Button variant="secondary" onClick={() => setConfirming(true)}>
-            {`Aprobar ${total}`}
-          </Button>
-        )}
+          )}
+        </div>
       </div>
       <ApproveStatementDialog
         statement={statement}

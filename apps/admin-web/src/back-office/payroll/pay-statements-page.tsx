@@ -1,4 +1,5 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
+import { avisoClass } from "../../components/ui/aviso";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, RefreshCw } from "lucide-react";
@@ -127,9 +128,7 @@ export function PayStatementsPage({
       ) : null}
       {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
-        <p className="text-celda text-texto">
-          {monthOpenLine(search.month, today)}
-        </p>
+        <p className={avisoClass}>{monthOpenLine(search.month, today)}</p>
       ) : null}
       {period === null ? null : query.isError ? (
         <QueryFailure

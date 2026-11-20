@@ -7,6 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import { PageHeader } from "../../components/page/page-header";
+import { buttonVariants } from "../../components/ui/button";
 import {
   LoadingNotice,
   QueryFailure,
@@ -144,14 +145,19 @@ function BranchWithdrawals({
 
   return (
     <article className="flex flex-col gap-5">
+      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
+      {/* Below the band, as a white button: small text stays on white. */}
       <Link
         to="/estudio/insumos"
-        className="inline-flex items-center gap-1 self-start rounded-control text-nota text-primario hover:text-primario-presionado focus-visible:shadow-foco"
+        className={buttonVariants({
+          variant: "secondary",
+          size: "sm",
+          className: "self-start",
+        })}
       >
-        <ChevronLeft size={14} strokeWidth={1.8} aria-hidden="true" />
+        <ChevronLeft size={16} strokeWidth={1.8} aria-hidden="true" />
         Volver a Insumos
       </Link>
-      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
       <div className="flex flex-wrap items-center gap-3">
         <MonthStepper
           month={month}

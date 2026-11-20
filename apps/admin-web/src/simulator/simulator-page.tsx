@@ -132,11 +132,12 @@ function Result({ input }: { input: SimulatorInput }) {
         label="Punto de equilibrio"
         figure={formatBolivianos(month.breakEvenCentavos)}
         line="Ingreso en caja que cubre los costos fijos, el pago a instructoras y el impuesto"
-      />
-      {/* FIX-088: the owner's check in words and bolivianos. */}
-      <p className="text-nota text-texto tabular">
-        {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
-      </p>
+      >
+        {/* FIX-088: the owner's check in words and bolivianos. */}
+        <p className="mt-1.5 rounded-panel bg-superficie-hundida px-3 py-2.5 text-nota text-texto tabular">
+          {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
+        </p>
+      </StatTile>
     </div>
   );
 }

@@ -43,7 +43,7 @@ function Summary({
   return (
     <section
       aria-label="Resumen"
-      className="flex flex-col gap-1.5 rounded-tarjeta bg-rosa-200 px-4 py-3.5 text-rosa-600"
+      className="flex flex-col gap-1.5 rounded-tarjeta bg-aviso px-4 py-3.5 text-texto inset-ring-[1.5px] inset-ring-borde-fuerte"
     >
       {total === null ? null : (
         <p className="text-celda font-semibold">{totalLine(total)}</p>

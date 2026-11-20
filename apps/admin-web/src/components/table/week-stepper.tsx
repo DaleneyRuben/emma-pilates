@@ -16,14 +16,14 @@ export function WeekStepper({
   onChange: (monday: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 md:gap-3.5">
       <Button
         variant="neutral"
         size="icon"
         aria-label="Semana anterior"
         onClick={() => onChange(addDays(monday, -7))}
       >
-        <ChevronLeft size={16} strokeWidth={1.8} aria-hidden="true" />
+        <ChevronLeft size={18} strokeWidth={1.8} aria-hidden="true" />
       </Button>
       <Button
         variant="neutral"
@@ -31,16 +31,13 @@ export function WeekStepper({
         aria-label="Semana siguiente"
         onClick={() => onChange(addDays(monday, 7))}
       >
-        <ChevronRight size={16} strokeWidth={1.8} aria-hidden="true" />
+        <ChevronRight size={18} strokeWidth={1.8} aria-hidden="true" />
       </Button>
-      <Button
-        variant="neutral"
-        size="sm"
-        onClick={() => onChange(weekStartOf(today))}
-      >
+      <Button variant="neutral" onClick={() => onChange(weekStartOf(today))}>
         Hoy
       </Button>
-      <p className="font-serif text-cuerpo-grande text-texto">
+      {/* Lora 24: large text, allowed on the 100 page (follow-up 284). */}
+      <p className="font-serif text-[24px] leading-tight text-texto">
         {formatWeekRange(monday)}
       </p>
     </div>

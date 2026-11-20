@@ -159,7 +159,7 @@ function BranchSchedule({
                   }}
                 />
                 {standingCount(sessions.data) < sessions.data.length ? (
-                  <p className="text-nota text-texto">
+                  <p className="self-start rounded-tarjeta bg-superficie px-[18px] py-3 text-nota text-texto shadow-tarjeta">
                     Las canceladas quedan como una línea fina.
                   </p>
                 ) : null}

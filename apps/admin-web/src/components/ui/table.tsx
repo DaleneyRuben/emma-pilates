@@ -7,9 +7,10 @@ import { cn } from "../../lib/cn";
 // draw FIX-088's compact card instead (white, thin border, no labels).
 export function Table({
   className,
+  lead,
   footer,
   ...props
-}: ComponentProps<"table"> & { footer?: ReactNode }) {
+}: ComponentProps<"table"> & { lead?: ReactNode; footer?: ReactNode }) {
   return (
     <div
       data-slot="table-container"
@@ -18,6 +19,11 @@ export function Table({
       // are divided.
       className="w-full overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
+      {lead === undefined ? null : (
+        <div className="border-b border-borde px-5 py-3.5 text-celda text-texto">
+          {lead}
+        </div>
+      )}
       <table
         data-slot="table"
         className={cn(

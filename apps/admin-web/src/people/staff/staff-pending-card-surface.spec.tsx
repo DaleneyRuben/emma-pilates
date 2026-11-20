@@ -18,9 +18,9 @@ const pendingCard = (panel: HTMLElement) => {
 const cardButton = [
   "h-[44px]",
   "w-full",
-  "border-rosa-600",
-  "bg-crema",
-  "text-rosa-600",
+  "inset-ring-primario",
+  "bg-superficie",
+  "text-texto",
   "text-fila-menu",
 ];
 
@@ -31,13 +31,13 @@ describe("AW24's pending card surface", () => {
     server.use(...signedInHandlers(), allBranchesHandler(), list()),
   );
 
-  it("draws the card as a Lino card with no border (follow-up 225)", async () => {
+  it("draws the card as a white card with no border (follow-up 225, Rosa Emma)", async () => {
     const { panel } = await openMember("Valentina Soria");
 
     const card = pendingCard(panel);
     expect(card).toHaveClass(
       "gap-2.5",
-      "rounded-marco",
+      "rounded-tarjeta",
       "bg-superficie",
       "p-4",
     );
@@ -57,7 +57,7 @@ describe("AW24's pending card surface", () => {
     expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass("text-texto");
   });
 
-  it("draws «Reenviar enlace» as the full-width Marfil button", async () => {
+  it("draws «Reenviar enlace» as the full-width white button", async () => {
     const { panel } = await openMember("Valentina Soria");
 
     expect(
@@ -67,7 +67,7 @@ describe("AW24's pending card surface", () => {
     ).toHaveClass(...cardButton);
   });
 
-  it("draws «Guardar correo» and «Cancelar» as two equal Marfil buttons", async () => {
+  it("draws «Guardar correo» and «Cancelar» as two equal white buttons", async () => {
     const { panel, user } = await openMember("Valentina Soria");
     const card = within(pendingCard(panel));
 

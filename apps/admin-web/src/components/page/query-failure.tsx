@@ -32,7 +32,9 @@ export function QueryFailure({
       role="alert"
       className="flex flex-col items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center"
     >
-      <p className="text-cuerpo text-texto">No pudimos cargar {what}.</p>
+      <p className="font-serif text-[24px] leading-tight text-texto">
+        No pudimos cargar {what}.
+      </p>
       <Button variant="neutral" size="sm" onClick={onRetry}>
         Reintentar
       </Button>

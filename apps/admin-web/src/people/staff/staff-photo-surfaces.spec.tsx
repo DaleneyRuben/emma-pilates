@@ -141,7 +141,9 @@ describe("staff photos on the admin web", () => {
     );
   });
 
-  it("leads the trainer's name in a Horario block with her photo", async () => {
+  // W2 (verification 2026-11-20): the week block is two compact lines, so
+  // her photo stays in the panel and the day list, not in the block.
+  it("keeps the trainer's photo out of a compact Horario block", async () => {
     server.use(
       ...sessionFormHandlers(),
       http.get(apiUrl(sessionsPath), () =>
@@ -156,9 +158,7 @@ describe("staff photos on the admin web", () => {
     const withPhoto = await screen.findByRole("button", {
       name: /^Reformer Pilates, 07:00, Valeria Peña/,
     });
-    expect(
-      within(withPhoto).getByRole("img", { name: "Foto de Valeria Peña" }),
-    ).toHaveAttribute("src", thumbnailUrl(photoId));
+    expect(within(withPhoto).queryByRole("img")).not.toBeInTheDocument();
     const without = screen.getByRole("button", {
       name: /^Mat Pilates, 16:00, Daniela Ortiz/,
     });

@@ -17,10 +17,13 @@ export function MonthStepper({
   onChange: (month: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    // Rosa Emma (RW-gastos, RW-informes): a white card around the arrows
+    // and the month in Lora, so it reads on the page and on the band.
+    <div className="flex items-center gap-2 self-start rounded-tarjeta bg-superficie p-1.5 shadow-tarjeta">
       <Button
         variant="neutral"
         size="icon"
+        className="size-[44px] rounded-[10px] inset-ring-borde-fuerte md:size-8"
         aria-label="Mes anterior"
         onClick={() => onChange(addMonths(month, -1))}
       >
@@ -28,13 +31,14 @@ export function MonthStepper({
       </Button>
       <p
         aria-live="polite"
-        className="min-w-[150px] text-center font-serif text-cuerpo-grande text-texto"
+        className="min-w-[150px] text-center font-serif text-[22px] leading-tight text-texto"
       >
         {formatMonth(month)}
       </p>
       <Button
         variant="neutral"
         size="icon"
+        className="size-[44px] rounded-[10px] inset-ring-borde-fuerte md:size-8"
         aria-label="Mes siguiente"
         disabled={month >= latest}
         onClick={() => onChange(addMonths(month, 1))}

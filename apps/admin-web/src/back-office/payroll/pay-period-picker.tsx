@@ -101,11 +101,11 @@ export function PayPeriodPicker({
   };
   const otherPeriod = () => onChange(otherPeriodSearch(search, today));
   const linkButton =
-    "h-9 rounded-control px-1 text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco";
+    "h-9 rounded-control px-1 text-celda font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco";
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 self-start rounded-tarjeta bg-superficie py-1.5 pr-4 pl-1.5 shadow-tarjeta">
         {shown.kind === "range" ? null : (
           <PeriodStepper
             names={stepNames[shown.kind]}

@@ -110,10 +110,28 @@ export function ContactAlertsPage() {
             : `${clientas(query.data.totalItems)} · seguimiento de sus primeros 90 días`
         }
       />
-      <p className="text-nota text-texto">
-        Escríbeles por WhatsApp y márcalas como contactadas. Salen solas de la
-        lista cuando reservan una clase.
-      </p>
+      {/* Rosa Emma (RW-clientas-contactar): the page's one Rosa profundo
+          block, the count in Lora over how to work the list. */}
+      <section className="flex flex-col gap-2 rounded-hero bg-destacado px-5 py-4 text-blanco shadow-destacado">
+        {query.data === undefined ? null : (
+          <p className="flex items-center gap-3">
+            <span className="font-serif text-cifra-grande leading-none tabular">
+              {query.data.totalItems}
+            </span>
+            <span className="text-cuerpo leading-tight font-bold">
+              {query.data.totalItems === 1
+                ? "clienta para contactar"
+                : "clientas para contactar"}
+              <br />
+              en sus primeros 90 días
+            </span>
+          </p>
+        )}
+        <p className="text-nota">
+          Escríbeles por WhatsApp y márcalas como contactadas. Salen solas de la
+          lista cuando reservan una clase.
+        </p>
+      </section>
       {notice?.kind === "success" ? (
         <PageNotice>{`Marcaste a ${notice.name} como contactada.`}</PageNotice>
       ) : null}

@@ -53,14 +53,10 @@ export function WeekGrid({
   const height = (last - first) * hourHeight;
 
   return (
-    <div
-      role="table"
-      aria-label="Semana"
-      className="overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
-    >
+    <div role="table" aria-label="Semana" className="flex flex-col gap-2">
       <div
         role="row"
-        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] border-b border-borde-fuerte bg-superficie-hundida lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
+        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] gap-1.5 lg:grid-cols-7 xl:grid-cols-[64px_repeat(7,minmax(0,1fr))]"
       >
         <span aria-hidden="true" className="lg:hidden xl:block" />
         {days.map((day) => {

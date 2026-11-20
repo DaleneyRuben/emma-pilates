@@ -6,7 +6,11 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
 import { boliviaMonth, boliviaToday } from "../lib/bolivia-time";
-import { chipClass, selectedClass } from "../components/ui/chip";
+import {
+  segmentClass,
+  segmentCurrentClass,
+  segmentedBarClass,
+} from "../components/ui/segmented";
 import { cn } from "../lib/cn";
 import { FinancePanel } from "./finance-panel";
 import { monthResultQueryOptions } from "./finance-queries";
@@ -38,7 +42,11 @@ function ReportTabs({
     { value: "finanzas", label: "Finanzas" },
   ] as const;
   return (
-    <div role="tablist" aria-label="Vistas del reporte" className="flex gap-1">
+    <div
+      role="tablist"
+      aria-label="Vistas del reporte"
+      className={segmentedBarClass}
+    >
       {tabs.map((tab) => {
         const selected = vista === tab.value;
         return (
@@ -48,7 +56,11 @@ function ReportTabs({
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(tab.value)}
-            className={cn(chipClass, selected && selectedClass)}
+            className={cn(
+              segmentClass,
+              "h-9 px-3.5 text-celda",
+              selected && segmentCurrentClass,
+            )}
           >
             {tab.label}
           </button>

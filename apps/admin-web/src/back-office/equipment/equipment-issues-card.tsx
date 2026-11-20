@@ -108,7 +108,8 @@ export function EquipmentIssuesCard({
   const issues = useQuery(branchIssuesQueryOptions(branchId, status));
   const change = useEquipmentChange(branchId);
   const copy = asking === null ? null : confirmCopy(asking);
-  // FIX-091 (W10 A): open faults sit above the table in a Rubor block.
+  // FIX-091 (W10 A), Rosa Emma (RW-equipos): open faults sit above the
+  // table in a white card under a Rosa profundo head.
   const urgent = status === "open" && (issues.data?.length ?? 0) > 0;
 
   const confirm = async () => {
@@ -126,18 +127,15 @@ export function EquipmentIssuesCard({
   return (
     <section
       aria-labelledby={titleId}
-      className={cn(
-        "flex flex-col rounded-marco border border-borde-fuerte",
-        urgent ? "bg-rosa-200" : "bg-superficie",
-      )}
+      className="flex flex-col overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
       <div
         className={cn(
-          "flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3",
-          urgent ? "border-borde-fuerte" : "border-borde",
+          "flex flex-wrap items-center justify-between gap-3 px-5 py-3.5",
+          urgent ? "bg-destacado text-blanco" : "border-b border-borde",
         )}
       >
-        <h2 id={titleId} className="font-serif text-[19px] text-texto">
+        <h2 id={titleId} className="font-serif text-[26px] leading-tight">
           {status === "open"
             ? `Fallas abiertas · ${issues.data?.length ?? 0}`
             : "Fallas resueltas"}
@@ -151,6 +149,7 @@ export function EquipmentIssuesCard({
             ["resolved", "Resueltas"],
           ]}
           onChange={setStatus}
+          onStrong={urgent}
           className="w-[220px]"
         />
       </div>
