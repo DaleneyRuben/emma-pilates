@@ -52,7 +52,8 @@ describe("StaffNavigation", () => {
 
   it.each([
     ["trainer", "Mi agenda"],
-    ["assistant", "Buscar clienta"],
+    // E7 pick A: the Assistant opens on «Hoy», with the Client search on top.
+    ["assistant", "Buscar por nombre, teléfono o correo"],
     ["administrator", "Pagos pendientes"],
     ["nutritionist", "Mi agenda"],
     ["coordinator", "Buscar clienta"],
@@ -66,7 +67,7 @@ describe("StaffNavigation", () => {
   // Follow-up 225 §8: Perfil replaces the avatar on every root (owner, 2026-11-02).
   it.each([
     ["trainer", ["Agenda", "Mis pagos", "Perfil"]],
-    ["assistant", ["Clientas", "Horario", "Caja", "Perfil"]],
+    ["assistant", ["Hoy", "Clientas", "Horario", "Caja", "Perfil"]],
     ["nutritionist", ["Agenda", "Disponibilidad", "Perfil"]],
     ["administrator", ["Pagos", "Clientas", "Horario", "Perfil"]],
     ["coordinator", ["Clientas", "Para contactar", "Horario", "Perfil"]],
