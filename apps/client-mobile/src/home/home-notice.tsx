@@ -1,5 +1,5 @@
-import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { promotionCardMaxWidth } from "./promotion-image";
 
@@ -7,8 +7,8 @@ type Action = { busy?: boolean; label: string; onPress: () => void; testID: stri
 
 /**
  * Inicio's notice on top (Rosa Emma C02c, C02d, C02g): the screen's 600 hero
- * with an uppercase eyebrow, a Lora 26 title, white lines, and at most one
- * white button or an underlined white link.
+ * with an `etiqueta` eyebrow, a `titulo-bloque` title, white `cuerpo` lines,
+ * and at most one white button or an underlined white link.
  */
 export function HomeNotice({
   action,
@@ -34,12 +34,20 @@ export function HomeNotice({
   const content = (
     <>
       <View style={styles.top}>
-        <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text>
-        {corner === undefined ? null : <Text style={styles.corner}>{corner}</Text>}
+        <Text style={styles.eyebrow} tone="onDark" variant="etiqueta">
+          {eyebrow}
+        </Text>
+        {corner === undefined ? null : (
+          <Text tone="onDark" variant="titulo-fila">
+            {corner}
+          </Text>
+        )}
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text tone="onDark" variant="titulo-bloque">
+        {title}
+      </Text>
       {lines.map((line) => (
-        <Text key={line} style={styles.line}>
+        <Text key={line} tone="onDark" variant="cuerpo">
           {line}
         </Text>
       ))}
@@ -54,7 +62,7 @@ export function HomeNotice({
           style={({ pressed }) => [styles.button, pressed && styles.pressed]}
           testID={action.testID}
         >
-          <Text style={styles.buttonLabel}>{action.busy ? "Preparando…" : action.label}</Text>
+          <Text variant="boton">{action.busy ? "Preparando…" : action.label}</Text>
         </Pressable>
       )}
       {link === undefined ? null : (
@@ -66,7 +74,9 @@ export function HomeNotice({
           style={styles.link}
           testID={link.testID}
         >
-          <Text style={styles.linkLabel}>{link.label}</Text>
+          <Text tone="onDark" variant="enlace">
+            {link.label}
+          </Text>
         </Pressable>
       )}
     </>
@@ -103,49 +113,11 @@ const styles = StyleSheet.create({
     minHeight: 48,
     paddingHorizontal: spacing.lgXl,
   },
-  buttonLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
   // On a tablet it lines up with Inicio's button and plan row, from the left.
   capped: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
-  corner: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
-  eyebrow: {
-    color: colors.onEmphasis,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-  },
-  line: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  eyebrow: { flexShrink: 1 },
   link: { alignSelf: "flex-start", marginTop: spacing.smd, minHeight: 24 },
-  linkLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
   pressed: { opacity: 0.85 },
-  title: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 26,
-    lineHeight: 29,
-  },
   top: {
     alignItems: "center",
     flexDirection: "row",

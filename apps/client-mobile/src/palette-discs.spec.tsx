@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react-native";
 import type { ReferredClientDto } from "@pilates/api-contracts";
+import { textVariants } from "@pilates/mobile-core";
 
 import { SoleNutritionist } from "./evaluations/evaluation-slot-picker";
 import { InvoiceDisclosure } from "./payments/invoice-disclosure";
@@ -44,16 +45,18 @@ describe("Client icons and initials in palette B", () => {
     } as ReferredClientDto;
     const screen = await render(<ReferredList referred={[referred]} />);
 
+    // Follow-up 285: initials under 44 pt are `pastilla`.
     const initials = screen.getByText("CM");
-    expect(initials).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_600SemiBold" });
+    expect(initials).toHaveStyle({ color: "#FFFBFB", ...textVariants.pastilla });
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 
   it("draws the Client's own initials on a Palo de rosa circle", async () => {
     const screen = await render(<ClientAvatar name="Carla Méndez" photoUri={null} size={44} />);
 
+    // Follow-up 285: initials on a 44 pt disc or larger are `destacado`.
     const initials = screen.getByText("CM");
-    expect(initials).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_600SemiBold" });
+    expect(initials).toHaveStyle({ color: "#FFFBFB", ...textVariants.destacado });
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 

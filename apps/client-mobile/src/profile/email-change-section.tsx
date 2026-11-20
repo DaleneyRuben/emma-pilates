@@ -4,18 +4,10 @@ import {
   resendCurrentAccountEmailChange,
   useGetCurrentAccountEmailChange,
 } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  spacing,
-  surfaces,
-  TextButton,
-  typography,
-} from "@pilates/mobile-core";
+import { spacing, surfaces, Text, TextButton } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 
@@ -63,11 +55,11 @@ export function EmailChangeSection() {
 
   return (
     <View accessibilityLabel="Cambio de correo pendiente" style={styles.card}>
-      <Text style={styles.title}>Revisa tu correo nuevo</Text>
-      <BodyText style={styles.body}>
+      <Text variant="titulo-fila">Revisa tu correo nuevo</Text>
+      <Text variant="cuerpo">
         Te enviamos un enlace a {pending.email}. Ábrelo dentro de 24 horas para confirmar el cambio;
         hasta entonces sigues entrando con tu correo actual.
-      </BodyText>
+      </Text>
       <View style={styles.actions}>
         <TextButton
           disabled={busy}
@@ -82,7 +74,7 @@ export function EmailChangeSection() {
           style={styles.link}
         />
       </View>
-      {notice === null ? null : <BodyText style={styles.notice}>{notice}</BodyText>}
+      {notice === null ? null : <Text variant="secundario">{notice}</Text>}
     </View>
   );
 }
@@ -92,7 +84,6 @@ export const normalizeEmail = (email: string): string => email.trim().toLowerCas
 
 const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: spacing.xlSm },
-  body: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   // C22b: the pending change on the soft 50 inset inside the fields' card.
   card: {
     ...surfaces.soft,
@@ -101,11 +92,4 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   link: { minHeight: 32, paddingHorizontal: 0 },
-  notice: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
 });

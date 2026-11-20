@@ -8,8 +8,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
-  fontFamilies,
   LoadingState,
   LogoutConfirmationSheet,
   QueryFailure,
@@ -18,7 +16,7 @@ import {
   SectionTitle,
   spacing,
   surfaces,
-  typography,
+  Text,
   useMobileIdentity,
   useRefetchOnFocus,
   useStickyNotice,
@@ -26,7 +24,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { appVersionLabel } from "./app-version";
@@ -106,10 +104,16 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
         <View style={styles.hero}>
           <ClientAvatar name={client.name} onEmphasis photoUri={photoUri} size={56} />
           <View style={styles.heroBody}>
-            <Text style={styles.name}>{client.name}</Text>
-            <Text style={styles.heroLine}>{client.email}</Text>
+            <Text tone="onDark" variant="titulo-bloque">
+              {client.name}
+            </Text>
+            <Text tone="onDark" variant="cuerpo">
+              {client.email}
+            </Text>
             {client.phone ? (
-              <Text style={styles.heroLine}>{phoneWithFlag(client.phone)}</Text>
+              <Text tone="onDark" variant="cuerpo">
+                {phoneWithFlag(client.phone)}
+              </Text>
             ) : null}
           </View>
           <Pressable
@@ -119,7 +123,9 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
             onPress={() => navigation.navigate("EditProfile")}
             style={styles.edit}
           >
-            <Text style={styles.editLabel}>Editar</Text>
+            <Text tone="onDark" variant="enlace">
+              Editar
+            </Text>
           </Pressable>
         </View>
         <View>
@@ -189,7 +195,8 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
             version, away from «Cerrar sesión»; it still opens C24. */}
         <View style={styles.end}>
           <Text
-            style={styles.footer}
+            style={styles.centered}
+            variant="secundario"
           >{`Emma Pilates Studio · versión ${appVersionLabel()} ·`}</Text>
           <Pressable
             accessibilityRole="button"
@@ -197,7 +204,9 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
             onPress={() => navigation.navigate("CloseAccount")}
             testID="profile-close-account"
           >
-            <Text style={[styles.footer, styles.closeAccount]}>Cerrar mi cuenta</Text>
+            <Text style={styles.centered} variant="enlace">
+              Cerrar mi cuenta
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -221,21 +230,9 @@ const planPill = {
 } as const;
 
 const styles = StyleSheet.create({
-  closeAccount: {
-    fontFamily: fontFamilies.bodyBold,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
+  centered: { textAlign: "center" },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   edit: { alignSelf: "center", minHeight: 44, justifyContent: "center" },
-  editLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationColor: colors.onEmphasis,
-    textDecorationLine: "underline",
-  },
   // C18s: the version line on its own white card.
   end: {
     ...surfaces.card,
@@ -247,13 +244,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  footer: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 19,
-    textAlign: "center",
-  },
+
   hero: {
     ...surfaces.emphasis,
     alignItems: "center",
@@ -262,17 +253,5 @@ const styles = StyleSheet.create({
     padding: spacing.xlSm,
   },
   heroBody: { flex: 1, gap: spacing.xxs },
-  heroLine: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  name: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 29,
-  },
   screen: { gap: spacing.md },
 });

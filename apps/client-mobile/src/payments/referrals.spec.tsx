@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Share } from "react-native";
+import { Share, StyleSheet } from "react-native";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -116,10 +116,13 @@ describe("Invita a una amiga (BKM-014)", () => {
     const card = await screen.findByTestId("referral-code-card");
     expect(card).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
     expect(screen.getByText("Tu código")).toBeOnTheScreen();
+    // Follow-up 285: the code is `cifra-grande`, with no hand-made spacing.
     expect(screen.getByText("LUCIA")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "Lora_400Regular",
+      fontFamily: "Lora_500Medium",
+      fontSize: 34,
     });
+    expect(StyleSheet.flatten(screen.getByText("LUCIA").props.style).letterSpacing).toBeUndefined();
     const copy = screen.getByRole("button", { name: "Copiar código" });
     expect(copy).toHaveStyle({ borderWidth: 1.5, height: 44, width: 44 });
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);

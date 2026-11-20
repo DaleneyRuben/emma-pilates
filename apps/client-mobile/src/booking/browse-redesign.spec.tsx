@@ -4,6 +4,7 @@ import {
   boliviaCivilDate,
   civilDateRange,
   clearMobileQueryCache,
+  textVariants,
 } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -152,11 +153,8 @@ describe("Client Reservar, palette B", () => {
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((row) => within(row));
     expect(screen.queryByTestId("seat-pill")).toBeNull();
-    const seats = {
-      color: "#93615D",
-      fontFamily: "WorkSans_700Bold",
-      fontWeight: "700" as const,
-    };
+    // Follow-up 285: the seats are `pastilla` in ink.
+    const seats = { color: "#93615D", ...textVariants.pastilla };
     expect(rows[0].getByText("5 de 12")).toHaveStyle(seats);
     expect(rows[1].getByText("Quedan 2 lugares")).toHaveStyle(seats);
     expect(rows[2].getByText("Lleno")).toHaveStyle(seats);

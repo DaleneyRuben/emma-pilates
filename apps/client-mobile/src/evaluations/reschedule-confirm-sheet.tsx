@@ -1,6 +1,5 @@
 import type { EvaluationSlotDto } from "@pilates/api-contracts";
-import { BodyText, colors, ConfirmationSheet, fontFamilies } from "@pilates/mobile-core";
-import { StyleSheet } from "react-native";
+import { ConfirmationSheet, Text } from "@pilates/mobile-core";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
 
@@ -42,17 +41,14 @@ export function RescheduleConfirmSheet({
       {target !== null ? (
         <>
           {currentStartsAt === undefined ? null : (
-            <BodyText>{`Antes: ${turno(currentStartsAt)}`}</BodyText>
+            <Text variant="cuerpo">{`Antes: ${turno(currentStartsAt)}`}</Text>
           )}
-          <BodyText style={styles.now}>{`Ahora: ${turno(target.startsAt)}`}</BodyText>
-          <BodyText>{`${target.durationMinutes} min · ${target.nutritionistName}`}</BodyText>
-          <BodyText>El pago se mantiene: no pagas de nuevo.</BodyText>
+          {/* The new turno is the sheet's key datum. */}
+          <Text variant="titulo-fila">{`Ahora: ${turno(target.startsAt)}`}</Text>
+          <Text variant="cuerpo">{`${target.durationMinutes} min · ${target.nutritionistName}`}</Text>
+          <Text variant="cuerpo">El pago se mantiene: no pagas de nuevo.</Text>
         </>
       ) : null}
     </ConfirmationSheet>
   );
 }
-
-const styles = StyleSheet.create({
-  now: { color: colors.text, fontWeight: "500", fontFamily: fontFamilies.bodyMedium },
-});

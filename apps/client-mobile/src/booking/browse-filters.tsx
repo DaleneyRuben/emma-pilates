@@ -1,19 +1,17 @@
 import {
-  BodyText,
   BranchPickerPill,
   Chip,
   colors,
   dayChipLabel,
-  fontFamilies,
   Glyph,
   PickerCheck,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 /**
  * Walkthrough n.º 7: with one Branch, the Branch is fixed (no chevron, not
@@ -39,10 +37,7 @@ export function BranchLine({
       testID="branch-fixed"
     >
       <Glyph color={colors.textMuted} name="pin" size={16} strokeWidth={1.5} />
-      <Text style={styles.branchLabel}>
-        {"Sucursal "}
-        <Text style={styles.branchName}>{name}</Text>
-      </Text>
+      <Text variant="compacto">{`Sucursal: ${name}`}</Text>
     </View>
   );
 }
@@ -85,10 +80,12 @@ export function DayStrip({
             style={[styles.dayChip, isSelected && styles.dayChipSelected]}
             testID={`browse-day-${date}`}
           >
-            <Text style={[styles.dayWeekday, isSelected && styles.onSelected]}>
+            <Text tone={isSelected ? "onDark" : "ink"} variant="pastilla">
               {date === today ? "Hoy" : label.weekday}
             </Text>
-            <Text style={[styles.dayNumber, isSelected && styles.onSelected]}>{label.day}</Text>
+            <Text tone={isSelected ? "onDark" : "ink"} variant="cifra">
+              {label.day}
+            </Text>
             {isFrozen ? (
               <Glyph
                 color={isSelected ? colors.onPrimary : colors.text}
@@ -130,16 +127,20 @@ export function DayStripOther({
       style={[styles.dayChip, selected && styles.dayChipSelected]}
       testID="browse-day-other"
     >
-      <Text style={selected ? [styles.dayNumber, styles.onSelected] : styles.otherLabel}>
-        {label}
-      </Text>
+      {selected ? (
+        <Text tone="onDark" variant="cifra">
+          {label}
+        </Text>
+      ) : (
+        <Text variant="pastilla">{label}</Text>
+      )}
     </Pressable>
   );
 }
 
 /**
- * C03e: the Branches on a white card under the band, the chosen one in bold
- * with its check.
+ * C03e: the Branches on a white card under the band, the chosen one marked
+ * by its check, never by weight (follow-up 285, rule 4).
  */
 export function BranchSheet({
   branches,
@@ -152,7 +153,9 @@ export function BranchSheet({
 }) {
   return (
     <View style={styles.branchSheet}>
-      <BodyText style={styles.sheetTitle}>Elige una sucursal</BodyText>
+      <Text accessibilityRole="header" variant="etiqueta">
+        Elige una sucursal
+      </Text>
       {branches.map((branch, index) => (
         <Pressable
           accessibilityLabel={branch.name}
@@ -163,12 +166,8 @@ export function BranchSheet({
           style={[styles.branchRow, index > 0 && styles.branchRule]}
         >
           <View style={styles.branchText}>
-            <Text
-              style={[styles.branchRowName, branch.id === selectedId && styles.branchNameSelected]}
-            >
-              {branch.name}
-            </Text>
-            <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
+            <Text variant="titulo-fila">{branch.name}</Text>
+            <Text variant="secundario">{branch.address}</Text>
           </View>
           <PickerCheck selected={branch.id === selectedId} testID={`picker-check-${branch.id}`} />
         </Pressable>
@@ -219,23 +218,12 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingHorizontal: spacing.mdLg,
   },
-  branchAddress: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  branchLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  branchName: { color: colors.text, fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
-  // Rosa Emma marks the chosen Branch by weight, not another colour (FIX-089).
-  branchNameSelected: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   branchRow: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
     paddingVertical: spacing.mdLg,
-  },
-  branchRowName: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.bodyMedium,
-    fontWeight: "500",
   },
   branchRule: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   branchSheet: { ...surfaces.card, gap: spacing.xxs, padding: spacing.lg },
@@ -251,29 +239,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   dayChipSelected: { backgroundColor: colors.primary },
-  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   dayRow: { flexDirection: "row", gap: 5 },
-  dayWeekday: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
-  onSelected: { color: colors.onPrimary },
-  otherLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
-  sheetTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
   // Horizontal strips keep their natural height: spare tablet height would
   // stretch them and an open Branch list would squash them.
   strip: { flexGrow: 0, flexShrink: 0 },

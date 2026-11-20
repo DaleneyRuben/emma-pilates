@@ -63,7 +63,11 @@ describe("Client Session detail on a frozen day", () => {
     expect(button).toHaveStyle({ backgroundColor: "#FEF6F2", borderColor: "#CDA697" });
     expect(button).toHaveProp("accessibilityHint", expect.stringMatching(/^Podrás reservar desde/));
     expect(screen.queryByRole("button", { name: "Reservar esta clase" })).toBeNull();
-    expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({ fontWeight: "700" });
+    // C04j: the frozen days are a row title (`titulo-fila`, 16 · 600).
+    expect(screen.getByText(/^Tu plan está congelado del /)).toHaveStyle({
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 16,
+    });
     // FIX-090: the shared list date inside the sentence, «lun 23 nov».
     expect(
       screen.getByText(`Podrás reservar desde el ${dayMonth(addCivilDays(endsOn, 1))}.`),

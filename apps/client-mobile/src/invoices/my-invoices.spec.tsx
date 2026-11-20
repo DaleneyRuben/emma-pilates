@@ -116,7 +116,9 @@ describe("Mis facturas", () => {
     // exception, on the one Rubor pill.
     expect(ancestorBackgrounds(screen.getByText("Lista"))).not.toContain("#E7CCBF");
     expect(ancestorBackgrounds(screen.getByText("En preparación"))).not.toContain("#E7CCBF");
-    expect(screen.getByText("En preparación")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    // Follow-up 285: both states in `pastilla`, the same weight either way.
+    expect(screen.getByText("En preparación")).toHaveStyle({ fontFamily: "WorkSans_700Bold" });
+    expect(screen.getByText("Lista")).toHaveStyle({ fontFamily: "WorkSans_700Bold" });
     expect(
       within(screen.getByTestId("exception-pill")).getByText("Pago anulado"),
     ).toBeOnTheScreen();

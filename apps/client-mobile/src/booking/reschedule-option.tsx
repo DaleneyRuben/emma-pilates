@@ -1,19 +1,18 @@
 import type { SessionAvailabilityDto } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   formatStartTime,
   formatTimeRange,
   Glyph,
   radii,
   spacing,
   surfaces,
+  Text,
   TypeBar,
-  typography,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 import { Children, Fragment } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { seatsTag } from "./session-row";
 
@@ -33,7 +32,7 @@ export function RescheduleOptions({ children }: { children: ReactNode }) {
 
 /**
  * One alternative as a class row (Rosa Emma C06): the class type's bar, the
- * start in Lora 22, the class over «Trainer · N de M lugares», and a radio
+ * start in `cifra`, the class over «Trainer · N de M lugares», and a radio
  * filled in 600 once chosen.
  */
 export function RescheduleOption({
@@ -55,12 +54,12 @@ export function RescheduleOption({
       testID={`reschedule-option-${session.id}`}
     >
       <TypeBar name={session.classTypeName} />
-      <Text numberOfLines={1} style={styles.time} testID="reschedule-time">
+      <Text numberOfLines={1} style={styles.time} testID="reschedule-time" variant="cifra">
         {formatStartTime(session.startsAt)}
       </Text>
       <View style={styles.body}>
-        <Text style={styles.title}>{session.classTypeName}</Text>
-        <Text style={styles.details}>{`${session.trainerName} · ${seatsTag(session)}`}</Text>
+        <Text variant="titulo-fila">{session.classTypeName}</Text>
+        <Text variant="secundario">{`${session.trainerName} · ${seatsTag(session)}`}</Text>
       </View>
       <View style={[styles.radio, selected && styles.radioOn]} testID="reschedule-radio">
         {selected ? (
@@ -73,7 +72,6 @@ export function RescheduleOption({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs, minWidth: 0 },
-  details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   radio: {
@@ -94,19 +92,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  // Lora 22 beside the type bar, wider when Android's digits need it.
-  time: {
-    color: colors.text,
-    flexShrink: 0,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontVariant: ["tabular-nums"],
-    minWidth: 62,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
+  // `cifra` beside the type bar, wider when Android's digits need it.
+  time: { flexShrink: 0, minWidth: 68 },
 });

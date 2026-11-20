@@ -1,15 +1,6 @@
 import { formatTitleDate, useGetCurrentClientSubscription } from "@pilates/api-contracts";
-import {
-  addCivilDays,
-  colors,
-  fontFamilies,
-  Glyph,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { addCivilDays, colors, Glyph, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { dayMonth, freezeRange } from "../subscription/freeze-window";
 
@@ -71,7 +62,7 @@ export function FrozenLegend({ freeze }: { freeze: ApprovedFreeze }) {
   return (
     <View style={styles.legend} testID="browse-frozen-legend">
       <Glyph color={colors.text} name="lock" size={14} strokeWidth={1.5} />
-      <Text style={styles.legendText}>{`Plan congelado ${rangeInSentence(freeze)}`}</Text>
+      <Text variant="secundario">{`Plan congelado ${rangeInSentence(freeze)}`}</Text>
     </View>
   );
 }
@@ -99,11 +90,12 @@ export function FrozenDayCard({
     freeze.planEndsOn === null ? "" : ` Tu plan ahora vence el ${dayMonth(freeze.planEndsOn)}.`;
   return (
     <View style={styles.card} testID="browse-frozen-day">
-      <Text accessibilityRole="header" style={styles.title}>
+      <Text accessibilityRole="header" tone="onDark" variant="titulo-bloque">
         {`${weekdayAndDay(day)}: plan congelado`}
       </Text>
       <Text
-        style={styles.body}
+        tone="onDark"
+        variant="cuerpo"
       >{`Pediste congelar tu plan ${rangeInSentence(freeze)}.${moved}`}</Text>
       <View style={styles.actions}>
         {backOn === null ? null : (
@@ -114,9 +106,7 @@ export function FrozenDayCard({
             style={({ pressed }) => [styles.button, pressed && styles.pressed]}
             testID="browse-frozen-back-on"
           >
-            <Text style={styles.buttonLabel}>
-              {`Ver clases del ${weekdayAndDay(backOn).toLowerCase()}`}
-            </Text>
+            <Text variant="boton">{`Ver clases del ${weekdayAndDay(backOn).toLowerCase()}`}</Text>
           </Pressable>
         )}
         <Pressable
@@ -126,7 +116,9 @@ export function FrozenDayCard({
           onPress={onOpenFreeze}
           style={styles.link}
         >
-          <Text style={styles.linkLabel}>Ver mi congelamiento</Text>
+          <Text tone="onDark" variant="enlace">
+            Ver mi congelamiento
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -141,12 +133,6 @@ export function dayBackFromFreeze(freeze: ApprovedFreeze, dates: readonly string
 
 const styles = StyleSheet.create({
   actions: { gap: spacing.smLg, marginTop: spacing.sm },
-  body: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   button: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -154,12 +140,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 48,
     paddingHorizontal: spacing.lgXl,
-  },
-  buttonLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
   },
   card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
   legend: {
@@ -172,20 +152,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.smd,
   },
-  legendText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   link: { alignSelf: "flex-start", justifyContent: "center", minHeight: 32 },
-  linkLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
   pressed: { opacity: 0.85 },
-  title: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 26,
-    lineHeight: 29,
-  },
 });

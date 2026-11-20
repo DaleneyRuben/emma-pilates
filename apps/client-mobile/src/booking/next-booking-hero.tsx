@@ -1,16 +1,14 @@
 import {
   attendeesLabel,
-  colors,
-  fontFamilies,
   formatCancellationWindow,
   formatStartTime,
   formatTimeRange,
   HeroAttendees,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useBookingAction } from "./booking-card";
 import { freePlacesLabel } from "./free-places";
@@ -49,11 +47,21 @@ export function NextBookingHero({
     <View style={styles.hero} testID="bookings-next-class">
       <View accessibilityLabel={label} accessible style={styles.content}>
         <View style={styles.top}>
-          <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text>
-          {places === undefined ? null : <Text style={styles.places}>{places}</Text>}
+          <Text style={styles.eyebrow} tone="onDark" variant="etiqueta">
+            {eyebrow}
+          </Text>
+          {places === undefined ? null : (
+            <Text tone="onDark" variant="pastilla">
+              {places}
+            </Text>
+          )}
         </View>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.detail}>{detail}</Text>
+        <Text tone="onDark" variant="titulo-bloque">
+          {title}
+        </Text>
+        <Text tone="onDark" variant="cuerpo">
+          {detail}
+        </Text>
         <HeroAttendees initials={attendees} />
       </View>
       {action === null ? null : (
@@ -66,7 +74,9 @@ export function NextBookingHero({
             style={styles.action}
             testID={action.testID}
           >
-            <Text style={styles.actionLabel}>{action.label}</Text>
+            <Text tone="onDark" variant="enlace">
+              {action.label}
+            </Text>
           </Pressable>
         </View>
       )}
@@ -76,37 +86,10 @@ export function NextBookingHero({
 
 const styles = StyleSheet.create({
   action: { justifyContent: "center", minHeight: 32 },
-  actionLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
   actionRow: { alignItems: "flex-end" },
   content: { gap: spacing.smd },
-  detail: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  eyebrow: {
-    color: colors.onEmphasis,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 12 * 0.14,
-  },
+  eyebrow: { flexShrink: 1 },
   hero: { ...surfaces.emphasis, gap: spacing.xs, padding: spacing.xlSm },
-  places: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
-  title: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.hero,
-    lineHeight: 31,
-  },
   top: {
     alignItems: "center",
     flexDirection: "row",

@@ -1,5 +1,5 @@
 import { cleanup, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, maxTextScale, textVariants } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import App from "../../App";
@@ -33,15 +33,16 @@ const promotion = {
   },
 };
 
-// UX-016 finding A2: a fixed line height next to a scaling font clips the
-// descenders. The carousel leaves the line box to the font.
+// UX-016 finding A2: a line box that does not fit the font clips the
+// descenders. Follow-up 285: the line height comes with the variant, sized
+// for the face, and the text grows up to 1.3 times with the phone.
 describe("Promotions carousel Dynamic Type", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("does not pin the headline or the description to a fixed line height", async () => {
+  it("takes the headline's and the description's line height from the type scale", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () => jsonResponse({ status: "none" }),
@@ -58,7 +59,12 @@ describe("Promotions carousel Dynamic Type", () => {
     const headline = StyleSheet.flatten(screen.getByText(promotion.headline).props.style);
     const description = StyleSheet.flatten(screen.getByText(promotion.description).props.style);
 
-    expect(headline.lineHeight).toBeUndefined();
-    expect(description.lineHeight).toBeUndefined();
+    expect(headline.lineHeight).toBe(textVariants["titulo-bloque"].lineHeight);
+    expect(description.lineHeight).toBe(textVariants.cuerpo.lineHeight);
+    expect(screen.getByText(promotion.headline)).toHaveProp("maxFontSizeMultiplier", maxTextScale);
+    expect(screen.getByText(promotion.description)).toHaveProp(
+      "maxFontSizeMultiplier",
+      maxTextScale,
+    );
   });
 });

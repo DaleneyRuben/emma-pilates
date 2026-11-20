@@ -55,7 +55,8 @@ describe("ClientNavigation", () => {
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
   });
 
-  // Rosa Emma: the open tab is a 600 pill with white icon and bold label.
+  // Rosa Emma: the open tab is a 600 pill with a white icon and label; the
+  // label keeps its weight and never drops under 12 pt (follow-up 285).
   it("draws the open tab white on its pill and the others in rosa profundo", async () => {
     const screen = await render(<ClientNavigation {...defaultProps} role="client" />);
     // React Navigation cross-fades an active and an idle copy of each icon.
@@ -73,10 +74,12 @@ describe("ClientNavigation", () => {
     expect(tabLabel("Inicio")).toHaveStyle({
       color: colors.onPrimary,
       fontFamily: "WorkSans_700Bold",
+      fontSize: 12,
     });
     expect(tabLabel("Reservar")).toHaveStyle({
       color: colors.text,
-      fontFamily: "WorkSans_400Regular",
+      fontFamily: "WorkSans_700Bold",
+      fontSize: 12,
     });
   });
 

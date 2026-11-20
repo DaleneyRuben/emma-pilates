@@ -1,13 +1,5 @@
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  Glyph,
-  radii,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, colors, Glyph, radii, spacing, Text } from "@pilates/mobile-core";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import type { AttachedReceipt } from "./receipt-upload";
 
@@ -40,10 +32,10 @@ export function ReceiptRow({
           <Glyph color={colors.text} name="upload" size={18} strokeWidth={1.7} />
         </View>
         <View style={styles.body}>
-          <Text style={styles.label}>
+          <Text variant="titulo-fila">
             {uploading ? "Subiendo comprobante…" : "Elegir comprobante"}
           </Text>
-          <Text style={styles.note}>JPG o PNG · hasta 5 MB</Text>
+          <Text variant="secundario">JPG o PNG · hasta 5 MB</Text>
         </View>
         <Chevron size={18} strokeWidth={1.7} tone="muted" />
       </Pressable>
@@ -64,8 +56,8 @@ export function ReceiptRow({
           style={styles.thumbnail}
         />
         <View style={styles.body}>
-          <Text style={styles.label}>Comprobante listo</Text>
-          <Text style={styles.note}>Listo para enviar · toca para cambiarlo</Text>
+          <Text variant="titulo-fila">Comprobante listo</Text>
+          <Text variant="secundario">Listo para enviar · toca para cambiarlo</Text>
         </View>
       </Pressable>
       <Pressable
@@ -92,13 +84,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 36,
   },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   remove: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   row: {
     alignItems: "center",

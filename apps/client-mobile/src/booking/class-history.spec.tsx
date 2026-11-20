@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import App from "../../App";
@@ -136,9 +136,10 @@ describe("Client Class History", () => {
     await waitFor(() => {
       expect(screen.getByText("Has asistido a")).toBeOnTheScreen();
     });
-    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 28 });
+    // Follow-up 285: the hero count is `titulo-bloque`, the row's day `cifra`.
+    expect(screen.getByText("3 clases desde agosto")).toHaveStyle(textVariants["titulo-bloque"]);
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
-    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
+    expect(screen.getByText("05")).toHaveStyle(textVariants.cifra);
     expect(screen.getByText("sáb")).toBeOnTheScreen();
 
     const rows = screen.getAllByTestId("class-history-row");
@@ -157,10 +158,10 @@ describe("Client Class History", () => {
     const screen = await openHistory([]);
 
     await waitFor(() => {
-      expect(screen.getByText("Todavía no tomaste clases")).toHaveStyle({
-        fontFamily: "Lora_400Regular",
-        fontSize: 24,
-      });
+      // Follow-up 285: a state title is `titulo-fila` (C05e).
+      expect(screen.getByText("Todavía no tomaste clases")).toHaveStyle(
+        textVariants["titulo-fila"],
+      );
     });
     expect(
       screen.getByTestId("empty-state-icon-clock", { includeHiddenElements: true }),

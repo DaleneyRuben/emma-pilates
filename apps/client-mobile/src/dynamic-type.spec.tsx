@@ -1,4 +1,5 @@
 import { render, within } from "@testing-library/react-native";
+import { textVariants } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import { ShortcutTile } from "./home/home-shortcuts";
@@ -36,8 +37,9 @@ describe("Dynamic Type on Client screens", () => {
     const label = within(screen.getByRole("button", { name: /^Inicio, tab/ })).getByText("Inicio");
     const style = StyleSheet.flatten(label.props.style);
 
+    // Follow-up 285: `pastilla` carries its own line box, taller than the font.
     expect(style.fontSize).toBe(12);
-    expect(style.lineHeight).toBeUndefined();
+    expect(style.lineHeight).toBeGreaterThan(12);
   });
 
   it("keeps a Home tile title's line box taller than its font", async () => {
@@ -47,6 +49,8 @@ describe("Dynamic Type on Client screens", () => {
     const title = within(screen.getByRole("button")).getByText("Reservar");
     const style = StyleSheet.flatten(title.props.style);
 
-    expect(style.lineHeight).toBeUndefined();
+    // Follow-up 285: the tile title is `titulo-fila`, whose line box is 1.35 times its font.
+    expect(style).toMatchObject(textVariants["titulo-fila"]);
+    expect(style.lineHeight).toBeGreaterThan(style.fontSize ?? 0);
   });
 });

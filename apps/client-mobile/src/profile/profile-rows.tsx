@@ -1,22 +1,21 @@
 import {
   Chevron,
   colors,
-  fontFamilies,
   Glyph,
   type GlyphName,
   radii,
   rosa,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * One Perfil row (C18, Rosa Emma): the line glyph on a 36 pt 50 disc, the
- * label in Work Sans 16 semibold, an optional value (a state on a 50 pill,
- * or a count in words) and the chevron.
+ * label in `titulo-fila`, an optional value in `pastilla` (a state on a 50
+ * pill, or a count in words) and the chevron.
  */
 export function ProfileRow({
   chevron = true,
@@ -44,13 +43,15 @@ export function ProfileRow({
       <View style={styles.disc} testID="profile-row-disc">
         <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       </View>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label} variant="titulo-fila">
+        {label}
+      </Text>
       {value === undefined ? null : pill ? (
         <View style={styles.pill}>
-          <Text style={styles.pillText}>{value}</Text>
+          <Text variant="pastilla">{value}</Text>
         </View>
       ) : (
-        <Text style={styles.value}>{value}</Text>
+        <Text variant="pastilla">{value}</Text>
       )}
       {chevron ? <Chevron size={16} strokeWidth={1.5} /> : null}
     </Pressable>
@@ -83,13 +84,7 @@ const styles = StyleSheet.create({
     width: 36,
   },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
+  label: { flex: 1 },
   pill: {
     backgroundColor: rosa[50],
     borderColor: colors.borderSoft,
@@ -99,12 +94,6 @@ const styles = StyleSheet.create({
     minHeight: 28,
     paddingHorizontal: spacing.md,
   },
-  pillText: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
   pressed: { backgroundColor: colors.rowHover },
   row: {
     alignItems: "center",
@@ -113,11 +102,5 @@ const styles = StyleSheet.create({
     minHeight: 64,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
-  },
-  value: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
   },
 });

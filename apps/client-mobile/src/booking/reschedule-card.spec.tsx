@@ -101,7 +101,7 @@ describe("Client reschedule option card", () => {
   }
 
   // C06 in Rosa Emma: the options are rows of one white card, the class
-  // type's bar, the start in Lora 22 and «Trainer · N de M lugares» under the
+  // type's bar, the start in `cifra` (Lora 24) and «Trainer · N de M lugares» under the
   // class, with a radio at the end.
   it("draws the option as a class row of the card with its radio", async () => {
     const { button, card, screen } = await openReschedule();
@@ -115,8 +115,8 @@ describe("Client reschedule option card", () => {
       backgroundColor: "#93615D",
     });
     expect(card.getByText(/^\d\d:\d\d$/)).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 22,
+      fontFamily: "Lora_500Medium",
+      fontSize: 24,
     });
     expect(card.getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
     expect(card.getByText("Emma Vargas · 4 de 12 lugares")).toHaveStyle({

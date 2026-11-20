@@ -6,9 +6,7 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   footerScreen,
@@ -25,14 +23,14 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  Text,
   TextButton,
   type GlyphName,
-  typography,
   useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
@@ -162,9 +160,7 @@ export function CloseAccountScreen() {
           <FooterPanel>
             {failed ? (
               <View accessibilityRole="alert" style={styles.failure}>
-                <BodyText style={styles.failureText}>
-                  No pudimos cerrar tu cuenta. Inténtalo de nuevo.
-                </BodyText>
+                <Text variant="cuerpo">No pudimos cerrar tu cuenta. Inténtalo de nuevo.</Text>
               </View>
             ) : null}
             {/* FIX-089: destructive is the secondary look, confirmed by the
@@ -186,9 +182,8 @@ export function CloseAccountScreen() {
         {/* C24: the lead, the consequences, then the data note, the consent
             and the password, each on a white card. */}
         <View style={styles.card}>
-          <BodyText style={styles.lead}>
-            Esto pasa al cerrar tu cuenta en Emma Pilates Studio:
-          </BodyText>
+          {/* C24 draws the lead as `titulo-fila`. */}
+          <Text variant="titulo-fila">Esto pasa al cerrar tu cuenta en Emma Pilates Studio:</Text>
         </View>
         <View style={styles.lines} testID="close-account-lines">
           {closure.lines.map((line, index) => (
@@ -201,15 +196,17 @@ export function CloseAccountScreen() {
                   strokeWidth={1.6}
                 />
               </View>
-              <Text style={styles.lineText}>{line}</Text>
+              <Text style={styles.lineText} variant="cuerpo">
+                {line}
+              </Text>
             </View>
           ))}
         </View>
         <View style={styles.card}>
-          <BodyText style={styles.note}>
+          <Text variant="secundario">
             Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
             sin tus datos, para su contabilidad.
-          </BodyText>
+          </Text>
           <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
           <FormField
             autoCapitalize="none"
@@ -250,8 +247,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  failureText: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: 14 },
-  lead: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   line: {
     alignItems: "flex-start",
     flexDirection: "row",
@@ -259,15 +254,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.smLg,
   },
-  lineText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-    paddingTop: spacing.smd,
-  },
+  lineText: { flex: 1, paddingTop: spacing.smd },
   lines: { ...surfaces.card, overflow: "hidden" },
-  note: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
   screen: { gap: spacing.md },
 });

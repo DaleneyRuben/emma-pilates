@@ -7,7 +7,6 @@ import {
   Chevron,
   colors,
   describePlanCardLabel,
-  fontFamilies,
   Glyph,
   LoadingState,
   QueryFailure,
@@ -17,11 +16,11 @@ import {
   SectionTitle,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { Fragment, useEffect } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
@@ -85,7 +84,8 @@ function LaunchBanner({ placesLeft, quiet }: { placesLeft: number | null; quiet:
         size={strong ? 22 : 20}
         strokeWidth={1.7}
       />
-      <Text style={[styles.bannerText, strong && styles.bannerTextStrong]}>
+      {/* C08, C08b: `titulo-fila` in both tones; only the ground changes. */}
+      <Text style={styles.bannerText} tone={strong ? "onDark" : "ink"} variant="titulo-fila">
         {scarce ? scarcityLine(placesLeft) : "Oferta por tiempo limitado · 15 % en tu plan"}
       </Text>
     </View>
@@ -102,13 +102,15 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
       testID={`plan-card-${plan.id}`}
     >
       <View style={styles.rowBody}>
-        <Text style={styles.planName}>{plan.name}</Text>
-        <Text style={styles.terms}>{planRowTerms(plan)}</Text>
+        <Text variant="titulo-fila">{plan.name}</Text>
+        <Text variant="secundario">{planRowTerms(plan)}</Text>
       </View>
       <View style={styles.prices}>
-        <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+        <Text variant="cifra">{formatBolivianos(plan.priceCentavos)}</Text>
         {plan.listPriceCentavos === undefined ? null : (
-          <Text style={styles.listPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
+          <Text strike variant="secundario">
+            {formatBolivianos(plan.listPriceCentavos)}
+          </Text>
         )}
       </View>
       <Chevron size={18} strokeWidth={1.7} tone="muted" />
@@ -209,42 +211,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   bannerStrong: { ...surfaces.emphasis, padding: spacing.lgXl },
-  bannerText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 21,
-  },
-  bannerTextStrong: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
+  bannerText: { flex: 1 },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  listPrice: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.label,
-    textDecorationLine: "line-through",
-  },
-  planName: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
   pressed: { opacity: 0.7 },
-  price: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontVariant: ["tabular-nums"],
-  },
   prices: { alignItems: "flex-end" },
   row: {
     alignItems: "center",
@@ -256,10 +227,4 @@ const styles = StyleSheet.create({
   },
   rowBody: { flex: 1, gap: spacing.xxs },
   screen: { gap: spacing.lg },
-  terms: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
 });

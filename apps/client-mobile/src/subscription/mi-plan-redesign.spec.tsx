@@ -66,9 +66,12 @@ describe("Mi plan, option A", () => {
     expect(hero).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 24 });
     const card = within(hero);
     expect(card.getByText("Trimestral 24 clases")).toBeOnTheScreen();
-    expect(card.getByText("Activo")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
+    expect(card.getByText("Activo")).toHaveStyle({
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
+    });
     expect(card.queryByTestId("subscription-status-dot")).toBeNull();
-    expect(card.getByText("25")).toHaveStyle({ color: "#FFFBFB", fontSize: 56 });
+    expect(card.getByText("25")).toHaveStyle({ color: "#FFFBFB", fontSize: 34 });
     expect(card.getByText("clases restantes")).toBeOnTheScreen();
     expect(
       card.getByText(`24 del plan + 1 de regalo (campaña) · vence el ${formatCivilDate(endsOn)}`),
@@ -115,7 +118,10 @@ describe("Mi plan, option A", () => {
     expect(screen.queryByText(/^Tu plan vence el/)).toBeNull();
     // Rosa Emma C12n: on the hero the exception is bold white words.
     const hero = within(screen.getByTestId("subscription-hero"));
-    expect(hero.getByText("Por vencer")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
+    expect(hero.getByText("Por vencer")).toHaveStyle({
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
+    });
   });
 
   it("shows the Freeze as one row that opens its detail", async () => {

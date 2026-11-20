@@ -1,14 +1,5 @@
 import type { PromotionDto } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  Heading,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
 import { useState } from "react";
 import {
   Image,
@@ -126,8 +117,9 @@ export function PromotionsCarousel({
               style={styles.image}
             />
             <View style={styles.copy}>
-              <Heading style={styles.headline}>{promotion.headline}</Heading>
-              <BodyText style={styles.description}>{promotion.description}</BodyText>
+              {/* FIX-082: the promotion leads Inicio, so its headline is the card's title. */}
+              <Text variant="titulo-bloque">{promotion.headline}</Text>
+              <Text variant="cuerpo">{promotion.description}</Text>
             </View>
           </View>
         ))}
@@ -141,7 +133,6 @@ const styles = StyleSheet.create({
   // Rosa Emma C02: a white card with the image inset at radius 16.
   card: { ...surfaces.card, padding: spacing.md, paddingBottom: spacing.mdLg },
   copy: { gap: spacing.sm, paddingTop: spacing.sm },
-  description: { fontFamily: fontFamilies.body, fontSize: 14 },
   descriptionPlaceholder: {
     backgroundColor: colors.divider,
     borderRadius: radii.control,
@@ -160,13 +151,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.smd,
     minHeight: spacing.md,
-  },
-  // FIX-082 (Inicio option A): the promotion leads Inicio, so no section
-  // label above it and its headline in the card title size.
-  headline: {
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontWeight: "400",
   },
   headlinePlaceholder: {
     backgroundColor: colors.primaryTint,

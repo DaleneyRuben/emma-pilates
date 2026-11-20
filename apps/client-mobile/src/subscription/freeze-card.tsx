@@ -4,15 +4,15 @@ import {
   Chevron,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   Glyph,
+  InlineError,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { dayMonth, freezeRange, freezeSummary } from "./freeze-window";
@@ -149,8 +149,8 @@ export function FreezeCard({
             <Glyph color={colors.text} name="sun" size={18} strokeWidth={1.7} />
           </View>
           <View style={styles.summaryBody}>
-            <Text style={styles.summaryTitle}>{content.title}</Text>
-            <Text style={styles.note}>{`${pill.label} · ${content.line}`}</Text>
+            <Text variant="titulo-fila">{content.title}</Text>
+            <Text variant="secundario">{`${pill.label} · ${content.line}`}</Text>
           </View>
           <Chevron direction={open ? "up" : "right"} size={18} strokeWidth={1.7} tone="muted" />
         </Pressable>
@@ -158,11 +158,17 @@ export function FreezeCard({
           <View style={styles.detail}>
             {content.rows.map(([label, value]) => (
               <View key={label} style={[styles.row, styles.rowRule]}>
-                <Text style={styles.rowLabel}>{label}</Text>
-                <Text style={styles.rowValue}>{value}</Text>
+                <Text style={styles.rowLabel} variant="cuerpo">
+                  {label}
+                </Text>
+                <Text style={styles.rowValue} variant="titulo-fila">
+                  {value}
+                </Text>
               </View>
             ))}
-            <Text style={[styles.note, styles.detailNote]}>{content.note}</Text>
+            <Text style={styles.detailNote} variant="secundario">
+              {content.note}
+            </Text>
           </View>
         ) : null}
       </View>
@@ -175,13 +181,14 @@ export function FreezeCard({
           onPress={() => setConfirming(true)}
           style={styles.withdraw}
         >
-          <Text style={styles.withdrawLabel}>Retirar solicitud</Text>
+          <Text variant="enlace">Retirar solicitud</Text>
         </Pressable>
       ) : null}
       {error === null ? null : (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {error}
-        </Text>
+        // On white, never straight on the 100 screen (follow-up 285, rule 3).
+        <View style={styles.errorCard}>
+          <InlineError>{error}</InlineError>
+        </View>
       )}
       <ConfirmationSheet
         busy={busy}
@@ -210,13 +217,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 36,
   },
-  error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
+  errorCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
@@ -226,16 +227,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  rowLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  rowLabel: { flex: 1 },
   rowRule: { borderBottomColor: colors.hairline, borderBottomWidth: 1 },
-  rowValue: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textAlign: "right",
-  },
+  rowValue: { flexShrink: 1, textAlign: "right" },
   summary: {
     alignItems: "center",
     flexDirection: "row",
@@ -244,12 +238,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   summaryBody: { flex: 1, gap: spacing.xxs },
-  summaryTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
   withdraw: {
     alignItems: "center",
     alignSelf: "center",
@@ -258,12 +246,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 36,
     paddingHorizontal: spacing.lg,
-  },
-  withdrawLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationLine: "underline",
   },
 });

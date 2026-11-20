@@ -1,13 +1,13 @@
 import {
   addCivilDays,
   colors,
-  fontFamilies,
   Glyph,
   spacing,
   surfaces,
+  Text,
   weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 /** The Monday of a civil date's week, which the weekly cap counts from. */
 export function weekOf(civilDate: string): string {
@@ -55,20 +55,15 @@ export function WeekNotice({
   return (
     <View style={styles.notice} testID="browse-week-notice">
       <Glyph color={colors.textMuted} name="calendar" size={18} strokeWidth={1.5} />
-      <Text style={styles.line}>{line}</Text>
+      <Text style={styles.line} variant="titulo-fila">
+        {line}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  line: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-    lineHeight: 20,
-  },
+  line: { flex: 1 },
   notice: {
     ...surfaces.card,
     alignItems: "center",

@@ -1,18 +1,17 @@
 import {
   colors,
   EditReferralCode,
-  fontFamilies,
   Glyph,
   PrimaryButton,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import * as Clipboard from "expo-clipboard";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
- * Invita option A (FIX-082): one card with the code in Lora 38 and an
+ * Invita option A (FIX-082): one card with the code in `cifra-grande` and an
  * outlined copy icon, «Compartir tu código» right under it as the screen's
  * one solid action, and «Editar código» centred below. Rosa Emma C16 draws
  * this card as the 600 hero; it stays white until the shared «Editar código»
@@ -37,16 +36,10 @@ export function ReferralCodeCard({
   };
   return (
     <View style={styles.card} testID="referral-code-card">
-      <Text style={styles.eyebrow}>Tu código</Text>
+      <Text variant="etiqueta">Tu código</Text>
       <View style={styles.codeRow}>
-        {/* Up to 20 characters: one line, the type shrinks to fit. */}
-        <Text
-          adjustsFontSizeToFit
-          minimumFontScale={0.5}
-          numberOfLines={1}
-          selectable
-          style={styles.code}
-        >
+        {/* Up to 20 characters: a long code wraps rather than shrinking (follow-up 285). */}
+        <Text selectable style={styles.code} variant="cifra-grande">
           {code}
         </Text>
         <Pressable
@@ -69,14 +62,7 @@ export function ReferralCodeCard({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
-  code: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.display,
-    fontSize: 38,
-    letterSpacing: 2,
-    lineHeight: 44,
-  },
+  code: { flex: 1 },
   codeRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   copy: {
     alignItems: "center",
@@ -88,13 +74,5 @@ const styles = StyleSheet.create({
     width: 44,
   },
   editRow: { flexDirection: "row", justifyContent: "center" },
-  eyebrow: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
   pressed: { opacity: 0.7 },
 });

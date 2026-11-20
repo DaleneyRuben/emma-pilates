@@ -1,15 +1,13 @@
 import {
-  colors,
   EmphasisCard,
-  fontFamilies,
   formatSessionDate,
   formatSessionMinutes,
   formatStartTime,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 type HeroDetail = {
   classType: { name: string };
@@ -29,21 +27,23 @@ export function SessionHero({ detail, quiet = false }: { detail: HeroDetail; qui
   if (quiet) {
     return (
       <View style={styles.quietHero} testID="session-hero">
-        <Text style={styles.quietEyebrow}>{formatSessionDate(detail.startsAt)}</Text>
-        <Text accessibilityRole="header" style={[styles.title, styles.quietText]}>
+        <Text variant="etiqueta">{formatSessionDate(detail.startsAt)}</Text>
+        <Text accessibilityRole="header" variant="titulo-bloque">
           {title}
         </Text>
-        <Text style={styles.quietNote}>{note}</Text>
+        <Text variant="cuerpo">{note}</Text>
       </View>
     );
   }
   return (
     <EmphasisCard eyebrow={formatSessionDate(detail.startsAt)} testID="session-hero">
       <View style={styles.lines}>
-        <Text accessibilityRole="header" style={[styles.title, styles.onEmphasis]}>
+        <Text accessibilityRole="header" tone="onDark" variant="titulo-bloque">
           {title}
         </Text>
-        <Text style={[styles.note, styles.onEmphasis]}>{note}</Text>
+        <Text tone="onDark" variant="cuerpo">
+          {note}
+        </Text>
       </View>
     </EmphasisCard>
   );
@@ -51,18 +51,5 @@ export function SessionHero({ detail, quiet = false }: { detail: HeroDetail; qui
 
 const styles = StyleSheet.create({
   lines: { gap: spacing.smd },
-  note: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  onEmphasis: { color: colors.onEmphasis },
-  quietEyebrow: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
   quietHero: { ...surfaces.card, gap: spacing.smd, padding: spacing.xlSm },
-  quietNote: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  quietText: { color: colors.text },
-  title: { fontFamily: fontFamilies.display, fontSize: typography.hero, lineHeight: 31 },
 });

@@ -7,12 +7,11 @@ import {
   type UpcomingBookingDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   formatStartTime,
+  InlineError,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -23,13 +22,13 @@ import {
   spacing,
   StateScreen,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
@@ -154,15 +153,15 @@ export function RescheduleScreen({
             <View style={styles.currentRow}>
               <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
               <View style={styles.currentBody}>
-                <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
-                <Text style={styles.currentDetails}>
+                <Text variant="titulo-fila">{booking.classTypeName}</Text>
+                <Text variant="secundario">
                   {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
                 </Text>
               </View>
             </View>
             {options.length === 0 ? null : (
               <View style={styles.replaced}>
-                <Text style={styles.replacedText}>Se reemplaza</Text>
+                <Text variant="pastilla">Se reemplaza</Text>
               </View>
             )}
           </View>
@@ -199,18 +198,16 @@ export function RescheduleScreen({
         )}
         {failure !== null ? (
           <View style={styles.failureBox}>
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              {failure}
-            </BodyText>
+            <InlineError>{failure}</InlineError>
           </View>
         ) : null}
       </ScrollView>
       {!loading && !failed && options.length > 0 ? (
         // C06: the line and the button sit on the white footer.
         <FooterPanel testID="reschedule-footer">
-          <BodyText style={styles.note}>
+          <Text style={styles.note} variant="secundario">
             {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
-          </BodyText>
+          </Text>
           <PrimaryButton
             busy={submitting}
             disabled={selectedId === null}
@@ -235,24 +232,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   currentBody: { flex: 1, gap: spacing.xxs },
-  currentDetails: {
-    color: colors.text,
-    fontSize: typography.note,
-    fontFamily: fontFamilies.body,
-  },
   currentRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  currentTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    lineHeight: 25,
-  },
-  failure: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,
@@ -260,12 +240,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  note: {
-    color: colors.text,
-    fontSize: typography.note,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
+  note: { textAlign: "center" },
   replaced: {
     alignSelf: "flex-start",
     backgroundColor: colors.primaryTint,
@@ -275,12 +250,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 28,
     paddingHorizontal: spacing.md,
-  },
-  replacedText: {
-    color: colors.text,
-    fontSize: typography.label,
-    fontWeight: "700",
-    fontFamily: fontFamilies.bodyBold,
   },
   screen: { gap: spacing.md, paddingBottom: 0 },
 });

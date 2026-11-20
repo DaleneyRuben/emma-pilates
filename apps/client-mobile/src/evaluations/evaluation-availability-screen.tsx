@@ -9,12 +9,11 @@ import {
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   BrandToast,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   Glyph,
+  InlineError,
   LoadingState,
   QueryFailure,
   Screen,
@@ -23,9 +22,9 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
-  typography,
   useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -175,9 +174,7 @@ export function EvaluationAvailabilityScreen({
   const failure =
     commands.failure === null ? null : (
       <View style={styles.failureBox}>
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {commands.failure}
-        </BodyText>
+        <InlineError>{commands.failure}</InlineError>
       </View>
     );
   const confirmMove = async () => {
@@ -201,7 +198,9 @@ export function EvaluationAvailabilityScreen({
           // C13: her Plan's offer on a white card with the tag glyph.
           <View style={styles.offer} testID="evaluation-offer">
             <Glyph color={colors.text} name="tag" size={18} strokeWidth={1.5} />
-            <BodyText style={styles.offerText}>{offer}</BodyText>
+            <Text style={styles.offerText} variant="titulo-fila">
+              {offer}
+            </Text>
           </View>
         ) : null}
         {movingNow === null ? failure : null}
@@ -292,12 +291,12 @@ export function EvaluationAvailabilityScreen({
       >
         {cancelling !== null ? (
           <>
-            <BodyText>
+            <Text variant="titulo-fila">
               {`${evaluationDate(cancelling.startsAt)}, ${clockTime(cancelling.startsAt)} · ${cancelling.durationMinutes} min · ${cancelling.nutritionistName}`}
-            </BodyText>
-            <BodyText>
+            </Text>
+            <Text variant="cuerpo">
               {`Podrás reservar otra evaluación para ${monthPhrase(boliviaMonth(cancelling.startsAt))}.`}
-            </BodyText>
+            </Text>
           </>
         ) : null}
       </ConfirmationSheet>
@@ -318,12 +317,6 @@ export function EvaluationAvailabilityScreen({
 const styles = StyleSheet.create({
   cards: { gap: spacing.md },
   content: { gap: spacing.md, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
-  failure: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,
@@ -339,13 +332,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  offerText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 21,
-  },
+  offerText: { flex: 1 },
   screen: { gap: spacing.md },
 });

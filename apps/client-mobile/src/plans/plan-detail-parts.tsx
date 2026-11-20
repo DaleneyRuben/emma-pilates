@@ -4,22 +4,21 @@ import {
   describeWeeklyCap,
   discountPercent,
   EmphasisCard,
-  fontFamilies,
   formatCancellationWindow,
   IconRow,
   IconRowGroup,
   SectionTitle,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { formatBolivianos } from "./plan-format";
 import { planValidity } from "./plans-screen";
 
 /**
- * C09's hero: its validity, the price in Lora 34, and the struck list price.
+ * C09's hero: its validity, the price in `cifra-grande`, and the struck list price.
  * The header above names the Plan, so the hero does not repeat it (FIX-089).
  */
 export function PlanHero({ plan }: { plan: PlanDto }) {
@@ -31,9 +30,13 @@ export function PlanHero({ plan }: { plan: PlanDto }) {
       testID="plan-hero"
     >
       <View style={styles.prices}>
-        <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+        <Text tone="onDark" variant="cifra-grande">
+          {formatBolivianos(plan.priceCentavos)}
+        </Text>
         {plan.listPriceCentavos === undefined ? null : (
-          <Text style={styles.listPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
+          <Text strike tone="onDark" variant="secundario">
+            {formatBolivianos(plan.listPriceCentavos)}
+          </Text>
         )}
       </View>
     </EmphasisCard>
@@ -77,16 +80,18 @@ export function PlanIncludes({
   );
 }
 
-function BreakdownRow({ label, tone, value }: { label: string; tone?: "discount"; value: string }) {
+function BreakdownRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, tone === "discount" && styles.discount]}>{value}</Text>
+      <Text style={styles.rowLabel} variant="cuerpo">
+        {label}
+      </Text>
+      <Text variant="titulo-fila">{value}</Text>
     </View>
   );
 }
 
-/** C09's «Desglose»: a white card with the list price, the discount, and the total in Lora 22. */
+/** C09's «Desglose»: a white card with the list price, the discount, and the total in `cifra`. */
 export function PlanBreakdown({ plan }: { plan: PlanDto }) {
   const percent = discountPercent(plan);
   const list = plan.listPriceCentavos ?? plan.priceCentavos;
@@ -100,15 +105,16 @@ export function PlanBreakdown({ plan }: { plan: PlanDto }) {
             <View style={styles.hairline} />
             <BreakdownRow
               label={`Descuento ${percent} %`}
-              tone="discount"
               value={`−${formatBolivianos(list - plan.priceCentavos)}`}
             />
           </>
         )}
         <View style={styles.hairline} />
         <View style={styles.row}>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.total}>{formatBolivianos(plan.priceCentavos)}</Text>
+          <Text style={styles.rowLabel} variant="titulo-fila">
+            Total
+          </Text>
+          <Text variant="cifra">{formatBolivianos(plan.priceCentavos)}</Text>
         </View>
       </View>
     </View>
@@ -116,21 +122,8 @@ export function PlanBreakdown({ plan }: { plan: PlanDto }) {
 }
 
 const styles = StyleSheet.create({
-  discount: { color: colors.text },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  listPrice: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textDecorationLine: "line-through",
-  },
-  price: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    fontVariant: ["tabular-nums"],
-  },
   prices: { alignItems: "baseline", flexDirection: "row", gap: spacing.smLg },
   row: {
     alignItems: "center",
@@ -141,20 +134,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  rowLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
-  rowValue: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "700",
-  },
-  total: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
-  totalLabel: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
+  rowLabel: { flex: 1 },
 });

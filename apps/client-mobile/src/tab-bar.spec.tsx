@@ -8,15 +8,15 @@ jest.setTimeout(20_000);
 
 const hidden = { includeHiddenElements: true };
 
-// FIX-089: the tab labels are Work Sans at 12 pt or more in Rosa profundo,
-// the open tab in weight rather than in another colour.
+// Follow-up 285: the tab labels are `pastilla` (Work Sans 12 · 700), white on
+// the open tab's 600 pill and ink on the others, in the same weight.
 describe("The Client tab bar", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("writes its labels in Work Sans, the open tab in bold", async () => {
+  it("writes its labels in Work Sans 12 · 700, the open tab in white", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () =>
         jsonResponse({
@@ -37,7 +37,7 @@ describe("The Client tab bar", () => {
     const open = within(screen.getByTestId("tab-home", hidden)).getByText("Inicio", hidden);
     const closed = within(screen.getByTestId("tab-booking", hidden)).getByText("Reservar", hidden);
     expect(open).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_700Bold" });
-    expect(closed).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_400Regular" });
+    expect(closed).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_700Bold" });
     expect(closed).toHaveStyle({ fontSize: 12 });
   });
 });

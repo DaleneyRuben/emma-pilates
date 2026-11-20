@@ -1,9 +1,7 @@
 import { getGetTransferQrImageUrl } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
   encodeBase64,
-  fontFamilies,
   FullScreenImage,
   LineIcon,
   PrimaryButton,
@@ -11,9 +9,10 @@ import {
   radii,
   spacing,
   surfaces,
+  Text,
 } from "@pilates/mobile-core";
 import { useEffect, useState, type ReactNode } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { Path, Polyline } from "react-native-svg";
 
 import { imageSizeFromBytes } from "./image-size";
@@ -85,7 +84,7 @@ function QrAction({
       <LineIcon color={colors.primaryDeep} size={16} strokeWidth={1.3}>
         {children}
       </LineIcon>
-      <Text style={styles.actionLabel}>{label}</Text>
+      <Text variant="boton-chico">{label}</Text>
     </Pressable>
   );
 }
@@ -149,9 +148,9 @@ export function TransferQrCard({
           {failedAt === "card" ? <QrSaveFailure /> : null}
         </>
       )}
-      <BodyText style={styles.centered}>
+      <Text style={styles.centered} variant="cuerpo">
         {`Escanéalo con tu app bancaria y transfiere ${amount ?? "el monto exacto"}.`}
-      </BodyText>
+      </Text>
       <FullScreenImage
         aspectRatio={ratio}
         banner={savedAt === "view" ? <QrSavedNotice /> : undefined}
@@ -181,12 +180,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.xs,
   },
-  actionLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-  },
   actions: { flexDirection: "row", gap: spacing.xl, justifyContent: "center" },
   card: {
     ...surfaces.card,
@@ -194,7 +187,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.lg,
   },
-  centered: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20, textAlign: "center" },
+  centered: { textAlign: "center" },
   footer: { gap: spacing.md },
   placeholder: {
     backgroundColor: colors.surfaceSubtle,

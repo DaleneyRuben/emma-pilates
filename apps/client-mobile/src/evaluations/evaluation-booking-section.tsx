@@ -4,18 +4,15 @@ import type {
   EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
-  colors,
-  fontFamilies,
   QueryFailure,
   SectionTitle,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { NextSlots } from "./evaluation-next-slots";
 import { MovingBand, NoSlots } from "./evaluation-screen-parts";
@@ -60,24 +57,22 @@ export function EvaluationBookingSection({
   // Her Plan's offer (finding 69) stays, quietly: under the three boxes, or
   // over the calendar as before.
   const offerLine =
-    booked && moving === null && offer !== null ? (
-      <BodyText style={styles.muted}>{offer}</BodyText>
-    ) : null;
+    booked && moving === null && offer !== null ? <Text variant="secundario">{offer}</Text> : null;
 
   const otherOne = booked && moving === null;
   const note = (
-    <BodyText style={styles.muted}>
+    <Text variant="secundario">
       {moving === null
         ? "Puedes reservar hasta 3 horas antes."
         : "Puedes reprogramarla hasta 3 horas antes."}
-    </BodyText>
+    </Text>
   );
   const body =
     availability === null ? (
       <QueryFailure label="No pudimos cargar los horarios de evaluación." onRetry={onRetry} />
     ) : moving === null && !hasPlan ? (
       <View style={otherOne ? styles.inCard : styles.card}>
-        <BodyText style={styles.body}>Necesitas un plan activo para reservar.</BodyText>
+        <Text variant="cuerpo">Necesitas un plan activo para reservar.</Text>
         <TextButton label="Ver planes" onPress={onPlans} style={styles.link} />
       </View>
     ) : days.length === 0 ? (
@@ -99,7 +94,7 @@ export function EvaluationBookingSection({
     return (
       <View style={styles.card} testID="evaluation-other">
         <View style={styles.header}>
-          <Text accessibilityRole="header" style={styles.title}>
+          <Text accessibilityRole="header" variant="etiqueta">
             ¿Otra evaluación?
           </Text>
           {quick && canBook ? (
@@ -110,7 +105,7 @@ export function EvaluationBookingSection({
               onPress={() => setExpanded(true)}
               style={styles.more}
             >
-              <Text style={styles.moreLabel}>Ver más días</Text>
+              <Text variant="enlace">Ver más días</Text>
             </Pressable>
           ) : null}
         </View>
@@ -138,7 +133,6 @@ export function EvaluationBookingSection({
 }
 
 const styles = StyleSheet.create({
-  body: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   header: {
     alignItems: "center",
@@ -148,21 +142,5 @@ const styles = StyleSheet.create({
   inCard: { gap: spacing.xs },
   link: { alignSelf: "flex-start", paddingHorizontal: 0 },
   more: { justifyContent: "center", minHeight: 32 },
-  moreLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
-  muted: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
   section: { gap: spacing.md },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
 });
