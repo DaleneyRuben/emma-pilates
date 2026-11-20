@@ -13,6 +13,7 @@ type Session = AdministratorSessionAvailabilityDto;
 const hourHeight = 64;
 // FIX-091 (W2, Horario B): a cancelled class is one thin line at its start.
 const cancelledLineHeight = 22;
+const minimumBlockHeight = 52;
 
 const hourLines = (color: string) =>
   `repeating-linear-gradient(to bottom, transparent 0, transparent ${hourHeight - 1}px, var(${color}) ${hourHeight - 1}px, var(${color}) ${hourHeight}px)`;
@@ -109,7 +110,13 @@ export function WeekGrid({
               "relative",
               day === today && "rounded-panel bg-superficie-hundida",
             )}
-            style={{ height }}
+            style={{
+              height,
+              // Today's soft column covers the row's lines: it draws its own.
+              ...(day === today
+                ? { backgroundImage: hourLines("--color-borde") }
+                : {}),
+            }}
           >
             {dayItems(day, hours, sessions).map((item) => {
               if (item.kind === "slot") {
@@ -149,10 +156,13 @@ export function WeekGrid({
                   session={session}
                   onOpen={onOpen}
                   className="absolute inset-x-1"
-                  short={(minutes / 60) * hourHeight - 2 < 76}
                   style={{
                     top,
-                    height: Math.max((minutes / 60) * hourHeight - 2, 44),
+                    // Room for both lines even when the type wraps (W2).
+                    height: Math.max(
+                      (minutes / 60) * hourHeight - 2,
+                      minimumBlockHeight,
+                    ),
                   }}
                 />
               );
