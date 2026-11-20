@@ -101,7 +101,13 @@ export function DataTable<Row>({
 
   return (
     <div className="flex flex-col gap-3">
-      <Table>
+      <Table
+        footer={
+          pagination === undefined ? undefined : (
+            <TablePagination {...pagination} shown={rows.length} />
+          )
+        }
+      >
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -132,9 +138,17 @@ export function DataTable<Row>({
             <TableRow className="hover:bg-transparent max-md:border-0 max-md:bg-transparent">
               <TableCell
                 colSpan={columns.length}
-                className="py-10 text-center text-cuerpo text-texto-tenue max-md:block max-md:before:content-none"
+                // Rosa Emma (rw.py empty): a multi-line empty message leads with its
+                // first line in Lora 24.
+                className="px-3 py-9 text-center text-cuerpo text-texto max-md:block max-md:before:content-none [&>span>span:first-child]:mb-1 [&>span>span:first-child]:font-serif [&>span>span:first-child]:text-[24px] [&>span>span:first-child]:leading-tight"
               >
-                {emptyMessage}
+                {typeof emptyMessage === "string" ? (
+                  <span className="font-serif text-[24px] leading-tight">
+                    {emptyMessage}
+                  </span>
+                ) : (
+                  emptyMessage
+                )}
               </TableCell>
             </TableRow>
           ) : (
@@ -190,9 +204,6 @@ export function DataTable<Row>({
           )}
         </TableBody>
       </Table>
-      {pagination === undefined ? null : (
-        <TablePagination {...pagination} shown={rows.length} />
-      )}
     </div>
   );
 }

@@ -111,7 +111,7 @@ function BranchEquipment({ branch }: { branch: Branch }) {
       />
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {failure === null ? null : (
-        <p role="alert" className="text-nota text-error-texto">
+        <p role="alert" className="text-nota text-texto">
           {failure}
         </p>
       )}

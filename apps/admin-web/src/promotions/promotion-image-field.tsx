@@ -84,7 +84,7 @@ export function PromotionImageField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
         Imagen
       </span>
       <input
@@ -102,7 +102,7 @@ export function PromotionImageField({
       {status.kind === "uploading" ? (
         <p
           role="status"
-          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto-tenue"
+          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto"
         >
           Subiendo la imagen…
         </p>
@@ -127,7 +127,7 @@ export function PromotionImageField({
             />
             Sube una imagen
           </button>
-          <p id={hintId} className="text-ayuda text-texto-tenue">
+          <p id={hintId} className="text-ayuda text-texto">
             Arrastra el archivo o haz clic · JPG, PNG o WEBP horizontal, mínimo
             1200 × 675 px
           </p>
@@ -146,7 +146,7 @@ export function PromotionImageField({
             <Button
               variant="link"
               size="sm"
-              className="text-error hover:text-error-texto"
+              className="text-texto hover:text-texto"
               onClick={() => {
                 if (value.previewUrl.startsWith("blob:")) {
                   URL.revokeObjectURL(value.previewUrl);
@@ -160,7 +160,7 @@ export function PromotionImageField({
         </>
       )}
       {status.kind === "failed" ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           {status.message}
         </p>
       ) : null}

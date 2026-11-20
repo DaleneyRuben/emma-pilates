@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { signIn, sidebar } from "./support/session";
 
-// Walkthrough 2026-11-04 n.º 1: P01's rail is 96 px with 12 px labels.
-// «Promociones» drew at 15 px, wider than the rail, and lost its first
-// letter. Each label must sit inside its own link.
-test.describe("P01 icon rail", () => {
+// Walkthrough 2026-11-04 n.º 1: «Promociones» once drew wider than the rail
+// and lost its first letter. Since Rosa Emma the rail is the 232 px sidebar
+// with 15 px labels; each label must still sit inside its own link.
+test.describe("the sidebar", () => {
   for (const width of [1440, 1900]) {
     test(`fits every label inside the rail at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -31,7 +31,7 @@ test.describe("P01 icon rail", () => {
       expect(overflowing).toEqual([]);
       await expect(sidebar(page).getByRole("link").first()).toHaveCSS(
         "font-size",
-        "12px",
+        "15px",
       );
     });
   }

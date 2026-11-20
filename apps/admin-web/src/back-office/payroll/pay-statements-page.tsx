@@ -1,4 +1,5 @@
 import type { PayStatementDto } from "@pilates/api-contracts";
+import { avisoClass } from "../../components/ui/aviso";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, RefreshCw } from "lucide-react";
@@ -33,12 +34,12 @@ const noPeriod: PayPeriodQuery = { month: "" };
 // what happened.
 function DoneNotice({ notice }: { notice: ApprovedNotice }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-nota text-texto">
+    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto">
       <p role="status" className="flex min-w-[220px] flex-1 items-start gap-3">
         <CheckCircle2
           size={18}
           aria-hidden="true"
-          className="mt-px flex-none text-exito"
+          className="mt-px flex-none text-texto"
         />
         {notice.text}
       </p>
@@ -121,15 +122,13 @@ export function PayStatementsPage({
       />
       <PayPeriodPicker search={search} onChange={change} />
       {draft.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           No pudimos calcular el período.
         </p>
       ) : null}
       {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
-        <p className="text-celda text-texto-secundario">
-          {monthOpenLine(search.month, today)}
-        </p>
+        <p className={avisoClass}>{monthOpenLine(search.month, today)}</p>
       ) : null}
       {period === null ? null : query.isError ? (
         <QueryFailure
@@ -140,7 +139,7 @@ export function PayStatementsPage({
       ) : statements === undefined ? (
         <LoadingNotice>Cargando los pagos…</LoadingNotice>
       ) : statements.length === 0 ? (
-        <p className="text-cuerpo text-texto-secundario">
+        <p className="text-cuerpo text-texto">
           {approvedCount === 0 ? (
             `${shown.label}: sin pagos calculados.`
           ) : (
@@ -148,7 +147,7 @@ export function PayStatementsPage({
               {`${shown.label}: todos los sueldos están aprobados. Están en `}
               <Link
                 to="/dinero/sueldos/pagados"
-                className="font-medium text-primario-profundo underline-offset-2 hover:underline"
+                className="font-medium text-texto underline-offset-2 hover:underline"
               >
                 Pagados
               </Link>

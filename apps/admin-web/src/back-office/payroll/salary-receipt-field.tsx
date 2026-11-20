@@ -93,10 +93,10 @@ export function SalaryReceiptField({
   return (
     <div className="flex flex-col gap-1.5">
       <span className="flex items-baseline gap-2">
-        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
           Comprobante
         </span>
-        <span className="text-ayuda text-texto-tenue">Obligatorio</span>
+        <span className="text-ayuda text-texto">Obligatorio</span>
       </span>
       <input
         ref={input}
@@ -113,7 +113,7 @@ export function SalaryReceiptField({
       {status.kind === "uploading" ? (
         <p
           role="status"
-          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto-tenue"
+          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto"
         >
           Subiendo el comprobante…
         </p>
@@ -122,7 +122,7 @@ export function SalaryReceiptField({
           type="button"
           aria-describedby={hintId}
           onClick={() => input.current?.click()}
-          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie text-nota font-medium text-primario-profundo hover:border-primario focus-visible:shadow-foco"
+          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie text-nota font-medium text-texto hover:border-primario focus-visible:shadow-foco"
         >
           <ImagePlus
             size={20}
@@ -133,16 +133,16 @@ export function SalaryReceiptField({
           Subir foto del comprobante
         </button>
       ) : (
-        <div className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino p-2.5">
+        <div className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta p-2.5">
           <img
             src={shown.thumbnail}
             alt="Comprobante del pago"
-            className="size-14 flex-none rounded-[6px] border border-divisor object-cover"
+            className="size-14 flex-none rounded-[6px] border border-borde object-cover"
           />
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="text-nota text-texto">Comprobante adjunto</span>
             {value?.kind === "uploaded" ? (
-              <span className="truncate text-ayuda text-texto-tenue">
+              <span className="truncate text-ayuda text-texto">
                 {value.name}
               </span>
             ) : null}
@@ -167,11 +167,11 @@ export function SalaryReceiptField({
         </div>
       )}
       {status.kind === "failed" ? (
-        <p role="alert" className="text-nota text-error-texto">
+        <p role="alert" className="text-nota text-texto">
           {status.message}
         </p>
       ) : (
-        <p id={hintId} className="text-ayuda text-texto-tenue">
+        <p id={hintId} className="text-ayuda text-texto">
           {value === null
             ? `Sin comprobante no se puede ${action} el pago. JPG, PNG o WebP, hasta 10 MB.`
             : value.kind === "attached"

@@ -75,7 +75,7 @@ export function FeedbackPanel({
       className="flex flex-1 flex-col"
     >
       <SidePanelBody>
-        <blockquote className="rounded-control border border-borde bg-lino px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
+        <blockquote className="rounded-control border border-borde-fuerte bg-superficie px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
           {feedback.text}
         </blockquote>
         <SummaryBlock title="Datos">
@@ -98,7 +98,7 @@ export function FeedbackPanel({
           <SummaryRow label="Sistema">{systemLabel(feedback)}</SummaryRow>
         </SummaryBlock>
         <section className="flex flex-col gap-1.5">
-          <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             Estado
           </h3>
           <ChoiceChips
@@ -118,15 +118,15 @@ export function FeedbackPanel({
             rows={4}
             onChange={(event) => setNote(event.target.value)}
           />
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto">
             Ej.: Arreglamos la lista de reservas en la versión 1.0.2.
           </p>
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto">
             Nota interna: la clienta o el equipo no la ven. Va en el CSV.
           </p>
         </div>
         {failure === null ? null : (
-          <p role="alert" className="text-nota text-error-texto">
+          <p role="alert" className="text-nota text-texto">
             {failure}
           </p>
         )}

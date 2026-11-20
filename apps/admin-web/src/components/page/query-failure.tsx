@@ -20,7 +20,7 @@ export function QueryFailure({
     return (
       <p
         role="alert"
-        className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
+        className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto"
       >
         No tienes permiso para ver esta sección.
       </p>
@@ -30,9 +30,9 @@ export function QueryFailure({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center gap-3 rounded-marco border border-borde bg-lino px-6 py-10 text-center"
+      className="flex flex-col items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center"
     >
-      <p className="text-cuerpo text-texto-secundario">
+      <p className="font-serif text-[24px] leading-tight text-texto">
         No pudimos cargar {what}.
       </p>
       <Button variant="neutral" size="sm" onClick={onRetry}>

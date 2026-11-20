@@ -19,13 +19,14 @@ import {
   SheetTrigger,
 } from "../../components/ui/sheet";
 import { cn } from "../../lib/cn";
+import { bandPillClass } from "../band-pill";
 import { useIsNarrowViewport } from "../use-media-query";
 import type { Branch } from "./branch-context";
 import { useBranchSelection } from "./use-branch-selection";
 
 // AW34's group label: 10px uppercase, 0.18em, Texto muy tenue.
 const labelClass =
-  "px-4 pt-1 pb-2 font-sans text-pie font-medium tracking-[0.18em] text-texto-muy-tenue uppercase";
+  "px-4 pt-1 pb-2 font-sans text-pie font-medium tracking-[0.18em] text-texto uppercase";
 
 // A listbox with a roving tabindex: Tab reaches the selected Branch, the
 // arrow keys (and Home/End) move between the options, Enter or Space choose.
@@ -75,7 +76,7 @@ function BranchRows({
       {branches.length === 0 ? (
         <p
           role={status === "error" ? "alert" : undefined}
-          className="px-4 py-2 text-ayuda text-texto-tenue"
+          className="px-4 py-2 text-ayuda text-texto"
         >
           {status === "error"
             ? "No pudimos cargar las sucursales. Inténtalo de nuevo."
@@ -101,18 +102,18 @@ function BranchRows({
               tabIndex={selected ? 0 : -1}
               onClick={() => choose(branch)}
               className={cn(
-                "flex items-center justify-between gap-3 px-4 text-left text-fila-menu text-texto hover:bg-hover-fila focus-visible:bg-hover-fila focus-visible:shadow-none",
+                "flex items-center justify-between gap-3 px-4 text-left text-fila-menu text-texto hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none",
                 rowHeightClass,
                 selected &&
-                  "bg-primario-tinte font-medium text-primario-profundo hover:bg-primario-tinte",
+                  "bg-superficie-hundida font-medium text-texto hover:bg-superficie-hundida",
               )}
             >
               <span className="flex min-w-0 flex-col">
                 <span className="truncate">{branch.name}</span>
                 <span
                   className={cn(
-                    "truncate text-ayuda font-normal text-texto-muy-tenue",
-                    selected && "text-primario-profundo",
+                    "truncate text-ayuda font-normal text-texto",
+                    selected && "text-texto",
                   )}
                 >
                   {branch.address}
@@ -125,11 +126,11 @@ function BranchRows({
           );
         })}
       </div>
-      <div className="mx-4 my-2 h-px bg-divisor" aria-hidden="true" />
+      <div className="mx-4 my-2 h-px bg-borde" aria-hidden="true" />
       <Link
         to="/ajustes/sucursales"
         onClick={onDone}
-        className="flex h-9 items-center px-4 text-fila-menu text-primario hover:bg-hover-fila hover:text-primario-presionado"
+        className="flex h-9 items-center px-4 text-fila-menu text-primario hover:bg-superficie-hundida hover:text-primario-presionado"
       >
         Gestionar sucursales
       </Link>
@@ -153,31 +154,27 @@ function BranchTrigger({
   return (
     <button
       type="button"
-      className={cn(
-        "flex h-11 items-center gap-2 rounded-tarjeta border border-borde bg-lino px-3.5 text-cuerpo text-texto hover:bg-rosa-tinte",
-        open && "bg-rosa-tinte",
-        className,
-      )}
+      className={cn(bandPillClass, open && "bg-superficie-hundida", className)}
       {...props}
     >
       <MapPin
-        size={20}
+        size={18}
         strokeWidth={1.6}
         aria-hidden="true"
         className="text-primario"
       />
       {branch === undefined ? (
-        <span className="text-tenue">Sin sucursal</span>
+        <span className="text-texto">Sin sucursal</span>
       ) : (
         <span>
           Sucursal <span>{branch.name}</span>
         </span>
       )}
       <ChevronDown
-        size={20}
-        strokeWidth={1.6}
+        size={16}
+        strokeWidth={1.7}
         aria-hidden="true"
-        className={cn("text-tenue transition-transform", open && "rotate-180")}
+        className={cn("text-texto transition-transform", open && "rotate-180")}
       />
     </button>
   );

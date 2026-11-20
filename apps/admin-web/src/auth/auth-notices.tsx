@@ -16,13 +16,13 @@ export function InfoRow({
   return (
     <p
       role="status"
-      className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino px-3.5 py-3 text-cuerpo text-texto"
+      className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-3 text-cuerpo text-texto"
     >
       <Icon
         size={20}
         strokeWidth={1.6}
         aria-hidden="true"
-        className="flex-none text-rosa-profundo"
+        className="flex-none text-rosa-600"
       />
       <span>{children}</span>
     </p>
@@ -34,13 +34,13 @@ export function WarningRow({ children }: { children: ReactNode }) {
   return (
     <p
       role="alert"
-      className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino px-3.5 py-3 text-cuerpo text-texto"
+      className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-3 text-cuerpo text-texto"
     >
       <CircleAlert
         size={20}
         strokeWidth={1.6}
         aria-hidden="true"
-        className="flex-none text-rosa-profundo"
+        className="flex-none text-rosa-600"
       />
       <span>{children}</span>
     </p>
@@ -54,7 +54,7 @@ export function MessageDisc({ icon: Icon }: { icon: LucideIcon }) {
       size={40}
       strokeWidth={1.4}
       aria-hidden="true"
-      className="text-rosa-profundo"
+      className="text-rosa-600"
     />
   );
 }

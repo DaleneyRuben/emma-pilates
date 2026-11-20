@@ -34,7 +34,7 @@ const classTypeColumns = (open: (row: AdminClassTypeDto) => void) => [
             <StatusPill tone="neutral">Archivado</StatusPill>
           )}
         </span>
-        <span className="text-ayuda text-texto-muy-tenue">
+        <span className="text-ayuda text-texto">
           {row.original.description}
         </span>
       </span>
@@ -47,7 +47,7 @@ const classTypeColumns = (open: (row: AdminClassTypeDto) => void) => [
   columns.accessor("equipmentNeeds", {
     header: "Equipo necesario",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue() ?? "—"}</span>
+      <span className="text-texto">{getValue() ?? "—"}</span>
     ),
   }),
 ];

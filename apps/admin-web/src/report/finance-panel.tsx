@@ -34,17 +34,17 @@ function Figure({
     <section
       aria-label={name}
       className={cn(
-        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4",
+        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde-fuerte bg-superficie px-5 py-4",
         rule,
       )}
     >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
         {name}
       </h2>
       <p className="font-serif text-cifra-grande leading-tight text-texto tabular">
         {figure}
       </p>
-      <p className="text-nota text-texto-tenue">{line}</p>
+      <p className="text-nota text-texto">{line}</p>
     </section>
   );
 }
@@ -57,7 +57,8 @@ const Amount = ({ label, children }: { label: string; children: string }) => (
 
 function BudgetTable({ result }: { result: MonthResultDto }) {
   if (result.lines.length === 0) return null;
-  const totalRow = "bg-superficie-sutil font-medium hover:bg-superficie-sutil";
+  const totalRow =
+    "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-titulo-panel text-texto">
@@ -122,15 +123,13 @@ function EmptyBudget({ month }: { month: string }) {
       }),
   });
   return (
-    <div className="flex flex-col items-center gap-3 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
-      <p className="text-cuerpo text-texto-secundario">
-        Aún no hay presupuesto.
-      </p>
+    <div className="flex flex-col items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
+      <p className="text-cuerpo text-texto">Aún no hay presupuesto.</p>
       <Button busy={seed.isPending} onClick={() => seed.mutate()}>
         Cargar presupuesto de apertura
       </Button>
       {seed.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           No pudimos cargar el presupuesto.
         </p>
       ) : null}
@@ -170,7 +169,7 @@ export function FinancePanel({
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <Figure
               name="Ingresos en caja"
-              rule="border-t-exito"
+              rule="border-t-texto"
               figure={formatBolivianos(result.cashIncomeCentavos)}
               line="Pagos confirmados en el mes"
             />
@@ -183,7 +182,7 @@ export function FinancePanel({
             <Figure
               name="Resultado"
               rule={
-                result.resultCentavos < 0 ? "border-t-error" : "border-t-exito"
+                result.resultCentavos < 0 ? "border-t-texto" : "border-t-texto"
               }
               figure={formatSignedBolivianos(result.resultCentavos)}
               line="Ingresos en caja menos impuesto, gastos, sueldos y nutricionista"
@@ -205,11 +204,11 @@ export function FinancePanel({
               }
             />
           </div>
-          <p className="text-nota text-texto-tenue tabular">
+          <p className="text-nota text-texto tabular">
             {`Costo de la nutricionista ${formatBolivianos(result.nutritionistCostCentavos)}`}
           </p>
           {/* H10: the month's Salary Payments are a cost of their own. */}
-          <p className="text-nota text-texto-tenue tabular">
+          <p className="text-nota text-texto tabular">
             {`Sueldos pagados ${formatBolivianos(result.salariesCentavos ?? 0)}`}
           </p>
           {result.lines.length === 0 ? (

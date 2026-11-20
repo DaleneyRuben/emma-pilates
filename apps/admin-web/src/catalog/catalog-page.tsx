@@ -156,7 +156,12 @@ export function CatalogPage<Row extends { id: string }>({
     }
   }, [lastPage, search.page, onPageClamp]);
 
-  const listing = query.isPending ? (
+  // W4: an empty page kept from the previous filter is not the new filter's
+  // answer, so it reads as loading rather than as that filter's empty state.
+  const waiting =
+    query.isPending ||
+    (query.isPlaceholderData && query.data.items.length === 0);
+  const listing = waiting ? (
     <LoadingNotice>{loadingMessage}</LoadingNotice>
   ) : query.isError ? (
     <QueryFailure
@@ -281,7 +286,7 @@ export function RowOpener({
         event.stopPropagation();
         onOpen();
       }}
-      className="rounded-control text-left font-medium text-texto hover:text-primario focus-visible:shadow-foco"
+      className="rounded-control text-left text-cuerpo font-bold text-texto hover:underline hover:underline-offset-[3px] focus-visible:shadow-foco"
     >
       {label}
     </button>

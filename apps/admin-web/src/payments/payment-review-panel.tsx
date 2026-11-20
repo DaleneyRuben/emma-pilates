@@ -101,7 +101,7 @@ function ReviewBody({
         {review.state === "pending" ? null : (
           <p
             role="status"
-            className="rounded-control border border-divisor bg-superficie px-3 py-2 text-nota text-texto-secundario"
+            className="rounded-control border border-borde bg-superficie px-3 py-2 text-nota text-texto"
           >
             Otra persona ya decidió este pago.
           </p>
@@ -152,7 +152,7 @@ export function PaymentReviewPanel({
       <SidePanelBody>
         {isApiError(review.error) &&
         review.error.code === "payment_not_found" ? (
-          <p role="alert" className="text-cuerpo text-texto-secundario">
+          <p role="alert" className="text-cuerpo text-texto">
             Este pago ya no existe. Cierra el panel y vuelve a abrir la lista.
           </p>
         ) : (

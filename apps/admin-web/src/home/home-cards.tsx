@@ -7,31 +7,44 @@ import { monthKpisQueryOptions } from "../indicators/indicator-queries";
 import { boliviaParts } from "../lib/bolivia-time";
 import { incomeReportQueryOptions } from "../report/report-queries";
 import { weekSessionsQueryOptions } from "../schedule/schedule-queries";
+import { cn } from "../lib/cn";
 import { todaySummary } from "./home-pending";
 
 const asideLink =
-  "text-nota font-medium text-primario-profundo hover:text-primario-presionado";
+  "text-nota font-bold underline underline-offset-[3px] hover:decoration-2";
 
 const plural = (count: number, one: string, many: string) =>
   `${countFormat.format(count)} ${count === 1 ? one : many}`;
 
+// Rosa Emma (RW-inicio): a white card with an 11 px uppercase label and its
+// figure in Lora; the money card is the page's one Rosa profundo block.
 export function SummaryCard({
   title,
   aside,
+  strong = false,
   children,
 }: {
   title: string;
   aside?: ReactNode;
+  strong?: boolean;
   children: ReactNode;
 }) {
   const id = `inicio-${title.replaceAll(" ", "-").toLowerCase()}`;
   return (
     <section
       aria-labelledby={id}
-      className="flex flex-col gap-2 rounded-tarjeta border border-borde bg-blanco px-5 py-4"
+      className={cn(
+        "flex min-h-[130px] flex-col gap-1.5 rounded-tarjeta px-5 py-[22px]",
+        strong
+          ? "bg-destacado text-blanco shadow-destacado"
+          : "bg-superficie text-texto shadow-tarjeta",
+      )}
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id={id} className="text-nota font-normal text-texto-tenue">
+        <h2
+          id={id}
+          className="font-sans text-etiqueta font-bold tracking-[0.14em] uppercase"
+        >
           {title}
         </h2>
         {aside}
@@ -44,10 +57,10 @@ export function SummaryCard({
 function Figure({ value, label }: { value: string; label: string }) {
   return (
     <span className="flex flex-col">
-      <span className="font-serif text-titulo-2 text-texto tabular">
+      <span className="font-serif text-titulo-1 text-texto tabular">
         {value}
       </span>
-      <span className="text-nota text-texto-tenue">{label}</span>
+      <span className="text-nota text-texto">{label}</span>
     </span>
   );
 }
@@ -76,7 +89,7 @@ export function TodayCard({
         </Link>
       }
     >
-      <p className="text-cuerpo text-texto tabular">
+      <p className="font-serif text-[28px] leading-tight text-texto tabular">
         {[
           plural(day.classes, "clase", "clases"),
           plural(day.bookings, "reserva", "reservas"),
@@ -84,9 +97,9 @@ export function TodayCard({
         ].join(" · ")}
       </p>
       {day.classes === 0 ? (
-        <p className="text-celda text-texto-tenue">Sin clases hoy.</p>
+        <p className="text-celda text-texto">Sin clases hoy.</p>
       ) : (
-        <ul className="flex flex-col gap-0.5 text-celda text-texto-secundario">
+        <ul className="flex flex-col gap-0.5 text-celda text-texto">
           {day.sessions.map((session) => (
             <li key={session.id} className="tabular">
               {`${boliviaParts(session.startsAt).time} ${session.classTypeName} · ${session.trainerName} (${session.bookedCount} de ${session.capacity})`}
@@ -112,6 +125,7 @@ export function MoneyCard({
   return (
     <SummaryCard
       title="Cobrado hoy"
+      strong
       aside={
         <Link to="/dinero/pagos" className={asideLink}>
           Ver pagos
@@ -119,17 +133,17 @@ export function MoneyCard({
       }
     >
       {income.data === undefined ? (
-        <p className="text-celda text-texto-tenue">
+        <p className="text-celda">
           {income.isError
             ? "No pudimos cargar lo cobrado."
             : "Cargando lo cobrado…"}
         </p>
       ) : (
         <>
-          <span className="text-cuerpo text-texto tabular">
+          <span className="font-serif text-cifra-grande leading-tight tabular">
             {formatMoney(income.data.totalCentavos)}
           </span>
-          <span className="text-celda text-texto-secundario tabular">
+          <span className="text-cuerpo font-medium tabular">
             {[
               `Efectivo ${formatMoney(income.data.byMethod.cash)}`,
               `QR ${formatMoney(income.data.byMethod.transfer)}`,
@@ -157,7 +171,7 @@ export function ClientsCard({ month }: { month: string }) {
       }
     >
       {kpis.data === undefined ? (
-        <p className="text-nota text-texto-tenue">
+        <p className="text-nota text-texto">
           {kpis.isError
             ? "No pudimos cargar las clientas."
             : "Cargando las clientas…"}

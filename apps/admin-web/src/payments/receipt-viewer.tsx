@@ -42,7 +42,7 @@ export function ReceiptViewer({
   if (receiptUrl === null) {
     return (
       <ReceiptSection>
-        <p className="rounded-control border border-divisor bg-superficie px-3 py-6 text-center text-nota text-texto-tenue">
+        <p className="rounded-control border border-borde bg-superficie px-3 py-6 text-center text-nota text-texto">
           {receiptMissing
             ? "Todavía no hay comprobante."
             : "El comprobante ya no está disponible."}
@@ -56,9 +56,9 @@ export function ReceiptViewer({
       <ReceiptSection>
         <div
           role="alert"
-          className="flex flex-col items-center gap-2 rounded-control border border-divisor bg-superficie px-3 py-6 text-center"
+          className="flex flex-col items-center gap-2 rounded-control border border-borde bg-superficie px-3 py-6 text-center"
         >
-          <p className="text-nota text-texto-secundario">
+          <p className="text-nota text-texto">
             No pudimos mostrar el comprobante.
           </p>
           <Button
@@ -90,7 +90,7 @@ export function ReceiptViewer({
       <button
         type="button"
         onClick={() => setEnlarged(true)}
-        className="flex justify-center overflow-hidden rounded-control bg-lino focus-visible:shadow-foco"
+        className="flex justify-center overflow-hidden rounded-control bg-superficie focus-visible:shadow-foco"
       >
         <img
           key={attempt}
@@ -100,7 +100,7 @@ export function ReceiptViewer({
           className="max-h-[360px] w-auto object-contain"
         />
       </button>
-      <p className="text-ayuda text-texto-muy-tenue">{caption}</p>
+      <p className="text-ayuda text-texto">{caption}</p>
       <ReceiptDialog
         open={enlarged}
         onOpenChange={setEnlarged}
@@ -122,7 +122,7 @@ function ReceiptSection({
   return (
     <section className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+        <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
           Comprobante
         </h3>
         {action}

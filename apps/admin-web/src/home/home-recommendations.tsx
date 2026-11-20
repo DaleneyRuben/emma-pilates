@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
@@ -29,7 +30,10 @@ const dismissFailureText = (error: unknown) =>
     : "No pudimos descartar la recomendación.";
 
 const textLink =
-  "rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
+  "rounded-control text-nota font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco";
+
+// On the 100 page a link beside a section title is large text (19 px bold).
+const sectionLink = cn(textLink, "text-grande underline-offset-4");
 
 function GroupRow({
   group,
@@ -43,10 +47,10 @@ function GroupRow({
   onDismiss: (group: RecommendationGroup) => void;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-divisor px-4 py-3.5 first:border-t-0 md:px-5">
+    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-superficie-hundida px-4 py-4 first:border-t-0 md:px-5">
       <div className="flex min-w-0 flex-1 basis-[260px] flex-col gap-0.5">
-        <p className="text-cuerpo text-texto">{group.title}</p>
-        <p className="text-nota text-texto-tenue">{group.note}</p>
+        <p className="text-cuerpo font-bold text-texto">{group.title}</p>
+        <p className="text-nota text-texto">{group.note}</p>
       </div>
       <div className="flex items-center gap-5">
         <Link
@@ -62,7 +66,7 @@ function GroupRow({
             aria-label={`Descartar: ${group.title}`}
             disabled={pending}
             onClick={() => onDismiss(group)}
-            className="rounded-control text-celda text-texto-tenue hover:text-texto focus-visible:shadow-foco disabled:opacity-60"
+            className="rounded-control text-nota font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco disabled:opacity-60"
           >
             Descartar
           </button>
@@ -111,21 +115,21 @@ export function HomeRecommendations({
       className="flex flex-col gap-2.5"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h2 id="inicio-recomendaciones" className="text-titulo-2 text-texto">
+        <h2 id="inicio-recomendaciones" className="text-seccion text-texto">
           Recomendaciones
         </h2>
         {open > shown.length ? (
-          <Link to="/informes" className={textLink}>
+          <Link to="/informes" className={sectionLink}>
             {`Ver las ${open}`}
           </Link>
         ) : shown.length === 0 ? (
-          <Link to="/informes" className={textLink}>
+          <Link to="/informes" className={sectionLink}>
             Ir a Informes
           </Link>
         ) : null}
       </div>
       {dismiss.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           {dismissFailureText(dismiss.error)}
         </p>
       ) : null}
@@ -138,11 +142,11 @@ export function HomeRecommendations({
       ) : query.data === undefined ? (
         <LoadingNotice>Cargando las recomendaciones…</LoadingNotice>
       ) : shown.length === 0 ? (
-        <p className="rounded-tarjeta border border-borde bg-blanco px-5 py-4 text-cuerpo text-texto-tenue">
+        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 text-cuerpo text-texto">
           Nada que revisar este mes.
         </p>
       ) : (
-        <ul className="flex flex-col rounded-tarjeta border border-borde bg-blanco">
+        <ul className="flex flex-col rounded-tarjeta bg-superficie shadow-tarjeta">
           {shown.map((group) => (
             <GroupRow
               key={group.key}

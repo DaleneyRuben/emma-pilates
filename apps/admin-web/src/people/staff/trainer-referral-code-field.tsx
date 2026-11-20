@@ -14,7 +14,7 @@ export function TrainerReferralCodeField({
   const id = useId();
   if (draft.query.data === undefined) {
     return draft.query.isError ? (
-      <p className="text-ayuda text-texto-tenue">
+      <p className="text-ayuda text-texto">
         No pudimos leer su código personal.
       </p>
     ) : null;
@@ -31,14 +31,14 @@ export function TrainerReferralCodeField({
         value={draft.value}
         onChange={(event) => draft.change(event.target.value)}
       />
-      <p id={`${id}-help`} className="text-ayuda text-texto-tenue">
+      <p id={`${id}-help`} className="text-ayuda text-texto">
         <ExampleHint example="CARLA">
           Las clientas que se registran con este código quedan como traídas por
           ella.
         </ExampleHint>
       </p>
       {draft.error === null ? null : (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           {draft.error}
         </p>
       )}

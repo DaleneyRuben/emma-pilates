@@ -16,7 +16,7 @@ export function FeedbackSender({ feedback }: { feedback: AdminFeedbackDto }) {
       to="/clientas"
       search={{ q: feedback.senderEmail, cliente: feedback.senderClientId }}
       onClick={(event) => event.stopPropagation()}
-      className="rounded-control font-medium text-primario-profundo underline-offset-2 hover:underline focus-visible:shadow-foco"
+      className="rounded-control font-medium text-texto underline-offset-2 hover:underline focus-visible:shadow-foco"
     >
       {feedback.senderName}
     </Link>

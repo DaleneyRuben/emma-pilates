@@ -27,7 +27,7 @@ const fileName = (name: string) =>
     .replace(/^-|-$/g, "")}.jpg`;
 
 const actionClass =
-  "inline-flex h-[44px] items-center gap-1.5 text-celda font-medium text-primario-profundo hover:text-primario-presionado";
+  "inline-flex h-[44px] items-center gap-1.5 text-celda font-medium text-texto hover:text-primario-presionado";
 
 function Notice({
   tone,
@@ -44,19 +44,17 @@ function Notice({
       className={cn(
         "flex flex-col gap-2 rounded-marco border border-dashed p-5 text-celda",
         tone === "error"
-          ? "border-borde bg-error-tinte"
-          : "border-borde-fuerte bg-lino",
+          ? "border-borde-fuerte bg-aviso"
+          : "border-borde-fuerte bg-superficie",
       )}
     >
       <Icon
         size={28}
         strokeWidth={1.4}
         aria-hidden="true"
-        className={tone === "error" ? "text-error" : "text-primario"}
+        className={tone === "error" ? "text-texto" : "text-primario"}
       />
-      <span
-        className={cn("font-semibold", tone === "error" && "text-error-texto")}
-      >
+      <span className={cn("font-semibold", tone === "error" && "text-texto")}>
         {title}
       </span>
       <span>{children}</span>
@@ -102,7 +100,7 @@ export function PayoutQrCard({
   );
 
   return (
-    <div className="flex flex-col items-center gap-2.5 rounded-marco border border-borde bg-crema p-[22px]">
+    <div className="flex flex-col items-center gap-2.5 rounded-tarjeta bg-superficie shadow-tarjeta p-[22px]">
       <button
         type="button"
         onClick={() => setEnlarged(true)}
@@ -121,7 +119,7 @@ export function PayoutQrCard({
         </button>
         {save}
       </div>
-      <span className="flex flex-col items-center text-center text-nota text-texto-tenue">
+      <span className="flex flex-col items-center text-center text-nota text-texto">
         <span>{label}</span>
         <span>{`Vale hasta el ${formatListDate(qr.validUntil)}`}</span>
       </span>
@@ -136,7 +134,7 @@ export function PayoutQrCard({
           >
             <BodyScrollLock />
             <div className="flex w-full items-center gap-3">
-              <Dialog.Title className="flex-1 font-display text-titulo-panel">
+              <Dialog.Title className="flex-1 font-serif text-titulo-panel">
                 {label}
               </Dialog.Title>
               <Dialog.Close aria-label="Cerrar" className={closeButtonClass}>
@@ -148,7 +146,7 @@ export function PayoutQrCard({
               alt=""
               className="size-[min(520px,100%)] object-contain"
             />
-            <span className="text-nota text-texto-tenue">
+            <span className="text-nota text-texto">
               {`Vale hasta el ${formatListDate(qr.validUntil)}`}
             </span>
             <a

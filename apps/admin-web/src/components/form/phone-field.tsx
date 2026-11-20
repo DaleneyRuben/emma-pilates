@@ -38,13 +38,13 @@ function PhoneInput({
   };
 
   return (
-    <div className="flex min-h-[44px] w-full rounded-panel border border-borde bg-crema focus-within:border-primario focus-within:shadow-foco has-[input[aria-invalid=true]]:border-rosa-profundo has-[input[aria-invalid=true]]:inset-ring has-[input[aria-invalid=true]]:inset-ring-rosa-profundo">
+    <div className="flex min-h-[44px] w-full rounded-panel border-[1.5px] border-borde-fuerte bg-superficie focus-within:border-primario focus-within:shadow-foco has-[input[aria-invalid=true]]:border-2 has-[input[aria-invalid=true]]:border-primario">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             type="button"
             aria-label={`País: ${country.name}, +${country.dial}`}
-            className="flex shrink-0 items-center gap-1.5 rounded-l-panel border-r border-arena-linea pr-2.5 pl-3 text-cuerpo font-semibold text-rosa-enlace hover:bg-rosa-tinte focus-visible:shadow-foco"
+            className="flex shrink-0 items-center gap-1.5 rounded-l-panel border-r border-borde pr-2.5 pl-3 text-cuerpo font-semibold text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
           >
             <span aria-hidden="true" className="leading-none">
               {country.flag}
@@ -85,7 +85,7 @@ function PhoneInput({
             onChange({ ...value, digits: event.target.value })
           }
           onBlur={onBlur}
-          className="min-w-0 flex-1 bg-transparent px-3.5 text-cuerpo text-texto tabular outline-none placeholder:text-texto-muy-tenue"
+          className="min-w-0 flex-1 bg-transparent px-3.5 text-cuerpo text-texto tabular outline-none placeholder:text-texto"
         />
       </FormControl>
     </div>

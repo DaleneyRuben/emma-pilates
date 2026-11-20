@@ -28,12 +28,14 @@ export function SessionDetail({
   notice,
   onBook,
   onDone,
+  onClose,
 }: {
   session: Session;
   branchId: string;
   notice: string | null;
   onBook: () => void;
   onDone: (notice: string | null) => void;
+  onClose: () => void;
 }) {
   const idBase = useId();
   const [tab, setTab] = useState<SessionTab>("reservas");
@@ -61,9 +63,12 @@ export function SessionDetail({
   const bookings = (
     <SessionBookingsTab
       roster={roster}
+      sessionId={session.id}
+      branchId={branchId}
       full={full}
       past={past}
       onBook={onBook}
+      onClose={onClose}
     />
   );
 
@@ -76,8 +81,8 @@ export function SessionDetail({
           <SeriesPauseNotice schedule={schedule} />
         )}
         {past ? (
-          <p className="flex items-center gap-2 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-celda text-texto-secundario">
-            <Lock size={16} aria-hidden="true" className="text-rosa-profundo" />
+          <p className="flex items-center gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-celda text-texto">
+            <Lock size={16} aria-hidden="true" className="text-rosa-600" />
             Clase pasada: solo lectura.
           </p>
         ) : null}

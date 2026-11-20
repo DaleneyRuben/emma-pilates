@@ -24,6 +24,8 @@ const roster: AdministratorSessionRoster = {
       clientName: 'Ana Pérez',
       clientPhoto: null,
       attendanceOutcome: null,
+      classNumber: 1,
+      founder: false,
     },
   ],
   waitlist: [

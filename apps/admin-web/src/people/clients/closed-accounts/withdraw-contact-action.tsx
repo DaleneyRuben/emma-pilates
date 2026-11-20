@@ -36,7 +36,7 @@ export function WithdrawContactAction({
         variant="link"
         size="sm"
         aria-label={`Dejar de enviar a ${contact.name}`}
-        className="text-error hover:text-error-texto"
+        className="text-texto hover:text-texto"
         onClick={() => {
           setFailed(false);
           setOpen(true);
@@ -60,7 +60,7 @@ export function WithdrawContactAction({
           Esta acción no se puede deshacer.
         </p>
         {failed ? (
-          <p role="alert" className="text-error-texto">
+          <p role="alert" className="text-texto">
             No pudimos borrar el contacto. Inténtalo de nuevo.
           </p>
         ) : null}

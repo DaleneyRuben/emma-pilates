@@ -45,7 +45,7 @@ function Message({ title, children }: { title: string; children: string }) {
     <div className="flex flex-col items-center gap-3 text-center">
       <MessageDisc icon={Link2Off} />
       <h1 className="font-serif text-titulo-1 text-texto">{title}</h1>
-      <p className="text-cuerpo text-texto-tenue">{children}</p>
+      <p className="text-cuerpo text-texto">{children}</p>
     </div>
   );
 }
@@ -175,15 +175,12 @@ export function CreatePasswordPage({ token }: { token: string | undefined }) {
   return (
     <AuthLayout>
       {state === "loading" ? (
-        <p role="status" className="text-center text-cuerpo text-texto-tenue">
+        <p role="status" className="text-center text-cuerpo text-texto">
           Revisando el enlace…
         </p>
       ) : null}
       {state === "unavailable" ? (
-        <p
-          role="alert"
-          className="text-center text-cuerpo text-texto-secundario"
-        >
+        <p role="alert" className="text-center text-cuerpo text-texto">
           No pudimos revisar el enlace. Inténtalo de nuevo en unos minutos.
         </p>
       ) : null}

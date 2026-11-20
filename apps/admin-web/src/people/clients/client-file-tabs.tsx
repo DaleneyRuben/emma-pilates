@@ -51,7 +51,7 @@ export function ClientFileTabs({
     <div
       role="tablist"
       aria-label="Ficha de la clienta"
-      className="-mt-2 flex gap-1 overflow-x-auto border-b border-arena-linea px-7"
+      className="-mt-2 flex gap-1 overflow-x-auto border-b border-borde px-7"
     >
       {tabs.map((tab, index) => {
         const selected = tab.value === value;
@@ -67,9 +67,9 @@ export function ClientFileTabs({
             onClick={() => onChange(tab.value)}
             onKeyDown={(event) => move(event, index)}
             className={cn(
-              "-mb-px inline-flex h-11 shrink-0 items-center border-b-2 border-transparent px-3 text-cuerpo text-tenue hover:text-texto focus-visible:shadow-foco",
+              "-mb-px inline-flex h-11 shrink-0 items-center border-b-2 border-transparent px-3 text-cuerpo text-texto hover:text-texto focus-visible:shadow-foco",
               selected &&
-                "border-rosa-profundo font-semibold text-rosa-enlace hover:text-rosa-enlace",
+                "border-rosa-600 font-semibold text-texto hover:text-texto",
             )}
           >
             {tab.label}

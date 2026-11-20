@@ -21,4 +21,11 @@ export interface AdministratorRosterBookingDto {
    * @nullable
    */
   attendanceOutcome: AdministratorRosterBookingDtoAttendanceOutcome;
+  /**
+   * Her n-th class, counting earlier held classes she did not miss: 1 is her first class (W1)
+   * @minimum 1
+   */
+  classNumber: number;
+  /** She holds an active Founder Membership (W1 «Fundadora») */
+  founder: boolean;
 }

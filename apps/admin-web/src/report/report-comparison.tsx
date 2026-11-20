@@ -58,7 +58,8 @@ const concepts = (allBranches: boolean): Concept[] => [
   },
 ];
 
-const totalRow = "bg-superficie-sutil font-medium hover:bg-superficie-sutil";
+const totalRow =
+  "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
 
 export function ComparisonTable({
   comparison,

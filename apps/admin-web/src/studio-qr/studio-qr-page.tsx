@@ -25,7 +25,7 @@ function QrImage() {
   const image = useQuery(studioQrImageQueryOptions());
 
   return (
-    <div className="flex size-[220px] shrink-0 items-center justify-center overflow-hidden rounded-marco bg-superficie text-texto-secundario">
+    <div className="flex size-[220px] shrink-0 items-center justify-center overflow-hidden rounded-marco bg-superficie text-texto">
       {image.data !== undefined ? (
         <img
           src={image.data}
@@ -33,7 +33,7 @@ function QrImage() {
           className="size-full object-contain"
         />
       ) : image.isError ? (
-        <p className="px-4 text-center text-nota text-texto-tenue">
+        <p className="px-4 text-center text-nota text-texto">
           No pudimos mostrar el QR.
         </p>
       ) : (
@@ -76,14 +76,14 @@ export function StudioQrPage() {
       ) : (
         <section
           aria-labelledby={titleId}
-          className="flex max-w-[1000px] flex-wrap items-center gap-5 rounded-marco border border-borde bg-lino p-6 max-md:p-4"
+          className="flex max-w-[1000px] flex-wrap items-center gap-5 rounded-tarjeta bg-superficie shadow-tarjeta p-6 max-md:p-4"
         >
           <QrImage />
           <div className="flex min-w-[200px] flex-1 flex-col items-start gap-2.5">
             <h2 id={titleId} className="text-titulo-panel text-texto">
               QR de transferencia
             </h2>
-            <p className="text-nota text-texto-tenue">
+            <p className="text-nota text-texto">
               Es el QR que ven las clientas al pagar desde la app. Al subir uno
               nuevo, la app lo usa al instante.
             </p>
@@ -111,12 +111,12 @@ export function StudioQrPage() {
               {upload.isPending ? "Subiendo el QR…" : "Subir un QR nuevo"}
             </label>
             {upload.isError ? (
-              <p role="alert" className="text-nota text-error-texto">
+              <p role="alert" className="text-nota text-texto">
                 {qrUploadMessage(upload.error)}
               </p>
             ) : null}
             {status.isPending ? null : (
-              <p className="text-nota text-texto-tenue">
+              <p className="text-nota text-texto">
                 {updatedLine(status.data.updatedAt)}
               </p>
             )}

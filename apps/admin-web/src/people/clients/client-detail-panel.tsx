@@ -98,14 +98,14 @@ function ClientSummary({
     <>
       <div className="flex items-center gap-3">
         <ClientPhoto name={client.name} photo={client.photo} size={40} />
-        <p className="text-nota text-texto-tenue">
+        <p className="text-nota text-texto">
           Clienta desde {formatListDate(client.clientSince)}
         </p>
       </div>
       {client.accountStatus === "pending" ? (
-        <div className="flex flex-col gap-1 rounded-control border border-borde bg-advertencia-tinte px-3 py-2">
+        <div className="flex flex-col gap-1 rounded-control border border-borde-fuerte bg-aviso px-3 py-2">
           <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
-          <p className="text-ayuda text-advertencia-texto">
+          <p className="text-ayuda text-texto">
             Todavía no abrió el enlace del correo para crear su contraseña.
           </p>
         </div>
@@ -122,7 +122,7 @@ function ClientSummary({
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde bg-lino px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
+          <span className="rounded-control border border-borde-fuerte bg-superficie px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto">
             {client.referralCode}
           </span>
         </SummaryRow>
@@ -195,7 +195,7 @@ export function ClientDetailPanel({
           ) : query.isError ? (
             isApiError(query.error) &&
             query.error.code === "client_not_found" ? (
-              <p role="alert" className="text-cuerpo text-texto-secundario">
+              <p role="alert" className="text-cuerpo text-texto">
                 Esta clienta ya no existe.
               </p>
             ) : (
@@ -248,7 +248,7 @@ export function ClientDetailPanel({
       (editing && granted === null) ? null : (
         <SidePanelFooter>
           {granted === null ? null : (
-            <p role="status" className="text-nota text-exito-texto">
+            <p role="status" className="text-nota text-texto">
               {granted}
             </p>
           )}

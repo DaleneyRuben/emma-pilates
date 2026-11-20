@@ -43,7 +43,7 @@ const movementAction = (
 
 // FIX-090: 44 px targets, apart, so a phone tap lands on the one meant.
 const rowLink =
-  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control px-2 text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco disabled:text-deshabilitado-texto";
+  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control px-2 text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco disabled:text-texto";
 
 const supplyColumns =
   (branchId: string, managesCatalog: boolean) =>
@@ -57,7 +57,9 @@ const supplyColumns =
             onOpen={() => open(row.original)}
           />
         ) : (
-          <span className="font-medium text-texto">{row.original.name}</span>
+          <span className="text-cuerpo font-bold text-texto">
+            {row.original.name}
+          </span>
         ),
     }),
     columns.accessor("quantityOnHand", {
@@ -76,7 +78,7 @@ const supplyColumns =
         getValue() ? (
           <StatusPill tone="advertencia">Stock bajo</StatusPill>
         ) : (
-          <span className="text-texto-tenue">Suficiente</span>
+          <span className="text-texto">Suficiente</span>
         ),
     }),
     // FIX-088 (Insumos B): each row logs its own Withdrawal or Restock.
@@ -119,11 +121,11 @@ const lowStockLine = (branch: Branch, count: number | undefined) =>
 function EmptySupplies({ managesCatalog }: { managesCatalog: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
+      <span className="text-texto">
         Todavía no hay insumos en esta sucursal.
       </span>
       {managesCatalog ? (
-        <span className="text-nota text-texto-tenue">
+        <span className="text-nota text-texto">
           Crea el primero con «Nuevo insumo».
         </span>
       ) : null}

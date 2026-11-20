@@ -173,13 +173,13 @@ export function ClassTypePanelForm({
           />
           {numberFields.map(renderText)}
           {classType === undefined ? null : (
-            <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
               Los cambios se aplican a las clases que se generen desde ahora;
               las ya programadas no cambian.
             </p>
           )}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}
@@ -191,7 +191,7 @@ export function ClassTypePanelForm({
           {classType === undefined || classType.archivedAt !== null ? null : (
             <Button
               variant="link"
-              className="self-center text-error hover:text-error-texto"
+              className="self-center text-texto hover:text-texto"
               onClick={() => setConfirming(true)}
             >
               Archivar tipo de clase

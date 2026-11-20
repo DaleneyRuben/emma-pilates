@@ -49,9 +49,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
     // A phone card still leads with the category.
     meta: { card: "detail" },
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatListDate(getValue())}
-      </span>
+      <span className="text-texto tabular">{formatListDate(getValue())}</span>
     ),
   }),
   columns.accessor("expenseCategoryName", {
@@ -61,12 +59,12 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
       isVoided(row.original) ? (
         <span className="flex flex-col gap-1">
           <span className="flex flex-wrap items-center gap-2">
-            <span className="text-texto-tenue">
+            <span className="text-texto">
               {row.original.expenseCategoryName}
             </span>
             <StatusPill tone="neutral">Eliminado</StatusPill>
           </span>
-          <span className="text-nota text-texto-tenue">
+          <span className="text-nota text-texto">
             {voidedLine(row.original)}
           </span>
         </span>
@@ -82,12 +80,10 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
     cell: ({ row, getValue }) => {
       const detail = getValue();
       return detail == null ? (
-        <span className="text-texto-tenue">—</span>
+        <span className="text-texto">—</span>
       ) : (
         <span
-          className={cn(
-            isVoided(row.original) ? "text-texto-tenue" : "text-texto",
-          )}
+          className={cn(isVoided(row.original) ? "text-texto" : "text-texto")}
         >
           {detail}
         </span>
@@ -101,9 +97,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
       <span
         className={cn(
           "tabular",
-          isVoided(row.original)
-            ? "text-texto-tenue line-through"
-            : "text-texto",
+          isVoided(row.original) ? "text-texto line-through" : "text-texto",
         )}
       >
         {formatBolivianos(getValue())}

@@ -10,9 +10,9 @@ function Figure({ name, figure }: { name: string; figure: string }) {
   return (
     <section
       aria-label={name}
-      className="flex flex-col gap-1 rounded-marco border border-borde bg-lino px-5 py-4"
+      className="flex flex-col gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
     >
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
         {name}
       </h3>
       <p className="font-serif text-cifra leading-tight text-texto tabular">
@@ -51,7 +51,7 @@ export function RevenueSection({
         {`Ingreso devengado · ${formatMonth(month)}`}
       </h2>
       {branchName === undefined ? null : (
-        <p className="text-nota text-texto-tenue">
+        <p className="text-nota text-texto">
           {branchName === ""
             ? "Todo el estudio: no se separa por sucursal."
             : `Todo el estudio, no solo ${branchName}: no se separa por sucursal.`}
@@ -83,7 +83,7 @@ export function RevenueSection({
               figure={formatBolivianos(revenue.data.deferredCentavos)}
             />
           </div>
-          <p className="text-nota text-texto-tenue">
+          <p className="rounded-tarjeta bg-superficie px-[18px] py-3 text-nota font-bold text-texto shadow-tarjeta">
             {`Clases pendientes de dar hoy: ${countFormat.format(revenue.data.classesStillOwed)}`}
           </p>
         </>

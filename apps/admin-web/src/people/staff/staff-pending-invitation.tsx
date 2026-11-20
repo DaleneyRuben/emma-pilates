@@ -88,7 +88,7 @@ export function PendingInvitation({
     );
 
   return (
-    <section className="flex flex-col gap-2.5 rounded-marco border border-borde bg-lino p-4">
+    <section className="flex flex-col gap-2.5 rounded-tarjeta bg-superficie shadow-tarjeta p-4">
       <div>
         <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
       </div>
@@ -102,7 +102,7 @@ export function PendingInvitation({
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
           />
-          <p className="text-ayuda text-texto-muy-tenue">
+          <p className="text-ayuda text-texto">
             {`Los enlaces enviados a ${email} dejarán de funcionar; enviaremos uno nuevo de 7 días.`}
           </p>
         </div>
@@ -122,12 +122,12 @@ export function PendingInvitation({
           </Button>
         </div>
       )}
-      <p className="text-nota leading-normal text-texto-secundario">
+      <p className="text-nota leading-normal text-texto">
         {expiresAt === null || expiresAt === undefined
           ? "El último enlace ya no es válido; envía uno nuevo."
           : `El enlace vence el ${formatListDate(boliviaParts(expiresAt).date)}.`}
       </p>
-      <p className="text-ayuda text-texto-muy-tenue">
+      <p className="text-ayuda text-texto">
         Si no activa su cuenta en 30 días desde el último envío o cambio, la
         invitación se elimina. Es distinto de los 7 días de cada enlace.
       </p>
@@ -162,11 +162,11 @@ export function PendingInvitation({
         </Button>
       )}
       {result === null ? null : result.ok ? (
-        <p role="status" className="text-ayuda text-exito-texto">
+        <p role="status" className="text-ayuda text-texto">
           {result.message}
         </p>
       ) : (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           {result.message}
         </p>
       )}

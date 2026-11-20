@@ -64,11 +64,11 @@ function EmptyPayments({ search }: { search: PaymentSearch }) {
         : empty[search.status];
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">{message}</span>
+      <span className="text-texto">{message}</span>
       {hint === undefined ? null : (
-        <span className="text-nota text-texto-tenue">{hint}</span>
+        <span className="text-nota text-texto">{hint}</span>
       )}
-      <span className="text-ayuda text-texto-muy-tenue">
+      <span className="text-ayuda text-texto">
         Las clientas pagan por QR desde la app y la asistente registra el
         efectivo; aquí se revisan y se marcan las facturas.
       </span>
@@ -162,7 +162,7 @@ export function PaymentsPage({
           {exportPayments.isError ? (
             <p
               role="alert"
-              className="w-full rounded-control bg-error-tinte px-3 py-2 text-nota text-error-texto"
+              className="w-full rounded-control bg-aviso px-3 py-2 text-nota text-texto"
             >
               No pudimos exportar los pagos. Inténtalo de nuevo.
             </p>

@@ -3,26 +3,46 @@ import {
   clientNameAndPhoto,
   clientNameSelect,
 } from '../client/client-photo-of';
+import { countEarlierClasses } from '../earlier-classes';
 import type { FindAdministratorSessionRoster } from './administrator-session-roster';
 
 const outcomes = { ATTENDED: 'attended', NO_SHOW: 'no_show' } as const;
+
+// The Clientas directory's rule: an active, not removed, Founder Membership.
+const isActiveFounder = (
+  membership: { status: string; deletedAt: Date | null } | null,
+): boolean =>
+  membership !== null &&
+  membership.status === 'ACTIVE' &&
+  membership.deletedAt === null;
 
 // Booked Clients in booking order and the open Waitlist in queue order: the
 // position is the entry's place among the open ones (joinedAt, then id, as
 // promotion reads them).
 export const findAdministratorSessionRoster =
-  (prisma: PrismaClient): FindAdministratorSessionRoster =>
+  (
+    prisma: PrismaClient,
+    now: () => Date = () => new Date(),
+  ): FindAdministratorSessionRoster =>
   async (sessionId) => {
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
       select: {
         id: true,
+        startsAt: true,
         bookings: {
           where: { state: 'BOOKED' },
           select: {
             id: true,
             clientId: true,
-            client: clientNameSelect,
+            client: {
+              select: {
+                ...clientNameSelect.select,
+                founderMembership: {
+                  select: { status: true, deletedAt: true },
+                },
+              },
+            },
             attendanceRecord: { select: { outcome: true } },
           },
           orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
@@ -39,6 +59,12 @@ export const findAdministratorSessionRoster =
       },
     });
     if (session === null) return null;
+    const earlier = await countEarlierClasses(
+      prisma,
+      session.bookings.map((booking) => booking.clientId),
+      session.startsAt,
+      now(),
+    );
 
     return {
       sessionId: session.id,
@@ -50,6 +76,8 @@ export const findAdministratorSessionRoster =
           booking.attendanceRecord === null
             ? null
             : outcomes[booking.attendanceRecord.outcome],
+        classNumber: (earlier.get(booking.clientId) ?? 0) + 1,
+        founder: isActiveFounder(booking.client.founderMembership),
       })),
       waitlist: session.waitlistEntries.map((entry, index) => ({
         waitlistEntryId: entry.id,

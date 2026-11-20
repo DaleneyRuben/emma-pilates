@@ -1,41 +1,57 @@
 import type { ReactNode } from "react";
 import { cn } from "../../lib/cn";
 
+const tones = {
+  destacado: "bg-destacado text-blanco shadow-destacado",
+  medio: "bg-medio text-blanco",
+  tarjeta: "bg-superficie text-texto shadow-tarjeta",
+} as const;
+
 /**
- * FIX-091: one figure at the top of a page (Comentarios' counters, Informes'
- * three and four numbers). Crema with an Arcilla border; `emphasis` makes it
- * the Palo de rosa block with Crema text, for the one figure that leads.
+ * FIX-091, Rosa Emma (rw.py kpis): one figure at the top of a page. The row
+ * leads with the Rosa profundo block (`destacado`, its 11 px label on 600);
+ * a Palo de rosa block (`medio`) carries large white text only, so its
+ * label sits under the figure at 19 px bold; the rest are white cards.
  */
 export function StatTile({
   label,
   figure,
   line,
-  emphasis = false,
+  tone = "tarjeta",
   children,
 }: {
   label: string;
   figure: string;
   line?: ReactNode;
-  emphasis?: boolean;
+  tone?: keyof typeof tones;
   children?: ReactNode;
 }) {
+  const medio = tone === "medio";
   return (
     <section
       aria-label={label}
       className={cn(
-        "flex min-w-0 flex-col gap-1 rounded-marco border px-4 py-3.5",
-        emphasis
-          ? "border-palo-de-rosa bg-palo-de-rosa text-crema"
-          : "border-arcilla bg-crema text-rosa-profundo",
+        "flex min-w-0 flex-col gap-1.5 rounded-tarjeta px-5 py-[18px]",
+        medio && "justify-end gap-0.5",
+        tones[tone],
       )}
     >
-      <h2 className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] uppercase">
-        {label}
-      </h2>
+      {medio ? null : (
+        <h2 className="font-sans text-etiqueta font-bold tracking-[0.14em] uppercase">
+          {label}
+        </h2>
+      )}
       <p className="font-serif text-cifra-grande leading-tight whitespace-nowrap tabular">
         {figure}
       </p>
-      {line === undefined ? null : <div className="text-nota">{line}</div>}
+      {medio ? (
+        <h2 className="font-sans text-grande leading-tight font-bold">
+          {label}
+        </h2>
+      ) : null}
+      {line === undefined ? null : (
+        <div className="flex flex-col gap-1 text-nota">{line}</div>
+      )}
       {children}
     </section>
   );
@@ -52,7 +68,7 @@ export function StatTiles({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-3 md:auto-cols-fr md:grid-flow-col md:grid-cols-none",
+        "grid grid-cols-2 gap-3 md:auto-cols-fr md:grid-flow-col md:grid-cols-none md:gap-4",
         className,
       )}
     >

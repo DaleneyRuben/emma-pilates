@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-svh flex-col bg-superficie text-texto min-[900px]:flex-row">
-      <aside className="flex h-[200px] flex-none items-center justify-center bg-rosa-tinte p-5 min-[900px]:h-auto min-[900px]:w-1/2 min-[900px]:p-12">
+      <aside className="flex h-[200px] flex-none items-center justify-center bg-banda p-5 min-[900px]:h-auto min-[900px]:w-1/2 min-[900px]:p-12">
         <img
           src="/emma-logo.png"
           alt="Emma Pilates Studio"
@@ -28,8 +28,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 export function AuthHeading({ title, line }: { title: string; line: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <h1 className="font-serif text-titulo-1 text-texto">{title}</h1>
-      <p className="text-cuerpo text-texto-tenue">{line}</p>
+      <h1 className="font-serif text-[34px] leading-tight text-texto">
+        {title}
+      </h1>
+      <p className="text-cuerpo text-texto">{line}</p>
     </div>
   );
 }

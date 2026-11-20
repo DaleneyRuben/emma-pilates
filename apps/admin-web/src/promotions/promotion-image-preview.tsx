@@ -45,7 +45,7 @@ export function PromotionImagePreview({
 
   return (
     <figure data-crop={crop} className="flex flex-col gap-1">
-      <div className="flex justify-center overflow-hidden rounded-control bg-lino">
+      <div className="flex justify-center overflow-hidden rounded-control bg-superficie">
         <div style={box} className="relative max-w-full">
           <img
             src={image.previewUrl}
@@ -77,11 +77,11 @@ export function PromotionImagePreview({
           ) : null}
         </div>
       </div>
-      <figcaption className="text-ayuda text-texto-tenue tabular">
+      <figcaption className="text-ayuda text-texto tabular">
         {image.label} · {image.width} × {image.height}
       </figcaption>
       {hints[crop] === null ? null : (
-        <p className="text-ayuda text-texto-tenue">{hints[crop]}</p>
+        <p className="text-ayuda text-texto">{hints[crop]}</p>
       )}
     </figure>
   );

@@ -36,7 +36,7 @@ export function MonthNarrative({ month }: { month: string }) {
   return (
     <section
       aria-label="Informe del mes"
-      className="flex flex-col gap-4 rounded-marco border border-borde bg-lino px-5 py-4"
+      className="flex flex-col gap-4 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
     >
       <h2 className="font-serif text-titulo-3 text-texto">Informe del mes</h2>
       {report.paragraphs.map((paragraph) => (
@@ -49,9 +49,7 @@ export function MonthNarrative({ month }: { month: string }) {
           {report.actions.map((action) => (
             <li key={action.because} className="flex flex-col gap-1">
               <p className="text-cuerpo text-texto">{action.text}</p>
-              <p className="text-nota text-texto-tenue">
-                Porque: {action.because}
-              </p>
+              <p className="text-nota text-texto">Porque: {action.because}</p>
             </li>
           ))}
         </ul>
@@ -64,7 +62,7 @@ export function MonthNarrative({ month }: { month: string }) {
           asked.mutate({ month, question: trimmed });
         }}
       >
-        <label className="flex min-w-0 flex-1 flex-col gap-1 text-nota text-texto-secundario">
+        <label className="flex min-w-0 flex-1 flex-col gap-1 text-nota text-texto">
           Pregunta sobre el mes
           <Input
             value={question}
@@ -77,7 +75,7 @@ export function MonthNarrative({ month }: { month: string }) {
         </Button>
       </form>
       {asked.isError ? (
-        <p role="alert" className="text-cuerpo text-texto-secundario">
+        <p role="alert" className="text-cuerpo text-texto">
           No pudimos responder la pregunta.
         </p>
       ) : asked.data === undefined ? null : (

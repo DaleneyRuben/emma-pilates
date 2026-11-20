@@ -78,7 +78,7 @@ export function CloseClientAccountAction({
         {refused ? (
           <div
             role="alert"
-            className="flex flex-col gap-1 rounded-control bg-error-tinte px-3 py-2 text-error-texto"
+            className="flex flex-col gap-1 rounded-control bg-aviso px-3 py-2 text-texto"
           >
             <span>
               No se puede cerrar todavía: tiene un pago por QR en revisión.
@@ -90,7 +90,7 @@ export function CloseClientAccountAction({
           </div>
         ) : null}
         {outcome === "failed" ? (
-          <p role="alert" className="text-error-texto">
+          <p role="alert" className="text-texto">
             No pudimos cerrar la cuenta. Inténtalo de nuevo.
           </p>
         ) : null}

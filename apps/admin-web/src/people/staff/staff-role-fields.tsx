@@ -29,7 +29,7 @@ function FieldTitle({ children }: { children: string }) {
   return (
     <span
       aria-hidden="true"
-      className="block text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
+      className="block text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
     >
       {children}
     </span>
@@ -38,7 +38,7 @@ function FieldTitle({ children }: { children: string }) {
 
 function ReadOnlyRow({ children }: { children: string }) {
   return (
-    <p className="rounded-control border border-divisor bg-superficie px-3 py-2.5 text-nota text-texto-secundario">
+    <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 text-nota text-texto">
       {children}
     </p>
   );
@@ -118,11 +118,9 @@ export function StaffRoleFields({
             <FormItem>
               <FieldTitle>Sucursales asignadas</FieldTitle>
               {branches.isPending ? (
-                <p className="text-ayuda text-texto-tenue">
-                  Cargando sucursales…
-                </p>
+                <p className="text-ayuda text-texto">Cargando sucursales…</p>
               ) : branches.isError ? (
-                <p role="alert" className="text-ayuda text-error-texto">
+                <p role="alert" className="text-ayuda text-texto">
                   No pudimos cargar las sucursales.
                 </p>
               ) : (

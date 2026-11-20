@@ -1,4 +1,5 @@
 import type { AdminPromotionContactDto } from "@pilates/api-contracts";
+import { ClientCounts } from "./client-counts";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -34,7 +35,7 @@ function FounderPlaces() {
   const places = useQuery(founderPlacesQueryOptions());
   if (places.data === undefined) return null;
   return (
-    <p className="text-nota text-texto-tenue">
+    <p className="text-nota text-texto">
       {countFormat.format(places.data.granted)} de{" "}
       {countFormat.format(places.data.places)} lugares de fundadora otorgados
     </p>
@@ -66,23 +67,21 @@ function EmptyDirectory({
   if (searching) {
     return (
       <span className="flex flex-col items-center gap-1">
-        <span className="text-texto-secundario">
-          No se encontró ninguna clienta.
-        </span>
-        <span className="text-nota text-texto-tenue">
+        <span className="text-texto">No se encontró ninguna clienta.</span>
+        <span className="text-nota text-texto">
           Revisa cómo escribiste el nombre o el teléfono.
         </span>
-        <span className="text-ayuda text-texto-muy-tenue">{origin}</span>
+        <span className="text-ayuda text-texto">{origin}</span>
       </span>
     );
   }
   if (filter !== undefined && filter !== "closed") {
-    return <span className="text-texto-secundario">{emptyChip[filter]}</span>;
+    return <span className="text-texto">{emptyChip[filter]}</span>;
   }
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">Todavía no hay clientas.</span>
-      <span className="text-ayuda text-texto-muy-tenue">{origin}</span>
+      <span className="text-texto">Todavía no hay clientas.</span>
+      <span className="text-ayuda text-texto">{origin}</span>
     </span>
   );
 }
@@ -90,15 +89,13 @@ function EmptyDirectory({
 function EmptyClosedAccounts({ searching }: { searching: boolean }) {
   return searching ? (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
-        No se encontró ninguna exclienta.
-      </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-texto">No se encontró ninguna exclienta.</span>
+      <span className="text-nota text-texto">
         Revisa cómo escribiste el nombre, el correo o el teléfono.
       </span>
     </span>
   ) : (
-    <span className="text-texto-secundario">
+    <span className="text-texto">
       Nadie cerró su cuenta pidiendo seguir recibiendo promociones.
     </span>
   );
@@ -163,6 +160,7 @@ export function ClientsPage({
   );
   const filter: ReactNode = (
     <div className="flex flex-col gap-3">
+      {query.data === undefined ? null : <ClientCounts page={query.data} />}
       <SearchFilter
         label="Buscar por nombre, correo o teléfono"
         value={search.q ?? ""}
@@ -182,7 +180,7 @@ export function ClientsPage({
         <FounderPlaces />
       ) : null}
       {closed ? (
-        <p className="text-nota text-texto-tenue">
+        <p className="text-nota text-texto">
           Exclientas que cerraron su cuenta y pidieron seguir recibiendo
           promociones. No tienen ficha.
         </p>
@@ -190,7 +188,7 @@ export function ClientsPage({
       {exportClients.isError ? (
         <p
           role="alert"
-          className="rounded-control bg-error-tinte px-3 py-2 text-nota text-error-texto"
+          className="rounded-control bg-aviso px-3 py-2 text-nota text-texto"
         >
           No pudimos exportar las clientas. Inténtalo de nuevo.
         </p>

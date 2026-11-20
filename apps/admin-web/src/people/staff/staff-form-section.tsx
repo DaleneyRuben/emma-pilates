@@ -17,7 +17,7 @@ export function StaffFormSection({
     <section aria-labelledby={id} className="flex flex-col gap-4">
       <h3
         id={id}
-        className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-profundo uppercase"
+        className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-600 uppercase"
       >
         {title}
       </h3>

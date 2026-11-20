@@ -39,7 +39,7 @@ export function InvoiceFileCard({
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 rounded-marco border border-borde bg-lino px-3.5 py-3">
+      <div className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-3">
         <span className="flex size-11 flex-none items-center justify-center rounded-control bg-superficie text-primario">
           <FileText size={22} strokeWidth={1.5} aria-hidden="true" />
         </span>
@@ -47,7 +47,7 @@ export function InvoiceFileCard({
           <span className="truncate text-cuerpo text-texto">
             {file.fileName}
           </span>
-          <span className="text-ayuda text-texto-tenue">
+          <span className="text-ayuda text-texto">
             {`${kindOf(file.mediaType)} · ${sizeOf(file.byteSize)} · subida por ${file.uploadedByName} · ${formatDateTime(file.uploadedAt)}`}
           </span>
         </span>
@@ -73,7 +73,7 @@ export function InvoiceFileCard({
           <Button
             variant="ghost"
             size="sm"
-            className="text-error hover:text-error-texto"
+            className="text-texto hover:text-texto"
             onClick={() => setAsking(true)}
           >
             Quitar factura

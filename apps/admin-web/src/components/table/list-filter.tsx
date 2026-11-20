@@ -19,7 +19,7 @@ export function ListFilter<Value extends string>({
   const id = useId();
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3 self-start rounded-tarjeta bg-superficie py-1.5 pr-1.5 pl-4 shadow-tarjeta">
       <label htmlFor={id} className="text-celda font-semibold text-texto">
         {label}
       </label>

@@ -5,7 +5,7 @@ import { StatusPill } from "../components/ui/status-pill";
 // "pendiente/completado" pair (booking/CONTEXT.md, Payment). FIX-091 (W4 B):
 // a transfer waiting reads «Por revisar», like Pagos' chip.
 const pills = {
-  pending: { tone: "advertencia", label: "Por revisar" },
+  pending: { tone: "accion", label: "Por revisar" },
   confirmed: { tone: "exito", label: "Confirmado" },
   rejected: { tone: "error", label: "Rechazado" },
   voided: { tone: "neutral", label: "Anulado" },

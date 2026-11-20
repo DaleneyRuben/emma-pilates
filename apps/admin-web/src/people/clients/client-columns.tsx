@@ -9,7 +9,7 @@ import { ClientPhone } from "./client-phone";
 
 const columns = createColumnHelper<AdminClientDto>();
 
-const none = <span className="text-texto-muy-tenue">—</span>;
+const none = <span className="text-texto">—</span>;
 
 // Walkthrough n.º 61: «5 de 8 + 1» when extra classes are live.
 export const classesLeft = (
@@ -49,7 +49,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
             onOpen={() => open(row.original)}
           />
           {row.original.founderNumber === null ? null : (
-            <span className="text-ayuda text-rosa-enlace">
+            <span className="text-ayuda text-texto">
               Fundadora n.º {row.original.founderNumber}
             </span>
           )}
@@ -61,9 +61,9 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     header: "Contacto",
     meta: { card: "hidden" },
     cell: ({ row }) => (
-      <span className="flex flex-col text-nota text-texto-secundario">
+      <span className="flex flex-col text-nota text-texto">
         <span>{row.original.email}</span>
-        <ClientPhone phone={row.original.phone} tone="text-texto-muy-tenue" />
+        <ClientPhone phone={row.original.phone} tone="text-texto" />
       </span>
     ),
   }),
@@ -74,11 +74,11 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
       const startsOn = row.original.planStartsOn;
       if (plan !== null) {
         return (
-          <span className="flex flex-col text-texto-secundario">
+          <span className="flex flex-col text-texto">
             <span>{plan}</span>
             {/* Walkthrough n.º 60: the Plan bought after a spent Guest Pass. */}
             {startsOn == null ? null : (
-              <span className="text-ayuda text-texto-tenue tabular">
+              <span className="text-ayuda text-texto tabular">
                 Empieza el {formatListDate(startsOn)}
               </span>
             )}
@@ -87,7 +87,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
       }
       // expired had a Plan; none never bought one (AdminClientDto.subscriptionStatus).
       return (
-        <span className="text-texto-muy-tenue">
+        <span className="text-texto">
           {row.original.subscriptionStatus === "expired"
             ? "Vencido"
             : "Sin plan"}
@@ -122,8 +122,8 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
         <span
           className={
             row.original.subscriptionStatus === "active"
-              ? "text-texto-secundario tabular"
-              : "text-texto-tenue tabular"
+              ? "text-texto tabular"
+              : "text-texto tabular"
           }
         >
           {label}
@@ -138,9 +138,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
       return day == null ? (
         none
       ) : (
-        <span className="text-texto-secundario tabular">
-          {formatListDate(day)}
-        </span>
+        <span className="text-texto tabular">{formatListDate(day)}</span>
       );
     },
   }),
@@ -149,11 +147,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     meta: { card: "hidden" },
     cell: ({ getValue }) => {
       const name = getValue();
-      return name === null ? (
-        none
-      ) : (
-        <span className="text-texto-secundario">{name}</span>
-      );
+      return name === null ? none : <span className="text-texto">{name}</span>;
     },
   }),
   columns.accessor("subscriptionStatus", {

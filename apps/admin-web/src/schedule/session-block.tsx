@@ -69,8 +69,8 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full items-center overflow-hidden rounded-control border border-divisor bg-crema px-2 text-left text-ayuda leading-tight text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco",
-        layout === "list" && "min-h-11",
+        "flex w-full items-center overflow-hidden rounded-[8px] bg-superficie-hundida px-2.5 text-left text-pie leading-tight text-texto inset-ring inset-ring-borde-fuerte transition-shadow hover:bg-blanco focus-visible:shadow-foco",
+        layout === "list" && "min-h-11 rounded-panel text-celda",
         className,
       )}
     >
@@ -118,25 +118,48 @@ export function SessionBlock({
       session={session}
       onOpen={onOpen}
       short={short}
+      layout={layout}
       className={className}
       style={style}
     />
   );
 }
 
-// FIX-084 (Horario A): every standing block is white with a thin border,
-// one accent at most: the amber dot of a class short of Equipment. The
-// trainer has a line of her own, so her name is never cut off.
+/** Rosa Emma (follow-up 284): Reformer 600, Mat 300, Cadillac 500. */
+const typeBar = (classTypeName: string): string =>
+  /cadillac/i.test(classTypeName)
+    ? "bg-tipo-cadillac"
+    : /mat/i.test(classTypeName)
+      ? "bg-tipo-mat"
+      : "bg-tipo-reformer";
+
+/** W2: «Daniela · 4 de 8», «Daniela · Llena · 3 en espera». */
+const gridLine = (session: Session): string => {
+  const firstName = session.trainerName.split(" ")[0] ?? session.trainerName;
+  const places =
+    session.bookedCount >= session.capacity
+      ? occupancy(session)
+      : `${session.bookedCount} de ${session.capacity}`;
+  return `${firstName} · ${places}`;
+};
+
+// Rosa Emma (RW-horario): every standing block is a white card with the
+// class type's colour bar, one accent at most: the dot of a class short of
+// Equipment. W2 (verification 2026-11-20): in the week grid two lines, the
+// type, then the trainer's first name and the places; the day list keeps
+// the time, her photo and full name.
 function StandingBlock({
   session,
   onOpen,
   short,
+  layout,
   className,
   style,
 }: {
   session: Session;
   onOpen: (session: Session) => void;
   short: boolean;
+  layout: "grid" | "list";
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -144,6 +167,46 @@ function StandingBlock({
   const start = boliviaParts(session.startsAt).time;
   const end = boliviaParts(session.endsAt).time;
 
+  if (layout === "grid") {
+    return (
+      <button
+        type="button"
+        aria-label={sessionLabel(session, flag)}
+        onClick={() => onOpen(session)}
+        style={style}
+        className={cn(
+          "flex w-full items-stretch gap-1.5 overflow-hidden rounded-panel bg-superficie py-1.5 pr-2 pl-1.5 text-left text-texto shadow-tarjeta transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco",
+          className,
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className={cn(
+            "w-1 shrink-0 rounded-full",
+            typeBar(session.classTypeName),
+          )}
+        />
+        <span className="flex min-w-0 flex-col gap-px">
+          <span
+            data-line=""
+            className="flex items-center gap-1.5 text-nota leading-tight font-bold break-words"
+          >
+            {flag === undefined ? null : <EquipmentDot />}
+            {session.classTypeName}
+          </span>
+          <span
+            data-line=""
+            className="truncate text-pie leading-tight tabular"
+          >
+            {gridLine(session)}
+          </span>
+        </span>
+      </button>
+    );
+  }
+
+  // RW-horario-420: a white card with the type's bar, the start in Lora,
+  // then the type, the time, her photo and name, and the places.
   return (
     <button
       type="button"
@@ -151,40 +214,47 @@ function StandingBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-start gap-px overflow-hidden rounded-control border border-borde bg-blanco px-2 py-1 text-left text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full items-stretch gap-3 overflow-hidden rounded-tarjeta bg-superficie px-3.5 py-3 text-left text-texto shadow-tarjeta transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco",
         className,
       )}
     >
-      <span className="flex w-full items-center gap-1.5 text-ayuda leading-tight font-medium whitespace-nowrap xl:text-nota">
-        {flag === undefined ? null : <EquipmentDot />}
-        {session.classTypeName}
-      </span>
-      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto-secundario tabular">
-        {start} – {end}
-        {short ? (
-          <>
-            {" · "}
-            <span>{occupancy(session)}</span>
-          </>
-        ) : null}
-      </span>
-      <span className="flex w-full items-center text-ayuda leading-tight break-words text-texto-secundario">
-        {/* Follow-up 242: her photo leads her name, when she has one. */}
-        {session.trainerPhoto === null ? null : (
-          <StaffPhoto
-            name={session.trainerName}
-            photo={session.trainerPhoto}
-            size={20}
-            className="mr-1 shrink-0"
-          />
+      <span
+        aria-hidden="true"
+        className={cn(
+          "w-[5px] shrink-0 rounded-full",
+          typeBar(session.classTypeName),
         )}
-        <span className="min-w-0">{session.trainerName}</span>
+      />
+      <span className="font-serif text-[24px] leading-tight tabular">
+        {start}
       </span>
-      {short ? null : (
-        <span className="text-ayuda leading-tight text-texto-tenue tabular">
-          {occupancy(session)}
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="flex items-center gap-1.5 text-[16px] leading-tight font-bold">
+          {flag === undefined ? null : <EquipmentDot />}
+          {session.classTypeName}
         </span>
-      )}
+        <span className="text-nota leading-tight tabular">
+          {start} – {end}
+          {short ? ` · ${occupancy(session)}` : null}
+        </span>
+        <span className="flex items-center text-nota leading-tight break-words">
+          {/* Follow-up 242: her photo leads her name, when she has one. */}
+          {session.trainerPhoto === null ? null : (
+            <StaffPhoto
+              name={session.trainerName}
+              photo={session.trainerPhoto}
+              size={20}
+              className="mr-1 shrink-0"
+            />
+          )}
+          <span className="min-w-0">{session.trainerName}</span>
+        </span>
+        {short ? null : (
+          <span className="text-nota leading-tight tabular">
+            {occupancy(session)}
+          </span>
+        )}
+      </span>
     </button>
   );
 }
