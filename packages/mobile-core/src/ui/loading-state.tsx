@@ -3,12 +3,14 @@ import {
   AccessibilityInfo,
   Animated,
   Easing,
+  Image,
   StyleSheet,
   View,
   useWindowDimensions,
 } from "react-native";
 
 import logo from "../../assets/emma-logo.png";
+import { colors, shadows } from "./tokens";
 
 // Design follow-up 94: nothing for 400 ms, a 300 ms fade, then one breath every
 // 2.8 s between the rest and the top; still under Reduce Motion.
@@ -60,22 +62,29 @@ export function LoadingState({ label }: { label: string }) {
     return () => animation.stop();
   }, [opacity, reduceMotion, scale, visible]);
 
-  const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
+  // E-A12 (Rosa Emma): the logo on a white disc with the card shadow.
+  const tablet = windowWidth >= tabletMinimumWidth;
+  const disc = tablet ? 150 : 120;
+  const logoWidth = tablet ? 126 : 100;
   return (
     <View accessibilityLabel={label} accessibilityRole="progressbar" accessible style={styles.area}>
       {visible && reduceMotion !== undefined ? (
         // The accessible area above is the one element screen readers reach.
-        <Animated.Image
-          resizeMode="contain"
-          source={logo}
-          style={{
-            width: logoWidth,
-            height: Math.round(logoWidth * logoAspect),
-            opacity,
-            transform: [{ scale }],
-          }}
-          testID="loading-state-logo"
-        />
+        <Animated.View
+          style={[
+            styles.disc,
+            { borderRadius: disc / 2, height: disc, width: disc },
+            { opacity, transform: [{ scale }] },
+          ]}
+          testID="loading-state-disc"
+        >
+          <Image
+            resizeMode="contain"
+            source={logo}
+            style={{ width: logoWidth, height: Math.round(logoWidth * logoAspect) }}
+            testID="loading-state-logo"
+          />
+        </Animated.View>
       ) : null}
     </View>
   );
@@ -115,4 +124,10 @@ function useReduceMotion(): boolean | undefined {
 
 const styles = StyleSheet.create({
   area: { flex: 1, alignItems: "center", justifyContent: "center" },
+  disc: {
+    ...shadows.card,
+    alignItems: "center",
+    backgroundColor: colors.card,
+    justifyContent: "center",
+  },
 });
