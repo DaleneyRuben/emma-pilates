@@ -67,6 +67,23 @@ describe("the admin web theme", () => {
     );
   });
 
+  it("gives each tipo class the family and weight of its style", () => {
+    for (const [style, { family, weight }] of Object.entries(typeScale)) {
+      const block =
+        new RegExp(`@utility tipo-${style} \\{([\\s\\S]*?)\\n\\}`).exec(
+          css,
+        )?.[1] ?? "";
+      expect([
+        style,
+        /font-family: var\(--font-(\w+)\)/.exec(block)?.[1],
+      ]).toEqual([style, family === "Lora" ? "serif" : "sans"]);
+      expect([style, /font-weight: (\d+)/.exec(block)?.[1]]).toEqual([
+        style,
+        String(weight),
+      ]);
+    }
+  });
+
   it("leaves the family and weight of headings to their tipo class", () => {
     const headings = /h1,\s*h2,\s*h3\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
     expect(headings).not.toMatch(/font-(family|weight)/);
