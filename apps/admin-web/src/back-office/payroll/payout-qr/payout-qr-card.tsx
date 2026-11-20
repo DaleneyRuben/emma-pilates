@@ -134,7 +134,7 @@ export function PayoutQrCard({
           >
             <BodyScrollLock />
             <div className="flex w-full items-center gap-3">
-              <Dialog.Title className="flex-1 font-display text-titulo-panel">
+              <Dialog.Title className="flex-1 font-serif text-titulo-panel">
                 {label}
               </Dialog.Title>
               <Dialog.Close aria-label="Cerrar" className={closeButtonClass}>
