@@ -16,6 +16,7 @@ executionOrder:
     - administrator-pending-payments
     - administrator-view-as
     - assistant-client-search
+    - assistant-today
     - coordinator-client-search
     - nutritionist-availability
     - trainer-agenda-and-inbox

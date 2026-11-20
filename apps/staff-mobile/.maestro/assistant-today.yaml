@@ -1,0 +1,32 @@
+# Critical journey (E7 pick A): the Assistant opens on «Hoy en <sucursal>»
+# with the Client search on top, today's next class with who is coming, what
+# is still to do («Facturas por subir», «Cerrar caja»), and the later classes.
+# Read-only: «Cerrar caja» only opens the Caja tab.
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-today"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible: "Hoy en .*"
+    timeout: 15000
+- assertVisible:
+    id: "client-search-input"
+- extendedWaitUntil:
+    visible:
+      id: "today-cash-close"
+    timeout: 15000
+- assertVisible:
+    id: "today-invoices"
+- takeScreenshot: staff-assistant-today
+- tapOn:
+    id: "today-cash-close"
+- extendedWaitUntil:
+    visible: "¿Cuánto efectivo hay en la caja.*|Hoy no hubo pagos en efectivo|Caja cerrada"
+    timeout: 15000
+- takeScreenshot: staff-assistant-today-cash
