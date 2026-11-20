@@ -20,6 +20,8 @@ async function openBooking(bookingWindowDays: number | Promise<number>, routes: 
         )
       : base(input, init)) as typeof globalThis.fetch;
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "assistant")} />);
+  // E7 pick A: she opens on «Hoy»; Buscar clienta is the Clientas tab.
+  await fireEvent.press(await screen.findByTestId("tab-clients"));
   await waitFor(() => expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen());
   await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
   await waitFor(() =>

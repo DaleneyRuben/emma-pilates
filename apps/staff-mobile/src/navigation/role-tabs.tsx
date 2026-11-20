@@ -31,6 +31,7 @@ import { ClientSearchScreen } from "../assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "../assistant/confirm-cash-payment-screen";
 import { NewClientScreen } from "../assistant/new-client-screen";
 import { SelectPlanScreen } from "../assistant/select-plan-screen";
+import { TodayScreen } from "../assistant/today-screen";
 import { CashCloseScreen } from "../cash-close/cash-close-screen";
 import { ContactListScreen } from "../coordinator/contact-list-screen";
 import { ViewAsScreen } from "../impersonation/view-as-screen";
@@ -84,6 +85,7 @@ const taskRoutes: ReadonlySet<string> = new Set([
 // Every tab's root. The Assistant's Caja is Cerrar caja itself, a root that
 // keeps its bar although the Administrator opens it as a task from Pagos.
 const tabRoots: ReadonlySet<string> = new Set([
+  "Today",
   "Agenda",
   "MyPay",
   "Profile",
@@ -211,6 +213,14 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
     createBottomTabNavigator({
       ...tabConfig,
       screens: {
+        // E7 pick A: «Hoy» leads; a Client's file opens inside it on a phone.
+        TodayTab: {
+          screen: createNativeStackNavigator({
+            ...stackConfig,
+            screens: { Today: TodayScreen, ...clientScreens, ...sellingScreens },
+          }),
+          options: tabOptions("Hoy", "today", "Today"),
+        },
         ClientsTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,

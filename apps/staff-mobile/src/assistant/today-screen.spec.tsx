@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
+import { Dimensions } from "react-native";
+
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 import { assistant, assistantRoutes, minute, session } from "./assistant-fixtures";
@@ -126,5 +128,31 @@ describe("Hoy, the Assistant's first tab (E7 pick A)", () => {
     await fireEvent.press(await screen.findByText("Urubó"));
     await waitFor(() => expect(screen.getByLabelText("Hoy en Urubó")).toBeOnTheScreen());
     expect(await screen.findByTestId("today-session-session-urubo")).toBeOnTheScreen();
+  });
+});
+
+describe("Hoy on the Assistant's tablet", () => {
+  beforeEach(() => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
+  });
+
+  afterEach(async () => {
+    await cleanup();
+    clearMobileQueryCache();
+    jest.restoreAllMocks();
+  });
+
+  it("caps the day's width and opens a Client's file in Clientas' panel", async () => {
+    const screen = await openToday();
+
+    expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({ maxWidth: 640 });
+    await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Ver clienta Lucía Fernández" }),
+    );
+    await waitFor(() => expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen());
+    expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });
 });
