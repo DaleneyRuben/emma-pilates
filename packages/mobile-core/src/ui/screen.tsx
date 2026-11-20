@@ -1,5 +1,11 @@
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
-import { StyleSheet, type View, type ViewStyle } from "react-native";
+import {
+  ScrollView,
+  type ScrollViewProps,
+  StyleSheet,
+  type View,
+  type ViewStyle,
+} from "react-native";
 import {
   type Edge,
   SafeAreaInsetsContext,
@@ -70,10 +76,22 @@ export function Screen({ edges, style, ...props }: SafeAreaViewProps) {
 }
 
 /**
- * For a scroll view that holds the header band: it lets the band reach past
- * its edges to the screen's, as the boards draw it.
+ * For a scroll view that holds the header band: the scroll view itself
+ * reaches the screen's top and side edges and pads its content back, so the
+ * band scrolls with the content and is never clipped (Android scroll views
+ * clip whatever overflows them).
  */
-export const bandScroll = StyleSheet.create({ scroll: { overflow: "visible" } }).scroll;
+export function useBandScroll(): {
+  contentContainerStyle: ViewStyle;
+  style: ViewStyle;
+} {
+  const frame = useContext(ScreenFrameContext);
+  if (frame === null) return { contentContainerStyle: {}, style: {} };
+  return {
+    contentContainerStyle: { paddingHorizontal: frame.left, paddingTop: frame.top },
+    style: { marginHorizontal: -frame.left, marginTop: -frame.top },
+  };
+}
 
 const styles = StyleSheet.create({
   insideTabBar: { paddingBottom: 0 },
@@ -83,3 +101,15 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
 });
+
+/** A screen's scroll view whose content starts with the header band. */
+export function BandScrollView({ contentContainerStyle, style, ...props }: ScrollViewProps) {
+  const bleed = useBandScroll();
+  return (
+    <ScrollView
+      {...props}
+      contentContainerStyle={[bleed.contentContainerStyle, contentContainerStyle]}
+      style={[bleed.style, style]}
+    />
+  );
+}

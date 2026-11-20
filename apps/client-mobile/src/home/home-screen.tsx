@@ -14,7 +14,7 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
-  bandScroll,
+  BandScrollView,
   boliviaCivilDate,
   LoadingState,
   OutlinedButton,
@@ -30,7 +30,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { approvedFreeze } from "../booking/frozen-day";
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
@@ -166,10 +166,9 @@ export function HomeScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView
+      <BandScrollView
         contentContainerStyle={styles.content}
         refreshControl={refreshControl}
-        style={bandScroll}
         testID="home-scroll"
       >
         <HomeHeader
@@ -283,7 +282,7 @@ export function HomeScreen() {
             </>
           )}
         </ShortcutSection>
-      </ScrollView>
+      </BandScrollView>
       <PhonePrompt client={loadedProfile.data} />
     </Screen>
   );

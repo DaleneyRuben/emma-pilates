@@ -81,6 +81,7 @@ export function AuthenticationScreen({
       style={[styles.screen, footer !== undefined && footerScreen]}
     >
       <FormScrollView
+        band
         contentContainerStyle={styles.content}
         footer={footer === undefined ? undefined : <FooterPanel>{footer}</FooterPanel>}
       >

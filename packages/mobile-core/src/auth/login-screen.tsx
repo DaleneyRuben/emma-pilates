@@ -74,7 +74,7 @@ export function LoginScreen({
 
   return (
     <Screen style={styles.screen}>
-      <FormScrollView contentContainerStyle={styles.content}>
+      <FormScrollView band contentContainerStyle={styles.content}>
         {/* Rosa Emma C01/E-A01: the wordmark on the band, the form in a white
             card, and «Regístrate» in its own card under it. */}
         <View style={styles.main} testID="login-main">
