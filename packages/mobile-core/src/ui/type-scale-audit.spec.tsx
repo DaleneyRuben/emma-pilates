@@ -119,6 +119,7 @@ describe("offScaleTexts", () => {
         <>
           <TextInput {...fieldTextProps("")} placeholder="Nombre" />
           <TextInput {...fieldTextProps("Lucía")} />
+          <TextInput {...fieldTextProps("510", "cifra-grande")} accessibilityLabel="Contado" />
           <TextInput placeholder="Buscar" style={{ fontSize: 18 }} />
         </>,
       ),

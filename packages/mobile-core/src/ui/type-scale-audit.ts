@@ -83,9 +83,12 @@ function auditText(node: RenderedNode, ground: string | undefined, opacity: numb
 function auditField(node: RenderedNode): string[] {
   const style = StyleSheet.flatten(node.props.style as TextStyle) ?? {};
   const label = `field «${String(node.props.placeholder ?? node.props.accessibilityLabel ?? "")}»`;
+  const figure = textVariants["cifra-grande"];
+  const face =
+    (fieldFaces.has(String(style.fontFamily)) && style.fontSize === textVariants.cuerpo.fontSize) ||
+    (style.fontFamily === figure.fontFamily && style.fontSize === figure.fontSize);
   const onScale =
-    fieldFaces.has(String(style.fontFamily)) &&
-    style.fontSize === textVariants.cuerpo.fontSize &&
+    face &&
     style.fontWeight === undefined &&
     tones.has(String(style.color)) &&
     tones.has(String(node.props.placeholderTextColor)) &&
