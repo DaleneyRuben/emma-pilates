@@ -82,9 +82,9 @@ export const openReport = async (fetcher: ReturnType<typeof routeFetcher>) => {
   await waitFor(() => expect(screen.getByText("Reformer Intermedio")).toBeOnTheScreen());
   await fireEvent.press(screen.getByRole("button", { name: /^Reformer Intermedio,/ }));
   await waitFor(() =>
-    expect(screen.getByRole("button", { name: "Reportar una falla" })).toBeOnTheScreen(),
+    expect(screen.getByRole("button", { name: "Reportar una falla de equipo" })).toBeOnTheScreen(),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Reportar una falla" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Reportar una falla de equipo" }));
   return screen;
 };
 

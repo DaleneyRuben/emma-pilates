@@ -57,7 +57,9 @@ describe("Trainer agenda greeting and times", () => {
     });
   });
 
-  it("writes the agenda start and the roster time as «10:00 – 10:50»", async () => {
+  // E6: the roster's block gives the start with the class and, once it is
+  // over, the end, both in the 24-hour form.
+  it("writes the agenda start and the roster times as «10:00» and «10:50»", async () => {
     const screen = await renderTrainer();
 
     await waitFor(() => {
@@ -65,7 +67,8 @@ describe("Trainer agenda greeting and times", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates,/ }));
     await waitFor(() => {
-      expect(screen.getByText(/^Sopocachi · .* · 10:00 – 10:50$/)).toBeOnTheScreen();
+      expect(screen.getByText("10:00 · Reformer Pilates")).toBeOnTheScreen();
     });
+    expect(screen.getByText("TERMINÓ A LAS 10:50")).toBeOnTheScreen();
   });
 });

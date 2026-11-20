@@ -1,6 +1,6 @@
 # Critical journey: the Trainer records attendance after a class (S03). Needs
 # the five-minute Session seed.mjs leaves for Emma with Lucía booked; the
-# roster offers «Asistió» only once the class has ended, so the flow reopens
+# roster offers «Vino» only once the class has started, so the flow reopens
 # it every half minute until then. Runs last: nothing after it needs Emma.
 appId: ${APP_ID}
 env:
