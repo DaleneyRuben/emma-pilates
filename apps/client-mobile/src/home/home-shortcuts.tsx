@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
     fontWeight: "700",
-    lineHeight: 21,
   },
   tiles: { flexDirection: "row", gap: spacing.md },
 });

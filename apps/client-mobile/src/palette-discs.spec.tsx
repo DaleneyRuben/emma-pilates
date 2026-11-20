@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
 import type { ReferredClientDto } from "@pilates/api-contracts";
 
-import { EvaluationSlotPicker } from "./evaluations/evaluation-slot-picker";
+import { SoleNutritionist } from "./evaluations/evaluation-slot-picker";
 import { InvoiceDisclosure } from "./payments/invoice-disclosure";
 import { ReceiptRow } from "./payments/receipt-row";
 import { ReferredList } from "./payments/referral-parts";
@@ -57,7 +57,7 @@ describe("Client icons and initials in palette B", () => {
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 
-  it("draws the Nutritionist's initials on a Palo de rosa circle", async () => {
+  it("draws the Nutritionist's initials on a rosa profundo circle", async () => {
     const slot = {
       bookable: true,
       branchId: "branch-1",
@@ -71,7 +71,7 @@ describe("Client icons and initials in palette B", () => {
       startsAt: "2026-12-01T13:00:00.000Z",
     };
     const screen = await render(
-      <EvaluationSlotPicker days={[{ date: "2026-12-01", slots: [slot] }]} onPick={jest.fn()} />,
+      <SoleNutritionist days={[{ date: "2026-12-01", slots: [slot] }]} />,
     );
 
     const initials = screen.getByText("GF");
