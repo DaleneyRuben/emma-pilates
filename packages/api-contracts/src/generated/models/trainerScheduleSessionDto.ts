@@ -16,6 +16,8 @@ export interface TrainerScheduleSessionDto {
   capacity: number;
   /** @minimum 0 */
   bookedCount: number;
+  /** Who is coming, in booking order, by initials only (E1 B, the agenda hero) */
+  attendeeInitials: string[];
   /** @nullable */
   cancellation?: SessionCancellationSummaryDto | null;
 }

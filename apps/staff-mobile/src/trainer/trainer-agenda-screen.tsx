@@ -1,6 +1,5 @@
 import {
   getListTrainerScheduleQueryKey,
-  listTrainerSchedule,
   useGetCurrentStaffMemberProfile,
   useListTrainerSchedule,
   staffRoleLabel,
@@ -28,9 +27,10 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";
 import { dayHeading } from "../ui/session-time";
+import { useIsTablet } from "../ui/use-is-tablet";
 import { agendaHeading } from "./agenda-cancellations";
 import { AgendaDay } from "./agenda-day";
-import { requireOk } from "./require-ok";
+import { agendaDayQuery, useWeekClassCounts } from "./agenda-schedule-query";
 
 type TrainerAgendaNavigation = {
   navigate: (screen: "Roster", params: { sessionId: string }) => void;
@@ -39,6 +39,7 @@ type TrainerAgendaNavigation = {
 /**
  * S02 Mi agenda (v2): it opens on today and shows no past day, since
  * attendance is never corrected (owner, 2026-11-02); «Hoy» comes back to it.
+ * E1 B «La semana de un vistazo»: the strip counts each day's classes.
  */
 export function TrainerAgendaScreen() {
   const navigation = useNavigation<TrainerAgendaNavigation>();
@@ -51,14 +52,10 @@ export function TrainerAgendaScreen() {
   const params = { on: selectedDate, includeCancelled: true };
   const schedule = useListTrainerSchedule(params, {
     fetcher,
-    query: {
-      queryFn: ({ signal }) =>
-        listTrainerSchedule(params, { signal }, fetcher).then((response) =>
-          requireOk(response, "The agenda could not be loaded"),
-        ),
-      refetchOnMount: "always",
-    },
+    query: { queryFn: agendaDayQuery(selectedDate, fetcher).queryFn, refetchOnMount: "always" },
   });
+  const counts = useWeekClassCounts(dates, fetcher);
+  const tablet = useIsTablet();
   const queryKeys = [getListTrainerScheduleQueryKey()];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -77,7 +74,7 @@ export function TrainerAgendaScreen() {
   const week = (
     <View style={styles.week}>
       <View style={styles.weekTitle}>
-        <SectionTitle>Esta semana</SectionTitle>
+        <SectionTitle>Esta semana · clases por día</SectionTitle>
         <Pressable
           accessibilityLabel="Hoy"
           accessibilityRole="button"
@@ -90,6 +87,7 @@ export function TrainerAgendaScreen() {
         </Pressable>
       </View>
       <DayStrip
+        counts={counts}
         dates={dates}
         onSelect={setSelectedDate}
         selected={selectedDate}
@@ -127,43 +125,50 @@ export function TrainerAgendaScreen() {
         refreshControl={refreshControl}
         testID="agenda-scroll"
       >
-        {header}
-        {week}
-        {sessions.length === 0 ? (
-          <StateScreen
-            icon="calendar"
-            layout="inList"
-            note={isToday ? undefined : "Elige otro día de la semana o vuelve a tus clases de hoy."}
-            primaryAction={
-              isToday
-                ? undefined
-                : { label: "Ver mis clases de hoy", onPress: () => setSelectedDate(today) }
-            }
-            title={
-              isToday
-                ? "Hoy no tienes clases"
-                : `El ${dayHeading(selectedDate).toLowerCase().split(" ").slice(0, 2).join(" ")} no tienes clases`
-            }
-          />
-        ) : (
-          <View>
-            <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
-            <AgendaDay
-              isToday={isToday}
-              now={new Date()}
-              onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
-              sessions={sessions}
+        <View style={[styles.column, tablet && styles.tablet]} testID="agenda-column">
+          {header}
+          {week}
+          {sessions.length === 0 ? (
+            <StateScreen
+              icon="calendar"
+              layout="inList"
+              note={
+                isToday ? undefined : "Elige otro día de la semana o vuelve a tus clases de hoy."
+              }
+              primaryAction={
+                isToday
+                  ? undefined
+                  : { label: "Ver mis clases de hoy", onPress: () => setSelectedDate(today) }
+              }
+              title={
+                isToday
+                  ? "Hoy no tienes clases"
+                  : `El ${dayHeading(selectedDate).toLowerCase().split(" ").slice(0, 2).join(" ")} no tienes clases`
+              }
             />
-          </View>
-        )}
+          ) : (
+            <View>
+              <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
+              <AgendaDay
+                isToday={isToday}
+                now={new Date()}
+                onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
+                sessions={sessions}
+              />
+            </View>
+          )}
+        </View>
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
+  column: { gap: spacing.xl },
+  content: { paddingBottom: spacing.xl },
   screen: { gap: spacing.xl, paddingHorizontal: spacing.xlSm },
+  // E1 B on a tablet: a phone's column, centred, so the hero never stretches.
+  tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   // FIX-089: a secondary chip, Crema with a Rosa profundo outline.
   todayButton: {
     alignItems: "center",

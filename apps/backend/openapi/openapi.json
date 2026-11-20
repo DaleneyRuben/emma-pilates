@@ -12278,6 +12278,13 @@
             "type": "number",
             "minimum": 0
           },
+          "attendeeInitials": {
+            "description": "Who is coming, in booking order, by initials only (E1 B, the agenda hero)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "cancellation": {
             "nullable": true,
             "type": "object",
@@ -12295,7 +12302,8 @@
           "startsAt",
           "endsAt",
           "capacity",
-          "bookedCount"
+          "bookedCount",
+          "attendeeInitials"
         ]
       },
       "ClientPhotoDto": {
@@ -12337,12 +12345,18 @@
               "no_show"
             ],
             "nullable": true
+          },
+          "classNumber": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Her n-th class, counting earlier held classes she did not miss: 1 is her first class (E6 B)"
           }
         },
         "required": [
           "bookingId",
           "clientName",
-          "clientPhoto"
+          "clientPhoto",
+          "classNumber"
         ]
       },
       "TrainerSessionRosterDto": {
@@ -12366,6 +12380,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
           "bookings": {
             "type": "array",
             "items": {
@@ -12379,6 +12397,7 @@
           "branchName",
           "startsAt",
           "endsAt",
+          "capacity",
           "bookings"
         ]
       },

@@ -17,4 +17,9 @@ export interface TrainerRosterBookingDto {
   clientPhoto: ClientPhotoDto | null;
   /** @nullable */
   attendanceOutcome?: TrainerRosterBookingDtoAttendanceOutcome;
+  /**
+   * Her n-th class, counting earlier held classes she did not miss: 1 is her first class (E6 B)
+   * @minimum 1
+   */
+  classNumber: number;
 }

@@ -2,11 +2,24 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
+import { randomUUID } from 'node:crypto';
 import { findTrainerScheduleSessions } from '../../src/booking/trainer-schedule-sessions';
+import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
+import {
+  bookingClock as clock,
+  createClientWithSubscription,
+  createFixture,
+} from './booking-command-test-support';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
 } from './database-test-context';
+
+const asClient = (client: { accountId: string; clientId: string }) => ({
+  accountId: client.accountId,
+  authenticationSessionId: randomUUID(),
+  identity: { kind: 'client' as const, clientId: client.clientId },
+});
 
 const day = 24 * 60 * 60 * 1_000;
 
@@ -103,5 +116,38 @@ describe("The Trainer's agenda (FIX-042)", () => {
     expect(standingOnly.every((session) => session.cancellation === null)).toBe(
       true,
     );
+  });
+  // E1 B: the hero shows who is coming by initials only, in booking order.
+  it('tells who is coming to each class by initials, in booking order', async () => {
+    const fixture = await createFixture(prisma, { now: clock });
+    await prisma.client.update({
+      where: { id: fixture.clientId },
+      data: { name: 'Lucía Fernández Rojas' },
+    });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    await commands.create({ sessionId: fixture.sessionId }, asClient(fixture));
+    const second = await createClientWithSubscription(prisma);
+    await prisma.client.update({
+      where: { id: second.clientId },
+      data: { name: 'elena' },
+    });
+    await commands.create({ sessionId: fixture.sessionId }, asClient(second));
+    const session = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+    });
+
+    const sessions = await findTrainerScheduleSessions(prisma)({
+      trainerStaffMemberId: fixture.trainerId,
+      on: civilDay(session.startsAt),
+      includeCancelled: true,
+    });
+
+    expect(sessions).toEqual([
+      expect.objectContaining({
+        sessionId: fixture.sessionId,
+        bookedCount: 2,
+        attendeeInitials: ['LF', 'E'],
+      }),
+    ]);
   });
 });

@@ -19,7 +19,7 @@ export function TodayHero({
   title,
 }: {
   accessibilityLabel?: string;
-  /** Who is coming, by initials (owner 2026-11-19). */
+  /** Who is coming, by initials (owner 2026-11-19; E1 B, E7 A). */
   attendees?: readonly string[];
   detail?: string;
   now: Date;

@@ -183,6 +183,14 @@ export class TrainerScheduleSessionDto {
   @ApiProperty({ minimum: 0 })
   bookedCount!: number;
 
+  @ApiProperty({
+    type: String,
+    isArray: true,
+    description:
+      'Who is coming, in booking order, by initials only (E1 B, the agenda hero)',
+  })
+  attendeeInitials!: string[];
+
   @ApiPropertyOptional({
     type: () => SessionCancellationSummaryDto,
     nullable: true,
@@ -206,6 +214,13 @@ export class TrainerRosterBookingDto {
 
   @ApiPropertyOptional({ enum: ['attended', 'no_show'], nullable: true })
   attendanceOutcome!: 'attended' | 'no_show' | null;
+
+  @ApiProperty({
+    minimum: 1,
+    description:
+      'Her n-th class, counting earlier held classes she did not miss: 1 is her first class (E6 B)',
+  })
+  classNumber!: number;
 }
 
 export class TrainerSessionRosterDto {
@@ -223,6 +238,9 @@ export class TrainerSessionRosterDto {
 
   @ApiProperty({ format: 'date-time' })
   endsAt!: Date;
+
+  @ApiProperty({ minimum: 1 })
+  capacity!: number;
 
   @ApiProperty({ type: TrainerRosterBookingDto, isArray: true })
   bookings!: TrainerRosterBookingDto[];

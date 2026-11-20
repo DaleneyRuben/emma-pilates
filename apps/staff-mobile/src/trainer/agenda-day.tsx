@@ -10,14 +10,14 @@ import {
 import { StyleSheet, View } from "react-native";
 
 import { SessionRow } from "../ui/session-row";
-import { startTime } from "../ui/session-time";
+import { minutesLabel, startTime } from "../ui/session-time";
 import { causeLabel, cancelledReason } from "./agenda-cancellations";
 import { TodayHero } from "../ui/today-hero";
 import { splitNextClass } from "./next-class";
 
 /**
  * One day of Mi agenda (ClaseE, FIX-089): today's next class as the Palo de
- * rosa hero, the day's other classes as rows of one card, and the cancelled ones
+ * rosa hero with who is coming by initials (E1 B), the day's other classes as rows of one card, and the cancelled ones
  * folded at the end. A cancelled class opens nothing: no attendance to take.
  */
 export function AgendaDay({
@@ -43,7 +43,8 @@ export function AgendaDay({
       {next === undefined ? null : (
         <TodayHero
           accessibilityLabel={label(next)}
-          detail={next.branchName}
+          attendees={next.attendeeInitials}
+          detail={`${next.branchName} · ${minutesLabel(next.startsAt, next.endsAt)}`}
           now={now}
           onPress={() => onOpen(next.sessionId)}
           places={placesLabel(next.bookedCount, next.capacity)}
