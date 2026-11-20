@@ -27,14 +27,13 @@ import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
+import { BranchCard, useCashBranches } from "../ui/branch-chips";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { useCashBranches } from "../ui/branch-chips";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses } from "./assistant-format";
-import { BranchCard } from "./branch-card";
 import type { ClientContext } from "./client-overview-screen";
 import {
   FrontDeskReceiptCard,

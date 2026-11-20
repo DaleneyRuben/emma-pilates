@@ -1,8 +1,9 @@
-import { colors, FormScrollView, shadows, spacing } from "@pilates/mobile-core";
+import { FormScrollView } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 import { bodyScroll, FooterPanel } from "../ui/card-pieces";
+import { TabFooter } from "../ui/tab-footer";
 
 /**
  * Cerrar caja's body under its fixed band (E-S04 to E-S08): the cards scroll
@@ -20,7 +21,7 @@ export function CashCloseFrame({
 }) {
   const panel =
     footer === undefined ? undefined : root ? (
-      <View style={styles.tabFooter}>{footer}</View>
+      <TabFooter bleed={0}>{footer}</TabFooter>
     ) : (
       <FooterPanel bleed={0}>{footer}</FooterPanel>
     );
@@ -32,16 +33,3 @@ export function CashCloseFrame({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  tabFooter: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    gap: spacing.smLg,
-    paddingBottom: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.mdLg,
-  },
-});

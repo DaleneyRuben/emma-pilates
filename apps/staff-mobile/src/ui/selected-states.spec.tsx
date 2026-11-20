@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native";
 import { ChannelGrid } from "../assistant/channel-grid";
 import { DateTile, Pill } from "../nutritionist/availability-block-form-parts";
 import { UnitTiles } from "../trainer/report-fault-pieces";
-import { BranchChips } from "./branch-chips";
+import { BranchCard } from "./branch-chips";
 import { DayStrip, DayStripAction } from "./day-strip";
 import { FilterChips } from "./filter-chips";
 import { PersonRow } from "./person-row";
@@ -59,7 +59,7 @@ describe("Staff selected states", () => {
 
   it("draws the Branch chips the same way", async () => {
     const screen = await render(
-      <BranchChips
+      <BranchCard
         label="Sucursal"
         onSelect={noop}
         options={[
@@ -74,7 +74,7 @@ describe("Staff selected states", () => {
     expectSelected(screen.getByTestId("branch-a"), screen.getByText("Achumani"));
     expectUnselected(screen.getByTestId("branch-c"));
     expectTouchTarget(screen.getByTestId("branch-c"));
-    expect(screen.getByText("Sucursal")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(screen.getByText("Sucursal")).toHaveStyle({ fontFamily: "WorkSans_700Bold" });
   });
 
   it("draws the chosen day and the «Otra» chip the same way", async () => {

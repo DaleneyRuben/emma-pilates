@@ -1,9 +1,10 @@
 import { useGetCurrentStaffMemberProfile, useListBranches } from "@pilates/api-contracts";
-import { BodyText, Chip, colors, fontFamilies, spacing } from "@pilates/mobile-core";
+import { Chip, spacing, surfaces } from "@pilates/mobile-core";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { CardLabel } from "./card-pieces";
 
 type Branch = { id: string; name: string };
 
@@ -40,8 +41,12 @@ export function useCashBranches() {
   return { branch, options, select, isPending, isError, refetch };
 }
 
-// S10's Branch chips; shown only when there is a choice to make.
-export function BranchChips({
+/**
+ * The Branch chips on their own white card under an uppercase label (E-S04
+ * «Sucursal», E-P03 «Sucursal donde recibes el efectivo»); shown only when
+ * there is a choice to make.
+ */
+export function BranchCard({
   label,
   onSelect,
   options,
@@ -56,8 +61,8 @@ export function BranchChips({
 }) {
   if (options.length < 2) return null;
   return (
-    <View style={styles.branches}>
-      <BodyText style={styles.label}>{label}</BodyText>
+    <View style={styles.card}>
+      <CardLabel>{label}</CardLabel>
       <View style={styles.chips}>
         {options.map((branch) => (
           <Chip
@@ -74,12 +79,6 @@ export function BranchChips({
 }
 
 const styles = StyleSheet.create({
-  branches: { gap: spacing.sm },
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-  },
 });

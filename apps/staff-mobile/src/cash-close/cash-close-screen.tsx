@@ -11,11 +11,10 @@ import { useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CenteredCard } from "../assistant/assistant-layout";
-import { BranchCard } from "../assistant/branch-card";
 import { bodyScroll, taskEdges } from "../ui/card-pieces";
+import { BranchCard, useCashBranches } from "../ui/branch-chips";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { useCashBranches } from "../ui/branch-chips";
 import { RootHeader } from "../ui/root-header";
 import { useIsStackRoot } from "../ui/use-is-stack-root";
 import { CashCloseForm } from "./cash-close-form";
