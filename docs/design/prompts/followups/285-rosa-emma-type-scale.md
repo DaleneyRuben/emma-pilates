@@ -1,12 +1,14 @@
 # Follow-up — Rosa Emma type scale: 13 text styles for web and apps
 
-Una sola escala para la web y las dos apps, con los mismos nombres. Sale de las dos auditorías
-(`AUDITORIA-WEB.md`, `AUDITORIA-APPS.md`) y reemplaza los tamaños de la nota 284.
+Una sola escala para la web y las dos apps, con los mismos nombres. Sale de dos auditorías de tipografía
+hechas el 20/11 sobre el código de main y reemplaza los tamaños de la nota 284.
 
 Con una sola tinta (#93615D, y blanco sobre 600), la jerarquía depende solo del tamaño, el peso y la
 fuente. Por eso cada texto usa uno de estos estilos y nada más.
 
 ## Los estilos
+
+Trece estilos base y cuatro variantes con nombre (`boton-chico`, `compacto-600`, `enlace`, y el enlace dentro de una frase). Nada más.
 
 | Estilo | Fuente | Web | Apps | Peso | Interlineado | Extra | Para qué |
 |---|---|---|---|---|---|---|---|
@@ -34,7 +36,7 @@ La **etiqueta de un campo** usa `compacto` en 600 (14 · 600). Es la única vari
 
 1. **Lora solo para títulos y cifras.** Nunca para frases, pistas, mensajes vacíos ni errores: esos van en `cuerpo`.
 2. **Ningún texto por debajo de 12 px.**
-3. **Texto chico solo sobre blanco, 50 o 600.** Sobre el fondo 100, la banda 200 o un bloque 500 solo van `titulo-*`, `cifra*` y `destacado`. Cualquier otro texto va dentro de una tarjeta blanca.
+3. **Texto chico solo sobre blanco, crema, 50 o 600.** Sobre el fondo 100, la banda 200 o un bloque 500 solo van `titulo-*`, `cifra*` y `destacado`. Cualquier otro texto va dentro de una tarjeta blanca.
 4. **Un peso por estilo, y el peso no cambia con el estado.** Un chip, una pestaña o un segmento elegido cambia de fondo, no de peso.
 5. **Sin transparencia en el texto.** Un elemento deshabilitado se ve como contorno y lo explica con texto, nunca atenuado.
 6. **Pasar el cursor no cambia el color del texto.** Un enlace engrosa su subrayado. Un botón cambia de sombra: el fondo 600 se queda en 600.
@@ -45,7 +47,7 @@ La **etiqueta de un campo** usa `compacto` en 600 (14 · 600). Es la única vari
 ## Cómo se hace cumplir
 
 - **Web:**
-  - las 13 clases `tipo-*` en `index.css`, con la escala cerrada (`--text-*: initial`);
+  - las clases `tipo-*` (los 13 estilos y sus variantes) en `index.css`, con la escala cerrada (`--text-*: initial`);
   - un ESLint que prohíba tamaños, familias, pesos, interlineados, mayúsculas y colores sueltos;
   - una prueba de contraste con axe en Playwright, a 1440 y a 420 px.
 - **Apps:**
@@ -65,10 +67,16 @@ La **etiqueta de un campo** usa `compacto` en 600 (14 · 600). Es la única vari
 visible text: family, size, weight, colour, opacity, uppercase and the background under it. It fails
 on anything outside the scale. `cortes.cjs` flags text that falls outside a clipping box.
 
-Run them like this:
+Run them like this (from the repo root, with `apps/admin-web` dependencies installed):
 
     node design/v3/sistema/revisor/revisar.cjs app 390 design/v3/cliente/*.dc.html
-    node design/v3/sistema/revisor/revisar.cjs web 1440 design/v3/admin/<1440 boards>
+    node design/v3/sistema/revisor/revisar.cjs app 390 design/v3/equipo/*.dc.html
+    node design/v3/sistema/revisor/revisar.cjs web 1440 <design/v3/admin boards without -420>
+    node design/v3/sistema/revisor/revisar.cjs web 420 design/v3/admin/*-420.dc.html
+    node design/v3/sistema/revisor/cortes.cjs 390 844 design/v3/cliente/*.dc.html
+
+Both exit with code 1 when they find a problem. The system page mixes surfaces (its phone mock uses the
+app title size), so check it with `web 1000` and expect that one mock title to be reported.
 
 Approved by the owner on 2026-11-20. At export, all 556 boards measured 0 problems across 23,710
 texts. The coding PRs must enforce the same rules with lint rules and an automated contrast test.
