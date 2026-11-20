@@ -1,11 +1,11 @@
 import { Children, Fragment, isValidElement, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { Chevron } from "../ui/chevron";
+import { Text } from "../ui/text";
 import { TypeBar } from "../ui/type-bar";
 import { attendeesLabel, HeroAttendees } from "./hero-attendees";
-import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, surfaces, typography } from "../ui/tokens";
+import { colors, spacing, surfaces } from "../ui/tokens";
 
 /** The places of a class, «N de M» (FIX-089). */
 export function placesLabel(booked: number, capacity: number): string {
@@ -42,11 +42,23 @@ export function NextClassHero({
   const content = (
     <>
       <View style={styles.heroTop}>
-        <Text style={styles.heroEyebrow}>{eyebrow.toUpperCase()}</Text>
-        {places === undefined ? null : <Text style={styles.heroPlaces}>{places}</Text>}
+        <Text style={styles.heroEyebrow} tone="onDark" variant="etiqueta">
+          {eyebrow}
+        </Text>
+        {places === undefined ? null : (
+          <Text tone="onDark" variant="pastilla">
+            {places}
+          </Text>
+        )}
       </View>
-      <Text style={styles.heroTitle}>{title}</Text>
-      {detail === undefined ? null : <Text style={styles.heroDetail}>{detail}</Text>}
+      <Text tone="onDark" variant="titulo-bloque">
+        {title}
+      </Text>
+      {detail === undefined ? null : (
+        <Text tone="onDark" variant="cuerpo">
+          {detail}
+        </Text>
+      )}
       <HeroAttendees initials={attendees} />
     </>
   );
@@ -142,21 +154,22 @@ export function ClassRow({
   const content = (
     <>
       <TypeBar name={typeName ?? title} />
-      <Text numberOfLines={1} style={styles.time} testID="class-row-time">
+      {/* No numberOfLines: at a large text size «08:00» grows, never «08:…». */}
+      <Text style={styles.time} testID="class-row-time" variant="cifra">
         {time}
       </Text>
       <View style={styles.body}>
-        <Text style={styles.title}>{title}</Text>
+        <Text variant="titulo-fila">{title}</Text>
         {detail === undefined ? null : (
           <View style={styles.detailLine}>
             {detailLead}
-            <Text numberOfLines={detailLines} style={styles.detail}>
+            <Text numberOfLines={detailLines} style={styles.detail} variant="secundario">
               {detail}
             </Text>
           </View>
         )}
       </View>
-      {end ?? (places === undefined ? null : <Text style={styles.places}>{places}</Text>)}
+      {end ?? (places === undefined ? null : <Text variant="pastilla">{places}</Text>)}
       {onPress === undefined ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
     </>
   );
@@ -208,8 +221,8 @@ export function CancelledFold({
         onPress={() => setOpen((current) => !current)}
         style={styles.foldLine}
       >
-        <Text style={styles.foldText}>{summary}</Text>
-        <Text style={styles.foldText}>{open ? "Ocultar" : "Ver"}</Text>
+        <Text variant="secundario">{summary}</Text>
+        <Text variant="enlace">{open ? "Ocultar" : "Ver"}</Text>
       </Pressable>
       {open ? children : null}
     </View>
@@ -218,12 +231,7 @@ export function CancelledFold({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs, minWidth: 0 },
-  detail: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
+  detail: { flexShrink: 1 },
   detailLine: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   divider: { backgroundColor: colors.hairline, height: 1 },
   fold: { gap: spacing.sm },
@@ -234,12 +242,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.xs,
   },
-  foldText: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-  },
   hero: { ...surfaces.emphasis, gap: spacing.smd, padding: spacing.xlSm },
   heroAction: {
     alignItems: "flex-end",
@@ -247,39 +249,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
   },
   heroWithAction: { ...surfaces.emphasis },
-  heroDetail: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  heroEyebrow: {
-    color: colors.onEmphasis,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-  },
-  heroPlaces: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
-  heroTitle: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.hero,
-  },
+  heroEyebrow: { flexShrink: 1 },
   heroTop: { flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
   list: { ...surfaces.card, overflow: "hidden" },
-  places: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
@@ -290,19 +262,6 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   standalone: { ...surfaces.card },
-  // The time in Lora 22 beside the type bar (Rosa Emma).
-  time: {
-    color: colors.text,
-    flexShrink: 0,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontVariant: ["tabular-nums"],
-    minWidth: 62,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
+  // The time in cifra beside the type bar (follow-up 285).
+  time: { flexShrink: 0, minWidth: 62 },
 });

@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { SessionCard } from "./session-card";
+import { Text } from "../ui/text";
 
 const hidden = { includeHiddenElements: true };
 
@@ -15,7 +15,7 @@ describe("SessionCard", () => {
       <SessionCard
         accessibilityLabel="Reformer Pilates 07:00 – 07:50"
         onPress={onPress}
-        tag={<Text>3 cupos</Text>}
+        tag={<Text variant="pastilla">3 cupos</Text>}
         time="07:00 – 07:50"
         title="Reformer Pilates"
         trainerName="Emma Vargas"
@@ -29,20 +29,20 @@ describe("SessionCard", () => {
       gap: 12,
       padding: 18,
     });
+    // Follow-up 285: the time in cifra, the class in titulo-fila.
     expect(screen.getByText("07:00 – 07:50")).toHaveStyle({
       color: "#93615D",
-      fontSize: 12,
+      fontFamily: "Lora_500Medium",
+      fontSize: 24,
       fontVariant: ["tabular-nums"],
-      fontWeight: "500",
-      letterSpacing: 1.2,
     });
     expect(screen.getByText("Reformer Pilates")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 16,
     });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
     const footer = screen.getByTestId("card-footer");
     expect(footer).toHaveStyle({ borderTopColor: "#E7CCBF", paddingTop: 12 });
@@ -60,7 +60,7 @@ describe("SessionCard", () => {
     const screen = await render(
       <SessionCard
         accessibilityLabel="Reformer Pilates 07:00 – 07:50"
-        footerEnd={<Text>3 cupos</Text>}
+        footerEnd={<Text variant="pastilla">3 cupos</Text>}
         onPress={() => undefined}
         selected
         time="07:00 – 07:50"
@@ -76,7 +76,7 @@ describe("SessionCard", () => {
     const footer = screen.getByTestId("card-footer");
     expect(footer).toHaveStyle({ borderTopColor: "#E7CCBF", paddingTop: 12 });
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
   });
 });
 
@@ -106,7 +106,7 @@ describe("SessionCard testID", () => {
         onPress={jest.fn()}
         time="08:00"
         title="Mat Pilates"
-        trainerFace={<Text>cara</Text>}
+        trainerFace={<Text variant="pastilla">cara</Text>}
         trainerName="Daniela Ortiz"
       />,
     );

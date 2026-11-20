@@ -5,13 +5,13 @@ import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { z } from "zod";
 
-import { BodyText } from "../ui/body-text";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { colors, spacing, surfaces } from "../ui/tokens";
+import { InlineError } from "../ui/inline-error";
+import { spacing, surfaces } from "../ui/tokens";
 import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
 
 const passwordSchema = z
@@ -143,9 +143,7 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
             )}
           />
           {failed ? (
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              No pudimos cambiar la contraseña. Inténtalo de nuevo.
-            </BodyText>
+            <InlineError>No pudimos cambiar la contraseña. Inténtalo de nuevo.</InlineError>
           ) : null}
         </View>
       </FormScrollView>
@@ -156,7 +154,6 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
 const styles = StyleSheet.create({
   // The fields on one white card (C23).
   card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lg },
-  failure: { color: colors.errorText },
   form: { paddingBottom: spacing.lg },
   screen: { gap: spacing.md },
 });

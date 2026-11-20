@@ -1,13 +1,14 @@
 import { useGetReferralCodeAvailability } from "@pilates/api-contracts";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Modal, ScrollView, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
+import { SheetTitle } from "../ui/sheet-title";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, shadows, spacing, typography } from "../ui/tokens";
+import { colors, radii, shadows, spacing } from "../ui/tokens";
 
 // The API's rule (BKM-017): 3 to 20 letters, digits or hyphens.
 const codePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
@@ -110,8 +111,8 @@ export function ReferralCodeSheet({
         >
           {confirmation === null ? null : (
             <View style={styles.sheet}>
-              <Text style={styles.title}>{`¿Cambiar tu código a ${code}?`}</Text>
-              <Text style={styles.body}>
+              <SheetTitle>{`¿Cambiar tu código a ${code}?`}</SheetTitle>
+              <Text variant="cuerpo">
                 {`Tu código anterior ${confirmation.current} dejará de funcionar. Las amigas que ya se registraron con él siguen contando para ti.`}
               </Text>
               <PrimaryButton
@@ -128,7 +129,7 @@ export function ReferralCodeSheet({
             </View>
           )}
           <View style={[styles.sheet, confirmation !== null && styles.hidden]}>
-            <Text style={styles.title}>Editar tu código</Text>
+            <SheetTitle>Editar tu código</SheetTitle>
             <View style={styles.field}>
               <FormField
                 autoCapitalize="characters"
@@ -137,13 +138,12 @@ export function ReferralCodeSheet({
                 label="Tu nuevo código"
                 maxLength={20}
                 onChangeText={(text) => onChangeCode(normalizeCode(text))}
-                style={styles.input}
                 testID="referral-code-input"
                 value={code}
               />
               {status === null ? null : <StatusLine status={status} />}
             </View>
-            <Text style={styles.note}>
+            <Text style={styles.note} variant="secundario">
               Usa de 3 a 20 letras, números o guiones. Puedes cambiarlo una vez cada 30 días.
             </Text>
             <PrimaryButton
@@ -161,32 +161,21 @@ export function ReferralCodeSheet({
 }
 
 function StatusLine({ status }: { status: CodeStatus }) {
-  const tone =
-    status === "available" ? styles.ok : status === "current" ? styles.quiet : styles.wrong;
   return (
     <View accessibilityLiveRegion="polite" style={styles.status}>
       {status === "available" ? (
         <Glyph color={colors.successText} name="check" size={16} strokeWidth={1.8} />
       ) : null}
-      <Text style={[styles.statusText, tone]}>{codeStatusText[status]}</Text>
+      <Text variant="secundario">{codeStatusText[status]}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
-  body: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   field: { gap: spacing.sm },
   hidden: { display: "none" },
-  input: { fontFamily: fontFamilies.display, fontSize: 22, letterSpacing: 2.6 },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
-  ok: { color: colors.successText },
-  quiet: { color: colors.textMuted },
+  note: { textAlign: "center" },
   scroll: { flexGrow: 1, justifyContent: "flex-end" },
   // E-F14: the white sheet with its 28 pt upper corners.
   sheet: {
@@ -200,12 +189,4 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
   },
   status: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  statusText: { fontFamily: fontFamilies.bodyBold, fontSize: 14, fontWeight: "700" },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 29,
-  },
-  wrong: { color: colors.errorText },
 });

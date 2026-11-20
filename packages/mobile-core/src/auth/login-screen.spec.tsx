@@ -17,7 +17,7 @@ describe("LoginScreen", () => {
   it("names Emma Pilates Studio without the tagline", async () => {
     const screen = await render(<LoginScreen onSubmit={jest.fn()} />);
 
-    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 34 });
+    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 30 });
     expect(screen.queryByText("Movimiento · Equilibrio · Bienestar")).toBeNull();
   });
 
@@ -36,9 +36,8 @@ describe("LoginScreen", () => {
       const band = screen.getByTestId("screen-header");
       expect(band).toHaveStyle({ backgroundColor: "#E7CCBF" });
       expect(band).toContainElement(screen.getByText("Emma Pilates Studio"));
-      expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({
-        fontSize: teamAccess ? 36 : 34,
-      });
+      // Follow-up 285: the wordmark is titulo-pagina in both apps.
+      expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 30 });
       expect(main).toContainElement(screen.getByTestId("login-submit"));
       expect(band).not.toContainElement(screen.getByTestId("login-submit"));
       if (teamAccess) {

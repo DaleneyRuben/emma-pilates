@@ -1,7 +1,4 @@
-import { StyleSheet, Text } from "react-native";
-
-import { fontFamilies } from "../ui/fonts";
-import { colors, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
 
 /**
  * The places of a class (follow-up 84, MOB-047; FIX-089): a normal state, so
@@ -16,17 +13,8 @@ export function SeatPill({
   testID?: string;
 }) {
   return (
-    <Text style={styles.label} testID={testID}>
+    <Text testID={testID} variant="pastilla">
       {children}
     </Text>
   );
 }
-
-const styles = StyleSheet.create({
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-});

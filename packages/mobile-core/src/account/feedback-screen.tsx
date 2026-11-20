@@ -1,17 +1,17 @@
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { Glyph } from "../ui/glyph";
+import { InlineError } from "../ui/inline-error";
 import { PrimaryButton } from "../ui/primary-button";
 import { StateScreen } from "../ui/state-screen";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import type { FeedbackMetadata } from "./feedback-metadata";
 import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
 import { useSendFeedback, type FeedbackType } from "./use-send-feedback";
@@ -39,7 +39,7 @@ function TypeChips({
 }) {
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>Tipo</Text>
+      <Text variant="compacto-600">Tipo</Text>
       <View style={styles.chips}>
         {types.map(([type, label]) => {
           const selected = type === value;
@@ -52,7 +52,9 @@ function TypeChips({
               onPress={() => onChange(type)}
               style={[styles.chip, selected && styles.chipSelected]}
             >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
+              <Text tone={selected ? "onDark" : "ink"} variant="compacto">
+                {label}
+              </Text>
             </Pressable>
           );
         })}
@@ -106,9 +108,7 @@ export function FeedbackScreen({
               {feedback.failure === null ? null : (
                 <View style={styles.failureBox}>
                   <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.6} />
-                  <BodyText accessibilityRole="alert" style={styles.failure}>
-                    {feedback.failure}
-                  </BodyText>
+                  <InlineError style={styles.failure}>{feedback.failure}</InlineError>
                 </View>
               )}
               <PrimaryButton
@@ -125,9 +125,9 @@ export function FeedbackScreen({
           revealEndWithKeyboard
         >
           <View style={styles.card}>
-            <BodyText>
+            <Text variant="cuerpo">
               Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.
-            </BodyText>
+            </Text>
             <TypeChips value={type} onChange={setType} />
             <View style={styles.field}>
               <FormField
@@ -142,8 +142,8 @@ export function FeedbackScreen({
                 value={text}
               />
               <View style={styles.counterRow}>
-                <Text style={styles.hint}>Mínimo 10 caracteres.</Text>
-                <Text style={styles.hint}>{`${text.length} / ${textLength.max}`}</Text>
+                <Text variant="secundario">Mínimo 10 caracteres.</Text>
+                <Text variant="secundario">{`${text.length} / ${textLength.max}`}</Text>
               </View>
             </View>
           </View>
@@ -170,16 +170,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
   },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  chipTextSelected: { color: colors.onPrimary },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   counterRow: { flexDirection: "row", justifyContent: "space-between" },
-  failure: { color: colors.errorText, flex: 1, fontSize: 14, lineHeight: 20 },
+  failure: { flex: 1 },
   // C25e: the day's limit on 50 with a 1.5 pt 400 rule, above the button.
   failureBox: {
     alignItems: "flex-start",
@@ -194,15 +187,6 @@ const styles = StyleSheet.create({
   },
   field: { gap: spacing.sm },
   form: { ...column, paddingBottom: spacing.lg },
-  hint: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
   screen: { gap: spacing.md },
   // Walkthrough finding 96: past 240 pt the field scrolls inside, so the row
   // under it stays above the keyboard.

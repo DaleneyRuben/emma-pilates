@@ -1,20 +1,25 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { ScrollView, Text } from "react-native";
+import { ScrollView } from "react-native";
 
 import { colors } from "../ui/tokens";
 import { usePullToRefresh } from "./pull-to-refresh";
+import { Text } from "../ui/text";
 
 function Probe({ queryFn }: { queryFn: () => Promise<string> }) {
   const bookings = useQuery({ queryKey: ["/api/v1/bookings"], queryFn });
   const refreshControl = usePullToRefresh([["/api/v1/bookings"]]);
   return (
     <ScrollView refreshControl={refreshControl} testID="probe-scroll">
-      <Text>{bookings.data ?? "loading"}</Text>
-      <Text>{refreshControl.props.refreshing ? "refreshing" : "idle"}</Text>
+      <Text variant="cuerpo">{bookings.data ?? "loading"}</Text>
+      <Text variant="cuerpo">{refreshControl.props.refreshing ? "refreshing" : "idle"}</Text>
       {/* RN's Jest mock drops the native control's props; the element keeps them. */}
-      <Text testID="tint">{String(refreshControl.props.tintColor)}</Text>
-      <Text testID="colors">{String(refreshControl.props.colors)}</Text>
+      <Text variant="cuerpo" testID="tint">
+        {String(refreshControl.props.tintColor)}
+      </Text>
+      <Text variant="cuerpo" testID="colors">
+        {String(refreshControl.props.colors)}
+      </Text>
     </ScrollView>
   );
 }

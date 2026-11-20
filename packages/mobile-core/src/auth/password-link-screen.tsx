@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
-import { BodyText } from "../ui/body-text";
+import { Text } from "../ui/text";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
@@ -154,7 +154,7 @@ export function PasswordLinkScreen({
   if (state === "loading") {
     return (
       <AuthenticationScreen staff={audience === "staff"} title="Comprobando enlace">
-        <BodyText>Estamos comprobando tu enlace seguro.</BodyText>
+        <Text variant="cuerpo">Estamos comprobando tu enlace seguro.</Text>
       </AuthenticationScreen>
     );
   }
@@ -171,10 +171,10 @@ export function PasswordLinkScreen({
         staff={staff}
         title="Tu cuenta está activa"
       >
-        <BodyText style={text}>
+        <Text variant="cuerpo" style={text}>
           Tu correo quedó verificado. Inicia sesión con tu correo y la contraseña que acabas de
           crear.
-        </BodyText>
+        </Text>
       </AuthenticationScreen>
     );
   }
@@ -188,7 +188,9 @@ export function PasswordLinkScreen({
         staff={staff}
         title="Esta invitación ya no está activa"
       >
-        <BodyText style={text}>{deadLinkCopy[audience].removed}</BodyText>
+        <Text variant="cuerpo" style={text}>
+          {deadLinkCopy[audience].removed}
+        </Text>
       </AuthenticationScreen>
     );
   }
@@ -215,11 +217,11 @@ export function PasswordLinkScreen({
         staff={staff}
         title="Este enlace ya no es válido"
       >
-        <BodyText style={text}>
+        <Text variant="cuerpo" style={text}>
           {activation
             ? deadLinkCopy[audience].expired
             : "Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola vez. Pide uno nuevo."}
-        </BodyText>
+        </Text>
       </AuthenticationScreen>
     );
   }
@@ -242,11 +244,11 @@ export function PasswordLinkScreen({
       staff={staff}
       title={activation ? "Crea tu contraseña" : "Crea una contraseña nueva"}
     >
-      <BodyText>
+      <Text variant="cuerpo">
         {activation
           ? "Elegir tu contraseña activa tu cuenta y confirma tu correo. Luego inicias sesión con ella."
           : "Elige una contraseña nueva para tu cuenta."}
-      </BodyText>
+      </Text>
       {failed ? <FormAlert>No pudimos guardar la contraseña. Inténtalo de nuevo.</FormAlert> : null}
       <Controller
         control={control}

@@ -1,8 +1,9 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Button, Text } from "react-native";
+import { Pressable } from "react-native";
 
 import { reportRecoveredError } from "../monitoring/error-reporting";
 import { MobileIdentityProvider, useMobileIdentity } from "./identity-provider";
+import { Text } from "../ui/text";
 
 jest.mock("../monitoring/error-reporting", () => ({ reportRecoveredError: jest.fn() }));
 
@@ -24,11 +25,19 @@ const failingManager = (failure: "hasBiometricSession" | "restore", error: Error
   unlockWithBiometrics: jest.fn(),
 });
 
+function ProbeButton({ onPress, title }: { onPress: () => void; title: string }) {
+  return (
+    <Pressable accessibilityLabel={title} accessibilityRole="button" onPress={onPress}>
+      <Text variant="boton">{title}</Text>
+    </Pressable>
+  );
+}
+
 function IdentityProbe() {
   const identity = useMobileIdentity();
 
   return (
-    <Text>
+    <Text variant="cuerpo">
       {identity.status}
       {identity.session === null ? "" : `:${identity.session.role}`}
     </Text>
@@ -41,12 +50,12 @@ function IdentityActionsProbe() {
 
   return (
     <>
-      <Text>{identity.status}</Text>
-      <Button onPress={() => void identity.refresh()} title="Refresh" />
-      <Text>{`acting:${acting}`}</Text>
-      <Button onPress={() => identity.start("new-credential")} title="Start" />
-      <Button onPress={() => identity.logout()} title="Logout" />
-      <Button onPress={() => identity.unlockWithBiometrics()} title="Unlock" />
+      <Text variant="cuerpo">{identity.status}</Text>
+      <ProbeButton onPress={() => void identity.refresh()} title="Refresh" />
+      <Text variant="cuerpo">{`acting:${acting}`}</Text>
+      <ProbeButton onPress={() => identity.start("new-credential")} title="Start" />
+      <ProbeButton onPress={() => identity.logout()} title="Logout" />
+      <ProbeButton onPress={() => identity.unlockWithBiometrics()} title="Unlock" />
     </>
   );
 }
@@ -216,9 +225,12 @@ describe("MobileIdentityProvider", () => {
 
       return (
         <>
-          <Text>{`${identity.status}|${identity.signOutNotice ?? "none"}`}</Text>
-          <Button onPress={() => identity.endClosedSession("Cerramos tu cuenta.")} title="Close" />
-          <Button onPress={() => identity.start("new-credential")} title="Start" />
+          <Text variant="cuerpo">{`${identity.status}|${identity.signOutNotice ?? "none"}`}</Text>
+          <ProbeButton
+            onPress={() => identity.endClosedSession("Cerramos tu cuenta.")}
+            title="Close"
+          />
+          <ProbeButton onPress={() => identity.start("new-credential")} title="Start" />
         </>
       );
     }

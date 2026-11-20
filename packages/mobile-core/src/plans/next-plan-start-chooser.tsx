@@ -1,8 +1,8 @@
 import { formatListDate } from "@pilates/api-contracts";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
-import { colors, spacing } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { spacing, surfaces } from "../ui/tokens";
 import { StartDateStrip } from "./start-date-chooser";
 import { addCivilDays, nextPlanStartOptions } from "./start-date-options";
 
@@ -32,19 +32,17 @@ export function NextPlanStartChooser({
   return (
     <View style={styles.block}>
       <StartDateStrip onSelect={onSelect} options={options} selected={selected} />
-      <Text style={styles.line}>
-        {`${currentPlan} vence el ${format(addCivilDays(firstDay, -1))}. El nuevo empieza el ${format(selected)}; se puede elegir hasta el ${format(last)}.`}
-      </Text>
+      {/* A sentence never sits straight on 100: its own white card (audit d6). */}
+      <View style={styles.lineCard} testID="next-plan-start-line">
+        <Text variant="cuerpo">
+          {`${currentPlan} vence el ${format(addCivilDays(firstDay, -1))}. El nuevo empieza el ${format(selected)}; se puede elegir hasta el ${format(last)}.`}
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   block: { gap: spacing.md },
-  line: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  lineCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
 });

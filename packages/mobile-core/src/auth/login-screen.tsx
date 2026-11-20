@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -9,14 +9,14 @@ import { emailHint, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
 import { ScreenHeader } from "../ui/screen-header";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 
 const loginSchema = z.object({
   email: z.email("Escribe un correo electrónico válido."),
@@ -86,7 +86,9 @@ export function LoginScreen({
           {notice === null ? null : (
             <View accessibilityRole="summary" style={styles.notice}>
               <Glyph color={colors.onEmphasis} name="check" size={20} strokeWidth={1.8} />
-              <Text style={styles.noticeText}>{notice}</Text>
+              <Text style={styles.noticeText} tone="onDark" variant="cuerpo">
+                {notice}
+              </Text>
             </View>
           )}
           <View style={styles.form}>
@@ -177,14 +179,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  noticeText: {
-    color: colors.onEmphasis,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 21,
-  },
+  noticeText: { flex: 1 },
   // A phone-width column, centred on a tablet instead of stretched.
   content: {
     alignSelf: "center",

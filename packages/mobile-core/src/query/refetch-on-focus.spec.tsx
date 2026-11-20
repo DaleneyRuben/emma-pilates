@@ -1,9 +1,9 @@
 import { NavigationContext } from "@react-navigation/native";
 import { act, render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Text } from "react-native";
 
 import { useRefetchOnFocus } from "./refetch-on-focus";
+import { Text } from "../ui/text";
 
 type Listener = () => void;
 
@@ -27,7 +27,7 @@ function fakeNavigation() {
 function Probe({ queryFn }: { queryFn: () => Promise<string> }) {
   const bookings = useQuery({ queryKey: ["/api/v1/bookings"], queryFn });
   useRefetchOnFocus([["/api/v1/bookings"]]);
-  return <Text>{bookings.data ?? "loading"}</Text>;
+  return <Text variant="cuerpo">{bookings.data ?? "loading"}</Text>;
 }
 
 describe("useRefetchOnFocus", () => {

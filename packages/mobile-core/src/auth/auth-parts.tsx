@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { ClockIcon } from "../ui/clock-icon";
-import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
 import { OutlinedButton } from "../ui/outlined-button";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { formatCountdown } from "./countdown";
 
 /** S01/S18 suggest the studio's own domain to the team (MOB-036). */
@@ -18,7 +18,9 @@ export function FormAlert({ children }: PropsWithChildren) {
   return (
     <View accessibilityRole="alert" accessible style={styles.alert} testID="form-alert">
       <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.6} />
-      <Text style={styles.alertText}>{children}</Text>
+      <Text style={styles.alertText} variant="cuerpo">
+        {children}
+      </Text>
     </View>
   );
 }
@@ -41,11 +43,13 @@ export function WaitNotice({
     <View style={[styles.notice, surface === "card" && styles.noticeOnCard]} testID="wait-notice">
       <ClockIcon testID="wait-notice-clock" />
       <View style={styles.noticeBody}>
-        <Text accessibilityRole="alert" style={styles.noticeText}>
+        <Text accessibilityRole="alert" variant="cuerpo">
           {message}
         </Text>
-        <Text style={styles.noticeWait}>
-          {`${waitLabel} ${formatCountdown(remainingSeconds)}.`}
+        {/* The time is the sentence's key datum: in weight, the rest regular. */}
+        <Text variant="cuerpo">
+          {`${waitLabel} `}
+          <Text variant="titulo-fila">{formatCountdown(remainingSeconds)}</Text>.
         </Text>
       </View>
     </View>
@@ -89,7 +93,7 @@ export function QuietButton({
       onPress={onPress}
       style={styles.quiet}
     >
-      <Text style={[styles.quietLabel, disabled && styles.disabledLabel]}>{label}</Text>
+      <Text variant="enlace">{label}</Text>
     </Pressable>
   );
 }
@@ -107,14 +111,14 @@ export function FooterPrompt({
   return (
     <View style={styles.footer}>
       <View style={styles.footerLine}>
-        <Text style={styles.footerPrompt}>{prompt}</Text>
+        <Text variant="cuerpo">{prompt}</Text>
         <Pressable
           accessibilityLabel={action}
           accessibilityRole="button"
           hitSlop={spacing.md}
           onPress={onPress}
         >
-          <Text style={styles.footerAction}>{action}</Text>
+          <Text variant="enlace-cuerpo">{action}</Text>
         </Pressable>
       </View>
     </View>
@@ -122,30 +126,14 @@ export function FooterPrompt({
 }
 
 const styles = StyleSheet.create({
-  disabledLabel: {
-    color: colors.disabledText,
-  },
   quiet: {
     alignItems: "center",
     justifyContent: "center",
     minHeight: 44,
     paddingHorizontal: spacing.sm,
   },
-  quietLabel: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-  },
   footer: {
     alignItems: "center",
-  },
-  footerAction: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationColor: colors.text,
-    textDecorationLine: "underline",
   },
   footerLine: {
     alignItems: "center",
@@ -154,11 +142,6 @@ const styles = StyleSheet.create({
     gap: spacing.smd,
     justifyContent: "center",
     minHeight: 24,
-  },
-  footerPrompt: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
   },
   // C01e: the failure on 50 with a 1.5 pt 400 rule, said in words.
   alert: {
@@ -172,13 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  alertText: {
-    color: colors.errorText,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  alertText: { flex: 1 },
   // C01t, C20l: the wait on the soft inset, its time in weight.
   notice: {
     ...surfaces.soft,
@@ -199,19 +176,5 @@ const styles = StyleSheet.create({
   noticeBody: {
     flex: 1,
     gap: 2,
-  },
-  noticeText: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  noticeWait: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "600",
-    lineHeight: 20,
   },
 });

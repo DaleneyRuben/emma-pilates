@@ -97,9 +97,10 @@ describe("Registration form summary", () => {
       backgroundColor: "#93615D",
       minHeight: 38,
     });
+    // Follow-up 285: a chip is compacto, chosen or not; only ground and tone change.
     expect(screen.getByText("Instagram")).toHaveStyle({
       color: "#FFFBFB",
-      fontFamily: "WorkSans_700Bold",
+      fontFamily: "WorkSans_400Regular",
     });
     expect(screen.getByRole("radio", { name: "TikTok" })).toHaveStyle({
       backgroundColor: "#FFFBFB",

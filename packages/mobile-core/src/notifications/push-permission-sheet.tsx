@@ -1,10 +1,11 @@
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
+import { SheetTitle } from "../ui/sheet-title";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, shadows, spacing, typography } from "../ui/tokens";
+import { colors, radii, shadows, spacing } from "../ui/tokens";
 
 // ADR-0067: the project's own explanation; only its yes opens the system
 // prompt. Design follow-up 91 refines the sheet; the Rosa Emma boards «CP»
@@ -31,10 +32,10 @@ export function PushPermissionSheet({
           <View style={styles.disc} testID="push-permission-disc">
             <Glyph color={colors.text} name="bell" size={32} strokeWidth={1.5} />
           </View>
-          <Text accessibilityRole="header" style={styles.title}>
-            {title}
+          <SheetTitle style={styles.centered}>{title}</SheetTitle>
+          <Text style={styles.reason} variant="cuerpo">
+            {reason}
           </Text>
-          <Text style={styles.reason}>{reason}</Text>
           <View style={styles.actions}>
             <PrimaryButton
               label="Activar notificaciones"
@@ -51,6 +52,7 @@ export function PushPermissionSheet({
 
 const styles = StyleSheet.create({
   actions: { alignSelf: "stretch", marginTop: spacing.md },
+  centered: { textAlign: "center" },
   backdrop: {
     backgroundColor: colors.scrim,
     flex: 1,
@@ -70,10 +72,6 @@ const styles = StyleSheet.create({
   },
   handle: { backgroundColor: colors.band, borderRadius: radii.pill, height: 5, width: 40 },
   reason: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
     paddingHorizontal: spacing.md,
     textAlign: "center",
   },
@@ -87,11 +85,5 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.md,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 24,
-    textAlign: "center",
   },
 });

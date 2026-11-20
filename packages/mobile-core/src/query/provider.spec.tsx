@@ -8,17 +8,17 @@ import {
   useIsRestoring,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Text } from "react-native";
 
 import { createMobilePersister, getPersistedCacheKey, persistedCacheVersion } from "./persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./provider";
+import { Text } from "../ui/text";
 
 let providedClient: QueryClientType | undefined;
 
 function QueryClientProbe() {
   providedClient = useQueryClient();
 
-  return <Text>query client available</Text>;
+  return <Text variant="cuerpo">query client available</Text>;
 }
 
 function RestoredBookingsProbe() {
@@ -27,7 +27,7 @@ function RestoredBookingsProbe() {
   providedClient = client;
 
   return (
-    <Text>
+    <Text variant="cuerpo">
       {restoring ? "restoring" : JSON.stringify(client.getQueryData(["/api/v1/bookings"]) ?? null)}
     </Text>
   );

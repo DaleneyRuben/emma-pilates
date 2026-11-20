@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react-native";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
+import { Text } from "../ui/text";
 import { ClassHistoryList } from "./class-history-list";
 
 const entry = (
@@ -35,11 +36,11 @@ describe("ClassHistoryList", () => {
   it("opens with the lead and the count since the oldest month on the hero", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
-    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#FFFBFB", fontSize: 14 });
+    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#FFFBFB", fontSize: 15 });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({
       color: "#FFFBFB",
-      fontFamily: "Lora_400Regular",
-      fontSize: 28,
+      fontFamily: "Lora_500Medium",
+      fontSize: 22,
     });
     expect(screen.getByTestId("class-history-summary")).toHaveStyle({
       backgroundColor: "#93615D",
@@ -51,10 +52,17 @@ describe("ClassHistoryList", () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     const heading = screen.getByText("Agosto 2026");
-    expect(heading).toHaveStyle({ fontSize: 12, fontWeight: "700", textTransform: "uppercase" });
+    expect(heading).toHaveStyle({
+      fontFamily: "WorkSans_700Bold",
+      fontSize: 12,
+      textTransform: "uppercase",
+    });
     expect(heading.parent).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(heading.parent?.parent).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
-    expect(screen.getByText("2 clases")).toHaveStyle({ color: "#93615D", fontWeight: "700" });
+    expect(screen.getByText("2 clases")).toHaveStyle({
+      color: "#93615D",
+      fontFamily: "WorkSans_700Bold",
+    });
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
   });
 
@@ -71,10 +79,12 @@ describe("ClassHistoryList", () => {
     expect(flat(rows[1])).toMatchObject({ borderBottomColor: "#F9E7DF", borderBottomWidth: 1 });
     expect(flat(rows[2])).not.toHaveProperty("borderBottomWidth");
 
-    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
+    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 24 });
+    // Board C05d: the weekday under the day is a spaced capital label («SÁB»).
     expect(screen.getByText("sáb")).toHaveStyle({
       color: "#93615D",
-      fontWeight: "700",
+      fontFamily: "WorkSans_700Bold",
+      fontSize: 12,
       textTransform: "uppercase",
     });
     expect(screen.getByText("Mat Pilates")).toHaveStyle({
@@ -83,7 +93,7 @@ describe("ClassHistoryList", () => {
     });
     expect(screen.getByText("Daniela Ortiz · Urubó")).toHaveStyle({
       color: "#93615D",
-      fontSize: 14,
+      fontSize: 13,
     });
   });
 
@@ -100,7 +110,7 @@ describe("ClassHistoryList", () => {
       <ClassHistoryList
         entries={history}
         lead="Has asistido a"
-        trainerFace={(item) => <Text>{`cara de ${item.trainerName}`}</Text>}
+        trainerFace={(item) => <Text variant="secundario">{`cara de ${item.trainerName}`}</Text>}
       />,
     );
 

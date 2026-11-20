@@ -1,10 +1,10 @@
 import type { NotificationDto } from "@pilates/api-contracts";
 import { Fragment } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
 import { notificationTopicIcon } from "./notification-topic";
 
@@ -40,7 +40,7 @@ function ActionLink({ action }: { action: NotificationAction }) {
       onPress={action.onPress}
       style={styles.action}
     >
-      <Text style={styles.actionLabel}>{action.label}</Text>
+      <Text variant="enlace-secundario">{action.label}</Text>
     </Pressable>
   );
 }
@@ -83,13 +83,18 @@ function NotificationRow({
         </View>
         <View style={styles.body}>
           <View style={styles.headline}>
-            <Text style={[styles.title, unread && styles.titleNew]}>{notification.title}</Text>
+            {/* The same weight read or not: the dot and the 600 disc say it's new. */}
+            <Text style={styles.title} variant="titulo-fila">
+              {notification.title}
+            </Text>
             <View style={styles.when}>
-              <Text style={styles.time}>{formatNotificationTime(notification.createdAt, now)}</Text>
+              <Text variant="secundario">
+                {formatNotificationTime(notification.createdAt, now)}
+              </Text>
               {unread ? <View style={styles.dot} testID="notification-new-dot" /> : null}
             </View>
           </View>
-          <Text style={styles.message}>{message}</Text>
+          <Text variant="secundario">{message}</Text>
         </View>
       </Pressable>
       {action === null ? null : <ActionLink action={action} />}
@@ -144,14 +149,6 @@ export function NotificationGroup({
 
 const styles = StyleSheet.create({
   action: { alignSelf: "flex-start", marginLeft: iconSize + spacing.md, paddingVertical: 2 },
-  actionLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationColor: colors.text,
-    textDecorationLine: "underline",
-  },
   body: { flex: 1, gap: 3 },
   divider: { backgroundColor: colors.hairline, height: 1 },
   dot: { backgroundColor: colors.primary, borderRadius: radii.pill, height: 8, width: 8 },
@@ -168,22 +165,7 @@ const styles = StyleSheet.create({
   iconNew: { backgroundColor: colors.emphasis },
   iconRead: { backgroundColor: colors.primaryTint },
   main: { flexDirection: "row", gap: spacing.md },
-  message: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body - 1,
-    lineHeight: 20,
-  },
   row: { gap: spacing.sm, minHeight: 60, paddingHorizontal: spacing.lg, paddingVertical: 14 },
-  time: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.label },
-  title: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
-  },
-  // New notices say it in weight as well as the dot (FIX-089: no tinted row).
-  titleNew: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
+  title: { flex: 1 },
   when: { alignItems: "center", flexDirection: "row", flexShrink: 0, gap: spacing.smd },
 });
