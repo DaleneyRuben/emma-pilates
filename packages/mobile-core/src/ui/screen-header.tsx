@@ -19,11 +19,11 @@ type Bleed = { left: number; top: number };
 function useBandBleed() {
   const frame = useContext(ScreenFrameContext);
   const band = useRef<View>(null);
-  const [bleed, setBleed] = useState<Bleed>(() => ({
-    left: frame?.left ?? 0,
-    top: frame?.top ?? 0,
-  }));
-  const minimumTop = frame?.top ?? 0;
+  const [measured, setMeasured] = useState<Bleed>({ left: 0, top: 0 });
+  const bleed: Bleed = {
+    left: Math.max(frame?.left ?? 0, measured.left),
+    top: Math.max(frame?.top ?? 0, measured.top),
+  };
 
   const onLayout = () => {
     const screen = frame?.ref.current;
@@ -31,20 +31,20 @@ function useBandBleed() {
     band.current.measureLayout(
       screen,
       (x, y) => {
-        setBleed((current) => {
-          const left = Math.max(0, x + current.left);
-          const top = Math.max(minimumTop, current.top, y + current.top);
-          return Math.abs(left - current.left) < 0.5 && Math.abs(top - current.top) < 0.5
-            ? current
-            : { left, top };
+        // Where the band would sit without its bleed, as measured now.
+        const naturalLeft = x + bleed.left;
+        const naturalTop = y + bleed.top;
+        setMeasured((current) => {
+          const left = Math.abs(naturalLeft - current.left) < 0.5 ? current.left : naturalLeft;
+          const top = naturalTop > current.top + 0.5 ? naturalTop : current.top;
+          return left === current.left && top === current.top ? current : { left, top };
         });
       },
       () => undefined,
     );
   };
 
-  const settled = frame === null ? null : { ...bleed, top: Math.max(bleed.top, minimumTop) };
-  return { band, bleed: settled, onLayout };
+  return { band, bleed: frame === null ? null : bleed, onLayout };
 }
 
 /**

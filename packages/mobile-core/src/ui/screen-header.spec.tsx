@@ -93,6 +93,22 @@ describe("ScreenHeader", () => {
     });
   });
 
+  it("reaches through its parent screen's top padding when nested in a pane", async () => {
+    const screen = await render(
+      <SafeAreaProvider initialMetrics={metrics}>
+        <Screen>
+          <Screen>
+            <ScreenHeader onBack={jest.fn()} title="Lucía Fernández" />
+          </Screen>
+        </Screen>
+      </SafeAreaProvider>,
+    );
+
+    expect(screen.getByTestId("screen-header")).toHaveStyle({
+      marginTop: -(spacing.lg + spacing.lg + 47),
+    });
+  });
+
   it("puts the eyebrow on a white capsule and an accessory at the end of the title", async () => {
     const screen = await render(
       <ScreenHeader
