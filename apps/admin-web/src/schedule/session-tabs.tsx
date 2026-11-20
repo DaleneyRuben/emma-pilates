@@ -62,7 +62,6 @@ export function SessionTabs({
             className={cn(
               segmentClass,
               segmentCompactClass,
-              segmentCompactClass,
               "shrink-0",
               selected && segmentCurrentClass,
             )}

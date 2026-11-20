@@ -86,7 +86,9 @@ export function PromotionImageField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label>Imagen</Label>
+      <Label asChild>
+        <span>Imagen</span>
+      </Label>
       <input
         ref={input}
         type="file"
