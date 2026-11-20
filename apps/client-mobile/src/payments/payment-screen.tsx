@@ -12,6 +12,7 @@ import {
   EmphasisCard,
   fontFamilies,
   FormScrollView,
+  Glyph,
   invoiceChoiceFrom,
   invoiceDataPayload,
   invoiceIncompleteNote,
@@ -19,9 +20,11 @@ import {
   LoadingState,
   PrimaryButton,
   QueryFailure,
+  radii,
   Screen,
   ScreenTopBar,
   SectionTitle,
+  shadows,
   spacing,
   surfaces,
   typography,
@@ -185,12 +188,16 @@ export function PaymentScreen() {
           </View>
         </View>
         {error === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.error}>
-            {error}
-          </BodyText>
+          <View style={styles.errorBox}>
+            <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
+            <BodyText accessibilityRole="alert" style={styles.error}>
+              {error}
+            </BodyText>
+          </View>
         )}
       </FormScrollView>
-      <View style={styles.footer}>
+      {/* Rosa Emma C10: the button and its line on a white panel cast upward. */}
+      <View style={styles.footer} testID="payment-footer">
         {offReason === undefined ? (
           <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         ) : null}
@@ -210,21 +217,48 @@ export function PaymentScreen() {
 
 const styles = StyleSheet.create({
   amount: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 32,
+    fontSize: 34,
     fontVariant: ["tabular-nums"],
   },
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  error: { color: colors.errorText },
-  footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  content: { gap: spacing.md, paddingBottom: spacing.lg },
+  error: {
+    color: colors.errorText,
+    flex: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  // Rosa Emma C10e: a failure on 50 with its outline and glyph.
+  errorBox: {
+    alignItems: "flex-start",
+    backgroundColor: colors.errorSurface,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  // A white panel from edge to edge with the card shadow cast upward.
+  footer: {
+    ...shadows.footer,
+    backgroundColor: colors.card,
+    gap: spacing.sm,
+    marginHorizontal: -spacing.lg,
+    paddingBottom: spacing.mdLg,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.mdLg,
+  },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
+    fontFamily: fontFamilies.body,
     fontSize: typography.note,
     textAlign: "center",
-    fontFamily: fontFamilies.body,
   },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.lg, paddingBottom: 0 },
 });

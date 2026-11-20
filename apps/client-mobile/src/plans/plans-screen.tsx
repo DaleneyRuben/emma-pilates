@@ -4,7 +4,6 @@ import {
   type PlanDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   Chevron,
   colors,
   describePlanCardLabel,
@@ -14,6 +13,7 @@ import {
   QueryFailure,
   Screen,
   ScreenTopBar,
+  StateScreen,
   SectionTitle,
   spacing,
   surfaces,
@@ -66,9 +66,9 @@ const scarcityLine = (placesLeft: number) =>
 /**
  * Walkthrough n.º 13: the launch banner while the 15 % applies to this
  * Client, in the strong tone with the count when few places are left (C08b).
- * It never says «Fundadora» nor how many places there were. Palette B
- * (FIX-089): a Crema card with a plain icon; the strong tone is the screen's
- * one Palo de rosa hero, so it stays Crema under the Plan to renew (C3 A).
+ * It never says «Fundadora» nor how many places there were. Rosa Emma: a
+ * white card with a plain icon; the strong tone is the screen's one 600
+ * hero, so it stays white under the Plan to renew (C3 A).
  */
 function LaunchBanner({ placesLeft, quiet }: { placesLeft: number | null; quiet: boolean }) {
   const scarce = placesLeft !== null;
@@ -82,8 +82,8 @@ function LaunchBanner({ placesLeft, quiet }: { placesLeft: number | null; quiet:
       <Glyph
         color={strong ? colors.onEmphasis : colors.text}
         name={scarce ? "flame" : "tag"}
-        size={20}
-        strokeWidth={1.6}
+        size={strong ? 22 : 20}
+        strokeWidth={1.7}
       />
       <Text style={[styles.bannerText, strong && styles.bannerTextStrong]}>
         {scarce ? scarcityLine(placesLeft) : "Oferta por tiempo limitado · 15 % en tu plan"}
@@ -111,7 +111,7 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
           <Text style={styles.listPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
         )}
       </View>
-      <Chevron size={16} strokeWidth={1.5} tone="muted" />
+      <Chevron size={18} strokeWidth={1.7} tone="muted" />
     </Pressable>
   );
 }
@@ -149,7 +149,7 @@ export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
       ) : plans.isError || plans.data.status !== 200 ? (
         <QueryFailure label="No pudimos cargar los planes." onRetry={() => void plans.refetch()} />
       ) : plans.data.data.length === 0 ? (
-        <BodyText>Por ahora no hay planes disponibles.</BodyText>
+        <StateScreen layout="card" title="Por ahora no hay planes disponibles." />
       ) : (
         <PlanList
           onOpen={(planId) => navigation.navigate("PlanDetail", { planId })}
@@ -204,22 +204,28 @@ const styles = StyleSheet.create({
     ...surfaces.card,
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.smLg,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.mdLg,
   },
-  bannerStrong: { ...surfaces.emphasis, borderWidth: 0 },
+  bannerStrong: { ...surfaces.emphasis, padding: spacing.lgXl },
   bannerText: {
     color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
     fontWeight: "600",
+    lineHeight: 21,
   },
-  bannerTextStrong: { color: colors.onEmphasis },
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
-  list: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  bannerTextStrong: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
+  },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  list: { gap: spacing.md, paddingBottom: spacing.xxl },
   listPrice: {
     color: colors.text,
     fontFamily: fontFamilies.body,
@@ -228,15 +234,15 @@ const styles = StyleSheet.create({
   },
   planName: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.bodyMedium,
-    fontWeight: "500",
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
   },
   pressed: { opacity: 0.7 },
   price: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 18,
+    fontSize: typography.titleSecondary,
     fontVariant: ["tabular-nums"],
   },
   prices: { alignItems: "flex-end" },
@@ -245,11 +251,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 56,
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.smLg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
   screen: { gap: spacing.lg },
-  terms: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  terms: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
 });

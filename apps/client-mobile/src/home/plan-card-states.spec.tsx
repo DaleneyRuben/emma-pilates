@@ -95,7 +95,9 @@ describe("Inicio and Mi plan plan cards", () => {
     );
 
     const card = within(screen.getByTestId("home-plan-card"));
-    expect(card.getByText("12 clases · 13 restantes")).toBeOnTheScreen();
+    expect(card.getByText("12 clases")).toBeOnTheScreen();
+    expect(card.getByText("13")).toBeOnTheScreen();
+    expect(card.getByText("restantes")).toBeOnTheScreen();
     expect(card.getByText("12 del plan + 1 de regalo · vence el lun 30 nov")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Mi plan, 12 clases/ }));

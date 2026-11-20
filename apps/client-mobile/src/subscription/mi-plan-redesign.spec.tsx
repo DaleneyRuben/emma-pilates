@@ -59,16 +59,16 @@ describe("Mi plan, option A", () => {
   });
 
   // FIX-089: «Activo» is a normal state, said in words without a dot.
-  it("draws the plan on a Crema card with «Activo» in words and one detail line", async () => {
+  it("draws the plan as the 600 hero with «Activo» in words and one detail line", async () => {
     const screen = await openMiPlan(view());
 
     const hero = screen.getByTestId("subscription-hero");
-    expect(hero).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(hero).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 24 });
     const card = within(hero);
     expect(card.getByText("Trimestral 24 clases")).toBeOnTheScreen();
-    expect(card.getByText("Activo")).toHaveStyle({ color: "#93615D" });
+    expect(card.getByText("Activo")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
     expect(card.queryByTestId("subscription-status-dot")).toBeNull();
-    expect(card.getByText("25")).toHaveStyle({ color: "#93615D" });
+    expect(card.getByText("25")).toHaveStyle({ color: "#FFFBFB", fontSize: 56 });
     expect(card.getByText("clases restantes")).toBeOnTheScreen();
     expect(
       card.getByText(`24 del plan + 1 de regalo (campaña) · vence el ${formatCivilDate(endsOn)}`),
@@ -113,9 +113,9 @@ describe("Mi plan, option A", () => {
     const screen = await openMiPlan(view({ status: "expiring_soon" }));
 
     expect(screen.queryByText(/^Tu plan vence el/)).toBeNull();
-    // FIX-089: the exception is the one Rubor pill.
+    // Rosa Emma C12n: on the hero the exception is bold white words.
     const hero = within(screen.getByTestId("subscription-hero"));
-    expect(within(hero.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
+    expect(hero.getByText("Por vencer")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
   });
 
   it("shows the Freeze as one row that opens its detail", async () => {

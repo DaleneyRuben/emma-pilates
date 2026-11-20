@@ -19,7 +19,7 @@ describe("PaymentStatusView", () => {
     ["pending", "Tu pago está en revisión", "hourglass"],
     ["confirmed", "¡Pago confirmado!", "check"],
     ["rejected", "No pudimos confirmar tu pago", "alert"],
-  ] as const)("draws the %s state as the v2 block", async (state, title, icon) => {
+  ] as const)("draws the %s state with its title in the band", async (state, title, icon) => {
     const screen = await render(
       <PaymentStatusView
         endsOn="2026-12-01"
@@ -30,9 +30,13 @@ describe("PaymentStatusView", () => {
       />,
     );
 
-    expect(screen.getByRole("header", { name: title })).toHaveStyle({ fontSize: 24 });
-    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
-    expect(screen.getByTestId(`state-screen-icon-${icon}`, hidden)).toHaveProp("stroke", "#93615D");
+    // Rosa Emma C11: the band holds the Lora 30 title and the glyph on a white disc.
+    expect(screen.getByRole("header", { name: title })).toHaveStyle({ fontSize: 30 });
+    expect(screen.getByTestId("payment-status-disc")).toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(screen.getByTestId(`payment-status-icon-${icon}`, hidden)).toHaveProp(
+      "stroke",
+      "#93615D",
+    );
     expect(screen.getByTestId("payment-status-facts")).toBeOnTheScreen();
     expect(screen.getByText("12 clases")).toBeOnTheScreen();
   });

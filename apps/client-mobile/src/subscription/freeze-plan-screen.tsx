@@ -16,6 +16,7 @@ import {
   PrimaryButton,
   QueryFailure,
   radii,
+  shadows,
   Screen,
   ScreenTopBar,
   spacing,
@@ -185,9 +186,11 @@ export function FreezePlanScreen() {
       {header}
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {attempted && open ? <FormErrorSummary fields={missing} /> : null}
-        <BodyText style={styles.lead}>
-          Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
-        </BodyText>
+        <View style={styles.leadCard}>
+          <BodyText style={styles.lead}>
+            Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
+          </BodyText>
+        </View>
         {open ? (
           <>
             <Calendar
@@ -208,28 +211,34 @@ export function FreezePlanScreen() {
         {summary === null ? null : (
           <View style={styles.summary} testID="freeze-summary">
             <Text style={styles.range}>{summary.range}</Text>
-            <SummaryRow label="Días congelados" value={summary.days} />
-            <SummaryRow label="Tu plan vencerá el" value={summary.newEnd} />
+            <View style={styles.summaryRows}>
+              <SummaryRow label="Días congelados" value={summary.days} />
+              <View style={styles.hairline} />
+              <SummaryRow label="Tu plan vencerá el" value={summary.newEnd} />
+            </View>
             <Text style={styles.was}>{summary.was}</Text>
           </View>
         )}
-        <FormField
-          error={attempted && reason.trim().length === 0 ? "Falta este dato" : undefined}
-          label="Motivo"
-          maxLength={300}
-          onChangeText={setReason}
-          placeholder="Cuéntale a la administración por qué"
-          value={reason}
-        />
-        <View style={styles.info}>
-          <Glyph color={colors.primary} name="alert" size={16} strokeWidth={1.5} />
-          <Text style={styles.infoText}>
-            Si tienes reservas esos días, se cancelan al aprobarse y las clases vuelven a tu plan.
-          </Text>
+        <View style={styles.reasonCard}>
+          <FormField
+            error={attempted && reason.trim().length === 0 ? "Falta este dato" : undefined}
+            label="Motivo"
+            maxLength={300}
+            onChangeText={setReason}
+            placeholder="Cuéntale a la administración por qué"
+            value={reason}
+          />
+          <View style={styles.info}>
+            <Glyph color={colors.primary} name="alert" size={18} strokeWidth={1.7} />
+            <Text style={styles.infoText}>
+              Si tienes reservas esos días, se cancelan al aprobarse y las clases vuelven a tu plan.
+            </Text>
+          </View>
         </View>
         {message === null ? null : <Reason alert text={message} />}
       </ScrollView>
-      <View style={styles.footer}>
+      {/* Rosa Emma C12i: the button on a white panel cast upward. */}
+      <View style={styles.footer} testID="freeze-footer">
         <PrimaryButton
           busy={submitting}
           disabled={!open || submitting}
@@ -279,27 +288,40 @@ function Reason({
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg, paddingBottom: spacing.lg },
-  footer: { paddingBottom: spacing.sm, paddingTop: spacing.sm },
-  info: { alignItems: "flex-start", flexDirection: "row", gap: spacing.sm },
+  content: { gap: spacing.md, paddingBottom: spacing.lg },
+  // A white panel from edge to edge with the card shadow cast upward.
+  footer: {
+    ...shadows.footer,
+    backgroundColor: colors.card,
+    marginHorizontal: -spacing.lg,
+    paddingBottom: spacing.mdLg,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.mdLg,
+  },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  info: { alignItems: "flex-start", flexDirection: "row", gap: spacing.smLg },
   infoText: {
-    color: colors.textMuted,
+    color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.body,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: typography.note,
+    lineHeight: 19,
   },
-  lead: { color: colors.textMuted },
-  prompt: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
-  range: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleSmall },
+  lead: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  leadCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
+  prompt: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
+  range: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.section },
   reason: {
     alignItems: "flex-start",
     backgroundColor: colors.errorSurface,
+    borderColor: colors.borderSoft,
     borderRadius: radii.inset,
+    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.sm,
     padding: spacing.md,
   },
+  reasonCard: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   reasonText: {
     color: colors.errorText,
     flex: 1,
@@ -307,10 +329,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.lg, paddingBottom: 0 },
   summary: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
-  summaryLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  summaryRow: { flexDirection: "row", justifyContent: "space-between" },
-  summaryValue: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontSize: 14 },
-  was: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13, textAlign: "right" },
+  summaryLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  summaryRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  summaryRows: { backgroundColor: colors.card, borderRadius: radii.card, overflow: "hidden" },
+  summaryValue: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+  },
+  was: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "right",
+  },
 });

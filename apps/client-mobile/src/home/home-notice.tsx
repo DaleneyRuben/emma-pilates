@@ -6,9 +6,9 @@ import { promotionCardMaxWidth } from "./promotion-image";
 type Action = { busy?: boolean; label: string; onPress: () => void; testID: string };
 
 /**
- * Inicio's notice on top (C1 C and C8 A + C, owner 2026-11-19): one Palo de
- * rosa block with an uppercase eyebrow, a Lora title, Crema lines, and at
- * most one Crema button or a quiet Crema link.
+ * Inicio's notice on top (Rosa Emma C02c, C02d, C02g): the screen's 600 hero
+ * with an uppercase eyebrow, a Lora 26 title, white lines, and at most one
+ * white button or an underlined white link.
  */
 export function HomeNotice({
   action,
@@ -96,16 +96,16 @@ const styles = StyleSheet.create({
   block: { ...surfaces.emphasis, gap: spacing.smd, padding: spacing.xlSm },
   button: {
     alignItems: "center",
-    backgroundColor: colors.onEmphasis,
+    backgroundColor: colors.card,
     borderRadius: radii.button,
     justifyContent: "center",
-    marginTop: spacing.xs,
+    marginTop: spacing.smd,
     minHeight: 48,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.lgXl,
   },
   buttonLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
     fontWeight: "700",
   },
@@ -113,33 +113,43 @@ const styles = StyleSheet.create({
   capped: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   corner: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
     fontWeight: "700",
   },
   eyebrow: {
     color: colors.onEmphasis,
     flexShrink: 1,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
     fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
   },
   line: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.body,
     fontSize: 14,
-    fontWeight: "500",
     lineHeight: 20,
   },
-  link: { alignSelf: "flex-start", minHeight: 24 },
+  link: { alignSelf: "flex-start", marginTop: spacing.smd, minHeight: 24 },
   linkLabel: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
   pressed: { opacity: 0.85 },
-  title: { color: colors.onEmphasis, fontFamily: fontFamilies.display, fontSize: 26 },
-  top: { flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
+  title: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: 26,
+    lineHeight: 29,
+  },
+  top: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "space-between",
+  },
 });

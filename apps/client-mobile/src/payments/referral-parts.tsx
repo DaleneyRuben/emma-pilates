@@ -25,23 +25,25 @@ const steps = [
 ] as const;
 
 /**
- * C16's «Cómo funciona»: three plain lines and the limits line. FIX-082
- * (Invita option A): no numbered discs, no card.
+ * C16's «Cómo funciona» (Rosa Emma): three plain lines and the limits line in
+ * one white card, no numbered discs.
  */
 export function HowItWorks() {
   return (
     <View>
       <SectionTitle>Cómo funciona</SectionTitle>
-      <View style={styles.steps}>
-        {steps.map((step) => (
-          <Text key={step} style={styles.step}>
-            {step}
-          </Text>
-        ))}
+      <View style={styles.card} testID="referral-how-it-works">
+        <View style={styles.steps}>
+          {steps.map((step) => (
+            <Text key={step} style={styles.step}>
+              {step}
+            </Text>
+          ))}
+        </View>
+        <Text style={styles.limits}>
+          Una amiga por mes. La clase gratis es una sola vez para ella.
+        </Text>
       </View>
-      <Text style={styles.limits}>
-        Una amiga por mes. La clase gratis es una sola vez para ella.
-      </Text>
     </View>
   );
 }
@@ -65,28 +67,37 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
 }
 
 const styles = StyleSheet.create({
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  label: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
   limits: {
     color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
-    marginTop: spacing.md,
+    lineHeight: 18,
   },
   step: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: typography.body,
-    lineHeight: 22,
+    fontWeight: "500",
+    lineHeight: 21,
   },
-  steps: { gap: spacing.xxs },
+  steps: { gap: spacing.sm },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 56,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.smLg,
   },
   value: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
 });

@@ -4,7 +4,6 @@ import {
   fontFamilies,
   Glyph,
   PrimaryButton,
-  radii,
   spacing,
   surfaces,
   typography,
@@ -13,9 +12,11 @@ import * as Clipboard from "expo-clipboard";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 /**
- * Invita option A (FIX-082, design audit 2026-11-18): one Lino card with the
- * code in Lora and an outlined copy icon, «Compartir tu código» right under
- * it as the screen's one solid action, and «Editar código» centred below.
+ * Invita option A (FIX-082): one card with the code in Lora 38 and an
+ * outlined copy icon, «Compartir tu código» right under it as the screen's
+ * one solid action, and «Editar código» centred below. Rosa Emma C16 draws
+ * this card as the 600 hero; it stays white until the shared «Editar código»
+ * can be drawn in white on 600.
  */
 export function ReferralCodeCard({
   code,
@@ -54,7 +55,7 @@ export function ReferralCodeCard({
           onPress={() => void copy()}
           style={({ pressed }) => [styles.copy, pressed && styles.pressed]}
         >
-          <Glyph color={colors.text} name="copy" size={18} strokeWidth={1.6} />
+          <Glyph color={colors.text} name="copy" size={20} strokeWidth={1.7} />
         </Pressable>
       </View>
       <PrimaryButton label="Compartir tu código" onPress={onShare} />
@@ -67,32 +68,32 @@ export function ReferralCodeCard({
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lgXl },
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
   code: {
     color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.display,
-    fontSize: 34,
+    fontSize: 38,
     letterSpacing: 2,
-    lineHeight: 40,
+    lineHeight: 44,
   },
   codeRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   copy: {
     alignItems: "center",
     borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    borderRadius: 12,
+    borderWidth: 1.5,
     height: 44,
     justifyContent: "center",
     width: 44,
   },
   editRow: { flexDirection: "row", justifyContent: "center" },
   eyebrow: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   pressed: { opacity: 0.7 },

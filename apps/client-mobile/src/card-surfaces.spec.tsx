@@ -32,9 +32,8 @@ describe("Client card surfaces (MOB-039)", () => {
     clearMobileQueryCache();
   });
 
-  // FIX-082 (design audit 2026-11-18, Inicio option A): the Plan is a light
-  // Lino row; «Reservar una clase» is Inicio's one strong element.
-  it("draws Inicio's plan as a Lino card at radius 16", async () => {
+  // Rosa Emma C02: the Plan is a 500 count block beside a white card.
+  it("draws Inicio's plan as a white card at radius 20 beside the medio count", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
       "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
@@ -44,9 +43,13 @@ describe("Client card surfaces (MOB-039)", () => {
     await waitFor(() => {
       expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("home-plan-card")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderRadius: 16,
+    expect(screen.getByTestId("home-plan-summary")).toHaveStyle({
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
+    });
+    expect(screen.getByTestId("home-plan-count")).toHaveStyle({
+      backgroundColor: "#B78380",
+      borderRadius: 20,
     });
   });
 });

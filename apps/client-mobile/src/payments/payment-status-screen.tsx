@@ -1,13 +1,5 @@
 import { useGetCurrentClientSubscription, useGetCurrentPayment } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  LoadingState,
-  QueryFailure,
-  Screen,
-  ScreenTopBar,
-  spacing,
-} from "@pilates/mobile-core";
+import { LoadingState, QueryFailure, Screen, ScreenTopBar, spacing } from "@pilates/mobile-core";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 import { BackHandler, StyleSheet } from "react-native";
@@ -91,6 +83,7 @@ export function PaymentStatusScreen() {
       <PaymentStatusView
         busy={retrying}
         endsOn={active?.endsOn}
+        error={error}
         onHome={goHome}
         onPrimary={
           current.state === "confirmed"
@@ -104,16 +97,10 @@ export function PaymentStatusScreen() {
           current.state === "confirmed" || current.state === "rejected" ? current.state : "pending"
         }
       />
-      {error === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          {error}
-        </BodyText>
-      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  error: { color: colors.errorText, textAlign: "center" },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.lg, paddingBottom: 0 },
 });

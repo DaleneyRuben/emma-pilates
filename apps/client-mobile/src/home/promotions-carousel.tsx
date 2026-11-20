@@ -138,12 +138,10 @@ export function PromotionsCarousel({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    overflow: "hidden",
-  },
-  copy: { gap: spacing.smd, padding: spacing.lg },
-  description: { fontSize: typography.note, fontFamily: fontFamilies.body },
+  // Rosa Emma C02: a white card with the image inset at radius 16.
+  card: { ...surfaces.card, padding: spacing.md, paddingBottom: spacing.mdLg },
+  copy: { gap: spacing.sm, paddingTop: spacing.sm },
+  description: { fontFamily: fontFamilies.body, fontSize: 14 },
   descriptionPlaceholder: {
     backgroundColor: colors.divider,
     borderRadius: radii.control,
@@ -151,12 +149,12 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   dot: {
-    backgroundColor: colors.secondaryAccent,
+    backgroundColor: colors.borderStrong,
     borderRadius: radii.pill,
-    height: 6,
-    width: 6,
+    height: 8,
+    width: 8,
   },
-  dotActive: { backgroundColor: colors.primary, width: 18 },
+  dotActive: { backgroundColor: colors.primary, width: 22 },
   dots: {
     alignSelf: "center",
     flexDirection: "row",
@@ -165,15 +163,24 @@ const styles = StyleSheet.create({
   },
   // FIX-082 (Inicio option A): the promotion leads Inicio, so no section
   // label above it and its headline in the card title size.
-  headline: { fontSize: typography.titleCard, fontFamily: fontFamilies.heading },
+  headline: {
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    fontWeight: "400",
+  },
   headlinePlaceholder: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.control,
     height: 18,
     width: "60%",
   },
-  image: { aspectRatio: 16 / 9, backgroundColor: colors.primaryTint, width: "100%" },
-  imagePlaceholder: { aspectRatio: 16 / 9, backgroundColor: colors.primaryTint },
+  image: {
+    aspectRatio: 16 / 9,
+    backgroundColor: colors.primaryTint,
+    borderRadius: 16,
+    width: "100%",
+  },
+  imagePlaceholder: { aspectRatio: 16 / 9, backgroundColor: colors.primaryTint, borderRadius: 16 },
   scroller: { flexGrow: 0, marginHorizontal: -spacing.lg },
   section: { gap: spacing.md },
   track: { gap: cardGap, paddingHorizontal: spacing.lg },

@@ -36,10 +36,10 @@ export function InvoiceDisclosure({
         testID="invoice-disclosure"
       >
         <View style={styles.icon}>
-          <Glyph color={colors.text} name="receipt" size={20} strokeWidth={1.5} />
+          <Glyph color={colors.text} name="receipt" size={18} strokeWidth={1.7} />
         </View>
         <Text style={styles.label}>¿Necesitas factura?</Text>
-        <Chevron direction={open ? "up" : "down"} size={16} strokeWidth={1.5} tone="muted" />
+        <Chevron direction={open ? "up" : "down"} size={18} strokeWidth={1.7} tone="muted" />
       </Pressable>
       {open ? (
         <View style={styles.fields}>
@@ -76,14 +76,22 @@ export function InvoiceDisclosure({
 }
 
 const styles = StyleSheet.create({
-  // FIX-089: the glyph alone, no tinted disc.
-  icon: { alignItems: "center", justifyContent: "center", width: 24 },
+  // Rosa Emma C10: the glyph on a 36 pt 50 disc.
+  icon: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
   fields: { gap: spacing.md, paddingBottom: spacing.lg, paddingHorizontal: spacing.lg },
   label: {
     color: colors.text,
     flex: 1,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
   note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
@@ -91,7 +99,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 56,
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
 });

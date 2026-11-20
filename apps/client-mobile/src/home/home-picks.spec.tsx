@@ -121,7 +121,7 @@ describe("Client Inicio with a booked class (C7 A)", () => {
       "LM",
       "SP",
     ]);
-    expect(circles[0]).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(circles[0]).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 
   it("keeps «Reservar una clase» when nothing is booked", async () => {
@@ -146,7 +146,7 @@ describe("Client Inicio with a payment in review or rejected (C8 A + C)", () => 
     });
 
     const notice = await screen.findByTestId("home-payment-card");
-    expect(notice).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(notice).toHaveStyle({ backgroundColor: "#93615D" });
     expect(within(notice).getByText("TU PAGO ESTÁ EN REVISIÓN")).toBeOnTheScreen();
     expect(within(notice).getByText("Trimestral 24")).toBeOnTheScreen();
     expect(
@@ -184,11 +184,11 @@ describe("Client Inicio with a payment in review or rejected (C8 A + C)", () => 
       ),
     ).toBeOnTheScreen();
     expect(within(notice).getByRole("button", { name: "Subir otro comprobante" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
     });
     // The block holds the one solid action, so booking turns secondary.
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
     });
   });
 });
@@ -214,7 +214,7 @@ describe("Client Inicio with a frozen plan (C1 C)", () => {
     const screen = await openHome(frozen(addCivilDays(today, 1), addCivilDays(today, 3)));
 
     const notice = await screen.findByTestId("home-freeze-notice");
-    expect(notice).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(notice).toHaveStyle({ backgroundColor: "#93615D" });
     expect(within(notice).getByText("PLAN CONGELADO")).toBeOnTheScreen();
     expect(within(notice).getByText(/^Del /)).toBeOnTheScreen();
     const backDay = formatTitleDate(back).split(" de ")[0]!.toLowerCase();

@@ -14,15 +14,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 export type PlanNotice = { icon: GlyphName; text: string; note?: string };
 
 /**
- * Finding 54 (follow-up 259 A): Mi plan's notices as one list without a
- * coloured fill, an icon each, so the plan card stays the one focus.
+ * Finding 54 (follow-up 259 A, Rosa Emma C12n): Mi plan's notices as one
+ * white card, an icon on a 50 disc each, so the plan card stays the one focus.
  */
 export function NoticeList({ notices }: { notices: readonly PlanNotice[] }) {
   return (
     <View style={styles.notices} testID="subscription-notices">
       {notices.map((notice, index) => (
         <View key={notice.text} style={[styles.notice, index > 0 && styles.noticeRule]}>
-          <Glyph color={colors.primary} name={notice.icon} size={20} strokeWidth={1.5} />
+          <IconDisc icon={notice.icon} />
           <View style={styles.noticeBody}>
             <Text style={styles.noticeText}>{notice.text}</Text>
             {notice.note === undefined ? null : (
@@ -35,7 +35,15 @@ export function NoticeList({ notices }: { notices: readonly PlanNotice[] }) {
   );
 }
 
-/** «Tu plan»: renewing and freezing as Lino rows with a line under the label. */
+function IconDisc({ icon }: { icon: GlyphName }) {
+  return (
+    <View style={styles.disc}>
+      <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.7} />
+    </View>
+  );
+}
+
+/** «Tu plan»: renewing and freezing as rows of a white card. */
 export function ActionRows({ children }: { children: ReactNode }) {
   const rows = Children.toArray(children);
   return (
@@ -64,13 +72,12 @@ export function ActionRow({
 }) {
   const content = (
     <>
-      {/* FIX-082: a plain muted icon, no tinted disc. */}
-      <Glyph color={colors.textMuted} name={icon} size={18} strokeWidth={1.5} />
+      <IconDisc icon={icon} />
       <View style={styles.rowBody}>
         <Text style={[styles.rowLabel, onPress === undefined && styles.rowLabelOff]}>{label}</Text>
         <Text style={styles.rowNote}>{note}</Text>
       </View>
-      {onPress === undefined ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
+      {onPress === undefined ? null : <Chevron size={18} strokeWidth={1.7} tone="muted" />}
     </>
   );
   if (onPress === undefined) {
@@ -94,29 +101,39 @@ export function ActionRow({
 }
 
 const styles = StyleSheet.create({
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 46 },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
   notice: {
-    alignItems: "flex-start",
+    alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   noticeBody: { flex: 1, gap: spacing.xxs },
   noticeNote: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: 13,
+    fontSize: typography.note,
     lineHeight: 18,
   },
   noticeRule: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   noticeText: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.body,
-    lineHeight: 21,
+    fontWeight: "600",
+    lineHeight: 20,
   },
-  notices: {},
+  notices: { ...surfaces.card },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
@@ -124,10 +141,20 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: 64,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.mdLg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
-  rowLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: typography.body },
-  rowLabelOff: { color: colors.textMuted },
-  rowNote: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13, lineHeight: 18 },
+  rowLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
+  rowLabelOff: { color: colors.text },
+  rowNote: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
 });
