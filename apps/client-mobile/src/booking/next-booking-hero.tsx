@@ -1,9 +1,11 @@
 import {
+  attendeesLabel,
   colors,
   fontFamilies,
   formatCancellationWindow,
   formatStartTime,
   formatTimeRange,
+  HeroAttendees,
   spacing,
   surfaces,
   typography,
@@ -13,24 +15,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useBookingAction } from "./booking-card";
 import { freePlacesLabel } from "./free-places";
 import { classDayWord } from "./next-class-hero";
-
-const shownFaces = 5;
-
-/** Who else is coming: white circles with 600 initials, five and «+N» at most. */
-function Attendees({ initials }: { initials: readonly string[] }) {
-  if (initials.length === 0) return null;
-  const rest = initials.length - shownFaces;
-  const circles = rest > 0 ? [...initials.slice(0, shownFaces), `+${rest}`] : initials;
-  return (
-    <View style={styles.faces} testID="hero-attendees">
-      {circles.map((text, index) => (
-        <View key={`${text}-${index}`} style={styles.face} testID="hero-attendee">
-          <Text style={styles.initials}>{text}</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
 
 /**
  * C05's next booked class: the 600 hero with the day, the time and the class,
@@ -44,7 +28,7 @@ export function NextBookingHero({
   const { action, insideWindow } = useBookingAction(props);
   const { cancellationWindowMinutes: window, item } = props;
   const attendees = item.attendeeInitials ?? [];
-  const eyebrow = `Próxima · ${classDayWord(item.startsAt, today)}`.toUpperCase();
+  const eyebrow = `Próxima · ${classDayWord(item.startsAt, today)}`;
   const title = `${formatStartTime(item.startsAt)} · ${item.classTypeName}`;
   const detail =
     insideWindow && window !== undefined
@@ -57,11 +41,7 @@ export function NextBookingHero({
       : freePlacesLabel(item.capacity - item.bookedCount, item.capacity);
   const label = [
     [eyebrow, title, places, detail].filter(Boolean).join(", "),
-    attendees.length === 0
-      ? undefined
-      : attendees.length === 1
-        ? "Viene 1 más"
-        : `Vienen ${attendees.length} más`,
+    attendees.length === 0 ? undefined : attendeesLabel(attendees.length),
   ]
     .filter(Boolean)
     .join(", ");
@@ -69,12 +49,12 @@ export function NextBookingHero({
     <View style={styles.hero} testID="bookings-next-class">
       <View accessibilityLabel={label} accessible style={styles.content}>
         <View style={styles.top}>
-          <Text style={styles.eyebrow}>{eyebrow}</Text>
+          <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text>
           {places === undefined ? null : <Text style={styles.places}>{places}</Text>}
         </View>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.detail}>{detail}</Text>
-        <Attendees initials={attendees} />
+        <HeroAttendees initials={attendees} />
       </View>
       {action === null ? null : (
         <View style={styles.actionRow}>
@@ -112,24 +92,9 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyBold,
     fontSize: 12,
     fontWeight: "700",
-    letterSpacing: 11 * 0.14,
+    letterSpacing: 12 * 0.14,
   },
-  face: {
-    alignItems: "center",
-    backgroundColor: colors.onEmphasis,
-    borderRadius: 16,
-    height: 32,
-    justifyContent: "center",
-    width: 32,
-  },
-  faces: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs, marginTop: spacing.smd },
   hero: { ...surfaces.emphasis, gap: spacing.xs, padding: spacing.xlSm },
-  initials: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-  },
   places: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyBold,

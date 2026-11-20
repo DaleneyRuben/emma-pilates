@@ -100,6 +100,8 @@ describe("Client Mis reservas, palette B", () => {
     });
     expect(within(hero).getByText("Urubó · Daniela Ortiz")).toBeOnTheScreen();
     expect(within(hero).getByText(/^PRÓXIMA · /)).toBeOnTheScreen();
+    // A screen reader hears the eyebrow in sentence case, not spelled out.
+    expect(within(hero).getByLabelText(/^Próxima · /)).toBeOnTheScreen();
     expect(screen.getAllByRole("button", { name: "Cancelar reserva" })).toHaveLength(2);
     expect(within(hero).getByRole("button", { name: "Cancelar reserva" })).toBeOnTheScreen();
     // The hero's class is not repeated as a card below it.

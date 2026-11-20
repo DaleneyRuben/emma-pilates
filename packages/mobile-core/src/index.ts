@@ -29,6 +29,7 @@ export * from "./auth/session-manager";
 export * from "./booking/plan-terms";
 export * from "./booking/weekly-cap-copy";
 export * from "./booking/class-card";
+export * from "./booking/hero-attendees";
 export * from "./booking/seat-pill";
 export * from "./booking/session-card";
 export * from "./booking/other-date-sheet";
