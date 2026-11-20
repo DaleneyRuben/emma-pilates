@@ -51,8 +51,9 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    expect(screen.getByText("Plan activo")).toBeOnTheScreen();
-    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    // Staff pick E4 A: the plan in a Palo de rosa block.
+    expect(screen.getByText("Activa")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
@@ -281,16 +282,18 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
-    // v2 S10: «¿Cómo paga?», then what to collect.
-    expect(screen.getByRole("tab", { name: "Efectivo" })).toHaveProp("accessibilityState", {
-      selected: true,
+    // Staff pick E3 C: what to collect on top, then «Cómo paga».
+    expect(screen.getByRole("radio", { name: /^Efectivo/ })).toHaveProp("accessibilityState", {
+      checked: true,
+      disabled: false,
     });
-    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    expect(screen.getByText("Lucía Fernández · Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.queryByText("Crédito aplicado")).toBeNull();
-    expect(screen.getByText("Total en efectivo")).toBeOnTheScreen();
-    expect(screen.getAllByText("Bs 560")).toHaveLength(2);
+    expect(screen.getByText("A cobrar")).toBeOnTheScreen();
+    expect(screen.getByText("8 clases · Bs 560")).toBeOnTheScreen();
+    expect(screen.queryByText(/^Descuento/)).toBeNull();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });

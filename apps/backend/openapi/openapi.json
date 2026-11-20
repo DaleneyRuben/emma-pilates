@@ -15558,6 +15558,30 @@
           "accountStatus"
         ]
       },
+      "ClientContactDto": {
+        "type": "object",
+        "properties": {
+          "onContactList": {
+            "type": "boolean",
+            "description": "Whether she has an open Contact Alert (Para contactar)"
+          },
+          "lastContactedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When a Staff Member last marked her contacted"
+          },
+          "lastContactedByYou": {
+            "type": "boolean",
+            "description": "Whether the signed-in Staff Member marked that last contact"
+          }
+        },
+        "required": [
+          "onContactList",
+          "lastContactedAt",
+          "lastContactedByYou"
+        ]
+      },
       "ClientOverviewDto": {
         "type": "object",
         "properties": {
@@ -15587,6 +15611,14 @@
             "minimum": 0,
             "deprecated": true,
             "description": "Deprecated (PAY-005): Credit was retired; always 0"
+          },
+          "contact": {
+            "description": "Her contact state, only for the Coordinator and the Administrator (BKM-013, ADR-0102)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientContactDto"
+              }
+            ]
           }
         },
         "required": [

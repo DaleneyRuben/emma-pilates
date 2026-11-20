@@ -13,12 +13,15 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { ClientContactPanel } from "../coordinator/client-contact-panel";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
+import { OutlineButton } from "../ui/outline-button";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { useInClientPanel } from "./assistant-workspace";
 import { canBookFor } from "./bookable-classes";
+import { ClientFreezeRow } from "./client-freeze-row";
 import { ClientPlanCard } from "./client-plan-card";
 import { StateCard } from "./state-card";
 import { PendingInvitationCard } from "./pending-invitation-card";
@@ -104,6 +107,11 @@ export function ClientOverviewScreen({
     onPress: () => navigation.navigate("SelectPlan", context),
     testID: "client-overview-cash-payment",
   };
+  const book = {
+    label: "Reservar clase",
+    onPress: () => navigation.navigate("BrowseSessions", context),
+    testID: "client-overview-book",
+  };
 
   return (
     <Screen style={styles.screen}>
@@ -155,20 +163,38 @@ export function ClientOverviewScreen({
           <>
             <ClientPlanCard
               active={active}
-              freeze={data.subscription.freeze}
               nextPlan={futurePlan}
               sells={sells}
               subscription={subscription}
             />
-            {canBook ? (
-              <PrimaryButton
-                label="Reservar clase"
-                onPress={() => navigation.navigate("BrowseSessions", context)}
-                testID="client-overview-book"
-              />
-            ) : canBuy ? (
-              <PrimaryButton {...cash} />
-            ) : null}
+            <ClientFreezeRow freeze={data.subscription.freeze} />
+          </>
+        )}
+        {/* Staff pick E4 A: the actions on top according to the role. */}
+        {sells ? (
+          subscription !== null && (canBook || canBuy) ? (
+            <View style={styles.pair} testID="client-overview-actions">
+              {canBook ? (
+                <View style={styles.wide}>
+                  <PrimaryButton {...book} />
+                </View>
+              ) : null}
+              {canBuy && canBook ? <OutlineButton {...cash} /> : null}
+              {canBuy && !canBook ? (
+                <View style={styles.wide}>
+                  <PrimaryButton {...cash} />
+                </View>
+              ) : null}
+            </View>
+          ) : null
+        ) : (
+          <>
+            <ClientContactPanel
+              clientId={client.id}
+              contact={data.contact}
+              phone={client.phone ?? null}
+            />
+            {canBook ? <OutlineButton {...book} /> : null}
           </>
         )}
         <PlainRowGroup testID="client-overview-rows">
@@ -185,9 +211,6 @@ export function ClientOverviewScreen({
             onPress={() => navigation.navigate("ClientHistory", context)}
             testID="client-overview-history"
           />
-          {subscription !== null && canBook && canBuy ? (
-            <PlainRow label={cash.label} onPress={cash.onPress} testID={cash.testID} />
-          ) : null}
         </PlainRowGroup>
       </ScrollView>
     </Screen>
@@ -201,5 +224,7 @@ const styles = StyleSheet.create({
   identityBody: { flex: 1, gap: spacing.xxs },
   incompletePhone: { color: colors.warningText },
   name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
+  pair: { flexDirection: "row", gap: spacing.md },
+  wide: { flex: 1 },
   screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
 });

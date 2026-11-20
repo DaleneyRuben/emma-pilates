@@ -30,15 +30,17 @@ describe("Client overview cash action", () => {
     expect(screen.queryByText(note)).toBeNull();
   });
 
-  // FIX-083 (Ficha pick A): «Reservar clase» is the one solid button; selling
-  // and her records follow as plain rows.
-  it("lists Registrar pago among the plain rows under «Reservar clase»", async () => {
+  // Staff pick E4 A: «Registrar pago» sits beside «Reservar clase» on top; her
+  // records follow as plain rows.
+  it("puts Registrar pago beside «Reservar clase», above the plain rows", async () => {
     const screen = await openLucia(assistantRoutes());
+    const actions = screen.getByTestId("client-overview-actions");
     const rows = screen.getByTestId("client-overview-rows");
 
+    expect(within(actions).getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(within(rows).getByRole("button", { name: /^Reservas, / })).toBeOnTheScreen();
     expect(within(rows).getByRole("button", { name: "Historial de clases" })).toBeOnTheScreen();
-    expect(within(rows).getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
+    expect(within(rows).queryByRole("button", { name: "Registrar pago" })).toBeNull();
     expect(within(rows).queryByTestId("icon-row-disc")).toBeNull();
   });
 

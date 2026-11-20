@@ -200,8 +200,17 @@ export class AssistantClientsController {
     const overview = await run(() =>
       this.operations.overview({ clientId: id }, principal),
     );
+    const { contact, ...rest } = overview;
     return {
-      ...overview,
+      ...rest,
+      ...(contact === undefined
+        ? {}
+        : {
+            contact: {
+              ...contact,
+              lastContactedAt: contact.lastContactedAt?.toISOString() ?? null,
+            },
+          }),
       subscription: {
         status: overview.subscription.status,
         subscription: toSubscriptionDto(overview.subscription.subscription),

@@ -34,11 +34,11 @@ describe("the plan card names the plan's Freeze", () => {
     const endsOn = civilIn(4);
     const screen = await openLucia(withFreeze({ state: "approved", startsOn, endsOn }));
 
+    // Staff pick E4 A: the Freeze on its own row.
     expect(
-      screen.getByText(
-        `Congelado del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}: esos días no puede reservar.`,
-      ),
+      screen.getByText(`Congelado del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}`),
     ).toBeOnTheScreen();
+    expect(screen.getByText("Aprobado · no puede reservar esos días")).toBeOnTheScreen();
   });
 
   it("names a Freeze still in review", async () => {
@@ -48,9 +48,10 @@ describe("the plan card names the plan's Freeze", () => {
 
     expect(
       screen.getByText(
-        `Pidió congelar del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}; está por revisar.`,
+        `Pidió congelar del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}`,
       ),
     ).toBeOnTheScreen();
+    expect(screen.getByText("Está por revisar")).toBeOnTheScreen();
   });
 
   it("says nothing of a Freeze that ended, was refused or was withdrawn", async () => {

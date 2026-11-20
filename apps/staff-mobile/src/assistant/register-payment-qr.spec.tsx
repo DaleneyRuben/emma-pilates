@@ -50,18 +50,18 @@ describe("Registrar pago by QR (S10)", () => {
       },
     });
 
-    await fireEvent.press(screen.getByRole("tab", { name: "QR" }));
+    await fireEvent.press(screen.getByRole("radio", { name: /^QR/ }));
     expect(screen.getByText("Monto exacto a transferir")).toBeOnTheScreen();
     expect(screen.getByLabelText("QR del estudio para transferir")).toBeOnTheScreen();
-    expect(screen.queryByRole("button", { name: "Confirmar pago en efectivo" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Confirmar Bs 560 en efectivo" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Confirmar Bs 560 por QR" })).toBeDisabled();
 
     await fireEvent.press(screen.getByRole("button", { name: "Fotografiar comprobante" }));
     await waitFor(() => expect(screen.getByText("Comprobante listo")).toBeOnTheScreen());
     expect(screen.getByText("Todavía no se envió")).toBeOnTheScreen();
     expect(sent).not.toHaveBeenCalled();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 por QR" }));
     await waitFor(() => expect(screen.getByText("Comprobante enviado")).toBeOnTheScreen());
     expect(sent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -92,13 +92,13 @@ describe("Registrar pago by QR (S10)", () => {
         jsonResponse({ id: "payment-1", state: "pending" }, 201),
     });
 
-    await fireEvent.press(screen.getByRole("tab", { name: "QR" }));
+    await fireEvent.press(screen.getByRole("radio", { name: /^QR/ }));
     await fireEvent.press(screen.getByTestId("start-date-2026-10-20"));
     await fireEvent.press(screen.getByRole("button", { name: "Fotografiar comprobante" }));
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled(),
+      expect(screen.getByRole("button", { name: "Confirmar Bs 560 por QR" })).toBeEnabled(),
     );
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 por QR" }));
 
     await waitFor(() => expect(screen.getByText("Comprobante enviado")).toBeOnTheScreen());
     expect(
@@ -116,13 +116,14 @@ describe("Registrar pago by QR (S10)", () => {
         jsonResponse({ code: "payment_pending_exists" }, 409),
     });
 
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
     expect(await screen.findByText("La clienta tiene un pago en revisión.")).toBeOnTheScreen();
     // FIX-028: a receipt is pending, so the cash way is off.
-    expect(screen.getByRole("tab", { name: "Efectivo" })).toHaveProp("accessibilityState", {
+    expect(screen.getByRole("radio", { name: /^Efectivo/ })).toHaveProp("accessibilityState", {
+      checked: true,
       disabled: true,
-      selected: true,
     });
-    expect(screen.getByRole("button", { name: "Confirmar pago en efectivo" })).toBeDisabled();
+    expect(screen.getByText("Hay un pago en revisión")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" })).toBeDisabled();
   });
 });

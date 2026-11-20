@@ -88,5 +88,43 @@ describe('Assistant client overview', () => {
 
     const chosen = await controller.overview(clientId, bearer);
     expect(chosen.subscription).not.toHaveProperty('renewalStartsOn');
+    expect(chosen).not.toHaveProperty('contact');
+  });
+
+  // Staff pick E4 A: the Coordinator's last contact, as an instant.
+  it('passes on her last contact when the role reads it', async () => {
+    overview.mockResolvedValue({
+      client: {
+        id: clientId,
+        name: 'Lucía Fernández',
+        email: 'lucia@example.com',
+        phone: null,
+        accountStatus: 'active',
+      },
+      subscription: {
+        status: 'expired',
+        subscription,
+        nextSubscription: null,
+        founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
+      },
+      nextBooking: null,
+      recentHistory: [],
+      creditAvailableCentavos: 0,
+      contact: {
+        onContactList: false,
+        lastContactedAt: new Date('2026-11-12T15:00:00.000Z'),
+        lastContactedByYou: true,
+      },
+    });
+
+    await expect(controller.overview(clientId, bearer)).resolves.toMatchObject({
+      contact: {
+        onContactList: false,
+        lastContactedAt: '2026-11-12T15:00:00.000Z',
+        lastContactedByYou: true,
+      },
+    });
   });
 });

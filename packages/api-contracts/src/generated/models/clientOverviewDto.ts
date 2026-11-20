@@ -6,6 +6,7 @@
  */
 import type { AssistantClientDto } from "./assistantClientDto";
 import type { ClassHistoryEntryDto } from "./classHistoryEntryDto";
+import type { ClientContactDto } from "./clientContactDto";
 import type { ClientSubscriptionDto } from "./clientSubscriptionDto";
 import type { UpcomingBookingDto } from "./upcomingBookingDto";
 
@@ -21,4 +22,6 @@ export interface ClientOverviewDto {
    * @minimum 0
    */
   creditAvailableCentavos: number;
+  /** Her contact state, only for the Coordinator and the Administrator (BKM-013, ADR-0102) */
+  contact?: ClientContactDto;
 }

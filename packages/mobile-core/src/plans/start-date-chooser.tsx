@@ -29,19 +29,34 @@ export function StartDateChooser({
   return <StartDateStrip onSelect={onSelect} options={options} selected={selected} />;
 }
 
-/** The «Fecha de inicio» title and its row of day tiles, for any set of days. */
+/**
+ * The «Fecha de inicio» title and its row of day tiles, for any set of days.
+ * Staff pick E3 C titles it «Empieza» and notes the current Plan's end in
+ * `aside`, beside the title.
+ */
 export function StartDateStrip({
+  aside,
   options,
   selected,
+  title = "Fecha de inicio",
   onSelect,
 }: {
+  aside?: string;
   options: StartDateOption[];
   selected: string;
+  title?: string;
   onSelect: (date: string) => void;
 }) {
   return (
     <View>
-      <SectionTitle>Fecha de inicio</SectionTitle>
+      {aside === undefined ? (
+        <SectionTitle>{title}</SectionTitle>
+      ) : (
+        <View style={styles.titleRow}>
+          <SectionTitle>{title}</SectionTitle>
+          <Text style={styles.aside}>{aside}</Text>
+        </View>
+      )}
       <ScrollView
         contentContainerStyle={styles.row}
         horizontal
@@ -119,6 +134,14 @@ function StartDateChip({
 }
 
 const styles = StyleSheet.create({
+  aside: {
+    color: colors.textMuted,
+    flexShrink: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 13,
+    marginBottom: spacing.md,
+    textAlign: "right",
+  },
   chip: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -136,6 +159,12 @@ const styles = StyleSheet.create({
   day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   row: { gap: spacing.sm },
   selectedText: { color: colors.onPrimary },
+  titleRow: {
+    alignItems: "baseline",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+  },
   selectedWeekday: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   weekday: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 12 },
 });
