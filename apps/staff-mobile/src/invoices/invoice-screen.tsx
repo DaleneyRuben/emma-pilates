@@ -11,13 +11,11 @@ import {
   EmphasisCard,
   FormScrollView,
   IconRow,
-  IconRowGroup,
   LoadingState,
   NoticeRow,
   PrimaryButton,
   QueryFailure,
   Screen,
-  SectionTitle,
   TextButton,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -25,6 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 
+import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { invoiceStyles as styles } from "./invoice-styles";
@@ -185,7 +184,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
   const data = current.invoiceData;
   const canUpload = data !== null && !current.voided;
   const footer = !canUpload ? undefined : (
-    <View style={styles.actions}>
+    <FooterPanel bleed={0}>
       {failure === null ? null : (
         <View accessibilityLabel={failure} accessibilityRole="alert">
           <NoticeRow message={failure} />
@@ -198,8 +197,10 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
             label="Reintentar"
             onPress={() => void send(picked, uploadedAssetId)}
           />
-          <TextButton label="Elegir otro archivo" onPress={() => setChoosing(true)} />
-          <TextButton label="Cancelar" onPress={reset} />
+          <View style={styles.row}>
+            <TextButton label="Elegir otro archivo" onPress={() => setChoosing(true)} />
+            <TextButton label="Cancelar" onPress={reset} />
+          </View>
         </>
       ) : current.file === null ? (
         <>
@@ -214,40 +215,52 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
           <TextButton label="Quitar factura" onPress={() => setAsking(true)} tone="error" />
         </View>
       )}
-    </View>
+    </FooterPanel>
   );
 
   return (
-    <Screen style={styles.screen}>
-      <FormScrollView contentContainerStyle={styles.content} footer={footer}>
-        {header}
-        <EmphasisCard eyebrow="Monto" note={`${current.clientName} · ${current.purchaseLabel}`}>
-          <Text style={styles.amount}>{formatMoney(current.amountDueCentavos)}</Text>
-          <Text style={styles.state}>
-            {current.voided ? "Anulado" : current.file === null ? "Confirmado" : "Factura emitida"}
-          </Text>
-        </EmphasisCard>
-        <View style={styles.section}>
-          <SectionTitle>Datos de la factura</SectionTitle>
-          <IconRowGroup>
+    <Screen
+      edges={canUpload ? taskEdges : undefined}
+      style={[styles.screen, canUpload && bodyScroll.taskScreen]}
+    >
+      {header}
+      <View style={bodyScroll.clip}>
+        <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
+          <EmphasisCard>
+            <View style={styles.heroTop}>
+              <Text style={styles.heroLabel}>Monto</Text>
+              <Text style={styles.state}>
+                {current.voided
+                  ? "Anulado"
+                  : current.file === null
+                    ? "Confirmado"
+                    : "Factura emitida"}
+              </Text>
+            </View>
+            <Text style={styles.amount}>{formatMoney(current.amountDueCentavos)}</Text>
+            <Text
+              style={styles.heroNote}
+            >{`${current.clientName} · ${current.purchaseLabel}`}</Text>
+          </EmphasisCard>
+          <RowCard label="Datos de la factura">
             {data === null ? (
               <IconRow icon="receipt" label="Sin factura" value="No la pidió" />
             ) : (
-              <>
-                <IconRow icon="receipt" label="NIT o CI" value={data.taxId} />
-                <IconRow icon="person" label="A nombre de" value={data.name} />
-              </>
+              [
+                <IconRow icon="receipt" key="tax" label="NIT o CI" value={data.taxId} />,
+                <IconRow icon="person" key="name" label="A nombre de" value={data.name} />,
+              ]
             )}
-          </IconRowGroup>
-        </View>
-        {current.file === null ? (
-          canUpload ? (
-            <InvoiceDropCard busy={busy} />
-          ) : null
-        ) : (
-          <InvoiceFileCard file={current.file} paymentId={paymentId} />
-        )}
-      </FormScrollView>
+          </RowCard>
+          {current.file === null ? (
+            canUpload ? (
+              <InvoiceDropCard busy={busy} />
+            ) : null
+          ) : (
+            <InvoiceFileCard file={current.file} paymentId={paymentId} />
+          )}
+        </FormScrollView>
+      </View>
       {notice === null ? null : (
         <BrandToast
           note={notice === "Factura subida" ? `${firstName} ya puede verla en su app` : undefined}

@@ -65,9 +65,9 @@ export function FreezeReviewCard({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  divided: { borderTopColor: colors.border, borderTopWidth: 1 },
+  divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   identity: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   name: { color: colors.text, flex: 1, fontFamily: fontFamilies.display, fontSize: 22 },
   request: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   row: {
@@ -75,20 +75,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
-    minHeight: 48,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.smLg,
   },
+  // E-D09: the table's 1 pt 200 rule, its rows split by 100 hairlines.
   table: {
-    borderColor: colors.border,
+    borderColor: colors.borderSoft,
     borderRadius: radii.inset,
     borderWidth: 1,
   },
   value: {
     color: colors.text,
     flexShrink: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
     fontWeight: "700",
     textAlign: "right",
   },

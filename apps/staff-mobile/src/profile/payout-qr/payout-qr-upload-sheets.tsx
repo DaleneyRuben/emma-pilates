@@ -5,7 +5,6 @@ import {
   OutlinedButton,
   boliviaCivilDate,
   colors,
-  radii,
   spacing,
   fontFamilies,
 } from "@pilates/mobile-core";
@@ -116,8 +115,8 @@ const styles = StyleSheet.create({
   lead: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   thumb: {
     backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: radii.control,
+    borderColor: colors.borderSoft,
+    borderRadius: spacing.md,
     borderWidth: 1,
     height: 64,
     width: 64,

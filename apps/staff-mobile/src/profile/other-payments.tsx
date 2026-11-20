@@ -1,17 +1,9 @@
 import { formatMoney, formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  Glyph,
-  SectionTitle,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { RowCard } from "./card-pieces";
 import { ReceiptThumbnail, useReceiptViewer } from "./receipt-viewer";
 
 function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
@@ -37,15 +29,13 @@ export function OtherPayments({
 }) {
   const receipts = useReceiptViewer();
   return (
-    <View accessibilityLabel={title} style={styles.section}>
-      <SectionTitle>{title}</SectionTitle>
-      <View style={styles.group}>
-        {payments.map((payment, index) => {
-          const divider = index > 0 && styles.divider;
+    <View accessibilityLabel={title}>
+      <RowCard label={title}>
+        {payments.map((payment) => {
           const receiptUrl = payment.receiptUrl ?? null;
           if (receiptUrl === null) {
             return (
-              <View key={payment.id} style={[styles.row, divider]}>
+              <View key={payment.id} style={styles.row}>
                 <View style={styles.icon}>
                   <Glyph name="card" size={20} />
                 </View>
@@ -59,7 +49,7 @@ export function OtherPayments({
               accessibilityRole="button"
               key={payment.id}
               onPress={() => receipts.show(payment)}
-              style={({ pressed }) => [styles.row, divider, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             >
               <ReceiptThumbnail url={receiptUrl} />
               <PaymentText payment={payment} />
@@ -67,7 +57,7 @@ export function OtherPayments({
             </Pressable>
           );
         })}
-      </View>
+      </RowCard>
       {receipts.error}
       {receipts.viewer}
     </View>
@@ -77,17 +67,16 @@ export function OtherPayments({
 const styles = StyleSheet.create({
   amount: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: 16,
     fontVariant: ["tabular-nums"],
+    fontWeight: "600",
   },
   body: { flex: 1, gap: 2 },
   date: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  divider: { borderTopColor: colors.hairline, borderTopWidth: 1 },
-  group: { ...surfaces.flatCard, overflow: "hidden" },
   // FIX-089: the icon stands alone, with no tinted box behind it.
   icon: { alignItems: "center", height: 40, justifyContent: "center", width: 40 },
-  pressed: { backgroundColor: colors.background },
+  pressed: { backgroundColor: colors.surfaceSubtle },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -96,5 +85,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  section: { gap: spacing.md },
 });

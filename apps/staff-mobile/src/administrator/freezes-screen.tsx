@@ -1,16 +1,9 @@
 import { useListDecidedFreezes, useListRequestedFreezes } from "@pilates/api-contracts";
-import {
-  IconRowGroup,
-  LoadingState,
-  QueryFailure,
-  Screen,
-  spacing,
-  StateScreen,
-  SectionTitle,
-} from "@pilates/mobile-core";
+import { LoadingState, QueryFailure, Screen, spacing, StateScreen } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
+import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { freezeDecidedDetail } from "./freeze-format";
@@ -31,15 +24,7 @@ export function FreezesScreen() {
   const fetcher = useStaffFetcher();
   const requested = useListRequestedFreezes({ fetcher, query: { refetchOnMount: "always" } });
   const decided = useListDecidedFreezes({ fetcher, query: { refetchOnMount: "always" } });
-  // Walkthrough finding 94: the note is the title's quiet line, not a line
-  // floating between the two sections.
-  const header = (
-    <BackBar
-      onBack={() => navigation.goBack()}
-      subtitle="Pausan el plan de la clienta. Los días congelados se suman a su vencimiento."
-      title="Congelamientos"
-    />
-  );
+  const header = <BackBar onBack={() => navigation.goBack()} title="Congelamientos" />;
   const open = (freezeId: string) => navigation.navigate("ReviewFreeze", { freezeId });
 
   if (requested.isPending) {
@@ -68,7 +53,12 @@ export function FreezesScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        {/* E-D07: the note opens the list as a soft aside, not on the band. */}
+        <SoftNote
+          icon="snowflake"
+          message="Pausan el plan de la clienta. Los días congelados se suman a su vencimiento."
+        />
         {freezes.length === 0 ? (
           <StateScreen
             icon="hourglass"
@@ -77,36 +67,30 @@ export function FreezesScreen() {
             title="No hay solicitudes por revisar"
           />
         ) : (
-          <View>
-            <SectionTitle>{`Por revisar · ${freezes.length}`}</SectionTitle>
-            <IconRowGroup>
-              {freezes.map((freeze) => (
-                <FreezeRow
-                  accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
-                  freeze={freeze}
-                  key={freeze.id}
-                  note={freeze.reason}
-                  onPress={() => open(freeze.id)}
-                />
-              ))}
-            </IconRowGroup>
-          </View>
+          <RowCard label={`Por revisar · ${freezes.length}`}>
+            {freezes.map((freeze) => (
+              <FreezeRow
+                accessibilityLabel={`Revisar congelamiento de ${freeze.clientName}`}
+                freeze={freeze}
+                key={freeze.id}
+                note={freeze.reason}
+                onPress={() => open(freeze.id)}
+              />
+            ))}
+          </RowCard>
         )}
         {decidedFreezes.length === 0 ? null : (
-          <View>
-            <SectionTitle>Decididas</SectionTitle>
-            <IconRowGroup>
-              {decidedFreezes.map((freeze) => (
-                <FreezeRow
-                  accessibilityLabel={`Ver congelamiento de ${freeze.clientName}`}
-                  freeze={freeze}
-                  key={freeze.id}
-                  note={freezeDecidedDetail(freeze)}
-                  onPress={() => open(freeze.id)}
-                />
-              ))}
-            </IconRowGroup>
-          </View>
+          <RowCard label="Decididas">
+            {decidedFreezes.map((freeze) => (
+              <FreezeRow
+                accessibilityLabel={`Ver congelamiento de ${freeze.clientName}`}
+                freeze={freeze}
+                key={freeze.id}
+                note={freezeDecidedDetail(freeze)}
+                onPress={() => open(freeze.id)}
+              />
+            ))}
+          </RowCard>
         )}
       </ScrollView>
     </Screen>
@@ -114,6 +98,5 @@ export function FreezesScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   screen: { paddingHorizontal: spacing.xlSm },
 });

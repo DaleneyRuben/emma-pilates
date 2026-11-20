@@ -6,6 +6,7 @@ import {
   type GlyphName,
   radii,
   spacing,
+  typography,
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -54,7 +55,7 @@ export function ProfileRow({
       testID={testID}
     >
       <View style={styles.disc}>
-        <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.5} />
+        <Glyph color={colors.text} name={icon} size={22} strokeWidth={1.6} />
       </View>
       <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
       {badge > 0 ? (
@@ -92,29 +93,38 @@ const styles = StyleSheet.create({
   },
   badgeLabel: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.label,
+    fontWeight: "700",
   },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", justifyContent: "center", width: 24 },
-  errorLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 16 },
+  errorLabel: { color: colors.text },
+  // E-F01: the row's label in Work Sans 16 SemiBold, its value 14 SemiBold.
+  label: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    minHeight: 56,
+    minHeight: 52,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.smd,
   },
   errorValue: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   plainValue: { letterSpacing: 0 },
   warningValue: { color: colors.warningText, fontFamily: fontFamilies.bodyMedium },
   value: {
     color: colors.textMuted,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: 14,
+    fontWeight: "600",
     letterSpacing: 1.1,
   },
 });

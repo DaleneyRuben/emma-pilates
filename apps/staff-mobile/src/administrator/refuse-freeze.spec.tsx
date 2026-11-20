@@ -66,9 +66,10 @@ describe("reviewing and refusing a freeze", () => {
     expect(screen.getByText("Lucía recibirá este motivo en su app.")).toBeOnTheScreen();
     expect(screen.getByText("Esto no se puede deshacer")).toBeOnTheScreen();
     expect(screen.getByText("Lucía podrá pedir otro congelamiento.")).toBeOnTheScreen();
+    // Rosa Emma (E-D11): a white card with the soft shadow.
     expect(screen.getByTestId("refuse-freeze-notice")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     const send = screen.getByRole("button", { name: "Rechazar y avisar a Lucía" });
     expect(send).toBeDisabled();

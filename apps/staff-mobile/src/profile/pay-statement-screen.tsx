@@ -4,13 +4,14 @@ import {
   EmphasisCard,
   fontFamilies,
   Screen,
-  SectionTitle,
+  ScreenHeader,
   spacing,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { BackBar, backBarScroll } from "../ui/back-bar";
+import { BackBar } from "../ui/back-bar";
+import { bodyScroll } from "./card-pieces";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { PayGroupRows } from "./pay-group-rows";
 import type { PayGroupKey } from "./pay-groups";
@@ -43,25 +44,18 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
         const status = statementStatus(statement, payments);
         return (
           <Screen style={styles.screen}>
-            <ScrollView
-              contentContainerStyle={[
-                backBarScroll.content,
-                styles.content,
-                tablet && styles.tablet,
-              ]}
-              refreshControl={pay.refreshControl}
-              style={backBarScroll.scroll}
-            >
-              {header}
-              <View style={styles.body} testID="pay-statement">
-                <View style={styles.titles}>
-                  <SectionTitle>
-                    {status.kind === "open" ? "Periodo en curso" : "Liquidación"}
-                  </SectionTitle>
-                  <Text accessibilityRole="header" style={styles.heading}>
-                    {heading}
-                  </Text>
-                </View>
+            {/* E-M06: the period is the band's title under its «Liquidación» capsule. */}
+            <View style={styles.body} testID="pay-statement">
+              <ScreenHeader
+                eyebrow={status.kind === "open" ? "Periodo en curso" : "Liquidación"}
+                onBack={() => navigation.goBack()}
+                title={heading}
+              />
+              <ScrollView
+                contentContainerStyle={[bodyScroll.content, tablet && styles.tablet]}
+                refreshControl={pay.refreshControl}
+                style={bodyScroll.scroll}
+              >
                 <EmphasisCard eyebrow="Total" testID="pay-statement-total">
                   <Text style={styles.total}>{formatMoney(statement.totalCentavos)}</Text>
                   <Text style={styles.state}>{totalStateLine(statement, status)}</Text>
@@ -74,8 +68,8 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
                     navigation.navigate("PayGroup", { statementId: statement.id, group })
                   }
                 />
-              </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
             {receipts.viewer}
           </Screen>
         );
@@ -85,19 +79,15 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
 }
 
 const styles = StyleSheet.create({
-  body: { gap: spacing.lg },
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  heading: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 26, lineHeight: 32 },
+  body: { flex: 1 },
   screen: { paddingHorizontal: spacing.xlSm },
   state: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: -spacing.xs,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 15,
+    fontWeight: "700",
   },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
-  titles: { gap: spacing.xs },
   total: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,

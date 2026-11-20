@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet } from "react-native";
 
+import { bodyScroll } from "./card-pieces";
 import { BackBar } from "../ui/back-bar";
 import { RootHeader } from "../ui/root-header";
 import { useIsStackRoot } from "../ui/use-is-stack-root";
@@ -73,21 +74,27 @@ export function StaffPayScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <StateScreen
-          icon="card"
-          note={
-            role === "trainer"
-              ? "Aquí verás cada mes lo que te corresponde por tus clases y lo que se te pagó."
-              : "Aquí verás cada mes lo que te corresponde y lo que se te pagó."
-          }
-          primaryAction={
-            agenda
-              ? { label: "Ver mi agenda", onPress: () => navigation.navigate("AgendaTab") }
-              : undefined
-          }
-          title="Todavía no tienes pagos"
-        />
-        {qrRow}
+        <ScrollView
+          contentContainerStyle={[bodyScroll.content, tablet && styles.tablet]}
+          style={bodyScroll.scroll}
+        >
+          <StateScreen
+            icon="card"
+            layout="card"
+            note={
+              role === "trainer"
+                ? "Aquí verás cada mes lo que te corresponde por tus clases y lo que se te pagó."
+                : "Aquí verás cada mes lo que te corresponde y lo que se te pagó."
+            }
+            primaryAction={
+              agenda
+                ? { label: "Ver mi agenda", onPress: () => navigation.navigate("AgendaTab") }
+                : undefined
+            }
+            title="Todavía no tienes pagos"
+          />
+          {qrRow}
+        </ScrollView>
       </Screen>
     );
   }
@@ -95,11 +102,12 @@ export function StaffPayScreen() {
   const others = otherPayments(statements, payments);
   return (
     <Screen style={styles.screen}>
+      {header}
       <ScrollView
-        contentContainerStyle={[styles.content, tablet && styles.tablet]}
+        contentContainerStyle={[bodyScroll.content, tablet && styles.tablet]}
         refreshControl={pay.refreshControl}
+        style={bodyScroll.scroll}
       >
-        {header}
         {summary === null ? null : <PaySummaryCard summary={summary} />}
         {statements.length === 0 ? null : (
           <PayHistory
@@ -121,7 +129,6 @@ export function StaffPayScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

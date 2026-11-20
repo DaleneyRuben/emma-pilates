@@ -10,11 +10,12 @@ import {
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { RowCard } from "./card-pieces";
 import type { PayGroup, PayGroupKey } from "./pay-groups";
 
 /**
- * E2 B: the proportions bar, then one Crema row per concept with its count
- * and sum; tapping a row opens that concept by day (board E2C).
+ * E2 B (E-M06): the proportions bar, then one white card with a row per
+ * concept, its dot, count and sum; tapping a row opens that concept by day.
  */
 export function PayGroupRows({
   groups,
@@ -38,18 +39,14 @@ export function PayGroupRows({
           )}
         </View>
       )}
-      <View style={styles.group}>
-        {groups.map((group, index) => (
+      <RowCard>
+        {groups.map((group) => (
           <Pressable
             accessibilityLabel={`${group.label}, ${group.note === null ? "" : `${group.note}, `}${formatMoney(group.centavos)}`}
             accessibilityRole="button"
             key={group.key}
             onPress={() => onOpen(group.key)}
-            style={({ pressed }) => [
-              styles.row,
-              index > 0 && styles.divider,
-              pressed && styles.pressed,
-            ]}
+            style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             testID="pay-group-row"
           >
             <View style={[styles.dot, { backgroundColor: group.color }]} />
@@ -61,8 +58,10 @@ export function PayGroupRows({
             <Chevron size={16} strokeWidth={1.5} tone="muted" />
           </Pressable>
         ))}
+      </RowCard>
+      <View style={styles.hintCard}>
+        <Text style={styles.hint}>Toca un grupo para ver cada clase con su fecha.</Text>
       </View>
-      <Text style={styles.hint}>Toca un grupo para ver cada clase con su fecha.</Text>
     </View>
   );
 }
@@ -77,13 +76,18 @@ const styles = StyleSheet.create({
   },
   bar: { borderRadius: radii.pill, flexDirection: "row", gap: 2, height: 8, overflow: "hidden" },
   body: { flex: 1, gap: 2 },
-  divider: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   dot: { borderRadius: 4, height: 8, width: 8 },
-  group: { ...surfaces.flatCard, overflow: "hidden" },
   hint: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  label: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
+  // A quiet line goes in a white card, never on the 100 screen.
+  hintCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.smLg },
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  pressed: { backgroundColor: colors.background },
+  pressed: { backgroundColor: colors.surfaceSubtle },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -93,5 +97,5 @@ const styles = StyleSheet.create({
     paddingRight: spacing.md,
     paddingVertical: spacing.md,
   },
-  section: { gap: spacing.md },
+  section: { gap: spacing.smLg },
 });

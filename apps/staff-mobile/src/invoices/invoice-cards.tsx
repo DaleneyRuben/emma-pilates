@@ -32,7 +32,7 @@ export function InvoiceDropCard({ busy }: { busy: boolean }) {
         {busy ? (
           <ActivityIndicator accessibilityLabel="Subiendo la factura" color={colors.primary} />
         ) : (
-          <Glyph name="receipt" size={18} strokeWidth={1.5} />
+          <Glyph name="receipt" size={28} strokeWidth={1.6} />
         )}
       </View>
       <Text style={styles.title}>{busy ? "Subiendo la factura…" : "Sube la factura emitida"}</Text>
@@ -99,29 +99,35 @@ export function InvoiceFileCard({
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
-  disc: { alignItems: "center", justifyContent: "center", width: 24 },
+  disc: { alignItems: "center", justifyContent: "center", minWidth: 28 },
+  // E-D19: a white box with the 400 dashed outline.
   drop: {
     alignItems: "center",
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.card,
     borderStyle: "dashed",
     borderWidth: 1.5,
-    gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    gap: spacing.smd,
+    padding: spacing.xlSm,
   },
   fileRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   fileText: { flex: 1, gap: 2 },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   thumb: {
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderColor: colors.hairline,
-    borderRadius: 6,
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderSoft,
+    borderRadius: 8,
     borderWidth: 1,
     height: 56,
     justifyContent: "center",
     width: 44,
   },
-  title: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
 });

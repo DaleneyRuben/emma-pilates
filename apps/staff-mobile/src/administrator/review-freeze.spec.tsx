@@ -100,9 +100,9 @@ describe("freeze review", () => {
     );
     await fireEvent.press(screen.getByText("Lucía pidió un congelamiento."));
     await waitFor(() => expect(screen.getByText("Lucía Fernández")).toBeOnTheScreen());
-    // iPad walk: the scroller holding the BackBar reaches the screen edge, so
-    // the chevron's negative margin is not clipped.
-    let scroller = screen.getByTestId("back-bar").parent;
+    // iPad walk: the scroller under the fixed band reaches the screen edge, so
+    // the card's shadow is not clipped.
+    let scroller = screen.getByTestId("freeze-review-card").parent;
     while (scroller && scroller.props.contentContainerStyle === undefined) {
       scroller = scroller.parent;
     }

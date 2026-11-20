@@ -1,6 +1,14 @@
 import { formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
-import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
+import {
+  Chevron,
+  colors,
+  fontFamilies,
+  Glyph,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { statusTone } from "./pay-history";
@@ -83,22 +91,22 @@ export function PaymentStrip({
 const styles = StyleSheet.create({
   detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.8 },
+  // E-M06: a white card; its icon on a 50 tile with the 200 rule.
   strip: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 14,
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 60,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.smLg,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
   },
   stripBody: { flex: 1, gap: 2 },
   stripIcon: {
     alignItems: "center",
-    borderRadius: 10,
+    borderColor: colors.borderSoft,
+    borderRadius: spacing.md,
+    borderWidth: 1,
     height: 40,
     justifyContent: "center",
     width: 40,
@@ -109,5 +117,10 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
     fontWeight: "600",
   },
-  stripTitle: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
+  stripTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
 });

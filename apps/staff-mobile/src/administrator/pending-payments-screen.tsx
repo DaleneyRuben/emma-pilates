@@ -8,14 +8,13 @@ import {
   BrandToast,
   ClientFace,
   colors,
+  EmphasisCard,
   fontFamilies,
   formatNotificationTime,
   Glyph,
-  IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
   surfaces,
   typography,
@@ -30,10 +29,11 @@ import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { describeSale } from "./administrator-format";
+import { bodyScroll, RowCard } from "../profile/card-pieces";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
-import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
+import { PlainRow } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 
 export type PaymentsNotice =
@@ -92,35 +92,32 @@ export function PendingPaymentsScreen({
     <RootHeader bell eyebrow={roleLabel} label="Pagos pendientes" title="Pagos pendientes" />
   );
   // Owner, 2026-11-02: what used to sit in the header opens from Pagos.
+  // Rosa Emma (E-D01): the label sits inside the white card.
   const shortcuts = (
-    <View>
-      <SectionTitle>Accesos</SectionTitle>
-      {/* FIX-083 (Ronda 2 pick A): plain rows, no icon discs. */}
-      <PlainRowGroup>
-        <PlainRow
-          label="Facturas por subir"
-          onPress={() => navigation.navigate("Invoices")}
-          testID="pending-payments-invoices"
-          value={invoiceCount > 0 ? String(invoiceCount) : undefined}
-        />
-        <PlainRow
-          label="Cancelar una clase"
-          onPress={() => navigation.navigate("CancelClass")}
-          testID="pending-payments-cancel-class"
-        />
-        <PlainRow
-          label="Congelamientos"
-          onPress={() => navigation.navigate("Freezes")}
-          testID="pending-payments-freezes"
-          value={freezeCount > 0 ? `${freezeCount} por revisar` : undefined}
-        />
-        <PlainRow
-          label="Cerrar caja"
-          onPress={() => navigation.navigate("CashClose")}
-          testID="cash-close-entry"
-        />
-      </PlainRowGroup>
-    </View>
+    <RowCard label="Accesos">
+      <PlainRow
+        label="Facturas por subir"
+        onPress={() => navigation.navigate("Invoices")}
+        testID="pending-payments-invoices"
+        value={invoiceCount > 0 ? String(invoiceCount) : undefined}
+      />
+      <PlainRow
+        label="Cancelar una clase"
+        onPress={() => navigation.navigate("CancelClass")}
+        testID="pending-payments-cancel-class"
+      />
+      <PlainRow
+        label="Congelamientos"
+        onPress={() => navigation.navigate("Freezes")}
+        testID="pending-payments-freezes"
+        value={freezeCount > 0 ? `${freezeCount} por revisar` : undefined}
+      />
+      <PlainRow
+        label="Cerrar caja"
+        onPress={() => navigation.navigate("CashClose")}
+        testID="cash-close-entry"
+      />
+    </RowCard>
   );
 
   if (pending.isPending) {
@@ -151,8 +148,13 @@ export function PendingPaymentsScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        {header}
+      {/* The staff boards keep the band fixed above the scrolling body. */}
+      {header}
+      <ScrollView
+        contentContainerStyle={bodyScroll.content}
+        refreshControl={refreshControl}
+        style={bodyScroll.scroll}
+      >
         {payments.length === 0 ? (
           // FIX-083 (Ronda 2 pick A): one small line, not half a screen.
           <View
@@ -161,18 +163,28 @@ export function PendingPaymentsScreen({
             style={styles.allClear}
             testID="pending-payments-all-clear"
           >
-            <Glyph color={colors.successText} name="check" size={20} strokeWidth={2} />
+            <Glyph color={colors.successText} name="check" size={22} strokeWidth={1.7} />
             <View style={styles.allClearText}>
               <Text style={styles.allClearTitle}>Todo al día</Text>
               <Text style={styles.allClearNote}>No hay pagos por confirmar</Text>
             </View>
           </View>
         ) : (
-          <View>
-            <SectionTitle>
-              {`Por confirmar · ${payments.length} · ${formatMoney(total)} en total`}
-            </SectionTitle>
-            <IconRowGroup>
+          <>
+            {/* E-D01: the pending total is the screen's one 600 hero. */}
+            <View
+              accessibilityLabel={`Por confirmar · ${payments.length} · ${formatMoney(total)} en total`}
+              accessible
+              testID="pending-payments-total"
+            >
+              <EmphasisCard eyebrow={`Por confirmar · ${payments.length}`}>
+                <View style={styles.totalLine}>
+                  <Text style={styles.total}>{formatMoney(total)}</Text>
+                  <Text style={styles.totalWord}>en total</Text>
+                </View>
+              </EmphasisCard>
+            </View>
+            <RowCard>
               {payments.map((payment) => (
                 <PersonRow
                   accessibilityLabel={`Revisar pago de ${payment.clientName}`}
@@ -192,8 +204,8 @@ export function PendingPaymentsScreen({
                   testID={`pending-payment-${payment.id}`}
                 />
               ))}
-            </IconRowGroup>
-          </View>
+            </RowCard>
+          </>
         )}
         {shortcuts}
       </ScrollView>
@@ -217,7 +229,25 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
   },
   allClearText: { flex: 1, gap: spacing.xxs },
-  allClearTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  allClearTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   screen: { paddingHorizontal: spacing.xlSm },
+  total: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: 34,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 40,
+  },
+  totalLine: { alignItems: "baseline", flexDirection: "row", flexWrap: "wrap", gap: spacing.smLg },
+  totalWord: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.titleSmall,
+    fontWeight: "700",
+  },
 });

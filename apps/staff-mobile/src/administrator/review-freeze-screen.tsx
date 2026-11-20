@@ -10,15 +10,16 @@ import {
   QueryFailure,
   Screen,
   spacing,
-  typography,
+  surfaces,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, FooterPanel, taskEdges } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar, backBarScroll } from "../ui/back-bar";
+import { BackBar } from "../ui/back-bar";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { freezeDecision } from "./freeze-format";
 import { FreezeReviewCard } from "./freeze-review-card";
@@ -113,7 +114,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
 
   if (refusing && requested && notice?.tone !== "success") {
     return (
-      <Screen style={styles.screen}>
+      <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
         <View style={[styles.column, tablet && styles.tablet]}>
           <RefuseFreezeStep
             busy={pending === "refused"}
@@ -134,20 +135,25 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
     );
   }
 
+  const deciding = requested && notice?.tone !== "success";
   return (
-    <Screen style={styles.screen}>
+    <Screen
+      edges={deciding ? taskEdges : undefined}
+      style={[styles.screen, deciding && bodyScroll.taskScreen]}
+    >
       <View style={[styles.column, tablet && styles.tablet]}>
-        <ScrollView
-          contentContainerStyle={[styles.content, backBarScroll.content]}
-          style={backBarScroll.scroll}
-        >
-          {header}
+        {header}
+        <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
           <FreezeReviewCard fetcher={fetcher} freeze={freeze} />
           {error}
-          {decision === undefined ? null : <Text style={styles.muted}>{decision}</Text>}
+          {decision === undefined ? null : (
+            <View style={styles.decision}>
+              <Text style={styles.decisionText}>{decision}</Text>
+            </View>
+          )}
         </ScrollView>
-        {requested && notice?.tone !== "success" ? (
-          <View style={styles.actions}>
+        {deciding ? (
+          <FooterPanel>
             <PrimaryButton
               busy={pending === "approved"}
               disabled={pending !== null}
@@ -162,7 +168,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
                 setRefusing(true);
               }}
             />
-          </View>
+          </FooterPanel>
         ) : null}
       </View>
       {toast}
@@ -171,11 +177,11 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
   // iPad: the review keeps a phone-like column instead of stretching.
   column: { alignSelf: "center", flex: 1, width: "100%" },
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  // E-D10: who decided and when, in a white card.
+  decision: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  decisionText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { maxWidth: 560 },
 });

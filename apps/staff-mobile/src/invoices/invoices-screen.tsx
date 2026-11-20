@@ -3,18 +3,18 @@ import {
   colors,
   EmptyState,
   fontFamilies,
-  IconRowGroup,
   LoadingState,
   QueryFailure,
   Screen,
   SegmentedTabs,
   spacing,
-  typography,
+  surfaces,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, RowCard } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
@@ -84,7 +84,7 @@ export function InvoicesScreen() {
   } else {
     body = (
       <>
-        <IconRowGroup>
+        <RowCard>
           {items.map((invoice) => (
             <PersonRow
               accessibilityLabel={`${invoice.clientName}, ${detailOf(invoice, filter)}`}
@@ -95,9 +95,11 @@ export function InvoicesScreen() {
               onPress={() => navigation.navigate("Invoice", { paymentId: invoice.paymentId })}
             />
           ))}
-        </IconRowGroup>
+        </RowCard>
         {filter === "pending" ? (
-          <Text style={styles.note}>Pagos confirmados de clientas que pidieron factura.</Text>
+          <View style={styles.noteCard}>
+            <Text style={styles.note}>Pagos confirmados de clientas que pidieron factura.</Text>
+          </View>
         ) : null}
       </>
     );
@@ -106,7 +108,7 @@ export function InvoicesScreen() {
   return (
     <Screen style={styles.screen}>
       <BackBar onBack={() => navigation.goBack()} title="Facturas" />
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         {tabs}
         {body}
       </ScrollView>
@@ -115,7 +117,8 @@ export function InvoicesScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg, paddingBottom: spacing.xl },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  // Rosa Emma: a quiet line sits in a white card, never on the 100 screen.
+  noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   screen: { paddingHorizontal: spacing.xlSm },
 });

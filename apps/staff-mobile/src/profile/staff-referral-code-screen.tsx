@@ -8,7 +8,6 @@ import {
   QueryFailure,
   ReferralCodeCard,
   Screen,
-  SectionTitle,
   spacing,
   surfaces,
   typography,
@@ -16,11 +15,12 @@ import {
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
+import { bodyScroll, RowCard } from "./card-pieces";
 
 const noticeMilliseconds = 3000;
 
@@ -62,27 +62,22 @@ export function StaffReferralCodeScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {header}
-        <View style={styles.codeBlock}>
-          <ReferralCodeCard code={code} onCopied={() => setNotice("Código copiado")} />
+      {header}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        <ReferralCodeCard code={code} onCopied={() => setNotice("Código copiado")} />
+        {/* E-F13: «Editar código» on its own white card. */}
+        <View style={styles.edit}>
           <EditReferralCode fetcher={fetcher} onChanged={() => setNotice("Código actualizado")} />
         </View>
-        <View>
-          <SectionTitle>Cómo funciona</SectionTitle>
-          <View style={styles.group}>
-            {steps.map((step, index) => (
-              <Fragment key={step}>
-                {index === 0 ? null : <View style={styles.hairline} />}
-                <View style={styles.row}>
-                  <View style={styles.disc}>
-                    <Text style={styles.discText}>{String(index + 1)}</Text>
-                  </View>
-                  <Text style={styles.label}>{step}</Text>
-                </View>
-              </Fragment>
-            ))}
-          </View>
+        <RowCard label="Cómo funciona">
+          {steps.map((step, index) => (
+            <View key={step} style={styles.row}>
+              <Text style={styles.number}>{String(index + 1)}</Text>
+              <Text style={styles.label}>{step}</Text>
+            </View>
+          ))}
+        </RowCard>
+        <View style={styles.noteCard}>
           <Text style={styles.note}>
             Puedes cambiar tu código una vez cada 30 días. Si lo cambias, el anterior deja de
             funcionar; las clientas que ya se registraron siguen contigo.
@@ -95,25 +90,18 @@ export function StaffReferralCodeScreen() {
 }
 
 const styles = StyleSheet.create({
-  codeBlock: { gap: spacing.sm },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  // FIX-089: the step number stands alone, with no tinted disc behind it.
-  disc: { alignItems: "center", justifyContent: "center", width: 36 },
-  discText: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 64 },
+  edit: { ...surfaces.card, alignItems: "flex-start", paddingHorizontal: spacing.xs },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
-  note: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    marginTop: spacing.md,
-  },
+  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  // A quiet line goes in a white card, never on the 100 screen.
+  noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  // FIX-089: the step number stands alone in Lora, with no disc behind it.
+  number: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22, width: 24 },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    minHeight: 56,
+    minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
   screen: { paddingHorizontal: spacing.xlSm },

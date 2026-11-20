@@ -133,7 +133,7 @@ describe("Staff Perfil", () => {
     // v2 S20: the empty inbox leads back to her agenda, as a secondary button:
     // the back arrow and the tab bar already go there (FIX-089).
     expect(screen.getByRole("button", { name: "Volver a mi agenda" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderWidth: 1.5,
     });
     await fireEvent.press(screen.getByRole("button", { name: "Volver a mi agenda" }));
