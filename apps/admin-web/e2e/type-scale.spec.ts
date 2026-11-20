@@ -79,16 +79,18 @@ for (const width of [1440, 420]) {
     let page: Page;
 
     test.beforeAll(async ({ browser }) => {
-      page = await browser.newPage({
+      // axe needs a page from an explicit context.
+      const context = await browser.newContext({
         viewport: { width, height: 900 },
         locale: "es-BO",
         timezoneId: "Europe/Madrid",
       });
+      page = await context.newPage();
       await signIn(page);
     });
 
     test.afterAll(async () => {
-      await page.close();
+      await page.context().close();
     });
 
     for (const path of signedInRoutes) {
@@ -100,16 +102,17 @@ for (const width of [1440, 420]) {
 
     for (const path of publicRoutes) {
       test(`${path} (signed out)`, async ({ browser }) => {
-        const visitor = await browser.newPage({
+        const context = await browser.newContext({
           viewport: { width, height: 900 },
           locale: "es-BO",
         });
+        const visitor = await context.newPage();
         await visitor.goto(path);
         await expect(
           visitor.getByRole("heading", { level: 1 }).first(),
         ).toBeVisible();
         expect(await audit(visitor, narrow)).toEqual([]);
-        await visitor.close();
+        await context.close();
       });
     }
   });
