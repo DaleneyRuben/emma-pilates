@@ -8,11 +8,13 @@ describe('loadTrainerSessionRoster', () => {
     branchName: 'Sucursal Centro',
     startsAt: new Date('2026-09-10T13:00:00.000Z'),
     endsAt: new Date('2026-09-10T14:00:00.000Z'),
+    capacity: 8,
     bookings: [
       {
         bookingId: 'booking-id',
         clientName: 'Ana Pérez',
         attendanceOutcome: 'attended' as const,
+        classNumber: 1,
       },
     ],
   };
@@ -43,11 +45,13 @@ describe('loadTrainerSessionRoster', () => {
       branchName: 'Sucursal Centro',
       startsAt: new Date('2026-09-10T13:00:00.000Z'),
       endsAt: new Date('2026-09-10T14:00:00.000Z'),
+      capacity: 8,
       bookings: [
         {
           bookingId: 'booking-id',
           clientName: 'Ana Pérez',
           attendanceOutcome: 'attended',
+          classNumber: 1,
         },
       ],
     });
