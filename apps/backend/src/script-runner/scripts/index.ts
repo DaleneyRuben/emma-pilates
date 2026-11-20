@@ -1,4 +1,5 @@
 import type { ScriptDefinition } from '../run-script';
+import { androidTestStudio } from './android-test-studio';
 import { storeReviewAccounts } from './store-review-accounts';
 
 // The scripts this release carries, by the name the Run Script workflow
@@ -6,4 +7,5 @@ import { storeReviewAccounts } from './store-review-accounts';
 // written; a script stays here after it ran, as the record of what it did.
 export const scripts: Record<string, ScriptDefinition> = {
   '20261031-store-review-accounts': storeReviewAccounts,
+  '20261120-android-test-studio': androidTestStudio,
 };
