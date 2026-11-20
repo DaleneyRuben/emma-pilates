@@ -10,8 +10,8 @@ export function Label({
     <LabelPrimitive.Root
       data-slot="label"
       className={cn(
-        // FIX-089 (FormB): a 14 px weight-600 label above the field.
-        "block text-celda font-semibold text-texto",
+        // Follow-up 285: a field's label is `compacto` in 600.
+        "block tipo-compacto-600 text-texto",
         className,
       )}
       {...props}

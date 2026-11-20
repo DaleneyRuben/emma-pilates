@@ -60,7 +60,7 @@ export function SearchFilter({
         placeholder={label}
         value={text}
         onChange={(event) => setText(event.target.value)}
-        className="h-[44px] rounded-boton border-0 pl-10 text-celda shadow-tarjeta [&::-webkit-search-cancel-button]:appearance-none"
+        className="h-[44px] rounded-boton border-0 pl-10 tipo-compacto shadow-tarjeta [&::-webkit-search-cancel-button]:appearance-none"
       />
     </div>
   );

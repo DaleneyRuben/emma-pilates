@@ -8,8 +8,7 @@ import {
   type PhoneCountry,
 } from "../../lib/phone-number";
 
-const sectionClass =
-  "px-4 pt-2.5 pb-1 text-pie font-medium tracking-[0.12em] text-texto uppercase";
+const sectionClass = "px-4 pt-2.5 pb-1 tipo-etiqueta text-texto";
 
 // The arrow keys move from the search into the options and between them
 // (Home/End jump); Enter or Space choose, as in the Branch selector.
@@ -48,21 +47,19 @@ function CountryOption({
       tabIndex={-1}
       onClick={() => onPick(country)}
       className={cn(
-        "flex min-h-10 w-full items-center gap-3 px-4 text-left text-cuerpo text-texto hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none",
+        "flex min-h-10 w-full items-center gap-3 px-4 text-left tipo-compacto text-texto hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none",
         selected && "bg-superficie-hundida hover:bg-superficie-hundida",
       )}
     >
-      <span aria-hidden="true" className="leading-none">
-        {country.flag}
-      </span>
+      <span aria-hidden="true">{country.flag}</span>
       <span className="flex-1 truncate">{country.name}</span>
-      <span className="text-celda text-texto tabular">+{country.dial}</span>
+      <span className="tipo-compacto text-texto tabular">+{country.dial}</span>
       {selected ? (
         <Check
           size={18}
           strokeWidth={1.8}
           aria-hidden="true"
-          className="text-rosa-600"
+          className="text-texto"
         />
       ) : null}
     </button>
@@ -112,7 +109,7 @@ export function PhoneCountryList({
           size={18}
           strokeWidth={1.6}
           aria-hidden="true"
-          className="text-primario"
+          className="text-texto"
         />
         <input
           type="text"
@@ -120,7 +117,7 @@ export function PhoneCountryList({
           placeholder="Buscar país o código"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-celda text-texto outline-none placeholder:text-texto"
+          className="min-w-0 flex-1 bg-transparent tipo-compacto text-texto outline-none"
         />
       </label>
       <div
@@ -154,7 +151,7 @@ export function PhoneCountryList({
         )}
       </div>
       {searching && matches.length === 0 ? (
-        <p className="px-4 py-2 text-ayuda text-texto">
+        <p className="px-4 py-2 tipo-secundario text-texto">
           No encontramos ese país.
         </p>
       ) : null}

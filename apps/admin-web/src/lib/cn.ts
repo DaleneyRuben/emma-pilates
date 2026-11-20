@@ -1,38 +1,16 @@
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
+import { typeScale } from "../components/ui/typography";
 
-// tailwind-merge only knows Tailwind's default font sizes; without the Emma
-// scale from index.css it reads `text-cuerpo` as a color and drops either
-// it or the real text color (`text-blanco`) that follows.
-const emmaFontSizes = [
-  "display",
-  "titulo-1",
-  "titulo-2",
-  "titulo-3",
-  "seccion",
-  "precio",
-  "cuerpo-grande",
-  "cuerpo",
-  "etiqueta",
-  "nota",
-  "titulo-pagina",
-  "titulo-panel",
-  "celda",
-  "cabecera-tabla",
-  "etiqueta-campo",
-  "ayuda",
-  "fila-menu",
-  "pie",
-  "titulo-pagina-grande",
-  "cifra",
-  "cifra-grande",
-  "fila",
-  "grande",
-  "titulo-dialogo",
-];
-
-const twMerge = extendTailwindMerge({
-  extend: { theme: { text: emmaFontSizes } },
+// tailwind-merge does not know the closed scale of index.css (follow-up
+// 285): without it, it reads a size token as a colour and drops either it or
+// the real text colour that follows; and the `tipo-*` classes form one group,
+// so a later style replaces an earlier one (`cn(segmentClass, "tipo-compacto")`).
+const twMerge = extendTailwindMerge<"tipo">({
+  extend: {
+    theme: { text: Object.keys(typeScale) },
+    classGroups: { tipo: [{ tipo: Object.keys(typeScale) }] },
+  },
 });
 
 export function cn(...inputs: ClassValue[]): string {

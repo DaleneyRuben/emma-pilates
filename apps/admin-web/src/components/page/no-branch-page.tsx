@@ -1,5 +1,6 @@
 import { LoadingNotice } from "./query-failure";
 import { PageHeader } from "./page-header";
+import { EmptyState } from "../ui/empty-state";
 
 // A Branch-scoped page before the selector has a Branch: still reading the
 // active Branches, or the studio has none yet.
@@ -20,9 +21,7 @@ export function NoBranchPage({
       {pending ? (
         <LoadingNotice>{loadingMessage}</LoadingNotice>
       ) : (
-        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
-          {emptyMessage}
-        </p>
+        <EmptyState>{emptyMessage}</EmptyState>
       )}
     </article>
   );

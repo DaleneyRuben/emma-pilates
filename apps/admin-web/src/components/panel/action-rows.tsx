@@ -12,9 +12,7 @@ export function ActionList({
 }) {
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        {title}
-      </h3>
+      <h3 className="tipo-etiqueta text-texto">{title}</h3>
       <ul
         aria-label={title}
         className="flex flex-col divide-y divide-borde overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
@@ -40,7 +38,7 @@ export function ActionRow({
       <button
         type="button"
         onClick={onClick}
-        className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left text-nota text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
+        className="flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left tipo-compacto text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
       >
         {label}
         <ChevronRight size={18} strokeWidth={1.8} aria-hidden="true" />

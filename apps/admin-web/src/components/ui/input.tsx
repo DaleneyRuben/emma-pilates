@@ -11,7 +11,7 @@ export function Input({
       type={type}
       data-slot="input"
       className={cn(
-        "h-[44px] w-full rounded-panel border-[1.5px] border-borde-fuerte bg-superficie px-3 text-cuerpo text-texto tabular placeholder:text-texto focus-visible:border-primario focus-visible:shadow-foco disabled:opacity-70 aria-invalid:border-2 aria-invalid:border-primario",
+        "h-[44px] w-full rounded-panel border-[1.5px] border-borde-fuerte bg-superficie px-3 tipo-cuerpo text-texto tabular focus-visible:border-primario focus-visible:shadow-foco disabled:bg-superficie-hundida disabled:border-borde aria-invalid:border-2 aria-invalid:border-primario",
         className,
       )}
       {...props}

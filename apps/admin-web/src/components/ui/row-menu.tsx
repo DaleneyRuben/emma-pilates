@@ -39,7 +39,7 @@ export function RowMenu({
             <DropdownMenu.Item
               key={item.label}
               onSelect={item.onSelect}
-              className="flex min-h-[40px] cursor-pointer items-center rounded-control px-3 text-cuerpo outline-none data-highlighted:bg-primario data-highlighted:font-bold data-highlighted:text-blanco"
+              className="flex min-h-[40px] cursor-pointer items-center rounded-control px-3 tipo-compacto outline-none data-highlighted:bg-primario data-highlighted:text-sobre-primario"
             >
               {item.label}
             </DropdownMenu.Item>

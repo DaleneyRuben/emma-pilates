@@ -7,16 +7,17 @@ import { cn } from "../lib/cn";
 import { initials } from "../lib/initials";
 
 const sizes = {
-  28: "size-7 text-[11px]",
-  32: "size-8 text-[11px]",
-  36: "size-9 text-[11px]",
-  40: "size-10 text-pie",
+  28: "size-7",
+  32: "size-8",
+  36: "size-9",
+  40: "size-10",
 } as const;
 
 /**
  * FIX-041 (walkthrough n.º 30): a Client's circle wherever the web draws
  * her, her thumbnail when she has a photo, otherwise her initials in Rosa
- * profundo on 50 inside an Arcilla ring (Rosa Emma, rw.py avatar). The admin-session cookie authenticates the same-origin
+ * profundo on 50 inside an Arcilla ring (Rosa Emma, rw.py avatar), in
+ * `pastilla` (follow-up 285: nothing under 12 px). The admin-session cookie authenticates the same-origin
  * image.
  */
 export function ClientPhoto({
@@ -42,7 +43,7 @@ export function ClientPhoto({
     <span
       data-photo=""
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-superficie-hundida font-bold text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-superficie-hundida tipo-pastilla text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
         sizes[size],
         className,
       )}

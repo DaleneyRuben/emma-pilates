@@ -134,7 +134,7 @@ export function CivilDateInput({
               setFromButton(true);
               setOpen(!open);
             }}
-            className="absolute inset-y-0.5 right-0.5 flex aspect-square items-center justify-center rounded-control text-rosa-600 hover:bg-superficie-hundida focus-visible:shadow-foco disabled:text-texto"
+            className="absolute inset-y-0.5 right-0.5 flex aspect-square items-center justify-center rounded-control text-texto hover:bg-superficie-hundida focus-visible:shadow-foco disabled:text-texto"
           >
             <CalendarDays aria-hidden className="size-5" />
           </button>
