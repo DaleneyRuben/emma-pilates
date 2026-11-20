@@ -80,7 +80,9 @@ export function PlanRow({
     >
       <View style={styles.medio} testID="home-plan-count">
         <Text style={styles.count}>{count}</Text>
-        <Text style={styles.unit}>{unit}</Text>
+        <Text adjustsFontSizeToFit minimumFontScale={0.85} numberOfLines={1} style={styles.unit}>
+          {unit}
+        </Text>
       </View>
       <View style={styles.card} testID="home-plan-summary">
         <View style={styles.body}>
@@ -120,8 +122,9 @@ const styles = StyleSheet.create({
     ...surfaces.medio,
     gap: spacing.xxs,
     justifyContent: "flex-end",
-    padding: spacing.lg,
-    width: 112,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
+    width: 116,
   },
   pressed: { opacity: 0.7 },
   row: {
