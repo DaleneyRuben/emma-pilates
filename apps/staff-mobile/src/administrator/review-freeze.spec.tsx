@@ -162,6 +162,23 @@ describe("freeze review", () => {
     expect(screen.getByLabelText("Vence: lun 1 mar")).toBeOnTheScreen();
   });
 
+  // FIX-091 stores the refusal reason (PR #348); E9 shows it on a refused freeze.
+  it("shows the stored refusal reason of a refused freeze", async () => {
+    const screen = await openReview(
+      { ...refusedFreeze, refusalReason: "Faltan días de aviso" },
+      "Congelamientos",
+      "Ver congelamiento de",
+    );
+
+    expect(screen.getByLabelText("Motivo del rechazo: Faltan días de aviso")).toBeOnTheScreen();
+  });
+
+  it("leaves the refusal reason row out when none was given", async () => {
+    const screen = await openReview(refusedFreeze, "Congelamientos", "Ver congelamiento de");
+
+    expect(screen.queryByText("Motivo del rechazo")).toBeNull();
+  });
+
   it("leaves out the plan end when an older API does not send it", async () => {
     const { planEndsOn: _before, planEndsOnAfter: _after, ...older } = requestedFreeze;
     const screen = await openReview(older, "Congelamientos, 1 por revisar");

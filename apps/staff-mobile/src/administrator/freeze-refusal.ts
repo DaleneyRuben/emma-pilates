@@ -1,7 +1,7 @@
 // E9 B (owner 2026-11-19): why a freeze is refused, as chips, plus an
-// optional message. The API takes one `refusalReason` (≤ 300) that reaches the
-// Client in her «Congelamiento rechazado» notification; it is not stored on
-// the freeze yet (that needs a migration).
+// optional message. The API takes one `refusalReason` (≤ 300), stores it on the
+// freeze (FIX-091) and sends it in the Client's «Congelamiento rechazado»
+// notification.
 export const refusalReasons = [
   "Faltan días de aviso",
   "Ya usó su congelamiento",

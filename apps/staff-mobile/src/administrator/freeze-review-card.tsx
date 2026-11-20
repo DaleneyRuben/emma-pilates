@@ -14,7 +14,8 @@ import { freezePlanEndRow, freezeRequestLine } from "./freeze-format";
 
 /**
  * E9 A (owner 2026-11-19): the Client with her photo or initials, what she
- * asks for with the days counted, then Plan / Vencería / Motivo as a table.
+ * asks for with the days counted, then Plan / Vencería / Motivo as a table,
+ * and the refusal reason once refused.
  */
 export function FreezeReviewCard({
   fetcher,
@@ -28,6 +29,10 @@ export function FreezeReviewCard({
     { label: "Plan", value: freeze.planName },
     ...(planEnd === undefined ? [] : [planEnd]),
     { label: "Motivo", value: freeze.reason },
+    // FIX-091 stores why a freeze was refused; E9 says it on a refused one.
+    ...(freeze.state === "refused" && freeze.refusalReason
+      ? [{ label: "Motivo del rechazo", value: freeze.refusalReason }]
+      : []),
   ];
   return (
     <View style={styles.card} testID="freeze-review-card">
