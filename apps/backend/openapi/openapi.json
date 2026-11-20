@@ -10206,6 +10206,128 @@
         ]
       }
     },
+    "/api/v1/staff-members/current/pay-statements": {
+      "get": {
+        "operationId": "listCurrentStaffPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/salary-payments": {
+      "get": {
+        "operationId": "listCurrentStaffSalaryPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSalaryPaymentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
+    "/api/v1/staff-members/current/salary-payments/{salaryPaymentId}/receipt": {
+      "get": {
+        "operationId": "getCurrentStaffSalaryPaymentReceipt",
+        "parameters": [
+          {
+            "name": "salaryPaymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "OwnPay"
+        ]
+      }
+    },
     "/api/v1/cash-closes/today": {
       "get": {
         "operationId": "getTodayCashClose",

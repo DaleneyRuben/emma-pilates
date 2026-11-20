@@ -244,6 +244,8 @@ export * from "./getClientPhotoForStaffParams";
 export * from "./getClientPhotoForStaffVariant";
 export * from "./getCurrentClientPhotoParams";
 export * from "./getCurrentClientPhotoVariant";
+export * from "./getCurrentStaffSalaryPaymentReceiptParams";
+export * from "./getCurrentStaffSalaryPaymentReceiptVariant";
 export * from "./getExpenseReportParams";
 export * from "./getIncomeReportParams";
 export * from "./getMonthKpisParams";
