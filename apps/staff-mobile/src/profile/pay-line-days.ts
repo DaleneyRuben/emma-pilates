@@ -58,10 +58,17 @@ export function linesByDay(lines: PayStatementLineDto[]): {
     if (match === null) {
       const [title = line.detail, ...rest] = line.detail.split(" · ");
       const note = rest.length === 0 ? null : rest.join(" · ");
-      const same = undated.find(
-        (row) =>
-          row.title === title && row.note === note && row.unitCentavos === line.amountCentavos,
-      );
+      // Only class lines join: two commissions read alike for two Clients
+      // with the same name and Plan.
+      const same =
+        line.kind === "commission"
+          ? undefined
+          : undated.find(
+              (row) =>
+                row.title === title &&
+                row.note === note &&
+                row.unitCentavos === line.amountCentavos,
+            );
       if (same === undefined) {
         undated.push({
           title,
