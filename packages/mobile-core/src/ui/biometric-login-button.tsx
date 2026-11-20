@@ -1,7 +1,8 @@
 import { Platform, Pressable, StyleSheet } from "react-native";
 
 import { BodyText } from "./body-text";
-import { colors, spacing } from "./tokens";
+import { fontFamilies } from "./fonts";
+import { colors, radii, spacing, typography } from "./tokens";
 
 type BiometricLoginButtonProps = {
   onPress: () => void;
@@ -23,14 +24,22 @@ export function BiometricLoginButton({ onPress }: BiometricLoginButtonProps) {
   );
 }
 
+// Rosa Emma C01f: an outlined secondary button, white with a 1.5 pt 600 rule.
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderRadius: radii.button,
+    borderWidth: 1.5,
     justifyContent: "center",
     minHeight: 48,
     paddingHorizontal: spacing.lg,
   },
   label: {
     color: colors.primaryDeep,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
   },
 });
