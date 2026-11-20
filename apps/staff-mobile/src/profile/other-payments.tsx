@@ -27,11 +27,18 @@ function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
 // Finding 111: a payment Nómina recorded without a statement, such as one
 // paid by hand. A row with a receipt opens it; one without shows a payment
 // icon and is inert.
-export function OtherPayments({ payments }: { payments: OwnSalaryPaymentDto[] }) {
+export function OtherPayments({
+  payments,
+  title = "Otros pagos",
+}: {
+  payments: OwnSalaryPaymentDto[];
+  /** «Pagos» when she has no statement at all (E8: the Assistant, the Nutritionist). */
+  title?: string;
+}) {
   const receipts = useReceiptViewer();
   return (
-    <View accessibilityLabel="Otros pagos" style={styles.section}>
-      <SectionTitle>Otros pagos</SectionTitle>
+    <View accessibilityLabel={title} style={styles.section}>
+      <SectionTitle>{title}</SectionTitle>
       <View style={styles.group}>
         {payments.map((payment, index) => {
           const divider = index > 0 && styles.divider;

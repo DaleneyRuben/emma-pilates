@@ -1,6 +1,5 @@
 import {
   useGetCurrentStaffMemberProfile,
-  useGetOwnPayoutQr,
   useGetOwnReferralCode,
   useGetUnreadNotificationCount,
   staffRoleLabel,
@@ -29,8 +28,10 @@ import appConfig from "../../app.json";
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { payoutQrRowValue } from "./payout-qr/payout-qr-copy";
+import { payPlacement } from "./pay-placement";
+import { PayoutQrRow } from "./payout-qr/payout-qr-row";
 import { ProfileRow } from "./profile-row";
+import { useLastPaymentNote } from "./use-last-payment-note";
 import { StaffPhotoSummary } from "./staff-photo-summary";
 import { branchesLabel } from "./staff-labels";
 
@@ -39,6 +40,7 @@ type ProfileNavigation = {
     screen:
       | "Notifications"
       | "PayTab"
+      | "MyPay"
       | "ChangePassword"
       | "Feedback"
       | "ReferralCode"
@@ -72,11 +74,9 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  // FIX-072: every role keeps the QR she is paid by.
-  const payoutQr = useGetOwnPayoutQr({ fetcher, query: { refetchOnMount: "always" } });
-  const payoutQrValue =
-    payoutQr.data?.status === 200 ? payoutQrRowValue(payoutQr.data.data.payoutQr) : undefined;
   const trainer = identity.session?.role === "trainer";
+  const pay = payPlacement(identity.session?.role);
+  const lastPayment = useLastPaymentNote(pay === "profile");
   // BKM-017: only a Trainer has a code of her own (follow-up 229).
   const ownCode = useGetOwnReferralCode({
     fetcher,
@@ -136,26 +136,24 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
         <View>
           <SectionTitle>Ajustes</SectionTitle>
           <IconRowGroup>
-            <ProfileRow
-              icon="image"
-              label="Mi QR de cobro"
-              onPress={() => navigation.navigate("PayoutQr")}
-              testID="profile-payout-qr"
-              value={payoutQrValue?.text}
-              valueTone={payoutQrValue?.tone}
-            />
+            {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
+                here: her tab, or for the Assistant the screen itself. */}
+            {pay === "none" ? null : (
+              <ProfileRow
+                icon="credit"
+                label="Mis pagos"
+                onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
+                testID="profile-my-pay"
+                value={lastPayment}
+              />
+            )}
+            {/* FIX-072: every role keeps the QR she is paid by. */}
+            <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
             {administrator ? (
               <ProfileRow
                 icon="eye"
                 label="Ver la app como…"
                 onPress={() => navigation.navigate("ViewAs")}
-              />
-            ) : null}
-            {trainer ? (
-              <ProfileRow
-                icon="credit"
-                label="Mis pagos"
-                onPress={() => navigation.navigate("PayTab")}
               />
             ) : null}
             {trainer && referralCode !== null ? (

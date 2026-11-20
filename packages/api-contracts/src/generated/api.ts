@@ -152,6 +152,7 @@ import type {
   GetAdminPromotionImageParams,
   GetClientPhotoForStaffParams,
   GetCurrentClientPhotoParams,
+  GetCurrentStaffSalaryPaymentReceiptParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
   GetMonthKpisParams,
@@ -38836,6 +38837,622 @@ export function useGetOwnSalaryPaymentReceipt<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetOwnSalaryPaymentReceiptQueryOptions(
+    salaryPaymentId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listCurrentStaffPayStatementsResponse200 = {
+  data: PayStatementDto[];
+  status: 200;
+};
+
+export type listCurrentStaffPayStatementsResponseSuccess =
+  listCurrentStaffPayStatementsResponse200 & {
+    headers: Headers;
+  };
+export type listCurrentStaffPayStatementsResponse =
+  listCurrentStaffPayStatementsResponseSuccess;
+
+export const getListCurrentStaffPayStatementsUrl = () => {
+  return `/api/v1/staff-members/current/pay-statements`;
+};
+
+export const listCurrentStaffPayStatements = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCurrentStaffPayStatementsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCurrentStaffPayStatementsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCurrentStaffPayStatementsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCurrentStaffPayStatementsResponse;
+};
+
+export const getListCurrentStaffPayStatementsQueryKey = () => {
+  return [`/api/v1/staff-members/current/pay-statements`] as const;
+};
+
+export const getListCurrentStaffPayStatementsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListCurrentStaffPayStatementsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listCurrentStaffPayStatements>>
+  > = ({ signal }) =>
+    listCurrentStaffPayStatements({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCurrentStaffPayStatementsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCurrentStaffPayStatements>>
+>;
+export type ListCurrentStaffPayStatementsQueryError = unknown;
+
+export function useListCurrentStaffPayStatements<
+  TData = Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentStaffPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentStaffPayStatements<
+  TData = Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentStaffPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentStaffPayStatements<
+  TData = Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListCurrentStaffPayStatements<
+  TData = Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListCurrentStaffPayStatementsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listCurrentStaffSalaryPaymentsResponse200 = {
+  data: OwnSalaryPaymentDto[];
+  status: 200;
+};
+
+export type listCurrentStaffSalaryPaymentsResponseSuccess =
+  listCurrentStaffSalaryPaymentsResponse200 & {
+    headers: Headers;
+  };
+export type listCurrentStaffSalaryPaymentsResponse =
+  listCurrentStaffSalaryPaymentsResponseSuccess;
+
+export const getListCurrentStaffSalaryPaymentsUrl = () => {
+  return `/api/v1/staff-members/current/salary-payments`;
+};
+
+export const listCurrentStaffSalaryPayments = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCurrentStaffSalaryPaymentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCurrentStaffSalaryPaymentsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCurrentStaffSalaryPaymentsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCurrentStaffSalaryPaymentsResponse;
+};
+
+export const getListCurrentStaffSalaryPaymentsQueryKey = () => {
+  return [`/api/v1/staff-members/current/salary-payments`] as const;
+};
+
+export const getListCurrentStaffSalaryPaymentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListCurrentStaffSalaryPaymentsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>
+  > = ({ signal }) =>
+    listCurrentStaffSalaryPayments({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCurrentStaffSalaryPaymentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>
+>;
+export type ListCurrentStaffSalaryPaymentsQueryError = unknown;
+
+export function useListCurrentStaffSalaryPayments<
+  TData = Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentStaffSalaryPayments<
+  TData = Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCurrentStaffSalaryPayments<
+  TData = Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListCurrentStaffSalaryPayments<
+  TData = Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCurrentStaffSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListCurrentStaffSalaryPaymentsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentStaffSalaryPaymentReceiptResponse200ImageJpeg = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentStaffSalaryPaymentReceiptResponse200ImagePng = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentStaffSalaryPaymentReceiptResponse200ImageWebp = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentStaffSalaryPaymentReceiptResponseSuccess = (
+  | getCurrentStaffSalaryPaymentReceiptResponse200ImageJpeg
+  | getCurrentStaffSalaryPaymentReceiptResponse200ImagePng
+  | getCurrentStaffSalaryPaymentReceiptResponse200ImageWebp
+) & {
+  headers: Headers;
+};
+export type getCurrentStaffSalaryPaymentReceiptResponse =
+  getCurrentStaffSalaryPaymentReceiptResponseSuccess;
+
+export const getGetCurrentStaffSalaryPaymentReceiptUrl = (
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/staff-members/current/salary-payments/${salaryPaymentId}/receipt?${stringifiedParams}`
+    : `/api/v1/staff-members/current/salary-payments/${salaryPaymentId}/receipt`;
+};
+
+export const getCurrentStaffSalaryPaymentReceipt = async (
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentStaffSalaryPaymentReceiptResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentStaffSalaryPaymentReceiptUrl(salaryPaymentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getCurrentStaffSalaryPaymentReceiptResponse["data"] =
+    body as getCurrentStaffSalaryPaymentReceiptResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentStaffSalaryPaymentReceiptResponse;
+};
+
+export const getGetCurrentStaffSalaryPaymentReceiptQueryKey = (
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+) => {
+  return [
+    `/api/v1/staff-members/current/salary-payments/${salaryPaymentId}/receipt`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetCurrentStaffSalaryPaymentReceiptQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetCurrentStaffSalaryPaymentReceiptQueryKey(salaryPaymentId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>
+  > = ({ signal }) =>
+    getCurrentStaffSalaryPaymentReceipt(
+      salaryPaymentId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: salaryPaymentId !== null && salaryPaymentId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentStaffSalaryPaymentReceiptQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>
+>;
+export type GetCurrentStaffSalaryPaymentReceiptQueryError = unknown;
+
+export function useGetCurrentStaffSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params: undefined | GetCurrentStaffSalaryPaymentReceiptParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentStaffSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentStaffSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentStaffSalaryPaymentReceipt<
+  TData = Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+  TError = unknown,
+>(
+  salaryPaymentId: string,
+  params?: GetCurrentStaffSalaryPaymentReceiptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffSalaryPaymentReceipt>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentStaffSalaryPaymentReceiptQueryOptions(
     salaryPaymentId,
     params,
     options,

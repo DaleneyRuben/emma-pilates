@@ -213,9 +213,14 @@ describe('trainer pay statements', () => {
         (row) => row.id,
       ),
     ).not.toContain(emmaStatement!.id);
+    // ADR-0111: every paid Staff Member reads her own statements, never
+    // another's; the Administrator reads them through Sueldos instead.
     await expect(
-      codeOf(statements().listOwnStatements(await assistant())),
-    ).resolves.toBe('back_office_access_denied');
+      statements().listOwnStatements(await assistant()),
+    ).resolves.toEqual([]);
+    await expect(codeOf(statements().listOwnStatements(admin))).resolves.toBe(
+      'back_office_access_denied',
+    );
     await expect(
       codeOf(
         statements().approveStatement(

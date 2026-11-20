@@ -4,7 +4,7 @@ import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
 import {
   BackOfficeError,
   requireAdministrator,
-  requireTrainer,
+  requirePayee,
   type BackOfficeActor,
 } from '../back-office-errors';
 import { recordBackOfficeAudit } from '../prisma-audit';
@@ -150,7 +150,7 @@ export const createPrismaPayStatements = (
     },
 
     listOwnStatements: async (principal: AuthenticatedPrincipal) => {
-      const staffMemberId = requireTrainer(principal);
+      const staffMemberId = requirePayee(principal);
       const rows = await prisma.payStatement.findMany({
         where: { staffMemberId, deletedAt: null },
         orderBy: { periodStart: 'desc' },

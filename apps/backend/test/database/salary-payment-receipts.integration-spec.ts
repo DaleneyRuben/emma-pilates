@@ -185,7 +185,7 @@ describe('Salary Payment receipts', () => {
     ).resolves.toBe('salary_receipt_not_ready');
   });
 
-  it('serves the receipt to the Administrator and the Trainer it pays only', async () => {
+  it('serves the receipt to the Administrator and the Staff Member it pays only', async () => {
     const admin = await principalOf('paola.mendoza@example.com');
     const photo = await readyReceipt(admin.accountId);
     const payment = await record(photo.id);
@@ -225,15 +225,19 @@ describe('Salary Payment receipts', () => {
       objectKey: thumbnail.storageKey,
       mediaType: 'image/webp',
     });
-    await expect(codeOf(own('daniela.ortiz@example.com'))).resolves.toBe(
-      'salary_payment_not_found',
-    );
+    // ADR-0111: any other paid Staff Member reads her own receipts only, so
+    // this one is not found for her.
     for (const email of [
-      'paola.mendoza@example.com',
+      'daniela.ortiz@example.com',
       'camila.rojas@example.com',
       'carolina.rivas@example.com',
-      'lucia@example.com',
+      'gabriela.flores@example.com',
     ]) {
+      await expect(codeOf(own(email))).resolves.toBe(
+        'salary_payment_not_found',
+      );
+    }
+    for (const email of ['paola.mendoza@example.com', 'lucia@example.com']) {
       await expect(codeOf(own(email))).resolves.toBe(
         'back_office_access_denied',
       );

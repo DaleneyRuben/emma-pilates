@@ -32,6 +32,26 @@ export function statusLine(status: StatementStatus): string {
     : `Pagado el ${formatListDate(status.payment.paidOn)}`;
 }
 
+/**
+ * E2 B: the state under the statement's total, with its real date: when an
+ * open period can be approved, or when an approved one was paid.
+ */
+export function totalStateLine(
+  statement: { approvableOn?: string | null },
+  status: StatementStatus,
+): string {
+  if (status.kind === "open") {
+    const approvableOn = statement.approvableOn ?? null;
+    return approvableOn === null
+      ? "En curso · puede cambiar"
+      : `En curso · se aprueba desde el ${formatListDate(approvableOn)}`;
+  }
+  if (status.kind === "unpaid") return "Aprobada · por pagar";
+  return status.payment === undefined
+    ? "Aprobada · pagada"
+    : `Aprobada · pagada el ${formatListDate(status.payment.paidOn)}`;
+}
+
 /** Payments Nómina recorded without a statement, such as one paid by hand. */
 export function otherPayments(
   statements: PayStatementDto[],

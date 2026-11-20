@@ -129,12 +129,13 @@ export const requireSupplyKeeper = (
   return { accountId: principal.accountId };
 };
 
-// A Trainer reads her own pay (BKO-006). Anyone else, a Coordinator included
-// (ADR-0102), is denied.
-export const requireTrainer = (principal: AuthenticatedPrincipal): string => {
+// A Staff Member who is paid reads her own pay (BKO-006, ADR-0111): a
+// Trainer, the Coordinator, a Nutritionist, or an Assistant. The
+// Administrator reads everyone's through Sueldos instead; a Client is denied.
+export const requirePayee = (principal: AuthenticatedPrincipal): string => {
   if (
     principal.identity.kind !== 'staff' ||
-    principal.identity.role !== 'trainer'
+    principal.identity.role === 'administrator'
   ) {
     throw new BackOfficeError('back_office_access_denied');
   }

@@ -54,9 +54,9 @@ export function staffRoutes(profile: unknown, pay: PayRoutes = {}) {
     "/api/v1/trainer/sessions": () => jsonResponse([]),
     "/api/v1/staff-members/current": () => jsonResponse(profile),
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
-    "/api/v1/trainer/pay-statements":
+    "/api/v1/staff-members/current/pay-statements":
       pay.statements ?? (() => jsonResponse([draftNovember, approvedOctober])),
-    "/api/v1/trainer/salary-payments":
+    "/api/v1/staff-members/current/salary-payments":
       pay.payments ??
       (() =>
         jsonResponse([

@@ -256,6 +256,42 @@ describe('Prisma Back Office salary payments', () => {
       ),
     ).resolves.toBe('back_office_access_denied');
   });
+  // ADR-0111: the Assistant, the Nutritionist, and the Coordinator read the
+  // payments logged for them, and only those.
+  it('lists the own Salary Payments of every paid Role and nobody else’s', async () => {
+    const admin = await administrator();
+    const paid = [
+      ['camila.rojas@example.com', 41_000],
+      ['gabriela.flores@example.com', 52_000],
+      ['carolina.rivas@example.com', 378_000],
+    ] as const;
+    for (const [email, amountCentavos] of paid) {
+      await payroll().recordSalaryPayment(
+        {
+          staffMemberId: await staffIdOf(email),
+          amountCentavos,
+          paidOn: civil('2026-08-02'),
+          receiptImageAssetId: await photoOf(admin),
+        },
+        admin,
+        randomUUID(),
+      );
+    }
+
+    for (const [email, amountCentavos] of paid) {
+      const own = await payroll().listOwnSalaryPayments(
+        await principalOf(email),
+      );
+      const theirs = paid
+        .filter(([other]) => other !== email)
+        .map(([, amount]) => amount);
+      expect(own.map((row) => row.amountCentavos)).toContain(amountCentavos);
+      for (const amount of theirs) {
+        expect(own.map((row) => row.amountCentavos)).not.toContain(amount);
+      }
+    }
+  });
+
   it('lists only the signed-in Trainer’s own Salary Payments, newest first', async () => {
     const daniela = await staffIdOf('daniela.ortiz@example.com');
     const emma = await staffIdOf('emma.vargas@example.com');
@@ -298,13 +334,7 @@ describe('Prisma Back Office salary payments', () => {
       expect.arrayContaining([71_000, 70_000]),
     );
     expect(own.map((row) => row.amountCentavos)).not.toContain(99_000);
-    for (const email of [
-      'camila.rojas@example.com',
-      'lucia@example.com',
-      'paola.mendoza@example.com',
-      'carolina.rivas@example.com',
-      'gabriela.flores@example.com',
-    ]) {
+    for (const email of ['lucia@example.com', 'paola.mendoza@example.com']) {
       await expect(
         codeOf(payroll().listOwnSalaryPayments(await principalOf(email))),
       ).resolves.toBe('back_office_access_denied');
