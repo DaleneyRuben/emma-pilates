@@ -7,7 +7,7 @@ import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { colors, radii, shadows, spacing, typography } from "../ui/tokens";
 
 // The API's rule (BKM-017): 3 to 20 letters, digits or hyphens.
 const codePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
@@ -179,24 +179,33 @@ const styles = StyleSheet.create({
   field: { gap: spacing.sm },
   hidden: { display: "none" },
   input: { fontFamily: fontFamilies.display, fontSize: 22, letterSpacing: 2.6 },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  note: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   ok: { color: colors.successText },
   quiet: { color: colors.textMuted },
   scroll: { flexGrow: 1, justifyContent: "flex-end" },
+  // E-F14: the white sheet with its 28 pt upper corners.
   sheet: {
+    ...shadows.sheet,
     backgroundColor: colors.card,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.lg,
-    padding: spacing.xl,
+    borderTopLeftRadius: radii.band,
+    borderTopRightRadius: radii.band,
+    gap: spacing.mdLg,
+    paddingBottom: spacing.xxl,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.xl,
   },
   status: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  statusText: { fontFamily: fontFamilies.bodyStrong, fontSize: 14, fontWeight: "600" },
+  statusText: { fontFamily: fontFamilies.bodyBold, fontSize: 14, fontWeight: "700" },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSecondary,
-    fontWeight: "500",
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 29,
   },
   wrong: { color: colors.errorText },
 });

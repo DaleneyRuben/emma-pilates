@@ -7,19 +7,15 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   BrandToast,
   colors,
   fontFamilies,
-  Heading,
-  IconRow,
-  IconRowGroup,
   LoadingState,
   LogoutConfirmationSheet,
   QueryFailure,
   Screen,
+  ScreenHeader,
   SectionTitle,
-  TextButton,
   spacing,
   surfaces,
   typography,
@@ -35,6 +31,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { appVersionLabel } from "./app-version";
 import { ClientAvatar } from "./client-avatar";
+import { ProfileRow, ProfileRowCard } from "./profile-rows";
 import { useClientPhoto } from "./use-client-photo";
 
 type ProfileNavigation = {
@@ -76,7 +73,8 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
     profile.data?.status === 200 ? (profile.data.data.photo?.imageAssetId ?? null) : null,
   );
 
-  const header = <Heading accessibilityLabel="Perfil">Perfil</Heading>;
+  // C18: the tab's root, so the band has no way back.
+  const header = <ScreenHeader title="Perfil" />;
 
   if (profile.isPending) {
     return (
@@ -104,50 +102,57 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.summary}>
-          <ClientAvatar name={client.name} photoUri={photoUri} size={56} />
-          <View style={styles.summaryBody}>
+        {/* C18: the identity is the screen's one 600 hero. */}
+        <View style={styles.hero}>
+          <ClientAvatar name={client.name} onEmphasis photoUri={photoUri} size={56} />
+          <View style={styles.heroBody}>
             <Text style={styles.name}>{client.name}</Text>
-            <BodyText>{client.email}</BodyText>
-            {client.phone ? <BodyText>{phoneWithFlag(client.phone)}</BodyText> : null}
+            <Text style={styles.heroLine}>{client.email}</Text>
+            {client.phone ? (
+              <Text style={styles.heroLine}>{phoneWithFlag(client.phone)}</Text>
+            ) : null}
           </View>
-          <TextButton label="Editar" onPress={() => navigation.navigate("EditProfile")} />
+          <Pressable
+            accessibilityLabel="Editar"
+            accessibilityRole="button"
+            hitSlop={spacing.sm}
+            onPress={() => navigation.navigate("EditProfile")}
+            style={styles.edit}
+          >
+            <Text style={styles.editLabel}>Editar</Text>
+          </Pressable>
         </View>
         <View>
           <SectionTitle>Tu plan y tus clases</SectionTitle>
-          <IconRowGroup plain>
-            <IconRow
-              chevron
+          <ProfileRowCard>
+            <ProfileRow
               icon="card"
               label="Mi plan"
               onPress={() => navigation.navigate("Subscription")}
+              pill
               value={status === null || status === "none" ? undefined : planPill[status]}
             />
-            <IconRow
-              chevron
-              icon="health"
+            <ProfileRow
+              icon="leaf"
               label="Evaluación nutricional"
               onPress={() => navigation.navigate("EvaluationAvailability")}
             />
-            <IconRow
-              chevron
-              icon="receipt"
+            <ProfileRow
+              icon="document"
               label="Mis facturas"
               onPress={() => navigation.navigate("MyInvoices")}
             />
-            <IconRow
-              chevron
+            <ProfileRow
               icon="personAdd"
               label="Invita a una amiga"
               onPress={() => navigation.navigate("Referrals")}
             />
-          </IconRowGroup>
+          </ProfileRowCard>
         </View>
         <View>
           <SectionTitle>Preferencias</SectionTitle>
-          <IconRowGroup plain>
-            <IconRow
-              chevron
+          <ProfileRowCard>
+            <ProfileRow
               icon="bell"
               label="Notificaciones"
               onPress={() => navigation.navigate("Notifications")}
@@ -157,37 +162,35 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                   : `${unreadCount} sin leer`
               }
             />
-          </IconRowGroup>
+          </ProfileRowCard>
         </View>
         <View>
           <SectionTitle>Cuenta</SectionTitle>
-          <IconRowGroup plain>
-            <IconRow
-              chevron
+          <ProfileRowCard>
+            <ProfileRow
               icon="password"
               label="Cambiar contraseña"
               onPress={() => navigation.navigate("ChangePassword")}
             />
-            <IconRow
-              chevron
+            <ProfileRow
               icon="message"
               label="Enviar comentarios"
               onPress={() => navigation.navigate("Feedback")}
             />
-            <IconRow
+            <ProfileRow
+              chevron={false}
               icon="logout"
               label="Cerrar sesión"
               onPress={() => setConfirmingLogout(true)}
-              tone="error"
             />
-          </IconRowGroup>
+          </ProfileRowCard>
         </View>
-        {/* Follow-up 256 § 2: «Cerrar mi cuenta» is a muted link after the
+        {/* Follow-up 256 § 2: «Cerrar mi cuenta» is a quiet link after the
             version, away from «Cerrar sesión»; it still opens C24. */}
         <View style={styles.end}>
-          <BodyText style={styles.footer}>
-            {`Emma Pilates Studio · versión ${appVersionLabel()} ·`}
-          </BodyText>
+          <Text
+            style={styles.footer}
+          >{`Emma Pilates Studio · versión ${appVersionLabel()} ·`}</Text>
           <Pressable
             accessibilityRole="button"
             hitSlop={spacing.md}
@@ -218,29 +221,58 @@ const planPill = {
 } as const;
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  closeAccount: { fontFamily: fontFamilies.body, textDecorationLine: "underline" },
+  closeAccount: {
+    fontFamily: fontFamilies.bodyBold,
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
+  content: { gap: spacing.md, paddingBottom: spacing.xxl },
+  edit: { alignSelf: "center", minHeight: 44, justifyContent: "center" },
+  editLabel: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+    textDecorationColor: colors.onEmphasis,
+    textDecorationLine: "underline",
+  },
+  // C18s: the version line on its own white card.
   end: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.xs,
-    justifyContent: "center",
-  },
-  footer: {
-    color: colors.textMuted,
-    fontSize: typography.label,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleCard },
-  screen: { gap: spacing.lg },
-  summary: {
     ...surfaces.card,
     alignItems: "center",
+    columnGap: spacing.xs,
     flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  summaryBody: { flex: 1, gap: spacing.xxs },
+  footer: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 19,
+    textAlign: "center",
+  },
+  hero: {
+    ...surfaces.emphasis,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.mdLg,
+    padding: spacing.xlSm,
+  },
+  heroBody: { flex: 1, gap: spacing.xxs },
+  heroLine: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 19,
+  },
+  name: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 29,
+  },
+  screen: { gap: spacing.md },
 });

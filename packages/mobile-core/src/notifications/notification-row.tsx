@@ -97,7 +97,7 @@ function NotificationRow({
   );
 }
 
-/** C2 C: one section's notices on a Crema card with an Arcilla border. */
+/** C19: one section's notices on a white card, rows split by 100 hairlines. */
 export function NotificationGroup({
   actionFor,
   items,
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
   action: { alignSelf: "flex-start", marginLeft: iconSize + spacing.md, paddingVertical: 2 },
   actionLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body - 1,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
     textDecorationColor: colors.text,
     textDecorationLine: "underline",
   },
@@ -184,6 +184,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   // New notices say it in weight as well as the dot (FIX-089: no tinted row).
-  titleNew: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  titleNew: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   when: { alignItems: "center", flexDirection: "row", flexShrink: 0, gap: spacing.smd },
 });

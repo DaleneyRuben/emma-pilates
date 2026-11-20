@@ -17,14 +17,23 @@ const api = (inspection?: Inspection) =>
 
 const hidden = { includeHiddenElements: true };
 
-// MOB-035: the outcome frames of 20, 21, 22, S18, S19 draw a 76 pt badge over
-// a centred title. FIX-089: the glyph stands alone in Rosa profundo, no disc.
-const expectBadge = (screen: Screen, _tone: "success" | "primary", icon: string, title: string) => {
-  expect(screen.getByTestId("outcome-badge", hidden)).toHaveStyle({ height: 76, width: 76 });
-  expect(screen.getByTestId("outcome-badge", hidden)).not.toHaveStyle({ borderRadius: 38 });
+// MOB-035, Rosa Emma: the outcome frames draw a 72 pt disc over a centred
+// title. On the client band a done or sent outcome is a solid 600 disc with a
+// white glyph and a dead link a white disc; the staff card draws a 50 disc.
+const expectBadge = (
+  screen: Screen,
+  surface: "solid" | "white" | "soft",
+  icon: string,
+  title: string,
+) => {
+  const disc = screen.getByTestId("outcome-badge", hidden);
+  expect(disc).toHaveStyle({ borderRadius: 36, height: 72, width: 72 });
+  expect(disc).toHaveStyle({
+    backgroundColor: { solid: colors.emphasis, white: colors.card, soft: "#FEF6F2" }[surface],
+  });
   const drawn = screen.getByTestId(`outcome-icon-${icon}`, hidden);
-  expect(drawn).toHaveProp("stroke", colors.text);
-  expect(drawn).toHaveProp("width", 34);
+  expect(drawn).toHaveProp("stroke", surface === "solid" ? colors.onEmphasis : colors.text);
+  expect(drawn).toHaveProp("width", 32);
   expect(screen.getByText(title)).toHaveStyle({ textAlign: "center" });
 };
 
@@ -40,7 +49,7 @@ describe("The outcome badge (MOB-035)", () => {
       await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
       await screen.findByText("Revisa tu correo");
-      expectBadge(screen, "success", "check", "Revisa tu correo");
+      expectBadge(screen, staff ? "soft" : "solid", "check", "Revisa tu correo");
     },
   );
 
@@ -59,7 +68,7 @@ describe("The outcome badge (MOB-035)", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Activar cuenta" }));
 
     await screen.findByText("Tu cuenta está activa");
-    expectBadge(screen, "success", "check", "Tu cuenta está activa");
+    expectBadge(screen, "solid", "check", "Tu cuenta está activa");
   });
 
   it.each([
@@ -77,17 +86,17 @@ describe("The outcome badge (MOB-035)", () => {
       );
 
       await screen.findByText(title);
-      expectBadge(screen, "primary", "clock", title);
+      expectBadge(screen, "white", "clock", title);
     },
   );
 
   it.each([
-    [null, "mail", "Confirmando tu correo", "primary"],
-    ["changed", "check", "Tu correo cambió", "success"],
-    ["expired", "clock", "Enlace vencido", "primary"],
-    ["invalid", "blocked", "Enlace no válido", "primary"],
-    ["email_unavailable", "at", "Correo no disponible", "primary"],
-  ] as const)("draws 22's %s outcome with its icon", async (status, icon, title, tone) => {
+    [null, "mail", "Confirmando tu correo", "solid"],
+    ["changed", "check", "Tu correo cambió", "solid"],
+    ["expired", "clock", "Enlace vencido", "white"],
+    ["invalid", "blocked", "Enlace no válido", "white"],
+    ["email_unavailable", "at", "Correo no disponible", "white"],
+  ] as const)("draws 22's %s outcome with its icon", async (status, icon, title, surface) => {
     const completeEmailChange =
       status === null
         ? () => new Promise<never>(() => undefined)
@@ -97,7 +106,7 @@ describe("The outcome badge (MOB-035)", () => {
     );
 
     await screen.findByText(title);
-    expectBadge(screen, tone, icon, title);
+    expectBadge(screen, surface, icon, title);
     expect(screen.getByText("Emma Pilates Studio")).toBeOnTheScreen();
   });
 });

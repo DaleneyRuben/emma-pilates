@@ -1,5 +1,5 @@
 import { formatListDate, type ClientInvoiceDto } from "@pilates/api-contracts";
-import { colors, ExceptionPill, fontFamilies, typography } from "@pilates/mobile-core";
+import { colors, ExceptionPill, fontFamilies } from "@pilates/mobile-core";
 import { StyleSheet, Text } from "react-native";
 
 /** «jue 5 nov», the day she paid, in Bolivia (FIX-090's list date). */
@@ -23,6 +23,12 @@ export function InvoiceState({ invoice }: { invoice: ClientInvoiceDto }) {
 }
 
 const styles = StyleSheet.create({
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  // C17: both states in words at 14 semibold.
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
+  },
   pending: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
 });

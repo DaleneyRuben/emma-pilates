@@ -17,11 +17,13 @@ describe("LoginScreen", () => {
   it("names Emma Pilates Studio without the tagline", async () => {
     const screen = await render(<LoginScreen onSubmit={jest.fn()} />);
 
-    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 36 });
+    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 34 });
     expect(screen.queryByText("Movimiento · Equilibrio · Bienestar")).toBeNull();
   });
 
-  it("centres the brand and the form together, the team login too (v2 C01, S01)", async () => {
+  // Rosa Emma C01/E-A01: the wordmark on the band (the team's with its
+  // capsule), the form in a white card and «Regístrate» in its own card.
+  it("draws the wordmark on the band and the form in a white card (C01, E-A01)", async () => {
     for (const teamAccess of [false, true]) {
       const screen = await render(
         <LoginScreen
@@ -31,13 +33,19 @@ describe("LoginScreen", () => {
         />,
       );
       const main = screen.getByTestId("login-main");
-      expect(main).toHaveStyle({
-        flexGrow: 1,
-        gap: teamAccess ? 24 : 32,
-        justifyContent: "center",
+      const band = screen.getByTestId("screen-header");
+      expect(band).toHaveStyle({ backgroundColor: "#E7CCBF" });
+      expect(band).toContainElement(screen.getByText("Emma Pilates Studio"));
+      expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({
+        fontSize: teamAccess ? 36 : 34,
       });
-      expect(main).toContainElement(screen.getByText("Emma Pilates Studio"));
       expect(main).toContainElement(screen.getByTestId("login-submit"));
+      expect(band).not.toContainElement(screen.getByTestId("login-submit"));
+      if (teamAccess) {
+        expect(band).toContainElement(screen.getByText("Acceso del equipo"));
+      } else {
+        expect(screen.getByText("¿No tienes una cuenta?")).toBeOnTheScreen();
+      }
       await screen.unmount();
     }
   });

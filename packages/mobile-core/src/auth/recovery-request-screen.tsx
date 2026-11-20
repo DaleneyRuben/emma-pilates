@@ -58,20 +58,29 @@ export function RecoveryRequestScreen({
   const topBar = { onBack, title: "Recuperar contraseña" };
 
   if (sentTo !== null) {
+    const back = (
+      <TextButton
+        label="Volver a iniciar sesión"
+        onPress={onBack}
+        style={teamAccess ? undefined : authStyles.pill}
+        testID="recovery-back"
+      />
+    );
     return (
       <AuthenticationScreen
+        actions={back}
         badge={{ icon: "check", tone: "success" }}
         brand={false}
+        staff={teamAccess}
         title="Revisa tu correo"
         topBar={topBar}
       >
-        <BodyText style={authStyles.centered}>
+        <BodyText style={teamAccess ? authStyles.centered : undefined}>
           {`Si hay una cuenta con ${sentTo}, te enviamos un enlace para restablecer tu contraseña.`}
         </BodyText>
-        <BodyText style={[authStyles.muted, authStyles.centered]}>
+        <BodyText style={[authStyles.small, teamAccess ? authStyles.centered : undefined]}>
           El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam.
         </BodyText>
-        <TextButton label="Volver a iniciar sesión" onPress={onBack} testID="recovery-back" />
       </AuthenticationScreen>
     );
   }
@@ -106,7 +115,9 @@ export function RecoveryRequestScreen({
         onPress={submit}
         testID="recovery-submit"
       />
-      {limited ? <TextButton label="Volver a iniciar sesión" onPress={onBack} /> : null}
+      {limited ? (
+        <TextButton label="Volver a iniciar sesión" onPress={onBack} style={authStyles.pill} />
+      ) : null}
     </AuthenticationScreen>
   );
 }

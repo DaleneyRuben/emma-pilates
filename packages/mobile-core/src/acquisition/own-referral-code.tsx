@@ -118,6 +118,7 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
   };
 
   return (
+    // E-F13: each app sets «Editar código» on its own white card.
     <>
       <TextButton label="Editar código" onPress={open} style={styles.edit} />
       <ReferralCodeSheet
@@ -160,9 +161,9 @@ const styles = StyleSheet.create({
   code: {
     color: colors.white,
     fontFamily: fontFamilies.display,
-    fontSize: 32,
-    letterSpacing: 3.8,
-    lineHeight: 36,
+    fontSize: 34,
+    letterSpacing: 34 * 0.12,
+    lineHeight: 40,
   },
   codeColumn: { flex: 1, gap: spacing.xs },
   copy: {
@@ -171,24 +172,29 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     flexDirection: "row",
     gap: spacing.sm,
-    minHeight: 44,
-    paddingHorizontal: spacing.lg,
+    minHeight: 40,
+    paddingHorizontal: spacing.mdLg,
   },
   copyLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
   },
-  edit: { alignSelf: "flex-start", paddingHorizontal: 0 },
+  edit: { alignSelf: "flex-start", minHeight: 40, paddingHorizontal: 0 },
   eyebrow: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   pressed: { opacity: 0.85 },
-  waitLine: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  waitLine: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    paddingVertical: spacing.sm,
+  },
 });

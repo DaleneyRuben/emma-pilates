@@ -10,6 +10,9 @@ import {
 import {
   BodyText,
   colors,
+  footerEdges,
+  FooterPanel,
+  footerScreen,
   FormErrorSummary,
   FormField,
   FormScrollView,
@@ -23,6 +26,7 @@ import {
   ScreenTopBar,
   spacing,
   storedPhone,
+  surfaces,
   type PhoneValue,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -132,9 +136,10 @@ function EditProfileForm({
     <FormScrollView
       contentContainerStyle={styles.form}
       footer={
-        <View style={styles.footer}>
+        // C22: the button on the white footer panel.
+        <FooterPanel>
           <PrimaryButton busy={isSubmitting} label="Guardar cambios" onPress={() => void save()} />
-        </View>
+        </FooterPanel>
       }
       keyboardVerticalOffset={spacing.xxl}
     >
@@ -144,49 +149,55 @@ function EditProfileForm({
           .map((field) => fieldLabels[field])}
       />
       <ProfilePhotoSection client={client} />
-      <Controller
-        control={control}
-        name="name"
-        render={({ field }) => (
-          <FormField
-            autoCapitalize="words"
-            error={errors.name?.message}
-            label="Nombre"
-            onBlur={field.onBlur}
-            onChangeText={field.onChange}
-            value={field.value}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="email"
-        render={({ field }) => (
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            error={errors.email?.message}
-            keyboardType="email-address"
-            label="Correo electrónico"
-            onBlur={field.onBlur}
-            onChangeText={field.onChange}
-            value={field.value}
-          />
-        )}
-      />
-      <EmailChangeSection />
-      <Controller
-        control={control}
-        name="phone"
-        render={({ field }) => (
-          <PhoneField error={errors.phone?.message} onChange={field.onChange} value={field.value} />
-        )}
-      />
-      {failed ? (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          No pudimos guardar los cambios. Inténtalo de nuevo.
-        </BodyText>
-      ) : null}
+      <View style={styles.card}>
+        <Controller
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="words"
+              error={errors.name?.message}
+              label="Nombre"
+              onBlur={field.onBlur}
+              onChangeText={field.onChange}
+              value={field.value}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="none"
+              autoCorrect={false}
+              error={errors.email?.message}
+              keyboardType="email-address"
+              label="Correo electrónico"
+              onBlur={field.onBlur}
+              onChangeText={field.onChange}
+              value={field.value}
+            />
+          )}
+        />
+        <EmailChangeSection />
+        <Controller
+          control={control}
+          name="phone"
+          render={({ field }) => (
+            <PhoneField
+              error={errors.phone?.message}
+              onChange={field.onChange}
+              value={field.value}
+            />
+          )}
+        />
+        {failed ? (
+          <BodyText accessibilityRole="alert" style={styles.error}>
+            No pudimos guardar los cambios. Inténtalo de nuevo.
+          </BodyText>
+        ) : null}
+      </View>
     </FormScrollView>
   );
 }
@@ -223,7 +234,7 @@ export function EditProfileScreen() {
   const client = profile.data.data;
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={[styles.screen, footerScreen]}>
       {header}
       <EditProfileForm
         client={client}
@@ -235,8 +246,9 @@ export function EditProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  // C22: the fields on one white card under the photo's card.
+  card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lg },
   error: { color: colors.errorText },
-  footer: { paddingTop: spacing.md },
-  form: { gap: spacing.lg, paddingBottom: spacing.lg },
-  screen: { gap: spacing.lg },
+  form: { gap: spacing.md, paddingBottom: spacing.lg },
+  screen: { gap: spacing.md },
 });

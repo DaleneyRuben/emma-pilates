@@ -84,8 +84,10 @@ describe("Mis facturas", () => {
     const screen = await openInvoices([]);
 
     expect(await screen.findByText("Aún no tienes facturas")).toBeOnTheScreen();
-    // FIX-082: the receipt glyph alone, no Rosa tinte disc behind it.
-    expect(screen.queryByTestId("empty-state-disc", { includeHiddenElements: true })).toBeNull();
+    // C17b (Rosa Emma): the state is a white card with its glyph on a 50 disc.
+    expect(screen.getByTestId("empty-state-disc", { includeHiddenElements: true })).toHaveStyle({
+      backgroundColor: "#FEF6F2",
+    });
     expect(
       screen.getByText("Cuando pidas factura al pagar, el estudio la sube aquí y te avisamos."),
     ).toBeOnTheScreen();
@@ -94,7 +96,10 @@ describe("Mis facturas", () => {
   it("lists ready, in-preparation and voided invoices", async () => {
     const screen = await openInvoices([ready, preparing, voided]);
     await screen.findAllByTestId("invoice-row-glyph", { includeHiddenElements: true });
-    expect(screen.queryByTestId("invoice-row-disc", { includeHiddenElements: true })).toBeNull();
+    // C17 (Rosa Emma): each row's glyph sits on a 36 pt 50 disc.
+    expect(
+      screen.getAllByTestId("invoice-row-disc", { includeHiddenElements: true })[0],
+    ).toHaveStyle({ backgroundColor: "#FEF6F2", height: 36 });
 
     expect(
       await screen.findByRole("button", { name: /Paquete de 8 clases, jue 5 nov, Bs 502, Lista/ }),

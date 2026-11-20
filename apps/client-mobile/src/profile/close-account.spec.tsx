@@ -95,10 +95,10 @@ describe("Cerrar mi cuenta", () => {
   it("lists what closing does and waits for the password", async () => {
     const { screen } = await openClosure();
 
-    // C24: each consequence is an icon row.
+    // C24: each consequence is a row on one white card, its icon on a 50 disc.
     expect(screen.getByTestId("close-account-lines")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     for (const line of [
       "Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.",
@@ -121,7 +121,7 @@ describe("Cerrar mi cuenta", () => {
 
     expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#93615D",
     });
   });

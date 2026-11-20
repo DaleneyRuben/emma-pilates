@@ -86,16 +86,16 @@ describe("Client email change", () => {
     await waitFor(() => {
       expect(screen.getByText("Revisa tu correo nuevo")).toBeOnTheScreen();
     });
-    // FIX-089: the pending notice is a Crema card with an Arcilla outline;
-    // Rubor is kept for pills, the form summary and the class time box.
+    // C22b (Rosa Emma): the pending notice is the soft 50 inset with its
+    // 1 pt 200 rule, inside the fields' white card.
     expect(screen.getByLabelText("Cambio de correo pendiente")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FEF6F2",
+      borderColor: "#E7CCBF",
       borderWidth: 1,
     });
     expect(screen.getByText("Revisa tu correo nuevo")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "WorkSans_500Medium",
+      fontFamily: "WorkSans_600SemiBold",
     });
     expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#93615D" });
     // The card sits under the fields: the keyboard must not hide it.

@@ -7,8 +7,8 @@ import { TextButton } from "../ui/text-button";
 import { colors, radii, shadows, spacing, typography } from "../ui/tokens";
 
 // ADR-0067: the project's own explanation; only its yes opens the system
-// prompt. Design follow-up 91 refines the sheet; the client v2 board «CP»
-// (follow-up 227) draws it centred on Marfil with the bell disc. Each app
+// prompt. Design follow-up 91 refines the sheet; the Rosa Emma boards «CP»
+// and E-A11 draw it centred on the white sheet with the bell disc. Each app
 // passes its own title and text (walkthrough n.º 16).
 export function PushPermissionSheet({
   onAccept,
@@ -56,9 +56,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
   },
+  // CP, E-A11: the bell on a 50 disc with its 1 pt 200 rule.
   disc: {
     alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderSoft,
     borderRadius: radii.pill,
+    borderWidth: 1,
     height: 72,
     justifyContent: "center",
     marginTop: spacing.md,
@@ -66,7 +70,7 @@ const styles = StyleSheet.create({
   },
   handle: { backgroundColor: colors.band, borderRadius: radii.pill, height: 5, width: 40 },
   reason: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.body,
     lineHeight: 22,

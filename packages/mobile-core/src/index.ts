@@ -78,6 +78,7 @@ export * from "./ui/exception-pill";
 export * from "./ui/fonts";
 export * from "./ui/form-error-summary";
 export * from "./ui/form-field";
+export * from "./ui/footer-panel";
 export * from "./ui/country-picker";
 export * from "./ui/phone-field";
 export * from "./ui/form-scroll-view";

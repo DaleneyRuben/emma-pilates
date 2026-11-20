@@ -4,17 +4,19 @@ import {
   type ClientInvoiceDto,
 } from "@pilates/api-contracts";
 import {
+  Chevron,
   colors,
   EmptyState,
   fontFamilies,
   formatBolivianos,
   Glyph,
-  IconRowGroup,
   LoadingState,
   QueryFailure,
+  rosa,
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
   usePullToRefresh,
 } from "@pilates/mobile-core";
@@ -22,6 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { ProfileRowCard } from "../profile/profile-rows";
 import { invoiceDate, InvoiceState, invoiceStateLabel } from "./invoice-parts";
 
 type InvoicesNavigation = {
@@ -39,15 +42,18 @@ function InvoiceRow({ invoice, onPress }: { invoice: ClientInvoiceDto; onPress: 
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
-      {/* FIX-082: the glyph alone, no tinted disc. */}
-      <View testID="invoice-row-glyph">
-        <Glyph color={colors.text} name="receipt" size={18} strokeWidth={1.5} />
+      {/* C17 (Rosa Emma): the glyph on a 36 pt 50 disc. */}
+      <View style={styles.disc} testID="invoice-row-disc">
+        <View testID="invoice-row-glyph">
+          <Glyph color={colors.text} name="document" size={18} strokeWidth={1.6} />
+        </View>
       </View>
       <View style={styles.text}>
         <Text style={styles.title}>{invoice.purchaseLabel}</Text>
         <Text style={styles.muted}>{`${date} · ${amount}`}</Text>
       </View>
       <InvoiceState invoice={invoice} />
+      <Chevron size={16} strokeWidth={1.5} />
     </Pressable>
   );
 }
@@ -85,13 +91,12 @@ export function MyInvoicesScreen() {
       {items.length === 0 ? (
         <EmptyState
           icon="receipt"
-          plainIcon
           message="Cuando pidas factura al pagar, el estudio la sube aquí y te avisamos."
           title="Aún no tienes facturas"
         />
       ) : (
         <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-          <IconRowGroup plain>
+          <ProfileRowCard>
             {items.map((invoice) => (
               <InvoiceRow
                 invoice={invoice}
@@ -101,11 +106,13 @@ export function MyInvoicesScreen() {
                 }
               />
             ))}
-          </IconRowGroup>
-          <Text style={styles.muted}>
-            Las facturas salen a nombre del NIT o CI que diste al pagar. Si un dato está mal,
-            avísale al estudio.
-          </Text>
+          </ProfileRowCard>
+          <View style={styles.noteCard}>
+            <Text style={styles.muted}>
+              Las facturas salen a nombre del NIT o CI que diste al pagar. Si un dato está mal,
+              avísale al estudio.
+            </Text>
+          </View>
         </ScrollView>
       )}
     </Screen>
@@ -113,7 +120,16 @@ export function MyInvoicesScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg, paddingBottom: spacing.xl, paddingTop: spacing.md },
+  content: { gap: spacing.md, paddingBottom: spacing.xl, paddingTop: spacing.xs },
+  disc: {
+    alignItems: "center",
+    backgroundColor: rosa[50],
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
   muted: {
     color: colors.text,
     fontFamily: fontFamilies.body,
@@ -125,11 +141,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    minHeight: 68,
+    minHeight: 64,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
   },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { gap: spacing.md },
   text: { flex: 1, gap: 2 },
-  title: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
 });

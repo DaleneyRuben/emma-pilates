@@ -1,10 +1,11 @@
 import type { PropsWithChildren } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { ButtonLabel } from "../ui/button-label";
 import { ClockIcon } from "../ui/clock-icon";
 import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, typography } from "../ui/tokens";
+import { Glyph } from "../ui/glyph";
+import { OutlinedButton } from "../ui/outlined-button";
+import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
 import { formatCountdown } from "./countdown";
 
 /** S01/S18 suggest the studio's own domain to the team (MOB-036). */
@@ -16,7 +17,7 @@ export const emailHint = (teamAccess: boolean) =>
 export function FormAlert({ children }: PropsWithChildren) {
   return (
     <View accessibilityRole="alert" accessible style={styles.alert} testID="form-alert">
-      <View style={styles.dot} />
+      <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.6} />
       <Text style={styles.alertText}>{children}</Text>
     </View>
   );
@@ -51,41 +52,21 @@ export function WaitNotice({
   );
 }
 
-/** An outlined action under the primary one, such as «Reenviar correo». */
+/** An outlined action under the primary one, such as «Reenviar correo» (C01c, C01x). */
 export function SecondaryButton({
   busy = false,
   disabled = false,
   label,
   onPress,
-  tone = "neutral",
 }: {
   busy?: boolean;
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  /** Kept for callers: a confirmation guards the destructive one, never red. */
   tone?: "error" | "neutral";
 }) {
-  return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ busy, disabled: disabled || busy }}
-      disabled={disabled || busy}
-      onPress={onPress}
-      style={[styles.secondary, tone === "error" && styles.secondaryError]}
-    >
-      <ButtonLabel
-        busy={busy}
-        label={label}
-        spinnerColor={tone === "error" ? colors.error : colors.text}
-        style={[
-          styles.secondaryLabel,
-          tone === "error" && styles.secondaryLabelError,
-          disabled && !busy && styles.disabledLabel,
-        ]}
-      />
-    </Pressable>
-  );
+  return <OutlinedButton busy={busy} disabled={disabled} label={label} onPress={onPress} />;
 }
 
 /** A discreet action in the muted tone, such as «Cancelar registro». */
@@ -125,7 +106,6 @@ export function FooterPrompt({
 }) {
   return (
     <View style={styles.footer}>
-      <View style={styles.footerRule} />
       <View style={styles.footerLine}>
         <Text style={styles.footerPrompt}>{prompt}</Text>
         <Pressable
@@ -156,110 +136,82 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.body,
     fontSize: 14,
   },
-  secondary: {
-    alignItems: "center",
-    alignSelf: "stretch",
-    borderColor: colors.borderStrong,
-    borderRadius: 8,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 52,
-  },
-  secondaryError: {
-    borderColor: colors.error,
-  },
-  secondaryLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-  },
-  secondaryLabelError: {
-    color: colors.errorText,
-  },
   footer: {
     alignItems: "center",
-    gap: spacing.lg,
   },
   footerAction: {
-    color: colors.primaryDeep,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 14,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+    textDecorationColor: colors.text,
+    textDecorationLine: "underline",
   },
   footerLine: {
     alignItems: "center",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 4,
+    gap: spacing.smd,
     justifyContent: "center",
-    minHeight: 44,
+    minHeight: 24,
   },
   footerPrompt: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: 14,
+    fontSize: typography.body,
   },
-  footerRule: {
-    alignSelf: "stretch",
-    backgroundColor: colors.divider,
-    height: 1,
-  },
+  // C01e: the failure on 50 with a 1.5 pt 400 rule, said in words.
   alert: {
     alignItems: "flex-start",
     backgroundColor: colors.errorTint,
-    borderColor: colors.error,
-    borderRadius: 10,
-    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
     flexDirection: "row",
     gap: spacing.smLg,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.mdLg,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
   },
   alertText: {
     color: colors.errorText,
     flex: 1,
     fontFamily: fontFamilies.body,
-    fontSize: typography.note,
+    fontSize: 14,
     lineHeight: 20,
   },
-  dot: {
-    backgroundColor: colors.error,
-    borderRadius: 3,
-    height: 6,
-    marginTop: 7,
-    width: 6,
-  },
+  // C01t, C20l: the wait on the soft inset, its time in weight.
   notice: {
+    ...surfaces.soft,
     alignItems: "flex-start",
-    backgroundColor: colors.secondaryTint,
-    borderColor: colors.borderStrong,
-    borderRadius: 10,
-    borderWidth: 1,
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.smLg,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
   noticeOnCard: {
     backgroundColor: colors.card,
+    borderColor: colors.borderStrong,
+    borderRadius: 10,
     gap: 10,
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
   noticeBody: {
     flex: 1,
-    gap: 3,
+    gap: 2,
   },
   noticeText: {
     color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: 14,
-    lineHeight: 21,
+    lineHeight: 20,
   },
   noticeWait: {
-    color: colors.textSecondary,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
     fontVariant: ["tabular-nums"],
+    fontWeight: "600",
     lineHeight: 20,
   },
 });

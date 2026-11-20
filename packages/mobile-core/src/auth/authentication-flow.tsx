@@ -92,8 +92,22 @@ function VerifyEmailScreen({
     };
   }, [api, token]);
 
+  // C01k: the outcome on the band, its line in the card, the button under it.
   return (
     <AuthenticationScreen
+      actions={
+        status === "loading" ? undefined : (
+          <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />
+        )
+      }
+      badge={
+        status === "loading"
+          ? { icon: "mail", tone: "primary" }
+          : status === "verified"
+            ? { icon: "check", tone: "success" }
+            : { icon: "blocked", tone: "primary" }
+      }
+      brand={false}
       title={
         status === "loading"
           ? "Verificando correo"
@@ -109,7 +123,6 @@ function VerifyEmailScreen({
             ? "Tu cuenta está lista. Ahora puedes iniciar sesión."
             : "Este enlace venció o ya fue utilizado."}
       </BodyText>
-      {status === "loading" ? null : <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />}
     </AuthenticationScreen>
   );
 }
