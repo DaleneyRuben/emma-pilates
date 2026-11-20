@@ -50,7 +50,8 @@ test("creates a one-off Session and moves it from the Editar tab", async ({
     name: "Reformer Pilates, 11:00, Daniela Ortiz, 0 de 12 lugares",
   });
   await expect(created).toBeVisible();
-  await expect(created).toContainText("11:00 – 12:15");
+  // W2: the block is two lines, the type and «Daniela · 0 de 12».
+  await expect(created).toContainText("Daniela · 0 de 12");
 
   await created.click();
   // FIX-091 (W1): the panel is titled by the class and opens on Reservas.
@@ -87,7 +88,7 @@ test("creates a one-off Session and moves it from the Editar tab", async ({
     name: "Reformer Pilates, 12:00, Daniela Ortiz, 0 de 12 lugares",
   });
   await expect(moved).toBeVisible();
-  await expect(moved).toContainText("12:00 – 13:15");
+  await expect(moved).toContainText("Daniela · 0 de 12");
 
   // The week in the address is the one drawn after a reload.
   await page.reload();

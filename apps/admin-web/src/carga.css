@@ -26,7 +26,7 @@
   }
 }
 
-/* The first load: the whole viewport, Crema, over whatever React draws
+/* The first load: the whole viewport, Rosa 100 (the page), over whatever React draws
    until the first page is on screen. */
 .carga-pantalla {
   position: fixed;
@@ -35,7 +35,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9f4f2;
+  background-color: #f9e7df;
 }
 
 .carga-logo {

@@ -43,7 +43,7 @@ function Summary({
   return (
     <section
       aria-label="Resumen"
-      className="flex flex-col gap-1.5 rounded-tarjeta bg-rubor px-4 py-3.5 text-rosa-profundo"
+      className="flex flex-col gap-1.5 rounded-tarjeta bg-aviso px-4 py-3.5 text-texto inset-ring-[1.5px] inset-ring-borde-fuerte"
     >
       {total === null ? null : (
         <p className="text-celda font-semibold">{totalLine(total)}</p>
@@ -106,7 +106,7 @@ export function CampaignPanel({
                   {repeated === null ? null : (
                     <p
                       role="status"
-                      className="rounded-tarjeta bg-advertencia-tinte px-4 py-3 text-celda text-advertencia-texto"
+                      className="rounded-tarjeta bg-aviso px-4 py-3 text-celda text-texto"
                     >
                       {repeated}
                     </p>
@@ -129,7 +129,7 @@ export function CampaignPanel({
               )}
             />
             <div className="flex flex-col gap-2">
-              <p className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-profundo uppercase">
+              <p className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-600 uppercase">
                 Quiénes la reciben
               </p>
               <FilterChips
@@ -149,7 +149,7 @@ export function CampaignPanel({
           </SidePanelBody>
           <SidePanelFooter>
             {failure === null ? null : (
-              <p role="alert" className="text-nota text-error-texto">
+              <p role="alert" className="text-nota text-texto">
                 {failure}
               </p>
             )}

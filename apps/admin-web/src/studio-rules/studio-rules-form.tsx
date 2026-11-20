@@ -180,7 +180,7 @@ export function StudioRulesForm({
               label: "Desde el mes 13 (%)",
             })}
           </div>
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto">
             Los meses se cuentan desde la fecha de apertura.
           </p>
         </fieldset>
@@ -193,7 +193,7 @@ export function StudioRulesForm({
           })}
         </div>
         {failure === null ? null : (
-          <p role="alert" className="text-nota text-error-texto">
+          <p role="alert" className="text-nota text-texto">
             {failure}
           </p>
         )}

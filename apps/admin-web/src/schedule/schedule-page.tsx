@@ -128,12 +128,12 @@ function BranchSchedule({
         ) : (
           <>
             {standingCount(sessions.data) === 0 ? (
-              <p className="text-nota text-texto-tenue">
+              <p className="text-nota text-texto">
                 No hay clases programadas esta semana.
               </p>
             ) : null}
             {count >= weekSessionLimit ? (
-              <p className="text-nota text-advertencia-texto">
+              <p className="text-nota text-texto">
                 Se muestran las primeras {weekSessionLimit} clases de la semana.
               </p>
             ) : null}
@@ -159,7 +159,7 @@ function BranchSchedule({
                   }}
                 />
                 {standingCount(sessions.data) < sessions.data.length ? (
-                  <p className="text-nota text-texto-tenue">
+                  <p className="self-start rounded-tarjeta bg-superficie px-[18px] py-3 text-nota text-texto shadow-tarjeta">
                     Las canceladas quedan como una línea fina.
                   </p>
                 ) : null}

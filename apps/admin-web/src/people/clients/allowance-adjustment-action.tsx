@@ -83,7 +83,7 @@ export function AllowanceAdjustmentAction({
       >
         <p>{copy.note}</p>
         <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             Clases
           </span>
           <Input
@@ -95,7 +95,7 @@ export function AllowanceAdjustmentAction({
           />
         </label>
         {failure === null ? null : (
-          <p role="alert" className="text-error-texto">
+          <p role="alert" className="text-texto">
             {failure}
           </p>
         )}

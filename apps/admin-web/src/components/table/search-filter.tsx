@@ -47,12 +47,12 @@ export function SearchFilter({
   // The native search clear button paints outside the closed palette, so
   // it is hidden; clearing the text does the same.
   return (
-    <div className="relative w-full max-w-[380px]">
+    <div className="relative w-full max-w-[420px]">
       <Search
-        size={16}
-        strokeWidth={1.6}
+        size={18}
+        strokeWidth={1.7}
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-texto-muy-tenue"
+        className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-texto"
       />
       <Input
         type="search"
@@ -60,7 +60,7 @@ export function SearchFilter({
         placeholder={label}
         value={text}
         onChange={(event) => setText(event.target.value)}
-        className="h-[44px] pl-9 text-nota md:h-[38px] [&::-webkit-search-cancel-button]:appearance-none"
+        className="h-[44px] rounded-boton border-0 pl-10 text-celda shadow-tarjeta [&::-webkit-search-cancel-button]:appearance-none"
       />
     </div>
   );

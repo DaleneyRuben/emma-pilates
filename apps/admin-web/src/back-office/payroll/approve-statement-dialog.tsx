@@ -112,11 +112,11 @@ export function ApproveStatementDialog({
         />
         <div className="flex flex-col gap-2">
           <dl className="grid grid-cols-[110px_minmax(0,1fr)] gap-x-3 gap-y-1 text-texto">
-            <dt className="text-texto-tenue">Período</dt>
+            <dt className="text-texto">Período</dt>
             <dd>{periodText}</dd>
-            <dt className="text-texto-tenue">Líneas</dt>
+            <dt className="text-texto">Líneas</dt>
             <dd>{`${lines} ${lines === 1 ? "línea" : "líneas"}`}</dd>
-            <dt className="text-texto-tenue">Se registra</dt>
+            <dt className="text-texto">Se registra</dt>
             <dd>Pago de sueldo con fecha de hoy</dd>
           </dl>
           <p>Después de aprobarlo ya no cambia aunque vuelvas a calcular.</p>
@@ -130,7 +130,7 @@ export function ApproveStatementDialog({
         </div>
       </div>
       {approve.isError ? (
-        <p role="alert" className="text-error-texto">
+        <p role="alert" className="text-texto">
           {failureOf(approve.error)}
         </p>
       ) : null}

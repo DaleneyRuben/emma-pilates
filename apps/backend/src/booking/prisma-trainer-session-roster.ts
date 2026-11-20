@@ -1,37 +1,14 @@
 import type { PrismaClient } from '../generated/prisma/client';
 import { clientNameAndPhoto, clientNameSelect } from './client/client-photo-of';
+import { countEarlierClasses } from './earlier-classes';
 import type { TrainerSessionRoster } from './trainer-session-roster';
 
 const outcomes = { ATTENDED: 'attended', NO_SHOW: 'no_show' } as const;
 
-// E6 B: how many classes each Client took before this one (held classes she
-// did not miss), so the roster can say «Primera clase» or «12.ª clase».
-const countEarlierClasses = async (
-  prisma: PrismaClient,
-  clientIds: string[],
-  startsAt: Date,
-): Promise<Map<string, number>> => {
-  if (clientIds.length === 0) return new Map();
-  const counts = await prisma.booking.groupBy({
-    by: ['clientId'],
-    where: {
-      clientId: { in: clientIds },
-      state: 'BOOKED',
-      session: { state: 'SCHEDULED', startsAt: { lt: startsAt } },
-      OR: [
-        { attendanceRecord: null },
-        { attendanceRecord: { outcome: 'ATTENDED' } },
-      ],
-    },
-    _count: { _all: true },
-  });
-  return new Map(counts.map((row) => [row.clientId, row._count._all]));
-};
-
 // The Trainer's class roster and attendance: the booked Clients in booking
 // order with the outcome she recorded, if any.
 export const findTrainerSessionRoster =
-  (prisma: PrismaClient) =>
+  (prisma: PrismaClient, now: () => Date = () => new Date()) =>
   async (sessionId: string): Promise<TrainerSessionRoster | null> => {
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -60,6 +37,7 @@ export const findTrainerSessionRoster =
       prisma,
       session.bookings.map((booking) => booking.clientId),
       session.startsAt,
+      now(),
     );
 
     return {

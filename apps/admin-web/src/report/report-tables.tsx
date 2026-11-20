@@ -43,7 +43,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-const totalRow = "bg-superficie-sutil font-medium hover:bg-superficie-sutil";
+const totalRow =
+  "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
 
 /**
  * AW16's breakdown by Expense Category. «Nómina» is its own row, and only
@@ -71,7 +72,7 @@ export function CategoryTable({
             <TableRow className="hover:bg-transparent max-md:border-0 max-md:bg-transparent">
               <TableCell
                 colSpan={2}
-                className="py-8 text-center text-texto-tenue max-md:block max-md:before:content-none"
+                className="py-8 text-center text-texto max-md:block max-md:before:content-none"
               >
                 Sin gastos en este rango.
               </TableCell>
@@ -83,7 +84,7 @@ export function CategoryTable({
                   <TableCell data-label="Categoría">
                     <span className="flex flex-col">
                       <span className="font-medium">Nómina</span>
-                      <span className="text-ayuda text-texto-tenue">
+                      <span className="text-ayuda text-texto">
                         Viene de Nómina, no de las categorías
                       </span>
                     </span>

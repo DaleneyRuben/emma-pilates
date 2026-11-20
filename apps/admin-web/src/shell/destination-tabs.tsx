@@ -1,13 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import type { NavigationItem } from "../app/navigation";
 import { countFormat } from "../components/table/pagination";
-import { chipClass, selectedClass } from "../components/ui/chip";
+import {
+  segmentBadgeClass,
+  segmentClass,
+  segmentCurrentClass,
+  segmentedBarClass,
+} from "../components/ui/segmented";
 import { cn } from "../lib/cn";
 import { countedName, useRail } from "./rail/use-rail";
 
-// P02–P09: a destination's pages as 44 px tabs on an Arena hairline, the
-// current one in Rosa enlace over a Rosa profundo underline; a tab's views
-// as pill switches under them.
+// Rosa Emma (rw.py tabs / views): a destination's pages as a white
+// segmented bar on the page, the current one solid Rosa profundo with white
+// text; a tab's views as the same bar, one step smaller, under it.
 export function DestinationTabs() {
   const { destinations, place, countOf } = useRail();
   if (place === undefined) return null;
@@ -23,7 +28,7 @@ export function DestinationTabs() {
       {tabs.length > 1 ? (
         <nav
           aria-label={`Páginas de ${place.destination.label}`}
-          className="flex flex-wrap gap-1 border-b border-arena-linea"
+          className={segmentedBarClass}
         >
           {tabs.map((tab) => {
             const count = countOf(tab);
@@ -33,14 +38,19 @@ export function DestinationTabs() {
                 item={tab}
                 current={tab.to === place.tab.to}
                 label={countedName(tab.label, count)}
-                className="-mb-px inline-flex h-11 items-center border-b-2 border-transparent px-3.5 text-cuerpo text-tenue hover:text-texto"
-                currentClassName="border-rosa-profundo font-semibold text-rosa-enlace hover:text-rosa-enlace"
+                className={segmentClass}
+                currentClassName={segmentCurrentClass}
               >
                 {tab.label}
                 {count === undefined ? null : (
                   <span
                     aria-hidden="true"
-                    className="ml-1.5 rounded-full bg-rosa-profundo px-[7px] py-0.5 text-pie font-semibold text-crema tabular"
+                    className={cn(
+                      segmentBadgeClass,
+                      tab.to === place.tab.to
+                        ? "bg-blanco text-texto"
+                        : "bg-rosa-600 text-blanco",
+                    )}
                   >
                     {countFormat.format(count.value)}
                   </span>
@@ -53,15 +63,15 @@ export function DestinationTabs() {
       {views.length > 0 ? (
         <nav
           aria-label={`Vistas de ${place.tab.label}`}
-          className="flex flex-wrap gap-2"
+          className={segmentedBarClass}
         >
           {views.map((view) => (
             <PageLink
               key={view.to}
               item={view}
               current={view.to === place.page.to}
-              className={chipClass}
-              currentClassName={selectedClass}
+              className={cn(segmentClass, "h-9 px-3.5 text-celda")}
+              currentClassName={segmentCurrentClass}
             >
               {view === place.tab ? (view.viewLabel ?? view.label) : view.label}
             </PageLink>

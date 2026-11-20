@@ -49,12 +49,12 @@ const comentarios = (count: number) =>
 function EmptyFeedback({ filtered }: { filtered: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
+      <span className="text-texto">
         {filtered
           ? "Ningún comentario con estos filtros."
           : "Todavía no hay comentarios."}
       </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-nota text-texto">
         Llegan desde «Enviar comentarios», en el Perfil de las dos apps.
       </span>
     </span>
@@ -129,7 +129,7 @@ export function FeedbackPage({
           {exportFeedback.isError ? (
             <p
               role="alert"
-              className="rounded-control bg-error-tinte px-3 py-2 text-nota text-error-texto"
+              className="rounded-control bg-aviso px-3 py-2 text-nota text-texto"
             >
               No pudimos exportar los comentarios. Inténtalo de nuevo.
             </p>

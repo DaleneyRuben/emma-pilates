@@ -1,3 +1,4 @@
+import { PageHeader } from "../components/page/page-header";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { LoadingNotice } from "../components/page/query-failure";
@@ -25,23 +26,25 @@ function PendingList({ rows }: { rows: readonly PendingRow[] }) {
       aria-labelledby="inicio-por-resolver"
       className="flex flex-col gap-2.5"
     >
-      <h2 id="inicio-por-resolver" className="text-titulo-2 text-texto">
+      <h2 id="inicio-por-resolver" className="text-seccion text-texto">
         Por resolver
       </h2>
       {rows.length === 0 ? (
-        <p className="rounded-tarjeta border border-borde bg-blanco px-5 py-4 text-cuerpo text-texto-tenue">
+        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 text-cuerpo text-texto">
           Todo al día: nada espera tu respuesta.
         </p>
       ) : (
-        <ul className="flex flex-col rounded-tarjeta border border-borde bg-blanco">
+        <ul className="flex flex-col rounded-tarjeta bg-superficie shadow-tarjeta">
           {rows.map((row, index) => (
             <li
               key={row.kind}
-              className="flex min-h-16 items-center gap-3 border-t border-divisor px-4 py-3 first:border-t-0 md:px-5"
+              className="flex min-h-[72px] items-center gap-3 border-t border-superficie-hundida px-4 py-3 first:border-t-0 md:px-5"
             >
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="font-medium text-texto">{row.title}</span>
-                <span className="text-nota text-texto-tenue">{row.note}</span>
+                <span className="text-cuerpo font-bold text-texto">
+                  {row.title}
+                </span>
+                <span className="text-nota text-texto">{row.note}</span>
               </span>
               <Link
                 to={row.to}
@@ -85,23 +88,21 @@ export function HomePage() {
   });
 
   return (
-    <div className="flex max-w-[1080px] flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-titulo-1 text-texto lg:text-titulo-pagina-grande">
-          {title}
-        </h1>
-        <p className="text-cuerpo text-texto-tenue">
-          {selectedBranch === undefined
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={title}
+        subtitle={
+          selectedBranch === undefined
             ? day
-            : `${day} · Sucursal ${selectedBranch.name}`}
-        </p>
-      </div>
+            : `${day} · Sucursal ${selectedBranch.name}`
+        }
+      />
       {counts.loading || branchStatus === "pending" ? (
         <LoadingNotice>Cargando el inicio…</LoadingNotice>
       ) : (
         <>
           <PendingList rows={rows} />
-          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2">
             {selectedBranch === undefined ? null : (
               <TodayCard
                 branch={selectedBranch}

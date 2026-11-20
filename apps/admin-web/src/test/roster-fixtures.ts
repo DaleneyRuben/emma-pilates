@@ -22,6 +22,8 @@ export const roster = (
     clientName,
     clientPhoto: null,
     attendanceOutcome: null,
+    classNumber: 1,
+    founder: false,
   })),
   waitlist: waitlist.map((clientName, index) => ({
     waitlistEntryId: `e1000000-0000-5000-8000-${String(index + 1).padStart(12, "0")}`,

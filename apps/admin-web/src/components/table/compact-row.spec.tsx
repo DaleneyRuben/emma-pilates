@@ -85,8 +85,8 @@ describe("the compact phone card", () => {
       screen.getByTestId("circle"),
     );
     expect(row.querySelector('[data-part="title"]')).toHaveClass(
-      "text-fila",
-      "font-medium",
+      "text-[16px]",
+      "font-semibold",
       "[&_[data-photo]]:hidden",
     );
     expect(row.querySelector('[data-part="chevron"]')).toBeInTheDocument();

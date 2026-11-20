@@ -7,6 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import { PageHeader } from "../../components/page/page-header";
+import { buttonVariants } from "../../components/ui/button";
 import {
   LoadingNotice,
   QueryFailure,
@@ -77,16 +78,12 @@ const movementColumns = [
   columns.accessor("recordedByName", {
     header: "Registró",
     meta: { card: "hidden" },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
   columns.accessor("recordedAt", {
     header: "Fecha",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatDateTime(getValue())}
-      </span>
+      <span className="text-texto tabular">{formatDateTime(getValue())}</span>
     ),
   }),
 ];
@@ -114,10 +111,8 @@ const summary = (
 function EmptyHistory({ kind }: { kind: MovementKind | "all" }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
-        Sin {nouns[kind][1]} en este rango.
-      </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-texto">Sin {nouns[kind][1]} en este rango.</span>
+      <span className="text-nota text-texto">
         Prueba con otro mes o con todos los insumos.
       </span>
     </span>
@@ -150,14 +145,19 @@ function BranchWithdrawals({
 
   return (
     <article className="flex flex-col gap-5">
+      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
+      {/* Below the band, as a white button: small text stays on white. */}
       <Link
         to="/estudio/insumos"
-        className="inline-flex items-center gap-1 self-start rounded-control text-nota text-primario hover:text-primario-presionado focus-visible:shadow-foco"
+        className={buttonVariants({
+          variant: "secondary",
+          size: "sm",
+          className: "self-start",
+        })}
       >
-        <ChevronLeft size={14} strokeWidth={1.8} aria-hidden="true" />
+        <ChevronLeft size={16} strokeWidth={1.8} aria-hidden="true" />
         Volver a Insumos
       </Link>
-      <PageHeader title="Insumos" subtitle={`Sucursal ${branch.name}`} />
       <div className="flex flex-wrap items-center gap-3">
         <MonthStepper
           month={month}
@@ -198,7 +198,7 @@ function BranchWithdrawals({
       ) : (
         <>
           {query.data.totalItems === 0 ? null : (
-            <p className="text-nota text-texto-secundario">
+            <p className="text-nota text-texto">
               {summary(query.data.totalItems, kind, month, supplyName)}
             </p>
           )}
@@ -219,8 +219,8 @@ function BranchWithdrawals({
             }}
           />
           {query.data.totals.length === 0 ? null : (
-            <section className="flex flex-col gap-1 rounded-control border border-divisor bg-superficie px-3 py-2.5">
-              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+            <section className="flex flex-col gap-1 rounded-control border border-borde bg-superficie px-3 py-2.5">
+              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
                 Consumo del mes
               </h2>
               <p className="text-nota text-texto tabular">

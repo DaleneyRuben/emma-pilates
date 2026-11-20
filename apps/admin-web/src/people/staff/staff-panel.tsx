@@ -130,7 +130,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
           />
           <StaffRoleFields control={form.control} role={role} gender={gender} />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

@@ -33,12 +33,12 @@ function MissingNotice({ count }: { count: number }) {
   return (
     <section
       role="status"
-      className="flex flex-col gap-0.5 rounded-control border border-borde bg-advertencia-tinte px-3 py-2.5"
+      className="flex flex-col gap-0.5 rounded-control border border-borde-fuerte bg-aviso px-3 py-2.5"
     >
-      <p className="text-cuerpo font-medium text-advertencia-texto">
+      <p className="text-cuerpo font-medium text-texto">
         {`${plural(count, "día", "días")} con ventas en efectivo sin cierre`}
       </p>
-      <p className="text-nota text-texto-secundario">
+      <p className="text-nota text-texto">
         Revisa con la asistente qué pasó esos días.
       </p>
     </section>
@@ -48,10 +48,10 @@ function MissingNotice({ count }: { count: number }) {
 function EmptyMonth() {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
+      <span className="text-texto">
         No hubo ventas en efectivo ni cierres en este mes.
       </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-nota text-texto">
         Prueba con otro mes o con otra sucursal.
       </span>
     </span>
@@ -100,7 +100,7 @@ function BranchCashCloses({
             emptyMessage={<EmptyMonth />}
           />
           {query.data.days.length === 0 ? null : (
-            <p className="text-nota text-texto-secundario tabular">
+            <p className="text-nota text-texto tabular">
               {summary(query.data)}
             </p>
           )}

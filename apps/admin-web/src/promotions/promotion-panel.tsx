@@ -195,7 +195,7 @@ export function PromotionPanelForm({
           <FormErrorSummary />
           <PromotionImageField value={image} onChange={setImage} />
           {wasPublished && imageChanged ? (
-            <p className="rounded-control border border-borde bg-advertencia-tinte px-3 py-2 text-ayuda text-advertencia-texto">
+            <p className="rounded-control border border-borde-fuerte bg-aviso px-3 py-2 text-ayuda text-texto">
               {imageChangeWarning(image !== null)}
             </p>
           ) : null}
@@ -267,7 +267,7 @@ export function PromotionPanelForm({
             />
           </div>
           {wasPublished ? (
-            <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
               {windowStatus(
                 boliviaToday(),
                 typed.displayStartsOn ?? "",
@@ -276,7 +276,7 @@ export function PromotionPanelForm({
             </p>
           ) : null}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

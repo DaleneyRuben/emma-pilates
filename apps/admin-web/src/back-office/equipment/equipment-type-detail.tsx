@@ -19,7 +19,7 @@ export type EquipmentAction =
 export type OnAction = (action: EquipmentAction) => void;
 
 const emptyNote =
-  "rounded-marco border border-borde bg-lino px-4 py-3 text-nota text-texto-tenue";
+  "rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto";
 
 function UnitActions({
   piece,
@@ -59,13 +59,13 @@ function UnitRows({
     return <p className={emptyNote}>Sin unidades en esta sucursal.</p>;
   }
   return (
-    <ul className="rounded-marco border border-borde bg-lino">
+    <ul className="rounded-tarjeta bg-superficie shadow-tarjeta">
       {units.map((piece) => {
         const pill = statusPills[piece.status];
         return (
           <li
             key={piece.id}
-            className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-divisor px-4 py-3 first:border-t-0"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-borde px-4 py-3 first:border-t-0"
           >
             <p className="min-w-[120px] text-cuerpo font-medium text-texto">
               {pieceName(piece)}
@@ -88,12 +88,12 @@ function QuantityCard({
   onAction: OnAction;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-marco border border-borde bg-lino px-5 py-4 max-md:p-4">
+    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 max-md:p-4">
       <p className="flex items-baseline gap-2 max-md:w-full">
         <span className="font-serif text-cifra leading-none text-texto tabular">
           {stock.quantity}
         </span>
-        <span className="text-nota text-texto-tenue">en esta sucursal</span>
+        <span className="text-nota text-texto">en esta sucursal</span>
       </p>
       <StatusPill tone="exito">{`${stock.usable} se pueden usar`}</StatusPill>
       {stock.damaged > 0 ? (
@@ -142,9 +142,7 @@ export function TypeDetail({
       className="flex flex-col gap-2"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <p className="text-nota text-texto-tenue">
-          {trackingLong[type.tracking]}
-        </p>
+        <p className="text-nota text-texto">{trackingLong[type.tracking]}</p>
         <span className="flex-1" />
         {holding.tracking === "unit" ? (
           <Button

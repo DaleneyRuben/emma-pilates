@@ -50,9 +50,7 @@ function PendingFreezes({ filter }: { filter: ReactNode }) {
       {...listProps}
       subtitle="Solicitudes pendientes de una clienta."
       emptyMessage={
-        <span className="text-texto-secundario">
-          No hay solicitudes pendientes.
-        </span>
+        <span className="text-texto">No hay solicitudes pendientes.</span>
       }
       filter={filter}
       query={query}
@@ -68,7 +66,7 @@ function PendingFreezes({ filter }: { filter: ReactNode }) {
       }
       footer={
         query.data === undefined || query.data.totalItems === 0 ? null : (
-          <p className="text-nota text-texto-tenue">
+          <p className="text-nota text-texto">
             Aprobar o rechazar se hace dentro de cada solicitud; rechazar pide
             confirmación.
           </p>
@@ -85,7 +83,7 @@ function DecidedFreezes({ filter }: { filter: ReactNode }) {
       {...listProps}
       subtitle="Solicitudes aprobadas, rechazadas o retiradas."
       emptyMessage={
-        <span className="text-texto-secundario">
+        <span className="text-texto">
           Todavía no hay congelamientos decididos.
         </span>
       }

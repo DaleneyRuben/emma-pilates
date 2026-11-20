@@ -14,7 +14,7 @@ export const SheetClose = SheetPrimitive.Close;
 // design/README.md, side-panel header (and follow-up 21's viewer): a 30px
 // square, 1px Borde on Superficie, whose border turns Palo de rosa on hover.
 export const closeButtonClass =
-  "inline-flex size-[40px] items-center justify-center rounded-tarjeta border border-borde bg-lino text-texto-tenue hover:text-texto focus-visible:shadow-foco";
+  "inline-flex size-[40px] items-center justify-center rounded-panel bg-superficie-hundida text-texto hover:bg-rosa-200 focus-visible:shadow-foco";
 
 const sheetVariants = cva(
   "fixed z-50 flex flex-col bg-superficie text-texto shadow-panel outline-none",
@@ -23,7 +23,8 @@ const sheetVariants = cva(
       side: {
         left: "inset-y-0 left-0 w-[300px] max-w-[85vw]",
         // Follow-up 233's panels: 520 px on Marfil.
-        right: "inset-y-0 right-0 w-[520px] max-w-full",
+        right:
+          "inset-y-0 right-0 w-[560px] max-w-full rounded-l-hero max-md:rounded-none",
         bottom: "inset-x-0 bottom-0 max-h-[85svh] rounded-t-marco",
         full: "inset-0",
       },
@@ -77,10 +78,10 @@ export function SheetContent({
         {children}
         {hideClose ? null : (
           <SheetPrimitive.Close
-            className={cn("absolute top-6 right-6", closeButtonClass)}
+            className={cn("absolute top-[26px] right-7", closeButtonClass)}
             aria-label={closeLabel}
           >
-            <X size={16} strokeWidth={1.6} aria-hidden="true" />
+            <X size={20} strokeWidth={1.7} aria-hidden="true" />
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Content>
@@ -92,7 +93,10 @@ export function SheetHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-1 px-7 pt-7 pb-3", className)}
+      className={cn(
+        "flex flex-col gap-1 border-b border-superficie-hundida px-7 pt-[26px] pb-4",
+        className,
+      )}
       {...props}
     />
   );
@@ -107,7 +111,7 @@ export function SheetTitle({
       data-slot="sheet-title"
       tabIndex={-1}
       className={cn(
-        "font-serif text-[24px] text-texto outline-none",
+        "font-serif text-titulo-panel text-texto outline-none",
         className,
       )}
       {...props}
@@ -121,7 +125,7 @@ export function SheetDescription({
 }: ComponentProps<typeof SheetPrimitive.Description>) {
   return (
     <SheetPrimitive.Description
-      className={cn("text-nota text-texto-tenue", className)}
+      className={cn("text-celda text-texto", className)}
       {...props}
     />
   );

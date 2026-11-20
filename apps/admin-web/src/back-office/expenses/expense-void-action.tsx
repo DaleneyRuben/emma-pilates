@@ -7,8 +7,9 @@ import { formatBolivianos } from "../../lib/money";
 import { backOfficeProblem } from "../back-office-problems";
 import { useExpenseVoid } from "./expense-queries";
 
-// Finding 104 (owner, 2026-11-18): «Eliminar gasto» voids the Expense. It
-// stays in Gastos, marked, and counts for nothing; nothing is deleted.
+// Finding 104 (owner, 2026-11-18): «Eliminar gasto» voids the Expense; it
+// counts for nothing and nothing is deleted. Since FIX-091 it leaves the list
+// for the month's «Ver gastos borrados» (W11).
 export function ExpenseVoidAction({
   branchId,
   expense,
@@ -44,7 +45,7 @@ export function ExpenseVoidAction({
     <>
       <Button
         variant="link"
-        className="self-center text-error hover:text-error-texto"
+        className="self-center text-texto hover:text-texto"
         onClick={() => {
           setFailure(null);
           setReason("");
@@ -62,12 +63,12 @@ export function ExpenseVoidAction({
         onConfirm={() => void confirm()}
       >
         <p>
-          Deja de contar en los totales y en Informes › Dinero. Sigue en la
-          lista de Gastos, marcado como eliminado, con quién y cuándo, y ya no
+          Deja de contar en los totales y en Informes › Dinero. Sale de la lista
+          y queda en «Ver gastos borrados» del mes, con quién y cuándo, y ya no
           se puede editar.
         </p>
         <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             Motivo (opcional)
           </span>
           <Input
@@ -78,7 +79,7 @@ export function ExpenseVoidAction({
           />
         </label>
         {failure === null ? null : (
-          <p role="alert" className="text-error-texto">
+          <p role="alert" className="text-texto">
             {failure}
           </p>
         )}

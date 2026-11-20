@@ -38,7 +38,7 @@ export function ExpenseMonthTotals({
   return (
     <section
       aria-label={`Total de ${formatMonth(month)}`}
-      className="flex flex-col gap-3 rounded-marco border border-arcilla bg-crema px-4 py-3.5 text-rosa-profundo"
+      className="flex flex-col gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3.5 text-rosa-600"
     >
       <h2 className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] uppercase">
         {monthName(month)}
@@ -59,7 +59,7 @@ export function ExpenseMonthTotals({
           {report.data.byCategory.length === 0 ? (
             <p className="text-nota">Sin gastos este mes.</p>
           ) : (
-            <ul className="flex flex-col divide-y divide-rubor rounded-control border border-rubor">
+            <ul className="flex flex-col divide-y divide-rosa-200 rounded-control border border-rosa-200">
               {report.data.byCategory.map((line) => (
                 <li
                   key={line.expenseCategoryId}

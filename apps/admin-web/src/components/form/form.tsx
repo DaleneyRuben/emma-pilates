@@ -90,7 +90,7 @@ export function FormLabel({
       ref={ref}
       data-slot="form-label"
       data-error={error !== undefined}
-      className={cn(error !== undefined && "text-error-texto", className)}
+      className={cn(error !== undefined && "text-texto", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -148,7 +148,7 @@ export function FormDescription({
     <p
       data-slot="form-description"
       id={formDescriptionId}
-      className={cn("text-nota text-texto-tenue", className)}
+      className={cn("text-nota text-texto", className)}
       {...props}
     >
       {children}
@@ -158,7 +158,7 @@ export function FormDescription({
 
 /** FIX-089 (FormB): an invalid field's message, 13 px bold after a «!». */
 export const fieldMessageClass =
-  "text-nota font-bold text-error-texto before:content-['!_']";
+  "text-nota font-bold text-texto before:content-['!_']";
 
 export function FormMessage({
   className,

@@ -10,7 +10,7 @@ import { ProjectionSection } from "./projection-section";
 import { simulateMonth, type SimulatorInput } from "./simulate-month";
 
 const cardClass =
-  "flex flex-col gap-4 rounded-marco border border-arcilla bg-crema p-6 max-md:p-4";
+  "flex flex-col gap-4 rounded-tarjeta bg-superficie shadow-tarjeta p-6 max-md:p-4";
 
 // The owner's opening month: 33 classes a week, 4 students paying about Bs 70
 // a class (diagnosis 3.4), Trainer pay of Bs 65 with up to 4 students and
@@ -62,7 +62,7 @@ function Field({
 // FIX-091 (W12 A): Entraría and Saldría under the result, one row each.
 function Flow({ name, figure }: { name: string; figure: string }) {
   return (
-    <li className="flex items-baseline justify-between gap-3 border-t border-divisor px-4 py-3 first:border-t-0">
+    <li className="flex items-baseline justify-between gap-3 border-t border-borde px-4 py-3 first:border-t-0">
       <span className="text-celda">{name}</span>
       <span className="text-celda font-semibold tabular">{figure}</span>
     </li>
@@ -110,13 +110,13 @@ function Result({ input }: { input: SimulatorInput }) {
     <div className="flex flex-col gap-3">
       <StatTile
         label="Quedaría al mes"
-        emphasis
+        tone="destacado"
         figure={formatSignedBolivianos(month.resultCentavos)}
         line={`${month.classes} clases · ingreso ${formatBolivianos(month.incomeCentavos)}`}
       />
       <ul
         aria-label="Entraría y saldría"
-        className="flex flex-col rounded-marco border border-arcilla bg-crema text-rosa-profundo"
+        className="flex flex-col rounded-tarjeta bg-superficie shadow-tarjeta text-rosa-600"
       >
         <Flow name="Entraría" figure={formatBolivianos(month.incomeCentavos)} />
         <Flow
@@ -132,11 +132,12 @@ function Result({ input }: { input: SimulatorInput }) {
         label="Punto de equilibrio"
         figure={formatBolivianos(month.breakEvenCentavos)}
         line="Ingreso en caja que cubre los costos fijos, el pago a instructoras y el impuesto"
-      />
-      {/* FIX-088: the owner's check in words and bolivianos. */}
-      <p className="text-nota text-texto-tenue tabular">
-        {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
-      </p>
+      >
+        {/* FIX-088: the owner's check in words and bolivianos. */}
+        <p className="mt-1.5 rounded-panel bg-superficie-hundida px-3 py-2.5 text-nota text-texto tabular">
+          {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
+        </p>
+      </StatTile>
     </div>
   );
 }
@@ -157,7 +158,7 @@ export function SimulatorPage() {
         <PageHeader title="Simulador" />
         <p
           role="alert"
-          className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario"
+          className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto"
         >
           No tienes permiso para ver esta sección.
         </p>
@@ -175,7 +176,7 @@ export function SimulatorPage() {
         <section aria-labelledby={assumptionsId} className={cardClass}>
           <h2
             id={assumptionsId}
-            className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-profundo uppercase"
+            className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-600 uppercase"
           >
             Tus supuestos
           </h2>
@@ -223,7 +224,7 @@ export function SimulatorPage() {
           </div>
         </section>
         {input === null ? (
-          <p role="alert" className="text-ayuda text-error-texto">
+          <p role="alert" className="text-ayuda text-texto">
             Escribe números enteros. El impuesto tiene que ser menor que 100.
           </p>
         ) : (

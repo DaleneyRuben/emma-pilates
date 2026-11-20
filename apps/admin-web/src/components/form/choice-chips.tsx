@@ -17,6 +17,7 @@ export function ChoiceChips<Value extends string>({
   onChange,
   className,
   showLegend = false,
+  onStrong = false,
 }: {
   legend: string;
   name: string;
@@ -27,6 +28,8 @@ export function ChoiceChips<Value extends string>({
   className?: string;
   /** Draw the legend as a field label above the chips. */
   showLegend?: boolean;
+  /** Over a Rosa profundo head: white outline, the chosen one solid white. */
+  onStrong?: boolean;
 }) {
   return (
     <fieldset className={cn("flex gap-2", className)}>
@@ -40,7 +43,14 @@ export function ChoiceChips<Value extends string>({
       {options.map(([option, label]) => (
         <label
           key={option}
-          className={cn(chipClass, option === value && chosenClass)}
+          className={cn(
+            chipClass,
+            option === value && chosenClass,
+            onStrong &&
+              (option === value
+                ? "bg-blanco text-texto inset-ring-blanco hover:bg-blanco"
+                : "bg-transparent font-bold text-blanco inset-ring-[1.5px] inset-ring-blanco hover:bg-blanco/10"),
+          )}
         >
           <input
             type="radio"

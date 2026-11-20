@@ -29,7 +29,7 @@ function CategoryRow({
       <span className="text-cuerpo text-texto">{category.name}</span>
       <span className="flex items-center gap-2">
         {category.inUse ? (
-          <span className="text-ayuda text-texto-muy-tenue">En uso</span>
+          <span className="text-ayuda text-texto">En uso</span>
         ) : null}
         <Button
           variant="ghost"
@@ -42,7 +42,7 @@ function CategoryRow({
           }
           disabled={category.inUse}
           onClick={onDelete}
-          className="text-error hover:text-error-texto"
+          className="text-texto hover:text-texto"
         >
           <Trash2 size={16} strokeWidth={1.6} aria-hidden="true" />
         </Button>
@@ -82,12 +82,12 @@ export function ExpenseCategoriesEditor() {
 
   return (
     <div className="flex flex-1 flex-col gap-5 px-7 py-4">
-      <p className="text-cuerpo text-texto-tenue">
+      <p className="text-cuerpo text-texto">
         Todo el estudio · agrupan los gastos de cada sucursal en el reporte.
       </p>
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {failure === null ? null : (
-        <p role="alert" className="text-nota text-error-texto">
+        <p role="alert" className="text-nota text-texto">
           {failure}
         </p>
       )}
@@ -100,15 +100,15 @@ export function ExpenseCategoriesEditor() {
           onRetry={() => void query.refetch()}
         />
       ) : (
-        <section className="flex w-full flex-col overflow-hidden rounded-marco border border-borde bg-lino">
+        <section className="flex w-full flex-col overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta">
           {query.data.length === 0 ? (
-            <p className="px-4 py-6 text-center text-nota text-texto-tenue">
+            <p className="px-4 py-6 text-center text-nota text-texto">
               Todavía no hay categorías. Agrega la primera abajo.
             </p>
           ) : (
             <ul
               aria-label="Categorías de gasto"
-              className="flex flex-col divide-y divide-divisor"
+              className="flex flex-col divide-y divide-borde"
             >
               {query.data.map((category) => (
                 <CategoryRow
@@ -120,7 +120,7 @@ export function ExpenseCategoriesEditor() {
             </ul>
           )}
           {isForbidden(query.error) ? null : (
-            <div className="border-t border-divisor px-4 py-3">
+            <div className="border-t border-borde px-4 py-3">
               <CategoryAdder
                 onAdded={(category) => {
                   setFailure(null);

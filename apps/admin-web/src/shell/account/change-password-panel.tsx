@@ -94,7 +94,7 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
         </SheetDescription>
       </SheetHeader>
       {saved ? (
-        <p role="status" className="px-5 py-4 text-cuerpo text-exito-texto">
+        <p role="status" className="px-5 py-4 text-cuerpo text-texto">
           Tu contraseña se actualizó. Cerramos tus otras sesiones abiertas.
         </p>
       ) : (
@@ -123,12 +123,12 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
                 />
               ))}
               {failed ? (
-                <p role="alert" className="text-nota text-error-texto">
+                <p role="alert" className="text-nota text-texto">
                   No pudimos guardar la contraseña. Inténtalo de nuevo.
                 </p>
               ) : null}
             </div>
-            <div className="border-t border-borde px-5 py-4">
+            <div className="border-t border-borde-fuerte px-5 py-4">
               <Button
                 type="submit"
                 size="lg"

@@ -14,6 +14,8 @@ import {
   startDatabaseTestContext,
 } from './database-test-context';
 
+const hour = 60 * 60 * 1_000;
+
 const asClient = (client: { accountId: string; clientId: string }) => ({
   accountId: client.accountId,
   authenticationSessionId: randomUUID(),
@@ -104,6 +106,8 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
           clientName: 'Ana',
           clientPhoto: null,
           attendanceOutcome: null,
+          classNumber: 1,
+          founder: false,
         },
         {
           bookingId: secondBooking.id,
@@ -111,6 +115,8 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
           clientName: 'Bea',
           clientPhoto: { imageAssetId: secondPhoto },
           attendanceOutcome: null,
+          classNumber: 1,
+          founder: false,
         },
       ],
       waitlist: [
@@ -129,6 +135,71 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
           position: 2,
         },
       ],
+    });
+  });
+
+  // W1 (Editar clase A): «12.ª clase», «Primera clase» and «Fundadora» under
+  // each name, counted as the Trainer's roster counts them (E6 B).
+  it('counts each Client’s class and marks an active founder', async () => {
+    const fixture = await createFixture(prisma, { capacity: 8, now: clock });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const session = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+    });
+    const before = await prisma.session.create({
+      data: {
+        branchId: session.branchId,
+        classTypeId: session.classTypeId,
+        trainerStaffMemberId: session.trainerStaffMemberId,
+        startsAt: new Date(session.startsAt.getTime() - 2 * hour),
+        endsAt: new Date(session.endsAt.getTime() - 2 * hour),
+        capacity: 8,
+      },
+    });
+    await commands.create({ sessionId: before.id }, asClient(fixture));
+    const second = await createClientWithSubscription(prisma);
+    await prisma.founderMembership.create({
+      data: { clientId: second.clientId, number: 7, since: clock },
+    });
+    const ana = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(fixture),
+    );
+    const bea = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(second),
+    );
+
+    const lost = await createClientWithSubscription(prisma);
+    await prisma.founderMembership.create({
+      data: {
+        clientId: lost.clientId,
+        number: 8,
+        since: clock,
+        status: 'LOST',
+        lostAt: clock,
+      },
+    });
+    const cata = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(lost),
+    );
+    const afterBoth = () => session.startsAt;
+
+    await expect(
+      findAdministratorSessionRoster(prisma, afterBoth)(fixture.sessionId),
+    ).resolves.toMatchObject({
+      bookings: [
+        { bookingId: ana.id, classNumber: 2, founder: false },
+        { bookingId: bea.id, classNumber: 1, founder: true },
+        { bookingId: cata.id, classNumber: 1, founder: false },
+      ],
+    });
+    // Opened before the earlier class is held, it does not count yet.
+    await expect(
+      findAdministratorSessionRoster(prisma, () => clock)(fixture.sessionId),
+    ).resolves.toMatchObject({
+      bookings: [{ bookingId: ana.id, classNumber: 1 }, {}, {}],
     });
   });
 

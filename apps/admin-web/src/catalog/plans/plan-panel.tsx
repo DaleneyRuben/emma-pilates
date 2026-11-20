@@ -222,13 +222,13 @@ export function PlanPanelForm({
           />
           {numberFields.map(renderText)}
           {plan === undefined ? null : (
-            <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
               Las suscripciones vigentes y las compras ya iniciadas conservan su
               precio.
             </p>
           )}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

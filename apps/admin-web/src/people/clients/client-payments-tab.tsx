@@ -47,7 +47,7 @@ export function ClientPaymentsTab({
       <Link
         to="/dinero/pagos"
         search={{ page: 1, pageSize: 20, status: "all", q: clientName }}
-        className="self-start rounded-control text-nota font-medium text-rosa-enlace hover:underline focus-visible:shadow-foco"
+        className="self-start rounded-control text-nota font-medium text-texto hover:underline focus-visible:shadow-foco"
       >
         Ver en Dinero
       </Link>

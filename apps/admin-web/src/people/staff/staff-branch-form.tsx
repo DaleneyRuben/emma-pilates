@@ -34,11 +34,11 @@ function BranchChips({
 }) {
   const branches = useQuery(activeBranchesQueryOptions());
   if (branches.isPending) {
-    return <p className="text-ayuda text-texto-tenue">Cargando sucursales…</p>;
+    return <p className="text-ayuda text-texto">Cargando sucursales…</p>;
   }
   if (branches.isError) {
     return (
-      <p role="alert" className="text-ayuda text-error-texto">
+      <p role="alert" className="text-ayuda text-texto">
         No pudimos cargar las sucursales.
       </p>
     );
@@ -99,7 +99,7 @@ export function StaffBranchForm({
         <SidePanelBody>
           <FormErrorSummary />
           <StaffPhotoBlock member={member} />
-          <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+          <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
             Puedes cambiar sus sedes y su foto. Invitar y cambiar roles lo hace
             Administración.
           </p>
@@ -110,7 +110,7 @@ export function StaffBranchForm({
             render={({ field }) => <BranchChips field={field} />}
           />
           {failure !== null ? (
-            <p role="alert" className="text-ayuda text-alerta">
+            <p role="alert" className="text-ayuda text-texto">
               {failure}
             </p>
           ) : null}

@@ -32,15 +32,13 @@ export function PayoutQrSlot({
     return (
       <div
         aria-hidden="true"
-        className="h-[290px] animate-pulse rounded-marco border border-borde bg-lino"
+        className="h-[290px] animate-pulse rounded-tarjeta bg-superficie shadow-tarjeta"
       />
     );
   }
   if (qr.isError) {
     return (
-      <p className="text-nota text-texto-tenue">
-        No pudimos cargar su QR de cobro.
-      </p>
+      <p className="text-nota text-texto">No pudimos cargar su QR de cobro.</p>
     );
   }
   return <PayoutQrCard staffName={staffName} qr={toView(qr.data)} />;

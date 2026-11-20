@@ -4,19 +4,19 @@ import { signIn, sidebar } from "./support/session";
 
 // UX-011: a 13-inch laptop (1024 px) is a width the design does not draw.
 // The week must still name each Session in full, and the report must keep
-// month names and amounts on one line. 1440 and 420 stay as drawn.
+// month names and amounts on one line. 1440 and 420 stay as drawn. W2: a
+// block is two lines, the type and «trainer · places».
 const fullType = async (page: Page) => {
   const block = page
     .getByRole("table", { name: "Semana" })
     .getByRole("button", { name: /Reformer Pilates, 07:00/ })
     .first();
   await expect(block).toBeVisible();
-  const type = block.locator(":scope > span").first();
+  const lines = block.locator("span[data-line]");
+  await expect(lines).toHaveCount(2);
+  const type = lines.first();
   await expect(type).toHaveText("Reformer Pilates");
-  await expect(type).toHaveCSS("white-space", "nowrap");
-  const time = block.locator(":scope > span").nth(1);
-  await expect(time).toContainText("07:00 – 07:50");
-  await expect(time).toHaveCSS("white-space", "nowrap");
+  await expect(lines.nth(1)).toContainText(/ · \d+ de \d+/);
   const fitted = await type.evaluate(
     (node) => node.scrollWidth <= node.clientWidth + 1,
   );
@@ -81,8 +81,8 @@ test.describe("the drawn widths", () => {
     await signIn(page, `/horario?week=${monday}`);
     await expect(sidebar(page)).toBeVisible();
     await fullType(page);
-    // Follow-up 232: a 96 px icon rail.
-    expect((await sidebar(page).boundingBox())?.width).toBe(96);
+    // Rosa Emma (design/v3/admin): a 232 px Rosa profundo sidebar.
+    expect((await sidebar(page).boundingBox())?.width).toBe(232);
 
     await page.setViewportSize({ width: 420, height: 860 });
     await expect(sidebar(page)).toHaveCount(0);

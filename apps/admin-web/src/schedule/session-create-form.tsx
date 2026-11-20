@@ -173,7 +173,7 @@ export function SessionCreateForm({
             )}
           />
           {frequency === "weekly" ? (
-            <p className="text-ayuda text-texto-tenue">
+            <p className="text-ayuda text-texto">
               Genera las clases de los próximos 30 días y las sigue creando cada
               semana.
             </p>
@@ -301,7 +301,7 @@ export function SessionCreateForm({
             />
           ) : null}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

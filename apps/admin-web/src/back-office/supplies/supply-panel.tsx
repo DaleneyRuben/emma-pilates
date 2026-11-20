@@ -164,13 +164,13 @@ export function SupplyPanelForm({
             />
           ) : (
             <div className="flex flex-col gap-1.5">
-              <p className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+              <p className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
                 Cantidad en stock
               </p>
-              <p className="rounded-control border border-divisor bg-superficie px-3 py-2.5 text-cuerpo text-texto tabular">
+              <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 text-cuerpo text-texto tabular">
                 {unitsLabel(supply.quantityOnHand)}
               </p>
-              <p className="text-ayuda text-texto-tenue">
+              <p className="text-ayuda text-texto">
                 Cambia solo con «Registrar retiro» y «Registrar reposición».
               </p>
             </div>
@@ -194,7 +194,7 @@ export function SupplyPanelForm({
             )}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}
@@ -206,7 +206,7 @@ export function SupplyPanelForm({
           {supply === undefined ? null : (
             <Button
               variant="link"
-              className="self-center text-error hover:text-error-texto"
+              className="self-center text-texto hover:text-texto"
               onClick={() => setConfirming(true)}
             >
               Archivar insumo

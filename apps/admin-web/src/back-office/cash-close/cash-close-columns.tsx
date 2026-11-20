@@ -22,7 +22,7 @@ const adjustmentNote =
 
 const voidedLine = (day: CashDayDto) =>
   (day.voidedCashCentavos ?? 0) > 0 ? (
-    <span className="block text-nota text-texto-secundario">
+    <span className="block text-nota text-texto">
       {`Ventas anuladas (efectivo en caja): ${formatBolivianos(day.voidedCashCentavos ?? 0)}`}
     </span>
   ) : null;
@@ -32,7 +32,7 @@ const signed = (centavos: number): string =>
     ? formatBolivianos(0)
     : `${centavos > 0 ? "+" : "−"}${formatBolivianos(Math.abs(centavos))}`;
 
-const quiet = <span className="text-texto-tenue">—</span>;
+const quiet = <span className="text-texto">—</span>;
 
 // AW151: a short drawer on the Error tint, a surplus on Advertencia.
 export const cashDayRowProps = (day: CashDayDto): ComponentProps<"tr"> => {
@@ -68,7 +68,7 @@ export const cashDayColumns = [
     cell: ({ row }) => (
       <>
         {row.original.close === null ? (
-          <span className="text-texto-tenue tabular">
+          <span className="text-texto tabular">
             {formatBolivianos(row.original.cashSalesCentavos)}
           </span>
         ) : (
@@ -112,10 +112,10 @@ export const cashDayColumns = [
       if (close === null) return quiet;
       const tone =
         close.differenceCentavos === 0
-          ? "text-texto-secundario"
+          ? "text-texto"
           : close.differenceCentavos < 0
-            ? "font-medium text-error-texto"
-            : "font-medium text-advertencia-texto";
+            ? "font-medium text-texto"
+            : "font-medium text-texto";
       return (
         <span className={cn(tone, "tabular")}>
           {signed(close.differenceCentavos)}
@@ -133,7 +133,7 @@ export const cashDayColumns = [
       return (
         <span
           title={adjustmentNote}
-          className="inline-flex items-center gap-1 text-nota text-texto-secundario tabular"
+          className="inline-flex items-center gap-1 text-nota text-texto tabular"
         >
           <Info size={12} strokeWidth={1.8} aria-hidden="true" />
           {signed(adjustment)}
@@ -149,7 +149,7 @@ export const cashDayColumns = [
       row.original.close === null ? (
         quiet
       ) : (
-        <span className="text-nota text-texto-secundario">
+        <span className="text-nota text-texto">
           {`${row.original.close.closedByName} · ${boliviaParts(row.original.close.closedAt).time}`}
         </span>
       ),
@@ -163,7 +163,7 @@ export const cashDayColumns = [
       return note === null ? null : (
         <span
           title={note}
-          className="block max-w-[220px] truncate text-nota text-texto-secundario max-md:max-w-none max-md:whitespace-normal"
+          className="block max-w-[220px] truncate text-nota text-texto max-md:max-w-none max-md:whitespace-normal"
         >
           {note}
         </span>

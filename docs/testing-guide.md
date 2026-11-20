@@ -62,7 +62,7 @@ numbered tests.
 | Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
 | Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 186) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
 | Staff app redesign picks | The Trainer's week with classes per day and the next class with who is coming (E1), the roster before and during the class with «Vino» / «No vino» (E6), the statement as a «TOTAL» block whose concepts open by day (E2), «Mis pagos» for every paid role (E8), the Palo de rosa Plan, the role's actions and the Coordinator's WhatsApp, Llamar and Anotar contacto on the client file (E4), Registrar pago with large options, a day strip and the invoice switch (E3), the Nutritionist's next appointment with WhatsApp (E5), the Assistant's «Hoy» (E7), and the freeze review with a refusal reason (E9) (Test 187) | The client file's Pagos and Evaluaciones rows need staff endpoints not built yet; transfer receipts are not on the Assistant's Hoy because only the Administrator confirms them |
-| Rosa Emma in the apps        | Both apps on the approved Rosa Emma system: the 200 header band behind the status bar, the 600 hero, 500 blocks, white cards with the rosa shadow, the 600 tab pill, class-type bars, and the joined undated lines of an old Liquidación (Test 188) | The boards in `design/v3/cliente` and `design/v3/equipo` are the reference; a screen the boards never drew keeps the shared pieces' look |
+| Rosa Emma in the apps        | Both apps on the approved Rosa Emma system: the 200 header band behind the status bar, the 600 hero, 500 blocks, white cards with the rosa shadow, the 600 tab pill, class-type bars, and the joined undated lines of an old Liquidación (Test 189) | The boards in `design/v3/cliente` and `design/v3/equipo` are the reference; a screen the boards never drew keeps the shared pieces' look |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 
 ## Where each designed screen is tested
@@ -70,7 +70,7 @@ numbered tests.
 The design index ([`docs/design/prompts/README.md`](./design/prompts/README.md))
 names every screen; this table says which tests walk each one, so a screen
 can be found by its design name. Since Rosa Emma every Client and Staff
-screen's look is also walked by Test 188 against its board in `design/v3/`.
+screen's look is also walked by Test 189 against its board in `design/v3/`.
 
 | Client app | Tests |
 | --- | --- |
@@ -11637,7 +11637,66 @@ I. **E9 · The freeze review and a refusal reason.** The Test 5A fixtures
    under **Decididas** shows «Pidió congelar …» and «Motivo del rechazo».
    An approved one shows a «Vence» row instead of «Vencería».
 
-## Test 188: Rosa Emma in the Client and Staff apps
+## Test 188: the admin web in Rosa Emma, and verification fixes W1, W2, W4 and W11
+
+Follow-up 284 and the boards in `design/v3/admin` (renders in
+`propuestas/v3/web/png/`). No migration. The admin roster gains two
+additive fields (`classNumber`, `founder`), so rebuild the API from the
+branch. Use a copy of `emma_vacia` (password «Password») or of the golden
+fixtures, the API, the worker and the admin web on your own ports, and
+check every step at 1440 px and at 420 px (open the menu with **Abrir
+menú**). Only the Rosa Emma scale (50–600), crema and white appear; no
+grey, no other hue.
+
+1. **Frame.** Wide: a Rosa profundo sidebar with «Emma Pilates Studio» in
+   Lora and the nine destinations in white (the current one a white pill,
+   its count swapped to Rosa profundo). The Rubor band holds the search, the
+   Branch cell and the account as white pills, then the page title in Lora,
+   the subtitle in 19 px bold and the page's actions. The page is Rosa 100;
+   tabs and a tab's views are a white segmented bar with the current one
+   solid. At 420 px a Rosa profundo top bar (menu, wordmark, search, avatar)
+   sits over the band, which starts with the Branch cell.
+2. **Shared pieces.** Tables, lists, forms and filter bars are white cards
+   with a soft shadow and the pagination inside; table heads are on 50.
+   Primary buttons and chosen chips are solid Rosa profundo with white text;
+   secondary ones white with a Rosa profundo outline. A calm state is a soft
+   50 pill, an exception a white pill with an Arcilla ring, «Por revisar» a
+   solid one. Side panels are white from the right with a rounded edge;
+   confirmation dialogs are white cards with the solid confirm and
+   **Volver** as a link. Empty states lead with a Lora 24 line.
+3. **Figure rows.** Comentarios, Informes › El mes and Clientas lead with a
+   Rosa profundo figure, then a Palo de rosa one with its word under the
+   number in large type, then white cards. Clientas lifts «Clientas», «con
+   plan activo», «Por vencer» and «Sin reservar» from its subtitle and chips.
+   Informes › Dinero leads with **Entró**; Inicio's **Cobrado hoy** and
+   Para contactar's count are the page's Rosa profundo block. Sueldos cards
+   carry a Rosa profundo head with the name and total in Lora; Equipos'
+   open faults sit under a Rosa profundo head.
+4. **W2 Horario.** Today's header is solid Rosa profundo («VIE 20 · HOY»)
+   over a soft 50 column, with no Rubor fill. Each class in the week is two
+   lines: «Reformer Pilates» and «Daniela · 0 de 12» (a full class reads
+   «Daniela · Llena · 3 en espera»), on a white card with the class type's
+   bar (Reformer 600, Mat 300, Cadillac 500). At 420 px the day list keeps
+   the time in Lora, the time range, her photo and name, and the places.
+5. **W1 Editar clase.** Book a Client into a class still to come. In
+   **Reservas** each Client shows «Primera clase», «12.ª clase» or
+   «3.ª clase · Fundadora» under her name and a **Quitar** link. **Quitar**
+   asks «¿Quitar a <nombre> de esta clase?» («La clase vuelve a su plan y, si
+   hay lista de espera, entra la primera.»); confirming says «Quitamos a
+   <nombre> de la clase.», the count drops and her class returns to her
+   Plan. Inside the cancellation window the dialog says «La clase ya está
+   dentro del plazo de cancelación: no se puede quitar esta reserva.». A
+   past class has no **Quitar**. **Cerrar** at the foot closes the panel.
+6. **W4 Pagos.** With nothing to review, «Por revisar · 0» shows «No hay
+   pagos pendientes.». Click **Todos**: the payments appear; «Todavía no hay
+   pagos.» never flashes while they load.
+7. **W11 Gastos.** Delete the month's only Expense: the confirmation reads
+   «… Sale de la lista y queda en «Ver gastos borrados» del mes, con quién y
+   cuándo, y ya no se puede editar.». After **Eliminar**, **Ver gastos
+   borrados** lists it, marked «Eliminado por <nombre> · <fecha>», never
+   «No hay gastos borrados en …».
+
+## Test 189: Rosa Emma in the Client and Staff apps
 
 The owner's approved redesign (2026-11-20, design follow-up 284; boards in
 `design/v3/cliente` and `design/v3/equipo`, system in `design/v3/sistema/`).

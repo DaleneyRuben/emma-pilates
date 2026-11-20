@@ -11,10 +11,10 @@ export function SummaryBlock({
 }) {
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
         {title}
       </h3>
-      <dl className="flex flex-col divide-y divide-divisor rounded-marco border border-borde bg-lino">
+      <dl className="flex flex-col divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta">
         {children}
       </dl>
     </section>
@@ -33,7 +33,7 @@ export function SummaryRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-      <dt className="text-nota text-texto-tenue">{label}</dt>
+      <dt className="text-nota text-texto">{label}</dt>
       <dd
         className={
           figure

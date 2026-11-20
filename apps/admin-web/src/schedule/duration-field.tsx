@@ -20,7 +20,7 @@ export function MinutesInput({
   return (
     <div
       className={cn(
-        "flex h-[44px] min-w-0 items-center overflow-hidden rounded-panel border border-borde bg-crema focus-within:border-primario focus-within:shadow-foco has-[[aria-invalid=true]]:border-rosa-profundo has-[[aria-invalid=true]]:inset-ring has-[[aria-invalid=true]]:inset-ring-rosa-profundo",
+        "flex h-[44px] min-w-0 items-center overflow-hidden rounded-panel border-[1.5px] border-borde-fuerte bg-superficie focus-within:border-primario focus-within:shadow-foco has-[[aria-invalid=true]]:border-2 has-[[aria-invalid=true]]:border-primario",
         className,
       )}
     >
@@ -35,7 +35,7 @@ export function MinutesInput({
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-full items-center border-l border-divisor bg-superficie text-nota text-texto-tenue",
+          "flex h-full items-center border-l border-borde bg-superficie text-nota text-texto",
           compact ? "px-2" : "px-3",
         )}
       >

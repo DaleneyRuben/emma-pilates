@@ -14,7 +14,7 @@ import {
 const columns = createColumnHelper<FreezeReviewDto>();
 
 const quiet = (text: string | undefined) => (
-  <span className="text-texto-secundario tabular">{text ?? "—"}</span>
+  <span className="text-texto tabular">{text ?? "—"}</span>
 );
 
 const clientColumn = columns.accessor("clientName", {
@@ -25,7 +25,9 @@ const clientColumn = columns.accessor("clientName", {
         name={row.original.clientName}
         photo={row.original.clientPhoto}
       />
-      <span className="font-medium text-texto">{row.original.clientName}</span>
+      <span className="text-cuerpo font-bold text-texto">
+        {row.original.clientName}
+      </span>
     </span>
   ),
 });
@@ -33,9 +35,7 @@ const clientColumn = columns.accessor("clientName", {
 const periodColumns = [
   columns.accessor("planName", {
     header: "Plan",
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
   columns.accessor("startsOn", {
     header: "Desde",
@@ -118,7 +118,7 @@ export const decidedFreezeColumns = () => [
           <StatusPill tone="error">Rechazada</StatusPill>
           {/* W16 B/C: what the Client was told. */}
           {row.original.refusalReason == null ? null : (
-            <span className="text-nota text-texto-tenue">
+            <span className="text-nota text-texto">
               {row.original.refusalReason}
             </span>
           )}

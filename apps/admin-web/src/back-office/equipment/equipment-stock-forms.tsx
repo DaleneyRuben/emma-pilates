@@ -33,7 +33,7 @@ function Stepper({
     >
       <span
         id={labelId}
-        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
+        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
       >
         ¿Cuántos?
       </span>
@@ -65,9 +65,7 @@ function Stepper({
           <Plus size={18} strokeWidth={1.8} aria-hidden="true" />
         </Button>
       </div>
-      <p className="text-ayuda text-texto-tenue">
-        {`De ${max} que se pueden usar.`}
-      </p>
+      <p className="text-ayuda text-texto">{`De ${max} que se pueden usar.`}</p>
     </div>
   );
 }
@@ -226,7 +224,7 @@ export function QuantityForm({
             aria-describedby={`${quantityId}-help`}
             onChange={(event) => setQuantity(event.target.value.trim())}
           />
-          <p id={`${quantityId}-help`} className="text-ayuda text-texto-tenue">
+          <p id={`${quantityId}-help`} className="text-ayuda text-texto">
             Cuenta también los dañados. Si se perdieron o se botaron, baja el
             número.
           </p>

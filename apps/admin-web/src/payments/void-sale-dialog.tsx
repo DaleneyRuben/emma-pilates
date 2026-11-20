@@ -74,7 +74,7 @@ export function VoidSaleDialog({
         devuelve: una anulación corrige un error.
       </p>
       <label className="flex flex-col gap-1 text-texto">
-        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
           Motivo
         </span>
         <Input
@@ -85,7 +85,7 @@ export function VoidSaleDialog({
         />
       </label>
       {failure === null ? null : (
-        <p role="alert" className="text-error-texto">
+        <p role="alert" className="text-texto">
           {failure}
         </p>
       )}

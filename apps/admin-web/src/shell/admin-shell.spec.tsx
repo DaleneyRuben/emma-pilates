@@ -55,12 +55,15 @@ describe("admin shell", () => {
       expect(
         within(rail()).getByRole("link", { name: "Inicio" }),
       ).toHaveAttribute("aria-current", "page");
-      // FIX-042 (decisiones §20.24): no «E» above the rail; it starts at
-      // Inicio and the brand stays in the top bar.
+      // Rosa Emma (design/v3/admin): «Emma Pilates Studio» heads the Rosa
+      // profundo sidebar, then Inicio; no logo image.
       expect(
         within(rail()).queryByRole("img", { name: "Emma Pilates Studio" }),
       ).toBeNull();
-      expect(rail().firstElementChild).toHaveAccessibleName("Inicio");
+      expect(rail().firstElementChild).toHaveTextContent("Emma Pilates Studio");
+      expect(within(rail()).getAllByRole("link")[0]).toHaveAccessibleName(
+        "Inicio",
+      );
       expect(
         screen.queryByRole("button", { name: "Abrir menú" }),
       ).not.toBeInTheDocument();
@@ -146,13 +149,11 @@ describe("admin shell", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("carries the wordmark, the search, the Branch and the account in the top bar", async () => {
+    it("carries the search, the Branch and the account in the top bar", async () => {
       renderShell("/horario");
       await heading("Horario");
 
       const topBar = screen.getByRole("banner");
-      expect(within(topBar).getByText("Emma")).toBeInTheDocument();
-      expect(within(topBar).getByText("Pilates Studio")).toBeInTheDocument();
       expect(
         within(topBar).getByRole("combobox", { name: "Buscar una clienta" }),
       ).toHaveAttribute("placeholder", "Buscar una clienta");
@@ -235,7 +236,7 @@ describe("admin shell", () => {
         screen.queryByRole("navigation", { name: "Secciones" }),
       ).not.toBeInTheDocument();
       expect(
-        within(screen.getByRole("banner")).getByText("Emma"),
+        within(screen.getByRole("banner")).getByText("Emma Pilates Studio"),
       ).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: "Abrir menú" }));

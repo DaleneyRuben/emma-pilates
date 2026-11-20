@@ -17510,6 +17510,15 @@
             ],
             "nullable": true,
             "description": "Null until the Trainer records Attendance"
+          },
+          "classNumber": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Her n-th class, counting earlier held classes she did not miss: 1 is her first class (W1)"
+          },
+          "founder": {
+            "type": "boolean",
+            "description": "She holds an active Founder Membership (W1 «Fundadora»)"
           }
         },
         "required": [
@@ -17517,7 +17526,9 @@
           "clientId",
           "clientName",
           "clientPhoto",
-          "attendanceOutcome"
+          "attendanceOutcome",
+          "classNumber",
+          "founder"
         ]
       },
       "AdministratorRosterWaitlistEntryDto": {

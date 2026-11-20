@@ -91,7 +91,7 @@ function AcquisitionForm({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-control border border-divisor bg-superficie p-3">
+    <div className="flex flex-col gap-3 rounded-control border border-borde bg-superficie p-3">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor={`${ids}-channel`}>Canal</Label>
         <Select
@@ -110,7 +110,7 @@ function AcquisitionForm({
           ))}
         </Select>
         {missingChannel ? (
-          <p role="alert" className="text-ayuda text-error-texto">
+          <p role="alert" className="text-ayuda text-texto">
             Elige cómo nos conoció.
           </p>
         ) : null}
@@ -124,11 +124,11 @@ function AcquisitionForm({
           value={code}
           onChange={(event) => setCode(event.target.value.toUpperCase())}
         />
-        <p className="text-ayuda text-texto-tenue">
+        <p className="text-ayuda text-texto">
           De una clienta o de una instructora. Si lo escribes, decide el canal.
         </p>
         {correction.isError ? (
-          <p role="alert" className="text-ayuda text-error-texto">
+          <p role="alert" className="text-ayuda text-texto">
             {failureMessage(correction.error)}
           </p>
         ) : null}
@@ -159,20 +159,18 @@ function AcquisitionRows({
     acquisition.declaredChannel !== "unknown" &&
     acquisition.declaredChannel !== acquisition.channel;
   return (
-    <dl className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
+    <dl className="flex flex-col divide-y divide-borde rounded-control border border-borde bg-superficie">
       <SummaryRow label="Canal">
         <span className="flex flex-col items-end">
           <span
             className={
-              acquisition.channel === "unknown"
-                ? "text-texto-muy-tenue"
-                : undefined
+              acquisition.channel === "unknown" ? "text-texto" : undefined
             }
           >
             {channelLabels[acquisition.channel]}
           </span>
           {answeredOtherwise ? (
-            <span className="text-ayuda text-texto-tenue">
+            <span className="text-ayuda text-texto">
               Ella respondió: {channelLabels[acquisition.declaredChannel]}
             </span>
           ) : null}
@@ -180,7 +178,7 @@ function AcquisitionRows({
       </SummaryRow>
       {acquisition.referralCode === null ? null : (
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde bg-lino px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
+          <span className="rounded-control border border-borde-fuerte bg-superficie px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto">
             {acquisition.referralCode}
           </span>
         </SummaryRow>
@@ -212,7 +210,7 @@ export function ClientAcquisitionBlock({ clientId }: { clientId: string }) {
       <div className="flex items-center justify-between gap-3">
         <h3
           id={titleId}
-          className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
+          className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
         >
           ¿Cómo nos conociste?
         </h3>
@@ -228,7 +226,7 @@ export function ClientAcquisitionBlock({ clientId }: { clientId: string }) {
         )}
       </div>
       {query.data === undefined ? (
-        <p className="text-nota text-texto-tenue">
+        <p className="text-nota text-texto">
           {query.isError ? "No pudimos leer este dato." : "Cargando…"}
         </p>
       ) : editing ? (

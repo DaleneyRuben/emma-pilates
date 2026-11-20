@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from "@testing-library/react";
-import { http } from "msw";
+import { delay, http } from "msw";
 import {
   apiUrl,
   jsonResponse,
@@ -30,7 +30,9 @@ import { expectBrandedLoading } from "../test/branded-loading";
 
 const reads: URLSearchParams[] = [];
 // The sidebar badge's one-row read falls through to its own handler.
-const paymentTable = (respond: (params: URLSearchParams) => Response) =>
+const paymentTable = (
+  respond: (params: URLSearchParams) => Response | Promise<Response>,
+) =>
   http.get(apiUrl(paymentsPath), ({ request }) => {
     const params = new URL(request.url).searchParams;
     if (params.get("pageSize") === "1") return undefined;
@@ -240,6 +242,35 @@ describe("AW28 Pagos on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(statusChip("Por revisar · 0")).toBeVisible();
+  });
+
+  it("W4: lists every Payment after Todos when nothing waits for review", async () => {
+    server.use(
+      paymentTable((params) =>
+        params.get("status") === "all"
+          ? delay(300).then(() =>
+              jsonResponse(
+                paymentPage([valeriaPayment, marianaPayment], {
+                  pendingCount: 0,
+                }),
+              ),
+            )
+          : jsonResponse(paymentPage([], { pendingCount: 0 })),
+      ),
+    );
+    const { user } = renderAdmin("/dinero/pagos");
+    await screen.findByText("No hay pagos pendientes.");
+
+    await user.click(statusChip("Todos"));
+
+    // The empty pending page is not «Todos»'s answer while that is on its way.
+    expect(screen.queryByText("Todavía no hay pagos.")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No hay pagos pendientes."),
+    ).not.toBeInTheDocument();
+    expect(await rowOf(/Valeria Quiroga/)).toBeVisible();
+    expect(await rowOf(/Mariana Paz/)).toBeVisible();
+    expect(screen.queryByText("Todavía no hay pagos.")).not.toBeInTheDocument();
   });
 
   it("says a search found no Payment and keeps the table header", async () => {

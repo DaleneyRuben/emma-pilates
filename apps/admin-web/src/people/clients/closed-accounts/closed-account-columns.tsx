@@ -17,20 +17,22 @@ export const closedAccountColumns = (onWithdrawn: (notice: string) => void) => [
     cell: ({ row }) => (
       <span className="flex items-center gap-2.5">
         <ClientPhoto name={row.original.name} photo={null} />
-        <span className="font-medium text-texto">{row.original.name}</span>
+        <span className="text-cuerpo font-bold text-texto">
+          {row.original.name}
+        </span>
       </span>
     ),
   }),
   columns.accessor("email", {
     header: "Contacto",
     cell: ({ row }) => (
-      <span className="flex flex-col text-nota text-texto-secundario">
+      <span className="flex flex-col text-nota text-texto">
         <span className="break-all">{row.original.email}</span>
         {/* No «Celular incompleto» warning: nobody can complete it now. */}
         {row.original.phone === null ? (
-          <span className="text-texto-muy-tenue">—</span>
+          <span className="text-texto">—</span>
         ) : (
-          <span className="tabular text-texto-muy-tenue">
+          <span className="tabular text-texto">
             {phoneWithFlag(row.original.phone)}
           </span>
         )}
@@ -41,9 +43,7 @@ export const closedAccountColumns = (onWithdrawn: (notice: string) => void) => [
     header: "Recibe promociones desde",
     meta: { card: "hidden" },
     cell: ({ row }) => (
-      <span className="text-texto-secundario tabular">
-        {sinceDate(row.original)}
-      </span>
+      <span className="text-texto tabular">{sinceDate(row.original)}</span>
     ),
   }),
   columns.display({

@@ -114,7 +114,7 @@ export function CompactRow<Data>({
           className={cn(
             cellBase,
             at("text"),
-            "row-start-1 min-w-0 text-fila font-medium break-words text-texto",
+            "row-start-1 min-w-0 text-[16px] font-semibold break-words text-texto",
             lead && "[&_[data-photo]]:hidden",
           )}
         >
@@ -142,7 +142,7 @@ export function CompactRow<Data>({
           className={cn(
             cellBase,
             at("chevron"),
-            "row-span-2 row-start-1 text-rosa-profundo",
+            "row-span-2 row-start-1 text-rosa-600",
           )}
         >
           <ChevronRight size={18} strokeWidth={1.8} />
@@ -154,7 +154,7 @@ export function CompactRow<Data>({
           className={cn(
             cellBase,
             at("text"),
-            "row-start-2 min-w-0 truncate text-nota text-texto-tenue [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline [&>span>*>*]:inline [&>span>*>*+*]:before:content-['_·_']",
+            "row-start-2 min-w-0 truncate text-nota text-texto [&>span:not(:empty)~span:not(:empty)]:before:content-['_·_'] [&>span>*]:inline [&>span>*>*]:inline [&>span>*>*+*]:before:content-['_·_']",
           )}
         >
           {details.map(({ cell }) => {

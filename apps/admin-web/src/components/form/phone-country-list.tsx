@@ -9,7 +9,7 @@ import {
 } from "../../lib/phone-number";
 
 const sectionClass =
-  "px-4 pt-2.5 pb-1 text-pie font-medium tracking-[0.12em] text-texto-tenue uppercase";
+  "px-4 pt-2.5 pb-1 text-pie font-medium tracking-[0.12em] text-texto uppercase";
 
 // The arrow keys move from the search into the options and between them
 // (Home/End jump); Enter or Space choose, as in the Branch selector.
@@ -48,23 +48,21 @@ function CountryOption({
       tabIndex={-1}
       onClick={() => onPick(country)}
       className={cn(
-        "flex min-h-10 w-full items-center gap-3 px-4 text-left text-cuerpo text-texto hover:bg-hover-fila focus-visible:bg-hover-fila focus-visible:shadow-none",
-        selected && "bg-rosa-tinte hover:bg-rosa-tinte",
+        "flex min-h-10 w-full items-center gap-3 px-4 text-left text-cuerpo text-texto hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none",
+        selected && "bg-superficie-hundida hover:bg-superficie-hundida",
       )}
     >
       <span aria-hidden="true" className="leading-none">
         {country.flag}
       </span>
       <span className="flex-1 truncate">{country.name}</span>
-      <span className="text-celda text-texto-tenue tabular">
-        +{country.dial}
-      </span>
+      <span className="text-celda text-texto tabular">+{country.dial}</span>
       {selected ? (
         <Check
           size={18}
           strokeWidth={1.8}
           aria-hidden="true"
-          className="text-rosa-profundo"
+          className="text-rosa-600"
         />
       ) : null}
     </button>
@@ -109,7 +107,7 @@ export function PhoneCountryList({
 
   return (
     <div className="flex max-h-[inherit] flex-col py-2" onKeyDown={moveFocus}>
-      <label className="mx-3 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-control border border-borde bg-lino px-3 focus-within:shadow-foco">
+      <label className="mx-3 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-control border border-borde-fuerte bg-superficie px-3 focus-within:shadow-foco">
         <Search
           size={18}
           strokeWidth={1.6}
@@ -122,7 +120,7 @@ export function PhoneCountryList({
           placeholder="Buscar país o código"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="min-w-0 flex-1 bg-transparent text-celda text-texto outline-none placeholder:text-texto-muy-tenue"
+          className="min-w-0 flex-1 bg-transparent text-celda text-texto outline-none placeholder:text-texto"
         />
       </label>
       <div
@@ -156,7 +154,7 @@ export function PhoneCountryList({
         )}
       </div>
       {searching && matches.length === 0 ? (
-        <p className="px-4 py-2 text-ayuda text-texto-tenue">
+        <p className="px-4 py-2 text-ayuda text-texto">
           No encontramos ese país.
         </p>
       ) : null}

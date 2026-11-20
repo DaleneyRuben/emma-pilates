@@ -19,7 +19,7 @@ export function IndicatorChart({
   return (
     <figure
       aria-label="Clases dictadas"
-      className="m-0 flex min-w-0 flex-col gap-3 rounded-marco border border-borde bg-lino px-5 py-4"
+      className="m-0 flex min-w-0 flex-col gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
     >
       <h2 className="text-titulo-panel text-texto">Clases dictadas</h2>
       {/* FIX-088: as wide as the card, never past a 420 px screen. */}

@@ -1,10 +1,11 @@
 import { useContext, type ReactNode } from "react";
 import { PageTabsContext } from "./page-tabs-context";
 
-// Follow-up 233 (the boards' head): the page title in Lora 32 with a
-// one-line Texto tenue subtitle on the left and the page's actions on the
-// right, then the destination's tabs and the tab's views. The title names
-// the page the tab opens, so a screen reader hears where it landed.
+// Follow-up 233, Rosa Emma (rw.py frame): the page title in Lora on the
+// Rubor band, the subtitle in 19 px bold (the large text the band allows) and
+// the page's actions on the right; below the band, on the page, the
+// destination's tabs and the tab's views. The title names the page the tab
+// opens, so a screen reader hears where it landed.
 export function PageHeader({
   title,
   subtitle,
@@ -16,18 +17,18 @@ export function PageHeader({
 }) {
   const tabs = useContext(PageTabsContext);
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex min-w-[240px] flex-1 flex-col gap-1">
-          <h1 className="text-titulo-1 text-texto lg:text-titulo-pagina-grande">
+    <div className="flex flex-col gap-[18px]">
+      <div className="-mx-4 flex flex-col gap-3 bg-banda px-4 pt-3 pb-[22px] lg:-mx-9 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between lg:gap-6 lg:px-9 lg:pt-[18px] lg:pb-[26px]">
+        <div className="flex min-w-0 flex-col gap-1.5 lg:min-w-[240px] lg:flex-1">
+          <h1 className="font-serif text-[32px] leading-[1.1] text-texto lg:text-titulo-pagina-grande">
             {title}
           </h1>
           {subtitle === undefined ? null : (
-            <p className="text-cuerpo text-texto-tenue">{subtitle}</p>
+            <p className="text-grande font-bold text-texto">{subtitle}</p>
           )}
         </div>
         {actions === undefined ? null : (
-          <div className="flex flex-wrap items-center gap-2">{actions}</div>
+          <div className="flex flex-wrap items-center gap-3">{actions}</div>
         )}
       </div>
       {tabs}

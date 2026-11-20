@@ -24,7 +24,7 @@ export function RowMenu({
       <DropdownMenu.Trigger
         aria-label={label}
         onClick={(event) => event.stopPropagation()}
-        className="inline-flex size-[44px] items-center justify-center rounded-control text-rosa-profundo hover:bg-rubor focus-visible:shadow-foco md:size-[36px]"
+        className="inline-flex size-[44px] items-center justify-center rounded-[10px] text-texto inset-ring inset-ring-borde hover:bg-superficie-hundida focus-visible:shadow-foco md:size-[36px]"
       >
         <MoreHorizontal aria-hidden className="size-5" />
       </DropdownMenu.Trigger>
@@ -33,13 +33,13 @@ export function RowMenu({
           align="end"
           sideOffset={4}
           onClick={(event) => event.stopPropagation()}
-          className="z-50 min-w-[180px] rounded-marco border border-arcilla bg-crema p-1 text-rosa-profundo shadow-popover"
+          className="z-50 min-w-[180px] rounded-[18px] bg-superficie p-2 text-texto shadow-popover"
         >
           {items.map((item) => (
             <DropdownMenu.Item
               key={item.label}
               onSelect={item.onSelect}
-              className="flex min-h-[40px] cursor-pointer items-center rounded-control px-3 text-celda outline-none data-highlighted:bg-rubor"
+              className="flex min-h-[40px] cursor-pointer items-center rounded-control px-3 text-cuerpo outline-none data-highlighted:bg-primario data-highlighted:font-bold data-highlighted:text-blanco"
             >
               {item.label}
             </DropdownMenu.Item>
