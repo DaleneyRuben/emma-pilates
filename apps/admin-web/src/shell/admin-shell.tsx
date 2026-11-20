@@ -9,14 +9,15 @@ import { PageTabsContext } from "../components/page/page-tabs-context";
 import { activeBranchesQueryOptions } from "./branch/branch-queries";
 import { BranchProvider } from "./branch/branch-provider";
 import { DestinationTabs } from "./destination-tabs";
-import { IconRail } from "./rail/icon-rail";
+import { Sidebar } from "./rail/sidebar";
 import { BranchCell, TopBar } from "./top-bar";
 import { useIsNarrowViewport } from "./use-media-query";
 
-// Follow-up 232 (P01): the icon rail on the left, the top bar and the page
-// on Marfil (each page's header draws its destination's tabs); at phone
-// width the rail becomes the menu drawer and the Branch cell moves above
-// the page. A
+// Rosa Emma (design/v3/admin): the Rosa profundo sidebar on the left, the
+// Rubor band with the top bar over the page header, and the page on 100
+// (each page's header draws its destination's tabs); at phone width the
+// sidebar becomes the menu drawer of a Rosa profundo top bar and the Branch
+// cell opens the band. A
 // page that throws while drawing is replaced by the recovery state inside
 // the main area (WEB-032); Reintentar resets it, and so does another page's
 // match once it is committed (the location moves before the matches do, so
@@ -61,22 +62,22 @@ export function AdminShell() {
     >
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-rosa-tinte focus:px-3 focus:py-2 focus:text-nota focus:font-medium focus:text-rosa-enlace focus:shadow-popover"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-superficie-hundida focus:px-3 focus:py-2 focus:text-nota focus:font-medium focus:text-texto focus:shadow-popover"
       >
         Saltar al contenido
       </a>
-      <div className="flex min-h-svh bg-superficie text-texto">
-        {narrow ? null : <IconRail />}
+      <div className="flex min-h-svh bg-fondo text-texto">
+        {narrow ? null : <Sidebar />}
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
           <main
             id="contenido"
             ref={main}
             tabIndex={-1}
-            className="flex flex-1 flex-col gap-5 bg-superficie px-5 pt-2 pb-8 outline-none focus-visible:shadow-none lg:px-10 lg:pb-14"
+            className="flex flex-1 flex-col bg-fondo px-4 pb-8 outline-none focus-visible:shadow-none lg:px-9 lg:pb-14"
           >
             {narrow ? (
-              <div className="flex">
+              <div className="-mx-4 flex bg-banda px-4 pt-[18px]">
                 <BranchCell />
               </div>
             ) : null}

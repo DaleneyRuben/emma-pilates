@@ -8,19 +8,21 @@ import { initials } from "../lib/initials";
 
 const sizes = {
   28: "size-7 text-[11px]",
-  40: "size-10 text-nota",
+  32: "size-8 text-[11px]",
+  36: "size-9 text-[11px]",
+  40: "size-10 text-pie",
 } as const;
 
 /**
  * FIX-041 (walkthrough n.º 30): a Client's circle wherever the web draws
- * her, her thumbnail when she has a photo, otherwise her initials in
- * Crema on Palo de rosa (FIX-089). The admin-session cookie authenticates the same-origin
+ * her, her thumbnail when she has a photo, otherwise her initials in Rosa
+ * profundo on 50 inside an Arcilla ring (Rosa Emma, rw.py avatar). The admin-session cookie authenticates the same-origin
  * image.
  */
 export function ClientPhoto({
   name,
   photo,
-  size = 28,
+  size = 36,
   className,
 }: {
   name: string;
@@ -40,7 +42,7 @@ export function ClientPhoto({
     <span
       data-photo=""
       className={cn(
-        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-palo-de-rosa font-bold text-crema",
+        "inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-superficie-hundida font-bold text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
         sizes[size],
         className,
       )}

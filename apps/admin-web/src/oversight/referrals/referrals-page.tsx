@@ -37,7 +37,7 @@ const referralColumns = () => [
         <span className="font-medium text-texto">
           {row.original.referrerName}
         </span>
-        <span className="text-ayuda text-texto-tenue">
+        <span className="text-ayuda text-texto">
           {count(
             row.original.referrerReferralCount,
             "referida en total",
@@ -49,16 +49,12 @@ const referralColumns = () => [
   }),
   columns.accessor("referredName", {
     header: "Clienta referida",
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
   columns.accessor("registeredAt", {
     header: "Fecha de registro",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {civilDate(getValue())}
-      </span>
+      <span className="text-texto tabular">{civilDate(getValue())}</span>
     ),
   }),
   // FIX-060 (walkthrough finding 86): her first confirmed Plan purchase.
@@ -68,11 +64,9 @@ const referralColumns = () => [
       // A backend before FIX-060 (a rollback) sends no «firstPurchaseAt».
       const boughtAt = getValue() as string | null | undefined;
       return boughtAt === null || boughtAt === undefined ? (
-        <span className="text-texto-tenue">Aún no</span>
+        <span className="text-texto">Aún no</span>
       ) : (
-        <span className="text-texto-secundario tabular">
-          {civilDate(boughtAt)}
-        </span>
+        <span className="text-texto tabular">{civilDate(boughtAt)}</span>
       );
     },
   }),
@@ -84,17 +78,15 @@ const referralColumns = () => [
       const { inviteReward, inviteRewardGrantedAt } = row.original;
       if (inviteReward === "granted" && inviteRewardGrantedAt !== null) {
         return (
-          <span className="text-texto-secundario tabular">
+          <span className="text-texto tabular">
             {`Sumada el ${civilDate(inviteRewardGrantedAt)}`}
           </span>
         );
       }
       return inviteReward === "owed" ? (
-        <span className="text-texto-secundario">
-          Se suma con su próximo plan
-        </span>
+        <span className="text-texto">Se suma con su próximo plan</span>
       ) : (
-        <span className="text-texto-muy-tenue">—</span>
+        <span className="text-texto">—</span>
       );
     },
   }),
@@ -103,17 +95,17 @@ const referralColumns = () => [
 function EmptyReferrals({ searching }: { searching: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
+      <span className="text-texto">
         {searching
           ? "No se encontró ningún referido."
           : "Todavía no hay referidos."}
       </span>
       {searching ? (
-        <span className="text-nota text-texto-tenue">
+        <span className="text-nota text-texto">
           Revisa cómo escribiste el nombre de la clienta.
         </span>
       ) : null}
-      <span className="text-ayuda text-texto-muy-tenue">
+      <span className="text-ayuda text-texto">
         Un referido nace cuando una clienta se registra con el código de otra.
       </span>
     </span>

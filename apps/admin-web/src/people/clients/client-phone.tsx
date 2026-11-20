@@ -16,10 +16,10 @@ export function ClientPhone({
   tone?: string;
 }) {
   if (phone === null || phone.trim() === "") {
-    return <span className="text-texto-tenue">Sin teléfono</span>;
+    return <span className="text-texto">Sin teléfono</span>;
   }
   if (!isCompletePhone(phone)) {
-    return <span className="text-advertencia-texto">Celular incompleto</span>;
+    return <span className="text-texto">Celular incompleto</span>;
   }
   return <span className={cn("tabular", tone)}>{phoneWithFlag(phone)}</span>;
 }

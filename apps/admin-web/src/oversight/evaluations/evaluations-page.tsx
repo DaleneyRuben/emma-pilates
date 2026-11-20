@@ -50,7 +50,7 @@ const evaluationColumns = () => [
         <span className="font-medium text-texto">
           {row.original.clientName}
         </span>
-        <span className="text-ayuda text-texto-tenue">
+        <span className="text-ayuda text-texto">
           {kindLabels[row.original.kind]}
         </span>
       </span>
@@ -58,16 +58,12 @@ const evaluationColumns = () => [
   }),
   columns.accessor("nutritionistName", {
     header: "Nutricionista",
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
   columns.accessor("startsAt", {
     header: "Fecha y hora",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatDateTime(getValue())}
-      </span>
+      <span className="text-texto tabular">{formatDateTime(getValue())}</span>
     ),
   }),
 ];
@@ -75,15 +71,13 @@ const evaluationColumns = () => [
 function EmptyWeek({ filtered }: { filtered: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
-        Sin evaluaciones en este rango.
-      </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-texto">Sin evaluaciones en este rango.</span>
+      <span className="text-nota text-texto">
         {filtered
           ? "Prueba con otra semana o quita el filtro de nutricionista."
           : "Prueba con otra semana."}
       </span>
-      <span className="text-ayuda text-texto-muy-tenue">
+      <span className="text-ayuda text-texto">
         Las clientas las agendan desde la app; la nutricionista publica su
         disponibilidad en la app del personal.
       </span>

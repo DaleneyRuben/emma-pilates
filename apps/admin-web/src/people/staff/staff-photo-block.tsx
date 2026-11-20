@@ -34,7 +34,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
             <span className="absolute inset-0 flex items-center justify-center bg-superficie/55">
               <span
                 aria-hidden="true"
-                className="size-6 animate-[spin_0.9s_linear_infinite] rounded-full border-[3px] border-rubor border-t-primario"
+                className="size-6 animate-[spin_0.9s_linear_infinite] rounded-full border-[3px] border-rosa-200 border-t-primario"
               />
             </span>
           ) : null}
@@ -61,7 +61,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
               {busy ? (
                 <span
                   role="status"
-                  className="inline-flex min-h-9 items-center text-nota text-texto-tenue"
+                  className="inline-flex min-h-9 items-center text-nota text-texto"
                 >
                   {busyLabels[status.kind]}
                 </span>
@@ -86,7 +86,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
                   )}
                 </span>
               )}
-              <span className="text-ayuda text-texto-tenue">
+              <span className="text-ayuda text-texto">
                 JPG, PNG o WebP, hasta 5 MB.
               </span>
             </>
@@ -96,13 +96,13 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
       {status.kind === "failed" ? (
         <div
           role="alert"
-          className="flex items-center gap-3 rounded-tarjeta border border-borde bg-lino px-3.5 py-2.5 text-nota text-texto"
+          className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-2.5 text-nota text-texto"
         >
           <CircleAlert
             size={20}
             strokeWidth={1.6}
             aria-hidden="true"
-            className="flex-none text-rosa-profundo"
+            className="flex-none text-rosa-600"
           />
           {status.message}
         </div>

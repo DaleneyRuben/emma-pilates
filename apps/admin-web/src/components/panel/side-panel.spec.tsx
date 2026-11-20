@@ -2,18 +2,18 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { SidePanel } from "./side-panel";
 
 describe("SidePanel", () => {
-  it("closes with follow-up 233's 40 px Lino square, the one the receipt viewer draws", () => {
+  it("closes with Rosa Emma's 40 px square on 50, the one the receipt viewer draws", () => {
     render(
       <SidePanel open onOpenChange={() => undefined} title="Nueva sucursal">
         <p>Formulario</p>
       </SidePanel>,
     );
 
-    // Follow-up 233 (the boards' .x): a 40 px Lino square, no border.
+    // Rosa Emma (rw.py panel): a 40 px square on 50, no border.
     expect(screen.getByRole("button", { name: "Cerrar" })).toHaveClass(
       "size-[40px]",
-      "bg-lino",
-      "rounded-tarjeta",
+      "bg-superficie-hundida",
+      "rounded-panel",
     );
   });
 

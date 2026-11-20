@@ -45,7 +45,7 @@ export function ExpenseVoidAction({
     <>
       <Button
         variant="link"
-        className="self-center text-error hover:text-error-texto"
+        className="self-center text-texto hover:text-texto"
         onClick={() => {
           setFailure(null);
           setReason("");
@@ -68,7 +68,7 @@ export function ExpenseVoidAction({
           se puede editar.
         </p>
         <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             Motivo (opcional)
           </span>
           <Input
@@ -79,7 +79,7 @@ export function ExpenseVoidAction({
           />
         </label>
         {failure === null ? null : (
-          <p role="alert" className="text-error-texto">
+          <p role="alert" className="text-texto">
             {failure}
           </p>
         )}

@@ -133,14 +133,14 @@ export function BranchPanelForm({
             )}
           />
           {branch === undefined ? null : (
-            <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
               Esta sucursal ya aparece en el selector de la barra superior y en
               cada registro que depende de ella (clases, insumos, gastos);
               renombrarla no mueve esos datos.
             </p>
           )}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}
@@ -152,7 +152,7 @@ export function BranchPanelForm({
           {branch === undefined || archived ? null : (
             <Button
               variant="link"
-              className="self-center text-error hover:text-error-texto"
+              className="self-center text-texto hover:text-texto"
               onClick={() => setConfirming(true)}
             >
               Archivar sucursal

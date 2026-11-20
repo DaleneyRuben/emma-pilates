@@ -6,9 +6,14 @@ import { StatTile, StatTiles } from "../components/ui/stat-tile";
 export function FeedbackCounters({ page }: { page: AdminFeedbackPageDto }) {
   return (
     <StatTiles className="grid-cols-3">
-      <StatTile label="Sin leer" figure={countFormat.format(page.newCount)} />
+      <StatTile
+        label="Sin leer"
+        tone="destacado"
+        figure={countFormat.format(page.newCount)}
+      />
       <StatTile
         label="Revisados"
+        tone="medio"
         figure={countFormat.format(page.reviewedCount)}
       />
       <StatTile

@@ -27,6 +27,8 @@ const emmaFontSizes = [
   "cifra",
   "cifra-grande",
   "fila",
+  "grande",
+  "titulo-dialogo",
 ];
 
 const twMerge = extendTailwindMerge({

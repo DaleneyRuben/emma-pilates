@@ -24,7 +24,7 @@ export function ClientResult({ client }: { client: AdminClientDto }) {
       <ClientPhoto name={client.name} photo={client.photo} size={40} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate font-medium text-texto">{client.name}</span>
-        <span className="truncate text-nota text-texto-tenue tabular">
+        <span className="truncate text-nota text-texto tabular">
           {clientLine(client)}
         </span>
       </span>

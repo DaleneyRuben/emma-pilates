@@ -18,11 +18,9 @@ type Panel =
 
 function EmptyCarousel() {
   return (
-    <section className="flex flex-col items-center gap-1 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
-      <p className="text-cuerpo text-texto-secundario">
-        Todavía no hay promociones.
-      </p>
-      <p className="text-nota text-texto-tenue">
+    <section className="flex flex-col items-center gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
+      <p className="text-cuerpo text-texto">Todavía no hay promociones.</p>
+      <p className="text-nota text-texto">
         Crea la primera con «Nueva promoción»; las clientas la verán en el
         inicio de la app cuando la publiques.
       </p>

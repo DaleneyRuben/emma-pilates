@@ -32,11 +32,11 @@ function TypeRow({
   const summary = holdingSummary(holding);
   return (
     <Fragment>
-      <TableRow className={open ? "bg-rubor hover:bg-rubor" : undefined}>
+      <TableRow className={open ? "bg-rosa-200 hover:bg-rosa-200" : undefined}>
         <TableCell data-label="Equipo">
           <span className="flex flex-col">
             <span className="font-medium">{type.name}</span>
-            <span className="text-nota text-texto-tenue">
+            <span className="text-nota text-texto">
               {trackingLabel[type.tracking]}
             </span>
           </span>
@@ -66,7 +66,7 @@ function TypeRow({
         <TableRow className="hover:bg-transparent">
           <TableCell
             colSpan={5}
-            className="bg-lino px-5 py-4 max-md:block max-md:before:content-none"
+            className="bg-superficie px-5 py-4 max-md:block max-md:before:content-none"
           >
             <TypeDetail
               id={detailId}
@@ -95,14 +95,14 @@ export function EquipmentTable({
 }) {
   if (holdings.length === 0) {
     return (
-      <p className="rounded-marco border border-borde bg-lino px-4 py-3 text-nota text-texto-tenue">
+      <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto">
         Todavía no hay tipos de equipo.
       </p>
     );
   }
   return (
     <Table aria-label="Equipos">
-      <TableHeader className="bg-rubor">
+      <TableHeader className="bg-rosa-200">
         <TableRow className="hover:bg-transparent">
           <TableHead>Equipo</TableHead>
           <TableHead>Unidades</TableHead>

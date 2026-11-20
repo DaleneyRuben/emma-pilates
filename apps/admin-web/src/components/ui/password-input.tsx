@@ -69,7 +69,7 @@ export function PasswordInput({
             field === null ? null : [field.selectionStart, field.selectionEnd];
           setShown((current) => !current);
         }}
-        className="absolute top-1/2 right-[2px] flex size-[40px] -translate-y-1/2 items-center justify-center rounded-control text-texto-tenue focus-visible:shadow-foco disabled:text-deshabilitado-texto"
+        className="absolute top-1/2 right-[2px] flex size-[40px] -translate-y-1/2 items-center justify-center rounded-control text-texto focus-visible:shadow-foco disabled:text-texto"
       >
         <svg
           width="20"

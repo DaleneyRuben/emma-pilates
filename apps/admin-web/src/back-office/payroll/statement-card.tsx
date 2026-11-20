@@ -50,14 +50,14 @@ export function StatementCard({
   return (
     <article
       aria-labelledby={headingId}
-      className="flex flex-col gap-3.5 rounded-tarjeta border border-borde bg-blanco px-5 py-5 md:px-6"
+      className="flex flex-col gap-3.5 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-5 md:px-6"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 flex-col gap-0.5">
           <h2 id={headingId} className="font-serif text-titulo-2 text-texto">
             {statement.staffMemberName}
           </h2>
-          <p className="text-nota text-texto-tenue">
+          <p className="text-nota text-texto">
             {role === undefined ? periodText : `${role} · ${periodText}`}
           </p>
         </div>
@@ -78,7 +78,7 @@ export function StatementCard({
             aria-expanded={showLines}
             aria-controls={showLines ? linesId : undefined}
             onClick={() => setShowLines((open) => !open)}
-            className="rounded-control text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco"
+            className="rounded-control text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco"
           >
             {showLines
               ? "Ocultar las líneas"
@@ -91,7 +91,7 @@ export function StatementCard({
           <span className="flex flex-wrap items-center justify-end gap-3">
             {/* BKO-007: her approval waits for the renewals. */}
             {member?.role === "coordinator" ? (
-              <span className="text-nota text-texto-tenue">
+              <span className="text-nota text-texto">
                 Su bono espera las renovaciones
               </span>
             ) : null}

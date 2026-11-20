@@ -13,7 +13,7 @@ import { StudioRulesForm } from "./studio-rules-form";
 import { studioSettingsQueryOptions } from "./studio-rules-queries";
 
 const cardClass =
-  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
+  "flex flex-col gap-4 rounded-tarjeta bg-superficie shadow-tarjeta p-6 max-md:p-4";
 
 const conflictMessage =
   "Alguien guardó otras reglas mientras editabas. Te mostramos las actuales: revisa y vuelve a guardar.";
@@ -34,15 +34,15 @@ function RuleCard({
         <h2 id={titleId} className="text-titulo-panel text-texto">
           {title}
         </h2>
-        <p className="text-ayuda text-texto-tenue">{note}</p>
+        <p className="text-ayuda text-texto">{note}</p>
       </div>
-      <dl className="flex flex-col divide-y divide-divisor">
+      <dl className="flex flex-col divide-y divide-borde">
         {rules.map((rule) => (
           <div
             key={rule.label}
             className="flex justify-between gap-6 py-2.5 max-md:flex-col max-md:gap-0.5"
           >
-            <dt className="text-nota text-texto-secundario">{rule.label}</dt>
+            <dt className="text-nota text-texto">{rule.label}</dt>
             <dd className="text-nota text-texto md:text-right">{rule.value}</dd>
           </div>
         ))}
@@ -71,7 +71,7 @@ export function StudioRulesPage() {
       ) : notice === "conflict" ? (
         <p
           role="alert"
-          className="rounded-control border border-borde bg-advertencia-tinte px-3 py-2 text-nota text-advertencia-texto"
+          className="rounded-control border border-borde-fuerte bg-aviso px-3 py-2 text-nota text-texto"
         >
           {conflictMessage}
         </p>
@@ -92,7 +92,7 @@ export function StudioRulesPage() {
                 <h2 id={formTitleId} className="text-titulo-panel text-texto">
                   Puedes cambiar
                 </h2>
-                <p className="text-ayuda text-texto-tenue">
+                <p className="text-ayuda text-texto">
                   {versionLine(settings.data)}
                 </p>
               </div>

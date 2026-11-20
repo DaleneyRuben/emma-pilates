@@ -29,17 +29,17 @@ function IssueRow({
   onAsk?: (asking: Asking) => void;
 }) {
   return (
-    <li className="flex flex-col gap-3 border-t border-borde px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
+    <li className="flex flex-col gap-3 border-t border-borde-fuerte px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="text-cuerpo font-medium text-texto">
           {issueTitle(issue)}
         </p>
         <p className="text-cuerpo text-texto">{issue.description}</p>
-        <p className="text-nota text-texto-tenue tabular">
+        <p className="text-nota text-texto tabular">
           {`Reportó ${issue.reportedByName} · ${formatDateTime(issue.reportedAt)}`}
         </p>
         {issue.resolvedAt === null ? null : (
-          <p className="text-nota text-texto-tenue tabular">
+          <p className="text-nota text-texto tabular">
             {`${issue.writtenOff ? "Dada de baja" : "Resuelta"} por ${issue.resolvedByName ?? ""} · ${formatDateTime(issue.resolvedAt)}`}
           </p>
         )}
@@ -127,14 +127,14 @@ export function EquipmentIssuesCard({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "flex flex-col rounded-marco border border-borde",
-        urgent ? "bg-rubor" : "bg-lino",
+        "flex flex-col rounded-marco border border-borde-fuerte",
+        urgent ? "bg-rosa-200" : "bg-superficie",
       )}
     >
       <div
         className={cn(
           "flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3",
-          urgent ? "border-borde" : "border-divisor",
+          urgent ? "border-borde-fuerte" : "border-borde",
         )}
       >
         <h2 id={titleId} className="font-serif text-[19px] text-texto">
@@ -155,7 +155,7 @@ export function EquipmentIssuesCard({
         />
       </div>
       {failure === null ? null : (
-        <p role="alert" className="px-4 pt-3 text-nota text-error-texto">
+        <p role="alert" className="px-4 pt-3 text-nota text-texto">
           {failure}
         </p>
       )}
@@ -172,7 +172,7 @@ export function EquipmentIssuesCard({
           />
         </div>
       ) : issues.data.length === 0 ? (
-        <p className="px-4 py-4 text-nota text-texto-tenue">
+        <p className="px-4 py-4 text-nota text-texto">
           {status === "open"
             ? "No hay fallas abiertas."
             : "Todavía no hay fallas resueltas."}

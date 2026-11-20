@@ -67,7 +67,7 @@ export function SidePanelBody({ children }: { children: ReactNode }) {
 
 export function SidePanelFooter({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 border-t border-divisor px-7 py-4">
+    <div className="flex flex-col gap-3 border-t border-borde px-7 py-4">
       {children}
     </div>
   );

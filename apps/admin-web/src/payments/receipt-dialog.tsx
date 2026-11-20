@@ -55,7 +55,7 @@ export function ReceiptDialog({
             <span
               className={cn(
                 "text-ayuda",
-                narrow ? "text-texto-tenue" : "text-superficie",
+                narrow ? "text-texto" : "text-superficie",
               )}
             >
               {caption}
@@ -70,7 +70,7 @@ export function ReceiptDialog({
             className={cn(
               narrow
                 ? "w-full object-contain"
-                : "max-h-[90vh] max-w-full rounded-marco bg-lino object-contain shadow-popover",
+                : "max-h-[90vh] max-w-full rounded-marco bg-superficie object-contain shadow-popover",
             )}
           />
         </Dialog.Content>

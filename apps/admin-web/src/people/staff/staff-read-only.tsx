@@ -30,13 +30,13 @@ export function StaffContact({
   } as const;
   const rows = only.map((row) => all[row]);
   return (
-    <dl className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
+    <dl className="flex flex-col divide-y divide-borde rounded-control border border-borde bg-superficie">
       {rows.map(([label, value]) => (
         <div
           key={label}
           className="flex items-baseline justify-between gap-4 px-3 py-2"
         >
-          <dt className="shrink-0 text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <dt className="shrink-0 text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             {label}
           </dt>
           <dd className="min-w-0 text-right text-nota break-words text-texto">
@@ -67,13 +67,13 @@ export function StaffReadOnly({
   return (
     <SidePanelBody>
       <StaffPhotoBlock member={member} />
-      <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+      <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
         {note}
       </p>
       <StaffContact member={member} />
       {facts.map(([label, value]) => (
         <div key={label} className="flex flex-col gap-1">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
             {label}
           </span>
           <span className="text-nota text-texto">{value}</span>

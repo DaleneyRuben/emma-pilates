@@ -7,7 +7,7 @@ import { roleLabelOf } from "./role-label";
 import { useLogout } from "./use-logout";
 
 const rowClass =
-  "flex h-9 w-full items-center px-4 text-left text-fila-menu hover:bg-hover-fila focus-visible:bg-hover-fila focus-visible:shadow-none";
+  "flex h-9 w-full items-center px-4 text-left text-fila-menu hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none";
 
 function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
   const { logout, failed, pending } = useLogout();
@@ -15,11 +15,11 @@ function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
   return (
     <div className="flex flex-col gap-3 p-4">
       <p className="font-medium text-texto">¿Cerrar sesión?</p>
-      <p className="text-ayuda text-texto-tenue">
+      <p className="text-ayuda text-texto">
         Se descartará cualquier panel sin guardar.
       </p>
       {failed ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           No pudimos cerrar la sesión. Inténtalo de nuevo.
         </p>
       ) : null}
@@ -75,10 +75,8 @@ export function AccountMenu({
         <span className="text-celda font-medium text-texto">
           {profile?.name ?? ""}
         </span>
-        <span className="text-ayuda text-texto-muy-tenue">
-          {profile?.email ?? ""}
-        </span>
-        <span className="pt-1 text-ayuda text-texto-tenue">
+        <span className="text-ayuda text-texto">{profile?.email ?? ""}</span>
+        <span className="pt-1 text-ayuda text-texto">
           {roleLabelOf(profile)}
         </span>
       </div>
@@ -93,7 +91,7 @@ export function AccountMenu({
         </button>
         <button
           type="button"
-          className={cn(rowClass, "text-error hover:text-error-texto")}
+          className={cn(rowClass, "text-texto hover:text-texto")}
           // Back from the confirmation, focus returns to the row it left.
           autoFocus={cancelled}
           onClick={() => setConfirming(true)}

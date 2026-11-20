@@ -55,11 +55,11 @@ export function WeekGrid({
     <div
       role="table"
       aria-label="Semana"
-      className="overflow-hidden rounded-marco border border-borde bg-lino"
+      className="overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
       <div
         role="row"
-        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] border-b border-borde bg-superficie-sutil lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
+        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] border-b border-borde-fuerte bg-superficie-hundida lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
       >
         <span aria-hidden="true" className="lg:hidden xl:block" />
         {days.map((day) => {
@@ -69,9 +69,9 @@ export function WeekGrid({
               key={day}
               role="columnheader"
               className={cn(
-                "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto-tenue uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
+                "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
                 // FIX-091 (W2, Horario B): today's column in Rubor.
-                day === today && "bg-rubor font-bold text-primario",
+                day === today && "bg-rosa-200 font-bold text-primario",
               )}
             >
               {tab.weekday}
@@ -95,7 +95,7 @@ export function WeekGrid({
           {hours.map((hour, index) => (
             <span
               key={hour}
-              className="absolute right-2 -translate-y-1/2 text-ayuda text-texto-muy-tenue tabular"
+              className="absolute right-2 -translate-y-1/2 text-ayuda text-texto tabular"
               style={{ top: index * hourHeight }}
             >
               {index === 0 ? null : hourLabel(hour)}
@@ -107,14 +107,14 @@ export function WeekGrid({
             key={day}
             role="cell"
             className={cn(
-              "relative border-l border-divisor",
-              day === today && "bg-rubor",
+              "relative border-l border-borde",
+              day === today && "bg-rosa-200",
             )}
             style={{
               height,
               // On Rubor the hour lines are drawn in Arcilla to stay visible.
               backgroundImage: hourLines(
-                day === today ? "--color-arcilla" : "--color-divisor",
+                day === today ? "--color-rosa-400" : "--color-borde",
               ),
             }}
           >

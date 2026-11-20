@@ -32,7 +32,7 @@ export function ProjectionSection({ input }: { input: SimulatorInput }) {
   return (
     <section aria-label="Proyección" className="flex flex-col gap-3">
       <h2 className="text-titulo-panel text-texto">Proyección</h2>
-      <p className="text-nota text-texto-tenue">
+      <p className="text-nota text-texto">
         El mes de arriba se repite. Bajo es el 80 % de las clientas y Alto el
         120 %, con un tope de 12 por clase.
       </p>

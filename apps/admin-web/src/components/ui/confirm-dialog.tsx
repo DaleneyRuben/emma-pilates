@@ -6,9 +6,9 @@ import { Button } from "./button";
 
 /**
  * A destructive action asks first (AW03 "pide confirmación antes de
- * ejecutarse"); the confirming button carries the Error tone and the other
- * one simply goes back. An irreversible action that is not destructive
- * (confirming a Payment, AW29) asks with the primary tone.
+ * ejecutarse"). Rosa Emma (rw.py dialog, RW-gastos-eliminar): a centred
+ * white card; the confirming button is the solid primary and «Volver» a
+ * text link, whatever the tone (no colour is red).
  */
 export function ConfirmDialog({
   open,
@@ -19,7 +19,6 @@ export function ConfirmDialog({
   cancelLabel = "Volver",
   pending = false,
   busy = false,
-  tone = "destructive",
   wide = false,
   confirmDescribedBy,
   onConfirm,
@@ -34,6 +33,7 @@ export function ConfirmDialog({
   pending?: boolean;
   /** The confirmation's own request is in flight (follow-up 93). */
   busy?: boolean;
+  /** Kept for callers; Rosa Emma draws both tones as the solid primary. */
   tone?: "destructive" | "primary";
   /** Room for a picture beside the details (FIX-072's payout QR). */
   wide?: boolean;
@@ -47,27 +47,29 @@ export function ConfirmDialog({
         <AlertDialog.Overlay className="fixed inset-0 z-50 bg-scrim" />
         <AlertDialog.Content
           className={cn(
-            "fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-marco bg-superficie p-5 shadow-popover",
+            "fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-3.5 rounded-hero bg-superficie px-7 pt-[26px] pb-[22px] shadow-dialogo",
             wide
               ? "max-h-[calc(100vh-32px)] w-[min(820px,calc(100vw-32px))] overflow-y-auto"
-              : "w-[min(420px,calc(100vw-32px))]",
+              : "w-[min(480px,calc(100vw-32px))]",
           )}
         >
           <BodyScrollLock />
-          <AlertDialog.Title className="font-serif text-titulo-panel text-texto">
+          <AlertDialog.Title className="font-serif text-titulo-dialogo text-texto">
             {title}
           </AlertDialog.Title>
           <AlertDialog.Description asChild>
-            <div className="flex flex-col gap-2 text-nota text-texto-secundario">
+            <div className="flex flex-col gap-3 text-cuerpo leading-[1.45] text-texto">
               {children}
             </div>
           </AlertDialog.Description>
-          <div className="flex flex-wrap justify-end gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-1.5">
             <AlertDialog.Cancel asChild>
-              <Button variant="neutral">{cancelLabel}</Button>
+              <Button variant="link" className="px-2">
+                {cancelLabel}
+              </Button>
             </AlertDialog.Cancel>
             <Button
-              variant={tone}
+              variant="primary"
               busy={busy}
               disabled={pending}
               aria-describedby={confirmDescribedBy}

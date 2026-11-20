@@ -27,11 +27,9 @@ import { ClientPhone } from "../clients/client-phone";
 
 function EmptyList() {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-marco border border-borde bg-lino px-6 py-10 text-center">
-      <p className="text-cuerpo text-texto-secundario">
-        Nadie para contactar por ahora.
-      </p>
-      <p className="text-nota text-texto-tenue">
+    <div className="flex flex-col items-center gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
+      <p className="text-cuerpo text-texto">Nadie para contactar por ahora.</p>
+      <p className="text-nota text-texto">
         Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas
         clases en sus primeros 90 días.
       </p>
@@ -69,17 +67,17 @@ function AlertRow({
         <ClientCell name={item.name} photo={item.photo} />
       </TableCell>
       <TableCell data-label="Teléfono">
-        <ClientPhone phone={item.phone} tone="text-texto-secundario" />
+        <ClientPhone phone={item.phone} tone="text-texto" />
       </TableCell>
       <TableCell data-label="Motivo">
-        <span className="flex flex-col text-nota text-texto-secundario">
+        <span className="flex flex-col text-nota text-texto">
           {item.reasons.map((reason) => (
             <span key={reason}>{contactAlertReasons[reason]}</span>
           ))}
         </span>
       </TableCell>
       <TableCell data-label="Empezó el">
-        <span className="text-texto-secundario tabular">
+        <span className="text-texto tabular">
           {startedOnLabel(item.startedOn)}
         </span>
       </TableCell>
@@ -112,7 +110,7 @@ export function ContactAlertsPage() {
             : `${clientas(query.data.totalItems)} · seguimiento de sus primeros 90 días`
         }
       />
-      <p className="text-nota text-texto-tenue">
+      <p className="text-nota text-texto">
         Escríbeles por WhatsApp y márcalas como contactadas. Salen solas de la
         lista cuando reservan una clase.
       </p>
@@ -120,7 +118,7 @@ export function ContactAlertsPage() {
         <PageNotice>{`Marcaste a ${notice.name} como contactada.`}</PageNotice>
       ) : null}
       {notice?.kind === "error" ? (
-        <p role="alert" className="text-nota text-error-texto">
+        <p role="alert" className="text-nota text-texto">
           {`No pudimos marcar a ${notice.name}. Inténtalo de nuevo.`}
         </p>
       ) : null}

@@ -37,9 +37,7 @@ const branchColumns = (open: (row: AdminBranchDto) => void) => [
   }),
   columns.accessor("address", {
     header: "Dirección",
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
 ];
 

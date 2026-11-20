@@ -28,24 +28,24 @@ function ClientResults({
   const results = useQuery(clientSearchQueryOptions(q));
   if (q.length < minimumClientQuery) return null;
   if (results.isPending) {
-    return <p className="text-celda text-texto-tenue">Buscando…</p>;
+    return <p className="text-celda text-texto">Buscando…</p>;
   }
   if (results.isError) {
     return (
-      <p role="alert" className="text-celda text-error-texto">
+      <p role="alert" className="text-celda text-texto">
         No pudimos buscar. Inténtalo de nuevo.
       </p>
     );
   }
   if (results.data.items.length === 0) {
     return (
-      <p className="text-celda text-texto-tenue">
+      <p className="text-celda text-texto">
         No encontramos clientas con esa búsqueda.
       </p>
     );
   }
   return (
-    <ul className="divide-y divide-divisor rounded-tarjeta border border-borde bg-lino">
+    <ul className="divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta">
       {results.data.items.map((client) => (
         <li
           key={client.id}
@@ -55,7 +55,7 @@ function ClientResults({
             <span className="text-celda font-medium text-texto">
               {client.name}
             </span>
-            <span className="text-ayuda text-texto-tenue">
+            <span className="text-ayuda text-texto">
               {client.planName ?? client.email}
             </span>
           </span>
@@ -113,7 +113,7 @@ export function BookClientForm({
   return (
     <div className="flex flex-1 flex-col gap-5 px-7 py-4">
       {full ? (
-        <p className="rounded-tarjeta bg-advertencia-tinte px-4 py-3 text-celda text-advertencia-texto">
+        <p className="rounded-tarjeta bg-aviso px-4 py-3 text-celda text-texto">
           La clase está llena: la clienta entra a la lista de espera en el
           puesto {nextPosition}.
         </p>
@@ -124,7 +124,7 @@ export function BookClientForm({
             <Search
               size={16}
               aria-hidden="true"
-              className="absolute top-1/2 left-3 -translate-y-1/2 text-rosa-empolvado"
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-superficie-hundida"
             />
             <Input
               aria-label="Buscar clienta"
@@ -145,7 +145,7 @@ export function BookClientForm({
               : `¿Reservar a ${picked.name} en esta clase?`}
           </p>
           {failure === null ? null : (
-            <p role="alert" className="text-celda text-error-texto">
+            <p role="alert" className="text-celda text-texto">
               {failure}
             </p>
           )}
@@ -165,7 +165,7 @@ export function BookClientForm({
           </div>
         </div>
       )}
-      <p className="text-ayuda text-texto-tenue">
+      <p className="text-ayuda text-texto">
         {full
           ? "Si se libera un lugar, entra sola y le llega el aviso."
           : "La reserva usa una clase de su plan y le llega el aviso como si reservara ella."}

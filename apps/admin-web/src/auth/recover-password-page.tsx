@@ -34,13 +34,11 @@ function SentState() {
     <div className="flex flex-col items-center gap-3 text-center">
       <MessageDisc icon={MailCheck} />
       <h1 className="font-serif text-titulo-1 text-texto">Revisa tu correo</h1>
-      <p className="text-cuerpo text-texto-secundario">
+      <p className="text-cuerpo text-texto">
         Si el correo corresponde a una cuenta, te enviamos un enlace para
         restablecer tu contraseña.
       </p>
-      <p className="text-nota text-texto-tenue">
-        El enlace vence en 30 minutos.
-      </p>
+      <p className="text-nota text-texto">El enlace vence en 30 minutos.</p>
       <BackToLoginLink />
     </div>
   );

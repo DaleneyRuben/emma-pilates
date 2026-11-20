@@ -19,7 +19,7 @@ export function ClientFileItem({
     <li className="flex items-center justify-between gap-3 px-3 py-2.5">
       <span className="flex min-w-0 flex-col">
         <span className="text-nota font-medium text-texto">{title}</span>
-        <span className="text-ayuda text-texto-tenue tabular">{detail}</span>
+        <span className="text-ayuda text-texto tabular">{detail}</span>
       </span>
       {aside}
     </li>
@@ -51,7 +51,7 @@ export function ClientFileSection<Data>({
     <section aria-labelledby={headingId} className="flex flex-col gap-1.5">
       <h3
         id={headingId}
-        className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
+        className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
       >
         {title}
       </h3>
@@ -64,9 +64,9 @@ export function ClientFileSection<Data>({
           onRetry={() => void query.refetch()}
         />
       ) : rows === null || rows.length === 0 ? (
-        <p className="text-nota text-texto-tenue">{empty}</p>
+        <p className="text-nota text-texto">{empty}</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
+        <ul className="flex flex-col divide-y divide-borde rounded-control border border-borde bg-superficie">
           {rows}
         </ul>
       )}

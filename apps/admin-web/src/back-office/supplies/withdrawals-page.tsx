@@ -77,16 +77,12 @@ const movementColumns = [
   columns.accessor("recordedByName", {
     header: "Registró",
     meta: { card: "hidden" },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    cell: ({ getValue }) => <span className="text-texto">{getValue()}</span>,
   }),
   columns.accessor("recordedAt", {
     header: "Fecha",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatDateTime(getValue())}
-      </span>
+      <span className="text-texto tabular">{formatDateTime(getValue())}</span>
     ),
   }),
 ];
@@ -114,10 +110,8 @@ const summary = (
 function EmptyHistory({ kind }: { kind: MovementKind | "all" }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto-secundario">
-        Sin {nouns[kind][1]} en este rango.
-      </span>
-      <span className="text-nota text-texto-tenue">
+      <span className="text-texto">Sin {nouns[kind][1]} en este rango.</span>
+      <span className="text-nota text-texto">
         Prueba con otro mes o con todos los insumos.
       </span>
     </span>
@@ -198,7 +192,7 @@ function BranchWithdrawals({
       ) : (
         <>
           {query.data.totalItems === 0 ? null : (
-            <p className="text-nota text-texto-secundario">
+            <p className="text-nota text-texto">
               {summary(query.data.totalItems, kind, month, supplyName)}
             </p>
           )}
@@ -219,8 +213,8 @@ function BranchWithdrawals({
             }}
           />
           {query.data.totals.length === 0 ? null : (
-            <section className="flex flex-col gap-1 rounded-control border border-divisor bg-superficie px-3 py-2.5">
-              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+            <section className="flex flex-col gap-1 rounded-control border border-borde bg-superficie px-3 py-2.5">
+              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
                 Consumo del mes
               </h2>
               <p className="text-nota text-texto tabular">

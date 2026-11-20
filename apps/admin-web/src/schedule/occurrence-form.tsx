@@ -139,7 +139,7 @@ export function OccurrenceForm({
         <SidePanelBody>
           <FormErrorSummary />
           <div className="flex flex-col gap-1.5">
-            <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+            <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
               Tipo de clase
             </span>
             <p className="text-cuerpo text-texto">{session.classTypeName}</p>
@@ -190,7 +190,7 @@ export function OccurrenceForm({
               )}
             />
           </div>
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto">
             Si cambias el día o la hora, avisamos a las clientas con reserva.
           </p>
           <DurationField />
@@ -213,7 +213,7 @@ export function OccurrenceForm({
             )}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

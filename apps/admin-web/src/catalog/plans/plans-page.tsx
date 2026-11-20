@@ -39,7 +39,7 @@ const planColumns = (open: (row: AdminPlanDto) => void) => [
     cell: ({ getValue }) => {
       const cap = getValue();
       return cap === null ? (
-        <span className="text-texto-tenue">{weeklyCapLabel(cap)}</span>
+        <span className="text-texto">{weeklyCapLabel(cap)}</span>
       ) : (
         weeklyCapLabel(cap)
       );

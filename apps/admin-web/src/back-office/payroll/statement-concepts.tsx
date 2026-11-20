@@ -25,11 +25,9 @@ export function ConceptRows({ lines }: { lines: PayStatementLineDto[] }) {
       {conceptsOf(lines).map((concept) => (
         <li
           key={concept.key}
-          className="flex items-baseline justify-between gap-3 border-b border-divisor py-2.5 text-celda last:border-b-0"
+          className="flex items-baseline justify-between gap-3 border-b border-borde py-2.5 text-celda last:border-b-0"
         >
-          <span className="min-w-0 text-texto-secundario">
-            {conceptName(concept)}
-          </span>
+          <span className="min-w-0 text-texto">{conceptName(concept)}</span>
           <span className="tabular whitespace-nowrap text-texto">
             {formatBolivianos(concept.subtotalCentavos)}
           </span>
@@ -57,7 +55,7 @@ export function StatementLines({
           // Lines have no identity of their own; their order is the statement's.
           <li
             key={`${concept.key}-${index}`}
-            className="flex items-center justify-between gap-3 border-divisor px-3 py-2 text-nota text-texto not-first:border-t"
+            className="flex items-center justify-between gap-3 border-borde px-3 py-2 text-nota text-texto not-first:border-t"
           >
             <span className="min-w-0">{line.detail}</span>
             <span className="tabular whitespace-nowrap">

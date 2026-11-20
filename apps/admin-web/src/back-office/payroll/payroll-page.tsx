@@ -42,9 +42,7 @@ const payrollColumns = (open: (row: AdminSalaryPaymentDto) => void) => [
   columns.accessor("paidOn", {
     header: "Fecha",
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatListDate(getValue())}
-      </span>
+      <span className="text-texto tabular">{formatListDate(getValue())}</span>
     ),
   }),
   columns.accessor("receiptUrl", {

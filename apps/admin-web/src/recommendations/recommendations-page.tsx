@@ -39,7 +39,7 @@ function Subject({ item }: { item: RecommendationDto }) {
       <Link
         to="/clientas"
         search={{ q: item.clientName, cliente: item.clientId ?? item.subject }}
-        className="self-start rounded-control font-medium text-primario-profundo underline-offset-2 hover:underline focus-visible:shadow-foco"
+        className="self-start rounded-control font-medium text-texto underline-offset-2 hover:underline focus-visible:shadow-foco"
       >
         {item.clientName}
       </Link>
@@ -68,11 +68,11 @@ function Finding({
   pending: boolean;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-divisor px-4 py-3.5 first:border-t-0 md:px-5">
+    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-borde px-4 py-3.5 first:border-t-0 md:px-5">
       <div className="flex min-w-0 flex-1 basis-[260px] flex-col gap-0.5">
         <Subject item={item} />
         <p className="text-cuerpo text-texto">{item.detail}</p>
-        <p className="text-nota text-texto-tenue">{stateLabel[item.state]}</p>
+        <p className="text-nota text-texto">{stateLabel[item.state]}</p>
       </div>
       {/* A resolved finding that holds again comes back unless discarded. */}
       {readOnly || item.state === "dismissed" ? null : (
@@ -80,7 +80,7 @@ function Finding({
           type="button"
           disabled={pending}
           onClick={() => onDismiss(item.id)}
-          className="rounded-control text-celda font-medium text-rosa-profundo underline underline-offset-2 focus-visible:shadow-foco disabled:no-underline"
+          className="rounded-control text-celda font-medium text-rosa-600 underline underline-offset-2 focus-visible:shadow-foco disabled:no-underline"
         >
           Descartar
         </button>
@@ -135,11 +135,11 @@ function FindingsByKind({
         onChange={(kind) => setChosen(kind)}
       />
       {shown.length === 0 ? (
-        <p className="rounded-marco border border-borde bg-crema px-6 py-8 text-center text-cuerpo text-texto">
+        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-8 text-center text-cuerpo text-texto">
           Nada pendiente en este grupo.
         </p>
       ) : (
-        <ul className="flex flex-col rounded-marco border border-borde bg-crema">
+        <ul className="flex flex-col rounded-tarjeta bg-superficie shadow-tarjeta">
           {shown.map((item) => (
             <Finding
               key={item.id}
@@ -200,7 +200,7 @@ export function RecommendationsSection({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2
           id="recomendaciones-del-mes"
-          className="font-sans text-pie font-medium tracking-[0.12em] text-texto-tenue uppercase"
+          className="font-sans text-pie font-medium tracking-[0.12em] text-texto uppercase"
         >
           Recomendaciones del mes
         </h2>
@@ -216,7 +216,7 @@ export function RecommendationsSection({
         )}
       </div>
       {recompute.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           No pudimos recalcular las recomendaciones.
         </p>
       ) : null}
@@ -231,7 +231,7 @@ export function RecommendationsSection({
       ) : query.data === undefined ? (
         <LoadingNotice>Cargando las recomendaciones…</LoadingNotice>
       ) : query.data.recommendations.length === 0 ? (
-        <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
+        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
           Nada que revisar este mes.
         </p>
       ) : (

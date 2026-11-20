@@ -21,7 +21,7 @@ export function FormErrorSummaryBox({
     <div
       role={announce ? "alert" : undefined}
       data-slot="form-error-summary"
-      className="flex flex-col gap-1 rounded-tarjeta bg-rubor p-[16px] text-rosa-profundo"
+      className="flex flex-col gap-1 rounded-tarjeta bg-rosa-200 p-[16px] text-rosa-600"
     >
       <p className="text-fila font-bold">{missingDataTitle(labels.length)}</p>
       <p className="text-celda">{labels.join(" · ")}</p>

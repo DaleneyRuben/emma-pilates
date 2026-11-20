@@ -1,9 +1,16 @@
-type Tone = "advertencia" | "error" | "exito" | "neutral";
+import { cn } from "../../lib/cn";
 
-// FIX-088 (design audit, round 2): a pill only for an exception (Advertencia,
-// Error); a normal state («Activo», «Confirmado», «Revisado») is plain text.
-// FIX-089 (palette B): every exception pill is the same Rubor pill with a
-// bold 12 px Rosa profundo word; the word carries the state, not a colour.
+type Tone = "accion" | "advertencia" | "error" | "exito" | "neutral";
+
+const pill =
+  "inline-flex h-7 items-center rounded-full px-3 text-pie font-bold whitespace-nowrap";
+
+// Rosa Emma (v3_rosa.py pill): a state as a pill whose look says how much it
+// asks. A calm state («Activa», «Confirmado», «Anulado») is the soft 50 pill
+// with a Rubor ring; an exception (Advertencia, Error) is the white pill with
+// an Arcilla ring; what waits for someone's action is solid Rosa profundo.
+// The word carries the state, never a colour. Only the exceptions and the
+// action carry `data-status-pill`.
 export function StatusPill({
   tone,
   children,
@@ -13,7 +20,13 @@ export function StatusPill({
 }) {
   if (tone === "exito" || tone === "neutral") {
     return (
-      <span className="text-pie whitespace-nowrap text-rosa-profundo">
+      <span
+        data-status="calma"
+        className={cn(
+          pill,
+          "bg-superficie-hundida text-texto inset-ring inset-ring-borde",
+        )}
+      >
         {children}
       </span>
     );
@@ -21,7 +34,12 @@ export function StatusPill({
   return (
     <span
       data-status-pill=""
-      className="inline-flex h-[24px] items-center rounded-full bg-rubor px-2.5 text-pie font-bold whitespace-nowrap text-rosa-profundo"
+      className={cn(
+        pill,
+        tone === "accion"
+          ? "bg-primario text-blanco"
+          : "bg-superficie text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
+      )}
     >
       {children}
     </span>

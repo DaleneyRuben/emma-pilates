@@ -41,7 +41,7 @@ export const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
             onOpen={() => open(row.original)}
           />
         </span>
-        <span className="text-nota text-texto-tenue tabular">
+        <span className="text-nota text-texto tabular">
           {appLine(row.original)}
         </span>
       </span>
@@ -51,7 +51,7 @@ export const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
     header: "Tipo",
     meta: { card: "detail", cardOrder: 2 },
     cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{typeLabels[getValue()]}</span>
+      <span className="text-texto">{typeLabels[getValue()]}</span>
     ),
   }),
   columns.accessor("status", {
@@ -62,7 +62,7 @@ export const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
     header: "Fecha",
     meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
-      <span className="whitespace-nowrap text-texto-secundario tabular">
+      <span className="whitespace-nowrap text-texto tabular">
         {formatDateTime(getValue())}
       </span>
     ),

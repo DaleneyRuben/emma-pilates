@@ -164,7 +164,7 @@ export function SeriesForm({
           <p className="text-nota text-texto">
             Serie semanal de {schedule.classTypeName}
           </p>
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto">
             Las clases que ya tienen reservas o lista de espera se mantienen sin
             cambios.
           </p>
@@ -249,7 +249,7 @@ export function SeriesForm({
             render={({ field }) => <EffectiveUntilItem {...field} />}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

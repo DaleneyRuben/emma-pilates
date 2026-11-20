@@ -101,7 +101,7 @@ export function PayPeriodPicker({
   };
   const otherPeriod = () => onChange(otherPeriodSearch(search, today));
   const linkButton =
-    "h-9 rounded-control px-1 text-celda font-medium text-primario-profundo hover:text-primario-presionado focus-visible:shadow-foco";
+    "h-9 rounded-control px-1 text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco";
 
   return (
     <div className="flex flex-col gap-3">
@@ -154,7 +154,7 @@ export function PayPeriodPicker({
         </div>
       ) : null}
       {shown.kind === "range" && shown.query === null ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           La fecha final no puede ser anterior a la inicial.
         </p>
       ) : null}

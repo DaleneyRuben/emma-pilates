@@ -31,7 +31,7 @@ function RosterSection({
 // FIX-091 (W1, Editar clase A): one Crema card with Rubor dividers, each
 // Client in her Palo de rosa circle.
 const listClass =
-  "divide-y divide-divisor rounded-tarjeta border border-borde bg-crema";
+  "divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta";
 const rowClass =
   "flex min-h-[56px] items-center gap-3 px-4 py-2.5 text-celda text-texto";
 
@@ -89,7 +89,7 @@ export function SessionRoster({
     <>
       <RosterSection title={`Reservaron (${roster.bookings.length})`}>
         {roster.bookings.length === 0 ? (
-          <p className="text-celda text-texto-tenue">Nadie reservó todavía.</p>
+          <p className="text-celda text-texto">Nadie reservó todavía.</p>
         ) : (
           <ul className={listClass}>
             {roster.bookings.map((booking) => (
@@ -107,7 +107,7 @@ export function SessionRoster({
           <ol className={listClass}>
             {roster.waitlist.map((entry) => (
               <li key={entry.waitlistEntryId} className={rowClass}>
-                <span className="w-6 font-serif text-titulo-3 text-rosa-profundo tabular">
+                <span className="w-6 font-serif text-titulo-3 text-rosa-600 tabular">
                   {entry.position}
                 </span>
                 <ClientPhoto
@@ -117,7 +117,7 @@ export function SessionRoster({
                 />
                 <span className="flex flex-1 flex-col">
                   <span className="font-medium">{entry.clientName}</span>
-                  <span className="text-ayuda text-texto-tenue">
+                  <span className="text-ayuda text-texto">
                     Entra sola si se libera un lugar
                   </span>
                 </span>

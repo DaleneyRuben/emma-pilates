@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../../lib/cn";
+import { bandPillClass } from "../band-pill";
 import { StaffPhoto } from "../../components/staff-photo";
 import {
   Popover,
@@ -38,26 +39,35 @@ export function AccountCell() {
     <button
       type="button"
       aria-label={name === "" ? "Tu cuenta" : `Tu cuenta: ${name}`}
-      className="flex h-11 items-center gap-2.5 rounded-tarjeta pr-2 pl-1 text-left text-texto hover:bg-lino focus-visible:shadow-foco"
+      className={cn(
+        narrow
+          ? "flex size-11 items-center justify-center rounded-full focus-visible:shadow-foco-solido"
+          : cn(bandPillClass, "gap-2.5 pr-3 pl-1.5 text-left font-normal"),
+      )}
     >
-      <StaffPhoto name={name} photo={profile?.photo} size={40} />
+      <StaffPhoto
+        name={name}
+        photo={profile?.photo}
+        size={narrow ? 36 : 32}
+        tone={narrow ? "sobre-lateral" : "solido"}
+      />
       {narrow ? (
         <span className="sr-only">{name}</span>
       ) : (
         <span className="flex flex-col">
-          <span className="text-celda leading-tight font-semibold">{name}</span>
-          <span className="text-pie text-tenue">
+          <span className="text-nota leading-tight font-bold">{name}</span>
+          <span className="text-nota leading-tight">
             {profile === undefined ? "" : roleLabelOf(profile)}
           </span>
         </span>
       )}
       {narrow ? null : (
         <ChevronDown
-          size={20}
-          strokeWidth={1.6}
+          size={16}
+          strokeWidth={1.7}
           aria-hidden="true"
           className={cn(
-            "text-tenue transition-transform",
+            "text-texto transition-transform",
             menuOpen && "rotate-180",
           )}
         />

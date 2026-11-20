@@ -5,7 +5,7 @@ export function PageNotice({ children }: { children: string }) {
   return (
     <p
       role="status"
-      className="rounded-tarjeta border-l-4 border-primario bg-lino px-4 py-3 text-celda text-texto"
+      className="rounded-tarjeta border-l-4 border-primario bg-superficie px-4 py-3 text-celda text-texto"
     >
       {children}
     </p>

@@ -19,7 +19,7 @@ import {
 
 export function Failure({ message }: { message: string | null }) {
   return message === null ? null : (
-    <p role="alert" className="text-nota text-error-texto">
+    <p role="alert" className="text-nota text-texto">
       {message}
     </p>
   );
@@ -109,7 +109,7 @@ export function AddUnitForm({
             <p
               key="help"
               id={`${numberId}-help`}
-              className="text-ayuda text-texto-tenue"
+              className="text-ayuda text-texto"
             >
               {help}
             </p>
@@ -198,7 +198,7 @@ export function ReportIssueForm({
             <label htmlFor={outId} className="text-cuerpo text-texto">
               No se puede usar
             </label>
-            <p id={`${outId}-help`} className="text-ayuda text-texto-tenue">
+            <p id={`${outId}-help`} className="text-ayuda text-texto">
               Márcalo si nadie debería usarlo hasta que lo arreglen.
             </p>
           </div>
@@ -239,7 +239,7 @@ export function DescriptionField({
         aria-describedby={`${id}-example`}
         onChange={(event) => onChange(event.target.value)}
       />
-      <p id={`${id}-example`} className="text-ayuda text-texto-tenue">
+      <p id={`${id}-example`} className="text-ayuda text-texto">
         {`Ej.: ${example}`}
       </p>
       {error === null ? null : (

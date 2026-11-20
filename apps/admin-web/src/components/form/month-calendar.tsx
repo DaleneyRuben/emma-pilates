@@ -64,9 +64,9 @@ const placeOf = (
 
 const bands: Record<RangePlace, string> = {
   start:
-    "bg-[linear-gradient(to_right,transparent_50%,var(--color-primario-tinte)_50%)]",
-  end: "bg-[linear-gradient(to_right,var(--color-primario-tinte)_50%,transparent_50%)]",
-  inside: "bg-primario-tinte",
+    "bg-[linear-gradient(to_right,transparent_50%,var(--color-superficie-hundida)_50%)]",
+  end: "bg-[linear-gradient(to_right,var(--color-superficie-hundida)_50%,transparent_50%)]",
+  inside: "bg-superficie-hundida",
   single: "",
 };
 
@@ -167,7 +167,7 @@ export function MonthCalendar({
           type="button"
           aria-label="Mes anterior"
           onClick={() => turn(-1)}
-          className="flex size-10 items-center justify-center rounded-full text-rosa-profundo hover:bg-primario-tinte focus-visible:shadow-foco"
+          className="flex size-10 items-center justify-center rounded-full text-rosa-600 hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           <ChevronLeft aria-hidden className="size-5" />
         </button>
@@ -181,7 +181,7 @@ export function MonthCalendar({
           type="button"
           aria-label="Mes siguiente"
           onClick={() => turn(1)}
-          className="flex size-10 items-center justify-center rounded-full text-rosa-profundo hover:bg-primario-tinte focus-visible:shadow-foco"
+          className="flex size-10 items-center justify-center rounded-full text-rosa-600 hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           <ChevronRight aria-hidden className="size-5" />
         </button>
@@ -190,7 +190,7 @@ export function MonthCalendar({
         {heads.map((head, index) => (
           <span
             key={index}
-            className="py-1 text-center text-etiqueta font-medium tracking-[0.06em] text-texto-tenue"
+            className="py-1 text-center text-etiqueta font-medium tracking-[0.06em] text-texto"
           >
             {head}
           </span>
@@ -230,10 +230,12 @@ export function MonthCalendar({
                 onClick={() => pick(date)}
                 className={cn(
                   "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent text-celda tabular focus-visible:shadow-foco",
-                  picked ? selectedClass : "text-texto hover:bg-primario-tinte",
-                  isToday && !picked && "border-rosa-profundo font-semibold",
+                  picked
+                    ? selectedClass
+                    : "text-texto hover:bg-superficie-hundida",
+                  isToday && !picked && "border-rosa-600 font-semibold",
                   refused &&
-                    "cursor-not-allowed text-deshabilitado-texto line-through hover:bg-transparent",
+                    "cursor-not-allowed text-texto line-through hover:bg-transparent",
                 )}
               >
                 {Number(date.slice(8, 10))}
@@ -243,22 +245,22 @@ export function MonthCalendar({
         })}
       </div>
       {reason === null ? null : (
-        <p role="status" className="mx-1 text-nota text-error-texto">
+        <p role="status" className="mx-1 text-nota text-texto">
           {reason}
         </p>
       )}
-      <div className="mt-0.5 flex items-center justify-between gap-2 border-t border-divisor pt-2">
+      <div className="mt-0.5 flex items-center justify-between gap-2 border-t border-borde pt-2">
         <button
           type="button"
           onClick={() => pick(today)}
-          className="h-9 rounded-control px-2.5 text-nota font-semibold text-rosa-enlace hover:bg-primario-tinte focus-visible:shadow-foco"
+          className="h-9 rounded-control px-2.5 text-nota font-semibold text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           Hoy
         </button>
         <button
           type="button"
           onClick={onClear}
-          className="h-9 rounded-control px-2.5 text-nota font-medium text-texto-tenue hover:bg-primario-tinte focus-visible:shadow-foco"
+          className="h-9 rounded-control px-2.5 text-nota font-medium text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           Borrar
         </button>

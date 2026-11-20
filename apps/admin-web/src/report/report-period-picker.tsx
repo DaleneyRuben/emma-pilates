@@ -23,7 +23,7 @@ function DateField({
     <div className="flex items-center gap-2">
       <label
         htmlFor={id}
-        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase"
+        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
       >
         {label}
       </label>
@@ -85,7 +85,7 @@ function RangeFields({
         />
       </div>
       {backwards ? (
-        <p role="alert" className="text-ayuda text-error-texto">
+        <p role="alert" className="text-ayuda text-texto">
           La fecha inicial no puede ser posterior a la final.
         </p>
       ) : null}

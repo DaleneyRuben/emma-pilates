@@ -58,7 +58,7 @@ export function ActiveEmailField({
             <Input type="email" autoComplete="off" {...field} />
           </FormControl>
           {sameEmail(typed, current) ? null : (
-            <p className="text-ayuda text-texto-tenue">
+            <p className="text-ayuda text-texto">
               {`Al guardar, le enviamos un enlace a este correo. Cambia cuando ${firstName(name)} lo abra.`}
             </p>
           )}
@@ -156,7 +156,7 @@ export function PendingEmailChange({
   return (
     <section
       aria-label={title}
-      className="flex gap-3 rounded-marco bg-rosa-tinte p-4"
+      className="flex gap-3 rounded-marco bg-superficie-hundida p-4"
     >
       <Hourglass
         size={20}
@@ -169,16 +169,14 @@ export function PendingEmailChange({
         <p className="break-words">
           {`Enviamos un enlace a ${pending.email}. Hasta que lo abra, sigue entrando con ${member.email}.`}
         </p>
-        <p className="text-ayuda text-texto-secundario">
+        <p className="text-ayuda text-texto">
           {`El enlace vence el ${linkDeadline(pending.expiresAt)}.`}
         </p>
         {result === null ? null : (
           <p
             role={result.ok ? "status" : "alert"}
             className={
-              result.ok
-                ? "text-ayuda text-primario"
-                : "text-ayuda text-error-texto"
+              result.ok ? "text-ayuda text-primario" : "text-ayuda text-texto"
             }
           >
             {result.message}
@@ -199,7 +197,7 @@ export function PendingEmailChange({
           <Button
             variant="link"
             size="sm"
-            className="text-error hover:text-error-texto"
+            className="text-texto hover:text-texto"
             disabled={change.isPending}
             busy={
               change.isPending && change.variables?.kind === "cancelEmailChange"

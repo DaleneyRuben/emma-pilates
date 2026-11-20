@@ -18,7 +18,7 @@ export function WaitNotice({
   return (
     <div
       role="status"
-      className="flex items-start gap-3 rounded-tarjeta border border-borde-fuerte bg-lino px-3.5 py-3"
+      className="flex items-start gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-3"
     >
       <Clock3
         size={18}
@@ -28,7 +28,7 @@ export function WaitNotice({
       />
       <div className="flex flex-col gap-0.5">
         <span className="text-cuerpo text-texto">{message}</span>
-        <span className="tabular text-nota text-texto-secundario">
+        <span className="tabular text-nota text-texto">
           {`${waitLabel} ${formatWait(seconds)}.`}
         </span>
       </div>

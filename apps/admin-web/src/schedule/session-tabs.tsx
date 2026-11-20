@@ -36,7 +36,7 @@ export function SessionTabs({
     <div
       role="tablist"
       aria-label="Clase"
-      className="mx-7 flex gap-4 overflow-x-auto border-b border-divisor"
+      className="mx-7 flex gap-4 overflow-x-auto border-b border-borde"
     >
       {tabs.map((tab, index) => {
         const selected = tab.value === value;
@@ -53,7 +53,7 @@ export function SessionTabs({
             onKeyDown={(event) => move(event, index)}
             className={cn(
               "-mb-px inline-flex h-11 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-cuerpo text-texto focus-visible:shadow-foco",
-              selected && "border-rosa-profundo font-bold",
+              selected && "border-rosa-600 font-bold",
             )}
           >
             {tab.label}

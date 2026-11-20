@@ -60,7 +60,7 @@ export function RemoveBookingAction({
           La clase vuelve a su plan y, si hay lista de espera, entra la primera.
         </p>
         {failure === null ? null : (
-          <p role="alert" className="font-semibold text-error-texto">
+          <p role="alert" className="font-semibold text-texto">
             {failure}
           </p>
         )}

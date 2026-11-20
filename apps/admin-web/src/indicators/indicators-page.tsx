@@ -47,9 +47,14 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
         <LoadingNotice>Cargando los indicadores…</LoadingNotice>
       ) : (
         <StatTiles>
-          <StatTile label="Ocupación" figure={`${data.occupancyPercent} %`} />
+          <StatTile
+            label="Ocupación"
+            tone="destacado"
+            figure={`${data.occupancyPercent} %`}
+          />
           <StatTile
             label="Clientas por clase"
+            tone="medio"
             figure={tenths.format(data.averageStudentsTimes10 / 10)}
           />
           <StatTile
@@ -80,7 +85,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
             </StatTiles>
           ) : null}
           {data.sessionsHeld === 0 ? (
-            <p className="rounded-marco border border-borde bg-lino px-6 py-10 text-center text-cuerpo text-texto-secundario">
+            <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
               Sin clases dictadas en este mes.
             </p>
           ) : (

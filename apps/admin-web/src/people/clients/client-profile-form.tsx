@@ -109,12 +109,12 @@ export function ClientProfileForm({
         <PhoneFormField control={form.control} name="phone" />
         <SummaryBlock title="Correo">
           <SummaryRow label="Correo">{client.email}</SummaryRow>
-          <p className="px-3 py-2 text-ayuda text-texto-tenue">
+          <p className="px-3 py-2 text-ayuda text-texto">
             La clienta cambia su correo desde su app.
           </p>
         </SummaryBlock>
         {failed ? (
-          <p role="alert" className="text-nota text-error-texto">
+          <p role="alert" className="text-nota text-texto">
             No pudimos guardar los cambios. Inténtalo de nuevo.
           </p>
         ) : null}

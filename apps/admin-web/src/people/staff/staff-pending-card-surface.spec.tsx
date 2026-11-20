@@ -18,9 +18,9 @@ const pendingCard = (panel: HTMLElement) => {
 const cardButton = [
   "h-[44px]",
   "w-full",
-  "border-rosa-profundo",
+  "border-rosa-600",
   "bg-crema",
-  "text-rosa-profundo",
+  "text-rosa-600",
   "text-fila-menu",
 ];
 
@@ -35,8 +35,13 @@ describe("AW24's pending card surface", () => {
     const { panel } = await openMember("Valentina Soria");
 
     const card = pendingCard(panel);
-    expect(card).toHaveClass("gap-2.5", "rounded-marco", "bg-lino", "p-4");
-    expect(card).not.toHaveClass("bg-advertencia-tinte");
+    expect(card).toHaveClass(
+      "gap-2.5",
+      "rounded-marco",
+      "bg-superficie",
+      "p-4",
+    );
+    expect(card).not.toHaveClass("bg-aviso");
   });
 
   it("puts the address and «Cambiar correo» on one row and tones the two lifetimes apart", async () => {
@@ -47,11 +52,9 @@ describe("AW24's pending card surface", () => {
     expect(change.parentElement).toHaveClass("justify-between");
     expect(card.getByText(/^El enlace vence el/)).toHaveClass(
       "text-nota",
-      "text-texto-secundario",
+      "text-texto",
     );
-    expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass(
-      "text-texto-muy-tenue",
-    );
+    expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass("text-texto");
   });
 
   it("draws «Reenviar enlace» as the full-width Marfil button", async () => {

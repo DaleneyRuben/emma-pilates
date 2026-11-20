@@ -62,7 +62,7 @@ export function PromotionCard({
           : { transform: `translateY(${card.offsetY}px) rotate(-0.6deg)` }
       }
       className={cn(
-        "relative flex cursor-pointer items-center gap-3 rounded-marco border border-borde bg-lino py-3 pr-4 pl-1 transition-shadow hover:bg-primario-tinte",
+        "relative flex cursor-pointer items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta py-3 pr-4 pl-1 transition-shadow hover:bg-superficie-hundida",
         card.dragging && "z-10 border-primario shadow-arrastre",
         card.dimmed && "opacity-[0.55]",
       )}
@@ -76,18 +76,18 @@ export function PromotionCard({
         onKeyDown={handle.onKeyDown}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto-muy-tenue hover:bg-hover-fila hover:text-texto-tenue focus-visible:shadow-foco active:cursor-grabbing",
-          handle.grabbed && "bg-primario-tinte text-primario-profundo",
+          "flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto hover:bg-superficie-hundida hover:text-texto focus-visible:shadow-foco active:cursor-grabbing",
+          handle.grabbed && "bg-superficie-hundida text-texto",
         )}
       >
         <GripVertical size={18} strokeWidth={1.6} aria-hidden="true" />
       </button>
-      <span className="inline-flex w-6 shrink-0 justify-center font-serif text-fila font-medium text-rosa-profundo tabular">
+      <span className="inline-flex w-6 shrink-0 justify-center font-serif text-fila font-medium text-rosa-600 tabular">
         <span className="sr-only">Posición {position}</span>
         <span aria-hidden="true">{position}</span>
       </span>
       {promotion.image === null || promotion.image === undefined ? (
-        <span className="flex aspect-video w-[120px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-control bg-primario-tinte text-primario-profundo max-md:w-[88px]">
+        <span className="flex aspect-video w-[120px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-control bg-superficie-hundida text-texto max-md:w-[88px]">
           <Image size={18} strokeWidth={1.5} aria-hidden="true" />
           <span className="text-pie">Sin imagen</span>
         </span>
@@ -101,7 +101,7 @@ export function PromotionCard({
           alt=""
           width={120}
           height={68}
-          className="aspect-video w-[120px] shrink-0 rounded-control bg-primario-tinte object-cover max-md:w-[88px]"
+          className="aspect-video w-[120px] shrink-0 rounded-control bg-superficie-hundida object-cover max-md:w-[88px]"
         />
       )}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -115,7 +115,7 @@ export function PromotionCard({
         >
           {promotion.headline}
         </button>
-        <span className="text-ayuda text-texto-tenue tabular">
+        <span className="text-ayuda text-texto tabular">
           {formatDisplayWindow(
             promotion.displayStartsOn,
             promotion.displayEndsOn,

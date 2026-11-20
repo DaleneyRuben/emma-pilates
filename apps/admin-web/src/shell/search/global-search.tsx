@@ -74,9 +74,9 @@ export function GlobalSearch({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative", className)}>
-      <label className="flex h-12 items-center gap-2.5 rounded-[14px] border border-borde bg-lino px-4 focus-within:shadow-foco">
+      <label className="flex h-11 items-center gap-2.5 rounded-boton bg-superficie px-3.5 shadow-tarjeta focus-within:shadow-foco">
         <Search
-          size={22}
+          size={18}
           strokeWidth={1.6}
           aria-hidden="true"
           className="shrink-0 text-primario"
@@ -116,15 +116,15 @@ export function GlobalSearch({ className }: { className?: string }) {
               if (result !== undefined) choose(result);
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-cuerpo text-texto outline-none placeholder:text-tenue focus-visible:shadow-none"
+          className="min-w-0 flex-1 bg-transparent text-celda text-texto outline-none placeholder:text-texto focus-visible:shadow-none"
         />
-        <kbd className="hidden rounded-[6px] bg-superficie px-2 py-0.5 font-sans text-pie text-tenue lg:inline">
+        <kbd className="hidden rounded-[6px] px-1.5 py-0.5 font-sans text-pie font-semibold text-texto ring-1 ring-borde lg:inline">
           Ctrl K
         </kbd>
       </label>
       {words === "" ? null : (
-        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 flex flex-col gap-1 rounded-marco bg-superficie p-2 shadow-popover">
-          <p className="px-3 pt-1 text-nota text-texto-tenue">
+        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 flex flex-col gap-1 rounded-[18px] bg-superficie p-2 shadow-popover">
+          <p className="px-3 pt-1 text-nota text-texto">
             Busca clientas por nombre, celular o correo
           </p>
           {status === null ? null : (
@@ -151,8 +151,8 @@ export function GlobalSearch({ className }: { className?: string }) {
                   onClick={() => choose(result)}
                   className={cn(
                     "flex min-h-11 cursor-pointer items-center gap-3 rounded-[10px] px-3 py-1.5 text-cuerpo",
-                    index === current && "bg-rosa-tinte",
-                    result.kind === "all" && "font-medium text-rosa-enlace",
+                    index === current && "bg-superficie-hundida",
+                    result.kind === "all" && "font-medium text-texto",
                   )}
                 >
                   {result.kind === "client" ? (

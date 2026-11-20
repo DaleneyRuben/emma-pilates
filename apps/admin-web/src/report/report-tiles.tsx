@@ -44,7 +44,11 @@ export function ReportTiles({
 }) {
   return (
     <StatTiles className="max-md:grid-cols-1">
-      <StatTile label="Entró" figure={formatBolivianos(income.totalCentavos)}>
+      <StatTile
+        label="Entró"
+        tone="destacado"
+        figure={formatBolivianos(income.totalCentavos)}
+      >
         <div className="flex flex-col gap-0.5 text-nota">
           {change === null ? null : <p className="font-medium">{change}</p>}
           {branchName === undefined ? (

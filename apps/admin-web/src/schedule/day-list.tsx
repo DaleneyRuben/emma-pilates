@@ -49,7 +49,7 @@ export function DayList({
                 "flex min-w-[52px] shrink-0 flex-col items-center rounded-control border px-2 py-1.5 text-ayuda",
                 selected ? selectedClass : unselectedClass,
                 // FIX-091 (W2, Horario B): today stays in Rubor.
-                date === today && !selected && "bg-rubor",
+                date === today && !selected && "bg-rosa-200",
               )}
             >
               <span>{tab.weekday}</span>
@@ -63,7 +63,7 @@ export function DayList({
       </div>
       <div role="tabpanel" className="flex flex-col gap-2">
         {ofDay.length === 0 ? (
-          <p className="rounded-marco border border-borde bg-lino px-4 py-6 text-center text-nota text-texto-tenue">
+          <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-6 text-center text-nota text-texto">
             Sin clases este día.
           </p>
         ) : (

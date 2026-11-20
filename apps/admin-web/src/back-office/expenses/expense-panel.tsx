@@ -145,7 +145,7 @@ export function ExpensePanelForm({
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
           <FormErrorSummary />
-          <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+          <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
             {expense === undefined
               ? `Se registra en la sucursal ${branch.name}.`
               : `Sucursal ${branch.name}: un gasto no cambia de sucursal.`}
@@ -254,7 +254,7 @@ export function ExpensePanelForm({
             )}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-error-texto">
+            <p role="alert" className="text-nota text-texto">
               {failure}
             </p>
           )}

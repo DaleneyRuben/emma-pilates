@@ -38,7 +38,7 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
             onOpen={() => open(row.original)}
           />
         ) : (
-          <span className="font-medium text-texto">
+          <span className="text-cuerpo font-bold text-texto">
             {row.original.clientName}
           </span>
         )}
@@ -50,10 +50,8 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     meta: { card: "detail", cardOrder: 1 },
     cell: ({ row }) => (
       <span className="flex flex-col gap-0.5">
-        <span className="text-texto-secundario">{row.original.planName}</span>
-        <span className="text-nota text-texto-tenue">
-          {saleLine(row.original)}
-        </span>
+        <span className="text-texto">{row.original.planName}</span>
+        <span className="text-nota text-texto">{saleLine(row.original)}</span>
       </span>
     ),
   }),
@@ -70,7 +68,7 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     header: "Fecha",
     meta: { card: "detail", cardOrder: 3 },
     cell: ({ getValue }) => (
-      <span className="whitespace-nowrap text-texto-secundario tabular">
+      <span className="whitespace-nowrap text-texto tabular">
         {formatDateTime(getValue())}
       </span>
     ),
@@ -81,7 +79,7 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
       <span className="inline-flex flex-col gap-1">
         <PaymentStatePill state={row.original.state} />
         {row.original.voidReason ? (
-          <span className="text-ayuda text-texto-tenue">
+          <span className="text-ayuda text-texto">
             {row.original.voidReason}
           </span>
         ) : null}

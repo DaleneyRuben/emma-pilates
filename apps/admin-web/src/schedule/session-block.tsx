@@ -69,7 +69,7 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full items-center overflow-hidden rounded-control border border-divisor bg-crema px-2 text-left text-ayuda leading-tight text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco",
+        "flex w-full items-center overflow-hidden rounded-control border border-borde bg-crema px-2 text-left text-ayuda leading-tight text-texto transition-shadow hover:bg-superficie-hundida focus-visible:shadow-foco",
         layout === "list" && "min-h-11",
         className,
       )}
@@ -151,7 +151,7 @@ function StandingBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start justify-start gap-px overflow-hidden rounded-control border border-borde bg-blanco px-2 py-1 text-left text-texto transition-shadow hover:bg-hover-fila focus-visible:shadow-foco lg:px-1.5 xl:px-2",
+        "flex w-full flex-col items-start justify-start gap-px overflow-hidden rounded-control border border-borde-fuerte bg-blanco px-2 py-1 text-left text-texto transition-shadow hover:bg-superficie-hundida focus-visible:shadow-foco lg:px-1.5 xl:px-2",
         className,
       )}
     >
@@ -159,7 +159,7 @@ function StandingBlock({
         {flag === undefined ? null : <EquipmentDot />}
         {session.classTypeName}
       </span>
-      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto-secundario tabular">
+      <span className="w-full text-ayuda leading-tight whitespace-nowrap text-texto tabular">
         {start} – {end}
         {short ? (
           <>
@@ -168,7 +168,7 @@ function StandingBlock({
           </>
         ) : null}
       </span>
-      <span className="flex w-full items-center text-ayuda leading-tight break-words text-texto-secundario">
+      <span className="flex w-full items-center text-ayuda leading-tight break-words text-texto">
         {/* Follow-up 242: her photo leads her name, when she has one. */}
         {session.trainerPhoto === null ? null : (
           <StaffPhoto
@@ -181,7 +181,7 @@ function StandingBlock({
         <span className="min-w-0">{session.trainerName}</span>
       </span>
       {short ? null : (
-        <span className="text-ayuda leading-tight text-texto-tenue tabular">
+        <span className="text-ayuda leading-tight text-texto tabular">
           {occupancy(session)}
         </span>
       )}

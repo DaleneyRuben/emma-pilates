@@ -25,7 +25,7 @@ export function WeeklyRowsField() {
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
         Días y horas
       </span>
       {fields.map((item, index) => (
@@ -94,7 +94,7 @@ export function WeeklyRowsField() {
               </div>
               <FormMessage />
               {formState.errors.rows?.[index]?.durationMinutes ? (
-                <p className="text-ayuda text-error-texto">
+                <p className="text-ayuda text-texto">
                   {formState.errors.rows[index].durationMinutes.message}
                 </p>
               ) : null}
@@ -113,7 +113,7 @@ export function WeeklyRowsField() {
           Agregar día
         </Button>
       ) : null}
-      <p className="text-ayuda text-texto-tenue">
+      <p className="text-ayuda text-texto">
         Cada día puede durar distinto; empieza en 60 minutos.
       </p>
     </div>

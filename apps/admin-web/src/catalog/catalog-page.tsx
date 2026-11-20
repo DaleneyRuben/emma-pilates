@@ -286,7 +286,7 @@ export function RowOpener({
         event.stopPropagation();
         onOpen();
       }}
-      className="rounded-control text-left font-medium text-texto hover:text-primario focus-visible:shadow-foco"
+      className="rounded-control text-left text-cuerpo font-bold text-texto hover:underline hover:underline-offset-[3px] focus-visible:shadow-foco"
     >
       {label}
     </button>

@@ -112,12 +112,12 @@ export function FreezeReviewPanel({
               aria-describedby={`${reasonId}-hint`}
               onChange={(event) => setRefusalReason(event.target.value)}
             />
-            <p id={`${reasonId}-hint`} className="text-ayuda text-texto-tenue">
+            <p id={`${reasonId}-hint`} className="text-ayuda text-texto">
               {`Se lo enviamos a ${firstName(freeze.clientName)}`}
             </p>
           </div>
           {problem === null ? null : (
-            <p role="alert" className="text-nota text-error">
+            <p role="alert" className="text-nota text-texto">
               {problem}
             </p>
           )}
