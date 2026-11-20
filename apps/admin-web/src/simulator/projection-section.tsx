@@ -31,7 +31,7 @@ export function ProjectionSection({ input }: { input: SimulatorInput }) {
   const rows = projectMonths(input);
   return (
     <section aria-label="Proyección" className="flex flex-col gap-3">
-      <h2 className="text-seccion text-texto">Proyección</h2>
+      <h2 className="tipo-titulo-seccion text-texto">Proyección</h2>
       <Table
         aria-label="Proyección a 3, 6 y 12 meses"
         lead="El mes de arriba se repite. Bajo es el 80 % de las clientas y Alto el 120 %, con un tope de 12 por clase."

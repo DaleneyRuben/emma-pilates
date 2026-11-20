@@ -55,7 +55,7 @@ const planColumns = (open: (row: AdminPlanDto) => void) => [
     header: "Precio",
     meta: { align: "right" },
     cell: ({ getValue }) => (
-      <span className="font-serif tabular">{formatBolivianos(getValue())}</span>
+      <span className="tipo-cifra">{formatBolivianos(getValue())}</span>
     ),
   }),
   columns.accessor("hiddenAt", {

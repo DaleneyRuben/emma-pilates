@@ -18,7 +18,9 @@ import {
 } from "../components/form/form";
 import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelBody } from "../components/panel/side-panel";
+import { avisoClass } from "../components/ui/aviso";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
+import { InlineError } from "../components/ui/inline-error";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { boliviaToday } from "../lib/bolivia-time";
@@ -195,9 +197,7 @@ export function PromotionPanelForm({
           <FormErrorSummary />
           <PromotionImageField value={image} onChange={setImage} />
           {wasPublished && imageChanged ? (
-            <p className="rounded-control border border-borde-fuerte bg-aviso px-3 py-2 text-ayuda text-texto">
-              {imageChangeWarning(image !== null)}
-            </p>
+            <p className={avisoClass}>{imageChangeWarning(image !== null)}</p>
           ) : null}
           <FormField
             control={form.control}
@@ -267,7 +267,7 @@ export function PromotionPanelForm({
             />
           </div>
           {wasPublished ? (
-            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-compacto text-texto">
               {windowStatus(
                 boliviaToday(),
                 typed.displayStartsOn ?? "",
@@ -275,11 +275,7 @@ export function PromotionPanelForm({
               )}
             </p>
           ) : null}
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <PromotionPanelFooter
           published={published}

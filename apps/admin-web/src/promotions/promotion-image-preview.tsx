@@ -77,11 +77,11 @@ export function PromotionImagePreview({
           ) : null}
         </div>
       </div>
-      <figcaption className="text-ayuda text-texto tabular">
+      <figcaption className="tipo-secundario text-texto tabular">
         {image.label} · {image.width} × {image.height}
       </figcaption>
       {hints[crop] === null ? null : (
-        <p className="text-ayuda text-texto">{hints[crop]}</p>
+        <p className="tipo-secundario text-texto">{hints[crop]}</p>
       )}
     </figure>
   );

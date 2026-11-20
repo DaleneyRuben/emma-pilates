@@ -8,7 +8,9 @@ import {
   uploadFailureMessage,
   uploadImage,
 } from "../api/upload-image";
+import { fieldMessageClass } from "../components/form/form";
 import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
 import { PromotionImagePreview } from "./promotion-image-preview";
 
 /** The image the form will save: the current one or a freshly uploaded one. */
@@ -84,9 +86,7 @@ export function PromotionImageField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        Imagen
-      </span>
+      <Label>Imagen</Label>
       <input
         ref={input}
         type="file"
@@ -102,7 +102,7 @@ export function PromotionImageField({
       {status.kind === "uploading" ? (
         <p
           role="status"
-          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto"
+          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center tipo-cuerpo text-texto"
         >
           Subiendo la imagen…
         </p>
@@ -117,17 +117,17 @@ export function PromotionImageField({
             type="button"
             aria-describedby={hintId}
             onClick={() => input.current?.click()}
-            className="flex flex-col items-center gap-1 rounded-control text-nota font-medium text-texto hover:text-primario focus-visible:shadow-foco"
+            className="flex flex-col items-center gap-1 rounded-control tipo-boton-chico text-texto focus-visible:shadow-foco"
           >
             <ImagePlus
               size={22}
               strokeWidth={1.5}
               aria-hidden="true"
-              className="text-primario"
+              className="text-texto"
             />
             Sube una imagen
           </button>
-          <p id={hintId} className="text-ayuda text-texto">
+          <p id={hintId} className="tipo-secundario text-texto">
             Arrastra el archivo o haz clic · JPG, PNG o WEBP horizontal, mínimo
             1200 × 675 px
           </p>
@@ -146,7 +146,6 @@ export function PromotionImageField({
             <Button
               variant="link"
               size="sm"
-              className="text-texto hover:text-texto"
               onClick={() => {
                 if (value.previewUrl.startsWith("blob:")) {
                   URL.revokeObjectURL(value.previewUrl);
@@ -160,7 +159,7 @@ export function PromotionImageField({
         </>
       )}
       {status.kind === "failed" ? (
-        <p role="alert" className="text-ayuda text-texto">
+        <p role="alert" className={fieldMessageClass}>
           {status.message}
         </p>
       ) : null}

@@ -10,7 +10,7 @@ import { formatBolivianos, formatSignedBolivianos } from "../lib/money";
 const Line = ({ children }: { children: string }) => <p>{children}</p>;
 
 const Detail = ({ children }: { children: string }) => (
-  <p className="text-ayuda tabular">{children}</p>
+  <p className="tabular">{children}</p>
 );
 
 /** The break-even of the month the range ends in (Finanzas' own figure). */
@@ -49,8 +49,10 @@ export function ReportTiles({
         tone="destacado"
         figure={formatBolivianos(income.totalCentavos)}
       >
-        <div className="flex flex-col gap-0.5 text-nota">
-          {change === null ? null : <p className="font-medium">{change}</p>}
+        <div className="flex flex-col gap-0.5 tipo-secundario">
+          {change === null ? null : (
+            <p className="tipo-titulo-fila">{change}</p>
+          )}
           {branchName === undefined ? (
             <>
               <Line>Pagos confirmados en el rango</Line>
@@ -81,7 +83,7 @@ export function ReportTiles({
           income.totalCentavos - expenses.totalCentavos,
         )}
       >
-        <div className="flex flex-col gap-0.5 text-nota">
+        <div className="flex flex-col gap-0.5 tipo-secundario">
           <Line>Ingresos menos gastos</Line>
           {branchName === undefined && finance !== undefined ? (
             <Line>{breakEvenLine(finance)}</Line>

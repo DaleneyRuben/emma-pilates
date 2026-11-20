@@ -22,6 +22,7 @@ import {
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { useClassTypeChange } from "./class-type-queries";
@@ -173,16 +174,12 @@ export function ClassTypePanelForm({
           />
           {numberFields.map(renderText)}
           {classType === undefined ? null : (
-            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-compacto text-texto">
               Los cambios se aplican a las clases que se generen desde ahora;
               las ya programadas no cambian.
             </p>
           )}
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button type="submit" size="lg" busy={change.isPending}>
@@ -191,7 +188,7 @@ export function ClassTypePanelForm({
           {classType === undefined || classType.archivedAt !== null ? null : (
             <Button
               variant="link"
-              className="self-center text-texto hover:text-texto"
+              className="self-center"
               onClick={() => setConfirming(true)}
             >
               Archivar tipo de clase

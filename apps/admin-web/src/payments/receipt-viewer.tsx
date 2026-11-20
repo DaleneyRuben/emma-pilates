@@ -42,7 +42,7 @@ export function ReceiptViewer({
   if (receiptUrl === null) {
     return (
       <ReceiptSection>
-        <p className="rounded-control border border-borde bg-superficie px-3 py-6 text-center text-nota text-texto">
+        <p className="rounded-control border border-borde bg-superficie px-3 py-6 text-center tipo-cuerpo text-texto">
           {receiptMissing
             ? "Todavía no hay comprobante."
             : "El comprobante ya no está disponible."}
@@ -58,7 +58,7 @@ export function ReceiptViewer({
           role="alert"
           className="flex flex-col items-center gap-2 rounded-control border border-borde bg-superficie px-3 py-6 text-center"
         >
-          <p className="text-nota text-texto">
+          <p className="tipo-cuerpo text-texto">
             No pudimos mostrar el comprobante.
           </p>
           <Button
@@ -100,7 +100,7 @@ export function ReceiptViewer({
           className="max-h-[360px] w-auto object-contain"
         />
       </button>
-      <p className="text-ayuda text-texto">{caption}</p>
+      <p className="tipo-secundario text-texto">{caption}</p>
       <ReceiptDialog
         open={enlarged}
         onOpenChange={setEnlarged}
@@ -122,9 +122,7 @@ function ReceiptSection({
   return (
     <section className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-          Comprobante
-        </h3>
+        <h3 className="tipo-etiqueta text-texto">Comprobante</h3>
         {action}
       </div>
       {children}

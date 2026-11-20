@@ -1,5 +1,6 @@
 import type { AdminPromotionDto } from "@pilates/api-contracts";
 import { Fragment, useId } from "react";
+import { InlineError } from "../components/ui/inline-error";
 import { cn } from "../lib/cn";
 import { PromotionCard } from "./promotion-card";
 import { usePromotionDragOrder } from "./use-promotion-order";
@@ -20,7 +21,7 @@ export function PromotionCardList({
     <li aria-hidden="true" className="relative h-0">
       <span className="absolute inset-x-0 -top-[6px] flex items-center gap-2">
         <span className="h-0.5 flex-1 rounded-full bg-primario" />
-        <span className="inline-flex h-[24px] items-center rounded-full bg-superficie px-3 text-pie font-bold text-texto inset-ring-[1.5px] inset-ring-borde-fuerte">
+        <span className="inline-flex h-[24px] items-center rounded-full bg-superficie px-3 tipo-pastilla text-texto inset-ring-[1.5px] inset-ring-borde-fuerte">
           {order.insertion?.label}
         </span>
       </span>
@@ -37,9 +38,7 @@ export function PromotionCardList({
         {order.announcement}
       </p>
       {order.failure === null ? null : (
-        <p role="alert" className="text-nota text-texto">
-          {order.failure}
-        </p>
+        <InlineError>{order.failure}</InlineError>
       )}
       <ol
         aria-label="Promociones en el orden del carrusel"

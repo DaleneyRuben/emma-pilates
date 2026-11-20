@@ -1,26 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
+import { StatTile } from "../components/ui/stat-tile";
 import { formatBolivianos } from "../lib/money";
 import { formatMonth } from "../lib/bolivia-time";
 import { revenueReportQueryOptions } from "./report-queries";
 
 const countFormat = new Intl.NumberFormat("es-BO");
-
-function Figure({ name, figure }: { name: string; figure: string }) {
-  return (
-    <section
-      aria-label={name}
-      className="flex flex-col gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
-    >
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        {name}
-      </h3>
-      <p className="font-serif text-cifra leading-tight text-texto tabular">
-        {figure}
-      </p>
-    </section>
-  );
-}
 
 // STU-002: cash, accrued by validity days, and deferred, beside the cash
 // report. Classes still owed are today's remaining allowance, not a month.
@@ -47,16 +32,9 @@ export function RevenueSection({
 
   return (
     <section aria-label="Ingreso devengado" className="flex flex-col gap-3">
-      <h2 className="font-serif text-seccion text-texto">
+      <h2 className="tipo-titulo-seccion text-texto">
         {`Ingreso devengado · ${formatMonth(month)}`}
       </h2>
-      {branchName === undefined ? null : (
-        <p className="text-nota text-texto">
-          {branchName === ""
-            ? "Todo el estudio: no se separa por sucursal."
-            : `Todo el estudio, no solo ${branchName}: no se separa por sucursal.`}
-        </p>
-      )}
       {revenue.isError ? (
         <QueryFailure
           error={revenue.error}
@@ -70,22 +48,33 @@ export function RevenueSection({
       ) : (
         <>
           <div className="grid gap-3 md:grid-cols-3">
-            <Figure
-              name="Caja"
+            <StatTile
+              label="Caja"
               figure={formatBolivianos(revenue.data.cashCentavos)}
             />
-            <Figure
-              name="Devengado"
+            <StatTile
+              label="Devengado"
               figure={formatBolivianos(revenue.data.accruedCentavos)}
             />
-            <Figure
-              name="Diferido"
+            <StatTile
+              label="Diferido"
               figure={formatBolivianos(revenue.data.deferredCentavos)}
             />
           </div>
-          <p className="rounded-tarjeta bg-superficie px-[18px] py-3 text-nota font-bold text-texto shadow-tarjeta">
-            {`Clases pendientes de dar hoy: ${countFormat.format(revenue.data.classesStillOwed)}`}
-          </p>
+          {/* Follow-up 285: the studio-wide note sits in the white card,
+              never loose on the page 100 (rule 3). */}
+          <div className="flex flex-col gap-1 rounded-tarjeta bg-superficie px-[18px] py-3 text-texto shadow-tarjeta">
+            <p className="tipo-titulo-fila">
+              {`Clases pendientes de dar hoy: ${countFormat.format(revenue.data.classesStillOwed)}`}
+            </p>
+            {branchName === undefined ? null : (
+              <p className="tipo-secundario">
+                {branchName === ""
+                  ? "Todo el estudio: no se separa por sucursal."
+                  : `Todo el estudio, no solo ${branchName}: no se separa por sucursal.`}
+              </p>
+            )}
+          </div>
         </>
       )}
     </section>
