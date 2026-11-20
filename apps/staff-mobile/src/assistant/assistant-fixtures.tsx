@@ -233,6 +233,8 @@ export async function openClientSearch(routes: Parameters<typeof routeFetcher>[0
   const screen = await render(
     <App runtime={createStaffRuntime(routeFetcher(routes), "assistant")} />,
   );
+  // E7 pick A: she opens on «Hoy»; Buscar clienta is the Clientas tab.
+  await fireEvent.press(await screen.findByTestId("tab-clients"));
   await waitFor(() => {
     expect(screen.getByLabelText("Buscar clienta")).toBeOnTheScreen();
   });

@@ -43,7 +43,7 @@ describe("Assistant rows", () => {
       color: "#93615D",
       fontSize: 13,
     });
-    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#93615D");
+    expect(within(row).getByTestId("chevron", hidden)).toHaveProp("stroke", "#93615D");
   });
 
   it("draws the picker pill and the Session card on the booking screen", async () => {

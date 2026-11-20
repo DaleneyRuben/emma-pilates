@@ -9,6 +9,7 @@ import { nextClassEyebrow } from "../trainer/next-class";
  */
 export function TodayHero({
   accessibilityLabel,
+  attendees,
   detail,
   now,
   onPress,
@@ -18,6 +19,8 @@ export function TodayHero({
   title,
 }: {
   accessibilityLabel?: string;
+  /** Who is coming, by initials (owner 2026-11-19). */
+  attendees?: readonly string[];
   detail?: string;
   now: Date;
   onPress?: () => void;
@@ -33,6 +36,7 @@ export function TodayHero({
         accessibilityLabel={
           accessibilityLabel === undefined ? undefined : `${accessibilityLabel}, ${eyebrow}`
         }
+        attendees={attendees}
         detail={detail}
         eyebrow={eyebrow}
         onPress={onPress}
