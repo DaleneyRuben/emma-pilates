@@ -161,4 +161,15 @@ describe("linesByDay", () => {
       },
     ]);
   });
+
+  // Two Clients with the same name and Plan are two commissions, not one
+  // person twice: only identical class lines join.
+  it("never joins identical commission lines", () => {
+    const { undated } = linesByDay([
+      line("commission", "Ana Rojas · Plan 30 días · 10 % de Bs 450", 4_500),
+      line("commission", "Ana Rojas · Plan 30 días · 10 % de Bs 450", 4_500),
+    ]);
+
+    expect(undated.map((row) => row.count)).toEqual([1, 1]);
+  });
 });
