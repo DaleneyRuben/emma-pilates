@@ -15,6 +15,11 @@ export interface NutritionistAgendaEntryDto {
    * @nullable
    */
   clientPhoto: ClientPhotoDto | null;
+  /**
+   * The Client phone as stored, null when she has none; the agenda opens WhatsApp to it (E5). Older builds ignore it.
+   * @nullable
+   */
+  clientPhone: string | null;
   startsAt: string;
   endsAt: string;
   durationMinutes: number;

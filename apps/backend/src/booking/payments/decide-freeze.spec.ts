@@ -146,6 +146,42 @@ describe('decideFreeze', () => {
     );
   });
 
+  // E9 (staff redesign): the Staff Member's reason reaches the Client in the
+  // notification; the Freeze row does not keep it yet.
+  it('tells the Client why when the refusal carries a reason', async () => {
+    const record = jest.fn().mockResolvedValue(undefined);
+    const refuse = jest.fn().mockResolvedValue(undefined);
+
+    await decideFreeze(
+      {
+        freezeId: freeze.id,
+        decision: 'refused',
+        refusalReason: 'Faltan días de aviso. Necesitamos 48 h de aviso.',
+      },
+      {
+        principal: staff('coordinator'),
+        loadFreeze: jest.fn().mockResolvedValue(freeze),
+        approve: jest.fn(),
+        refuse,
+        record,
+        now: () => new Date('2026-10-23T15:00:00.000Z'),
+      },
+    );
+
+    expect(record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'freeze_refused',
+        message:
+          'Tu solicitud de congelamiento fue rechazada. Motivo: Faltan días de aviso. Necesitamos 48 h de aviso.',
+      }),
+    );
+    expect(refuse).toHaveBeenCalledWith({
+      freezeId: freeze.id,
+      decidedByAccountId: 'coordinator-account',
+      decidedAt: new Date('2026-10-23T15:00:00.000Z'),
+    });
+  });
+
   it('names both months when the Freeze crosses one', async () => {
     const record = jest.fn().mockResolvedValue(undefined);
     await decideFreeze(

@@ -1,0 +1,90 @@
+import type { FreezeReviewDto } from "@pilates/api-contracts";
+import {
+  ClientFace,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
+import { StyleSheet, Text, View } from "react-native";
+
+import { freezePlanEndRow, freezeRequestLine } from "./freeze-format";
+
+/**
+ * E9 A (owner 2026-11-19): the Client with her photo or initials, what she
+ * asks for with the days counted, then Plan / Vencería / Motivo as a table.
+ */
+export function FreezeReviewCard({
+  fetcher,
+  freeze,
+}: {
+  fetcher: typeof globalThis.fetch;
+  freeze: FreezeReviewDto;
+}) {
+  const planEnd = freezePlanEndRow(freeze);
+  const rows = [
+    { label: "Plan", value: freeze.planName },
+    ...(planEnd === undefined ? [] : [planEnd]),
+    { label: "Motivo", value: freeze.reason },
+  ];
+  return (
+    <View style={styles.card} testID="freeze-review-card">
+      <View style={styles.identity}>
+        <ClientFace
+          fetcher={fetcher}
+          name={freeze.clientName}
+          photo={freeze.clientPhoto}
+          size={40}
+        />
+        <Text style={styles.name}>{freeze.clientName}</Text>
+      </View>
+      <Text style={styles.request}>{freezeRequestLine(freeze)}</Text>
+      <View style={styles.table}>
+        {rows.map((row, index) => (
+          <View
+            accessibilityLabel={`${row.label}: ${row.value}`}
+            accessible
+            key={row.label}
+            style={[styles.row, index > 0 && styles.divided]}
+          >
+            <Text style={styles.label}>{row.label}</Text>
+            <Text style={styles.value}>{row.value}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  divided: { borderTopColor: colors.border, borderTopWidth: 1 },
+  identity: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  name: { color: colors.text, flex: 1, fontFamily: fontFamilies.display, fontSize: 22 },
+  request: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+    minHeight: 48,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  table: {
+    borderColor: colors.border,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+  },
+  value: {
+    color: colors.text,
+    flexShrink: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.note,
+    fontWeight: "700",
+    textAlign: "right",
+  },
+});

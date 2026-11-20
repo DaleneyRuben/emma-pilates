@@ -286,12 +286,21 @@ describe('Prisma evaluation booking commands', () => {
     ).id;
   });
 
-  it('shows the Nutritionist their own agenda with each Client photo and derived first and follow-up kinds', async () => {
+  it('shows the Nutritionist their own agenda with each Client photo, phone, and derived first and follow-up kinds', async () => {
     const carla = await world.principalOf('carla@example.com');
     const isabel = await world.prisma.client.findFirstOrThrow({
       where: { name: 'Isabel Arce' },
     });
     const isabelPhoto = await attachClientPhoto(world.prisma, isabel.id);
+    // E5 (staff redesign): «Escribirle por WhatsApp» needs her phone.
+    await world.prisma.client.update({
+      where: { id: isabel.id },
+      data: { phone: '+591 70011009' },
+    });
+    await world.prisma.client.updateMany({
+      where: { name: 'Lucía Fernández' },
+      data: { phone: null },
+    });
 
     const firstPage = await commands().listNutritionistAgenda(
       { limit: 2 },
@@ -302,6 +311,7 @@ describe('Prisma evaluation booking commands', () => {
         evaluationId: ids.isabelSeptember,
         clientName: 'Isabel Arce',
         clientPhoto: { imageAssetId: isabelPhoto },
+        clientPhone: '+591 70011009',
         startsAt: at('2026-09-28T14:30:00.000Z'),
         durationMinutes: 45,
         branchName: 'Centro',
@@ -311,6 +321,7 @@ describe('Prisma evaluation booking commands', () => {
         evaluationId: ids.luciaFollowUp,
         clientName: 'Lucía Fernández',
         clientPhoto: null,
+        clientPhone: null,
         kind: 'first',
       }),
     ]);

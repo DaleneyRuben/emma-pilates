@@ -81,8 +81,24 @@ const requireOperations = (principal: AuthenticatedPrincipal): void => {
   if (!runsOperations(principal)) throw new FreezeAccessDeniedError();
 };
 
+export type DecideFreezeCommand = {
+  freezeId: string;
+  decision: 'approved' | 'refused';
+  /**
+   * E9: why a refusal was made, told to the Client in her notification only.
+   * The Freeze row has no column for it: persisting it needs a migration
+   * (owner's approval) in a later change.
+   */
+  refusalReason?: string;
+};
+
+const refusalMessage = (refusalReason: string | undefined): string =>
+  refusalReason === undefined
+    ? 'Tu solicitud de congelamiento fue rechazada.'
+    : `Tu solicitud de congelamiento fue rechazada. Motivo: ${refusalReason}`;
+
 export const decideFreeze = async (
-  command: { freezeId: string; decision: 'approved' | 'refused' },
+  command: DecideFreezeCommand,
   dependencies: DecideFreezeDependencies,
 ): Promise<{ state: 'approved' | 'refused' }> => {
   requireOperations(dependencies.principal);
@@ -112,7 +128,7 @@ export const decideFreeze = async (
     title: approved ? 'Congelamiento aprobado' : 'Congelamiento rechazado',
     message: approved
       ? approvalMessage(freeze)
-      : 'Tu solicitud de congelamiento fue rechazada.',
+      : refusalMessage(command.refusalReason),
     destination: { type: 'subscription', id: freeze.subscriptionId },
     occurredAt: decidedAt,
   });

@@ -14,7 +14,11 @@ import {
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { decideFreeze, FreezeAccessDeniedError } from './decide-freeze';
+import {
+  decideFreeze,
+  FreezeAccessDeniedError,
+  type DecideFreezeCommand,
+} from './decide-freeze';
 import { approveFreeze, refuseFreeze } from './freeze-approval';
 import { assertFreezeRequestAllowed } from './freeze-window';
 import { PaymentRuleError } from './payment-errors';
@@ -173,7 +177,7 @@ export const createFreezeCommands = (
     });
 
   const decide = async (
-    command: { freezeId: string; decision: 'approved' | 'refused' },
+    command: DecideFreezeCommand,
     principal: AuthenticatedPrincipal,
   ): Promise<{ state: 'approved' | 'refused' }> =>
     retrySerializable(() =>

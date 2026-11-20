@@ -7,11 +7,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  CardActionRow,
-  cardWithActionRow,
-  colors,
   ConfirmationSheet,
-  fontFamilies,
   IconRow,
   IconRowGroup,
   LoadingState,
@@ -20,7 +16,6 @@ import {
   Screen,
   spacing,
   StateScreen,
-  surfaces,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
@@ -29,38 +24,22 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { dayHeading } from "../ui/session-time";
-import {
-  agendaDayLabel,
-  boliviaToday,
-  civilDateOf,
-  clockTime,
-  countLabel,
-} from "./nutritionist-format";
+import { useIsTablet } from "../ui/use-is-tablet";
+import { LaterAppointmentCard } from "./agenda-later-card";
+import { NextAppointment } from "./agenda-next-appointment";
+import { agendaDayLabel, boliviaToday, civilDateOf, clockTime } from "./nutritionist-format";
 
 const agendaPageSize = 50;
-
-const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {
-  first: "Primera evaluación",
-  follow_up: "Seguimiento",
-};
-
-const groupByDay = (entries: NutritionistAgendaEntryDto[]) =>
-  entries.reduce<{ date: string; entries: NutritionistAgendaEntryDto[] }[]>((groups, entry) => {
-    const date = civilDateOf(entry.startsAt);
-    const last = groups[groups.length - 1];
-    if (last?.date === date) last.entries.push(entry);
-    else groups.push({ date, entries: [entry] });
-    return groups;
-  }, []);
 
 export function NutritionistAgendaScreen() {
   const navigation = useNavigation<{ navigate: (tab: "AvailabilityTab") => void }>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   const queryClient = useQueryClient();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
   const agenda = useListNutritionistAgenda(
@@ -133,7 +112,7 @@ export function NutritionistAgendaScreen() {
   }
 
   const today = boliviaToday();
-  const groups = groupByDay(agenda.data.data.items);
+  const [next, ...later] = agenda.data.data.items;
 
   return (
     <Screen style={styles.screen}>
@@ -144,7 +123,7 @@ export function NutritionistAgendaScreen() {
             <NoticeRow message={failure} />
           </View>
         ) : null}
-        {groups.length === 0 ? (
+        {next === undefined ? (
           <StateScreen
             icon="calendar"
             layout="inList"
@@ -156,48 +135,24 @@ export function NutritionistAgendaScreen() {
             title="No tienes evaluaciones"
           />
         ) : (
-          groups.map((group) => (
-            <View key={group.date}>
-              <SectionTitle>{`${agendaDayLabel(group.date, today)} · ${countLabel(group.entries.length, "evaluación", "evaluaciones")}`}</SectionTitle>
-              <View style={styles.cards}>
-                {group.entries.map((entry) => {
-                  // A started Evaluation can no longer be cancelled (evaluation_started).
-                  const cancellable = new Date(entry.startsAt).getTime() > Date.now();
-                  return (
-                    <View
+          <View style={[styles.column, tablet && styles.tablet]}>
+            <NextAppointment entry={next} onCancel={() => setCancelling(next)} today={today} />
+            {later.length === 0 ? null : (
+              <View>
+                <SectionTitle>Después</SectionTitle>
+                <View style={styles.cards}>
+                  {later.map((entry) => (
+                    <LaterAppointmentCard
+                      entry={entry}
                       key={entry.evaluationId}
-                      style={[styles.card, cancellable && cardWithActionRow]}
-                    >
-                      <View
-                        accessibilityLabel={`${clockTime(entry.startsAt)} ${entry.clientName}`}
-                        accessible
-                        style={styles.cardBody}
-                      >
-                        <View style={styles.timeColumn}>
-                          <Text numberOfLines={1} style={styles.time}>
-                            {clockTime(entry.startsAt)}
-                          </Text>
-                          <Text style={styles.quiet}>{`${entry.durationMinutes} min`}</Text>
-                        </View>
-                        <View style={styles.who}>
-                          <Text style={styles.client}>{entry.clientName}</Text>
-                          <Text style={styles.quiet}>{kindLabel[entry.kind]}</Text>
-                        </View>
-                      </View>
-                      {cancellable ? (
-                        <CardActionRow
-                          label="Cancelar evaluación"
-                          onPress={() => setCancelling(entry)}
-                          testID={`cancel-evaluation-${entry.evaluationId}`}
-                          tone="error"
-                        />
-                      ) : null}
-                    </View>
-                  );
-                })}
+                      onCancel={() => setCancelling(entry)}
+                      today={today}
+                    />
+                  ))}
+                </View>
               </View>
-            </View>
-          ))
+            )}
+          </View>
         )}
       </ScrollView>
       <ConfirmationSheet
@@ -233,21 +188,10 @@ export function NutritionistAgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  cardBody: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   cards: { gap: spacing.md },
-  client: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
+  // iPad: the block and the rows keep a phone-like column instead of stretching.
+  column: { gap: spacing.xl },
   list: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
   screen: { paddingHorizontal: spacing.xlSm },
-  time: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 20,
-    fontVariant: ["tabular-nums"],
-  },
-  // «07:00» in Lora 20 runs wider than 56 pt on both platforms (more so on
-  // Android): a fixed width wrapped it, so 56 is only the floor.
-  timeColumn: { flexShrink: 0, minWidth: 56 },
-  who: { flex: 1, gap: spacing.xxs },
+  tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

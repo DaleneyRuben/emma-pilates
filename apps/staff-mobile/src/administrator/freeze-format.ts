@@ -20,23 +20,33 @@ export function freezeRange(startsOn: string, endsOn: string): string {
   return `${weekday} ${day} al ${end}`;
 }
 
+/** E9 A: «Pide congelar del lun 9 al dom 15 nov (7 días)», «Pidió …» once decided. */
+export function freezeRequestLine(freeze: FreezeReviewDto): string {
+  const verb = freeze.state === "requested" ? "Pide" : "Pidió";
+  const { endsOn, startsOn } = freeze;
+  return `${verb} congelar del ${freezeRange(startsOn, endsOn)} (${freezeDays(startsOn, endsOn)})`;
+}
+
 /**
- * Where the Client's plan end stands (walkthrough finding 52), or undefined
- * when an older API does not send it.
+ * Where the Client's plan end stands (walkthrough finding 52) as the review
+ * table's row (E9 A): «Vencería · vie 12 feb (antes vie 5 feb)» while
+ * requested, or undefined when an older API does not send it.
  */
-export function freezePlanEnd(freeze: FreezeReviewDto): string | undefined {
+export function freezePlanEndRow(
+  freeze: FreezeReviewDto,
+): { label: string; value: string } | undefined {
   const { planEndsOn, planEndsOnAfter, state } = freeze;
   if (planEndsOn === undefined) return undefined;
   const before = formatListDate(planEndsOn);
-  const after =
-    planEndsOnAfter === undefined || planEndsOnAfter === null
-      ? undefined
-      : formatListDate(planEndsOnAfter);
-  if (state === "approved") {
-    return after === undefined ? undefined : `Ahora vence el ${after} (antes, el ${before})`;
-  }
-  if (state === "requested" && after !== undefined) return `Vence el ${before} → ${after}`;
-  return `Vence el ${before}`;
+  const moves =
+    (state === "requested" || state === "approved") &&
+    planEndsOnAfter !== undefined &&
+    planEndsOnAfter !== null;
+  if (!moves) return { label: "Vence", value: before };
+  return {
+    label: state === "requested" ? "Vencería" : "Vence",
+    value: `${formatListDate(planEndsOnAfter)} (antes ${before})`,
+  };
 }
 
 const outcome = (freeze: FreezeReviewDto) =>
