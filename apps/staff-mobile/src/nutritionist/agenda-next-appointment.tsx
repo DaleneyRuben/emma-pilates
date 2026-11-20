@@ -112,9 +112,9 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: typography.label,
     fontWeight: "700",
-    letterSpacing: 11 * 0.14,
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   initials: {

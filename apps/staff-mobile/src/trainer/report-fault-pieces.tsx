@@ -270,9 +270,9 @@ const styles = StyleSheet.create({
   tileOut: {
     color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "600",
-    lineHeight: 12,
+    lineHeight: 14,
     textAlign: "center",
   },
   tileWithNote: { height: 58 },
