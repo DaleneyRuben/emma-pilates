@@ -4,7 +4,7 @@ import { type RefreshControlProps, ScrollView, StyleSheet, Text, View } from "re
 
 import { formatSessionDate } from "../time/session-format";
 import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, typography } from "../ui/tokens";
+import { colors, spacing, surfaces, typography } from "../ui/tokens";
 import {
   classCountLabel,
   groupClassHistoryByMonth,
@@ -61,8 +61,9 @@ function HistoryRow({
 }
 
 /**
- * The attended classes of 07 and S22: a «N clases desde <mes>» summary, then
- * one group per month whose rows sit between rules on the screen (MOB-040).
+ * The attended classes of 07 and S22 (Rosa Emma C05d): the «N clases desde
+ * <mes>» summary as the 600 hero, then one white card per month with its
+ * header strip and the classes divided by hairlines.
  */
 export function ClassHistoryList({
   entries,
@@ -72,7 +73,7 @@ export function ClassHistoryList({
 }: ClassHistoryListProps) {
   return (
     <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-      <View style={styles.summary}>
+      <View style={styles.summary} testID="class-history-summary">
         <Text style={styles.lead}>{lead}</Text>
         <Text style={styles.figure}>{summarizeClassHistory(entries)}</Text>
       </View>
@@ -102,48 +103,62 @@ const styles = StyleSheet.create({
   body: { flex: 1, gap: 3 },
   faceLine: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   faceText: { flexShrink: 1 },
-  content: { gap: 30, paddingBottom: spacing.xxl },
+  content: { gap: spacing.md, paddingBottom: spacing.xxl },
   count: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.label,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.note,
     fontVariant: ["tabular-nums"],
+    fontWeight: "700",
   },
   date: { alignItems: "center", gap: 1, width: 38 },
   day: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: 20,
+    fontFamily: fontFamilies.display,
+    fontSize: 22,
     fontVariant: ["tabular-nums"],
   },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  figure: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: 26 },
-  group: { gap: spacing.smd },
+  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  figure: { color: colors.onEmphasis, fontFamily: fontFamilies.display, fontSize: typography.hero },
+  group: { ...surfaces.card, overflow: "hidden" },
   groupHeader: {
-    alignItems: "baseline",
-    borderBottomColor: colors.borderStrong,
-    borderBottomWidth: 1,
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
-    paddingBottom: spacing.smLg,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.mdLg,
   },
   heading: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    letterSpacing: 1.76,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
-  lead: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  row: { alignItems: "center", flexDirection: "row", gap: spacing.lg, paddingVertical: spacing.lg },
-  ruled: { borderBottomColor: colors.rule, borderBottomWidth: 1 },
-  summary: { gap: spacing.xxs },
-  title: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: typography.bodyLarge },
+  lead: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.lg,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.mdLg,
+  },
+  ruled: { borderBottomColor: colors.hairline, borderBottomWidth: 1 },
+  summary: { ...surfaces.emphasis, gap: spacing.xs, padding: spacing.xl },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   weekday: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.body,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
+    fontWeight: "700",
     letterSpacing: 1,
     textTransform: "uppercase",
   },
