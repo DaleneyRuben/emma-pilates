@@ -26,6 +26,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
 import { BackBar, backBarScroll } from "../ui/back-bar";
 import { useHasStarted } from "../ui/use-has-started";
+import { useMinuteClock } from "../ui/use-minute-clock";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { countLabel } from "../ui/session-time";
 import { RosterBlock } from "./roster-block";
@@ -77,6 +78,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
   const started = useHasStarted(
     roster.data?.status === 200 ? roster.data.data.startsAt : undefined,
   );
+  const now = useMinuteClock();
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
 
   if (roster.isPending)
@@ -144,7 +146,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
           endsAt={session.endsAt}
           marked={attendance ? marked : undefined}
           newClients={countNewClients(session.bookings)}
-          now={new Date()}
+          now={now}
           startsAt={session.startsAt}
         />
         {empty ? (
