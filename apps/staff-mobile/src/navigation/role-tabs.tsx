@@ -175,6 +175,24 @@ const profileTab = {
   options: tabOptions("Perfil", "profile", "Profile"),
 };
 
+// E8 (ADR-0111): «Mis pagos» is a tab for the Trainer, the Coordinator and the
+// Nutritionist, with «Mi QR de cobro» one tap away; the Assistant, whose bar
+// is full, opens it from Perfil.
+const payTab = {
+  screen: createNativeStackNavigator({
+    ...stackConfig,
+    screens: { ...payScreens, PayoutQr: PayoutQrScreen },
+  }),
+  options: tabOptions("Mis pagos", "pay", "MyPay"),
+};
+const assistantProfileTab = {
+  screen: createNativeStackNavigator({
+    ...stackConfig,
+    screens: { ...profileScreens, ...payScreens },
+  }),
+  options: tabOptions("Perfil", "profile", "Profile"),
+};
+
 // Follow-up 225 §8: one tab bar per role, drawn like the client's, on Lino.
 const tabConfig = {
   // Walkthrough n.º 28: tapping a tab opens it on its root screen.
@@ -205,13 +223,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Agenda", "agenda", "Agenda"),
         },
-        PayTab: {
-          screen: createNativeStackNavigator({
-            ...stackConfig,
-            screens: payScreens,
-          }),
-          options: tabOptions("Mis pagos", "pay", "MyPay"),
-        },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),
@@ -249,7 +261,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Caja", "cash", "CashClose"),
         },
-        ProfileTab: profileTab,
+        ProfileTab: assistantProfileTab,
       },
     }),
   ),
@@ -274,6 +286,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Disponibilidad", "availability", "Availability"),
         },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),
@@ -346,6 +359,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
           }),
           options: tabOptions("Horario", "schedule", "Schedule"),
         },
+        PayTab: payTab,
         ProfileTab: profileTab,
       },
     }),

@@ -1,8 +1,8 @@
 import {
-  getListOwnPayStatementsQueryKey,
-  getListOwnSalaryPaymentsQueryKey,
-  useListOwnPayStatements,
-  useListOwnSalaryPayments,
+  getListCurrentStaffPayStatementsQueryKey,
+  getListCurrentStaffSalaryPaymentsQueryKey,
+  useListCurrentStaffPayStatements,
+  useListCurrentStaffSalaryPayments,
 } from "@pilates/api-contracts";
 import { usePullToRefresh, useRefetchOnFocus } from "@pilates/mobile-core";
 
@@ -11,9 +11,18 @@ import { useStaffFetcher } from "../staff-fetcher";
 /** «Mis pagos» and a statement's screen read the same two lists. */
 export function useOwnPay() {
   const fetcher = useStaffFetcher();
-  const statements = useListOwnPayStatements({ fetcher, query: { refetchOnMount: "always" } });
-  const payments = useListOwnSalaryPayments({ fetcher, query: { refetchOnMount: "always" } });
-  const queryKeys = [getListOwnPayStatementsQueryKey(), getListOwnSalaryPaymentsQueryKey()];
+  const statements = useListCurrentStaffPayStatements({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
+  const payments = useListCurrentStaffSalaryPayments({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
+  const queryKeys = [
+    getListCurrentStaffPayStatementsQueryKey(),
+    getListCurrentStaffSalaryPaymentsQueryKey(),
+  ];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
   const pending = statements.isPending || payments.isPending;

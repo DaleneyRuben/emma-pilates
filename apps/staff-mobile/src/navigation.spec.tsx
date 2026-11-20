@@ -68,9 +68,9 @@ describe("StaffNavigation", () => {
   it.each([
     ["trainer", ["Agenda", "Mis pagos", "Perfil"]],
     ["assistant", ["Hoy", "Clientas", "Horario", "Caja", "Perfil"]],
-    ["nutritionist", ["Agenda", "Disponibilidad", "Perfil"]],
+    ["nutritionist", ["Agenda", "Disponibilidad", "Mis pagos", "Perfil"]],
     ["administrator", ["Pagos", "Clientas", "Horario", "Perfil"]],
-    ["coordinator", ["Clientas", "Para contactar", "Horario", "Perfil"]],
+    ["coordinator", ["Clientas", "Para contactar", "Horario", "Mis pagos", "Perfil"]],
   ] as const)("gives %s its own tab bar", async (role, tabs) => {
     const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 
