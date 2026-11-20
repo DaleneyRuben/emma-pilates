@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
+import { StyleSheet, type TextStyle } from "react-native";
 
-import { Text } from "./text";
+import { Text, type TextLayoutStyle } from "./text";
 
 function styleOf(node: { props: { style?: unknown } }) {
   return StyleSheet.flatten(node.props.style as never);
@@ -64,6 +64,30 @@ describe("Text", () => {
       textAlign: "center",
       textDecorationLine: "line-through",
     });
+  });
+
+  it("keeps its variant and tone over a style typed loosely", async () => {
+    // A `TextStyle` variable passes the type check; the variant still wins.
+    const loose: TextStyle = {
+      color: "#000000",
+      fontSize: 9,
+      fontWeight: "700",
+      marginTop: 4,
+      opacity: 0.5,
+    };
+    const screen = await render(
+      <Text style={loose as TextLayoutStyle} variant="cuerpo">
+        Hola
+      </Text>,
+    );
+
+    expect(styleOf(screen.getByText("Hola"))).toMatchObject({
+      color: "#93615D",
+      fontSize: 15,
+      marginTop: 4,
+    });
+    expect(styleOf(screen.getByText("Hola"))).not.toHaveProperty("fontWeight");
+    expect(styleOf(screen.getByText("Hola"))).not.toHaveProperty("opacity");
   });
 
   it("refuses typography, colour and opacity in its style", () => {

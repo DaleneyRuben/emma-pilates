@@ -1,4 +1,5 @@
 import {
+  StyleSheet,
   Text as NativeText,
   type StyleProp,
   type TextProps as NativeTextProps,
@@ -14,23 +15,33 @@ import {
 } from "./type-scale";
 
 /** What a variant owns: a caller's style can never set these (follow-up 285). */
-type TypographyKey =
-  | "color"
-  | "fontFamily"
-  | "fontSize"
-  | "fontStyle"
-  | "fontVariant"
-  | "fontWeight"
-  | "letterSpacing"
-  | "lineHeight"
-  | "opacity"
-  | "textDecorationColor"
-  | "textDecorationLine"
-  | "textDecorationStyle"
-  | "textShadowColor"
-  | "textShadowOffset"
-  | "textShadowRadius"
-  | "textTransform";
+const typographyKeys = [
+  "color",
+  "fontFamily",
+  "fontSize",
+  "fontStyle",
+  "fontVariant",
+  "fontWeight",
+  "letterSpacing",
+  "lineHeight",
+  "opacity",
+  "textDecorationColor",
+  "textDecorationLine",
+  "textDecorationStyle",
+  "textShadowColor",
+  "textShadowOffset",
+  "textShadowRadius",
+  "textTransform",
+] as const;
+
+type TypographyKey = (typeof typographyKeys)[number];
+
+/** The caller's style without any typography, even when it was typed loosely. */
+function layoutOnly(style: StyleProp<TextLayoutStyle>) {
+  const flat: Record<string, unknown> = { ...StyleSheet.flatten(style) };
+  for (const key of typographyKeys) delete flat[key];
+  return flat as TextLayoutStyle;
+}
 
 /** Layout only: margins, flex, alignment, width. Never type or colour. */
 export type TextLayoutStyle = Omit<TextStyle, TypographyKey>;
@@ -62,11 +73,13 @@ export function Text({
     <NativeText
       {...props}
       maxFontSizeMultiplier={Math.min(maxFontSizeMultiplier ?? maxTextScale, maxTextScale)}
+      // The caller's layout only: a loosely typed style can never set the
+      // face, size, colour or opacity.
       style={[
+        layoutOnly(style),
         textVariants[variant],
         { color: textTones[tone] },
         strike && { textDecorationLine: "line-through" },
-        style,
       ]}
     />
   );

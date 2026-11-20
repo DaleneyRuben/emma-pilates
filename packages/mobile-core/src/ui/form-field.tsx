@@ -61,12 +61,14 @@ export function FormField({
           placeholder={isPassword && dotsOnly.test(placeholder ?? "") ? undefined : placeholder}
           placeholderTextColor={fieldText.placeholderTextColor}
           secureTextEntry={isPassword && !shown}
+          // The field's text last: a caller's style places the box, never
+          // its face, size or colour (follow-up 285).
           style={[
-            fieldText.style,
             styles.input,
             isPassword ? styles.passwordInput : null,
             error === undefined ? null : styles.inputError,
             style,
+            fieldText.style,
           ]}
         />
         {isPassword ? (
