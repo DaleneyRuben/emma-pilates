@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.14,
     textTransform: "uppercase",

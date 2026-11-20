@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   initialsText: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
   },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   releasedEyebrow: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
@@ -269,7 +269,12 @@ const styles = StyleSheet.create({
     lineHeight: 44,
     textDecorationLine: "line-through",
   },
-  smallOnCard: { color: colors.text, fontSize: typography.note, lineHeight: 18 },
+  smallOnCard: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
   when: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
@@ -277,6 +282,11 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
     lineHeight: 31,
   },
-  whenOnCard: { color: colors.text, fontSize: typography.section, lineHeight: 27 },
+  whenOnCard: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 27,
+  },
   wrapper: { gap: spacing.md },
 });

@@ -318,7 +318,12 @@ export function EvaluationAvailabilityScreen({
 const styles = StyleSheet.create({
   cards: { gap: spacing.md },
   content: { gap: spacing.md, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
-  failure: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,

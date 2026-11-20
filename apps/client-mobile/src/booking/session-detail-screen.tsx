@@ -355,7 +355,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
-  message: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  message: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   messageBox: {
     backgroundColor: colors.primaryTint,
     borderColor: colors.borderStrong,

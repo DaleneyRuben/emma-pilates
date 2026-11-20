@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: colors.onEmphasis,
     flexShrink: 1,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.14,
   },
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   initials: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
   },
   places: {

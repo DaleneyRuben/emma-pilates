@@ -54,7 +54,7 @@ export const usedMonthStyles = StyleSheet.create({
   label: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.14,
     textTransform: "uppercase",

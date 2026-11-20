@@ -246,7 +246,12 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSecondary,
     lineHeight: 25,
   },
-  failure: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,

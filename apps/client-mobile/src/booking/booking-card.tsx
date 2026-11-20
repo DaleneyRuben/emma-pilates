@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   weekday: {
     color: colors.text,
     fontFamily: fontFamilies.bodyBold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 11 * 0.08,
     textTransform: "uppercase",

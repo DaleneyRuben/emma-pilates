@@ -223,7 +223,12 @@ function capitalized(text: string): string {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
-  failure: { color: colors.errorText, fontSize: 14, lineHeight: 20 },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,
