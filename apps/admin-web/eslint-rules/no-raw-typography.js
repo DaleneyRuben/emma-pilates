@@ -41,8 +41,30 @@ function utilityOf(token) {
   return token.slice(start).replace(/^!|!$/g, "");
 }
 
+// An arbitrary property sets typography as well as any utility does.
+const ARBITRARY =
+  /^\[(font|font-size|font-weight|font-family|font-style|line-height|letter-spacing|text-transform|text-decoration[\w-]*|color|opacity)\s*:/;
+
+// Inline styles that would set typography or a text colour.
+const STYLE_PROPERTIES = new Set([
+  "fontSize",
+  "fontFamily",
+  "fontWeight",
+  "fontStyle",
+  "lineHeight",
+  "letterSpacing",
+  "textTransform",
+  "textDecoration",
+  "textDecorationLine",
+  "color",
+  "opacity",
+]);
+
+const CLASS_HELPERS = new Set(["cn", "clsx", "cx", "cva", "twMerge"]);
+
 function isRaw(token) {
   const utility = utilityOf(token);
+  if (ARBITRARY.test(utility)) return true;
   const variants = token.slice(0, token.length - utility.length);
   if (utility.startsWith("text-")) {
     const rest = utility.slice(5);
@@ -56,7 +78,8 @@ function isRaw(token) {
   return (
     /^font-/.test(utility) ||
     /^(leading|tracking)-/.test(utility) ||
-    /^(uppercase|lowercase|capitalize)$/.test(utility) ||
+    /^(uppercase|lowercase|capitalize|normal-case)$/.test(utility) ||
+    /^(italic|not-italic)$/.test(utility) ||
     /^(underline|overline)$/.test(utility) ||
     /^(underline-offset|decoration)-/.test(utility)
   );
@@ -78,6 +101,8 @@ export default {
         "Typography comes from a tipo-* class (follow-up 285), never from raw utilities.",
     },
     messages: {
+      style:
+        "«{{property}}» in a style sets typography by hand; use a tipo-* class (follow-up 285).",
       raw: "«{{token}}» sets typography by hand; use a tipo-* class (follow-up 285) and text-texto or text-sobre-primario.",
     },
     schema: [],
@@ -89,6 +114,26 @@ export default {
       },
       TemplateElement(node) {
         check(context, node, node.value.cooked ?? node.value.raw);
+      },
+      // `cn("…", { uppercase: open })`: the keys of a class helper's object.
+      "CallExpression > ObjectExpression > Property"(node) {
+        const call = node.parent.parent;
+        const helper = call.callee.type === "Identifier" && call.callee.name;
+        if (!CLASS_HELPERS.has(helper)) return;
+        if (node.key.type === "Identifier" && !node.computed) {
+          check(context, node.key, node.key.name);
+        }
+      },
+      "JSXAttribute[name.name='style'] ObjectExpression > Property"(node) {
+        const name =
+          node.key.type === "Identifier" ? node.key.name : node.key.value;
+        if (STYLE_PROPERTIES.has(name)) {
+          context.report({
+            node: node.key,
+            messageId: "style",
+            data: { property: name },
+          });
+        }
       },
     };
   },
