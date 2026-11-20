@@ -44,6 +44,7 @@ import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
 import { PayoutQrScreen } from "../profile/payout-qr/payout-qr-screen";
 import { StaffReferralCodeScreen } from "../profile/staff-referral-code-screen";
+import { PayGroupScreen } from "../profile/pay-group-screen";
 import { PayStatementScreen } from "../profile/pay-statement-screen";
 import { StaffPayScreen } from "../profile/staff-pay-screen";
 import { StaffProfileScreen } from "../profile/staff-profile-screen";
@@ -137,6 +138,13 @@ const sellingScreens = {
   SelectPlan: SelectPlanScreen,
   ConfirmCashPayment: ConfirmCashPaymentScreen,
 };
+// Finding 111 and E2 B: a statement opens from «Historial» over the tab bar,
+// and each of its concepts opens by day.
+const payScreens = {
+  MyPay: StaffPayScreen,
+  PayStatement: PayStatementScreen,
+  PayGroup: PayGroupScreen,
+};
 const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: CancelSessionScreen };
 
 const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
@@ -200,8 +208,7 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
         PayTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
-            // Finding 111: a statement opens from «Historial» over the tab bar.
-            screens: { MyPay: StaffPayScreen, PayStatement: PayStatementScreen },
+            screens: payScreens,
           }),
           options: tabOptions("Mis pagos", "pay", "MyPay"),
         },
