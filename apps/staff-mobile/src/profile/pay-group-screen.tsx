@@ -22,6 +22,12 @@ import { useOwnPay } from "./use-own-pay";
 
 export type PayGroupParams = { statementId: string; group: PayGroupKey };
 
+// «54 × Bs 25» for a row that stands for several identical lines.
+function undatedNote(line: UndatedPayLine): string | null {
+  const times = line.count > 1 ? `${line.count} × ${formatMoney(line.unitCentavos)}` : null;
+  return [line.note, times].filter((part) => part !== null).join(" · ") || null;
+}
+
 function UndatedRows({ lines }: { lines: UndatedPayLine[] }) {
   return (
     <View style={styles.group}>
@@ -30,7 +36,9 @@ function UndatedRows({ lines }: { lines: UndatedPayLine[] }) {
         <View key={index} style={[styles.row, index > 0 && styles.divider]}>
           <View style={styles.rowBody}>
             <Text style={styles.rowTitle}>{line.title}</Text>
-            {line.note === null ? null : <Text style={styles.note}>{line.note}</Text>}
+            {undatedNote(line) === null ? null : (
+              <Text style={styles.note}>{undatedNote(line)}</Text>
+            )}
           </View>
           <Text style={styles.amount}>{formatMoney(line.amountCentavos)}</Text>
         </View>

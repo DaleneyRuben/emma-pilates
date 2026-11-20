@@ -16,7 +16,14 @@ export type PayDay = {
   centavos: number;
 };
 
-export type UndatedPayLine = { title: string; note: string | null; amountCentavos: number };
+export type UndatedPayLine = {
+  title: string;
+  note: string | null;
+  /** How many identical lines this row stands for (verification E2). */
+  count: number;
+  unitCentavos: number;
+  amountCentavos: number;
+};
 
 const weekdays: Record<string, string> = {
   dom: "domingo",
@@ -36,7 +43,9 @@ const classDetail =
 /**
  * E2 C: a group's lines by day, in the statement's order, with each day's
  * count and sum. A line whose text names no class (a commission, or a
- * statement drafted before lines carried the class) stays undated.
+ * statement drafted before lines carried the class) stays undated; identical
+ * undated lines join into one row with their count and sum (verification E2:
+ * an old statement listed 54 rows of «Mínimo no alcanzado · Bs 25»).
  */
 export function linesByDay(lines: PayStatementLineDto[]): {
   days: PayDay[];
@@ -48,11 +57,23 @@ export function linesByDay(lines: PayStatementLineDto[]): {
     const match = classDetail.exec(line.detail);
     if (match === null) {
       const [title = line.detail, ...rest] = line.detail.split(" · ");
-      undated.push({
-        title,
-        note: rest.length === 0 ? null : rest.join(" · "),
-        amountCentavos: line.amountCentavos,
-      });
+      const note = rest.length === 0 ? null : rest.join(" · ");
+      const same = undated.find(
+        (row) =>
+          row.title === title && row.note === note && row.unitCentavos === line.amountCentavos,
+      );
+      if (same === undefined) {
+        undated.push({
+          title,
+          note,
+          count: 1,
+          unitCentavos: line.amountCentavos,
+          amountCentavos: line.amountCentavos,
+        });
+      } else {
+        same.count += 1;
+        same.amountCentavos += line.amountCentavos;
+      }
       continue;
     }
     const [, weekday = "", date = "", time = "", branch = "", classType = "", extra] = match;
