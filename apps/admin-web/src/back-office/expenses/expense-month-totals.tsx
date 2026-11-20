@@ -40,7 +40,7 @@ export function ExpenseMonthTotals({
   return (
     <section
       aria-label={`Total de ${formatMonth(month)}`}
-      className="flex flex-col gap-3 rounded-tarjeta bg-destacado px-4 py-3.5 text-sobre-primario shadow-destacado"
+      className="flex flex-col gap-3 rounded-tarjeta bg-superficie px-4 py-3.5 text-texto shadow-tarjeta"
     >
       <h2 className="tipo-etiqueta">{monthName(month)}</h2>
       {report.isPending ? (
@@ -77,7 +77,7 @@ export function ExpenseMonthTotals({
       )}
       <Button
         variant="link"
-        className="self-start text-sobre-primario"
+        className="self-start text-texto"
         onClick={() => onShowEliminated(!showingEliminated)}
       >
         {showingEliminated ? "Volver a los gastos" : "Ver gastos borrados"}

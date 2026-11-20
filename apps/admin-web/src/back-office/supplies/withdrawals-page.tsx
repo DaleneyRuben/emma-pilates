@@ -221,9 +221,9 @@ function BranchWithdrawals({
           {query.data.totals.length === 0 ? null : (
             // Rosa Emma (RW-insumos-movimientos): the month's use is the 600
             // block, white on Rosa profundo.
-            <section className="flex flex-col gap-1 rounded-tarjeta bg-destacado px-5 py-4 text-sobre-primario shadow-destacado">
+            <section className="flex flex-col gap-1 rounded-control border border-borde bg-superficie px-3 py-2.5 text-texto">
               <h2 className="tipo-etiqueta">Consumo del mes</h2>
-              <p className="tipo-destacado tabular">
+              <p className="tipo-titulo-fila tabular">
                 {query.data.totals
                   .map(
                     (total) =>

@@ -33,7 +33,7 @@ function MissingNotice({ count }: { count: number }) {
   return (
     <section
       role="status"
-      className="flex flex-col gap-0.5 rounded-tarjeta bg-destacado px-5 py-4 text-sobre-primario shadow-destacado"
+      className="flex flex-col gap-0.5 rounded-control border border-borde-fuerte bg-aviso px-3 py-2.5 text-texto"
     >
       <p className="tipo-destacado">
         {`${plural(count, "día", "días")} con ventas en efectivo sin cierre`}

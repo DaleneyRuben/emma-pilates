@@ -123,7 +123,7 @@ function ClientSummary({
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde-fuerte bg-superficie-hundida px-2 py-0.5 tipo-titulo-fila text-texto tabular">
+          <span className="rounded-control border border-borde-fuerte bg-superficie px-2 py-0.5 tipo-titulo-fila text-texto tabular">
             {client.referralCode}
           </span>
         </SummaryRow>

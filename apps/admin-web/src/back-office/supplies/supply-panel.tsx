@@ -166,7 +166,7 @@ export function SupplyPanelForm({
           ) : (
             <div className="flex flex-col gap-1.5">
               <p className="tipo-compacto-600 text-texto">Cantidad en stock</p>
-              <p className="rounded-control border border-borde bg-superficie-hundida px-3 py-2.5 tipo-cuerpo text-texto tabular">
+              <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 tipo-cuerpo text-texto tabular">
                 {unitsLabel(supply.quantityOnHand)}
               </p>
               <p className="tipo-secundario text-texto">

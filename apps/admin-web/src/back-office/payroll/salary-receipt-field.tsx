@@ -121,7 +121,7 @@ export function SalaryReceiptField({
           type="button"
           aria-describedby={hintId}
           onClick={() => input.current?.click()}
-          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie-hundida tipo-titulo-fila text-texto hover:border-primario focus-visible:shadow-foco"
+          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie tipo-titulo-fila text-texto hover:border-primario focus-visible:shadow-foco"
         >
           <ImagePlus
             size={20}

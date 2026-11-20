@@ -145,7 +145,6 @@ export function FinancePanel({
         <>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <StatTile
-              tone="destacado"
               label="Ingresos en caja"
               figure={formatBolivianos(result.cashIncomeCentavos)}
               line="Pagos confirmados en el mes"
