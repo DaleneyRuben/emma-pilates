@@ -1,4 +1,4 @@
-import { cleanup, waitFor } from "@testing-library/react-native";
+import { cleanup, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { routeFetcher, jsonResponse } from "../test-support";
@@ -6,8 +6,8 @@ import { entry, inDays, openApp, page, routes } from "./nutritionist-test-suppor
 
 jest.setTimeout(20_000);
 
-// MOB-042: S15's row is a Lora time column, a thin divider, the Client over
-// the kind, and the chevron.
+// MOB-042: S15's row is a Lora time column, the Client over the kind; since
+// E5 B the first appointment is the block and the rows come under «Después».
 describe("Nutritionist agenda rows", () => {
   afterEach(async () => {
     await cleanup();
@@ -19,7 +19,12 @@ describe("Nutritionist agenda rows", () => {
       routeFetcher(
         routes({
           "/api/v1/nutritionist/evaluations": () =>
-            jsonResponse(page([entry("eval-1", inDays(1), "09:00", "Valeria Áñez", "first")])),
+            jsonResponse(
+              page([
+                entry("eval-0", inDays(1), "08:00", "Carla Prueba", "follow_up"),
+                entry("eval-1", inDays(1), "09:00", "Valeria Áñez", "first"),
+              ]),
+            ),
         }),
       ),
     );
@@ -38,8 +43,13 @@ describe("Nutritionist agenda rows", () => {
     expect(screen.getByText("09:00")).toHaveProp("numberOfLines", 1);
     expect(screen.getByText("45 min")).toHaveStyle({ color: "#93615D", fontSize: 13 });
     expect(screen.getByText("Valeria Áñez")).toHaveStyle({ color: "#93615D", fontSize: 16 });
-    expect(screen.getByText("Primera evaluación")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(screen.getByText("Mañana · Primera evaluación")).toHaveStyle({
+      color: "#93615D",
+      fontSize: 13,
+    });
     expect(screen.getByLabelText("09:00 Valeria Áñez")).toBeOnTheScreen();
-    expect(screen.getByText("Cancelar evaluación")).toHaveStyle({ color: "#93615D" });
+    expect(
+      within(screen.getByTestId("cancel-evaluation-eval-1")).getByText("Cancelar evaluación"),
+    ).toHaveStyle({ color: "#93615D" });
   });
 });

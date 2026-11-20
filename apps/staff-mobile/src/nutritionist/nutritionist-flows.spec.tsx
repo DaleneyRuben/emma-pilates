@@ -37,7 +37,7 @@ describe("Nutritionist agenda and availability", () => {
     clearMobileQueryCache();
   });
 
-  it("groups upcoming Evaluations by day and cancels a selected one after confirming", async () => {
+  it("leads with the next Evaluation and cancels a selected one after confirming", async () => {
     let cancelled = false;
     const fetcher = routeFetcher(
       routes({
@@ -62,10 +62,11 @@ describe("Nutritionist agenda and availability", () => {
       expect(screen.getByText("Valeria Áñez")).toBeOnTheScreen();
     });
     expect(screen.getByText("Hola, Gabriela")).toBeOnTheScreen();
-    expect(screen.getByText(/^Hoy · /)).toBeOnTheScreen();
-    expect(screen.getByText(/^Mañana · /)).toBeOnTheScreen();
-    expect(screen.getByText("Primera evaluación")).toBeOnTheScreen();
-    expect(screen.getByText("Seguimiento")).toBeOnTheScreen();
+    // E5 B: the next one in the block, the rest under «Después».
+    expect(screen.getByText("Hoy · 23:00")).toBeOnTheScreen();
+    expect(screen.getByText("Primera evaluación · 45 min")).toBeOnTheScreen();
+    expect(screen.getByText("Después")).toBeOnTheScreen();
+    expect(screen.getByText("Mañana · Seguimiento")).toBeOnTheScreen();
     expect(screen.getByText("Nutricionista · " + todayHeading())).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByTestId("cancel-evaluation-evaluation-1"));
