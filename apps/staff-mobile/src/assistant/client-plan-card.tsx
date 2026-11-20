@@ -1,5 +1,5 @@
 import { formatListDate, type ClientOverviewDto } from "@pilates/api-contracts";
-import { colors, fontFamilies, spacing, typography } from "@pilates/mobile-core";
+import { colors, fontFamilies, spacing, surfaces, typography } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 import { bookableClasses } from "./bookable-classes";
@@ -24,7 +24,7 @@ function unitLabel(count: number, active: boolean): string {
 }
 
 /**
- * Staff pick E4 A: S06's Plan in a Palo de rosa block with Crema text. The
+ * Staff pick E4 A (E-C08): S06's Plan as the screen's 600 hero, white text. The
  * name in small capitals and «Activa» or «Plan vencido», the classes she can
  * still book in Lora, where they come from and when they end, her extra or
  * campaign classes, and the next Plan when one is already paid.
@@ -53,13 +53,13 @@ export function ClientPlanCard({
       </View>
       <Text style={styles.line}>{allowanceLine(subscription, active)}</Text>
       {subscription.extraClassesLine ? (
-        <Text style={styles.line}>{subscription.extraClassesLine}</Text>
+        <Text style={styles.next}>{subscription.extraClassesLine}</Text>
       ) : null}
       {nextPlan === null ? null : (
         <>
           <View style={styles.rule} />
           {/* Walkthrough finding 117: which Plan is paid, and why no «Registrar pago». */}
-          <Text style={styles.line}>
+          <Text style={styles.next}>
             {`Próximo plan ya pagado: ${nextPlan.planName}, desde el ${formatListDate(nextPlan.startsOn)}.${sells ? " Podrás registrar otro pago cuando empiece." : ""}`}
           </Text>
         </>
@@ -70,35 +70,47 @@ export function ClientPlanCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.emphasis,
-    borderRadius: 18,
-    gap: spacing.sm,
-    padding: spacing.xlSm,
+    ...surfaces.emphasis,
+    gap: spacing.smd,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.lgXl,
   },
-  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
-  line: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: typography.note },
+  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.smLg },
+  line: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: typography.body },
+  next: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   number: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 40,
+    fontSize: 44,
     fontVariant: ["tabular-nums"],
+    lineHeight: 48,
   },
   plan: {
     color: colors.onEmphasis,
     flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
     fontWeight: "700",
-    letterSpacing: typography.label * 0.12,
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
-  rule: { backgroundColor: colors.onEmphasis, height: 1 },
+  rule: { backgroundColor: colors.onEmphasis, height: 1, marginTop: spacing.sm },
   status: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
   },
   top: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  unit: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: typography.body },
+  unit: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.titleSmall,
+    fontWeight: "700",
+  },
 });

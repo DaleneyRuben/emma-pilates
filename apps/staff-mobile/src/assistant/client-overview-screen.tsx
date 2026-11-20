@@ -7,14 +7,18 @@ import {
   LoadingState,
   PrimaryButton,
   QueryFailure,
+  radii,
   Screen,
+  ScreenHeader,
   spacing,
+  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ClientContactPanel } from "../coordinator/client-contact-panel";
 import { useStaffFetcher } from "../staff-fetcher";
+import { bodyScroll } from "../profile/card-pieces";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
 import { OutlineButton } from "../ui/outline-button";
@@ -68,7 +72,7 @@ export function ClientOverviewScreen({
 
   if (overview.isPending) {
     return (
-      <Screen style={styles.screen}>
+      <Screen style={[styles.screen, styles.gapped]}>
         {back}
         <LoadingState label="Cargando clienta" />
       </Screen>
@@ -76,7 +80,7 @@ export function ClientOverviewScreen({
   }
   if (overview.isError || overview.data.status !== 200) {
     return (
-      <Screen style={styles.screen}>
+      <Screen style={[styles.screen, styles.gapped]}>
         {back}
         <QueryFailure
           label="No pudimos cargar a la clienta."
@@ -115,27 +119,34 @@ export function ClientOverviewScreen({
 
   return (
     <Screen style={styles.screen}>
-      {back}
-      <ScrollView contentContainerStyle={styles.content}>
+      {/* E-C08: her face, name and contact sit in the band, which stays put. */}
+      <ScreenHeader
+        onBack={inPanel ? undefined : () => navigation.goBack()}
+        testID="back-bar-block"
+      >
         <View style={styles.identity}>
           <ClientFace fetcher={fetcher} name={client.name} photo={client.photo} size={56} />
           <View style={styles.identityBody}>
             <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
               {client.name}
             </Text>
-            <Text style={styles.contact}>
-              {isCompletePhone(client.phone) ? (
-                describeContact(client.phone, client.email)
-              ) : (
-                // Walkthrough finding 95: as the admin web's file (finding 74).
-                <>
-                  <Text style={styles.incompletePhone}>Celular incompleto</Text>
-                  {` · ${client.email}`}
-                </>
-              )}
-            </Text>
+            <View style={styles.contactBox}>
+              <Text style={styles.contact}>
+                {isCompletePhone(client.phone) ? (
+                  describeContact(client.phone, client.email)
+                ) : (
+                  // Walkthrough finding 95: as the admin web's file (finding 74).
+                  <>
+                    <Text style={styles.incompletePhone}>Celular incompleto</Text>
+                    {` · ${client.email}`}
+                  </>
+                )}
+              </Text>
+            </View>
           </View>
         </View>
+      </ScreenHeader>
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         {pending ? (
           <PendingInvitationCard
             clientEmail={client.email}
@@ -148,6 +159,7 @@ export function ClientOverviewScreen({
         {subscription === null ? (
           <StateCard
             action={canBuy ? cash : undefined}
+            display
             icon="card"
             testID="client-no-plan"
             note={
@@ -179,7 +191,11 @@ export function ClientOverviewScreen({
                   <PrimaryButton {...book} />
                 </View>
               ) : null}
-              {canBuy && canBook ? <OutlineButton {...cash} /> : null}
+              {canBuy && canBook ? (
+                <View style={styles.wide}>
+                  <OutlineButton {...cash} />
+                </View>
+              ) : null}
               {canBuy && !canBook ? (
                 <View style={styles.wide}>
                   <PrimaryButton {...cash} />
@@ -218,13 +234,30 @@ export function ClientOverviewScreen({
 }
 
 const styles = StyleSheet.create({
-  contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  content: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  identity: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
-  identityBody: { flex: 1, gap: spacing.xxs },
-  incompletePhone: { color: colors.warningText },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
-  pair: { flexDirection: "row", gap: spacing.md },
+  contact: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 19 },
+  // Small text never sits on the 200 band: the contact rides on a white
+  // capsule, as the band's subtitle does. It is no card, so it casts no
+  // shadow; its outline is the capsule's own white.
+  contactBox: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderColor: colors.card,
+    borderWidth: 1,
+    borderRadius: radii.control + spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 5,
+  },
+  gapped: { gap: spacing.md },
+  identity: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
+  identityBody: { flex: 1, gap: spacing.smd },
+  incompletePhone: { color: colors.text },
+  name: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.price,
+    lineHeight: 29,
+  },
+  pair: { flexDirection: "row", gap: spacing.smLg },
   wide: { flex: 1 },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

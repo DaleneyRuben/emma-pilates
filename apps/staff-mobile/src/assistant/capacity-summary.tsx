@@ -1,9 +1,17 @@
-import { colors, EmphasisCard, fontFamilies, radii, spacing, surfaces } from "@pilates/mobile-core";
+import {
+  colors,
+  EmphasisCard,
+  fontFamilies,
+  radii,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 /**
- * S08's hero (v2): when, the class in Lora 24, the free seats in Lora 32 and
- * a white bar of the booked share; a full class wears «Completa».
+ * S08's hero (E-R03): when, the class in Lora, the free seats in Lora 40 and
+ * a white bar of the booked share on a 500 track; a full class wears
+ * «Completa» on a white capsule (E-R04).
  */
 export function CapacitySummary({
   availableSeats,
@@ -23,34 +31,63 @@ export function CapacitySummary({
   const free = full ? 0 : availableSeats;
   const booked = Math.min(1, Math.max(0, (capacity - free) / Math.max(capacity, 1)));
   return (
-    <View testID="capacity-summary" style={styles.wrap}>
-      <EmphasisCard eyebrow={when} pill={full ? "Completa" : undefined} title={title}>
-        <View style={styles.count}>
-          <Text style={styles.free}>{String(free)}</Text>
-          <Text style={styles.of}>
-            {full && waitlistCount > 0
-              ? `lugares libres de ${capacity} · ${waitlistCount} en espera`
-              : `lugares libres de ${capacity}`}
-          </Text>
+    <EmphasisCard eyebrow={when} testID="capacity-summary" title={title}>
+      {full ? (
+        <View style={styles.pill}>
+          <Text style={styles.pillLabel}>Completa</Text>
         </View>
-        <View style={styles.track}>
-          <View style={[styles.bar, { width: `${booked * 100}%` }]} testID="capacity-bar" />
-        </View>
-      </EmphasisCard>
-    </View>
+      ) : null}
+      <View style={styles.count}>
+        <Text style={styles.free}>{String(free)}</Text>
+        <Text style={styles.of}>
+          {full && waitlistCount > 0
+            ? `lugares libres de ${capacity} · ${waitlistCount} en espera`
+            : `lugares libres de ${capacity}`}
+        </Text>
+      </View>
+      <View style={styles.track}>
+        <View style={[styles.bar, { width: `${booked * 100}%` }]} testID="capacity-bar" />
+      </View>
+    </EmphasisCard>
   );
 }
 
 const styles = StyleSheet.create({
-  bar: { backgroundColor: colors.onEmphasis, borderRadius: radii.pill, height: 6 },
-  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
+  bar: { backgroundColor: colors.onEmphasis, height: "100%" },
+  count: { alignItems: "baseline", flexDirection: "row", flexWrap: "wrap", gap: spacing.smLg },
   free: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 32,
+    fontSize: 40,
     fontVariant: ["tabular-nums"],
+    lineHeight: 44,
   },
-  of: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
-  track: { backgroundColor: colors.primary, borderRadius: radii.pill, height: 6 },
-  wrap: surfaces.emphasis,
+  of: {
+    color: colors.onEmphasis,
+    flexShrink: 1,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.titleSmall,
+    fontWeight: "700",
+  },
+  pill: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    justifyContent: "center",
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
+  },
+  pillLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.label,
+    fontWeight: "700",
+  },
+  track: {
+    backgroundColor: colors.medio,
+    borderRadius: spacing.xs,
+    height: spacing.sm,
+    marginTop: spacing.sm,
+    overflow: "hidden",
+  },
 });

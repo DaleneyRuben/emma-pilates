@@ -6,7 +6,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   Chevron,
-  BodyText,
   colors,
   describePlanCardLabel,
   describePlanTerms,
@@ -22,8 +21,10 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, RowCard } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
+import { useIsTablet } from "../ui/use-is-tablet";
 import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
@@ -40,6 +41,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
   const { clientId, clientName, clientPhoto } = route.params;
   const navigation = useNavigation<SelectPlanNavigation>();
   const fetcher = useStaffFetcher();
+  const tablet = useIsTablet();
   // FIX-019: S10 names the fixed renewal start from the overview, so the Plans
   // wait for it; without it a renewal would offer dates the server ignores.
   const overview = useGetAssistantClientOverview(clientId, { fetcher });
@@ -48,21 +50,20 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     query: { refetchOnMount: "always" },
   });
 
-  const header = (
-    <>
-      <BackBar onBack={() => navigation.goBack()} title="Elige un plan" />
-      <ClientBanner
-        action="Registrando pago para"
-        clientName={clientName}
-        clientPhoto={clientPhoto}
-      />
-    </>
+  const back = <BackBar onBack={() => navigation.goBack()} title="Elige un plan" />;
+  const banner = (
+    <ClientBanner
+      action="Registrando pago para"
+      clientName={clientName}
+      clientPhoto={clientPhoto}
+    />
   );
 
   if (quotes.isPending || overview.isPending) {
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <LoadingState label="Cargando planes" />
       </Screen>
     );
@@ -78,8 +79,9 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
       void overview.refetch();
     };
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <QueryFailure label="No pudimos cargar los planes." onRetry={retry} />
       </Screen>
     );
@@ -90,66 +92,86 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
   // Credit is retired (PAY-005): every Plan is collected at its full price.
   const { plans } = quotes.data.data;
 
+  const rows = plans.map((plan) => (
+    <Pressable
+      accessibilityLabel={describePlanCardLabel(plan)}
+      accessibilityRole="button"
+      key={plan.id}
+      onPress={() =>
+        navigation.navigate("ConfirmCashPayment", {
+          clientId,
+          clientName,
+          clientPhoto,
+          quote: plan,
+          ...(renewalStartsOn === undefined ? {} : { renewalStartsOn }),
+        })
+      }
+      style={({ pressed }) => [styles.row, tablet && styles.card, pressed && styles.pressed]}
+      testID={`select-plan-${plan.id}`}
+    >
+      <View style={styles.rowBody}>
+        <Text style={styles.planName}>{plan.name}</Text>
+        <Text style={styles.terms}>{describePlanTerms(plan)}</Text>
+      </View>
+      <View style={styles.prices}>
+        {plan.listPriceCentavos === undefined ? null : (
+          <Text style={styles.originalPrice}>{formatMoney(plan.listPriceCentavos)}</Text>
+        )}
+        <Text style={styles.price}>{formatMoney(plan.priceCentavos)}</Text>
+      </View>
+      <Chevron size={16} strokeWidth={1.5} tone="muted" />
+    </Pressable>
+  ));
+
+  // E-P01: on a phone the Plans are rows of one white card under its label;
+  // a tablet keeps a grid of cards.
   return (
     <Screen style={styles.screen}>
-      {header}
-      <ScrollView contentContainerStyle={styles.list}>
-        <SectionTitle>Planes disponibles</SectionTitle>
-        <TabletGrid testID="assistant-plan-grid">
-          {plans.map((plan) => (
-            <Pressable
-              accessibilityLabel={describePlanCardLabel(plan)}
-              accessibilityRole="button"
-              key={plan.id}
-              onPress={() =>
-                navigation.navigate("ConfirmCashPayment", {
-                  clientId,
-                  clientName,
-                  clientPhoto,
-                  quote: plan,
-                  ...(renewalStartsOn === undefined ? {} : { renewalStartsOn }),
-                })
-              }
-              style={styles.card}
-              testID={`select-plan-${plan.id}`}
-            >
-              <View style={styles.cardBody}>
-                <Text style={styles.planName}>{plan.name}</Text>
-                <BodyText>{describePlanTerms(plan)}</BodyText>
-              </View>
-              <View style={styles.prices}>
-                {plan.listPriceCentavos === undefined ? null : (
-                  <Text style={styles.originalPrice}>{formatMoney(plan.listPriceCentavos)}</Text>
-                )}
-                <Text style={styles.price}>{formatMoney(plan.priceCentavos)}</Text>
-              </View>
-              <Chevron size={16} strokeWidth={1.5} tone="muted" />
-            </Pressable>
-          ))}
-        </TabletGrid>
+      {back}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        {banner}
+        {tablet ? (
+          <>
+            <SectionTitle>Planes disponibles</SectionTitle>
+            <TabletGrid testID="assistant-plan-grid">{rows}</TabletGrid>
+          </>
+        ) : (
+          <RowCard label="Planes disponibles" testID="assistant-plan-grid">
+            {rows}
+          </RowCard>
+        )}
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  cardBody: { flex: 1, gap: spacing.xs },
-  list: { paddingBottom: spacing.xxl },
-  planName: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  card: surfaces.card,
+  gapped: { gap: spacing.md },
   originalPrice: {
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    color: colors.textSubtle,
     fontSize: typography.note,
     textDecorationLine: "line-through",
   },
-  price: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  planName: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
+  },
+  pressed: { opacity: 0.7 },
+  price: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.price },
   prices: { alignItems: "flex-end" },
-  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    minHeight: 64,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  rowBody: { flex: 1, gap: spacing.xxs },
+  screen: { paddingHorizontal: spacing.xlSm },
+  terms: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

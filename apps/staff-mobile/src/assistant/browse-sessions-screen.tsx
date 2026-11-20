@@ -8,7 +8,6 @@ import {
   bookingWindowDays,
   boliviaCivilDate,
   civilDateRange,
-  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
@@ -20,13 +19,15 @@ import {
   spacing,
   StaffFace,
   StateScreen,
+  surfaces,
   upcomingCivilDates,
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useMemo, useState, type ReactNode } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
+import { bodyScroll, RowCard } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { BranchField } from "../ui/branch-field";
@@ -87,25 +88,25 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
     },
   );
 
-  const header = (
-    <>
-      <BackBar onBack={() => navigation.goBack()} title="Reservar una clase" />
-      <ClientBanner action="Reservando para" clientName={clientName} clientPhoto={clientPhoto} />
-    </>
+  const back = <BackBar onBack={() => navigation.goBack()} title="Reservar una clase" />;
+  const banner = (
+    <ClientBanner action="Reservando para" clientName={clientName} clientPhoto={clientPhoto} />
   );
 
   if (branches.isPending || classTypes.isPending) {
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <LoadingState label="Cargando sucursales" />
       </Screen>
     );
   }
   if (branches.isError || branch === undefined) {
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <QueryFailure
           label="No pudimos cargar las sucursales."
           onRetry={() => void branches.refetch()}
@@ -143,123 +144,136 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
       sessionId: session.id,
     });
 
+  const dayLabel = `${dayTitle} · ${countLabel(visible.length, "clase", "clases")}`;
+  const rows = rest.map((session) => {
+    const exception = exceptionOf(session);
+    const places = placesLabel(session.bookedCount, session.capacity);
+    return (
+      <SessionRow
+        key={session.id}
+        accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
+        exception={exception}
+        onPress={() => openSession(session)}
+        places={places}
+        standalone={tablet}
+        subtitle={session.trainerName}
+        subtitleLead={
+          <StaffFace
+            fetcher={fetcher}
+            name={session.trainerName}
+            photo={session.trainerPhoto}
+            size={20}
+          />
+        }
+        testID={`session-card-${session.id}`}
+        time={startTime(session.startsAt, session.endsAt)}
+        title={session.classTypeName}
+      />
+    );
+  });
+
+  // E-R01: the band stays put; the Client, the filters card, the next class
+  // and the day's card of classes scroll under it.
   return (
     <Screen style={styles.screen}>
-      {header}
-      <BranchField
-        onSelect={setSelectedBranchId}
-        options={branchList}
-        selectedId={branch.id}
-        selectedName={branch.name}
-      />
-      <DayStrip
-        dates={strip}
-        onSelect={setSelectedDate}
-        selected={selectedDate}
-        testIDPrefix="assistant-day"
-        today={today}
-        trailing={
-          later.length === 0 ? undefined : (
-            <DayStripAction
-              accessibilityLabel={`Elegir otra fecha, hasta ${windowDays} días`}
-              label={pickedLater ? (dayHeading(selectedDate).split(" ")[1] ?? "Otra") : "Otra"}
-              onPress={() => setChoosingDate(true)}
-              selected={pickedLater}
-              testID="assistant-day-other"
+      {back}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        {banner}
+        <View style={styles.filters}>
+          <BranchField
+            onSelect={setSelectedBranchId}
+            options={branchList}
+            selectedId={branch.id}
+            selectedName={branch.name}
+          />
+          <DayStrip
+            dates={strip}
+            onSelect={setSelectedDate}
+            selected={selectedDate}
+            testIDPrefix="assistant-day"
+            today={today}
+            trailing={
+              later.length === 0 ? undefined : (
+                <DayStripAction
+                  accessibilityLabel={`Elegir otra fecha, hasta ${windowDays} días`}
+                  label={pickedLater ? (dayHeading(selectedDate).split(" ")[1] ?? "Otra") : "Otra"}
+                  onPress={() => setChoosingDate(true)}
+                  selected={pickedLater}
+                  testID="assistant-day-other"
+                />
+              )
+            }
+          />
+          <FilterChips
+            onSelect={setClassTypeId}
+            options={[
+              { id: allClassTypes, label: "Todas" },
+              ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
+            ]}
+            selected={classTypeId}
+            testID="assistant-class-type-strip"
+          />
+        </View>
+        {sessions.isPending ? (
+          <LoadingState label="Cargando clases" />
+        ) : sessions.isError ? (
+          <QueryFailure
+            label="No pudimos cargar las clases."
+            onRetry={() => void sessions.refetch()}
+          />
+        ) : visible.length === 0 ? (
+          typeName === undefined ? (
+            <StateScreen
+              icon="calendar"
+              layout="inList"
+              note="Elige otro día de la semana para reservar."
+              primaryAction={
+                nextDate === undefined
+                  ? undefined
+                  : { label: "Ver mañana", onPress: () => setSelectedDate(nextDate) }
+              }
+              title={
+                allCancelled ? allCancelledTitle(selectedDate, today) : "Este día no hay clases"
+              }
+            />
+          ) : (
+            <StateScreen
+              icon="calendar"
+              layout="inList"
+              note="Prueba otro día o mira todas las clases de este día."
+              primaryAction={{
+                label: "Ver todas las clases",
+                onPress: () => setClassTypeId(allClassTypes),
+              }}
+              title={noClassesOfType(selectedDate, today, typeName)}
             />
           )
-        }
-      />
-      <FilterChips
-        onSelect={setClassTypeId}
-        options={[
-          { id: allClassTypes, label: "Todas" },
-          ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
-        ]}
-        selected={classTypeId}
-        testID="assistant-class-type-strip"
-      />
-      {sessions.isPending ? (
-        <LoadingState label="Cargando clases" />
-      ) : sessions.isError ? (
-        <QueryFailure
-          label="No pudimos cargar las clases."
-          onRetry={() => void sessions.refetch()}
-        />
-      ) : visible.length === 0 ? (
-        typeName === undefined ? (
-          <StateScreen
-            icon="calendar"
-            layout="inList"
-            note="Elige otro día de la semana para reservar."
-            primaryAction={
-              nextDate === undefined
-                ? undefined
-                : { label: "Ver mañana", onPress: () => setSelectedDate(nextDate) }
-            }
-            title={allCancelled ? allCancelledTitle(selectedDate, today) : "Este día no hay clases"}
-          />
         ) : (
-          <StateScreen
-            icon="calendar"
-            layout="inList"
-            note="Prueba otro día o mira todas las clases de este día."
-            primaryAction={{
-              label: "Ver todas las clases",
-              onPress: () => setClassTypeId(allClassTypes),
-            }}
-            title={noClassesOfType(selectedDate, today, typeName)}
-          />
-        )
-      ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          <SectionTitle>
-            {`${dayTitle} · ${countLabel(visible.length, "clase", "clases")}`}
-          </SectionTitle>
-          {next === undefined ? null : (
-            <TodayHero
-              accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}, ${exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}`}
-              detail={`${next.branchName} · ${next.trainerName}`}
-              now={now}
-              onPress={() => openSession(next)}
-              places={exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}
-              startsAt={next.startsAt}
-              testID={`session-card-${next.id}`}
-              title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
-            />
-          )}
-          {rest.length === 0 ? null : (
-            <SessionList tablet={tablet}>
-              {rest.map((session) => {
-                const exception = exceptionOf(session);
-                const places = placesLabel(session.bookedCount, session.capacity);
-                return (
-                  <SessionRow
-                    key={session.id}
-                    accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}, ${exception ?? places}`}
-                    exception={exception}
-                    onPress={() => openSession(session)}
-                    places={places}
-                    standalone={tablet}
-                    subtitle={session.trainerName}
-                    subtitleLead={
-                      <StaffFace
-                        fetcher={fetcher}
-                        name={session.trainerName}
-                        photo={session.trainerPhoto}
-                        size={20}
-                      />
-                    }
-                    testID={`session-card-${session.id}`}
-                    time={startTime(session.startsAt, session.endsAt)}
-                    title={session.classTypeName}
-                  />
-                );
-              })}
-            </SessionList>
-          )}
-        </ScrollView>
-      )}
+          <>
+            {/* The day's count heads its card; a lone hero keeps it as a title. */}
+            {rest.length === 0 || tablet ? <SectionTitle>{dayLabel}</SectionTitle> : null}
+            {next === undefined ? null : (
+              <TodayHero
+                accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}, ${exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}`}
+                detail={`${next.branchName} · ${next.trainerName}`}
+                now={now}
+                onPress={() => openSession(next)}
+                places={exceptionOf(next) ?? placesLabel(next.bookedCount, next.capacity)}
+                startsAt={next.startsAt}
+                testID={`session-card-${next.id}`}
+                title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
+              />
+            )}
+            {rest.length === 0 ? null : tablet ? (
+              <TabletGrid testID="assistant-session-grid">{rows}</TabletGrid>
+            ) : (
+              <RowCard label={dayLabel} testID="assistant-session-grid">
+                {rows}
+              </RowCard>
+            )}
+          </>
+        )}
+      </ScrollView>
       <OtherDateSheet
         dates={later}
         onClose={() => setChoosingDate(false)}
@@ -275,16 +289,14 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
   );
 }
 
-// One card of rows on a phone (ClaseE); a grid of lone rows on a tablet.
-function SessionList({ children, tablet }: { children: ReactNode; tablet: boolean }) {
-  return tablet ? (
-    <TabletGrid testID="assistant-session-grid">{children}</TabletGrid>
-  ) : (
-    <ClassList testID="assistant-session-grid">{children}</ClassList>
-  );
-}
-
 const styles = StyleSheet.create({
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  // E-R01: the Branch, the days and the class types share one white card.
+  filters: {
+    ...surfaces.card,
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.mdLg,
+  },
+  gapped: { gap: spacing.md },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

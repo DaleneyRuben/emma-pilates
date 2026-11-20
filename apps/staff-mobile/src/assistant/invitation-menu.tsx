@@ -2,10 +2,11 @@ import {
   colors,
   fontFamilies,
   Glyph,
-  IconRowGroup,
   radii,
+  shadows,
   spacing,
   TextButton,
+  typography,
 } from "@pilates/mobile-core";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -39,7 +40,10 @@ function MenuRow({ detail, disabled = false, label, onPress, tone }: Option) {
   );
 }
 
-/** S06's «Más opciones de la invitación» sheet: change the email or cancel. */
+/**
+ * S06's «Más opciones de la invitación» sheet (E-C13): the white sheet with
+ * its grabber, the Lora title, and the two ways on split by hairlines.
+ */
 export function InvitationMenu({
   cancellable,
   firstName,
@@ -61,7 +65,7 @@ export function InvitationMenu({
         <View accessibilityRole="none" style={styles.sheet} testID="invitation-menu">
           <View style={styles.grabber} />
           <Text style={styles.title}>{`Invitación de ${firstName}`}</Text>
-          <IconRowGroup>
+          <View>
             <MenuRow
               detail="Anula los enlaces al correo anterior"
               label="Cambiar correo"
@@ -78,7 +82,7 @@ export function InvitationMenu({
               onPress={onCancel}
               tone="error"
             />
-          </IconRowGroup>
+          </View>
           <TextButton label="Cerrar" onPress={onClose} />
         </View>
       </View>
@@ -89,34 +93,52 @@ export function InvitationMenu({
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
   body: { flex: 1, gap: spacing.xxs },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  detail: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   disabled: { opacity: 0.5 },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", justifyContent: "center", width: 24 },
   errorLabel: { color: colors.text },
+  // The 200 grabber, drawn as its outline so no 200 fill sits on the sheet.
   grabber: {
     alignSelf: "center",
-    backgroundColor: colors.border,
+    borderColor: colors.borderSoft,
     borderRadius: radii.pill,
-    height: 4,
-    width: 36,
+    borderWidth: 2.5,
+    height: 5,
+    marginBottom: spacing.sm,
+    width: 40,
   },
-  label: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
+    borderTopColor: colors.hairline,
+    borderTopWidth: 1,
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.mdLg,
     minHeight: 64,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   sheet: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    gap: spacing.lg,
-    padding: spacing.xlSm,
+    ...shadows.sheet,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: radii.band,
+    borderTopRightRadius: radii.band,
+    gap: spacing.smd,
     paddingBottom: spacing.xxl,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.md,
   },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 30,
+    marginBottom: spacing.sm,
+  },
 });

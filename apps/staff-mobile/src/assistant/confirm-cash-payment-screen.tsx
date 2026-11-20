@@ -26,13 +26,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, FooterPanel, taskEdges } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { BranchChips, useCashBranches } from "../ui/branch-chips";
+import { useCashBranches } from "../ui/branch-chips";
 import { CenteredCard } from "./assistant-layout";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses } from "./assistant-format";
+import { BranchCard } from "./branch-card";
 import type { ClientContext } from "./client-overview-screen";
 import {
   FrontDeskReceiptCard,
@@ -177,8 +179,8 @@ export function ConfirmCashPaymentScreen({
   if (sent !== null) {
     const result = sent.kind === "cash" ? sent.result : null;
     return (
-      <Screen style={styles.screen}>
-        <CenteredCard maxWidth={520}>
+      <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
+        <CenteredCard maxWidth={520} style={styles.column}>
           <PaymentDone
             amount={result === null ? amount : formatMoney(result.payment.amountDueCentavos)}
             classes={describeClasses(result?.payment.classAllowance ?? quote.classAllowance)}
@@ -200,8 +202,9 @@ export function ConfirmCashPaymentScreen({
 
   const cash = method === "cash";
   const branchMissing = branchId === null ? "Elige la sucursal de la venta" : undefined;
+  // E-P02: the hint and the button share the white footer panel.
   const footer = (
-    <View style={styles.footer}>
+    <FooterPanel bleed={0}>
       {failure !== null ? (
         <View accessibilityLabel={failure} accessibilityRole="alert">
           <NoticeRow message={failure} />
@@ -237,61 +240,63 @@ export function ConfirmCashPaymentScreen({
           testID="front-desk-send"
         />
       )}
-    </View>
+    </FooterPanel>
   );
 
   return (
-    <Screen style={styles.screen}>
-      <CenteredCard maxWidth={520}>
+    <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
+      <CenteredCard maxWidth={520} style={styles.column}>
         <BackBar onBack={() => navigation.goBack()} title="Registrar pago" />
-        <FormScrollView contentContainerStyle={styles.content} footer={footer}>
-          <PaymentChargeBlock clientName={clientName} clientPhoto={clientPhoto} quote={quote} />
-          <PaymentMethodOptions
-            lockedTo={lockedTo}
-            onSelect={(next) => {
-              setMethod(next);
-              setFailure(null);
-            }}
-            selected={method}
-          />
-          {cash ? null : (
-            <>
-              <StudioQrCard amount={amount} />
-              <FrontDeskReceiptCard
-                onChoose={(source) => void chooseReceipt(source)}
-                receipt={receipt}
-              />
-            </>
-          )}
-          <PaymentStartDays
-            onSelect={renewalStartsOn === undefined ? setStartsOn : setNextStart}
-            renewalStartsOn={renewalStartsOn}
-            selected={start ?? startsOn}
-            today={today}
-          />
-          {/* The transfer API takes no invoice data, so the switch is for cash only. */}
-          {cash ? <InvoiceSwitch onChange={setInvoiceEdit} value={invoice} /> : null}
-          <BranchChips
-            label={cash ? "Sucursal donde recibes el efectivo" : "Sucursal de la venta"}
-            onSelect={branches.select}
-            options={branches.options}
-            selectedId={branchId}
-            testIDPrefix="cash-branch"
-          />
-        </FormScrollView>
+        <View style={bodyScroll.clip}>
+          <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
+            <PaymentChargeBlock clientName={clientName} clientPhoto={clientPhoto} quote={quote} />
+            <PaymentMethodOptions
+              lockedTo={lockedTo}
+              onSelect={(next) => {
+                setMethod(next);
+                setFailure(null);
+              }}
+              selected={method}
+            />
+            {cash ? null : (
+              <>
+                <StudioQrCard amount={amount} />
+                <FrontDeskReceiptCard
+                  onChoose={(source) => void chooseReceipt(source)}
+                  receipt={receipt}
+                />
+              </>
+            )}
+            <PaymentStartDays
+              onSelect={renewalStartsOn === undefined ? setStartsOn : setNextStart}
+              renewalStartsOn={renewalStartsOn}
+              selected={start ?? startsOn}
+              today={today}
+            />
+            {/* The transfer API takes no invoice data, so the switch is for cash only. */}
+            {cash ? <InvoiceSwitch onChange={setInvoiceEdit} value={invoice} /> : null}
+            <BranchCard
+              label={cash ? "Sucursal donde recibes el efectivo" : "Sucursal de la venta"}
+              onSelect={branches.select}
+              options={branches.options}
+              selectedId={branchId}
+              testIDPrefix="cash-branch"
+            />
+          </FormScrollView>
+        </View>
       </CenteredCard>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  footer: { gap: spacing.sm, paddingTop: spacing.md },
+  column: { gap: 0 },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
+    lineHeight: 18,
     textAlign: "center",
   },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

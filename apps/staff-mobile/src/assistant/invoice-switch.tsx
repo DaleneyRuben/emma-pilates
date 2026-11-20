@@ -5,14 +5,15 @@ import {
   type InvoiceChoice,
   radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 /**
- * Staff pick E3 C: «Pide factura» as a switch. Off, the sale goes without an
- * invoice; on, it shows the NIT or CI and the name, prefilled from her last
- * sale (PAY-007).
+ * Staff pick E3 C (E-P02, E-P03): «Pide factura» as a switch on a white
+ * card. Off, the sale goes without an invoice; on, it shows the NIT or CI and
+ * the name, prefilled from her last sale (PAY-007).
  */
 export function InvoiceSwitch({
   onChange,
@@ -54,38 +55,37 @@ export function InvoiceSwitch({
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
   card: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.button,
-    borderWidth: 1,
+    ...surfaces.card,
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.mdLg,
   },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: { alignItems: "center", flexDirection: "row", gap: spacing.md, minHeight: 44 },
+  // Off: a 400 thumb on a 50 track ringed in 400 (no 200 fill, FIX-089);
+  // on: a white thumb on 600.
   thumb: {
-    backgroundColor: colors.border,
+    backgroundColor: colors.borderStrong,
     borderRadius: radii.pill,
-    height: 20,
-    width: 20,
+    height: 23,
+    width: 23,
   },
   thumbOn: { alignSelf: "flex-end", backgroundColor: colors.onPrimary },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
   track: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderStrong,
     borderRadius: radii.pill,
-    borderWidth: 1,
-    height: 28,
+    borderWidth: 1.5,
+    height: 32,
     justifyContent: "center",
     paddingHorizontal: 3,
-    width: 48,
+    width: 52,
   },
   trackOn: { backgroundColor: colors.primary, borderColor: colors.primary },
 });

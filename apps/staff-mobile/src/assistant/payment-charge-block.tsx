@@ -6,6 +6,7 @@ import {
   initials,
   radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
@@ -20,8 +21,8 @@ export const quoteDiscount = (quote: PlanQuoteDto): number =>
     : 0;
 
 /**
- * Staff pick E3 C: what is collected, on top, in a Palo de rosa block. Her
- * initials in a Crema circle (or her photo), the Plan, «A cobrar» large, and
+ * Staff pick E3 C (E-P02): what is collected, on top, as the 600 hero. Her
+ * initials in a white circle (or her photo), the Plan, «A cobrar» large, and
  * the list price and the discount on the right. Credit is retired (PAY-005):
  * the amount is the full price.
  */
@@ -72,14 +73,15 @@ const styles = StyleSheet.create({
   amount: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 36,
+    fontSize: 40,
     fontVariant: ["tabular-nums"],
+    lineHeight: 46,
   },
   block: {
-    backgroundColor: colors.emphasis,
-    borderRadius: 18,
-    gap: spacing.lg,
-    padding: spacing.xlSm,
+    ...surfaces.emphasis,
+    gap: spacing.md,
+    paddingHorizontal: spacing.lgXl,
+    paddingVertical: spacing.lg,
   },
   bottom: {
     alignItems: "flex-end",
@@ -99,8 +101,8 @@ const styles = StyleSheet.create({
   detail: { alignItems: "flex-end", flexShrink: 1, gap: spacing.xs, paddingBottom: spacing.sm },
   detailLine: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
     textAlign: "right",
   },
   initials: {
@@ -111,18 +113,18 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "600",
-    letterSpacing: typography.label * 0.12,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   name: {
     color: colors.onEmphasis,
     flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
   who: { alignItems: "center", flexDirection: "row", gap: spacing.md },
 });

@@ -6,20 +6,20 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
-  ClassList,
   colors,
   fontFamilies,
   LoadingState,
   placesLabel,
   QueryFailure,
-  SectionTitle,
   spacing,
+  surfaces,
   typography,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { RowCard } from "../profile/card-pieces";
 import { ScheduleClassRow } from "../schedule/schedule-class-card";
 import { useStaffFetcher } from "../staff-fetcher";
 import { splitNextClass } from "../trainer/next-class";
@@ -46,8 +46,8 @@ function NextClass({ now, session }: { now: Date; session: SessionAvailabilityDt
 }
 
 /**
- * E7 pick A: today's next class at the Branch as the Palo de rosa hero with
- * who is coming, the `pending` rows, then «Más tarde» with the classes after it.
+ * E7 pick A: today's next class at the Branch as the 600 hero with who is
+ * coming, the `pending` rows, then the «Más tarde» card with the classes after it.
  */
 export function TodayAgenda({ branchId, pending }: { branchId: string; pending: ReactNode }) {
   const fetcher = useStaffFetcher();
@@ -78,31 +78,34 @@ export function TodayAgenda({ branchId, pending }: { branchId: string; pending: 
   const now = new Date();
   const { next, rest } = splitNextClass(sessions.data.data, true, now);
   if (next === undefined) {
-    return frame(<Text style={styles.empty}>Hoy no quedan clases en esta sucursal.</Text>);
+    return frame(
+      <View style={styles.emptyCard}>
+        <Text style={styles.empty}>Hoy no quedan clases en esta sucursal.</Text>
+      </View>,
+    );
   }
   const later = rest.filter((session) => new Date(session.startsAt) > new Date(next.startsAt));
   return frame(
     <NextClass now={now} session={next} />,
     later.length === 0 ? null : (
-      <View style={styles.later}>
-        <SectionTitle>Más tarde</SectionTitle>
-        <ClassList testID="today-later">
-          {later.map((session) => (
-            <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
-          ))}
-        </ClassList>
-      </View>
+      <RowCard label="Más tarde" testID="today-later">
+        {later.map((session) => (
+          <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
+        ))}
+      </RowCard>
     ),
   );
 }
 
 const styles = StyleSheet.create({
-  agenda: { gap: spacing.lg },
+  agenda: { gap: spacing.md },
+  // E-S02: the quiet line reads in Lora on its own white card.
   empty: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    lineHeight: 29,
     textAlign: "center",
   },
-  later: { gap: spacing.md },
+  emptyCard: { ...surfaces.card, paddingHorizontal: spacing.xlSm, paddingVertical: spacing.xl },
 });

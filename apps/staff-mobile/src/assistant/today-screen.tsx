@@ -90,7 +90,11 @@ export function TodayScreen() {
     day = <QueryFailure label="No pudimos cargar las sucursales." onRetry={branches.refetch} />;
   } else {
     day = (
-      <ScrollView contentContainerStyle={styles.day} refreshControl={refreshControl}>
+      <ScrollView
+        contentContainerStyle={styles.day}
+        refreshControl={refreshControl}
+        style={styles.scroll}
+      >
         {newClientLink}
         <TodayAgenda
           branchId={branch.id}
@@ -129,7 +133,14 @@ export function TodayScreen() {
 }
 
 const styles = StyleSheet.create({
-  day: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  day: {
+    gap: spacing.md,
+    paddingBottom: spacing.xxl,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.xs,
+  },
   screen: { paddingHorizontal: spacing.xlSm },
-  top: { gap: spacing.lg },
+  // The day reaches the screen's sides so the cards' shadows show.
+  scroll: { marginHorizontal: -spacing.xlSm },
+  top: { gap: spacing.md },
 });

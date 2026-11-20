@@ -8,13 +8,16 @@ import {
   PrimaryButton,
   radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { randomUUID } from "expo-crypto";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
+import { RowCard } from "../profile/card-pieces";
+import { ValueRow } from "../ui/value-row";
+import { CashCloseFrame } from "./cash-close-frame";
 import {
   cashCloseFailure,
   cashCloseProblems,
@@ -71,21 +74,27 @@ export function useRecordCashClose(
  * FIX-083 (Cerrar caja pick A): she counts first, in one large amount field;
  * the expected cash and the difference appear under it only once she has
  * typed her count (FIX-090), and closing asks once more because a close
- * cannot be undone.
+ * cannot be undone. E-S05: each part on its white card, the button and its
+ * reminder in the white footer.
  */
 export function CashCloseForm({
   branch,
   cashPaymentCount,
   expectedCentavos,
   fetcher,
+  lead,
   onClosed,
+  root,
   voidedCashCentavos,
 }: {
   branch: { id: string; name: string };
   cashPaymentCount: number;
   expectedCentavos: number;
   fetcher: typeof globalThis.fetch;
+  /** What leads the body, such as the Branch chips. */
+  lead?: ReactNode;
   onClosed: (close: CashCloseDto | null, failure: string | null) => Promise<void>;
+  root: boolean;
   voidedCashCentavos: number;
 }) {
   const [counted, setCounted] = useState("");
@@ -106,11 +115,26 @@ export function CashCloseForm({
     setConfirming(false);
   };
 
-  return (
+  const footer = (
     <>
-      <View style={styles.count}>
+      <PrimaryButton
+        disabled={countedCentavos === null}
+        label="Cerrar caja"
+        onPress={() => setConfirming(true)}
+        testID="cash-close-submit"
+      />
+      <Text style={[styles.quiet, styles.centered]}>
+        Te pediremos confirmar: un cierre no se puede deshacer.
+      </Text>
+    </>
+  );
+
+  return (
+    <CashCloseFrame footer={footer} root={root}>
+      {lead}
+      <View style={styles.card}>
         <Text style={styles.question}>{question}</Text>
-        <View style={[styles.amount, focused && styles.amountFocused]}>
+        <View style={[styles.amount, (focused || counted !== "") && styles.amountFocused]}>
           <Text style={styles.currency}>Bs</Text>
           <TextInput
             accessibilityLabel={question}
@@ -129,57 +153,61 @@ export function CashCloseForm({
       </View>
       {/* FIX-090: what the payments expect only reads once she has counted. */}
       {countedCentavos === null || difference === null || differenceCentavos === null ? null : (
-        <PlainRowGroup>
-          <PlainRow label="Esperado según los pagos" value={formatMoney(expectedCentavos)} />
+        <RowCard>
+          <View
+            accessibilityLabel={`Esperado según los pagos, ${formatMoney(expectedCentavos)}`}
+            accessible
+          >
+            <ValueRow label="Esperado según los pagos" value={formatMoney(expectedCentavos)} />
+          </View>
           {voidedCashCentavos > 0 ? (
-            <PlainRow
-              label="Ventas anuladas (efectivo en caja)"
-              value={formatMoney(voidedCashCentavos)}
-            />
+            <View
+              accessibilityLabel={`Ventas anuladas (efectivo en caja), ${formatMoney(voidedCashCentavos)}`}
+              accessible
+            >
+              <ValueRow
+                label="Ventas anuladas (efectivo en caja)"
+                value={formatMoney(voidedCashCentavos)}
+              />
+            </View>
           ) : null}
           <View
             accessibilityLabel={`Diferencia · ${formatSignedBolivianos(differenceCentavos)} · ${difference.label}`}
             accessible
-            style={styles.differenceRow}
           >
-            <Text style={styles.differenceLabel}>Diferencia</Text>
-            <Text style={[styles.differenceValue, { color: difference.text }]}>
-              {differenceValue(differenceCentavos)}
-            </Text>
+            <ValueRow
+              label="Diferencia"
+              value={
+                <Text style={[styles.differenceValue, { color: difference.text }]}>
+                  {differenceValue(differenceCentavos)}
+                </Text>
+              }
+            />
           </View>
-        </PlainRowGroup>
+        </RowCard>
       )}
-      <Text style={styles.quiet}>{describeCashSales(cashPaymentCount, branch.name)}</Text>
-      {differenceCentavos === null || differenceCentavos === 0 ? null : (
-        <FormField
-          label="Nota"
-          optional
-          maxLength={500}
-          multiline
-          numberOfLines={3}
-          onChangeText={setNote}
-          hint="Ej.: faltó cambio para un billete de 200"
-          style={styles.note}
-          testID="cash-close-note"
-          value={note}
-        />
-      )}
+      <View style={styles.card}>
+        <Text style={styles.sales}>{describeCashSales(cashPaymentCount, branch.name)}</Text>
+        {differenceCentavos === null || differenceCentavos === 0 ? null : (
+          <FormField
+            label="Nota"
+            optional
+            maxLength={500}
+            multiline
+            numberOfLines={3}
+            onChangeText={setNote}
+            hint="Ej.: faltó cambio para un billete de 200"
+            style={styles.note}
+            testID="cash-close-note"
+            value={note}
+          />
+        )}
+      </View>
       {failure === null ? null : (
         <View accessibilityLabel={failure} accessibilityRole="alert">
           <NoticeRow message={failure} />
         </View>
       )}
-      <View style={styles.footer}>
-        <PrimaryButton
-          disabled={countedCentavos === null}
-          label="Cerrar caja"
-          onPress={() => setConfirming(true)}
-          testID="cash-close-submit"
-        />
-        <Text style={[styles.quiet, styles.centered]}>
-          Te pediremos confirmar: un cierre no se puede deshacer.
-        </Text>
-      </View>
       <ConfirmationSheet
         busy={submitting}
         confirmLabel="Cerrar caja"
@@ -195,7 +223,7 @@ export function CashCloseForm({
         tone="primary"
         visible={confirming}
       />
-    </>
+    </CashCloseFrame>
   );
 }
 
@@ -204,49 +232,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.card,
     borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    borderRadius: radii.button,
+    borderWidth: 1.5,
     flexDirection: "row",
-    gap: spacing.sm,
-    height: 64,
-    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
+    height: 88,
+    paddingHorizontal: spacing.lgXl,
   },
   amountFocused: { borderColor: colors.primary, borderWidth: 2 },
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   centered: { textAlign: "center" },
-  count: { gap: spacing.sm },
   currency: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.titleCard,
-  },
-  differenceLabel: {
-    color: colors.textMuted,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-  },
-  differenceRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    minHeight: 52,
-    paddingHorizontal: spacing.lg,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyLarge,
+    fontWeight: "700",
   },
   differenceValue: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
     fontVariant: ["tabular-nums"],
+    fontWeight: "700",
   },
-  footer: { gap: spacing.sm },
   input: {
     color: colors.text,
     flex: 1,
     fontFamily: fontFamilies.display,
-    fontSize: typography.title,
+    fontSize: 40,
     fontVariant: ["tabular-nums"],
     padding: 0,
   },
   note: { minHeight: 88, paddingTop: spacing.md, textAlignVertical: "top" },
-  question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: typography.body },
-  quiet: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
+  question: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
+  },
+  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  sales: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
 });

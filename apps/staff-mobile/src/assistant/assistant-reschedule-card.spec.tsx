@@ -8,9 +8,9 @@ jest.setTimeout(20_000);
 
 const hidden = { includeHiddenElements: true };
 
-// MOB-048: the Assistant's reschedule draws 06's option card: the shared
-// Session card with the seat pill in the footer instead of the chevron and a
-// 2px Palo de rosa border once selected.
+// MOB-048, E-R12: the Assistant's reschedule draws each option as the class
+// row on its own white card (type bar, Lora start time), the free seats as a
+// pill instead of the chevron, and a 2px 600 ring once selected.
 describe("Assistant reschedule option card", () => {
   afterEach(async () => {
     await cleanup();
@@ -45,42 +45,22 @@ describe("Assistant reschedule option card", () => {
     return { button, card: within(button), screen };
   }
 
-  it("draws the option as the frame's card with the seats in the footer", async () => {
+  it("draws the option as the class row on its own card with the seats as a pill", async () => {
     const { button, card } = await openReschedule();
 
-    expect(button).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderRadius: 16,
-      padding: 18,
-    });
-    expect(card.getByText(/^\d\d:\d\d – \d\d:\d\d$/)).toHaveStyle({
-      color: "#93615D",
-      fontSize: 12,
-      fontWeight: "500",
-      letterSpacing: 1.2,
-    });
-    expect(card.getByText("Reformer Pilates")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 19,
-    });
-    expect(card.getByTestId("card-footer")).toHaveStyle({
-      borderTopColor: "#E7CCBF",
-      paddingTop: 12,
-    });
+    expect(button).toHaveStyle({ borderColor: "transparent", borderWidth: 2 });
+    expect(card.getByTestId("class-row-time")).toHaveTextContent(/^\d\d:\d\d$/);
+    expect(card.getByTestId("class-row-time")).toHaveStyle({ fontFamily: "Lora_400Regular" });
+    expect(card.getByText("Reformer Pilates")).toHaveStyle({ color: "#93615D" });
     // FIX-041: her face (here her initials) leads her name.
     expect(card.getByText("EV")).toBeOnTheScreen();
-    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
-    // FIX-089: the seats are a normal state, so bold words and no pill.
-    expect(card.getByTestId("seat-pill")).not.toHaveStyle({ borderRadius: 999 });
-    expect(card.getByText("6 lugares libres")).toHaveStyle({
-      color: "#93615D",
-      fontSize: 13,
-      fontWeight: "600",
-    });
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D" });
+    expect(card.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#FEF6F2" });
+    expect(card.getByText("6 lugares libres")).toBeOnTheScreen();
     expect(card.queryByTestId("chevron", hidden)).toBeNull();
   });
 
-  it("marks the selected option by its 2px Rosa profundo border", async () => {
+  it("marks the selected option by its 2px 600 ring", async () => {
     const { button, screen } = await openReschedule();
 
     await fireEvent.press(button);

@@ -35,6 +35,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
@@ -220,7 +221,7 @@ export function ClientBookingsScreen({
           variant="plain"
         />
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView contentContainerStyle={styles.list} style={bodyScroll.scroll}>
           {items.map((item) => (
             <BookingCard
               cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
@@ -272,21 +273,31 @@ export function ClientBookingsScreen({
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  card: {
+    ...surfaces.card,
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
   cardBody: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
   cardText: { alignItems: "flex-start", flex: 1, gap: spacing.xs },
-  cardTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  cardTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 21 },
   // FIX-089: the date stands alone, with no tinted box behind it.
-  disc: { alignItems: "center", height: 52, justifyContent: "center", width: 48 },
-  discDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  disc: { alignItems: "center", width: 44 },
+  discDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
   discWeekday: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: "600",
   },
-  line: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13, lineHeight: 18 },
+  list: {
+    gap: spacing.smLg,
+    paddingBottom: spacing.xxl,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.xs,
+  },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
   withAction: cardWithActionRow,
 });

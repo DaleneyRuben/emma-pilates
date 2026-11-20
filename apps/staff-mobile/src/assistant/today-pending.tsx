@@ -2,7 +2,8 @@ import { useGetTodayCashClose } from "@pilates/api-contracts";
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 import { useStaffFetcher } from "../staff-fetcher";
-import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
+import { RowCard } from "../profile/card-pieces";
+import { PlainRow } from "../ui/plain-rows";
 
 function invoicesDetail(count: number): string {
   if (count === 0) return "Nada pendiente";
@@ -10,9 +11,9 @@ function invoicesDetail(count: number): string {
 }
 
 /**
- * What is still to do at the front desk today (E7 pick A), as Crema rows with
- * an Arcilla border: the invoices to upload (FIX-044) and the Branch's Cash
- * Close. Transfer receipts are confirmed by an Administrator only, so they
+ * What is still to do at the front desk today (E7 pick A), as rows on one
+ * white card under its «Pendientes» label (E-S01): the invoices to upload
+ * (FIX-044) and the Branch's Cash Close. Transfer receipts are confirmed by an Administrator only, so they
  * are not the Assistant's to review here.
  */
 export function TodayPending({
@@ -32,7 +33,7 @@ export function TodayPending({
   );
   const closed = today.data?.status === 200 && today.data.data.close !== null;
   return (
-    <PlainRowGroup testID="today-pending">
+    <RowCard label="Pendientes" testID="today-pending">
       <PlainRow
         detail={invoicesDetail(invoiceCount)}
         label="Facturas por subir"
@@ -46,6 +47,6 @@ export function TodayPending({
         onPress={onCashClose}
         testID="today-cash-close"
       />
-    </PlainRowGroup>
+    </RowCard>
   );
 }

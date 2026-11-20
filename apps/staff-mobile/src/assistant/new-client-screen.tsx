@@ -15,8 +15,8 @@ import {
   PhoneField,
   PrimaryButton,
   Screen,
-  SectionTitle,
   spacing,
+  surfaces,
   typography,
   useCountdown,
   WaitNotice,
@@ -25,6 +25,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { CenteredCard } from "./assistant-layout";
@@ -157,9 +158,10 @@ export function NewClientScreen() {
   };
 
   const referralLabel = channel === null ? undefined : referralLabels[channel];
+  // E-C05: the hint and «Crear cuenta» share the white footer panel.
   const footer =
     selfRegistered !== null ? undefined : (
-      <View style={styles.footer}>
+      <FooterPanel bleed={0}>
         {failure !== null ? (
           failure === limitedEmailMessage ? (
             <Text accessibilityRole="alert" style={styles.note}>
@@ -185,106 +187,112 @@ export function NewClientScreen() {
           onPress={() => void create()}
           testID="new-client-submit"
         />
-      </View>
+      </FooterPanel>
     );
 
+  const task = footer !== undefined;
   return (
-    <Screen style={styles.screen}>
-      <CenteredCard maxWidth={560}>
+    <Screen
+      edges={task ? taskEdges : undefined}
+      style={[styles.screen, task && bodyScroll.taskScreen]}
+    >
+      <CenteredCard maxWidth={560} style={styles.column}>
         <BackBar onBack={() => navigation.goBack()} title="Nueva clienta" />
-        <FormScrollView contentContainerStyle={styles.form} footer={footer}>
-          {selfRegistered !== null ? (
-            <SelfRegisteredNotice
-              clientId={selfRegistered.clientId}
-              email={selfRegistered.email}
-              onOpen={() => openClient(selfRegistered.clientId)}
-            />
-          ) : (
-            <>
-              {accountLimited && waitSeconds > 0 ? (
-                <WaitNotice
-                  message={accountEmailLimitMessage}
-                  remainingSeconds={waitSeconds}
-                  waitLabel="Podrás intentarlo en"
-                />
-              ) : null}
-              <FormErrorSummary fields={missing} />
-              <View style={styles.fields}>
-                <SectionTitle>Datos</SectionTitle>
-                <FormField
-                  autoCapitalize="words"
-                  error={nameError}
-                  label="Nombre"
-                  onChangeText={setName}
-                  testID="new-client-name"
-                  value={name}
-                />
-                <FormField
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  error={emailError}
-                  hint="Ej.: lucia@gmail.com"
-                  keyboardType="email-address"
-                  label="Correo electrónico"
-                  onChangeText={(value) => {
-                    setEmail(value);
-                    setEmailInUse(false);
-                  }}
-                  testID="new-client-email"
-                  value={email}
-                />
-                <PhoneField
-                  error={phoneError}
-                  onChange={setPhone}
-                  testID="new-client-phone"
-                  value={phone}
-                />
-              </View>
-              <View style={styles.channel}>
-                <SectionTitle>¿Cómo nos conoció?</SectionTitle>
-                <ChannelGrid
-                  error={channelError}
-                  label="¿Cómo nos conoció?"
-                  onChange={setChannel}
-                  value={channel}
-                />
-                {referralLabel === undefined ? null : (
-                  <FormField
-                    autoCapitalize="characters"
-                    autoCorrect={false}
-                    error={
-                      codeUnknown
-                        ? "No encontramos ese código. Revísalo o déjalo vacío."
-                        : undefined
-                    }
-                    label={referralLabel}
-                    onChangeText={(value) => {
-                      setReferralCode(value);
-                      setCodeUnknown(false);
-                    }}
-                    testID="new-client-referral-code"
-                    value={referralCode}
+        <View style={bodyScroll.clip}>
+          <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
+            {selfRegistered !== null ? (
+              <SelfRegisteredNotice
+                clientId={selfRegistered.clientId}
+                email={selfRegistered.email}
+                onOpen={() => openClient(selfRegistered.clientId)}
+              />
+            ) : (
+              <>
+                {accountLimited && waitSeconds > 0 ? (
+                  <WaitNotice
+                    message={accountEmailLimitMessage}
+                    remainingSeconds={waitSeconds}
+                    waitLabel="Podrás intentarlo en"
                   />
-                )}
-              </View>
-            </>
-          )}
-        </FormScrollView>
+                ) : null}
+                <FormErrorSummary fields={missing} />
+                <View style={styles.card}>
+                  <CardLabel>Datos</CardLabel>
+                  <FormField
+                    autoCapitalize="words"
+                    error={nameError}
+                    label="Nombre"
+                    onChangeText={setName}
+                    testID="new-client-name"
+                    value={name}
+                  />
+                  <FormField
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={emailError}
+                    hint="Ej.: lucia@gmail.com"
+                    keyboardType="email-address"
+                    label="Correo electrónico"
+                    onChangeText={(value) => {
+                      setEmail(value);
+                      setEmailInUse(false);
+                    }}
+                    testID="new-client-email"
+                    value={email}
+                  />
+                  <PhoneField
+                    error={phoneError}
+                    onChange={setPhone}
+                    testID="new-client-phone"
+                    value={phone}
+                  />
+                </View>
+                <View style={styles.card}>
+                  <CardLabel>¿Cómo nos conoció?</CardLabel>
+                  <ChannelGrid
+                    error={channelError}
+                    label="¿Cómo nos conoció?"
+                    onChange={setChannel}
+                    value={channel}
+                  />
+                  {referralLabel === undefined ? null : (
+                    <FormField
+                      autoCapitalize="characters"
+                      autoCorrect={false}
+                      error={
+                        codeUnknown
+                          ? "No encontramos ese código. Revísalo o déjalo vacío."
+                          : undefined
+                      }
+                      label={referralLabel}
+                      onChangeText={(value) => {
+                        setReferralCode(value);
+                        setCodeUnknown(false);
+                      }}
+                      testID="new-client-referral-code"
+                      value={referralCode}
+                    />
+                  )}
+                </View>
+              </>
+            )}
+          </FormScrollView>
+        </View>
       </CenteredCard>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  channel: { gap: spacing.md },
-  fields: { gap: spacing.lg },
-  footer: { gap: spacing.sm, paddingTop: spacing.md },
-  form: { gap: spacing.xl, paddingBottom: spacing.xl },
+  // E-C05: each group of fields on a white card under its uppercase label.
+  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  column: { gap: 0 },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
+    lineHeight: 18,
     textAlign: "center",
   },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

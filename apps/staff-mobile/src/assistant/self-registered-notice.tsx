@@ -1,8 +1,10 @@
 import {
   BodyText,
   colors,
+  Glyph,
   PrimaryButton,
   spacing,
+  surfaces,
   TextButton,
   typography,
   useCountdown,
@@ -69,14 +71,18 @@ export function SelfRegisteredNotice({
     }
   };
 
+  // E-C07: on S05 the notice is its own white card, an alert glyph on top.
   return (
-    <View style={styles.notice}>
-      <BodyText accessibilityRole="alert">
+    <View style={[styles.notice, surface === "screen" && styles.card]}>
+      {surface === "screen" ? (
+        <Glyph color={colors.text} name="alert" size={26} strokeWidth={1.6} />
+      ) : null}
+      <BodyText accessibilityRole="alert" style={surface === "screen" ? styles.lead : undefined}>
         Este correo ya se registró desde la app y espera verificación. No cambiamos sus datos ni su
         contraseña.
       </BodyText>
       <BodyText style={styles.email}>{email}</BodyText>
-      <BodyText style={styles.note}>
+      <BodyText style={[styles.note, surface === "screen" && styles.screenNote]}>
         Puedes enviarle un enlace de verificación nuevo, válido por 24 horas. Los anteriores dejan
         de funcionar.
       </BodyText>
@@ -104,9 +110,17 @@ export function SelfRegisteredNotice({
 }
 
 const styles = StyleSheet.create({
-  email: { fontFamily: fontFamilies.bodyMedium, color: colors.text, fontWeight: "500" },
+  card: { ...surfaces.card, padding: spacing.xlSm },
+  email: { color: colors.text, fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   failure: { color: colors.errorText },
-  note: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.note },
+  lead: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.bodyLarge,
+    lineHeight: 24,
+  },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  screenNote: { fontFamily: fontFamilies.body, fontSize: typography.body, lineHeight: 22 },
   notice: { gap: spacing.md },
-  success: { fontFamily: fontFamilies.body, color: colors.successText, fontSize: typography.note },
+  success: { color: colors.successText, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

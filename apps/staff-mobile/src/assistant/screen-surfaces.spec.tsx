@@ -27,19 +27,20 @@ describe("Assistant surfaces on Superficie", () => {
     const screen = await openLucia(withoutPlan());
 
     expect(screen.getByTestId("client-no-plan")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderRadius: 16,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
   });
 
-  it("leaves the tablet's empty panel unfilled, as the split-view frames do", async () => {
+  // Rosa Emma: every empty state is a white card.
+  it("draws the tablet's empty panel on a white card", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
     const panel = screen.getByText("Selecciona una clienta para ver sus detalles").parent;
-    expect(StyleSheet.flatten(panel?.props.style)).not.toHaveProperty("backgroundColor");
+    expect(StyleSheet.flatten(panel?.props.style)).toHaveProperty("backgroundColor", "#FFFBFB");
   });
 
   it("puts the unread count on the bell beside Buscar clienta", async () => {
@@ -77,8 +78,8 @@ describe("Assistant cards and empty states (MOB-039)", () => {
 
     expect(screen.getByText("Historial de clases")).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-history").parent).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderRadius: 16,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
   });
 
@@ -92,14 +93,14 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
   });
 
-  it("draws the tablet's empty panel with the plain person icon, a Lora 24 title, and its helper", async () => {
+  it("draws the tablet's empty panel with the person icon on its disc, a Lora 24 title, and its helper", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
     const screen = await openClientSearch(assistantRoutes());
 
-    // FIX-089: no tinted disc behind the icon.
-    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
+    // Rosa Emma: the glyph sits on the 64 pt 50 disc.
+    expect(screen.getByTestId("empty-state-disc")).toBeOnTheScreen();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Selecciona una clienta para ver sus detalles")).toHaveStyle({
       fontFamily: "Lora_400Regular",
