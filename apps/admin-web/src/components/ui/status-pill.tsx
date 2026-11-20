@@ -3,7 +3,7 @@ import { cn } from "../../lib/cn";
 type Tone = "accion" | "advertencia" | "error" | "exito" | "neutral";
 
 const pill =
-  "inline-flex h-7 items-center rounded-full px-3 text-pie font-bold whitespace-nowrap";
+  "inline-flex h-7 items-center rounded-full px-3 tipo-pastilla whitespace-nowrap";
 
 // Rosa Emma (v3_rosa.py pill): a state as a pill whose look says how much it
 // asks. A calm state («Activa», «Confirmado», «Anulado») is the soft 50 pill
@@ -37,7 +37,7 @@ export function StatusPill({
       className={cn(
         pill,
         tone === "accion"
-          ? "bg-primario text-blanco"
+          ? "bg-primario text-sobre-primario"
           : "bg-superficie text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
       )}
     >

@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { ClientPhoto } from "../../components/client-photo";
+import { EmptyState } from "../../components/ui/empty-state";
+import { InlineError } from "../../components/ui/inline-error";
 import { ContactAlertActions } from "./contact-alert-actions";
 import {
   clientas,
@@ -27,13 +29,10 @@ import { ClientPhone } from "../clients/client-phone";
 
 function EmptyList() {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
-      <p className="text-cuerpo text-texto">Nadie para contactar por ahora.</p>
-      <p className="text-nota text-texto">
-        Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas
-        clases en sus primeros 90 días.
-      </p>
-    </div>
+    <EmptyState title="Nadie para contactar por ahora.">
+      Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas
+      clases en sus primeros 90 días.
+    </EmptyState>
   );
 }
 
@@ -47,7 +46,7 @@ function ClientCell({
   return (
     <span className="flex items-center gap-2.5">
       <ClientPhoto name={name} photo={photo} />
-      <span className="font-medium text-texto">{name}</span>
+      <span className="tipo-titulo-fila text-texto">{name}</span>
     </span>
   );
 }
@@ -70,7 +69,7 @@ function AlertRow({
         <ClientPhone phone={item.phone} tone="text-texto" />
       </TableCell>
       <TableCell data-label="Motivo">
-        <span className="flex flex-col text-nota text-texto">
+        <span className="flex flex-col tipo-secundario text-texto">
           {item.reasons.map((reason) => (
             <span key={reason}>{contactAlertReasons[reason]}</span>
           ))}
@@ -112,13 +111,13 @@ export function ContactAlertsPage() {
       />
       {/* Rosa Emma (RW-clientas-contactar): the page's one Rosa profundo
           block, the count in Lora over how to work the list. */}
-      <section className="flex flex-col gap-2 rounded-hero bg-destacado px-5 py-4 text-blanco shadow-destacado">
+      <section className="flex flex-col gap-2 rounded-hero bg-destacado px-5 py-4 text-sobre-primario shadow-destacado">
         {query.data === undefined ? null : (
           <p className="flex items-center gap-3">
-            <span className="font-serif text-cifra-grande leading-none tabular">
+            <span className="tipo-cifra-grande tabular">
               {query.data.totalItems}
             </span>
-            <span className="text-cuerpo leading-tight font-bold">
+            <span className="tipo-destacado">
               {query.data.totalItems === 1
                 ? "clienta para contactar"
                 : "clientas para contactar"}
@@ -127,7 +126,7 @@ export function ContactAlertsPage() {
             </span>
           </p>
         )}
-        <p className="text-nota">
+        <p className="tipo-cuerpo">
           Escríbeles por WhatsApp y márcalas como contactadas. Salen solas de la
           lista cuando reservan una clase.
         </p>
@@ -136,9 +135,9 @@ export function ContactAlertsPage() {
         <PageNotice>{`Marcaste a ${notice.name} como contactada.`}</PageNotice>
       ) : null}
       {notice?.kind === "error" ? (
-        <p role="alert" className="text-nota text-texto">
+        <InlineError>
           {`No pudimos marcar a ${notice.name}. Inténtalo de nuevo.`}
-        </p>
+        </InlineError>
       ) : null}
       {query.isPending ? (
         <LoadingNotice>Cargando clientas…</LoadingNotice>

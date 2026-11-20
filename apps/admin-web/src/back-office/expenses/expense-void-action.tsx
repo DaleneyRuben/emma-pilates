@@ -1,6 +1,7 @@
 import type { AdminExpenseDto } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
+import { fieldMessageClass } from "../../components/form/form";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { formatBolivianos } from "../../lib/money";
@@ -45,7 +46,7 @@ export function ExpenseVoidAction({
     <>
       <Button
         variant="link"
-        className="self-center text-texto hover:text-texto"
+        className="self-center"
         onClick={() => {
           setFailure(null);
           setReason("");
@@ -68,7 +69,7 @@ export function ExpenseVoidAction({
           se puede editar.
         </p>
         <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
+          <span className="tipo-compacto-600 text-texto">
             Motivo (opcional)
           </span>
           <Input
@@ -79,7 +80,7 @@ export function ExpenseVoidAction({
           />
         </label>
         {failure === null ? null : (
-          <p role="alert" className="text-texto">
+          <p role="alert" className={fieldMessageClass}>
             {failure}
           </p>
         )}

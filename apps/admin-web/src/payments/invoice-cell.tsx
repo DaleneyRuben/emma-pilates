@@ -17,13 +17,13 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
   return (
     <span className="flex min-w-0 flex-col gap-1">
       {payment.invoiceData === null ? (
-        <span className="text-nota text-texto">Sin factura</span>
+        <span className="tipo-compacto text-texto">Sin factura</span>
       ) : (
         <span className="flex min-w-0 flex-col">
-          <span className="text-nota text-texto tabular">
+          <span className="tipo-compacto text-texto tabular">
             {payment.invoiceData.taxId}
           </span>
-          <span className="max-w-[220px] truncate text-ayuda text-texto">
+          <span className="max-w-[220px] truncate tipo-secundario text-texto">
             {payment.invoiceData.name}
           </span>
         </span>
@@ -37,7 +37,7 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
           ) : (
             <>
               <StatusPill tone="exito">Emitida</StatusPill>
-              <span className="text-ayuda text-texto">
+              <span className="tipo-secundario text-texto">
                 {file === null
                   ? "sin archivo"
                   : `por ${file.uploadedByName} · ${formatListDate(boliviaParts(file.uploadedAt).date)}`}

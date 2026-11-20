@@ -59,7 +59,7 @@ const concepts = (allBranches: boolean): Concept[] => [
 ];
 
 const totalRow =
-  "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
+  "bg-superficie-hundida tipo-titulo-fila hover:bg-superficie-hundida";
 
 export function ComparisonTable({
   comparison,
@@ -81,7 +81,7 @@ export function ComparisonTable({
   const reports = comparison.pair;
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-titulo-panel text-texto">Mes contra mes</h2>
+      <h2 className="tipo-titulo-seccion text-texto">Mes contra mes</h2>
       <Table aria-label="Mes contra mes">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -100,7 +100,7 @@ export function ComparisonTable({
               className={cn(concept.total && totalRow)}
             >
               {/* At phone width the concept is the card's title, not a labelled line. */}
-              <TableCell className="max-md:font-semibold max-md:before:content-none">
+              <TableCell className="max-md:tipo-titulo-fila max-md:before:content-none">
                 {concept.name}
               </TableCell>
               {reports.map((report) => (

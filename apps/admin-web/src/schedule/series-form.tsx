@@ -15,6 +15,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  fieldMessageClass,
 } from "../components/form/form";
 import { FormErrorSummary } from "../components/form/form-error-summary";
 import { parseCivilDate } from "../components/form/civil-date";
@@ -161,10 +162,10 @@ export function SeriesForm({
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
           <FormErrorSummary />
-          <p className="text-nota text-texto">
+          <p className="tipo-titulo-fila text-texto">
             Serie semanal de {schedule.classTypeName}
           </p>
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Las clases que ya tienen reservas o lista de espera se mantienen sin
             cambios.
           </p>
@@ -249,7 +250,7 @@ export function SeriesForm({
             render={({ field }) => <EffectiveUntilItem {...field} />}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
+            <p role="alert" className={fieldMessageClass}>
               {failure}
             </p>
           )}

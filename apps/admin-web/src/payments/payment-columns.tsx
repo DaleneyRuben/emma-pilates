@@ -38,7 +38,7 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
             onOpen={() => open(row.original)}
           />
         ) : (
-          <span className="text-cuerpo font-bold text-texto">
+          <span className="tipo-titulo-fila text-texto">
             {row.original.clientName}
           </span>
         )}
@@ -51,7 +51,9 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
     cell: ({ row }) => (
       <span className="flex flex-col gap-0.5">
         <span className="text-texto">{row.original.planName}</span>
-        <span className="text-nota text-texto">{saleLine(row.original)}</span>
+        <span className="tipo-secundario text-texto">
+          {saleLine(row.original)}
+        </span>
       </span>
     ),
   }),
@@ -79,7 +81,7 @@ export const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
       <span className="inline-flex flex-col gap-1">
         <PaymentStatePill state={row.original.state} />
         {row.original.voidReason ? (
-          <span className="text-ayuda text-texto">
+          <span className="tipo-secundario text-texto">
             {row.original.voidReason}
           </span>
         ) : null}

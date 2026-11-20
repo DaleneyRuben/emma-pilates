@@ -52,10 +52,13 @@ export function ReceiptDialog({
               narrow && "sticky top-0 bg-superficie px-4 py-3",
             )}
           >
+            {/* Follow-up 285: on the scrim the caption sits in a white
+                pill, never small white text on the veil (rule 3). */}
             <span
               className={cn(
-                "text-ayuda",
-                narrow ? "text-texto" : "text-superficie",
+                "tipo-secundario text-texto",
+                !narrow &&
+                  "rounded-full bg-superficie px-3.5 py-2 shadow-tarjeta",
               )}
             >
               {caption}

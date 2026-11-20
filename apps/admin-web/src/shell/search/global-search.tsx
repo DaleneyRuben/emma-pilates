@@ -79,7 +79,7 @@ export function GlobalSearch({ className }: { className?: string }) {
           size={18}
           strokeWidth={1.6}
           aria-hidden="true"
-          className="shrink-0 text-primario"
+          className="shrink-0 text-texto"
         />
         <input
           ref={input}
@@ -116,19 +116,19 @@ export function GlobalSearch({ className }: { className?: string }) {
               if (result !== undefined) choose(result);
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-celda text-texto outline-none placeholder:text-texto focus-visible:shadow-none"
+          className="min-w-0 flex-1 bg-transparent tipo-compacto text-texto outline-none focus-visible:shadow-none"
         />
-        <kbd className="hidden rounded-[6px] px-1.5 py-0.5 font-sans text-pie font-semibold text-texto ring-1 ring-borde lg:inline">
+        <kbd className="hidden rounded-[6px] px-1.5 py-0.5 tipo-pastilla text-texto ring-1 ring-borde lg:inline">
           Ctrl K
         </kbd>
       </label>
       {words === "" ? null : (
         <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 flex flex-col gap-1 rounded-[18px] bg-superficie p-2 shadow-popover">
-          <p className="px-3 pt-1 text-nota text-texto">
+          <p className="px-3 pt-1 tipo-secundario text-texto">
             Busca clientas por nombre, celular o correo
           </p>
           {status === null ? null : (
-            <p role="status" className="px-3 py-2 text-cuerpo text-texto">
+            <p role="status" className="px-3 py-2 tipo-titulo-fila text-texto">
               {status}
             </p>
           )}
@@ -150,9 +150,9 @@ export function GlobalSearch({ className }: { className?: string }) {
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => choose(result)}
                   className={cn(
-                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-[10px] px-3 py-1.5 text-cuerpo",
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-[10px] px-3 py-1.5 tipo-cuerpo",
                     index === current && "bg-superficie-hundida",
-                    result.kind === "all" && "font-medium text-texto",
+                    result.kind === "all" && "tipo-enlace text-texto",
                   )}
                 >
                   {result.kind === "client" ? (

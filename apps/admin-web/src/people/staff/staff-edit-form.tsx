@@ -13,6 +13,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
 import type { StaffRole } from "../people-search";
 import { DeactivateAction } from "./staff-account-actions";
@@ -253,7 +254,7 @@ export function StaffEditForm({
                   />
                 )}
                 {emailNotice === null ? null : (
-                  <p role="status" className="text-ayuda text-texto">
+                  <p role="status" className="tipo-secundario text-texto">
                     {emailNotice}
                   </p>
                 )}
@@ -278,11 +279,7 @@ export function StaffEditForm({
               <TrainerReferralCodeField draft={referral} />
             </StaffFormSection>
           ) : null}
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <div className="flex flex-wrap items-center justify-end gap-3">

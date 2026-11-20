@@ -110,10 +110,7 @@ export function SheetTitle({
     <SheetPrimitive.Title
       data-slot="sheet-title"
       tabIndex={-1}
-      className={cn(
-        "font-serif text-titulo-panel text-texto outline-none",
-        className,
-      )}
+      className={cn("tipo-titulo-seccion text-texto outline-none", className)}
       {...props}
     />
   );
@@ -125,7 +122,7 @@ export function SheetDescription({
 }: ComponentProps<typeof SheetPrimitive.Description>) {
   return (
     <SheetPrimitive.Description
-      className={cn("text-celda text-texto", className)}
+      className={cn("tipo-compacto text-texto", className)}
       {...props}
     />
   );

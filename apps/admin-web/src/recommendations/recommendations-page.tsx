@@ -4,7 +4,10 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
+import { EmptyState } from "../components/ui/empty-state";
 import { FilterChips } from "../components/ui/filter-chips";
+import { InlineError } from "../components/ui/inline-error";
+import { TextLink } from "../components/ui/text-link";
 import type { RecommendationDto } from "@pilates/api-contracts";
 import { monthKpisQueryOptions } from "../indicators/indicator-queries";
 import { narrativeQueryOptions } from "../indicators/narrative-queries";
@@ -37,19 +40,23 @@ const weekdays = [
 function Subject({ item }: { item: RecommendationDto }) {
   if (item.rule === "inactive_client" && item.clientName != null) {
     return (
-      <Link
-        to="/clientas"
-        search={{ q: item.clientName, cliente: item.clientId ?? item.subject }}
-        className="self-start rounded-control font-medium text-texto underline-offset-2 hover:underline focus-visible:shadow-foco"
-      >
-        {item.clientName}
-      </Link>
+      <TextLink asChild className="self-start rounded-control">
+        <Link
+          to="/clientas"
+          search={{
+            q: item.clientName,
+            cliente: item.clientId ?? item.subject,
+          }}
+        >
+          {item.clientName}
+        </Link>
+      </TextLink>
     );
   }
   if (item.rule === "weak_schedule" && item.trainerName != null) {
     const day = weekdays[item.weekday ?? 0] ?? "";
     return (
-      <p className="font-medium text-texto">
+      <p className="tipo-titulo-fila text-texto">
         {day === "" ? item.trainerName : `${item.trainerName} · ${day}`}
       </p>
     );
@@ -74,7 +81,7 @@ function Finding({
     <li className="flex flex-col gap-2 rounded-tarjeta bg-superficie px-[18px] py-4 shadow-tarjeta">
       <div className="flex min-w-0 flex-col gap-1.5">
         <Subject item={item} />
-        <p className="text-celda text-texto">{item.detail}</p>
+        <p className="tipo-compacto text-texto">{item.detail}</p>
       </div>
       <div className="mt-auto flex items-center justify-between gap-3">
         <StatusPill tone={item.state === "new" ? "accion" : "neutral"}>
@@ -82,14 +89,13 @@ function Finding({
         </StatusPill>
         {/* A resolved finding that holds again comes back unless discarded. */}
         {readOnly || item.state === "dismissed" ? null : (
-          <button
-            type="button"
+          <TextLink
             disabled={pending}
             onClick={() => onDismiss(item.id)}
-            className="rounded-control text-nota font-bold text-texto underline underline-offset-[3px] focus-visible:shadow-foco disabled:no-underline"
+            className="rounded-control"
           >
             Descartar
-          </button>
+          </TextLink>
         )}
       </div>
     </li>
@@ -142,9 +148,7 @@ function FindingsByKind({
         onChange={(kind) => setChosen(kind)}
       />
       {shown.length === 0 ? (
-        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-8 text-center text-cuerpo text-texto">
-          Nada pendiente en este grupo.
-        </p>
+        <EmptyState>Nada pendiente en este grupo.</EmptyState>
       ) : (
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {shown.map((item) => (
@@ -205,10 +209,7 @@ export function RecommendationsSection({
       className="flex flex-col gap-3"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-tarjeta bg-superficie py-2 pr-2 pl-[18px] shadow-tarjeta">
-        <h2
-          id="recomendaciones-del-mes"
-          className="font-sans text-etiqueta font-bold tracking-[0.14em] text-texto uppercase"
-        >
+        <h2 id="recomendaciones-del-mes" className="tipo-etiqueta text-texto">
           Recomendaciones del mes
         </h2>
         {readOnly ? null : (
@@ -223,9 +224,7 @@ export function RecommendationsSection({
         )}
       </div>
       {recompute.isError ? (
-        <p role="alert" className="text-ayuda text-texto">
-          No pudimos recalcular las recomendaciones.
-        </p>
+        <InlineError>No pudimos recalcular las recomendaciones.</InlineError>
       ) : null}
       {query.isError ? (
         <QueryFailure
@@ -238,9 +237,7 @@ export function RecommendationsSection({
       ) : query.data === undefined ? (
         <LoadingNotice>Cargando las recomendaciones…</LoadingNotice>
       ) : query.data.recommendations.length === 0 ? (
-        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
-          Nada que revisar este mes.
-        </p>
+        <EmptyState>Nada que revisar este mes.</EmptyState>
       ) : (
         <FindingsByKind
           key={month}

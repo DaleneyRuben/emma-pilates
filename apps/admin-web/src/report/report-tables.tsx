@@ -27,7 +27,7 @@ const Amount = ({
     data-label={label}
     className={cn(
       "whitespace-nowrap tabular md:text-right",
-      strong && "font-medium",
+      strong && "tipo-titulo-fila",
     )}
   >
     <span className="whitespace-nowrap">{children}</span>
@@ -37,14 +37,14 @@ const Amount = ({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-titulo-panel text-texto">{title}</h2>
+      <h2 className="tipo-titulo-seccion text-texto">{title}</h2>
       {children}
     </section>
   );
 }
 
 const totalRow =
-  "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
+  "bg-superficie-hundida tipo-titulo-fila hover:bg-superficie-hundida";
 
 /**
  * AW16's breakdown by Expense Category. «Nómina» is its own row, and only
@@ -83,8 +83,8 @@ export function CategoryTable({
                 <TableRow>
                   <TableCell data-label="Categoría">
                     <span className="flex flex-col">
-                      <span className="font-medium">Nómina</span>
-                      <span className="text-ayuda text-texto">
+                      <span className="tipo-titulo-fila">Nómina</span>
+                      <span className="tipo-secundario text-texto">
                         Viene de Nómina, no de las categorías
                       </span>
                     </span>

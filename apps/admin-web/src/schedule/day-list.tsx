@@ -1,6 +1,7 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { addDays, boliviaParts, formatDayTab } from "../lib/bolivia-time";
 import { selectedClass, unselectedClass } from "../components/ui/chip";
+import { EmptyState } from "../components/ui/empty-state";
 import { cn } from "../lib/cn";
 import { SessionBlock } from "./session-block";
 import { cancellationOf } from "./session-cancellation";
@@ -46,7 +47,7 @@ export function DayList({
               aria-selected={selected}
               onClick={() => onDayChange(date)}
               className={cn(
-                "flex min-w-[48px] flex-1 flex-col items-center gap-0.5 rounded-boton px-0.5 py-2 text-nota",
+                "flex min-w-[48px] flex-1 flex-col items-center gap-0.5 rounded-boton px-0.5 py-2",
                 selected ? selectedClass : unselectedClass,
                 // Rosa Emma (RW-horario-420): today rings on 50 while
                 // another day is chosen.
@@ -55,12 +56,10 @@ export function DayList({
                   "bg-superficie-hundida inset-ring-[1.5px] inset-ring-primario",
               )}
             >
-              <span>{tab.weekday}</span>
-              <span className="font-serif text-[20px] leading-tight tabular">
-                {tab.day}
-              </span>
+              <span className="tipo-secundario">{tab.weekday}</span>
+              <span className="tipo-titulo-fila tabular">{tab.day}</span>
               {date === today ? (
-                <span className="text-pie leading-none">hoy</span>
+                <span className="tipo-pastilla">hoy</span>
               ) : null}
             </button>
           );
@@ -68,9 +67,7 @@ export function DayList({
       </div>
       <div role="tabpanel" className="flex flex-col gap-2">
         {ofDay.length === 0 ? (
-          <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-6 text-center text-nota text-texto">
-            Sin clases este día.
-          </p>
+          <EmptyState>Sin clases este día.</EmptyState>
         ) : (
           ofDay.map((session) => (
             <SessionBlock

@@ -6,19 +6,23 @@ import { type ReactNode, useState } from "react";
 import { cn } from "../lib/cn";
 import { initials } from "../lib/initials";
 
+// Follow-up 285: initials are `pastilla` (12 px), or `titulo-seccion` on
+// the 96 px portrait; the 18 and 20 px dots are too small for any text on
+// the scale, so they show the colour alone.
 const sizes = {
-  18: "size-[18px] text-[7px]",
-  20: "size-5 text-[8px]",
-  32: "size-8 text-[11px]",
-  36: "size-9 text-[11px]",
-  40: "size-10 text-pie",
-  96: "size-24 font-serif text-[35px]",
+  18: "size-[18px]",
+  20: "size-5",
+  32: "size-8 tipo-pastilla",
+  36: "size-9 tipo-pastilla",
+  40: "size-10 tipo-pastilla",
+  96: "size-24 tipo-titulo-seccion",
 } as const;
+const tiny = new Set([18, 20]);
 
 const tones = {
   suave:
     "bg-superficie-hundida text-texto inset-ring-[1.5px] inset-ring-borde-fuerte",
-  solido: "bg-rosa-600 text-blanco",
+  solido: "bg-rosa-600 text-sobre-primario",
   "sobre-lateral": "bg-blanco text-texto",
 } as const;
 
@@ -62,14 +66,16 @@ export function StaffPhoto({
     <span
       data-photo=""
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-bold",
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full",
         tones[tone],
         sizes[size],
         className,
       )}
     >
       {shown === undefined || shown === failed ? (
-        <span aria-hidden="true">{initials(name)}</span>
+        tiny.has(size) ? null : (
+          <span aria-hidden="true">{initials(name)}</span>
+        )
       ) : (
         <img
           src={shown}

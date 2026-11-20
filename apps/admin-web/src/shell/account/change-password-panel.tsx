@@ -19,6 +19,7 @@ import {
 } from "../../components/form/form";
 import { FormErrorSummary } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { PasswordInput } from "../../components/ui/password-input";
 import {
   SheetContent,
@@ -94,7 +95,7 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
         </SheetDescription>
       </SheetHeader>
       {saved ? (
-        <p role="status" className="px-5 py-4 text-cuerpo text-texto">
+        <p role="status" className="px-5 py-4 tipo-cuerpo text-texto">
           Tu contraseña se actualizó. Cerramos tus otras sesiones abiertas.
         </p>
       ) : (
@@ -123,9 +124,9 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
                 />
               ))}
               {failed ? (
-                <p role="alert" className="text-nota text-texto">
+                <InlineError>
                   No pudimos guardar la contraseña. Inténtalo de nuevo.
-                </p>
+                </InlineError>
               ) : null}
             </div>
             <div className="border-t border-borde-fuerte px-5 py-4">

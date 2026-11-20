@@ -62,7 +62,7 @@ export function AdminShell() {
     >
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-superficie-hundida focus:px-3 focus:py-2 focus:text-nota focus:font-medium focus:text-texto focus:shadow-popover"
+        className="sr-only tipo-secundario text-texto focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-control focus:bg-superficie-hundida focus:px-3 focus:py-2 focus:shadow-popover"
       >
         Saltar al contenido
       </a>

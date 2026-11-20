@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  fieldMessageClass,
 } from "../components/form/form";
 import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
@@ -173,7 +174,7 @@ export function SessionCreateForm({
             )}
           />
           {frequency === "weekly" ? (
-            <p className="text-ayuda text-texto">
+            <p className="tipo-secundario text-texto">
               Genera las clases de los próximos 30 días y las sigue creando cada
               semana.
             </p>
@@ -301,7 +302,7 @@ export function SessionCreateForm({
             />
           ) : null}
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
+            <p role="alert" className={fieldMessageClass}>
               {failure}
             </p>
           )}

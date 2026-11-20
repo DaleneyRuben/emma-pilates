@@ -9,6 +9,7 @@ import { ChoiceChips } from "../components/form/choice-chips";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
 import { Button } from "../components/ui/button";
+import { InlineError } from "../components/ui/inline-error";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import {
@@ -75,7 +76,7 @@ export function FeedbackPanel({
       className="flex flex-1 flex-col"
     >
       <SidePanelBody>
-        <blockquote className="rounded-control border border-borde-fuerte bg-superficie px-3 py-2.5 text-cuerpo whitespace-pre-wrap text-texto">
+        <blockquote className="rounded-control border border-borde-fuerte bg-superficie px-3 py-2.5 tipo-cuerpo whitespace-pre-wrap text-texto">
           {feedback.text}
         </blockquote>
         <SummaryBlock title="Datos">
@@ -98,9 +99,7 @@ export function FeedbackPanel({
           <SummaryRow label="Sistema">{systemLabel(feedback)}</SummaryRow>
         </SummaryBlock>
         <section className="flex flex-col gap-1.5">
-          <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-            Estado
-          </h3>
+          <h3 className="tipo-compacto-600 text-texto">Estado</h3>
           <ChoiceChips
             legend="Estado"
             name="feedback-status"
@@ -118,18 +117,14 @@ export function FeedbackPanel({
             rows={4}
             onChange={(event) => setNote(event.target.value)}
           />
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Ej.: Arreglamos la lista de reservas en la versión 1.0.2.
           </p>
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Nota interna: la clienta o el equipo no la ven. Va en el CSV.
           </p>
         </div>
-        {failure === null ? null : (
-          <p role="alert" className="text-nota text-texto">
-            {failure}
-          </p>
-        )}
+        {failure === null ? null : <InlineError>{failure}</InlineError>}
       </SidePanelBody>
       <SidePanelFooter>
         <Button type="submit" size="lg" busy={triage.isPending}>

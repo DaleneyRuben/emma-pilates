@@ -29,7 +29,7 @@ describe("StatTile (FIX-091)", () => {
     expect(tile).toHaveClass("bg-medio");
     expect(tile).toHaveTextContent(/^1Revisados$/);
     expect(screen.getByRole("heading", { name: "Revisados" })).toHaveClass(
-      "text-grande",
+      "tipo-destacado",
     );
   });
 });

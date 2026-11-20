@@ -89,7 +89,7 @@ export function PromotionPanelFooter({
       {editing ? (
         <Button
           variant="link"
-          className="self-center text-texto hover:text-texto"
+          className="self-center"
           disabled={pending}
           onClick={onDelete}
         >

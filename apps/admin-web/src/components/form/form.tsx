@@ -148,7 +148,7 @@ export function FormDescription({
     <p
       data-slot="form-description"
       id={formDescriptionId}
-      className={cn("text-nota text-texto", className)}
+      className={cn("tipo-secundario text-texto", className)}
       {...props}
     >
       {children}
@@ -156,9 +156,9 @@ export function FormDescription({
   );
 }
 
-/** FIX-089 (FormB): an invalid field's message, 13 px bold after a «!». */
+/** Follow-up 285: an invalid field's message, `secundario` after a «!». */
 export const fieldMessageClass =
-  "text-nota font-bold text-texto before:content-['!_']";
+  "tipo-secundario text-texto before:content-['!_']";
 
 export function FormMessage({
   className,

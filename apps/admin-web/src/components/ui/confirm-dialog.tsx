@@ -54,11 +54,11 @@ export function ConfirmDialog({
           )}
         >
           <BodyScrollLock />
-          <AlertDialog.Title className="font-serif text-titulo-dialogo text-texto">
+          <AlertDialog.Title className="tipo-titulo-seccion text-texto">
             {title}
           </AlertDialog.Title>
           <AlertDialog.Description asChild>
-            <div className="flex flex-col gap-3 text-cuerpo leading-[1.45] text-texto">
+            <div className="flex flex-col gap-3 tipo-cuerpo text-texto">
               {children}
             </div>
           </AlertDialog.Description>

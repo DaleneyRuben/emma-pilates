@@ -19,7 +19,7 @@ export type EquipmentAction =
 export type OnAction = (action: EquipmentAction) => void;
 
 const emptyNote =
-  "rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto";
+  "rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 tipo-compacto text-texto";
 
 function UnitActions({
   piece,
@@ -67,7 +67,7 @@ function UnitRows({
             key={piece.id}
             className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-borde px-4 py-3 first:border-t-0"
           >
-            <p className="min-w-[120px] text-cuerpo font-medium text-texto">
+            <p className="min-w-[120px] tipo-titulo-fila text-texto">
               {pieceName(piece)}
             </p>
             <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
@@ -90,10 +90,8 @@ function QuantityCard({
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 max-md:p-4">
       <p className="flex items-baseline gap-2 max-md:w-full">
-        <span className="font-serif text-cifra leading-none text-texto tabular">
-          {stock.quantity}
-        </span>
-        <span className="text-nota text-texto">en esta sucursal</span>
+        <span className="tipo-cifra-grande text-texto">{stock.quantity}</span>
+        <span className="tipo-compacto text-texto">en esta sucursal</span>
       </p>
       <StatusPill tone="exito">{`${stock.usable} se pueden usar`}</StatusPill>
       {stock.damaged > 0 ? (
@@ -142,7 +140,9 @@ export function TypeDetail({
       className="flex flex-col gap-2"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <p className="text-nota text-texto">{trackingLong[type.tracking]}</p>
+        <p className="tipo-compacto text-texto">
+          {trackingLong[type.tracking]}
+        </p>
         <span className="flex-1" />
         {holding.tracking === "unit" ? (
           <Button

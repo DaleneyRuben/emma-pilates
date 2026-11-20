@@ -9,6 +9,7 @@ import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
+import { EmptyState } from "../components/ui/empty-state";
 import { WeekStepper } from "../components/table/week-stepper";
 import { addDays, boliviaToday, weekStartOf } from "../lib/bolivia-time";
 import type { Branch } from "../shell/branch/branch-context";
@@ -128,12 +129,12 @@ function BranchSchedule({
         ) : (
           <>
             {standingCount(sessions.data) === 0 ? (
-              <p className="text-nota text-texto">
+              <EmptyState className="py-5">
                 No hay clases programadas esta semana.
-              </p>
+              </EmptyState>
             ) : null}
             {count >= weekSessionLimit ? (
-              <p className="text-nota text-texto">
+              <p className="self-start rounded-tarjeta bg-superficie px-[18px] py-3 tipo-secundario text-texto shadow-tarjeta">
                 Se muestran las primeras {weekSessionLimit} clases de la semana.
               </p>
             ) : null}
@@ -159,7 +160,7 @@ function BranchSchedule({
                   }}
                 />
                 {standingCount(sessions.data) < sessions.data.length ? (
-                  <p className="self-start rounded-tarjeta bg-superficie px-[18px] py-3 text-nota text-texto shadow-tarjeta">
+                  <p className="self-start rounded-tarjeta bg-superficie px-[18px] py-3 tipo-secundario text-texto shadow-tarjeta">
                     Las canceladas quedan como una línea fina.
                   </p>
                 ) : null}

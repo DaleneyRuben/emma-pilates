@@ -41,7 +41,7 @@ export const feedbackColumns = (open: (row: AdminFeedbackDto) => void) => [
             onOpen={() => open(row.original)}
           />
         </span>
-        <span className="text-nota text-texto tabular">
+        <span className="tipo-secundario text-texto tabular">
           {appLine(row.original)}
         </span>
       </span>

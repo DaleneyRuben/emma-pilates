@@ -9,6 +9,7 @@ import {
 } from "../../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
@@ -112,15 +113,11 @@ export function FreezeReviewPanel({
               aria-describedby={`${reasonId}-hint`}
               onChange={(event) => setRefusalReason(event.target.value)}
             />
-            <p id={`${reasonId}-hint`} className="text-ayuda text-texto">
+            <p id={`${reasonId}-hint`} className="tipo-secundario text-texto">
               {`Se lo enviamos a ${firstName(freeze.clientName)}`}
             </p>
           </div>
-          {problem === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {problem}
-            </p>
-          )}
+          {problem === null ? null : <InlineError>{problem}</InlineError>}
         </div>
       </SidePanelBody>
       <SidePanelFooter>

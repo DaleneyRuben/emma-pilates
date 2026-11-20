@@ -31,7 +31,7 @@ export function SessionSeriesTab({
         <LoadingNotice>Cargando la serie semanal…</LoadingNotice>
       </div>
     ) : (
-      <p role="alert" className="px-7 py-4 text-nota text-texto">
+      <p role="alert" className="px-7 py-4 tipo-cuerpo text-texto">
         Esta serie semanal ya no está vigente. Cambia solo esta clase en Editar.
       </p>
     );
@@ -39,7 +39,7 @@ export function SessionSeriesTab({
 
   return (
     <div className="flex flex-1 flex-col">
-      <p className="px-7 pt-4 text-nota text-texto">
+      <p className="px-7 pt-4 tipo-compacto text-texto">
         Los cambios valen para esta clase y las siguientes de la serie.
       </p>
       <SeriesForm

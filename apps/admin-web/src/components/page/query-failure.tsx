@@ -20,7 +20,7 @@ export function QueryFailure({
     return (
       <p
         role="alert"
-        className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto"
+        className="rounded-tarjeta bg-superficie px-6 py-10 text-center tipo-cuerpo text-texto shadow-tarjeta"
       >
         No tienes permiso para ver esta sección.
       </p>
@@ -32,9 +32,7 @@ export function QueryFailure({
       role="alert"
       className="flex flex-col items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center"
     >
-      <p className="font-serif text-[24px] leading-tight text-texto">
-        No pudimos cargar {what}.
-      </p>
+      <p className="tipo-titulo-fila text-texto">No pudimos cargar {what}.</p>
       <Button variant="neutral" size="sm" onClick={onRetry}>
         Reintentar
       </Button>

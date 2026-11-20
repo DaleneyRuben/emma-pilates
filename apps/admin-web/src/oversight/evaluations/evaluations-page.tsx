@@ -47,10 +47,10 @@ const evaluationColumns = () => [
     header: "Clienta",
     cell: ({ row }) => (
       <span className="flex flex-col">
-        <span className="font-medium text-texto">
+        <span className="tipo-titulo-fila text-texto">
           {row.original.clientName}
         </span>
-        <span className="text-ayuda text-texto">
+        <span className="tipo-secundario text-texto">
           {kindLabels[row.original.kind]}
         </span>
       </span>
@@ -72,12 +72,12 @@ function EmptyWeek({ filtered }: { filtered: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
       <span className="text-texto">Sin evaluaciones en este rango.</span>
-      <span className="text-nota text-texto">
+      <span>
         {filtered
           ? "Prueba con otra semana o quita el filtro de nutricionista."
           : "Prueba con otra semana."}
       </span>
-      <span className="text-ayuda text-texto">
+      <span>
         Las clientas las agendan desde la app; la nutricionista publica su
         disponibilidad en la app del personal.
       </span>

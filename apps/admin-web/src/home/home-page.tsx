@@ -26,11 +26,11 @@ function PendingList({ rows }: { rows: readonly PendingRow[] }) {
       aria-labelledby="inicio-por-resolver"
       className="flex flex-col gap-2.5"
     >
-      <h2 id="inicio-por-resolver" className="text-seccion text-texto">
+      <h2 id="inicio-por-resolver" className="tipo-titulo-seccion text-texto">
         Por resolver
       </h2>
       {rows.length === 0 ? (
-        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 text-cuerpo text-texto">
+        <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4 tipo-cuerpo text-texto">
           Todo al día: nada espera tu respuesta.
         </p>
       ) : (
@@ -41,10 +41,8 @@ function PendingList({ rows }: { rows: readonly PendingRow[] }) {
               className="flex min-h-[72px] items-center gap-3 border-t border-superficie-hundida px-4 py-3 first:border-t-0 md:px-5"
             >
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-cuerpo font-bold text-texto">
-                  {row.title}
-                </span>
-                <span className="text-nota text-texto">{row.note}</span>
+                <span className="tipo-titulo-fila text-texto">{row.title}</span>
+                <span className="tipo-secundario text-texto">{row.note}</span>
               </span>
               <Link
                 to={row.to}

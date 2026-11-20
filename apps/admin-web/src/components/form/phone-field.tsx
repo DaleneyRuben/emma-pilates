@@ -44,11 +44,9 @@ function PhoneInput({
           <button
             type="button"
             aria-label={`País: ${country.name}, +${country.dial}`}
-            className="flex shrink-0 items-center gap-1.5 rounded-l-panel border-r border-borde pr-2.5 pl-3 text-cuerpo font-semibold text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
+            className="flex shrink-0 items-center gap-1.5 rounded-l-panel border-r border-borde pr-2.5 pl-3 tipo-cuerpo text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
           >
-            <span aria-hidden="true" className="leading-none">
-              {country.flag}
-            </span>
+            <span aria-hidden="true">{country.flag}</span>
             <span className="tabular">+{country.dial}</span>
             <ChevronDown
               size={18}
@@ -85,7 +83,7 @@ function PhoneInput({
             onChange({ ...value, digits: event.target.value })
           }
           onBlur={onBlur}
-          className="min-w-0 flex-1 bg-transparent px-3.5 text-cuerpo text-texto tabular outline-none placeholder:text-texto"
+          className="min-w-0 flex-1 bg-transparent px-3.5 tipo-cuerpo text-texto tabular outline-none"
         />
       </FormControl>
     </div>

@@ -29,9 +29,10 @@ test.describe("the sidebar", () => {
       );
 
       expect(overflowing).toEqual([]);
+      // Follow-up 285: a nav row is `titulo-fila`, 16 px.
       await expect(sidebar(page).getByRole("link").first()).toHaveCSS(
         "font-size",
-        "15px",
+        "16px",
       );
     });
   }

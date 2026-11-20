@@ -13,10 +13,8 @@ export function PageRecoveryState({ reset }: { reset: () => void }) {
       role="alert"
       className="mt-5 flex flex-col items-center rounded-tarjeta bg-superficie px-6 py-8 text-center shadow-tarjeta"
     >
-      <h1 className="font-serif text-[24px] leading-tight text-texto">
-        Algo salió mal
-      </h1>
-      <p className="mt-2 max-w-[480px] text-cuerpo text-texto">
+      <h1 className="tipo-titulo-fila text-texto">Algo salió mal</h1>
+      <p className="mt-1 max-w-[480px] tipo-cuerpo text-texto">
         No pudimos mostrar esta página. Inténtalo de nuevo; si vuelve a pasar,
         recarga la página.
       </p>

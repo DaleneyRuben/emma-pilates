@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CivilDateInput } from "../../components/form/civil-date-input";
 import { Button } from "../../components/ui/button";
+import { TextLink } from "../../components/ui/text-link";
+import { fieldMessageClass } from "../../components/form/form";
 import { Label } from "../../components/ui/label";
 import {
   addDays,
@@ -45,7 +47,7 @@ function PeriodStepper({
       </Button>
       <p
         aria-live="polite"
-        className="min-w-[150px] text-center font-serif text-cuerpo-grande text-texto"
+        className="min-w-[150px] text-center tipo-titulo-bloque text-texto"
       >
         {label}
       </p>
@@ -100,8 +102,6 @@ export function PayPeriodPicker({
     onChange({ month: range.from.slice(0, 7), period: "range", ...range });
   };
   const otherPeriod = () => onChange(otherPeriodSearch(search, today));
-  const linkButton =
-    "h-9 rounded-control px-1 text-celda font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco";
 
   return (
     <div className="flex flex-col gap-3">
@@ -115,48 +115,51 @@ export function PayPeriodPicker({
           />
         )}
         {shown.kind === "month" ? (
-          <button type="button" className={linkButton} onClick={otherPeriod}>
+          <TextLink className="h-9 rounded-control px-1" onClick={otherPeriod}>
             Otro período
-          </button>
+          </TextLink>
         ) : (
-          <button
-            type="button"
-            className={linkButton}
+          <TextLink
+            className="h-9 rounded-control px-1"
             onClick={() => onChange(searchFor("month", search, today))}
           >
             Volver al mes
-          </button>
+          </TextLink>
         )}
       </div>
       {shown.kind === "range" ? (
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="pay-period-from">Desde</Label>
-            <CivilDateInput
-              id="pay-period-from"
-              className="w-[150px]"
-              value={shown.from}
-              rangeEnd={shown.to}
-              onChange={(value) => setRange("from", value)}
-            />
+        // Follow-up 285: the range's labels and its error are small text, so
+        // they sit in a white card, never loose on the page 100 (rule 3).
+        <div className="flex flex-col gap-2 self-start rounded-tarjeta bg-superficie px-4 py-3.5 shadow-tarjeta">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="pay-period-from">Desde</Label>
+              <CivilDateInput
+                id="pay-period-from"
+                className="w-[150px]"
+                value={shown.from}
+                rangeEnd={shown.to}
+                onChange={(value) => setRange("from", value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="pay-period-to">Hasta</Label>
+              <CivilDateInput
+                id="pay-period-to"
+                className="w-[150px]"
+                value={shown.to}
+                rangeStart={shown.from}
+                align="end"
+                onChange={(value) => setRange("to", value)}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="pay-period-to">Hasta</Label>
-            <CivilDateInput
-              id="pay-period-to"
-              className="w-[150px]"
-              value={shown.to}
-              rangeStart={shown.from}
-              align="end"
-              onChange={(value) => setRange("to", value)}
-            />
-          </div>
+          {shown.query === null ? (
+            <p role="alert" className={fieldMessageClass}>
+              La fecha final no puede ser anterior a la inicial.
+            </p>
+          ) : null}
         </div>
-      ) : null}
-      {shown.kind === "range" && shown.query === null ? (
-        <p role="alert" className="text-ayuda text-texto">
-          La fecha final no puede ser anterior a la inicial.
-        </p>
       ) : null}
     </div>
   );

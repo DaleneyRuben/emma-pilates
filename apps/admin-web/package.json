@@ -36,6 +36,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.61.0",
     "@swc/core": "1.16.2",
@@ -75,7 +76,8 @@
     ],
     "testMatch": [
       "<rootDir>/src/**/*.spec.ts?(x)",
-      "<rootDir>/e2e/support/*.test.ts"
+      "<rootDir>/e2e/support/*.test.ts",
+      "<rootDir>/eslint-rules/*.spec.js"
     ],
     "transform": {
       "^.+\\.(mjs|cjs|[tj]sx?)$": [

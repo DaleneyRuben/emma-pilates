@@ -21,6 +21,7 @@ import {
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { useBranchChange } from "./branch-queries";
 
@@ -133,17 +134,13 @@ export function BranchPanelForm({
             )}
           />
           {branch === undefined ? null : (
-            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-compacto text-texto">
               Esta sucursal ya aparece en el selector de la barra superior y en
               cada registro que depende de ella (clases, insumos, gastos);
               renombrarla no mueve esos datos.
             </p>
           )}
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button type="submit" size="lg" busy={change.isPending}>
@@ -152,7 +149,7 @@ export function BranchPanelForm({
           {branch === undefined || archived ? null : (
             <Button
               variant="link"
-              className="self-center text-texto hover:text-texto"
+              className="self-center"
               onClick={() => setConfirming(true)}
             >
               Archivar sucursal

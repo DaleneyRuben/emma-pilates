@@ -91,10 +91,10 @@ export function InvoiceUploadField({
             size={22}
             strokeWidth={1.5}
             aria-hidden="true"
-            className="text-primario"
+            className="text-texto"
           />
           <span className="flex min-w-0 flex-1 flex-col gap-1">
-            <span className="truncate text-cuerpo">{chosen?.name}</span>
+            <span className="truncate tipo-cuerpo">{chosen?.name}</span>
             {upload.isPending ? (
               <span
                 role="progressbar"
@@ -104,7 +104,7 @@ export function InvoiceUploadField({
                 <span className="block h-full w-3/5 animate-pulse rounded-full bg-primario" />
               </span>
             ) : (
-              <span className="text-ayuda text-texto">No se subió</span>
+              <span className="tipo-secundario text-texto">No se subió</span>
             )}
           </span>
         </div>
@@ -118,12 +118,12 @@ export function InvoiceUploadField({
             size={24}
             strokeWidth={1.6}
             aria-hidden="true"
-            className="text-rosa-600"
+            className="text-texto"
           />
-          <span className="text-cuerpo">
+          <span className="tipo-cuerpo">
             Arrastra aquí la factura o elige un archivo
           </span>
-          <span className="text-ayuda text-texto">
+          <span className="tipo-secundario text-texto">
             PDF, JPG o PNG, hasta 10 MB
           </span>
           <Button
@@ -173,7 +173,7 @@ export function InvoiceUploadField({
         </>
       ) : null}
       {upload.isPending || upload.isError ? null : (
-        <p className="text-ayuda text-texto">
+        <p className="tipo-secundario text-texto">
           {`Al subirla, el pago queda como factura emitida y ${firstName} la ve en su app.`}
         </p>
       )}

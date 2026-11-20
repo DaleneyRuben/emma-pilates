@@ -8,36 +8,43 @@ import { cn } from "../../lib/cn";
 // Rosa profundo outline. Destructive looks like Secondary (never red); the
 // action asks first (ConfirmDialog). Disabled is 50 with an Arcilla ring. A
 // small button is 44 px tall at phone width (audit 8.2) and 36 px from md up.
+// Follow-up 285: the label is `boton` (16) or `boton-chico` (14) and a link
+// is `enlace`; hover never changes a colour or a weight (rules 4 and 6), so
+// the primary fill stays 600 and lifts with a shadow.
 const quiet =
   "bg-superficie text-texto inset-ring-[1.5px] inset-ring-primario hover:bg-superficie-hundida";
-const bare =
-  "disabled:bg-transparent disabled:inset-ring-0 disabled:font-semibold";
+const bare = "disabled:bg-transparent disabled:inset-ring-0";
+const boxed: (
+  "primary" | "secondary" | "neutral" | "outline" | "destructive" | "ghost"
+)[] = ["primary", "secondary", "neutral", "outline", "destructive", "ghost"];
 
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton font-bold transition-colors focus-visible:shadow-foco disabled:pointer-events-none disabled:bg-superficie-hundida disabled:font-semibold disabled:text-texto disabled:shadow-none disabled:inset-ring-[1.5px] disabled:inset-ring-borde-fuerte [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-boton transition-[background-color,box-shadow] focus-visible:shadow-foco disabled:pointer-events-none disabled:bg-superficie-hundida disabled:text-texto disabled:shadow-none disabled:inset-ring-[1.5px] disabled:inset-ring-borde-fuerte [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-primario text-blanco hover:bg-primario-presionado focus-visible:shadow-foco-solido",
+          "bg-primario text-sobre-primario hover:shadow-destacado focus-visible:shadow-foco-solido",
         secondary: quiet,
         neutral: quiet,
         outline: quiet,
         destructive: quiet,
         // FIX-088: a disabled text link stays text, never a block.
-        link: cn(
-          "h-auto px-0 text-texto underline underline-offset-[3px] hover:decoration-2",
-          bare,
-        ),
+        link: cn("h-auto px-0 text-texto", bare),
         ghost: cn("text-texto hover:bg-superficie-hundida", bare),
       },
       size: {
-        sm: "h-[44px] px-3.5 text-celda md:h-[36px]",
-        md: "h-[44px] px-[18px] text-[16px]",
-        lg: "h-[48px] px-5 text-[16px]",
+        sm: "h-[44px] px-3.5 md:h-[36px]",
+        md: "h-[44px] px-[18px]",
+        lg: "h-[48px] px-5",
         icon: "size-[44px] p-0",
       },
     },
+    compoundVariants: [
+      { variant: "link", class: "tipo-enlace" },
+      { variant: boxed, size: "sm", class: "tipo-boton-chico" },
+      { variant: boxed, size: ["md", "lg", "icon"], class: "tipo-boton" },
+    ],
     defaultVariants: {
       variant: "primary",
       size: "md",

@@ -167,21 +167,18 @@ export function MonthCalendar({
           type="button"
           aria-label="Mes anterior"
           onClick={() => turn(-1)}
-          className="flex size-10 items-center justify-center rounded-full text-rosa-600 hover:bg-superficie-hundida focus-visible:shadow-foco"
+          className="flex size-10 items-center justify-center rounded-full text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           <ChevronLeft aria-hidden className="size-5" />
         </button>
-        <span
-          aria-live="polite"
-          className="font-serif text-cuerpo-grande text-texto"
-        >
+        <span aria-live="polite" className="tipo-titulo-fila text-texto">
           {monthTitle(month)}
         </span>
         <button
           type="button"
           aria-label="Mes siguiente"
           onClick={() => turn(1)}
-          className="flex size-10 items-center justify-center rounded-full text-rosa-600 hover:bg-superficie-hundida focus-visible:shadow-foco"
+          className="flex size-10 items-center justify-center rounded-full text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           <ChevronRight aria-hidden className="size-5" />
         </button>
@@ -190,7 +187,7 @@ export function MonthCalendar({
         {heads.map((head, index) => (
           <span
             key={index}
-            className="py-1 text-center text-etiqueta font-medium tracking-[0.06em] text-texto"
+            className="py-1 text-center tipo-etiqueta text-texto"
           >
             {head}
           </span>
@@ -229,11 +226,11 @@ export function MonthCalendar({
                 aria-disabled={refused || undefined}
                 onClick={() => pick(date)}
                 className={cn(
-                  "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent text-celda tabular focus-visible:shadow-foco",
+                  "flex size-9 items-center justify-center rounded-full border-[1.5px] border-transparent tipo-compacto tabular focus-visible:shadow-foco",
                   picked
                     ? selectedClass
                     : "text-texto hover:bg-superficie-hundida",
-                  isToday && !picked && "border-rosa-600 font-semibold",
+                  isToday && !picked && "border-rosa-600",
                   refused &&
                     "cursor-not-allowed text-texto line-through hover:bg-transparent",
                 )}
@@ -245,7 +242,7 @@ export function MonthCalendar({
         })}
       </div>
       {reason === null ? null : (
-        <p role="status" className="mx-1 text-nota text-texto">
+        <p role="status" className="mx-1 tipo-secundario text-texto">
           {reason}
         </p>
       )}
@@ -253,14 +250,14 @@ export function MonthCalendar({
         <button
           type="button"
           onClick={() => pick(today)}
-          className="h-9 rounded-control px-2.5 text-nota font-semibold text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
+          className="h-9 rounded-control px-2.5 tipo-boton-chico text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           Hoy
         </button>
         <button
           type="button"
           onClick={onClear}
-          className="h-9 rounded-control px-2.5 text-nota font-medium text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
+          className="h-9 rounded-control px-2.5 tipo-boton-chico text-texto hover:bg-superficie-hundida focus-visible:shadow-foco"
         >
           Borrar
         </button>

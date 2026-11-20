@@ -1,13 +1,12 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { Button } from "../components/ui/button";
+import { typeScale } from "../components/ui/typography";
 import { cn } from "./cn";
 
 describe("cn", () => {
-  it("keeps an Emma font size and a text color side by side", () => {
-    expect(cn("font-serif text-titulo-panel text-texto")).toBe(
-      "font-serif text-titulo-panel text-texto",
+  it("keeps a tipo class and a text colour side by side", () => {
+    expect(cn("tipo-titulo-seccion text-texto")).toBe(
+      "tipo-titulo-seccion text-texto",
     );
   });
 
@@ -20,29 +19,26 @@ describe("cn", () => {
     );
 
     expect(screen.getByRole("button", { name: "Grande" })).toHaveClass(
-      "text-blanco",
-      "text-[16px]",
+      "text-sobre-primario",
+      "tipo-boton",
     );
     expect(screen.getByRole("button", { name: "Chico" })).toHaveClass(
-      "text-blanco",
-      "text-celda",
+      "text-sobre-primario",
+      "tipo-boton-chico",
     );
   });
 
-  // Walkthrough 2026-11-04 n.º 1: the rail's `text-pie` was dropped as a
-  // color, so «Promociones» drew at 15 px and overflowed the 96 px rail.
-  it("keeps every font size index.css defines next to a text color", () => {
-    const css = readFileSync(join(__dirname, "../index.css"), "utf8");
-    const sizes = [...css.matchAll(/--text-([a-z0-9-]+):/g)]
-      .map((match) => match[1] ?? "")
-      .filter((name) => !name.includes("--"));
-    expect(sizes).toContain("pie");
-    for (const size of sizes) {
+  // Walkthrough 2026-11-04 n.º 1: a size read as a colour was dropped, so
+  // «Promociones» drew at 15 px and overflowed the 96 px rail.
+  it("keeps every size of the scale next to a text colour", () => {
+    for (const size of Object.keys(typeScale)) {
       expect(cn(`text-${size} text-texto`)).toBe(`text-${size} text-texto`);
     }
   });
 
-  it("still lets a later font size replace an earlier one", () => {
-    expect(cn("text-cuerpo", "text-nota")).toBe("text-nota");
+  it("lets a later tipo class replace an earlier one", () => {
+    expect(cn("tipo-titulo-fila h-10", "tipo-compacto h-9")).toBe(
+      "tipo-compacto h-9",
+    );
   });
 });

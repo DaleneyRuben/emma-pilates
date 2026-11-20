@@ -55,72 +55,47 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
+  /*
+   * Follow-up 285: the closed type scale. Two families, thirteen sizes, and
+   * no weight, leading or tracking tokens: every text takes all of them from
+   * one `tipo-*` class below (src/components/ui/typography.ts describes the
+   * scale; src/theme.spec.ts keeps this list exact).
+   */
+  --font-*: initial;
   --font-serif: "Lora", ui-serif, Georgia, serif;
   --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-weight-*: initial;
+  --leading-*: initial;
+  --tracking-*: initial;
 
-  --text-display: 44px;
-  --text-display--line-height: 1.1;
-  --text-display--letter-spacing: -0.01em;
-  --text-titulo-1: 30px;
-  --text-titulo-1--line-height: 1.2;
-  --text-titulo-2: 22px;
-  --text-titulo-2--line-height: 1.3;
-  /* FIX-089 (audit 1.2): the steps the month narrative and the revenue
-     section already asked for. */
-  --text-titulo-3: 18px;
-  --text-titulo-3--line-height: 1.35;
-  --text-seccion: 26px;
-  --text-seccion--line-height: 1.15;
-  --text-precio: 26px;
-  --text-precio--line-height: 1.2;
-  --text-cuerpo-grande: 17px;
-  --text-cuerpo-grande--line-height: 1.65;
-  --text-cuerpo: 15px;
-  --text-cuerpo--line-height: 1.6;
-  --text-etiqueta: 11px;
-  --text-etiqueta--line-height: 1.2;
-  --text-etiqueta--letter-spacing: 0.14em;
-  --text-nota: 13px;
-  --text-nota--line-height: 1.5;
-
-  /* Admin web runs one step tighter. */
-  --text-titulo-pagina: 27px;
-  --text-titulo-pagina--line-height: 1.2;
-  --text-titulo-panel: 28px;
-  --text-titulo-panel--line-height: 1.15;
-  --text-celda: 14px;
-  --text-celda--line-height: 1.45;
-  /* Rosa Emma: 11 px bold uppercase labels, on white only. */
-  --text-cabecera-tabla: 11px;
-  --text-cabecera-tabla--line-height: 1.2;
-  --text-cabecera-tabla--letter-spacing: 0.14em;
-  --text-etiqueta-campo: 12px;
-  --text-etiqueta-campo--line-height: 1.2;
-  --text-etiqueta-campo--letter-spacing: 0.14em;
-  /* FIX-089 (FormB): hints and secondary lines at 13 px. */
-  --text-ayuda: 13px;
-  --text-ayuda--line-height: 1.4;
-  --text-fila-menu: 13.5px;
-  --text-fila-menu--line-height: 1.4;
-  /* Follow-up 225: the rail's labels, counts and the Role line, 12 px with
-     no tracking (Etiqueta is the tracked uppercase label). */
-  --text-pie: 12px;
-  --text-pie--line-height: 1.3;
-  /* FIX-089: the page title, KPI figures and a phone row's name. */
-  --text-titulo-pagina-grande: 36px;
-  --text-titulo-pagina-grande--line-height: 1.1;
-  --text-cifra: 34px;
-  --text-cifra--line-height: 1.1;
-  --text-cifra-grande: 36px;
+  --text-*: initial;
+  --text-titulo-pagina: 34px;
+  --text-titulo-pagina--line-height: 1.1;
+  --text-titulo-seccion: 28px;
+  --text-titulo-seccion--line-height: 1.15;
+  --text-titulo-bloque: 22px;
+  --text-titulo-bloque--line-height: 1.2;
+  --text-cifra-grande: 34px;
   --text-cifra-grande--line-height: 1.1;
-  --text-fila: 15px;
-  --text-fila--line-height: 1.4;
-  /* Rosa Emma: the large text allowed on 100, 200 and 500 (19 px bold) and
-     the dialog title. */
-  --text-grande: 19px;
-  --text-grande--line-height: 1.3;
-  --text-titulo-dialogo: 26px;
-  --text-titulo-dialogo--line-height: 1.15;
+  --text-cifra: 24px;
+  --text-cifra--line-height: 1.2;
+  --text-destacado: 19px;
+  --text-destacado--line-height: 1.3;
+  --text-titulo-fila: 16px;
+  --text-titulo-fila--line-height: 1.35;
+  --text-boton: 16px;
+  --text-boton--line-height: 1;
+  --text-cuerpo: 15px;
+  --text-cuerpo--line-height: 1.5;
+  --text-compacto: 14px;
+  --text-compacto--line-height: 1.45;
+  --text-secundario: 13px;
+  --text-secundario--line-height: 1.45;
+  --text-etiqueta: 12px;
+  --text-etiqueta--line-height: 1.2;
+  --text-etiqueta--letter-spacing: 0.12em;
+  --text-pastilla: 12px;
+  --text-pastilla--line-height: 1.2;
 
   /* Rosa Emma: fields 12, buttons and tabs 14, cards 20, panels 24. */
   --radius-control: 12px;
@@ -153,6 +128,7 @@
     color: var(--color-texto);
     font-family: var(--font-sans);
     font-size: var(--text-cuerpo);
+    font-weight: 400;
     line-height: var(--text-cuerpo--line-height);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -166,9 +142,14 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
-    font-weight: 500;
     margin: 0;
+  }
+
+  /* Rule 7: a field's example text is the ink in italic, never dimmed. */
+  ::placeholder {
+    color: var(--color-texto);
+    font-style: italic;
+    opacity: 1;
   }
 
   p {
@@ -219,4 +200,188 @@
   appearance: none;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393615D' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
     right 12px center / 16px no-repeat;
+}
+
+/*
+ * Follow-up 285: the thirteen text styles and their four named variants.
+ * Each carries family, size, weight, line-height, letter-spacing and case;
+ * the colour comes from the container (ink, or white on 600). Lora is for
+ * titles and figures only. Below md the page title and the large figure
+ * step down (30 and 28 px), as on the 420 px boards.
+ */
+@utility tipo-titulo-pagina {
+  font-family: var(--font-serif);
+  font-size: var(--text-titulo-pagina);
+  font-weight: 500;
+  line-height: var(--text-titulo-pagina--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  @media (width < 48rem) {
+    font-size: 30px;
+  }
+}
+
+@utility tipo-titulo-seccion {
+  font-family: var(--font-serif);
+  font-size: var(--text-titulo-seccion);
+  font-weight: 500;
+  line-height: var(--text-titulo-seccion--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-titulo-bloque {
+  font-family: var(--font-serif);
+  font-size: var(--text-titulo-bloque);
+  font-weight: 500;
+  line-height: var(--text-titulo-bloque--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-cifra-grande {
+  font-family: var(--font-serif);
+  font-size: var(--text-cifra-grande);
+  font-weight: 500;
+  line-height: var(--text-cifra-grande--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  @media (width < 48rem) {
+    font-size: 28px;
+  }
+}
+
+@utility tipo-cifra {
+  font-family: var(--font-serif);
+  font-size: var(--text-cifra);
+  font-weight: 500;
+  line-height: var(--text-cifra--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one Work Sans allowed on 100, 200 and 500. */
+@utility tipo-destacado {
+  font-family: var(--font-sans);
+  font-size: var(--text-destacado);
+  font-weight: 700;
+  line-height: var(--text-destacado--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-titulo-fila {
+  font-family: var(--font-sans);
+  font-size: var(--text-titulo-fila);
+  font-weight: 600;
+  line-height: var(--text-titulo-fila--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-boton {
+  font-family: var(--font-sans);
+  font-size: var(--text-boton);
+  font-weight: 700;
+  line-height: var(--text-boton--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-boton-chico {
+  font-family: var(--font-sans);
+  font-size: var(--text-compacto);
+  font-weight: 700;
+  line-height: var(--text-boton--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-cuerpo {
+  font-family: var(--font-sans);
+  font-size: var(--text-cuerpo);
+  font-weight: 400;
+  line-height: var(--text-cuerpo--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-compacto {
+  font-family: var(--font-sans);
+  font-size: var(--text-compacto);
+  font-weight: 400;
+  line-height: var(--text-compacto--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* A field's label: the one weight variant outside the table. */
+@utility tipo-compacto-600 {
+  font-family: var(--font-sans);
+  font-size: var(--text-compacto);
+  font-weight: 600;
+  line-height: var(--text-compacto--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility tipo-secundario {
+  font-family: var(--font-sans);
+  font-size: var(--text-secundario);
+  font-weight: 400;
+  line-height: var(--text-secundario--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Rule 8: capitals come from this style only. */
+@utility tipo-etiqueta {
+  font-family: var(--font-sans);
+  font-size: var(--text-etiqueta);
+  font-weight: 700;
+  line-height: var(--text-etiqueta--line-height);
+  letter-spacing: var(--text-etiqueta--letter-spacing);
+  text-transform: uppercase;
+}
+
+@utility tipo-pastilla {
+  font-family: var(--font-sans);
+  font-size: var(--text-pastilla);
+  font-weight: 700;
+  line-height: var(--text-pastilla--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/*
+ * A link on its own («Ver horario», «Volver»): always underlined, since with
+ * one ink the underline is its only mark; hover thickens it (rule 6).
+ */
+@utility tipo-enlace {
+  font-family: var(--font-sans);
+  font-size: var(--text-compacto);
+  font-weight: 700;
+  line-height: var(--text-compacto--line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* A link inside a sentence or a row: the size of the text around it. */
+@utility tipo-enlace-en-linea {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
 }

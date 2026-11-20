@@ -22,7 +22,7 @@ const adjustmentNote =
 
 const voidedLine = (day: CashDayDto) =>
   (day.voidedCashCentavos ?? 0) > 0 ? (
-    <span className="block text-nota text-texto">
+    <span className="block tipo-secundario text-texto">
       {`Ventas anuladas (efectivo en caja): ${formatBolivianos(day.voidedCashCentavos ?? 0)}`}
     </span>
   ) : null;
@@ -49,7 +49,7 @@ export const cashDayColumns = [
   columns.accessor("businessDate", {
     header: "Fecha",
     cell: ({ getValue }) => (
-      <span className="font-medium text-texto tabular">
+      <span className="tipo-titulo-fila text-texto tabular">
         {formatListDate(getValue())}
       </span>
     ),
@@ -110,12 +110,11 @@ export const cashDayColumns = [
     cell: ({ row }) => {
       const close = row.original.close;
       if (close === null) return quiet;
+      // Follow-up 285: a difference is the row's figure, in `titulo-fila`.
       const tone =
         close.differenceCentavos === 0
           ? "text-texto"
-          : close.differenceCentavos < 0
-            ? "font-medium text-texto"
-            : "font-medium text-texto";
+          : "tipo-titulo-fila text-texto";
       return (
         <span className={cn(tone, "tabular")}>
           {signed(close.differenceCentavos)}
@@ -133,7 +132,7 @@ export const cashDayColumns = [
       return (
         <span
           title={adjustmentNote}
-          className="inline-flex items-center gap-1 text-nota text-texto tabular"
+          className="inline-flex items-center gap-1 tipo-secundario text-texto tabular"
         >
           <Info size={12} strokeWidth={1.8} aria-hidden="true" />
           {signed(adjustment)}
@@ -149,7 +148,7 @@ export const cashDayColumns = [
       row.original.close === null ? (
         quiet
       ) : (
-        <span className="text-nota text-texto">
+        <span className="tipo-secundario text-texto">
           {`${row.original.close.closedByName} · ${boliviaParts(row.original.close.closedAt).time}`}
         </span>
       ),
@@ -163,7 +162,7 @@ export const cashDayColumns = [
       return note === null ? null : (
         <span
           title={note}
-          className="block max-w-[220px] truncate text-nota text-texto max-md:max-w-none max-md:whitespace-normal"
+          className="block max-w-[220px] truncate tipo-secundario text-texto max-md:max-w-none max-md:whitespace-normal"
         >
           {note}
         </span>

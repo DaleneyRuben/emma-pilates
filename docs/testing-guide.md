@@ -3634,13 +3634,22 @@ take about a minute:
     created tomorrow evening at Centro, «Reservar a una clienta», Valeria
     Quiroga, **Confirmar la reserva**: the page stays on Horario, says
     "Valeria Quiroga quedó reservada." and lists her under «Reservaron (1)».
+22. **The type scale and contrast (follow-up 285, Test 190).** Every admin
+    route (27 signed in as Paola, 4 signed out), plus a Client's panel, a
+    Staff Member's panel, the new class panel and the Branch selector open,
+    at 1440 and at 420 px: every
+    visible text keeps to one of the scale's styles, none is under 12 px,
+    small text sits only on white, crema, 50 or 600, no text is dimmed by
+    opacity, capitals come only from `etiqueta`, and axe's `color-contrast`
+    rule finds nothing. Each route prints a `type-audit` line with its counts.
 
 `session.spec.ts` is the three parts of item 1. `authorization.spec.ts` is
 the two parts of item 5. `laptop.spec.ts` is the two widths of item 15.
 `date-fields.spec.ts` runs item 16 at both widths, and `simulator.spec.ts`
-runs item 20 at both widths; `horario-booking.spec.ts` is item 21. With the
-files the items above do not name, twenty-two files make twenty-nine
-journeys.
+runs item 20 at both widths; `horario-booking.spec.ts` is item 21.
+`type-scale.spec.ts` is item 22, one test per route or open panel and width
+(70). With the files the items above do not name, twenty-three files make
+twenty-nine journeys and the 70 type checks.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -11745,3 +11754,46 @@ G. **Liquidación (verification E2).** As a Trainer whose statement was drafted
    one row, «Mínimo no alcanzado · 54 × Bs 25» with «Bs 1.350», instead of 54
    rows. A newer statement still lists its classes by day with time, type and
    Branch.
+
+## Test 190: the admin web type scale (follow-up 285)
+
+Follow-up 285 closed one type scale for the web and both apps: thirteen
+styles and four named variants. In the admin web each is a `tipo-*` class in
+`apps/admin-web/src/index.css` that carries family, size, weight,
+line-height, letter-spacing and case; `src/components/ui/typography.ts`
+describes the same scale for the tests. The boards in `design/v3/admin` are
+the reference.
+
+A. **Automated.** From `apps/admin-web`:
+   - `pnpm exec jest src/theme.spec.ts`: `@theme` holds exactly the thirteen
+     sizes, two families and no weight, leading or tracking tokens, and every
+     style has its class.
+   - `pnpm lint`: the `typography/no-raw-typography` rule
+     (`eslint-rules/no-raw-typography.js`) refuses raw sizes, families,
+     weights, `leading-*`, `tracking-*`, `uppercase`, underlines, opacity and
+     any text colour but `text-texto` and `text-sobre-primario` in class
+     strings. `pnpm exec jest eslint-rules` checks the rule itself.
+   - `pnpm exec playwright test e2e/type-scale.spec.ts` (Test 31, item 22)
+     measures every route and four open panels at 1440 and at 420 px with
+     the rules of
+     `design/v3/sistema/revisor/revisar.cjs` and axe's `color-contrast`.
+     Expected: 70 passed, every `type-audit` line «0 off the rules, 0
+     contrast». On `main` before this change the same check counted 1021 of
+     2341 texts off the rules and 2 contrast failures.
+B. **By eye, at 1440 and at 420 px** (Paola, `emma-local-2026`):
+   1. Every page title is Lora 34 (30 at 420), the band subtitle Work Sans
+      19 bold. Section, panel and dialog titles are Lora 28.
+   2. Lora appears only in titles and figures (a price or an amount in a
+      row is a figure, `cifra`): empty messages, errors and hints are Work
+      Sans.
+   3. Nothing small sits on the page's 100 or the band's 200: Horario's
+      «N clases con más lugares que equipos · Revisar», the Dinero «Desde /
+      Hasta» fields, list summaries and errors are inside white cards or
+      pills.
+   4. Choosing a chip, a tab, a segment or a menu row changes its background
+      only; the label never gets bolder or wider.
+   5. Hovering the primary button keeps it Rosa profundo and lifts it with a
+      shadow; hovering a link thickens its underline. No text changes colour.
+   6. A disabled field reads at full ink on 50; field examples are italic.
+   7. Every link is underlined and bold: «Ver horario», «Ver las 9»,
+      «Volver», «Descartar».

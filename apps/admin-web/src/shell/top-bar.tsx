@@ -23,7 +23,7 @@ export function BranchCell() {
 
   if (item?.ownBranchFilter === true) {
     return narrow ? null : (
-      <p className={cn(bandPillClass, "hover:bg-superficie")}>
+      <p className={cn(bandPillClass, "tipo-compacto hover:bg-superficie")}>
         <MapPin size={18} strokeWidth={1.6} aria-hidden="true" />
         El reporte usa su propio filtro de sucursal
       </p>
@@ -53,7 +53,7 @@ export function TopBar() {
       <header className="sticky top-0 z-40 flex flex-col bg-lateral">
         <div className="flex h-16 items-center gap-3 px-3">
           <MenuDrawer />
-          <span className="flex-1 font-serif text-[20px] whitespace-nowrap text-blanco">
+          <span className="flex-1 tipo-titulo-bloque whitespace-nowrap text-sobre-primario">
             Emma Pilates Studio
           </span>
           <button
@@ -61,7 +61,7 @@ export function TopBar() {
             aria-label="Buscar"
             aria-expanded={searching}
             onClick={() => setSearching((open) => !open)}
-            className="inline-flex size-11 items-center justify-center rounded-boton text-blanco focus-visible:shadow-foco-solido"
+            className="inline-flex size-11 items-center justify-center rounded-boton text-sobre-primario focus-visible:shadow-foco-solido"
           >
             <Search size={22} strokeWidth={1.7} aria-hidden="true" />
           </button>

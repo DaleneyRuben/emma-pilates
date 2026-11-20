@@ -3,6 +3,7 @@ import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
+import { InlineError } from "../components/ui/inline-error";
 import { Input } from "../components/ui/input";
 import {
   askNarrativeQuestionRequest,
@@ -38,9 +39,9 @@ export function MonthNarrative({ month }: { month: string }) {
       aria-label="Informe del mes"
       className="flex flex-col gap-4 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
     >
-      <h2 className="font-serif text-titulo-3 text-texto">Informe del mes</h2>
+      <h2 className="tipo-titulo-bloque text-texto">Informe del mes</h2>
       {report.paragraphs.map((paragraph) => (
-        <p key={paragraph} className="text-cuerpo text-texto">
+        <p key={paragraph} className="tipo-cuerpo text-texto">
           {paragraph}
         </p>
       ))}
@@ -48,8 +49,10 @@ export function MonthNarrative({ month }: { month: string }) {
         <ul aria-label="Acciones" className="flex flex-col gap-3">
           {report.actions.map((action) => (
             <li key={action.because} className="flex flex-col gap-1">
-              <p className="text-cuerpo text-texto">{action.text}</p>
-              <p className="text-nota text-texto">Porque: {action.because}</p>
+              <p className="tipo-titulo-fila text-texto">{action.text}</p>
+              <p className="tipo-secundario text-texto">
+                Porque: {action.because}
+              </p>
             </li>
           ))}
         </ul>
@@ -62,7 +65,7 @@ export function MonthNarrative({ month }: { month: string }) {
           asked.mutate({ month, question: trimmed });
         }}
       >
-        <label className="flex min-w-0 flex-1 flex-col gap-1 text-nota text-texto">
+        <label className="flex min-w-0 flex-1 flex-col gap-1 tipo-compacto-600 text-texto">
           Pregunta sobre el mes
           <Input
             value={question}
@@ -75,11 +78,9 @@ export function MonthNarrative({ month }: { month: string }) {
         </Button>
       </form>
       {asked.isError ? (
-        <p role="alert" className="text-cuerpo text-texto">
-          No pudimos responder la pregunta.
-        </p>
+        <InlineError>No pudimos responder la pregunta.</InlineError>
       ) : asked.data === undefined ? null : (
-        <p className="text-cuerpo text-texto">{asked.data.answer}</p>
+        <p className="tipo-cuerpo text-texto">{asked.data.answer}</p>
       )}
     </section>
   );

@@ -49,7 +49,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
             onOpen={() => open(row.original)}
           />
           {row.original.founderNumber === null ? null : (
-            <span className="text-ayuda text-texto">
+            <span className="tipo-secundario text-texto">
               Fundadora n.º {row.original.founderNumber}
             </span>
           )}
@@ -61,7 +61,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
     header: "Contacto",
     meta: { card: "hidden" },
     cell: ({ row }) => (
-      <span className="flex flex-col text-nota text-texto">
+      <span className="flex flex-col tipo-secundario text-texto">
         <span>{row.original.email}</span>
         <ClientPhone phone={row.original.phone} tone="text-texto" />
       </span>
@@ -78,7 +78,7 @@ export const clientColumns = (open: (row: AdminClientDto) => void) => [
             <span>{plan}</span>
             {/* Walkthrough n.º 60: the Plan bought after a spent Guest Pass. */}
             {startsOn == null ? null : (
-              <span className="text-ayuda text-texto tabular">
+              <span className="tipo-secundario text-texto tabular">
                 Empieza el {formatListDate(startsOn)}
               </span>
             )}

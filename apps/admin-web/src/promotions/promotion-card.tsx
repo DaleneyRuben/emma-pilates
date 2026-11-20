@@ -64,7 +64,9 @@ export function PromotionCard({
       className={cn(
         "relative flex cursor-pointer items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta py-3 pr-4 pl-1 transition-shadow hover:bg-superficie-hundida",
         card.dragging && "z-10 border-primario shadow-arrastre",
-        card.dimmed && "opacity-[0.55]",
+        // Follow-up 285: no opacity on text (rule 5); while another card is
+        // carried, the rest step back to the 50 ground with full ink.
+        card.dimmed && "bg-superficie-hundida shadow-none",
       )}
     >
       <button
@@ -76,20 +78,20 @@ export function PromotionCard({
         onKeyDown={handle.onKeyDown}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto hover:bg-superficie-hundida hover:text-texto focus-visible:shadow-foco active:cursor-grabbing",
+          "flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto hover:bg-superficie-hundida focus-visible:shadow-foco active:cursor-grabbing",
           handle.grabbed && "bg-superficie-hundida text-texto",
         )}
       >
         <GripVertical size={18} strokeWidth={1.6} aria-hidden="true" />
       </button>
-      <span className="inline-flex w-6 shrink-0 justify-center font-serif text-fila font-medium text-rosa-600 tabular">
+      <span className="inline-flex w-6 shrink-0 justify-center tipo-cifra text-texto tabular">
         <span className="sr-only">Posición {position}</span>
         <span aria-hidden="true">{position}</span>
       </span>
       {promotion.image === null || promotion.image === undefined ? (
         <span className="flex aspect-video w-[120px] shrink-0 flex-col items-center justify-center gap-0.5 rounded-control bg-superficie-hundida text-texto max-md:w-[88px]">
           <Image size={18} strokeWidth={1.5} aria-hidden="true" />
-          <span className="text-pie">Sin imagen</span>
+          <span className="tipo-pastilla">Sin imagen</span>
         </span>
       ) : (
         <img
@@ -111,11 +113,11 @@ export function PromotionCard({
             event.stopPropagation();
             onOpen();
           }}
-          className="truncate rounded-control text-left text-celda font-medium text-texto hover:text-primario focus-visible:shadow-foco max-md:line-clamp-2 max-md:whitespace-normal"
+          className="truncate rounded-control text-left tipo-titulo-fila text-texto focus-visible:shadow-foco max-md:line-clamp-2 max-md:whitespace-normal"
         >
           {promotion.headline}
         </button>
-        <span className="text-ayuda text-texto tabular">
+        <span className="tipo-secundario text-texto tabular">
           {formatDisplayWindow(
             promotion.displayStartsOn,
             promotion.displayEndsOn,
