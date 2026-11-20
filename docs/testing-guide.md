@@ -11780,8 +11780,9 @@ A. **Automated.** From `apps/admin-web`:
 B. **By eye, at 1440 and at 420 px** (Paola, `emma-local-2026`):
    1. Every page title is Lora 34 (30 at 420), the band subtitle Work Sans
       19 bold. Section, panel and dialog titles are Lora 28.
-   2. Lora appears only in titles and figures: empty messages, errors, hints
-      and prices in cells are Work Sans.
+   2. Lora appears only in titles and figures (a price or an amount in a
+      row is a figure, `cifra`): empty messages, errors and hints are Work
+      Sans.
    3. Nothing small sits on the page's 100 or the band's 200: Horario's
       «N clases con más lugares que equipos · Revisar», the Dinero «Desde /
       Hasta» fields, list summaries and errors are inside white cards or
