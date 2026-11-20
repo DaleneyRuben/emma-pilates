@@ -151,6 +151,7 @@ export function SessionPanel({
             setNotice(null);
             onDone(message);
           }}
+          onClose={close}
         />
       ) : null}
     </SidePanel>

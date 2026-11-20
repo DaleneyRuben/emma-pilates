@@ -1,4 +1,5 @@
 import {
+  cancelBooking,
   createBooking,
   getAdministratorSessionRoster,
   getGetAdministratorSessionRosterQueryKey,
@@ -62,6 +63,30 @@ export function useBookClient(sessionId: string, branchId: string) {
         { headers: { "idempotency-key": crypto.randomUUID() } },
         adminFetch,
       );
+    },
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: getGetAdministratorSessionRosterQueryKey(sessionId),
+        }),
+        queryClient.invalidateQueries({
+          predicate: isBranchSessionsKey(branchId),
+        }),
+      ]),
+  });
+}
+
+/**
+ * W1 (Editar clase A): «Quitar» cancels a Client's booking on her behalf,
+ * as the assistant's app does; the backend returns the class to her Plan
+ * and promotes the Waitlist. Success refetches the roster and the weeks.
+ */
+export function useRemoveBooking(sessionId: string, branchId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (bookingId: string) => {
+      await cancelBooking(bookingId, undefined, adminFetch);
     },
     onSuccess: () =>
       Promise.all([

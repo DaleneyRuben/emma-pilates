@@ -28,12 +28,14 @@ export function SessionDetail({
   notice,
   onBook,
   onDone,
+  onClose,
 }: {
   session: Session;
   branchId: string;
   notice: string | null;
   onBook: () => void;
   onDone: (notice: string | null) => void;
+  onClose: () => void;
 }) {
   const idBase = useId();
   const [tab, setTab] = useState<SessionTab>("reservas");
@@ -61,9 +63,12 @@ export function SessionDetail({
   const bookings = (
     <SessionBookingsTab
       roster={roster}
+      sessionId={session.id}
+      branchId={branchId}
       full={full}
       past={past}
       onBook={onBook}
+      onClose={onClose}
     />
   );
 

@@ -2,7 +2,7 @@ import type {
   AdministratorRosterBookingDto,
   AdministratorSessionRosterDto,
 } from "@pilates/api-contracts";
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { ClientPhoto } from "../components/client-photo";
 
 const attendance: Record<string, string> = {
@@ -35,7 +35,22 @@ const listClass =
 const rowClass =
   "flex min-h-[56px] items-center gap-3 px-4 py-2.5 text-celda text-texto";
 
-function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
+/** W1: «Primera clase», «12.ª clase», with « · Fundadora» for a founder. */
+function bookingNote(booking: AdministratorRosterBookingDto): string {
+  const count =
+    booking.classNumber === 1
+      ? "Primera clase"
+      : `${booking.classNumber}.ª clase`;
+  return booking.founder ? `${count} · Fundadora` : count;
+}
+
+function BookedRow({
+  booking,
+  action,
+}: {
+  booking: AdministratorRosterBookingDto;
+  action?: ReactNode;
+}) {
   const outcome =
     booking.attendanceOutcome === null
       ? undefined
@@ -47,21 +62,28 @@ function BookedRow({ booking }: { booking: AdministratorRosterBookingDto }) {
         photo={booking.clientPhoto}
         size={40}
       />
-      <span className="flex-1 font-medium">{booking.clientName}</span>
+      <span className="flex flex-1 flex-col">
+        <span className="font-medium">{booking.clientName}</span>
+        <span className="text-ayuda">{bookingNote(booking)}</span>
+      </span>
       {outcome === undefined ? null : (
-        <span className="text-ayuda text-texto-tenue">{outcome}</span>
+        <span className="text-ayuda">{outcome}</span>
       )}
+      {action}
     </li>
   );
 }
 
 // WEB-039 (board P02, the class panel): who booked, then the Waitlist in
-// queue order. Names and faces only (FIX-041): the panel never shows a plan
-// or an amount.
+// queue order. Names, faces (FIX-041) and her class number (W1): the panel
+// never shows a plan or an amount.
 export function SessionRoster({
   roster,
+  actionFor,
 }: {
   roster: AdministratorSessionRosterDto;
+  /** W1: «Quitar» on each booking of a class still to come. */
+  actionFor?: (booking: AdministratorRosterBookingDto) => ReactNode;
 }) {
   return (
     <>
@@ -71,7 +93,11 @@ export function SessionRoster({
         ) : (
           <ul className={listClass}>
             {roster.bookings.map((booking) => (
-              <BookedRow key={booking.bookingId} booking={booking} />
+              <BookedRow
+                key={booking.bookingId}
+                booking={booking}
+                action={actionFor?.(booking)}
+              />
             ))}
           </ul>
         )}

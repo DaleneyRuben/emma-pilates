@@ -32,3 +32,19 @@ export function bookingProblem(error: unknown, clientName: string): string {
   }
   return "No pudimos reservar. Inténtalo de nuevo.";
 }
+
+// W1: why the backend refused «Quitar», by its stable code.
+const removalProblems: Record<string, string> = {
+  booking_cancellation_window:
+    "La clase ya está dentro del plazo de cancelación: no se puede quitar esta reserva.",
+  booking_access_denied:
+    "Esta reserva ya no se puede quitar. Cierra el panel y actualiza el horario.",
+};
+
+export function removalProblem(error: unknown): string {
+  if (isApiError(error)) {
+    const known = removalProblems[error.code];
+    if (known !== undefined) return known;
+  }
+  return "No pudimos quitar la reserva. Inténtalo de nuevo.";
+}
