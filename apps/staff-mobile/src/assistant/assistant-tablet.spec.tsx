@@ -174,7 +174,7 @@ describe("Assistant flows on a tablet", () => {
     expect(screen.getByTestId("assistant-centered-card")).toHaveStyle({
       maxWidth: 520,
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Confirmar pago en efectivo" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
     await waitFor(() => {
       expect(screen.getByText("¡Pago registrado!")).toBeOnTheScreen();
     });

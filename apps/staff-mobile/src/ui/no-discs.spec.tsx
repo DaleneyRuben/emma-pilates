@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react-native";
 
 import { InvitationMenu } from "../assistant/invitation-menu";
-import { InvoiceDisclosure } from "../assistant/invoice-disclosure";
+import { InvoiceSwitch } from "../assistant/invoice-switch";
 import { StateCard } from "../assistant/state-card";
 import { ProfileRow } from "../profile/profile-row";
 import { PersonRow } from "./person-row";
@@ -28,9 +28,9 @@ function backgrounds(node: Node | Node[]): string[] {
 // FIX-089: no tinted disc behind an icon; a person without a photo is her
 // initials in bold Crema on a Palo de rosa circle (ListaC).
 describe("Staff rows without discs", () => {
-  it("draws S10's invoice disclosure with a plain icon", async () => {
+  it("draws S10's «Pide factura» switch without a Rubor fill", async () => {
     const screen = await render(
-      <InvoiceDisclosure
+      <InvoiceSwitch
         onChange={noop}
         value={{ name: "", taxId: "", wantsInvoice: false } as never}
       />,
