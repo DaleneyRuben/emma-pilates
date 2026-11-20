@@ -68,20 +68,22 @@ describe("Trainer agenda header", () => {
     const screen = await renderTrainer();
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Hoy 21")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Hoy 21, sin clases")).toBeOnTheScreen();
     });
-    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
-    expect(screen.getByLabelText("Sáb 24")).toBeOnTheScreen();
-    expect(screen.getByLabelText("Mar 27")).toBeOnTheScreen();
-    expect(screen.queryByLabelText("Lun 19")).toBeNull();
-    expect(screen.queryByLabelText("Mar 20")).toBeNull();
+    expect(screen.getByLabelText("Hoy 21, sin clases")).toHaveProp("accessibilityState", {
+      selected: true,
+    });
+    expect(screen.getByLabelText("Sáb 24, sin clases")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Mar 27, sin clases")).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/^Lun 19/)).toBeNull();
+    expect(screen.queryByLabelText(/^Mar 20/)).toBeNull();
   });
 
   it("offers today again from an empty day and from the «Hoy» button", async () => {
     const screen = await renderTrainer();
-    await waitFor(() => expect(screen.getByLabelText("Sáb 24")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByLabelText("Sáb 24, sin clases")).toBeOnTheScreen());
 
-    await fireEvent.press(screen.getByLabelText("Sáb 24"));
+    await fireEvent.press(screen.getByLabelText("Sáb 24, sin clases"));
     await waitFor(() => {
       expect(screen.getByText("El sábado 24 no tienes clases")).toBeOnTheScreen();
     });
@@ -89,10 +91,14 @@ describe("Trainer agenda header", () => {
       screen.getByText("Elige otro día de la semana o vuelve a tus clases de hoy."),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Ver mis clases de hoy" }));
-    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
+    expect(screen.getByLabelText("Hoy 21, sin clases")).toHaveProp("accessibilityState", {
+      selected: true,
+    });
 
-    await fireEvent.press(screen.getByLabelText("Sáb 24"));
+    await fireEvent.press(screen.getByLabelText("Sáb 24, sin clases"));
     await fireEvent.press(screen.getByRole("button", { name: "Hoy" }));
-    expect(screen.getByLabelText("Hoy 21")).toHaveProp("accessibilityState", { selected: true });
+    expect(screen.getByLabelText("Hoy 21, sin clases")).toHaveProp("accessibilityState", {
+      selected: true,
+    });
   });
 });

@@ -73,7 +73,8 @@ describe("Trainer agenda rows", () => {
     expect(hero.getByText("PRÓXIMA · EN 40 MIN")).toBeOnTheScreen();
     expect(hero.getByText("10:40 · Reformer Pilates")).toBeOnTheScreen();
     expect(hero.getByText("2 de 8")).toBeOnTheScreen();
-    expect(hero.getByText("Sopocachi")).toBeOnTheScreen();
+    // E1 B: the branch and the length, «Sopocachi · 50 min».
+    expect(hero.getByText("Sopocachi · 50 min")).toBeOnTheScreen();
 
     const list = within(screen.getByTestId("class-list"));
     expect(list.getByText("08:30")).toBeOnTheScreen();
