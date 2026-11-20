@@ -166,7 +166,12 @@ anything is written.
    `AUTHENTICATION_EMAIL_DIGEST_KEY`, `AUTHENTICATION_LINK_ENCRYPTION_KEY`, and
    `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID`, the values the API and worker
    use; without them the script stops with `authentication_keys_missing`,
-   on a dry run too. The `worker` must be running to deliver the emails.
+   on a dry run too, and with only some of them the runner stops before it
+   records the run. The `worker` must be running to deliver the emails.
+   If an Administrator with another email was bootstrapped and has not
+   activated, the bootstrap refuses (`BootstrapPendingForAnotherEmailError`)
+   before anything is written: she activates first, and the studio's address
+   is then invited in her name.
 2. **Dry run first**, with the params. Every step logs one
    `android_test_*` line with `action` (`bootstrap`, `invite`, `create`,
    `publish`, `lower`, `grant`, or `exists`, `keep`), and
