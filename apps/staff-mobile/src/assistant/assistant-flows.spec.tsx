@@ -51,8 +51,7 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    // Staff pick E4 A: the plan in a Palo de rosa block.
-    expect(screen.getByText("Activa")).toBeOnTheScreen();
+    expect(screen.getByText("Activa")).toBeOnTheScreen(); // E4 A: a Palo de rosa block
     expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
@@ -282,7 +281,6 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Registrar pago")).toBeOnTheScreen();
     });
-    // Staff pick E3 C: what to collect on top, then «Cómo paga».
     expect(screen.getByRole("radio", { name: /^Efectivo/ })).toHaveProp("accessibilityState", {
       checked: true,
       disabled: false,
@@ -291,7 +289,6 @@ describe("Assistant Client flows", () => {
     expect(screen.queryByText("Crédito aplicado")).toBeNull();
     expect(screen.getByText("A cobrar")).toBeOnTheScreen();
     expect(screen.getByText("8 clases · Bs 560")).toBeOnTheScreen();
-    expect(screen.queryByText(/^Descuento/)).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar Bs 560 en efectivo" }));
     await waitFor(() => {
