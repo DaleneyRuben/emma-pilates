@@ -9,11 +9,6 @@ type TextButtonProps = {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
-  /** Kept for callers: «error» and «onTint» draw the same ink link, since an
-   * error is said in words, never in colour (follow-up 285). */
-  tone?: "default" | "error" | "onTint";
-  /** @deprecated Every standalone link is underlined (follow-up 285). */
-  underline?: boolean;
 };
 
 /**

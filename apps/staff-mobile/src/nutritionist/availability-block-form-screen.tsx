@@ -271,7 +271,7 @@ export function AvailabilityBlockFormScreen({
       <FooterPanel>
         <PrimaryButton busy={submitting} disabled={!valid} label="Guardar" onPress={save} />
         {editing ? (
-          <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} tone="error" />
+          <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} />
         ) : null}
       </FooterPanel>
       <TimeWheelSheet

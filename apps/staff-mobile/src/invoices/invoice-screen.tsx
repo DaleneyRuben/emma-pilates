@@ -213,7 +213,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
       ) : (
         <View style={styles.row}>
           <TextButton label="Reemplazar" onPress={() => setChoosing(true)} />
-          <TextButton label="Quitar factura" onPress={() => setAsking(true)} tone="error" />
+          <TextButton label="Quitar factura" onPress={() => setAsking(true)} />
         </View>
       )}
     </FooterPanel>

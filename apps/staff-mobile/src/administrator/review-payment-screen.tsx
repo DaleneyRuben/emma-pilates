@@ -261,7 +261,6 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                   label="Rechazar"
                   onPress={() => setRejecting(true)}
                   testID="review-reject"
-                  tone="error"
                 />
               </FooterPanel>
             )

@@ -28,10 +28,8 @@ describe("CardActionRow", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("draws «Cancelar reserva» in Error", async () => {
-    const screen = await render(
-      <CardActionRow label="Cancelar reserva" onPress={jest.fn()} tone="error" />,
-    );
+  it("draws «Cancelar reserva» in the one ink: an error is said in words", async () => {
+    const screen = await render(<CardActionRow label="Cancelar reserva" onPress={jest.fn()} />);
 
     expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#93615D" });
   });

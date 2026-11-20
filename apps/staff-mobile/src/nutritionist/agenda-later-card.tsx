@@ -45,7 +45,6 @@ export function LaterAppointmentCard({
             onPress={onCancel}
             style={styles.actionButton}
             testID={`cancel-evaluation-${entry.evaluationId}`}
-            tone="error"
           />
         </View>
       ) : null}

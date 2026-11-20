@@ -29,10 +29,10 @@ describe("TextButton", () => {
     expect(screen.getByRole("button", { name: "Ahora no" })).toHaveStyle({ minHeight: 44 });
   });
 
-  it("draws the Error tone and a disabled link in the same ink", async () => {
+  it("draws every link, disabled or not, in the same ink", async () => {
     const screen = await render(
       <>
-        <TextButton label="Cancelar reserva" onPress={jest.fn()} tone="error" />
+        <TextButton label="Cancelar reserva" onPress={jest.fn()} />
         <TextButton disabled label="Volver" onPress={jest.fn()} />
       </>,
     );

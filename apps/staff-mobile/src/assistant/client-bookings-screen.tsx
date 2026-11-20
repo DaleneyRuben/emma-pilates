@@ -114,7 +114,7 @@ function BookingCard({
       ) : !windowKnown ? null : insideWindow ? (
         <CardActionRow disabled={locked} label="Reprogramar" onPress={onReschedule} />
       ) : (
-        <CardActionRow disabled={locked} label="Cancelar reserva" onPress={onCancel} tone="error" />
+        <CardActionRow disabled={locked} label="Cancelar reserva" onPress={onCancel} />
       )}
     </View>
   );

@@ -6,9 +6,7 @@ import { TextButton } from "./text-button";
 // Follow-up 70: text on a tint reads in Palo de rosa sobre tinte.
 describe("text on a tint", () => {
   it("lets a text link sit on Palo de rosa tinte", async () => {
-    const screen = await render(
-      <TextButton label="Reenviar correo" onPress={jest.fn()} tone="onTint" />,
-    );
+    const screen = await render(<TextButton label="Reenviar correo" onPress={jest.fn()} />);
 
     expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#93615D" });
   });
