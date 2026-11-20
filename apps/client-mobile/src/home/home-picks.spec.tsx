@@ -177,7 +177,12 @@ describe("Client Inicio with a payment in review or rejected (C8 A + C)", () => 
     const notice = await screen.findByTestId("home-payment-card");
     expect(within(notice).getByText("NO PUDIMOS CONFIRMAR TU PAGO")).toBeOnTheScreen();
     expect(within(notice).getByText("El comprobante no corresponde al monto.")).toBeOnTheScreen();
-    expect(within(notice).getByText("Sube uno nuevo para activar tu plan.")).toBeOnTheScreen();
+    // A renewal: she keeps her current plan meanwhile (review of C8).
+    expect(
+      within(notice).getByText(
+        "Sube uno nuevo para activar tu renovación. Mientras, sigues usando tu plan actual.",
+      ),
+    ).toBeOnTheScreen();
     expect(within(notice).getByRole("button", { name: "Subir otro comprobante" })).toHaveStyle({
       backgroundColor: "#F9F4F2",
     });

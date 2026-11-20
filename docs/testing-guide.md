@@ -9178,7 +9178,11 @@ D. **Rejected (C02d, C8).** Log in as Sofía. **Inicio**'s Palo de rosa block
    confirmó». **Subir otro comprobante** opens the payment of the same Plan
    (a payment she already started opens again instead of failing). A class
    detail says «No pudimos confirmar tu pago.» with **Subir otro
-   comprobante**. Elegir plan opens the rejected payment.
+   comprobante**. Elegir plan opens the rejected payment. A Client whose
+   renewal was rejected while her Plan is still active sees the same block
+   on top with «Sube uno nuevo para activar tu renovación. Mientras, sigues
+   usando tu plan actual.», her Plan row below and **Reservar una clase** as
+   the outlined button.
 E. **The invoice reason (C10c).** On that payment, attach a receipt and open
    **¿Necesitas factura?** with both fields empty: **Enviar comprobante** is
    off and above it reads «Completa el NIT o CI, o cierra la factura». Type a

@@ -185,6 +185,7 @@ export function HomeScreen() {
           <PaymentRejectedCard
             busy={resendReceipt.busy}
             error={resendReceipt.error}
+            hasActivePlan={hasActivePlan}
             onResend={() => void resendReceipt.resend(standing.payment.planId)}
             payment={standing.payment}
           />

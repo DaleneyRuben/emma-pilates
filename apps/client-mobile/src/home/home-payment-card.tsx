@@ -39,11 +39,14 @@ export function PaymentInReviewCard({
 export function PaymentRejectedCard({
   busy,
   error,
+  hasActivePlan,
   onResend,
   payment,
 }: {
   busy: boolean;
   error: string | null;
+  /** A renewal: she keeps booking with the current Plan meanwhile. */
+  hasActivePlan: boolean;
   onResend: () => void;
   payment: PaymentDto;
 }) {
@@ -60,7 +63,9 @@ export function PaymentRejectedCard({
         eyebrow="No pudimos confirmar tu pago"
         lines={[
           ...(payment.rejectionReason ? [payment.rejectionReason] : []),
-          "Sube uno nuevo para activar tu plan.",
+          hasActivePlan
+            ? "Sube uno nuevo para activar tu renovación. Mientras, sigues usando tu plan actual."
+            : "Sube uno nuevo para activar tu plan.",
         ]}
         testID="home-payment-card"
         title={payment.planName}
