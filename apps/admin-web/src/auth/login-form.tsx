@@ -25,6 +25,7 @@ import { PasswordInput } from "../components/ui/password-input";
 import { useStartSession } from "../session/use-start-session";
 import { emailField } from "./auth-fields";
 import { WarningRow } from "./auth-notices";
+import { TextLink } from "../components/ui/text-link";
 import { authTextLinkClass } from "./back-to-login-link";
 import { WaitNotice } from "./request-limit-notice";
 import { useCountdown } from "./use-countdown";
@@ -137,9 +138,9 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         >
           Iniciar sesión
         </Button>
-        <Link to="/recuperar-contrasena" className={authTextLinkClass}>
-          ¿Olvidaste tu contraseña?
-        </Link>
+        <TextLink asChild className={authTextLinkClass}>
+          <Link to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
+        </TextLink>
       </form>
     </Form>
   );

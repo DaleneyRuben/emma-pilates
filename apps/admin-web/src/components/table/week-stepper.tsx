@@ -37,7 +37,7 @@ export function WeekStepper({
         Hoy
       </Button>
       {/* Lora 24: large text, allowed on the 100 page (follow-up 284). */}
-      <p className="font-serif text-[24px] leading-tight text-texto">
+      <p className="tipo-titulo-seccion text-texto">
         {formatWeekRange(monday)}
       </p>
     </div>

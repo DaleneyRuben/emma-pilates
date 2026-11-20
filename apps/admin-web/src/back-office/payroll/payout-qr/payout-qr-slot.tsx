@@ -1,5 +1,6 @@
 import type { PayoutQrResultDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
+import { InlineError } from "../../../components/ui/inline-error";
 import { PayoutQrCard, type PayoutQrView } from "./payout-qr-card";
 import { payoutQrQueryOptions } from "./payout-qr-queries";
 
@@ -37,9 +38,7 @@ export function PayoutQrSlot({
     );
   }
   if (qr.isError) {
-    return (
-      <p className="text-nota text-texto">No pudimos cargar su QR de cobro.</p>
-    );
+    return <InlineError>No pudimos cargar su QR de cobro.</InlineError>;
   }
   return <PayoutQrCard staffName={staffName} qr={toView(qr.data)} />;
 }

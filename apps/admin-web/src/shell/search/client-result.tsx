@@ -23,8 +23,10 @@ export function ClientResult({ client }: { client: AdminClientDto }) {
     <>
       <ClientPhoto name={client.name} photo={client.photo} size={40} />
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate font-medium text-texto">{client.name}</span>
-        <span className="truncate text-nota text-texto tabular">
+        <span className="truncate tipo-titulo-fila text-texto">
+          {client.name}
+        </span>
+        <span className="truncate tipo-secundario text-texto tabular">
           {clientLine(client)}
         </span>
       </span>
@@ -32,7 +34,7 @@ export function ClientResult({ client }: { client: AdminClientDto }) {
         size={18}
         strokeWidth={1.6}
         aria-hidden="true"
-        className="shrink-0 text-primario"
+        className="shrink-0 text-texto"
       />
     </>
   );

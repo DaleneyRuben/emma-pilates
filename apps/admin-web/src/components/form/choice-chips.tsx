@@ -34,9 +34,7 @@ export function ChoiceChips<Value extends string>({
   return (
     <fieldset className={cn("flex gap-2", className)}>
       <legend
-        className={
-          showLegend ? "mb-2 text-celda font-medium text-texto" : "sr-only"
-        }
+        className={showLegend ? "mb-2 tipo-compacto-600 text-texto" : "sr-only"}
       >
         {legend}
       </legend>
@@ -49,7 +47,7 @@ export function ChoiceChips<Value extends string>({
             onStrong &&
               (option === value
                 ? "bg-blanco text-texto inset-ring-blanco hover:bg-blanco"
-                : "bg-transparent font-bold text-blanco inset-ring-[1.5px] inset-ring-blanco hover:bg-blanco/10"),
+                : "bg-transparent text-sobre-primario inset-ring-[1.5px] inset-ring-blanco hover:bg-blanco/10"),
           )}
         >
           <input

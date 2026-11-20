@@ -18,8 +18,8 @@ export function ClientFileItem({
   return (
     <li className="flex items-center justify-between gap-3 px-3 py-2.5">
       <span className="flex min-w-0 flex-col">
-        <span className="text-nota font-medium text-texto">{title}</span>
-        <span className="text-ayuda text-texto tabular">{detail}</span>
+        <span className="tipo-titulo-fila text-texto">{title}</span>
+        <span className="tipo-secundario text-texto tabular">{detail}</span>
       </span>
       {aside}
     </li>
@@ -49,10 +49,7 @@ export function ClientFileSection<Data>({
   const rows = query.data === undefined ? null : children(query.data);
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-1.5">
-      <h3
-        id={headingId}
-        className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
-      >
+      <h3 id={headingId} className="tipo-etiqueta text-texto">
         {title}
       </h3>
       {query.isPending ? (
@@ -64,7 +61,7 @@ export function ClientFileSection<Data>({
           onRetry={() => void query.refetch()}
         />
       ) : rows === null || rows.length === 0 ? (
-        <p className="text-nota text-texto">{empty}</p>
+        <p className="tipo-compacto text-texto">{empty}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-borde rounded-control border border-borde bg-superficie">
           {rows}

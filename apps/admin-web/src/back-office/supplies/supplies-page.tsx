@@ -14,6 +14,7 @@ import {
   type ListSearch,
 } from "../../components/table/pagination";
 import { StatusPill } from "../../components/ui/status-pill";
+import { TextLink } from "../../components/ui/text-link";
 import { useAdminRole } from "../../session/admin-role";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
@@ -42,8 +43,10 @@ const movementAction = (
 });
 
 // FIX-090: 44 px targets, apart, so a phone tap lands on the one meant.
+// Follow-up 285: they are links (`enlace`); hover thickens the underline and
+// never changes the colour (rule 6).
 const rowLink =
-  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control px-2 text-celda font-medium text-texto hover:text-primario-presionado focus-visible:shadow-foco disabled:text-texto";
+  "inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-control px-2";
 
 const supplyColumns =
   (branchId: string, managesCatalog: boolean) =>
@@ -57,7 +60,7 @@ const supplyColumns =
             onOpen={() => open(row.original)}
           />
         ) : (
-          <span className="text-cuerpo font-bold text-texto">
+          <span className="tipo-titulo-fila text-texto">
             {row.original.name}
           </span>
         ),
@@ -66,7 +69,7 @@ const supplyColumns =
       header: "Cantidad en stock",
       meta: { align: "right" },
       cell: ({ getValue }) => (
-        <span className="text-texto tabular">
+        <span className="tipo-titulo-fila text-texto tabular">
           {countFormat.format(getValue())}
         </span>
       ),
@@ -89,9 +92,8 @@ const supplyColumns =
       cell: ({ row }) => (
         <span className="inline-flex gap-3">
           {(["withdrawal", "restock"] as const).map((kind) => (
-            <button
+            <TextLink
               key={kind}
-              type="button"
               aria-label={`${kind === "withdrawal" ? "Registrar retiro" : "Registrar reposición"} de ${row.original.name}`}
               // Nothing to withdraw from an empty Supply.
               disabled={
@@ -104,7 +106,7 @@ const supplyColumns =
               }}
             >
               {kind === "withdrawal" ? "Retiro" : "Reposición"}
-            </button>
+            </TextLink>
           ))}
         </span>
       ),
@@ -121,14 +123,8 @@ const lowStockLine = (branch: Branch, count: number | undefined) =>
 function EmptySupplies({ managesCatalog }: { managesCatalog: boolean }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto">
-        Todavía no hay insumos en esta sucursal.
-      </span>
-      {managesCatalog ? (
-        <span className="text-nota text-texto">
-          Crea el primero con «Nuevo insumo».
-        </span>
-      ) : null}
+      <span>Todavía no hay insumos en esta sucursal.</span>
+      {managesCatalog ? <span>Crea el primero con «Nuevo insumo».</span> : null}
     </span>
   );
 }

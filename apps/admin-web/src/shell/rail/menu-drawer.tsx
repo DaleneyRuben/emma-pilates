@@ -29,7 +29,7 @@ export function MenuDrawer() {
           aria-label="Abrir menú"
           className={cn(
             squareButton,
-            "text-blanco focus-visible:shadow-foco-solido",
+            "text-sobre-primario focus-visible:shadow-foco-solido",
           )}
         >
           <Menu size={24} strokeWidth={1.6} aria-hidden="true" />
@@ -43,14 +43,14 @@ export function MenuDrawer() {
       >
         <SheetTitle className="sr-only">Menú</SheetTitle>
         <div className="flex items-center gap-2 pb-5 pl-2">
-          <span className="flex-1 font-serif text-[22px] text-blanco">
+          <span className="flex-1 tipo-titulo-bloque text-sobre-primario">
             Emma Pilates Studio
           </span>
           <SheetClose
             aria-label="Cerrar menú"
             className={cn(
               squareButton,
-              "text-blanco focus-visible:shadow-foco-solido",
+              "text-sobre-primario focus-visible:shadow-foco-solido",
             )}
           >
             <X size={22} strokeWidth={1.6} aria-hidden="true" />

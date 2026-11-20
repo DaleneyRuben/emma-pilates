@@ -20,14 +20,14 @@ export function ListFilter<Value extends string>({
 
   return (
     <div className="flex items-center gap-3 self-start rounded-tarjeta bg-superficie py-1.5 pr-1.5 pl-4 shadow-tarjeta">
-      <label htmlFor={id} className="text-celda font-semibold text-texto">
+      <label htmlFor={id} className="tipo-compacto-600 text-texto">
         {label}
       </label>
       <Select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as Value)}
-        className="h-[44px] w-auto min-w-[140px] text-nota md:h-[38px]"
+        className="h-[44px] w-auto min-w-[140px] tipo-compacto md:h-[38px]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

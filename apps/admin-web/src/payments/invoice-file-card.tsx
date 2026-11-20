@@ -40,14 +40,14 @@ export function InvoiceFileCard({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-3">
-        <span className="flex size-11 flex-none items-center justify-center rounded-control bg-superficie text-primario">
+        <span className="flex size-11 flex-none items-center justify-center rounded-control bg-superficie text-texto">
           <FileText size={22} strokeWidth={1.5} aria-hidden="true" />
         </span>
         <span className="flex min-w-0 flex-col">
-          <span className="truncate text-cuerpo text-texto">
+          <span className="truncate tipo-titulo-fila text-texto">
             {file.fileName}
           </span>
-          <span className="text-ayuda text-texto">
+          <span className="tipo-secundario text-texto">
             {`${kindOf(file.mediaType)} · ${sizeOf(file.byteSize)} · subida por ${file.uploadedByName} · ${formatDateTime(file.uploadedAt)}`}
           </span>
         </span>
@@ -70,12 +70,7 @@ export function InvoiceFileCard({
         )}
         {/* Owner, 2026-11-05: a voided sale's invoice stays with the Client. */}
         {invoice.voided ? null : (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-texto hover:text-texto"
-            onClick={() => setAsking(true)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setAsking(true)}>
             Quitar factura
           </Button>
         )}

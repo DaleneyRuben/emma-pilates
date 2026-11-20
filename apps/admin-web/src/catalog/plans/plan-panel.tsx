@@ -26,6 +26,7 @@ import {
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { durationLabel, planDurations, weeklyClassCaps } from "./plan-format";
@@ -222,16 +223,12 @@ export function PlanPanelForm({
           />
           {numberFields.map(renderText)}
           {plan === undefined ? null : (
-            <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+            <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-compacto text-texto">
               Las suscripciones vigentes y las compras ya iniciadas conservan su
               precio.
             </p>
           )}
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button

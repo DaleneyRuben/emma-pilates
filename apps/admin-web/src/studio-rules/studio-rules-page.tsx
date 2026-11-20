@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
+import { avisoClass } from "../components/ui/aviso";
 import { useAdminRole } from "../session/admin-role";
 import {
   configurableRules,
@@ -31,10 +32,10 @@ function RuleCard({
   return (
     <section aria-labelledby={titleId} className={cardClass}>
       <div className="flex flex-col gap-1">
-        <h2 id={titleId} className="text-titulo-panel text-texto">
+        <h2 id={titleId} className="tipo-titulo-seccion text-texto">
           {title}
         </h2>
-        <p className="text-ayuda text-texto">{note}</p>
+        <p className="tipo-secundario text-texto">{note}</p>
       </div>
       <dl className="flex flex-col divide-y divide-borde">
         {rules.map((rule) => (
@@ -42,8 +43,10 @@ function RuleCard({
             key={rule.label}
             className="flex justify-between gap-6 py-2.5 max-md:flex-col max-md:gap-0.5"
           >
-            <dt className="text-nota text-texto">{rule.label}</dt>
-            <dd className="text-nota text-texto md:text-right">{rule.value}</dd>
+            <dt className="tipo-compacto text-texto">{rule.label}</dt>
+            <dd className="tipo-titulo-fila text-texto md:text-right">
+              {rule.value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -69,10 +72,7 @@ export function StudioRulesPage() {
       {notice === "saved" ? (
         <PageNotice>Guardamos las reglas del estudio.</PageNotice>
       ) : notice === "conflict" ? (
-        <p
-          role="alert"
-          className="rounded-control border border-borde-fuerte bg-aviso px-3 py-2 text-nota text-texto"
-        >
+        <p role="alert" className={avisoClass}>
           {conflictMessage}
         </p>
       ) : null}
@@ -89,10 +89,10 @@ export function StudioRulesPage() {
           {edits ? (
             <section aria-labelledby={formTitleId} className={cardClass}>
               <div className="flex flex-col gap-1">
-                <h2 id={formTitleId} className="text-titulo-panel text-texto">
+                <h2 id={formTitleId} className="tipo-titulo-seccion text-texto">
                   Puedes cambiar
                 </h2>
-                <p className="text-ayuda text-texto">
+                <p className="tipo-secundario text-texto">
                   {versionLine(settings.data)}
                 </p>
               </div>

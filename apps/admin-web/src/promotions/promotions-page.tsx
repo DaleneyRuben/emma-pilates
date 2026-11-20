@@ -8,6 +8,7 @@ import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanel } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
+import { EmptyState } from "../components/ui/empty-state";
 import { PromotionCardList } from "./promotion-card-list";
 import { carouselSubtitle } from "./promotion-format";
 import { PromotionPanelForm } from "./promotion-panel";
@@ -18,15 +19,10 @@ type Panel =
 
 function EmptyCarousel() {
   return (
-    <section className="flex flex-col items-center gap-1 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
-      <p className="mb-1 font-serif text-[24px] leading-tight text-texto">
-        Todavía no hay promociones.
-      </p>
-      <p className="text-cuerpo text-texto">
-        Crea la primera con «Nueva promoción»; las clientas la verán en el
-        inicio de la app cuando la publiques.
-      </p>
-    </section>
+    <EmptyState title="Todavía no hay promociones.">
+      Crea la primera con «Nueva promoción»; las clientas la verán en el inicio
+      de la app cuando la publiques.
+    </EmptyState>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { parseCivilDate } from "../components/form/civil-date";
 import { CivilDateInput } from "../components/form/civil-date-input";
+import { fieldMessageClass } from "../components/form/form";
 import { FilterChips } from "../components/ui/filter-chips";
 import { periodOf, periodRange, type ReportPeriod } from "./report-period";
 import type { ReportRange } from "./report-search";
@@ -21,10 +22,7 @@ function DateField({
   const id = useId();
   return (
     <div className="flex items-center gap-2">
-      <label
-        htmlFor={id}
-        className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
-      >
+      <label htmlFor={id} className="tipo-compacto-600 text-texto">
         {label}
       </label>
       <CivilDateInput
@@ -35,7 +33,7 @@ function DateField({
         rangeEnd={rangeEnd}
         align={rangeStart === undefined ? "start" : "end"}
         className="w-auto"
-        inputClassName="h-[34px] text-nota"
+        inputClassName="h-[34px] tipo-compacto"
       />
     </div>
   );
@@ -69,7 +67,9 @@ function RangeFields({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    // Follow-up 285: the band 200 takes no small text (rule 3), so the
+    // labels and the range error sit in a white card.
+    <div className="flex flex-col gap-1.5 rounded-tarjeta bg-superficie px-3.5 py-2.5 shadow-tarjeta">
       <div className="flex flex-wrap items-center gap-3">
         <DateField
           label="Desde"
@@ -85,7 +85,7 @@ function RangeFields({
         />
       </div>
       {backwards ? (
-        <p role="alert" className="text-ayuda text-texto">
+        <p role="alert" className={fieldMessageClass}>
           La fecha inicial no puede ser posterior a la final.
         </p>
       ) : null}

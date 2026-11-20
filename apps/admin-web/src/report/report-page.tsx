@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import type { SearchChange } from "../catalog/catalog-search";
 import { PageHeader } from "../components/page/page-header";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
+import { EmptyState } from "../components/ui/empty-state";
 import { ListFilter } from "../components/table/list-filter";
 import { useKnownOption } from "../components/table/use-known-option";
 import { boliviaMonth, boliviaToday } from "../lib/bolivia-time";
 import {
   segmentClass,
+  segmentCompactClass,
   segmentCurrentClass,
   segmentedBarClass,
 } from "../components/ui/segmented";
@@ -58,7 +60,7 @@ function ReportTabs({
             onClick={() => onChange(tab.value)}
             className={cn(
               segmentClass,
-              "h-9 px-3.5 text-celda",
+              segmentCompactClass,
               selected && segmentCurrentClass,
             )}
           >
@@ -163,7 +165,7 @@ export function ReportPage({
         </div>
       ) : null}
       {finance || branchId === undefined ? null : (
-        <p className="text-nota text-texto">
+        <p className="rounded-tarjeta bg-superficie px-[18px] py-3 tipo-cuerpo text-texto shadow-tarjeta">
           La nómina y los ingresos por QR se ven solo en «Todas las sucursales».
         </p>
       )}
@@ -196,9 +198,7 @@ export function ReportPage({
           />
           {income.data.totalCentavos === 0 &&
           expenses.data.totalCentavos === 0 ? (
-            <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
-              Sin ingresos ni gastos en este rango.
-            </p>
+            <EmptyState>Sin ingresos ni gastos en este rango.</EmptyState>
           ) : (
             <MonthChart
               months={monthTotals(

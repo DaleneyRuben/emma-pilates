@@ -7,6 +7,7 @@ import { Hourglass } from "lucide-react";
 import { useState } from "react";
 import type { Control } from "react-hook-form";
 import {
+  fieldMessageClass,
   FormControl,
   FormField,
   FormItem,
@@ -58,7 +59,7 @@ export function ActiveEmailField({
             <Input type="email" autoComplete="off" {...field} />
           </FormControl>
           {sameEmail(typed, current) ? null : (
-            <p className="text-ayuda text-texto">
+            <p className="tipo-secundario text-texto">
               {`Al guardar, le enviamos un enlace a este correo. Cambia cuando ${firstName(name)} lo abra.`}
             </p>
           )}
@@ -162,21 +163,21 @@ export function PendingEmailChange({
         size={20}
         strokeWidth={1.6}
         aria-hidden="true"
-        className="mt-0.5 shrink-0 text-primario"
+        className="mt-0.5 shrink-0 text-texto"
       />
-      <div className="flex min-w-0 flex-col gap-1.5 text-nota text-texto">
-        <p className="font-semibold">{title}</p>
-        <p className="break-words">
+      <div className="flex min-w-0 flex-col gap-1.5 text-texto">
+        <p className="tipo-titulo-fila">{title}</p>
+        <p className="tipo-compacto break-words">
           {`Enviamos un enlace a ${pending.email}. Hasta que lo abra, sigue entrando con ${member.email}.`}
         </p>
-        <p className="text-ayuda text-texto">
+        <p className="tipo-secundario text-texto">
           {`El enlace vence el ${linkDeadline(pending.expiresAt)}.`}
         </p>
         {result === null ? null : (
           <p
             role={result.ok ? "status" : "alert"}
             className={
-              result.ok ? "text-ayuda text-primario" : "text-ayuda text-texto"
+              result.ok ? "tipo-secundario text-texto" : fieldMessageClass
             }
           >
             {result.message}
@@ -197,7 +198,6 @@ export function PendingEmailChange({
           <Button
             variant="link"
             size="sm"
-            className="text-texto hover:text-texto"
             disabled={change.isPending}
             busy={
               change.isPending && change.variables?.kind === "cancelEmailChange"

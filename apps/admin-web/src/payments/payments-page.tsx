@@ -4,6 +4,7 @@ import { CatalogPage } from "../catalog/catalog-page";
 import type { SearchChange } from "../catalog/catalog-search";
 import { countFormat } from "../components/table/pagination";
 import { SearchFilter } from "../components/table/search-filter";
+import { avisoClass } from "../components/ui/aviso";
 import { Button } from "../components/ui/button";
 import { chipClass, selectedClass } from "../components/ui/chip";
 import { FilterChips } from "../components/ui/filter-chips";
@@ -66,9 +67,9 @@ function EmptyPayments({ search }: { search: PaymentSearch }) {
     <span className="flex flex-col items-center gap-1">
       <span className="text-texto">{message}</span>
       {hint === undefined ? null : (
-        <span className="text-nota text-texto">{hint}</span>
+        <span className="tipo-secundario text-texto">{hint}</span>
       )}
-      <span className="text-ayuda text-texto">
+      <span className="tipo-secundario text-texto">
         Las clientas pagan por QR desde la app y la asistente registra el
         efectivo; aquí se revisan y se marcan las facturas.
       </span>
@@ -160,10 +161,7 @@ export function PaymentsPage({
             </button>
           </div>
           {exportPayments.isError ? (
-            <p
-              role="alert"
-              className="w-full rounded-control bg-aviso px-3 py-2 text-nota text-texto"
-            >
+            <p role="alert" className={cn("w-full", avisoClass)}>
               No pudimos exportar los pagos. Inténtalo de nuevo.
             </p>
           ) : null}

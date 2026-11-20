@@ -49,7 +49,7 @@ const staffColumns =
       header: "Rol",
       // A category, not a state: never a status pill (AW23, follow-up 52).
       cell: ({ getValue, row }) => (
-        <span className="inline-flex rounded-full bg-superficie-hundida px-2.5 py-0.5 text-pie font-semibold text-texto inset-ring inset-ring-borde">
+        <span className="inline-flex rounded-full bg-superficie-hundida px-2.5 py-0.5 tipo-secundario text-texto inset-ring inset-ring-borde">
           {staffRoleLabel(getValue() as StaffRole, row.original.gender)}
         </span>
       ),
@@ -58,10 +58,10 @@ const staffColumns =
       header: "Contacto",
       meta: { card: "hidden" },
       cell: ({ row }) => (
-        <span className="flex flex-col text-nota text-texto">
+        <span className="flex flex-col tipo-secundario text-texto">
           <span>{row.original.email}</span>
           {row.original.pendingEmail === null ? null : (
-            <span className="text-primario">
+            <span className="text-texto">
               {`Por confirmar: ${row.original.pendingEmail.email}`}
             </span>
           )}

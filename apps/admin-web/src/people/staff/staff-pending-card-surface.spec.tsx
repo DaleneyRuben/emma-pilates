@@ -21,7 +21,7 @@ const cardButton = [
   "inset-ring-primario",
   "bg-superficie",
   "text-texto",
-  "text-fila-menu",
+  "tipo-boton",
 ];
 
 // WEB-015: AW24's pending card as the export draws it.
@@ -51,10 +51,13 @@ describe("AW24's pending card surface", () => {
     const change = card.getByRole("button", { name: "Cambiar correo" });
     expect(change.parentElement).toHaveClass("justify-between");
     expect(card.getByText(/^El enlace vence el/)).toHaveClass(
-      "text-nota",
+      "tipo-compacto",
       "text-texto",
     );
-    expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass("text-texto");
+    expect(card.getByText(/^Si no activa su cuenta/)).toHaveClass(
+      "tipo-secundario",
+      "text-texto",
+    );
   });
 
   it("draws «Reenviar enlace» as the full-width white button", async () => {

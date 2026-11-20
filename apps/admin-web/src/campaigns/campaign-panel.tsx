@@ -18,6 +18,7 @@ import {
 } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { FilterChips } from "../components/ui/filter-chips";
+import { InlineError } from "../components/ui/inline-error";
 import { Input } from "../components/ui/input";
 import {
   giveLabel,
@@ -46,11 +47,11 @@ function Summary({
       className="flex flex-col gap-1.5 rounded-tarjeta bg-aviso px-4 py-3.5 text-texto inset-ring-[1.5px] inset-ring-borde-fuerte"
     >
       {total === null ? null : (
-        <p className="text-celda font-semibold">{totalLine(total)}</p>
+        <p className="tipo-titulo-fila">{totalLine(total)}</p>
       )}
-      <p className="text-nota">{recipientLine(preview.recipientCount)}</p>
-      {owed === null ? null : <p className="text-nota">{owed}</p>}
-      <p className="text-nota">No se puede deshacer.</p>
+      <p className="tipo-compacto">{recipientLine(preview.recipientCount)}</p>
+      {owed === null ? null : <p className="tipo-compacto">{owed}</p>}
+      <p className="tipo-compacto">No se puede deshacer.</p>
     </section>
   );
 }
@@ -106,7 +107,7 @@ export function CampaignPanel({
                   {repeated === null ? null : (
                     <p
                       role="status"
-                      className="rounded-tarjeta bg-aviso px-4 py-3 text-celda text-texto"
+                      className="rounded-tarjeta bg-aviso px-4 py-3 tipo-compacto text-texto"
                     >
                       {repeated}
                     </p>
@@ -129,9 +130,7 @@ export function CampaignPanel({
               )}
             />
             <div className="flex flex-col gap-2">
-              <p className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-600 uppercase">
-                Quiénes la reciben
-              </p>
+              <p className="tipo-compacto-600 text-texto">Quiénes la reciben</p>
               <FilterChips
                 label="Quiénes la reciben"
                 value={everyActiveClient}
@@ -148,11 +147,7 @@ export function CampaignPanel({
             <Summary preview={preview} total={total} />
           </SidePanelBody>
           <SidePanelFooter>
-            {failure === null ? null : (
-              <p role="alert" className="text-nota text-texto">
-                {failure}
-              </p>
-            )}
+            {failure === null ? null : <InlineError>{failure}</InlineError>}
             <div className="flex flex-wrap justify-end gap-2">
               <Button
                 type="button"

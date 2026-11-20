@@ -27,7 +27,7 @@ export function TablePagination({
   return (
     <nav
       aria-label="Paginación"
-      className="flex flex-wrap items-center justify-between gap-3 text-nota text-texto tabular"
+      className="flex flex-wrap items-center justify-between gap-3 tipo-secundario text-texto tabular"
     >
       <p>
         {rangeLabel === undefined

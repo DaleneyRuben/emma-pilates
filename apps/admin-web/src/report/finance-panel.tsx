@@ -3,6 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MonthStepper } from "../components/table/month-stepper";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
+import { EmptyState } from "../components/ui/empty-state";
+import { StatTile } from "../components/ui/stat-tile";
+import { fieldMessageClass } from "../components/form/form";
 import {
   Table,
   TableBody,
@@ -12,42 +15,11 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { boliviaMonth } from "../lib/bolivia-time";
-import { cn } from "../lib/cn";
 import { formatBolivianos, formatSignedBolivianos } from "../lib/money";
 import {
   monthResultQueryOptions,
   seedOpeningBudgetRequest,
 } from "./finance-queries";
-
-function Figure({
-  name,
-  rule,
-  figure,
-  line,
-}: {
-  name: string;
-  rule: string;
-  figure: string;
-  line: string;
-}) {
-  return (
-    <section
-      aria-label={name}
-      className={cn(
-        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde-fuerte bg-superficie px-5 py-4",
-        rule,
-      )}
-    >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        {name}
-      </h2>
-      <p className="font-serif text-cifra-grande leading-tight text-texto tabular">
-        {figure}
-      </p>
-      <p className="text-nota text-texto">{line}</p>
-    </section>
-  );
-}
 
 const Amount = ({ label, children }: { label: string; children: string }) => (
   <TableCell data-label={label} className="tabular md:text-right">
@@ -58,10 +30,10 @@ const Amount = ({ label, children }: { label: string; children: string }) => (
 function BudgetTable({ result }: { result: MonthResultDto }) {
   if (result.lines.length === 0) return null;
   const totalRow =
-    "bg-superficie-hundida font-medium hover:bg-superficie-hundida";
+    "bg-superficie-hundida tipo-titulo-fila hover:bg-superficie-hundida";
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-titulo-panel text-texto">
+      <h2 className="tipo-titulo-seccion text-texto">
         Presupuesto frente a lo gastado
       </h2>
       <Table aria-label="Presupuesto frente a lo gastado">
@@ -123,17 +95,22 @@ function EmptyBudget({ month }: { month: string }) {
       }),
   });
   return (
-    <div className="flex flex-col items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center">
-      <p className="text-cuerpo text-texto">Aún no hay presupuesto.</p>
-      <Button busy={seed.isPending} onClick={() => seed.mutate()}>
-        Cargar presupuesto de apertura
-      </Button>
-      {seed.isError ? (
-        <p role="alert" className="text-ayuda text-texto">
-          No pudimos cargar el presupuesto.
-        </p>
-      ) : null}
-    </div>
+    <EmptyState
+      action={
+        <div className="flex flex-col items-center gap-2">
+          <Button busy={seed.isPending} onClick={() => seed.mutate()}>
+            Cargar presupuesto de apertura
+          </Button>
+          {seed.isError ? (
+            <p role="alert" className={fieldMessageClass}>
+              No pudimos cargar el presupuesto.
+            </p>
+          ) : null}
+        </div>
+      }
+    >
+      Aún no hay presupuesto.
+    </EmptyState>
   );
 }
 
@@ -167,31 +144,25 @@ export function FinancePanel({
       ) : (
         <>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <Figure
-              name="Ingresos en caja"
-              rule="border-t-texto"
+            <StatTile
+              label="Ingresos en caja"
               figure={formatBolivianos(result.cashIncomeCentavos)}
               line="Pagos confirmados en el mes"
             />
-            <Figure
-              name="Impuesto"
-              rule="border-t-texto"
+            <StatTile
+              label="Impuesto"
               figure={formatBolivianos(result.taxCentavos)}
               line={`${result.taxRatePercent} % de los ingresos en caja`}
             />
-            <Figure
-              name="Resultado"
-              rule={
-                result.resultCentavos < 0 ? "border-t-texto" : "border-t-texto"
-              }
+            <StatTile
+              label="Resultado"
               figure={formatSignedBolivianos(result.resultCentavos)}
               line="Ingresos en caja menos impuesto, gastos, sueldos y nutricionista"
             />
             {/* Finding 107 (h): without a budget the break-even is only the
                 Nutritionist's cost, a number that would pass for a real one. */}
-            <Figure
-              name="Punto de equilibrio"
-              rule="border-t-texto"
+            <StatTile
+              label="Punto de equilibrio"
               figure={
                 result.lines.length === 0
                   ? "—"
@@ -204,13 +175,17 @@ export function FinancePanel({
               }
             />
           </div>
-          <p className="text-nota text-texto tabular">
-            {`Costo de la nutricionista ${formatBolivianos(result.nutritionistCostCentavos)}`}
-          </p>
-          {/* H10: the month's Salary Payments are a cost of their own. */}
-          <p className="text-nota text-texto tabular">
-            {`Sueldos pagados ${formatBolivianos(result.salariesCentavos ?? 0)}`}
-          </p>
+          {/* Follow-up 285: the two costs sit in a white card, never loose
+              on the page 100 (rule 3). */}
+          <div className="flex flex-col gap-1 rounded-tarjeta bg-superficie px-[18px] py-3 tipo-titulo-fila text-texto tabular shadow-tarjeta">
+            <p>
+              {`Costo de la nutricionista ${formatBolivianos(result.nutritionistCostCentavos)}`}
+            </p>
+            {/* H10: the month's Salary Payments are a cost of their own. */}
+            <p>
+              {`Sueldos pagados ${formatBolivianos(result.salariesCentavos ?? 0)}`}
+            </p>
+          </div>
           {result.lines.length === 0 ? (
             <EmptyBudget month={month} />
           ) : (

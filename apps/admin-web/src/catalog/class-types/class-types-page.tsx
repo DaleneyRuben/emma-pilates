@@ -34,7 +34,7 @@ const classTypeColumns = (open: (row: AdminClassTypeDto) => void) => [
             <StatusPill tone="neutral">Archivado</StatusPill>
           )}
         </span>
-        <span className="text-ayuda text-texto">
+        <span className="tipo-secundario text-texto">
           {row.original.description}
         </span>
       </span>

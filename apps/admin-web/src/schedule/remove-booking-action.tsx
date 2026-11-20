@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { fieldMessageClass } from "../components/form/form";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { removalProblem } from "./booking-problems";
@@ -40,7 +41,6 @@ export function RemoveBookingAction({
         variant="link"
         size="sm"
         aria-label={`Quitar a ${clientName}`}
-        className="underline"
         onClick={() => {
           setFailure(null);
           setOpen(true);
@@ -60,7 +60,7 @@ export function RemoveBookingAction({
           La clase vuelve a su plan y, si hay lista de espera, entra la primera.
         </p>
         {failure === null ? null : (
-          <p role="alert" className="font-semibold text-texto">
+          <p role="alert" className={fieldMessageClass}>
             {failure}
           </p>
         )}

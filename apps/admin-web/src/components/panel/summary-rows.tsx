@@ -11,9 +11,7 @@ export function SummaryBlock({
 }) {
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        {title}
-      </h3>
+      <h3 className="tipo-etiqueta text-texto">{title}</h3>
       <dl className="flex flex-col divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta">
         {children}
       </dl>
@@ -28,17 +26,17 @@ export function SummaryRow({
 }: {
   label: string;
   children: ReactNode;
-  /** Money and counts in Lora with tabular figures. */
+  /** Money and counts, stressed as a row title with tabular figures. */
   figure?: boolean;
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-      <dt className="text-nota text-texto">{label}</dt>
+      <dt className="tipo-secundario text-texto">{label}</dt>
       <dd
         className={
           figure
-            ? "text-right font-serif text-fila text-texto tabular"
-            : "text-right text-nota text-texto"
+            ? "text-right tipo-titulo-fila text-texto tabular"
+            : "text-right tipo-compacto text-texto"
         }
       >
         {children}

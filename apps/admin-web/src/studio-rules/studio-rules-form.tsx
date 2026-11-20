@@ -18,6 +18,7 @@ import { CivilDateInput } from "../components/form/civil-date-input";
 import { civilDateValue } from "../components/form/civil-date";
 import { wholeNumberField } from "../components/form/number-field";
 import { Button } from "../components/ui/button";
+import { InlineError } from "../components/ui/inline-error";
 import { Input } from "../components/ui/input";
 import { formatCancellationWindow } from "./studio-rules-format";
 import { useStudioSettingsChange } from "./studio-rules-queries";
@@ -163,7 +164,7 @@ export function StudioRulesForm({
           })}
         </div>
         <fieldset className="flex flex-col gap-3">
-          <legend className="pb-2 text-celda font-medium text-texto">
+          <legend className="pb-2 tipo-titulo-fila text-texto">
             Meta de renovación de la coordinadora
           </legend>
           <div className="grid gap-4 md:grid-cols-3">
@@ -180,7 +181,7 @@ export function StudioRulesForm({
               label: "Desde el mes 13 (%)",
             })}
           </div>
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Los meses se cuentan desde la fecha de apertura.
           </p>
         </fieldset>
@@ -192,11 +193,7 @@ export function StudioRulesForm({
               "Déjala vacía hasta conocerla. Antes de esa fecha, las clientas pueden comprar con inicio el día de la apertura.",
           })}
         </div>
-        {failure === null ? null : (
-          <p role="alert" className="text-nota text-texto">
-            {failure}
-          </p>
-        )}
+        {failure === null ? null : <InlineError>{failure}</InlineError>}
         <Button
           type="submit"
           size="lg"

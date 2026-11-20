@@ -23,7 +23,7 @@ export function EmptySlot({
       aria-label={`Nueva clase el ${formatLongDay(day)} a las ${time}`}
       onClick={() => onCreate({ date: day, time })}
       style={style}
-      className="group absolute inset-x-1 flex items-start gap-1 rounded-control border border-dashed border-transparent px-2 py-1 text-ayuda font-medium text-texto hover:border-primario hover:bg-superficie-hundida focus-visible:border-primario focus-visible:bg-superficie-hundida focus-visible:shadow-foco-solido"
+      className="group absolute inset-x-1 flex items-start gap-1 rounded-control border border-dashed border-transparent px-2 py-1 tipo-secundario text-texto hover:border-primario hover:bg-superficie-hundida focus-visible:border-primario focus-visible:bg-superficie-hundida focus-visible:shadow-foco-solido"
     >
       <span
         aria-hidden="true"

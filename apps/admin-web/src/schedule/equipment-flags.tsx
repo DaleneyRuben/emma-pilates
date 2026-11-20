@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { TextLink } from "../components/ui/text-link";
 import { typeEquipment, type EquipmentFlag } from "./equipment-flag-data";
 
 /**
@@ -18,25 +19,26 @@ export function EquipmentDot() {
 /** FIX-084: the panel's sentence for a class short of Equipment. */
 export function EquipmentFlagNote({ flag }: { flag: EquipmentFlag }) {
   return (
-    <p className="flex items-start gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-celda text-texto">
+    <p className="flex items-start gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 tipo-compacto text-texto">
       <span className="mt-[7px] flex">
         <EquipmentDot />
       </span>
       <span>
         {`Faltan equipos: ${flag.workingCount} ${typeEquipment(flag)} funcionando para ${flag.capacity} lugares. Baja su capacidad o revisa `}
-        <Link
-          to="/estudio/equipos"
-          className="font-medium text-texto underline-offset-2 hover:underline"
-        >
-          Equipos
-        </Link>
+        <TextLink asChild inline>
+          <Link to="/estudio/equipos">Equipos</Link>
+        </TextLink>
         .
       </span>
     </p>
   );
 }
 
-/** Follow-up 170 §2, FIX-084: how many of the week's classes are short, in one quiet line. */
+/**
+ * Follow-up 170 §2, FIX-084: how many of the week's classes are short, in
+ * one quiet line inside a white pill, never loose on the page 100
+ * (follow-up 285, rule 3).
+ */
 export function EquipmentFlagsNotice({
   flags,
 }: {
@@ -51,17 +53,14 @@ export function EquipmentFlagsNotice({
     <p
       role="status"
       aria-label={text}
-      className="flex items-center gap-2 text-nota text-texto"
+      className="flex items-center gap-2 self-start rounded-full bg-superficie px-3.5 py-2 tipo-compacto text-texto shadow-tarjeta"
     >
       <EquipmentDot />
       <span>
         {`${text} · `}
-        <Link
-          to="/estudio/equipos"
-          className="font-medium text-texto underline-offset-2 hover:underline"
-        >
-          Revisar
-        </Link>
+        <TextLink asChild inline>
+          <Link to="/estudio/equipos">Revisar</Link>
+        </TextLink>
       </span>
     </p>
   );

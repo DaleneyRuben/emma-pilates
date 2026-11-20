@@ -5,6 +5,7 @@ import {
 } from "@pilates/api-contracts";
 import { useId, useState } from "react";
 import { Button } from "../../components/ui/button";
+import { TextLink } from "../../components/ui/text-link";
 import { boliviaToday, formatDayMonth } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import {
@@ -54,18 +55,16 @@ export function StatementCard({
       // total in Lora over the white card with its lines.
       className="flex flex-col overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-destacado px-5 py-[18px] text-blanco md:px-[22px]">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-destacado px-5 py-[18px] text-sobre-primario md:px-[22px]">
         <div className="flex min-w-0 flex-col gap-1">
-          <h2 id={headingId} className="font-serif text-titulo-1 leading-tight">
+          <h2 id={headingId} className="tipo-titulo-seccion">
             {statement.staffMemberName}
           </h2>
-          <p className="text-nota font-medium">
+          <p className="tipo-compacto">
             {role === undefined ? periodText : `${role} · ${periodText}`}
           </p>
         </div>
-        <p className="font-serif text-[32px] leading-tight whitespace-nowrap tabular">
-          {total}
-        </p>
+        <p className="tipo-cifra-grande whitespace-nowrap">{total}</p>
       </div>
       <div className="flex flex-col gap-3.5 px-5 pt-2 pb-5 md:px-[22px]">
         <ConceptRows lines={statement.lines} />
@@ -76,25 +75,24 @@ export function StatementCard({
           {count === 0 ? (
             <span />
           ) : (
-            <button
-              type="button"
+            <TextLink
               aria-expanded={showLines}
               aria-controls={showLines ? linesId : undefined}
               onClick={() => setShowLines((open) => !open)}
-              className="rounded-control text-celda font-bold text-texto underline underline-offset-[3px] hover:decoration-2 focus-visible:shadow-foco"
+              className="rounded-control"
             >
               {showLines
                 ? "Ocultar las líneas"
                 : count === 1
                   ? "Ver la línea"
                   : `Ver las ${count} líneas`}
-            </button>
+            </TextLink>
           )}
           {waits ? (
             <span className="flex flex-wrap items-center justify-end gap-3">
               {/* BKO-007: her approval waits for the renewals. */}
               {member?.role === "coordinator" ? (
-                <span className="text-nota text-texto">
+                <span className="tipo-secundario text-texto">
                   Su bono espera las renovaciones
                 </span>
               ) : null}

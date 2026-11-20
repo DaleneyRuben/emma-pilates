@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { countFormat } from "../components/table/pagination";
+import { TextLink } from "../components/ui/text-link";
 import { monthKpisQueryOptions } from "../indicators/indicator-queries";
 import { boliviaParts } from "../lib/bolivia-time";
 import { incomeReportQueryOptions } from "../report/report-queries";
@@ -10,13 +11,7 @@ import { weekSessionsQueryOptions } from "../schedule/schedule-queries";
 import { cn } from "../lib/cn";
 import { todaySummary } from "./home-pending";
 
-const asideLink =
-  "text-nota font-bold underline underline-offset-[3px] hover:decoration-2";
-
-const plural = (count: number, one: string, many: string) =>
-  `${countFormat.format(count)} ${count === 1 ? one : many}`;
-
-// Rosa Emma (RW-inicio): a white card with an 11 px uppercase label and its
+// Rosa Emma (RW-inicio): a white card with its `etiqueta` label and its
 // figure in Lora; the money card is the page's one Rosa profundo block.
 export function SummaryCard({
   title,
@@ -36,15 +31,12 @@ export function SummaryCard({
       className={cn(
         "flex min-h-[130px] flex-col gap-1.5 rounded-tarjeta px-5 py-[22px]",
         strong
-          ? "bg-destacado text-blanco shadow-destacado"
+          ? "bg-destacado text-sobre-primario shadow-destacado"
           : "bg-superficie text-texto shadow-tarjeta",
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <h2
-          id={id}
-          className="font-sans text-etiqueta font-bold tracking-[0.14em] uppercase"
-        >
+        <h2 id={id} className="tipo-etiqueta">
           {title}
         </h2>
         {aside}
@@ -57,17 +49,16 @@ export function SummaryCard({
 function Figure({ value, label }: { value: string; label: string }) {
   return (
     <span className="flex flex-col">
-      <span className="font-serif text-titulo-1 text-texto tabular">
-        {value}
-      </span>
-      <span className="text-nota text-texto">{label}</span>
+      <span className="tipo-cifra text-texto">{value}</span>
+      <span className="tipo-secundario text-texto">{label}</span>
     </span>
   );
 }
 
 /**
  * P01's «Hoy», FIX-084 (Inicio A): today's classes at the selected Branch,
- * their bookings and occupancy in one line, then each class.
+ * their bookings and occupancy as three figures, then each class with its
+ * time as a figure (follow-up 285).
  */
 export function TodayCard({
   branch,
@@ -84,25 +75,39 @@ export function TodayCard({
     <SummaryCard
       title="Hoy"
       aside={
-        <Link to="/horario" className={asideLink}>
-          Ver horario
-        </Link>
+        <TextLink asChild>
+          <Link to="/horario">Ver horario</Link>
+        </TextLink>
       }
     >
-      <p className="font-serif text-[28px] leading-tight text-texto tabular">
-        {[
-          plural(day.classes, "clase", "clases"),
-          plural(day.bookings, "reserva", "reservas"),
-          `${day.occupancyPercent === null ? "—" : `${day.occupancyPercent} %`} ocupación`,
-        ].join(" · ")}
-      </p>
+      <div className="grid grid-cols-3 gap-2">
+        <Figure
+          value={countFormat.format(day.classes)}
+          label={day.classes === 1 ? "clase" : "clases"}
+        />
+        <Figure
+          value={countFormat.format(day.bookings)}
+          label={day.bookings === 1 ? "reserva" : "reservas"}
+        />
+        <Figure
+          value={
+            day.occupancyPercent === null ? "—" : `${day.occupancyPercent} %`
+          }
+          label="ocupación"
+        />
+      </div>
       {day.classes === 0 ? (
-        <p className="text-celda text-texto">Sin clases hoy.</p>
+        <p className="tipo-compacto text-texto">Sin clases hoy.</p>
       ) : (
-        <ul className="flex flex-col gap-0.5 text-celda text-texto">
+        <ul className="flex flex-col gap-1 text-texto">
           {day.sessions.map((session) => (
-            <li key={session.id} className="tabular">
-              {`${boliviaParts(session.startsAt).time} ${session.classTypeName} · ${session.trainerName} (${session.bookedCount} de ${session.capacity})`}
+            <li key={session.id} className="flex items-baseline gap-3">
+              <span className="tipo-cifra">
+                {boliviaParts(session.startsAt).time}
+              </span>
+              <span className="tipo-compacto tabular">
+                {`${session.classTypeName} · ${session.trainerName} (${session.bookedCount} de ${session.capacity})`}
+              </span>
             </li>
           ))}
         </ul>
@@ -127,23 +132,23 @@ export function MoneyCard({
       title="Cobrado hoy"
       strong
       aside={
-        <Link to="/dinero/pagos" className={asideLink}>
-          Ver pagos
-        </Link>
+        <TextLink asChild className="text-sobre-primario">
+          <Link to="/dinero/pagos">Ver pagos</Link>
+        </TextLink>
       }
     >
       {income.data === undefined ? (
-        <p className="text-celda">
+        <p className="tipo-compacto">
           {income.isError
             ? "No pudimos cargar lo cobrado."
             : "Cargando lo cobrado…"}
         </p>
       ) : (
         <>
-          <span className="font-serif text-cifra-grande leading-tight tabular">
+          <span className="tipo-cifra-grande">
             {formatMoney(income.data.totalCentavos)}
           </span>
-          <span className="text-cuerpo font-medium tabular">
+          <span className="tipo-cuerpo tabular">
             {[
               `Efectivo ${formatMoney(income.data.byMethod.cash)}`,
               `QR ${formatMoney(income.data.byMethod.transfer)}`,
@@ -165,13 +170,13 @@ export function ClientsCard({ month }: { month: string }) {
     <SummaryCard
       title="Clientas"
       aside={
-        <Link to="/clientas" className={asideLink}>
-          Ver clientas
-        </Link>
+        <TextLink asChild>
+          <Link to="/clientas">Ver clientas</Link>
+        </TextLink>
       }
     >
       {kpis.data === undefined ? (
-        <p className="text-nota text-texto">
+        <p className="tipo-compacto text-texto">
           {kpis.isError
             ? "No pudimos cargar las clientas."
             : "Cargando las clientas…"}

@@ -9,6 +9,7 @@ import { IndicatorChart } from "./indicator-chart";
 import { hasAmounts, monthKpisQueryOptions } from "./indicator-queries";
 import { RecommendationsSection } from "../recommendations/recommendations-page";
 import { MonthNarrative } from "./month-narrative";
+import { EmptyState } from "../components/ui/empty-state";
 import { StatTile, StatTiles } from "../components/ui/stat-tile";
 
 const tenths = new Intl.NumberFormat("es-BO", {
@@ -69,7 +70,8 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
       {failed !== undefined || data === undefined ? null : (
         <>
           {hasAmounts(data) ? (
-            <StatTiles>
+            // Audit 4.g.3: a money figure does not wrap, so one column below md.
+            <StatTiles className="grid-cols-1">
               <StatTile
                 label="Cobrado"
                 figure={formatBolivianos(data.cashCentavos)}
@@ -85,9 +87,7 @@ export function IndicatorsPage({ readOnly = false }: { readOnly?: boolean }) {
             </StatTiles>
           ) : null}
           {data.sessionsHeld === 0 ? (
-            <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-6 py-10 text-center text-cuerpo text-texto">
-              Sin clases dictadas en este mes.
-            </p>
+            <EmptyState>Sin clases dictadas en este mes.</EmptyState>
           ) : (
             <IndicatorChart
               points={series.map((item, index) => ({

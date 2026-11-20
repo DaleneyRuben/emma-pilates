@@ -5,7 +5,9 @@ import type {
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { avisoClass } from "../components/ui/aviso";
 import { Button } from "../components/ui/button";
+import { InlineError } from "../components/ui/inline-error";
 import { Input } from "../components/ui/input";
 import { StatusPill } from "../components/ui/status-pill";
 import { bookingProblem } from "./booking-problems";
@@ -28,18 +30,14 @@ function ClientResults({
   const results = useQuery(clientSearchQueryOptions(q));
   if (q.length < minimumClientQuery) return null;
   if (results.isPending) {
-    return <p className="text-celda text-texto">Buscando…</p>;
+    return <p className="tipo-cuerpo text-texto">Buscando…</p>;
   }
   if (results.isError) {
-    return (
-      <p role="alert" className="text-celda text-texto">
-        No pudimos buscar. Inténtalo de nuevo.
-      </p>
-    );
+    return <InlineError>No pudimos buscar. Inténtalo de nuevo.</InlineError>;
   }
   if (results.data.items.length === 0) {
     return (
-      <p className="text-celda text-texto">
+      <p className="tipo-cuerpo text-texto">
         No encontramos clientas con esa búsqueda.
       </p>
     );
@@ -52,10 +50,8 @@ function ClientResults({
           className="flex min-h-[52px] items-center gap-3 px-4 py-2"
         >
           <span className="flex flex-1 flex-col">
-            <span className="text-celda font-medium text-texto">
-              {client.name}
-            </span>
-            <span className="text-ayuda text-texto">
+            <span className="tipo-titulo-fila text-texto">{client.name}</span>
+            <span className="tipo-secundario text-texto">
               {client.planName ?? client.email}
             </span>
           </span>
@@ -113,7 +109,7 @@ export function BookClientForm({
   return (
     <div className="flex flex-1 flex-col gap-5 px-7 py-4">
       {full ? (
-        <p className="rounded-tarjeta bg-aviso px-4 py-3 text-celda text-texto">
+        <p className={avisoClass}>
           La clase está llena: la clienta entra a la lista de espera en el
           puesto {nextPosition}.
         </p>
@@ -124,7 +120,7 @@ export function BookClientForm({
             <Search
               size={16}
               aria-hidden="true"
-              className="absolute top-1/2 left-3 -translate-y-1/2 text-superficie-hundida"
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-texto"
             />
             <Input
               aria-label="Buscar clienta"
@@ -139,16 +135,12 @@ export function BookClientForm({
         </>
       ) : (
         <div className="flex flex-col gap-4">
-          <p className="text-cuerpo text-texto">
+          <p className="tipo-cuerpo text-texto">
             {full
               ? `¿Agregar a ${picked.name} a la lista de espera?`
               : `¿Reservar a ${picked.name} en esta clase?`}
           </p>
-          {failure === null ? null : (
-            <p role="alert" className="text-celda text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
           <div className="flex flex-wrap justify-end gap-2">
             <Button
               variant="neutral"
@@ -165,7 +157,7 @@ export function BookClientForm({
           </div>
         </div>
       )}
-      <p className="text-ayuda text-texto">
+      <p className="tipo-secundario text-texto">
         {full
           ? "Si se libera un lugar, entra sola y le llega el aviso."
           : "La reserva usa una clase de su plan y le llega el aviso como si reservara ella."}

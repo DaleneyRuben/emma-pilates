@@ -20,14 +20,14 @@ export function Table({
       className="w-full overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta"
     >
       {lead === undefined ? null : (
-        <div className="border-b border-borde px-5 py-3.5 text-celda text-texto">
+        <div className="border-b border-borde px-5 py-3.5 tipo-compacto text-texto">
           {lead}
         </div>
       )}
       <table
         data-slot="table"
         className={cn(
-          "w-full caption-bottom border-collapse text-celda text-texto max-md:block",
+          "w-full caption-bottom border-collapse tipo-compacto text-texto max-md:block",
           className,
         )}
         {...props}
@@ -82,7 +82,7 @@ export function TableHead({ className, ...props }: ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-12 px-5 text-left align-middle text-etiqueta font-bold tracking-[0.14em] whitespace-nowrap text-texto uppercase",
+        "h-12 px-5 text-left align-middle tipo-etiqueta whitespace-nowrap text-texto",
         className,
       )}
       {...props}
@@ -95,7 +95,7 @@ export function TableCell({ className, ...props }: ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-5 py-3.5 align-middle max-md:flex max-md:empty:hidden max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:text-cabecera-tabla max-md:before:font-medium max-md:before:tracking-[0.14em] max-md:before:text-texto max-md:before:uppercase max-md:before:content-[attr(data-label)]",
+        "px-5 py-3.5 align-middle max-md:flex max-md:empty:hidden max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:tipo-etiqueta max-md:before:text-texto max-md:before:content-[attr(data-label)]",
         className,
       )}
       {...props}

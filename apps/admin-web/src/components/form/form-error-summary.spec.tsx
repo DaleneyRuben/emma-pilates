@@ -75,7 +75,9 @@ describe("FormErrorSummary (FIX-089, FormB)", () => {
       "aria-invalid",
       "true",
     );
-    expect(screen.getByText("Escribe el nombre.")).toHaveClass("font-bold");
+    expect(screen.getByText("Escribe el nombre.")).toHaveClass(
+      "tipo-secundario",
+    );
   });
 
   it("shrinks as fields are fixed and leaves once all are", async () => {

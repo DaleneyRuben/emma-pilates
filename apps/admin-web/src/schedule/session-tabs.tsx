@@ -1,6 +1,7 @@
 import type { KeyboardEvent, ReactNode } from "react";
 import {
   segmentClass,
+  segmentCompactClass,
   segmentCurrentClass,
   segmentedBarClass,
 } from "../components/ui/segmented";
@@ -60,7 +61,8 @@ export function SessionTabs({
             onKeyDown={(event) => move(event, index)}
             className={cn(
               segmentClass,
-              "h-9 shrink-0 px-3.5 text-celda",
+              segmentCompactClass,
+              "shrink-0",
               selected && segmentCurrentClass,
             )}
           >

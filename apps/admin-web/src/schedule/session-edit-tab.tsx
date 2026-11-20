@@ -21,7 +21,7 @@ export function SessionEditTab({
   return (
     <div className="flex flex-1 flex-col">
       {session.sessionScheduleId === null ? null : (
-        <p className="px-7 pt-4 text-nota text-texto">
+        <p className="px-7 pt-4 tipo-compacto text-texto">
           Cambia solo esta clase. Para cambiar la serie, usa Serie semanal.
         </p>
       )}

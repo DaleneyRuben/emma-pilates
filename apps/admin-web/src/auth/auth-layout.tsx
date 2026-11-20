@@ -28,10 +28,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 export function AuthHeading({ title, line }: { title: string; line: string }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <h1 className="font-serif text-[34px] leading-tight text-texto">
-        {title}
-      </h1>
-      <p className="text-cuerpo text-texto">{line}</p>
+      <h1 className="tipo-titulo-pagina text-texto">{title}</h1>
+      <p className="tipo-cuerpo text-texto">{line}</p>
     </div>
   );
 }

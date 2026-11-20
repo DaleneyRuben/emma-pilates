@@ -2,7 +2,7 @@ import { useId, type ReactNode } from "react";
 
 /**
  * FIX-091 (W14 A): «Editar miembro» reads as one page by sections, each
- * under a small Rosa profundo title (Datos, Rol y sucursales, Código de
+ * under a small `etiqueta` title (Datos, Rol y sucursales, Código de
  * invitación).
  */
 export function StaffFormSection({
@@ -15,10 +15,7 @@ export function StaffFormSection({
   const id = useId();
   return (
     <section aria-labelledby={id} className="flex flex-col gap-4">
-      <h3
-        id={id}
-        className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-600 uppercase"
-      >
+      <h3 id={id} className="tipo-etiqueta text-texto">
         {title}
       </h3>
       {children}

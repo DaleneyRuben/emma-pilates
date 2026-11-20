@@ -19,6 +19,7 @@ import {
 } from "../../components/panel/side-panel";
 import { PhoneFormField } from "../../components/form/phone-field";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { WaitNotice } from "../../auth/request-limit-notice";
 import { useCountdown } from "../../auth/use-countdown";
@@ -129,11 +130,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
             description="La asistente lo usa para escribirle por WhatsApp."
           />
           <StaffRoleFields control={form.control} role={role} gender={gender} />
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button

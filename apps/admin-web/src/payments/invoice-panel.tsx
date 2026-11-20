@@ -22,7 +22,7 @@ const methods: Record<StaffInvoiceDto["method"], string> = {
 function InvoiceState({ invoice }: { invoice: StaffInvoiceDto }) {
   if (invoice.invoiceIssued === null) {
     return invoice.voided ? (
-      <span className="text-nota text-texto">Pago anulado</span>
+      <span className="tipo-secundario text-texto">Pago anulado</span>
     ) : (
       <StatusPill tone="advertencia">Por emitir</StatusPill>
     );
@@ -31,7 +31,7 @@ function InvoiceState({ invoice }: { invoice: StaffInvoiceDto }) {
     <span className="inline-flex items-center gap-2">
       <StatusPill tone="exito">Emitida</StatusPill>
       {invoice.file === null ? (
-        <span className="text-ayuda text-texto">sin archivo</span>
+        <span className="tipo-secundario text-texto">sin archivo</span>
       ) : null}
     </span>
   );
@@ -121,7 +121,7 @@ export function InvoicePanel({ payment }: { payment: AdminPaymentDto }) {
       <SidePanelBody>
         {isApiError(invoice.error) &&
         invoice.error.code === "payment_not_found" ? (
-          <p role="alert" className="text-cuerpo text-texto">
+          <p role="alert" className="tipo-cuerpo text-texto">
             Este pago ya no existe. Cierra el panel y vuelve a abrir la lista.
           </p>
         ) : (

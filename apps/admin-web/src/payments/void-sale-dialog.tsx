@@ -3,11 +3,13 @@ import {
   voidPayment,
 } from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { adminFetch } from "../api/fetcher";
 import { isApiError } from "../api/problem";
+import { fieldMessageClass } from "../components/form/form";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 
 const problems: Record<string, string> = {
   payment_already_voided: "Esta venta ya fue anulada.",
@@ -29,6 +31,7 @@ export function VoidSaleDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const queryClient = useQueryClient();
+  const reasonId = useId();
   const [reason, setReason] = useState("");
   const [failure, setFailure] = useState<string | null>(null);
   const voidSale = useMutation({
@@ -73,19 +76,17 @@ export function VoidSaleDialog({
         El plan termina y las reservas futuras se cancelan. El dinero no se
         devuelve: una anulación corrige un error.
       </p>
-      <label className="flex flex-col gap-1 text-texto">
-        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-          Motivo
-        </span>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={reasonId}>Motivo</Label>
         <Input
-          aria-label="Motivo"
+          id={reasonId}
           value={reason}
           maxLength={300}
           onChange={(event) => setReason(event.target.value)}
         />
-      </label>
+      </div>
       {failure === null ? null : (
-        <p role="alert" className="text-texto">
+        <p role="alert" className={fieldMessageClass}>
           {failure}
         </p>
       )}

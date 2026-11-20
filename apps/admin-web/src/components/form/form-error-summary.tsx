@@ -23,8 +23,8 @@ export function FormErrorSummaryBox({
       data-slot="form-error-summary"
       className="flex flex-col gap-1 rounded-boton bg-aviso px-[18px] py-3.5 text-texto inset-ring-2 inset-ring-primario"
     >
-      <p className="text-fila font-bold">{missingDataTitle(labels.length)}</p>
-      <p className="text-celda">{labels.join(" · ")}</p>
+      <p className="tipo-titulo-fila">{missingDataTitle(labels.length)}</p>
+      <p className="tipo-compacto">{labels.join(" · ")}</p>
     </div>
   );
 }

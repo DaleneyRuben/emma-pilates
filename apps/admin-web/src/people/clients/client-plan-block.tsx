@@ -29,11 +29,11 @@ export function ClientPlanBlock({
       <SummaryBlock title="Plan">
         <SummaryRow label="Plan">
           <span className="flex items-center justify-end gap-2">
-            <span className="text-texto">Sin plan activo</span>
+            <span className="tipo-compacto text-texto">Sin plan activo</span>
             <StatusPill tone="error">Plan vencido</StatusPill>
           </span>
         </SummaryRow>
-        <p className="px-3 py-2 text-ayuda text-texto">
+        <p className="px-3 py-2 tipo-secundario text-texto">
           Último plan vencido el {formatListDate(current.endsOn)}.
         </p>
       </SummaryBlock>
@@ -75,7 +75,7 @@ export function ClientPlanBlock({
         </SummaryRow>
       )}
       {current.extraClassesLine ? (
-        <p className="px-3 py-2 text-nota text-texto">
+        <p className="px-3 py-2 tipo-secundario text-texto">
           {current.extraClassesLine}
         </p>
       ) : null}

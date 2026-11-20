@@ -18,6 +18,7 @@ import { ActionRow } from "../../components/panel/action-rows";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { TextLink } from "../../components/ui/text-link";
 import { addDays, boliviaToday } from "../../lib/bolivia-time";
 
 const refusals: Record<string, string> = {
@@ -119,13 +120,13 @@ export function CourtesyAccessAction({
         {problem === null ? null : (
           <div
             role="alert"
-            className="flex flex-col gap-1 rounded-control bg-aviso px-3 py-2 text-texto"
+            className="flex flex-col items-start gap-1.5 rounded-[16px] bg-aviso px-[18px] py-3.5 tipo-titulo-fila text-texto inset-ring-[1.5px] inset-ring-borde-fuerte"
           >
             <span>{problem}</span>
             {problem === refusals.payment_pending_exists ? (
-              <Link to="/dinero/pagos" className="font-medium text-primario">
-                Ir a Pagos
-              </Link>
+              <TextLink asChild>
+                <Link to="/dinero/pagos">Ir a Pagos</Link>
+              </TextLink>
             ) : null}
           </div>
         )}

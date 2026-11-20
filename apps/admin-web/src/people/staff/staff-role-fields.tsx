@@ -10,6 +10,7 @@ import {
   MultiChoiceChips,
 } from "../../components/form/choice-chips";
 import {
+  fieldMessageClass,
   FormDescription,
   FormField,
   FormItem,
@@ -27,10 +28,7 @@ const roleOptions = (gender: StaffGenderCode | "") =>
 
 function FieldTitle({ children }: { children: string }) {
   return (
-    <span
-      aria-hidden="true"
-      className="block text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
-    >
+    <span aria-hidden="true" className="block tipo-compacto-600 text-texto">
       {children}
     </span>
   );
@@ -38,7 +36,7 @@ function FieldTitle({ children }: { children: string }) {
 
 function ReadOnlyRow({ children }: { children: string }) {
   return (
-    <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 text-nota text-texto">
+    <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 tipo-compacto text-texto">
       {children}
     </p>
   );
@@ -118,9 +116,11 @@ export function StaffRoleFields({
             <FormItem>
               <FieldTitle>Sucursales asignadas</FieldTitle>
               {branches.isPending ? (
-                <p className="text-ayuda text-texto">Cargando sucursales…</p>
+                <p className="tipo-secundario text-texto">
+                  Cargando sucursales…
+                </p>
               ) : branches.isError ? (
-                <p role="alert" className="text-ayuda text-texto">
+                <p role="alert" className={fieldMessageClass}>
                   No pudimos cargar las sucursales.
                 </p>
               ) : (

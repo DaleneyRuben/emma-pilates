@@ -1,5 +1,6 @@
 import { Fragment, useId, useState } from "react";
 import { Button } from "../../components/ui/button";
+import { EmptyState } from "../../components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -39,8 +40,8 @@ function TypeRow({
       >
         <TableCell data-label="Equipo">
           <span className="flex flex-col">
-            <span className="font-medium">{type.name}</span>
-            <span className="text-nota text-texto">
+            <span className="tipo-titulo-fila">{type.name}</span>
+            <span className="tipo-secundario text-texto">
               {trackingLabel[type.tracking]}
             </span>
           </span>
@@ -98,11 +99,7 @@ export function EquipmentTable({
   onAction: OnAction;
 }) {
   if (holdings.length === 0) {
-    return (
-      <p className="rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto">
-        Todavía no hay tipos de equipo.
-      </p>
-    );
+    return <EmptyState>Todavía no hay tipos de equipo.</EmptyState>;
   }
   return (
     <Table aria-label="Equipos">

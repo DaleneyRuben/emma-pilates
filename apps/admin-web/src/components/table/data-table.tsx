@@ -138,17 +138,11 @@ export function DataTable<Row>({
             <TableRow className="hover:bg-transparent max-md:border-0 max-md:bg-transparent">
               <TableCell
                 colSpan={columns.length}
-                // Rosa Emma (rw.py empty): a multi-line empty message leads with its
-                // first line in Lora 24.
-                className="px-3 py-9 text-center text-cuerpo text-texto max-md:block max-md:before:content-none [&>span>span:first-child]:mb-1 [&>span>span:first-child]:font-serif [&>span>span:first-child]:text-[24px] [&>span>span:first-child]:leading-tight"
+                // Follow-up 285: a multi-line empty message leads with its
+                // first line in `titulo-fila`, never Lora; one line is `cuerpo`.
+                className="px-3 py-9 text-center tipo-cuerpo text-texto max-md:block max-md:before:content-none [&>span>span:first-child]:mb-1 [&>span>span:first-child]:tipo-titulo-fila"
               >
-                {typeof emptyMessage === "string" ? (
-                  <span className="font-serif text-[24px] leading-tight">
-                    {emptyMessage}
-                  </span>
-                ) : (
-                  emptyMessage
-                )}
+                {emptyMessage}
               </TableCell>
             </TableRow>
           ) : (

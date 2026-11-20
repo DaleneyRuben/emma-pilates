@@ -85,13 +85,12 @@ describe("the compact phone card", () => {
       screen.getByTestId("circle"),
     );
     expect(row.querySelector('[data-part="title"]')).toHaveClass(
-      "text-[16px]",
-      "font-semibold",
+      "tipo-titulo-fila",
       "[&_[data-photo]]:hidden",
     );
     expect(row.querySelector('[data-part="chevron"]')).toBeInTheDocument();
     expect(row.querySelector('[data-part="detail"]')).toHaveClass(
-      "text-nota",
+      "tipo-secundario",
       "truncate",
     );
   });

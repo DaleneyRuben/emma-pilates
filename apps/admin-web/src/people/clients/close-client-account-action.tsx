@@ -10,6 +10,8 @@ import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
 import { ActionRow } from "../../components/panel/action-rows";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
+import { TextLink } from "../../components/ui/text-link";
 import { describeClosureForAdministrator } from "./close-client-account-lines";
 
 type Outcome = "refused" | "failed" | null;
@@ -72,27 +74,27 @@ export function CloseClientAccountAction({
             <li key={line}>{line}</li>
           ))}
         </ul>
-        <p className="font-medium text-texto">
+        <p className="tipo-titulo-fila text-texto">
           Esta acción no se puede deshacer.
         </p>
         {refused ? (
           <div
             role="alert"
-            className="flex flex-col gap-1 rounded-control bg-aviso px-3 py-2 text-texto"
+            className="flex flex-col items-start gap-1.5 rounded-[16px] bg-aviso px-[18px] py-3.5 tipo-titulo-fila text-texto inset-ring-[1.5px] inset-ring-borde-fuerte"
           >
             <span>
               No se puede cerrar todavía: tiene un pago por QR en revisión.
               Confírmalo o recházalo en Pagos y vuelve a intentarlo.
             </span>
-            <Link to="/dinero/pagos" className="font-medium text-primario">
-              Ir a Pagos
-            </Link>
+            <TextLink asChild>
+              <Link to="/dinero/pagos">Ir a Pagos</Link>
+            </TextLink>
           </div>
         ) : null}
         {outcome === "failed" ? (
-          <p role="alert" className="text-texto">
+          <InlineError>
             No pudimos cerrar la cuenta. Inténtalo de nuevo.
-          </p>
+          </InlineError>
         ) : null}
       </ConfirmDialog>
     </ActionRow>

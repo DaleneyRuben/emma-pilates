@@ -36,10 +36,8 @@ export function StaffContact({
           key={label}
           className="flex items-baseline justify-between gap-4 px-3 py-2"
         >
-          <dt className="shrink-0 text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-            {label}
-          </dt>
-          <dd className="min-w-0 text-right text-nota break-words text-texto">
+          <dt className="shrink-0 tipo-secundario text-texto">{label}</dt>
+          <dd className="min-w-0 text-right tipo-compacto break-words text-texto">
             {value}
           </dd>
         </div>
@@ -67,16 +65,14 @@ export function StaffReadOnly({
   return (
     <SidePanelBody>
       <StaffPhotoBlock member={member} />
-      <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+      <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-secundario text-texto">
         {note}
       </p>
       <StaffContact member={member} />
       {facts.map(([label, value]) => (
         <div key={label} className="flex flex-col gap-1">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-            {label}
-          </span>
-          <span className="text-nota text-texto">{value}</span>
+          <span className="tipo-compacto-600 text-texto">{label}</span>
+          <span className="tipo-compacto text-texto">{value}</span>
         </div>
       ))}
     </SidePanelBody>

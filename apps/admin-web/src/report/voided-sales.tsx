@@ -12,8 +12,8 @@ export function VoidedSales({ sales }: { sales: VoidedSale[] }) {
       aria-label="Ventas anuladas"
       className="flex flex-col gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3"
     >
-      <h2 className="text-nota font-medium text-texto">Ventas anuladas</h2>
-      <p className="text-ayuda text-texto">
+      <h2 className="tipo-titulo-fila text-texto">Ventas anuladas</h2>
+      <p className="tipo-secundario text-texto">
         Fuera de los totales. Una anulación corrige un error y no devuelve
         dinero.
       </p>
@@ -21,7 +21,7 @@ export function VoidedSales({ sales }: { sales: VoidedSale[] }) {
         {sales.map((sale) => (
           <li
             key={sale.paymentId}
-            className="flex flex-wrap justify-between gap-2 text-nota"
+            className="flex flex-wrap justify-between gap-2 tipo-secundario text-texto"
           >
             <span>{sale.voidReason}</span>
             <span className="text-texto tabular">

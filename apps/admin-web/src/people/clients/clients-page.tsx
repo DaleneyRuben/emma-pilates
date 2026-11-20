@@ -10,6 +10,7 @@ import { PageNotice } from "../../components/page/page-notice";
 import { countFormat } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { useAdminRole } from "../../session/admin-role";
 import type { ClientFilter, ClientSearch } from "../people-search";
 import { clientColumns } from "./client-columns";
@@ -29,13 +30,18 @@ const fundadoras = (count: number) =>
 const exclientas = (count: number) =>
   `${countFormat.format(count)} ${count === 1 ? "exclienta" : "exclientas"}`;
 
+// Follow-up 285 (rule 3): a line about the list sits in a white pill, never
+// loose on the page 100.
+const whitePill =
+  "self-start rounded-full bg-superficie px-3.5 py-2 tipo-compacto text-texto shadow-tarjeta";
+
 // The old Fundadoras page's subtitle, under the Fundadora chip for the
 // Administrator only (ADR-0102, ADR-0108).
 function FounderPlaces() {
   const places = useQuery(founderPlacesQueryOptions());
   if (places.data === undefined) return null;
   return (
-    <p className="text-nota text-texto">
+    <p className={whitePill}>
       {countFormat.format(places.data.granted)} de{" "}
       {countFormat.format(places.data.places)} lugares de fundadora otorgados
     </p>
@@ -67,11 +73,9 @@ function EmptyDirectory({
   if (searching) {
     return (
       <span className="flex flex-col items-center gap-1">
-        <span className="text-texto">No se encontró ninguna clienta.</span>
-        <span className="text-nota text-texto">
-          Revisa cómo escribiste el nombre o el teléfono.
-        </span>
-        <span className="text-ayuda text-texto">{origin}</span>
+        <span>No se encontró ninguna clienta.</span>
+        <span>Revisa cómo escribiste el nombre o el teléfono.</span>
+        <span>{origin}</span>
       </span>
     );
   }
@@ -80,8 +84,8 @@ function EmptyDirectory({
   }
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto">Todavía no hay clientas.</span>
-      <span className="text-ayuda text-texto">{origin}</span>
+      <span>Todavía no hay clientas.</span>
+      <span>{origin}</span>
     </span>
   );
 }
@@ -89,10 +93,8 @@ function EmptyDirectory({
 function EmptyClosedAccounts({ searching }: { searching: boolean }) {
   return searching ? (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto">No se encontró ninguna exclienta.</span>
-      <span className="text-nota text-texto">
-        Revisa cómo escribiste el nombre, el correo o el teléfono.
-      </span>
+      <span>No se encontró ninguna exclienta.</span>
+      <span>Revisa cómo escribiste el nombre, el correo o el teléfono.</span>
     </span>
   ) : (
     <span className="text-texto">
@@ -180,18 +182,15 @@ export function ClientsPage({
         <FounderPlaces />
       ) : null}
       {closed ? (
-        <p className="text-nota text-texto">
+        <p className="self-start rounded-tarjeta bg-superficie px-4 py-3 tipo-compacto text-texto shadow-tarjeta">
           Exclientas que cerraron su cuenta y pidieron seguir recibiendo
           promociones. No tienen ficha.
         </p>
       ) : null}
       {exportClients.isError ? (
-        <p
-          role="alert"
-          className="rounded-control bg-aviso px-3 py-2 text-nota text-texto"
-        >
+        <InlineError>
           No pudimos exportar las clientas. Inténtalo de nuevo.
-        </p>
+        </InlineError>
       ) : null}
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
     </div>

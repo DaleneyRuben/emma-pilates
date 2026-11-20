@@ -23,6 +23,7 @@ import { FormErrorSummary } from "../components/form/form-error-summary";
 import { SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
+import { InlineError } from "../components/ui/inline-error";
 import { Textarea } from "../components/ui/textarea";
 import { boliviaToday, formatLongDay } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
@@ -146,11 +147,7 @@ export function PaymentDecision({
 
   return (
     <SidePanelFooter>
-      {failure === null ? null : (
-        <p role="alert" className="text-nota text-texto">
-          {failure}
-        </p>
-      )}
+      {failure === null ? null : <InlineError>{failure}</InlineError>}
       {rejecting ? (
         <Form {...form}>
           <form

@@ -1,5 +1,6 @@
 import type { AdminFeedbackDto } from "@pilates/api-contracts";
 import { Link } from "@tanstack/react-router";
+import { TextLink } from "../components/ui/text-link";
 
 /**
  * Walkthrough finding 88: who sent a Feedback. A Client's name opens her file
@@ -12,13 +13,14 @@ export function FeedbackSender({ feedback }: { feedback: AdminFeedbackDto }) {
     return <span>{feedback.senderName}</span>;
   }
   return (
-    <Link
-      to="/clientas"
-      search={{ q: feedback.senderEmail, cliente: feedback.senderClientId }}
-      onClick={(event) => event.stopPropagation()}
-      className="rounded-control font-medium text-texto underline-offset-2 hover:underline focus-visible:shadow-foco"
-    >
-      {feedback.senderName}
-    </Link>
+    <TextLink asChild inline className="rounded-control">
+      <Link
+        to="/clientas"
+        search={{ q: feedback.senderEmail, cliente: feedback.senderClientId }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {feedback.senderName}
+      </Link>
+    </TextLink>
   );
 }

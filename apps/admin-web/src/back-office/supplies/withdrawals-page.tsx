@@ -57,7 +57,7 @@ const movementColumns = [
   columns.accessor("supplyName", {
     header: "Insumo",
     cell: ({ getValue }) => (
-      <span className="font-medium text-texto">{getValue()}</span>
+      <span className="tipo-titulo-fila text-texto">{getValue()}</span>
     ),
   }),
   columns.accessor("kind", {
@@ -70,7 +70,7 @@ const movementColumns = [
     header: "Cantidad",
     meta: { align: "right" },
     cell: ({ getValue }) => (
-      <span className="text-texto tabular">
+      <span className="tipo-titulo-fila text-texto tabular">
         {countFormat.format(getValue())}
       </span>
     ),
@@ -111,10 +111,8 @@ const summary = (
 function EmptyHistory({ kind }: { kind: MovementKind | "all" }) {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto">Sin {nouns[kind][1]} en este rango.</span>
-      <span className="text-nota text-texto">
-        Prueba con otro mes o con todos los insumos.
-      </span>
+      <span>Sin {nouns[kind][1]} en este rango.</span>
+      <span>Prueba con otro mes o con todos los insumos.</span>
     </span>
   );
 }
@@ -198,7 +196,9 @@ function BranchWithdrawals({
       ) : (
         <>
           {query.data.totalItems === 0 ? null : (
-            <p className="text-nota text-texto">
+            // Follow-up 285 (RW-insumos-movimientos): the period's summary is a
+            // white card, never small text loose on the page 100 (rule 3).
+            <p className="rounded-tarjeta bg-superficie px-5 py-3.5 tipo-titulo-fila text-texto shadow-tarjeta">
               {summary(query.data.totalItems, kind, month, supplyName)}
             </p>
           )}
@@ -219,11 +219,11 @@ function BranchWithdrawals({
             }}
           />
           {query.data.totals.length === 0 ? null : (
-            <section className="flex flex-col gap-1 rounded-control border border-borde bg-superficie px-3 py-2.5">
-              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-                Consumo del mes
-              </h2>
-              <p className="text-nota text-texto tabular">
+            // Rosa Emma (RW-insumos-movimientos): the month's use is the 600
+            // block, white on Rosa profundo.
+            <section className="flex flex-col gap-1 rounded-control border border-borde bg-superficie px-3 py-2.5 text-texto">
+              <h2 className="tipo-etiqueta">Consumo del mes</h2>
+              <p className="tipo-titulo-fila tabular">
                 {query.data.totals
                   .map(
                     (total) =>

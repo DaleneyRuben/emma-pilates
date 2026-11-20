@@ -16,7 +16,7 @@ const describe = (month: ReportMonth) =>
 
 function Legend() {
   return (
-    <ul className="flex items-center gap-4 text-nota text-texto">
+    <ul className="flex items-center gap-4 tipo-secundario text-texto">
       {[
         ["Ingresos", "bg-rosa-500"],
         ["Gastos", "bg-rosa-600"],
@@ -63,10 +63,10 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex flex-col gap-0.5">
-          <h2 id={titleId} className="text-titulo-panel text-texto">
+          <h2 id={titleId} className="tipo-titulo-seccion text-texto">
             Mes por mes
           </h2>
-          <p className="text-nota text-texto">
+          <p className="tipo-secundario text-texto">
             Ingresos y gastos comparados por mes, en bolivianos
           </p>
         </div>
@@ -75,7 +75,7 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
       <div className="flex gap-3">
         <div
           aria-hidden="true"
-          className="relative h-48 w-[72px] shrink-0 text-ayuda text-texto tabular"
+          className="relative h-48 w-[72px] shrink-0 tipo-secundario text-texto tabular"
         >
           {ticksCentavos.map((tick) => (
             <span
@@ -126,7 +126,7 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
             {months.map((month) => (
               <span
                 key={month.month}
-                className="flex-1 text-center text-ayuda text-texto"
+                className="flex-1 text-center tipo-secundario text-texto"
               >
                 {shortMonth(month.month)}
               </span>
@@ -140,9 +140,11 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
                 left: `${((shownIndex + 0.5) / months.length) * 100}%`,
                 transform: `translateX(-${((shownIndex + 0.5) / months.length) * 100}%)`,
               }}
-              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control border border-borde-fuerte bg-superficie px-3 py-2 text-nota text-texto shadow-popover tabular"
+              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control border border-borde-fuerte bg-superficie px-3 py-2 tipo-secundario text-texto shadow-popover tabular"
             >
-              <span className="font-medium">{formatMonth(shown.month)}</span>
+              <span className="tipo-titulo-fila">
+                {formatMonth(shown.month)}
+              </span>
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
