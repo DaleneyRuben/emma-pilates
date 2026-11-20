@@ -1,7 +1,7 @@
 import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { CardLabel } from "../profile/card-pieces";
+import { CardLabel } from "../ui/card-pieces";
 
 export type PaymentMethod = "cash" | "qr";
 

@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, RowCard } from "../profile/card-pieces";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";

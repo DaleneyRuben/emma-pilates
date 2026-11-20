@@ -19,7 +19,7 @@ import {
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { ScheduleClassRow } from "../schedule/schedule-class-card";
 import { useStaffFetcher } from "../staff-fetcher";
 import { splitNextClass } from "../trainer/next-class";

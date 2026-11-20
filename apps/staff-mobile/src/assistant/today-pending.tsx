@@ -2,7 +2,7 @@ import { useGetTodayCashClose } from "@pilates/api-contracts";
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 import { useStaffFetcher } from "../staff-fetcher";
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { PlainRow } from "../ui/plain-rows";
 
 function invoicesDetail(count: number): string {

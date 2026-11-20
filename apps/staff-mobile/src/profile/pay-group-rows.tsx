@@ -10,7 +10,7 @@ import {
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { RowCard } from "./card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import type { PayGroup, PayGroupKey } from "./pay-groups";
 
 /**

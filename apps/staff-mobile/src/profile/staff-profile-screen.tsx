@@ -27,7 +27,7 @@ import appConfig from "../../app.json";
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
-import { bodyScroll, RowCard } from "./card-pieces";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { payPlacement } from "./pay-placement";
 import { PayoutQrRow } from "./payout-qr/payout-qr-row";
 import { ProfileRow } from "./profile-row";

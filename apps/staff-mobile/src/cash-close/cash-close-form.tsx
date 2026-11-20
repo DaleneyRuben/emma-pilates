@@ -15,7 +15,7 @@ import { randomUUID } from "expo-crypto";
 import { useState, type ReactNode } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { ValueRow } from "../ui/value-row";
 import { CashCloseFrame } from "./cash-close-frame";
 import {

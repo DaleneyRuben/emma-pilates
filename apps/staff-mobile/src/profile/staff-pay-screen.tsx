@@ -10,7 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet } from "react-native";
 
-import { bodyScroll } from "./card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { BackBar } from "../ui/back-bar";
 import { RootHeader } from "../ui/root-header";
 import { useIsStackRoot } from "../ui/use-is-stack-root";

@@ -2,7 +2,7 @@ import { colors, FormScrollView, shadows, spacing } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { bodyScroll, FooterPanel } from "../profile/card-pieces";
+import { bodyScroll, FooterPanel } from "../ui/card-pieces";
 
 /**
  * Cerrar caja's body under its fixed band (E-S04 to E-S08): the cards scroll

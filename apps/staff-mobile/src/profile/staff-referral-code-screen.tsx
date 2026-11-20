@@ -20,7 +20,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
-import { bodyScroll, RowCard } from "./card-pieces";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 
 const noticeMilliseconds = 3000;
 

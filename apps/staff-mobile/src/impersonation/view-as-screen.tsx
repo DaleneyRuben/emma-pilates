@@ -20,7 +20,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
-import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 import { createImpersonationApi } from "./impersonation-api";

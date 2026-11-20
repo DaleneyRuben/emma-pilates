@@ -27,7 +27,7 @@ import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import {

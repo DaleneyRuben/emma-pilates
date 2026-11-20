@@ -23,7 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { SoftNote } from "../profile/card-pieces";
+import { SoftNote } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { accountEmailLimitCode, resendLimitNotice } from "./assistant-format";

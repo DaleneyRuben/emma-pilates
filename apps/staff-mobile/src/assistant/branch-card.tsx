@@ -1,7 +1,7 @@
 import { Chip, spacing, surfaces } from "@pilates/mobile-core";
 import { StyleSheet, View } from "react-native";
 
-import { CardLabel } from "../profile/card-pieces";
+import { CardLabel } from "../ui/card-pieces";
 
 type Branch = { id: string; name: string };
 

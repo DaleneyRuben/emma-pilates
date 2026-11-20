@@ -15,7 +15,7 @@ import {
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Path } from "react-native-svg";
 
-import { CardLabel } from "../profile/card-pieces";
+import { CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import {
   contactMissingPhoneNote,

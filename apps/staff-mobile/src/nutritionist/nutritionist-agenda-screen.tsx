@@ -25,7 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { bodyScroll } from "../profile/card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { dayHeading } from "../ui/session-time";

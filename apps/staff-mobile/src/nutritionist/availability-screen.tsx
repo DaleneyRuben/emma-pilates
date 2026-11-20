@@ -21,8 +21,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
-import { TabFooter } from "../schedule/tab-footer";
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
+import { TabFooter } from "../ui/tab-footer";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import {

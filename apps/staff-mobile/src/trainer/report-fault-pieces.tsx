@@ -10,7 +10,7 @@ import {
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
-import { CardLabel } from "../profile/card-pieces";
+import { CardLabel } from "../ui/card-pieces";
 
 // S26's pieces (FIX-067, FIX-076): the labelled numbered tiles and the switch of a per-unit
 // type, and the damage counter of a by-quantity type. Each is its own white card (I10, I11).

@@ -35,7 +35,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll } from "../profile/card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAssistantApi } from "./assistant-api";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";

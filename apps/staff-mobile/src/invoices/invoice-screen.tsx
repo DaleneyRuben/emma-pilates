@@ -23,7 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 
-import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { invoiceStyles as styles } from "./invoice-styles";

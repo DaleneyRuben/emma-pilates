@@ -23,7 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll } from "../profile/card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
@@ -35,9 +35,9 @@ import { RootHeader } from "../ui/root-header";
 import { allCancelledTitle, countLabel, dayHeading } from "../ui/session-time";
 import { cancelledReason } from "../trainer/agenda-cancellations";
 import { splitNextClass } from "../trainer/next-class";
-import { ClassDayCards } from "./class-day-cards";
+import { ClassDayCards } from "../ui/class-day-cards";
 import { scheduleCancelledRows, ScheduleClassRow, ScheduleNextClass } from "./schedule-class-card";
-import { TabFooter } from "./tab-footer";
+import { TabFooter } from "../ui/tab-footer";
 
 type ScheduleNavigation = {
   navigate: {

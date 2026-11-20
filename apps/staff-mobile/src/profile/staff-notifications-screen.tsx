@@ -33,7 +33,7 @@ import {
 import { groupNotifications } from "../notifications/notification-groups";
 import { DeniedNotice, NotificationEntries } from "../notifications/notification-entries";
 import { useStaffFetcher } from "../staff-fetcher";
-import { bodyScroll } from "./card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 
 const params = { limit: 50 };
 const queryKeys = [getListNotificationsQueryKey(params), getGetUnreadNotificationCountQueryKey()];

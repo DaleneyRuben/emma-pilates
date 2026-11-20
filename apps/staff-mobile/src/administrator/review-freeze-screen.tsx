@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, FooterPanel, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { useIsTablet } from "../ui/use-is-tablet";

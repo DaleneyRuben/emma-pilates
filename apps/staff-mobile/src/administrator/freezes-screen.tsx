@@ -3,7 +3,7 @@ import { LoadingState, QueryFailure, Screen, spacing, StateScreen } from "@pilat
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet } from "react-native";
 
-import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { freezeDecidedDetail } from "./freeze-format";

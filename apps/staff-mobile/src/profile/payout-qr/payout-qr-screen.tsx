@@ -23,7 +23,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../../staff-fetcher";
 import { BackBar } from "../../ui/back-bar";
-import { bodyScroll, FooterPanel, taskEdges } from "../card-pieces";
+import { bodyScroll, FooterPanel, taskEdges } from "../../ui/card-pieces";
 import { PayoutQrCard } from "./payout-qr-card";
 import { payoutQrBanner } from "./payout-qr-copy";
 import { qrDate } from "./payout-qr-dates";

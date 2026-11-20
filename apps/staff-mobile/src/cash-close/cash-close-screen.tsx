@@ -12,7 +12,7 @@ import { StyleSheet, View } from "react-native";
 
 import { CenteredCard } from "../assistant/assistant-layout";
 import { BranchCard } from "../assistant/branch-card";
-import { bodyScroll, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { useCashBranches } from "../ui/branch-chips";

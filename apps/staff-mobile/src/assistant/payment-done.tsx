@@ -2,7 +2,7 @@ import { PrimaryButton, StateScreen } from "@pilates/mobile-core";
 import { useEffect, useEffectEvent } from "react";
 import { BackHandler, ScrollView } from "react-native";
 
-import { bodyScroll, FooterPanel, RowCard } from "../profile/card-pieces";
+import { bodyScroll, FooterPanel, RowCard } from "../ui/card-pieces";
 import { BackBar } from "../ui/back-bar";
 import { ValueRow } from "../ui/value-row";
 

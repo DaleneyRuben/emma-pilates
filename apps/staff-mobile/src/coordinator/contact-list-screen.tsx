@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { useIsTablet } from "../ui/use-is-tablet";

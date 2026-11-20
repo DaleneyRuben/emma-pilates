@@ -29,7 +29,7 @@ import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { describeSale } from "./administrator-format";
-import { bodyScroll, RowCard } from "../profile/card-pieces";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";

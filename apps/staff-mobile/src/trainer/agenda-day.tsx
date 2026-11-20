@@ -1,7 +1,7 @@
 import type { TrainerScheduleSessionDto } from "@pilates/api-contracts";
 import { ClassRow, formatTimeRange, placesLabel } from "@pilates/mobile-core";
 
-import { ClassDayCards } from "../schedule/class-day-cards";
+import { ClassDayCards } from "../ui/class-day-cards";
 import { SessionRow } from "../ui/session-row";
 import { minutesLabel, startTime } from "../ui/session-time";
 import { causeLabel, cancelledReason } from "./agenda-cancellations";

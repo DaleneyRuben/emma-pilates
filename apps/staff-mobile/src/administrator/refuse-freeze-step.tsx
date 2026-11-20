@@ -12,7 +12,7 @@ import {
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, CardLabel, FooterPanel } from "../profile/card-pieces";
+import { bodyScroll, CardLabel, FooterPanel } from "../ui/card-pieces";
 import {
   refusalDisabledReason,
   refusalMessageLimit,

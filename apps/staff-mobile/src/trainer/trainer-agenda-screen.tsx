@@ -24,7 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, CardLabel } from "../profile/card-pieces";
+import { bodyScroll, CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";

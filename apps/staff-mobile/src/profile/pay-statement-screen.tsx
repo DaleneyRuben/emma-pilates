@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackBar } from "../ui/back-bar";
-import { bodyScroll } from "./card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { PayGroupRows } from "./pay-group-rows";
 import type { PayGroupKey } from "./pay-groups";

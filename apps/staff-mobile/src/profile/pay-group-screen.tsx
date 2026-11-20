@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BackBar } from "../ui/back-bar";
-import { bodyScroll, CardLabel, RowCard } from "./card-pieces";
+import { bodyScroll, CardLabel, RowCard } from "../ui/card-pieces";
 import { useIsTablet } from "../ui/use-is-tablet";
 import { groupSummary, type PayGroupKey, payGroups } from "./pay-groups";
 import { linesByDay, type UndatedPayLine } from "./pay-line-days";

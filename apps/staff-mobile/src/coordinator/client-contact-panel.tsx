@@ -18,7 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Linking, StyleSheet, Text, View } from "react-native";
 
-import { CardLabel } from "../profile/card-pieces";
+import { CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { OutlineButton } from "../ui/outline-button";
 import { contactWhatsAppHref } from "./contact-list-copy";

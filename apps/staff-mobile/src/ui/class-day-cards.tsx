@@ -2,7 +2,7 @@ import { colors, fontFamilies, spacing, typography } from "@pilates/mobile-core"
 import { useState, type ReactElement } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "./card-pieces";
 
 /**
  * A day's classes under the hero (equipo boards I01–I03, H01–H04): the

@@ -31,7 +31,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { bodyScroll, CardLabel, FooterPanel, RowCard, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, CardLabel, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 

@@ -1,7 +1,7 @@
 import { formatMoney } from "@pilates/api-contracts";
 import { discountPercent } from "@pilates/mobile-core";
 
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { ValueRow } from "../ui/value-row";
 
 // Walkthrough n.º 73: a discounted Plan shows what she saw paying, in C09's

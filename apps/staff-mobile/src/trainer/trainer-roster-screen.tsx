@@ -21,8 +21,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 
-import { bodyScroll, RowCard } from "../profile/card-pieces";
-import { TabFooter } from "../schedule/tab-footer";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
+import { TabFooter } from "../ui/tab-footer";
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
 import { BackBar } from "../ui/back-bar";

@@ -24,7 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../profile/card-pieces";
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { FilterChips } from "../ui/filter-chips";

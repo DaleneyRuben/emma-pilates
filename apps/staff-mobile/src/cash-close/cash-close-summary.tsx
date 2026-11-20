@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { clockTime } from "../nutritionist/nutritionist-format";
-import { RowCard } from "../profile/card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { ValueRow } from "../ui/value-row";
 import { CashCloseFrame } from "./cash-close-frame";
 import { formatSignedBolivianos } from "./cash-close-format";

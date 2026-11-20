@@ -18,7 +18,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { ClientContactPanel } from "../coordinator/client-contact-panel";
 import { useStaffFetcher } from "../staff-fetcher";
-import { bodyScroll } from "../profile/card-pieces";
+import { bodyScroll } from "../ui/card-pieces";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
 import { OutlineButton } from "../ui/outline-button";

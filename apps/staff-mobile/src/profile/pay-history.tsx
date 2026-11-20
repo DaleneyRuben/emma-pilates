@@ -3,7 +3,7 @@ import type { OwnSalaryPaymentDto, PayStatementDto } from "@pilates/api-contract
 import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { RowCard } from "./card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { type StatementStatus, statementStatus, statusLine } from "./pay-ledger";
 import { payPeriodHeading } from "./pay-period-heading";
 

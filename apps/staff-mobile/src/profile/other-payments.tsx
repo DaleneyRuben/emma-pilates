@@ -3,7 +3,7 @@ import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
 import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { RowCard } from "./card-pieces";
+import { RowCard } from "../ui/card-pieces";
 import { ReceiptThumbnail, useReceiptViewer } from "./receipt-viewer";
 
 function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
