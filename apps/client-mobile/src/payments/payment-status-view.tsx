@@ -1,14 +1,14 @@
 import {
   colors,
   fontFamilies,
+  FooterPanel,
   Glyph,
-  type GlyphName,
   PrimaryButton,
   ScreenHeader,
-  shadows,
   spacing,
   surfaces,
   TextButton,
+  type GlyphName,
   typography,
 } from "@pilates/mobile-core";
 import { Fragment, type ReactNode } from "react";
@@ -103,10 +103,10 @@ function StatusLayout({
           </View>
         )}
       </ScrollView>
-      <View style={styles.footer} testID="payment-status-actions">
+      <FooterPanel testID="payment-status-actions">
         {primaryAction === undefined ? null : <PrimaryButton {...primaryAction} />}
         {textAction === undefined ? null : <TextButton {...textAction} />}
-      </View>
+      </FooterPanel>
     </>
   );
 }
@@ -232,16 +232,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   facts: { ...surfaces.card, overflow: "hidden" },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    gap: spacing.xs,
-    marginHorizontal: -spacing.lg,
-    paddingBottom: spacing.mdLg,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.mdLg,
-  },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
   note: {

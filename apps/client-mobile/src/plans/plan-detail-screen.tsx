@@ -13,6 +13,8 @@ import {
   boliviaCivilDate,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   Glyph,
   LoadingState,
   NextPlanStartChooser,
@@ -21,7 +23,6 @@ import {
   radii,
   Screen,
   ScreenTopBar,
-  shadows,
   spacing,
   StartDateChooser,
   surfaces,
@@ -164,7 +165,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   };
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={detail.name} />
       <ScrollView contentContainerStyle={styles.content}>
         <PlanHero plan={detail} />
@@ -201,7 +202,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         {error === null ? null : <Aside alert text={error} />}
       </ScrollView>
       {/* Rosa Emma C09: the button and its line on a white panel cast upward. */}
-      <View style={styles.footer} testID="plan-detail-footer">
+      <FooterPanel testID="plan-detail-footer">
         <BodyText style={styles.note}>Pagas por QR y subes tu comprobante</BodyText>
         <PrimaryButton
           busy={busy}
@@ -209,7 +210,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
           onPress={() => void continueToPayment()}
           testID="plan-continue-to-payment"
         />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
@@ -253,16 +254,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   content: { gap: spacing.md, paddingBottom: spacing.lg },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    gap: spacing.sm,
-    marginHorizontal: -spacing.lg,
-    paddingBottom: spacing.mdLg,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.mdLg,
-  },
   note: {
     color: colors.text,
     fontFamily: fontFamilies.body,

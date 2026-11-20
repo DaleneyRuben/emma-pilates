@@ -1,5 +1,12 @@
 import { useGetCurrentClientSubscription, useGetCurrentPayment } from "@pilates/api-contracts";
-import { LoadingState, QueryFailure, Screen, ScreenTopBar, spacing } from "@pilates/mobile-core";
+import {
+  footerEdges,
+  LoadingState,
+  QueryFailure,
+  Screen,
+  ScreenTopBar,
+  spacing,
+} from "@pilates/mobile-core";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 import { BackHandler, StyleSheet } from "react-native";
@@ -79,7 +86,7 @@ export function PaymentStatusScreen() {
     subscription.data?.status === 200 ? (subscription.data.data.subscription ?? null) : null;
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <PaymentStatusView
         busy={retrying}
         endsOn={active?.endsOn}

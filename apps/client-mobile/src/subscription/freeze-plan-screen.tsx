@@ -9,6 +9,8 @@ import {
   Calendar,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   FormErrorSummary,
   FormField,
   Glyph,
@@ -16,7 +18,6 @@ import {
   PrimaryButton,
   QueryFailure,
   radii,
-  shadows,
   Screen,
   ScreenTopBar,
   spacing,
@@ -182,7 +183,7 @@ export function FreezePlanScreen() {
   ];
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {attempted && open ? <FormErrorSummary fields={missing} /> : null}
@@ -238,14 +239,14 @@ export function FreezePlanScreen() {
         {message === null ? null : <Reason alert text={message} />}
       </ScrollView>
       {/* Rosa Emma C12i: the button on a white panel cast upward. */}
-      <View style={styles.footer} testID="freeze-footer">
+      <FooterPanel testID="freeze-footer">
         <PrimaryButton
           busy={submitting}
           disabled={!open || submitting}
           label="Enviar solicitud"
           onPress={() => void submit()}
         />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
@@ -289,15 +290,6 @@ function Reason({
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.lg },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    marginHorizontal: -spacing.lg,
-    paddingBottom: spacing.mdLg,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.mdLg,
-  },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   info: { alignItems: "flex-start", flexDirection: "row", gap: spacing.smLg },
   infoText: {

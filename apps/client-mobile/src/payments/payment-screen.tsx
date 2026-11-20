@@ -11,12 +11,13 @@ import {
   colors,
   EmphasisCard,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   FormScrollView,
   Glyph,
   invoiceChoiceFrom,
   invoiceDataPayload,
   invoiceIncompleteNote,
-  type InvoiceChoice,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -24,9 +25,9 @@ import {
   Screen,
   ScreenTopBar,
   SectionTitle,
-  shadows,
   spacing,
   surfaces,
+  type InvoiceChoice,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -160,7 +161,7 @@ export function PaymentScreen() {
         : ` · empieza el ${formatCivilDate(current.startsOn)}`;
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       {header}
       <FormScrollView contentContainerStyle={styles.content}>
         <EmphasisCard
@@ -197,7 +198,7 @@ export function PaymentScreen() {
         )}
       </FormScrollView>
       {/* Rosa Emma C10: the button and its line on a white panel cast upward. */}
-      <View style={styles.footer} testID="payment-footer">
+      <FooterPanel testID="payment-footer">
         {offReason === undefined ? (
           <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         ) : null}
@@ -210,7 +211,7 @@ export function PaymentScreen() {
           onPress={() => void submit()}
           testID="payment-submit"
         />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
@@ -241,16 +242,6 @@ const styles = StyleSheet.create({
     gap: spacing.smLg,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-  },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    gap: spacing.sm,
-    marginHorizontal: -spacing.lg,
-    paddingBottom: spacing.mdLg,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.mdLg,
   },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },

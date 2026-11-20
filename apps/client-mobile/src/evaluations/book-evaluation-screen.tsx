@@ -12,13 +12,14 @@ import {
   colors,
   EmphasisCard,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   formatBolivianos,
   IconRow,
   IconRowGroup,
   PrimaryButton,
   Screen,
   ScreenTopBar,
-  shadows,
   SectionTitle,
   spacing,
   surfaces,
@@ -146,7 +147,7 @@ export function BookEvaluationScreen({
   };
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirma tu cita" />
       <ScrollView contentContainerStyle={styles.content}>
         <EmphasisCard
@@ -198,7 +199,7 @@ export function BookEvaluationScreen({
         ) : null}
       </ScrollView>
       {/* C14: the button and its line sit on the white footer. */}
-      <View style={styles.footer} testID="evaluation-footer">
+      <FooterPanel testID="evaluation-footer">
         {slot.included || receipt === null ? null : (
           <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
         )}
@@ -212,7 +213,7 @@ export function BookEvaluationScreen({
           label="Confirmar evaluación"
           onPress={() => void confirm()}
         />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
@@ -235,15 +236,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
-  },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    gap: spacing.sm,
-    marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.xlSm,
-    paddingVertical: spacing.mdLg,
   },
   group: { ...surfaces.card },
   note: {

@@ -10,6 +10,8 @@ import {
   BodyText,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   formatStartTime,
   LoadingState,
   PrimaryButton,
@@ -18,10 +20,9 @@ import {
   Screen,
   ScreenTopBar,
   SectionTitle,
-  shadows,
+  spacing,
   StateScreen,
   surfaces,
-  spacing,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -144,7 +145,7 @@ export function RescheduleScreen({
   const options = alternatives.data ?? [];
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <ScrollView contentContainerStyle={styles.content}>
         <View>
@@ -206,7 +207,7 @@ export function RescheduleScreen({
       </ScrollView>
       {!loading && !failed && options.length > 0 ? (
         // C06: the line and the button sit on the white footer.
-        <View style={styles.footer} testID="reschedule-footer">
+        <FooterPanel testID="reschedule-footer">
           <BodyText style={styles.note}>
             {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
           </BodyText>
@@ -219,7 +220,7 @@ export function RescheduleScreen({
             onPress={() => void confirm()}
             testID="reschedule-confirm"
           />
-        </View>
+        </FooterPanel>
       ) : null}
     </Screen>
   );
@@ -258,16 +259,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
-  },
-  // A white panel from edge to edge with the card shadow cast upward.
-  footer: {
-    ...shadows.footer,
-    backgroundColor: colors.card,
-    gap: spacing.smLg,
-    marginHorizontal: -spacing.lg,
-    paddingBottom: spacing.mdLg,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.mdLg,
   },
   note: {
     color: colors.text,
