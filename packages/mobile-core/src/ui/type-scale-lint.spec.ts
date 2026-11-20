@@ -62,6 +62,27 @@ describe("the type scale lint rule", () => {
     expect(rules(messages)).toEqual(Array(10).fill("no-restricted-syntax"));
   });
 
+  it("refuses quoted keys, Animated.Text and the scale's raw tables", () => {
+    const messages = lint(
+      "src/booking/sample.tsx",
+      [
+        'import { Animated } from "react-native";',
+        'import { textTones, textVariants, typeFaces } from "@pilates/mobile-core";',
+        "export const raw = { \"fontSize\": 9, 'color': '#f00' };",
+        "export const parts = [Animated.Text, textTones, textVariants, typeFaces];",
+      ].join("\n"),
+    );
+
+    expect(rules(messages).sort()).toEqual([
+      "no-restricted-imports",
+      "no-restricted-imports",
+      "no-restricted-imports",
+      "no-restricted-syntax",
+      "no-restricted-syntax",
+      "no-restricted-syntax",
+    ]);
+  });
+
   it("leaves layout, icon colours passed as props and destructured colours alone", () => {
     const messages = lint(
       "src/booking/sample.tsx",

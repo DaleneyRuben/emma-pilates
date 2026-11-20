@@ -50,9 +50,15 @@ const restrictedTypographyImports = [
   },
   {
     name: "@pilates/mobile-core",
-    importNames: ["typography", "fontFamilies"],
+    importNames: [
+      "typography",
+      "fontFamilies",
+      "textVariants",
+      "typeFaces",
+      "textTones",
+    ],
     message:
-      "Sizes and faces live inside <Text variant=…> (follow-up 285); pick a variant.",
+      "Sizes, faces and text colours live inside <Text variant=…> (follow-up 285); pick a variant.",
   },
 ];
 
@@ -68,9 +74,17 @@ const typographyKeys = [
   "textTransform",
 ];
 
+const typographyKeyPattern = `/^(${typographyKeys.join("|")})$/`;
+
 const restrictedTypographySyntax = [
   {
-    selector: `ObjectExpression > Property[key.name=/^(${typographyKeys.join("|")})$/]`,
+    selector: `ObjectExpression > Property[key.name=${typographyKeyPattern}]`,
+    message:
+      "Text styles come from <Text variant=…> in @pilates/mobile-core (follow-up 285); never declare one locally.",
+  },
+  {
+    // A quoted key is the same key: { "fontSize": 9 }.
+    selector: `ObjectExpression > Property[key.value=${typographyKeyPattern}]`,
     message:
       "Text styles come from <Text variant=…> in @pilates/mobile-core (follow-up 285); never declare one locally.",
   },
@@ -78,6 +92,15 @@ const restrictedTypographySyntax = [
     selector: "ObjectExpression > Property[key.name='color']",
     message:
       "A text's colour is the tone prop of <Text> (ink or onDark); an icon takes its colour as a prop.",
+  },
+  {
+    selector: "ObjectExpression > Property[key.value='color']",
+    message:
+      "A text's colour is the tone prop of <Text> (ink or onDark); an icon takes its colour as a prop.",
+  },
+  {
+    selector: "MemberExpression[object.name='Animated'][property.name='Text']",
+    message: "Use <Text variant=…> from @pilates/mobile-core (follow-up 285).",
   },
 ];
 
