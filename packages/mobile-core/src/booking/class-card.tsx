@@ -2,6 +2,7 @@ import { Children, Fragment, isValidElement, useState, type ReactNode } from "re
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Chevron } from "../ui/chevron";
+import { TypeBar } from "../ui/type-bar";
 import { attendeesLabel, HeroAttendees } from "./hero-attendees";
 import { fontFamilies } from "../ui/fonts";
 import { colors, spacing, surfaces, typography } from "../ui/tokens";
@@ -12,8 +13,8 @@ export function placesLabel(booked: number, capacity: number): string {
 }
 
 /**
- * The next class (ClaseE, FIX-089): a Palo de rosa hero with the time and
- * class in large Lora, the places, and the branch and who is coming.
+ * The next class (Rosa Emma): the solid 600 hero with the time and class in
+ * large Lora, the places, and the branch and who is coming.
  */
 export function NextClassHero({
   accessibilityLabel,
@@ -72,7 +73,7 @@ export function NextClassHero({
   );
 }
 
-/** Rows of classes on one Crema card with an Arcilla outline and Rubor dividers. */
+/** Rows of classes on one white card with 100 dividers. */
 export function ClassList({
   children,
   testID = "class-list",
@@ -94,8 +95,8 @@ export function ClassList({
 }
 
 /**
- * Any other class (ClaseE): the time in a Rubor box, the class and one quiet
- * line, the places «N de M» at the end. `standalone` gives a lone row its own
+ * Any other class (Rosa Emma): the type bar, the time in Lora, the class and
+ * one quiet line, the places «N de M» at the end. `standalone` gives a lone row its own
  * card; otherwise put rows in a `ClassList`.
  */
 export function ClassRow({
@@ -110,6 +111,7 @@ export function ClassRow({
   testID,
   time,
   title,
+  typeName,
 }: {
   accessibilityLabel?: string;
   detail?: string;
@@ -125,14 +127,15 @@ export function ClassRow({
   testID?: string;
   time: string;
   title: string;
+  /** The class type that colours the bar, when the title is not its name. */
+  typeName?: string;
 }) {
   const content = (
     <>
-      <View style={styles.timeBox} testID="class-row-time">
-        <Text numberOfLines={1} style={styles.time}>
-          {time}
-        </Text>
-      </View>
+      <TypeBar name={typeName ?? title} />
+      <Text numberOfLines={1} style={styles.time} testID="class-row-time">
+        {time}
+      </Text>
       <View style={styles.body}>
         <Text style={styles.title}>{title}</Text>
         {detail === undefined ? null : (
@@ -238,9 +241,10 @@ const styles = StyleSheet.create({
   heroEyebrow: {
     color: colors.onEmphasis,
     flexShrink: 1,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
     fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
   },
   heroPlaces: {
     color: colors.onEmphasis,
@@ -248,14 +252,18 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
     fontWeight: "700",
   },
-  heroTitle: { color: colors.onEmphasis, fontFamily: fontFamilies.display, fontSize: 26 },
+  heroTitle: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.hero,
+  },
   heroTop: { flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
-  list: { ...surfaces.card },
+  list: { ...surfaces.card, overflow: "hidden" },
   places: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
   },
   pressed: { opacity: 0.7 },
   row: {
@@ -267,26 +275,19 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   standalone: { ...surfaces.card },
+  // The time in Lora 22 beside the type bar (Rosa Emma).
   time: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
+    flexShrink: 0,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
     fontVariant: ["tabular-nums"],
-    fontWeight: "700",
-  },
-  timeBox: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 10,
-    height: 36,
-    justifyContent: "center",
     minWidth: 62,
-    paddingHorizontal: spacing.sm,
   },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
 });
