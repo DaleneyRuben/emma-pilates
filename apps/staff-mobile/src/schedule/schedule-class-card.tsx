@@ -1,14 +1,7 @@
 import type { SessionAvailabilityDto } from "@pilates/api-contracts";
-import {
-  CancelledFold,
-  ClassList,
-  ClassRow,
-  formatTimeRange,
-  placesLabel,
-  StaffFace,
-} from "@pilates/mobile-core";
+import { ClassRow, formatTimeRange, placesLabel, StaffFace } from "@pilates/mobile-core";
 
-import { cancelledReason, causeLabel } from "../trainer/agenda-cancellations";
+import { causeLabel } from "../trainer/agenda-cancellations";
 import { minutesLabel, startTime } from "../ui/session-time";
 import { SessionRow } from "../ui/session-row";
 import { TodayHero } from "../ui/today-hero";
@@ -76,33 +69,19 @@ export function ScheduleClassRow({
   );
 }
 
-/** The day's cancelled classes, folded into one line at the end until opened. */
-export function ScheduleCancelledFold({
-  sessions,
-}: {
-  sessions: readonly SessionAvailabilityDto[];
-}) {
-  return (
-    <CancelledFold
-      count={sessions.length}
-      reason={cancelledReason(sessions)}
-      testID="schedule-cancelled-fold"
-    >
-      <ClassList testID="schedule-cancelled-list">
-        {sessions.map((session) => {
-          const cause = causeLabel(session.cancellation?.cause ?? "studio");
-          return (
-            <ClassRow
-              accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
-              detail={cause}
-              key={session.id}
-              testID={`schedule-cancelled-${session.id}`}
-              time={startTime(session.startsAt, session.endsAt)}
-              title={session.classTypeName}
-            />
-          );
-        })}
-      </ClassList>
-    </CancelledFold>
-  );
+/** The day's cancelled classes as rows, for the fold of `ClassDayCards`: each with its cause. */
+export function scheduleCancelledRows(sessions: readonly SessionAvailabilityDto[]) {
+  return sessions.map((session) => {
+    const cause = causeLabel(session.cancellation?.cause ?? "studio");
+    return (
+      <ClassRow
+        accessibilityLabel={`${session.classTypeName}, ${formatTimeRange(session.startsAt, session.endsAt)}, ${cause}`}
+        detail={cause}
+        key={session.id}
+        testID={`schedule-cancelled-${session.id}`}
+        time={startTime(session.startsAt, session.endsAt)}
+        title={session.classTypeName}
+      />
+    );
+  });
 }

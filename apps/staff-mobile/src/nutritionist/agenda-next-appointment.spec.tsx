@@ -33,9 +33,9 @@ describe("Nutritionist agenda: next appointment", () => {
     );
 
     const hero = within(await screen.findByTestId("next-appointment"));
-    expect(screen.getByTestId("next-appointment")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("next-appointment")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(hero.getByText("Próxima cita")).toBeOnTheScreen();
-    expect(hero.getByText("Mañana · 09:45")).toHaveStyle({ color: "#F9F4F2" });
+    expect(hero.getByText("Mañana · 09:45")).toHaveStyle({ color: "#FFFBFB" });
     expect(hero.getByText("VÁ")).toBeOnTheScreen();
     expect(hero.getByText("Valeria Áñez")).toBeOnTheScreen();
     expect(hero.getByText("Primera evaluación · 45 min · Pagada")).toBeOnTheScreen();

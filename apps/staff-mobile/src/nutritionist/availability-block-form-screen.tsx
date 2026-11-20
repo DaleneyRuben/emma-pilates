@@ -10,16 +10,16 @@ import {
 } from "@pilates/api-contracts";
 import {
   colors,
-  IconRow,
-  IconRowGroup,
+  fontFamilies,
+  Glyph,
   NoticeRow,
   PrimaryButton,
   radii,
   Screen,
   spacing,
+  surfaces,
   TextButton,
   typography,
-  fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,6 +27,7 @@ import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import {
@@ -35,7 +36,6 @@ import {
   pillRow,
   problemMessage,
   saveFailureMessage,
-  SectionLabel,
 } from "./availability-block-form-parts";
 import { BlockChangeSheet, type Confirmation } from "./availability-block-sheets";
 import {
@@ -165,29 +165,33 @@ export function AvailabilityBlockFormScreen({
     );
   };
 
+  // Boards N07–N08: the band stays fixed, each step is a white card with its
+  // label inside, and the white footer holds «Guardar» (and «Eliminar horario»).
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
       <BackBar
         onBack={() => navigation.goBack()}
         title={editing ? "Editar horario" : "Nuevo horario"}
       />
-      <ScrollView contentContainerStyle={styles.content}>
-        <SectionLabel>Día</SectionLabel>
-        <View style={styles.weekdays}>
-          {weekdayNames.map((name, index) => (
-            <Pill
-              accessibilityLabel={name}
-              fill
-              key={name}
-              label={weekdayTag(index + 1)}
-              onPress={() => setWeekday(index + 1)}
-              selected={weekday === index + 1}
-            />
-          ))}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        <View style={styles.card}>
+          <CardLabel>Día</CardLabel>
+          <View style={styles.weekdays}>
+            {weekdayNames.map((name, index) => (
+              <Pill
+                accessibilityLabel={name}
+                fill
+                key={name}
+                label={weekdayTag(index + 1)}
+                onPress={() => setWeekday(index + 1)}
+                selected={weekday === index + 1}
+              />
+            ))}
+          </View>
         </View>
         {branches.length > 1 ? (
-          <>
-            <SectionLabel>Sucursal</SectionLabel>
+          <View style={styles.card}>
+            <CardLabel>Sucursal</CardLabel>
             <View style={styles.pills}>
               {branches.map((branch) => (
                 <Pill
@@ -199,73 +203,77 @@ export function AvailabilityBlockFormScreen({
                 />
               ))}
             </View>
-          </>
+          </View>
         ) : branches[0] === undefined ? null : (
-          <>
-            <SectionLabel>Sucursal</SectionLabel>
+          <View style={styles.card}>
+            <CardLabel>Sucursal</CardLabel>
             <Text style={styles.fixedBranch}>{branches[0].name}</Text>
-          </>
+          </View>
         )}
-        <SectionLabel>Horario</SectionLabel>
-        <View style={styles.times}>
-          {timeField("start", startsAtLocal)}
-          {timeField("end", endsAtLocal)}
+        <View style={styles.card}>
+          <CardLabel>Horario</CardLabel>
+          <View style={styles.times}>
+            {timeField("start", startsAtLocal)}
+            {timeField("end", endsAtLocal)}
+          </View>
         </View>
-        <SectionLabel>{editing ? "Aplicar cambios desde" : "A partir del"}</SectionLabel>
-        <ScrollView
-          contentContainerStyle={styles.weekdays}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.dateStrip}
-        >
-          {Array.from({ length: effectiveDateChoices }, (_, offset) => {
-            const date = addCivilDays(today, offset);
-            return (
-              <DateTile
-                accessibilityLabel={`Fecha ${civilDateChip(date, today)}`}
-                date={date}
-                key={date}
-                onPress={() => setEffectiveFrom(date)}
-                selected={effectiveFrom === date}
-                today={today}
-              />
-            );
-          })}
-        </ScrollView>
-        {turnos > 0 ? (
-          <IconRowGroup>
-            <IconRow
-              icon="clock"
-              label={[
-                `${countLabel(turnos, "turno", "turnos")} de 45 min`,
-                ...(booked > 0
-                  ? [countLabel(booked, "ya tiene reserva", "ya tienen reserva")]
-                  : []),
-              ].join(" · ")}
-            />
-          </IconRowGroup>
-        ) : (
-          <Text style={styles.muted}>
-            El sistema generará turnos de evaluación individuales dentro de este horario.
-          </Text>
-        )}
-        {booked > 0 && editing ? (
-          <Text style={styles.muted}>
-            {`${countLabel(booked, "evaluación reservada se mantiene", "evaluaciones reservadas se mantienen")}.`}
-          </Text>
-        ) : null}
+        <View style={styles.card}>
+          <CardLabel>{editing ? "Aplicar cambios desde" : "A partir del"}</CardLabel>
+          <ScrollView
+            contentContainerStyle={styles.dates}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.dateStrip}
+          >
+            {Array.from({ length: effectiveDateChoices }, (_, offset) => {
+              const date = addCivilDays(today, offset);
+              return (
+                <DateTile
+                  accessibilityLabel={`Fecha ${civilDateChip(date, today)}`}
+                  date={date}
+                  key={date}
+                  onPress={() => setEffectiveFrom(date)}
+                  selected={effectiveFrom === date}
+                  today={today}
+                />
+              );
+            })}
+          </ScrollView>
+          {turnos > 0 ? (
+            <View style={styles.turnos}>
+              <Glyph color={colors.text} name="clock" size={22} strokeWidth={1.6} />
+              <Text style={styles.turnosText}>
+                {[
+                  `${countLabel(turnos, "turno", "turnos")} de 45 min`,
+                  ...(booked > 0
+                    ? [countLabel(booked, "ya tiene reserva", "ya tienen reserva")]
+                    : []),
+                ].join(" · ")}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.muted}>
+              El sistema generará turnos de evaluación individuales dentro de este horario.
+            </Text>
+          )}
+          {booked > 0 && editing ? (
+            <Text style={styles.muted}>
+              {`${countLabel(booked, "evaluación reservada se mantiene", "evaluaciones reservadas se mantienen")}.`}
+            </Text>
+          ) : null}
+        </View>
         {message !== null ? (
           <View accessibilityLabel={message} accessibilityRole="alert">
             <NoticeRow message={message} />
           </View>
         ) : null}
       </ScrollView>
-      <View style={styles.footer}>
+      <FooterPanel>
         <PrimaryButton busy={submitting} disabled={!valid} label="Guardar" onPress={save} />
         {editing ? (
           <TextButton label="Eliminar horario" onPress={() => setConfirming("end")} tone="error" />
         ) : null}
-      </View>
+      </FooterPanel>
       <TimeWheelSheet
         key={openings}
         onClose={() => setPicking(null)}
@@ -297,36 +305,46 @@ export function AvailabilityBlockFormScreen({
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  dateStrip: { flexGrow: 0 },
-  failure: { color: colors.errorText },
-  muted: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.note },
-  pills: pillRow,
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
+  dateStrip: { flexGrow: 0, marginHorizontal: -spacing.lg },
+  dates: { flexDirection: "row", gap: 6, paddingHorizontal: spacing.lg },
   fixedBranch: {
-    fontFamily: fontFamilies.body,
     color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
-  footer: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  pills: pillRow,
+  screen: { paddingHorizontal: spacing.xlSm },
+  // Board N07: the time boxes, white with a 1.5 pt 400 outline and the time in Lora.
   timeField: {
     backgroundColor: colors.card,
     borderColor: colors.borderStrong,
-    borderRadius: radii.control,
-    borderWidth: 1,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
     flex: 1,
-    gap: spacing.xxs,
-    padding: spacing.md,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.smLg,
   },
-  timeLabel: { fontFamily: fontFamilies.body, color: colors.textMuted, fontSize: typography.label },
-  timePlaceholder: { color: colors.textSubtle },
+  timeLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  timePlaceholder: { fontStyle: "italic" },
   timeValue: {
-    fontFamily: fontFamilies.bodyMedium,
     color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    fontVariant: ["tabular-nums"],
   },
-  times: { flexDirection: "row", gap: spacing.md },
-  // v2 S17: the seven day tiles share the width, 6 pt apart.
-  weekdays: { flexDirection: "row", gap: 6 },
+  times: { flexDirection: "row", gap: spacing.smLg },
+  turnos: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
+  turnosText: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    lineHeight: 21,
+  },
+  // v2 S17: the seven day tiles share the width, 4 pt apart (board N07).
+  weekdays: { flexDirection: "row", gap: spacing.xs },
 });

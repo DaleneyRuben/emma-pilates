@@ -1,9 +1,19 @@
 import type { EquipmentDto } from "@pilates/api-contracts";
-import { chipStyles, colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
+import {
+  chipStyles,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
+import { CardLabel } from "../profile/card-pieces";
+
 // S26's pieces (FIX-067, FIX-076): the labelled numbered tiles and the switch of a per-unit
-// type, and the damage counter of a by-quantity type.
+// type, and the damage counter of a by-quantity type. Each is its own white card (I10, I11).
 
 export const unitName = (piece: EquipmentDto) => `${piece.typeName} ${piece.number}`;
 
@@ -19,10 +29,8 @@ export function UnitTiles({
   units: EquipmentDto[];
 }) {
   return (
-    <View style={styles.unitGroup}>
-      <Text accessibilityRole="header" style={styles.unitHeading}>
-        Número del equipo
-      </Text>
+    <View style={styles.card}>
+      <CardLabel>Número del equipo</CardLabel>
       <View accessibilityLabel={label} style={styles.tiles}>
         {units.map((piece) => {
           const selected = piece.id === chosenId;
@@ -133,7 +141,7 @@ export function DamageCounter({
     );
   return (
     <View style={styles.card}>
-      <Text style={styles.muted}>{`Hay ${usable} que se pueden usar`}</Text>
+      <Text style={styles.usable}>{`Hay ${usable} que se pueden usar`}</Text>
       <Text style={styles.question}>¿Cuántos se dañaron?</Text>
       <View style={styles.stepper}>
         <StepButton
@@ -185,7 +193,7 @@ export function OutOfServiceSwitch({
         importantForAccessibility="no-hide-descendants"
         onValueChange={onChange}
         thumbColor={colors.white}
-        trackColor={{ false: colors.hairline, true: colors.primary }}
+        trackColor={{ false: colors.band, true: colors.primary }}
         value={value}
       />
     </Pressable>
@@ -193,14 +201,7 @@ export function OutOfServiceSwitch({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   count: {
     color: colors.text,
     fontFamily: fontFamilies.display,
@@ -208,11 +209,11 @@ const styles = StyleSheet.create({
     minWidth: 40,
     textAlign: "center",
   },
-  helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  helper: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   onSelected: { color: colors.onPrimary },
-  question: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
-  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
+  question: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  // Board I11: the stepper's square buttons, white with a 600 outline.
   step: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -230,21 +231,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
   },
-  stepper: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
-  switchLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
+  stepper: { alignItems: "center", flexDirection: "row", gap: spacing.xlSm },
+  switchLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   switchRow: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   switchText: { flex: 1, gap: spacing.xxs },
   missing: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
     textAlign: "center",
@@ -254,24 +258,29 @@ const styles = StyleSheet.create({
     borderRadius: radii.inset,
     height: 44,
     justifyContent: "center",
-    minWidth: 72,
-    paddingHorizontal: spacing.mdLg,
+    paddingHorizontal: spacing.smd,
+    width: 72,
   },
   tileNumber: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "500",
+    fontWeight: "700",
   },
-  tileOut: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 12 },
-  tileWithNote: { height: 52 },
-  tiles: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  unitGroup: { gap: spacing.sm },
-  unitHeading: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 12,
-    letterSpacing: 1.54,
-    textTransform: "uppercase",
+  tileOut: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 12,
+    textAlign: "center",
+  },
+  tileWithNote: { height: 58 },
+  tiles: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  usable: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
   },
 });

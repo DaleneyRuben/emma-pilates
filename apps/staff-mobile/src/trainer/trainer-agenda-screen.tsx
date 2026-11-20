@@ -9,12 +9,13 @@ import {
   colors,
   fontFamilies,
   LoadingState,
+  OutlinedButton,
   QueryFailure,
   radii,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
+  surfaces,
   upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -23,6 +24,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, CardLabel } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { DayStrip } from "../ui/day-strip";
 import { RootHeader } from "../ui/root-header";
@@ -39,7 +41,8 @@ type TrainerAgendaNavigation = {
 /**
  * S02 Mi agenda (v2): it opens on today and shows no past day, since
  * attendance is never corrected (owner, 2026-11-02); «Hoy» comes back to it.
- * E1 B «La semana de un vistazo»: the strip counts each day's classes.
+ * E1 B «La semana de un vistazo»: the strip counts each day's classes. Boards
+ * I01–I04: the band stays fixed; the week, the hero and the day's cards scroll.
  */
 export function TrainerAgendaScreen() {
   const navigation = useNavigation<TrainerAgendaNavigation>();
@@ -74,7 +77,9 @@ export function TrainerAgendaScreen() {
   const week = (
     <View style={styles.week}>
       <View style={styles.weekTitle}>
-        <SectionTitle>Esta semana · clases por día</SectionTitle>
+        <View style={styles.weekLabel}>
+          <CardLabel>Esta semana · clases por día</CardLabel>
+        </View>
         <Pressable
           accessibilityLabel="Hoy"
           accessibilityRole="button"
@@ -101,8 +106,10 @@ export function TrainerAgendaScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        {week}
-        <LoadingState label="Cargando agenda" />
+        <View style={styles.loading}>
+          {week}
+          <LoadingState label="Cargando agenda" />
+        </View>
       </Screen>
     );
   if (schedule.isError || schedule.data.status !== 200)
@@ -120,13 +127,14 @@ export function TrainerAgendaScreen() {
   const dayName = isToday ? "Hoy" : dayHeading(selectedDate).split(" ")[0];
   return (
     <Screen style={styles.screen}>
+      {header}
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={bodyScroll.content}
         refreshControl={refreshControl}
+        style={bodyScroll.scroll}
         testID="agenda-scroll"
       >
         <View style={[styles.column, tablet && styles.tablet]} testID="agenda-column">
-          {header}
           {week}
           {sessions.length === 0 ? (
             <StateScreen
@@ -135,27 +143,30 @@ export function TrainerAgendaScreen() {
               note={
                 isToday ? undefined : "Elige otro día de la semana o vuelve a tus clases de hoy."
               }
-              primaryAction={
-                isToday
-                  ? undefined
-                  : { label: "Ver mis clases de hoy", onPress: () => setSelectedDate(today) }
-              }
               title={
                 isToday
                   ? "Hoy no tienes clases"
                   : `El ${dayHeading(selectedDate).toLowerCase().split(" ").slice(0, 2).join(" ")} no tienes clases`
               }
-            />
+            >
+              {isToday ? null : (
+                // Board I04: the way back to today is the secondary button.
+                <View style={styles.backToToday}>
+                  <OutlinedButton
+                    label="Ver mis clases de hoy"
+                    onPress={() => setSelectedDate(today)}
+                  />
+                </View>
+              )}
+            </StateScreen>
           ) : (
-            <View>
-              <SectionTitle>{agendaHeading(dayName, sessions)}</SectionTitle>
-              <AgendaDay
-                isToday={isToday}
-                now={new Date()}
-                onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
-                sessions={sessions}
-              />
-            </View>
+            <AgendaDay
+              heading={agendaHeading(dayName, sessions)}
+              isToday={isToday}
+              now={new Date()}
+              onOpen={(sessionId) => navigation.navigate("Roster", { sessionId })}
+              sessions={sessions}
+            />
           )}
         </View>
       </ScrollView>
@@ -164,28 +175,42 @@ export function TrainerAgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  column: { gap: spacing.xl },
-  content: { paddingBottom: spacing.xl },
-  screen: { gap: spacing.xl, paddingHorizontal: spacing.xlSm },
+  backToToday: { alignSelf: "stretch", marginTop: spacing.xs },
+  column: { gap: spacing.smLg },
+  loading: { gap: spacing.smLg, paddingTop: spacing.md },
+  screen: { paddingHorizontal: spacing.xlSm },
   // E1 B on a tablet: a phone's column, centred, so the hero never stretches.
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
-  // FIX-089: a secondary chip, Crema with a Rosa profundo outline.
+  // Board I01: a secondary chip, white with a 400 outline, at the card's end.
   todayButton: {
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.primary,
+    borderColor: colors.borderStrong,
     borderWidth: 1.5,
     borderRadius: radii.pill,
     height: 36,
     justifyContent: "center",
-    paddingHorizontal: spacing.mdLg,
+    paddingHorizontal: spacing.lg,
   },
   todayLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
   },
-  week: { gap: spacing.md },
-  weekTitle: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
+  // The week sits in its own white card, its label inside (board I01).
+  week: {
+    ...surfaces.card,
+    gap: spacing.md,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.mdLg,
+  },
+  weekTitle: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingLeft: spacing.xs,
+  },
+  weekLabel: { flex: 1 },
 });

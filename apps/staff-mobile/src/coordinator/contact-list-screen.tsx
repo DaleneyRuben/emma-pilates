@@ -6,14 +6,11 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
   LoadingState,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
-  surfaces,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -21,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { bodyScroll, RowCard, SoftNote } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { useIsTablet } from "../ui/use-is-tablet";
@@ -38,7 +36,9 @@ type ContactNavigation = {
 
 /**
  * S28 Para contactar, the Coordinator's second tab (BKM-013, v2), as the calm
- * list of walkthrough finding 113 (proposal A): rows open her sheet.
+ * list of walkthrough finding 113 (proposal A): rows open her sheet. Boards
+ * K01–K05: the band holds the title alone, the note rides a soft aside, and
+ * the Clients are rows of one white card under their count.
  */
 export function ContactListScreen() {
   const navigation = useNavigation<ContactNavigation>();
@@ -88,30 +88,32 @@ export function ContactListScreen() {
       initial: false,
     });
   };
-  const header = (
-    <RootHeader
-      note="Clientas nuevas que conviene escribir. Salen solas de la lista cuando reservan."
-      title="Para contactar"
+  const header = <RootHeader title="Para contactar" />;
+  const note = (
+    <SoftNote
+      icon="message"
+      message="Clientas nuevas que conviene escribir. Salen solas de la lista cuando reservan."
     />
   );
 
   return (
     <Screen style={styles.screen}>
+      {header}
       {list.isPending ? (
         <>
-          {header}
+          <View style={styles.state}>{note}</View>
           <LoadingState label="Cargando la lista" />
         </>
       ) : list.isError || list.data?.status !== 200 ? (
         <>
-          {header}
           <QueryFailure label="No pudimos cargar la lista." onRetry={() => void list.refetch()} />
         </>
       ) : items.length === 0 ? (
         <>
-          <RootHeader title="Para contactar" />
+          <View style={styles.balance} />
           <StateScreen
             icon="person"
+            layout="card"
             note="Aquí aparecen las clientas nuevas que dejan de reservar o toman pocas clases."
             textAction={{
               label: "Buscar una clienta",
@@ -119,25 +121,24 @@ export function ContactListScreen() {
             }}
             title="Nadie para contactar"
           />
+          <View style={styles.balance} />
         </>
       ) : (
         <ScrollView
-          contentContainerStyle={[styles.list, tablet && styles.tablet]}
+          contentContainerStyle={[bodyScroll.content, tablet && styles.tablet]}
           refreshControl={refreshControl}
+          style={bodyScroll.scroll}
         >
-          {header}
-          <View>
-            <SectionTitle>
-              {items.length === 1 ? "1 clienta" : `${items.length} clientas`}
-            </SectionTitle>
-            <View style={styles.group}>
-              {items.map((item, index) => (
-                <View key={item.clientId} style={index > 0 && styles.divided}>
-                  <ContactRow item={item} onOpen={(row) => setOpenId(row.clientId)} />
-                </View>
-              ))}
-            </View>
-          </View>
+          {note}
+          <RowCard label={items.length === 1 ? "1 clienta" : `${items.length} clientas`}>
+            {items.map((item) => (
+              <ContactRow
+                item={item}
+                key={item.clientId}
+                onOpen={(row) => setOpenId(row.clientId)}
+              />
+            ))}
+          </RowCard>
         </ScrollView>
       )}
       <ContactSheet
@@ -161,9 +162,9 @@ export function ContactListScreen() {
 }
 
 const styles = StyleSheet.create({
-  divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
-  group: { ...surfaces.card, overflow: "hidden" },
-  list: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  // Board K05: the empty card sits in the middle of the space under the band.
+  balance: { flex: 1 },
+  screen: { paddingHorizontal: spacing.xlSm },
+  state: { paddingTop: spacing.md },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

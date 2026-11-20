@@ -9,7 +9,6 @@ import {
   BrandToast,
   ConfirmationSheet,
   IconRow,
-  IconRowGroup,
   LoadingState,
   NoticeRow,
   QueryFailure,
@@ -26,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { bodyScroll } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { dayHeading } from "../ui/session-time";
@@ -116,8 +116,12 @@ export function NutritionistAgendaScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
-        {header}
+      {header}
+      <ScrollView
+        contentContainerStyle={bodyScroll.content}
+        refreshControl={refreshControl}
+        style={bodyScroll.scroll}
+      >
         {failure !== null ? (
           <View accessibilityLabel={failure} accessibilityRole="alert">
             <NoticeRow message={failure} />
@@ -165,7 +169,7 @@ export function NutritionistAgendaScreen() {
         visible={cancelling !== null}
       >
         {cancelling !== null ? (
-          <IconRowGroup>
+          <View style={styles.sheetRows}>
             <IconRow
               icon="calendar"
               label={`${agendaDayLabel(civilDateOf(cancelling.startsAt), today).split(" · ")[0]}, ${clockTime(cancelling.startsAt)} · ${cancelling.clientName}`}
@@ -177,7 +181,7 @@ export function NutritionistAgendaScreen() {
                 label={`El pago de ${cancelling.clientName.split(" ")[0]} sigue vigente; ella elige otro turno.`}
               />
             ) : null}
-          </IconRowGroup>
+          </View>
         ) : null}
       </ConfirmationSheet>
       {notice !== null ? (
@@ -190,8 +194,9 @@ export function NutritionistAgendaScreen() {
 const styles = StyleSheet.create({
   cards: { gap: spacing.md },
   // iPad: the block and the rows keep a phone-like column instead of stretching.
-  column: { gap: spacing.xl },
-  list: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  column: { gap: spacing.md },
   screen: { paddingHorizontal: spacing.xlSm },
+  // Board N02: the facts are plain lines on the white sheet, not a card.
+  sheetRows: { marginHorizontal: -spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

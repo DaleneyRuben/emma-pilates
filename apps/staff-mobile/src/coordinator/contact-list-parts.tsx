@@ -9,11 +9,13 @@ import {
   NoticeRow,
   radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Path } from "react-native-svg";
 
+import { CardLabel } from "../profile/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import {
   contactMissingPhoneNote,
@@ -73,7 +75,7 @@ export function ContactRow({
           style={styles.whatsApp}
         >
           <View style={styles.ring}>
-            <LineIcon color={colors.primaryOnTint} size={18} strokeWidth={1.6}>
+            <LineIcon color={colors.text} size={18} strokeWidth={1.6}>
               <Path d="M4.5 5.5h15v10h-9l-4.5 4v-4h-1.5z" />
             </LineIcon>
           </View>
@@ -129,11 +131,11 @@ export function ContactSheet({
     >
       <Text style={styles.meta}>{contactSheetMeta(item)}</Text>
       <View style={styles.inset}>
-        <Text style={styles.insetTitle}>Por qué está aquí</Text>
+        <CardLabel>Por qué está aquí</CardLabel>
         {contactReasonLabels(item.reasons).map((label) => (
           <View key={label} style={styles.reasonLine}>
             <View style={styles.dot} />
-            <Text style={styles.reasons}>{label}</Text>
+            <Text style={styles.reasonText}>{label}</Text>
           </View>
         ))}
       </View>
@@ -150,52 +152,51 @@ export function ContactSheet({
 }
 
 const styles = StyleSheet.create({
-  chevron: { alignSelf: "stretch", justifyContent: "center", paddingRight: spacing.smLg },
-  dot: { backgroundColor: colors.iconQuiet, borderRadius: 3, height: 5, width: 5 },
+  chevron: { alignSelf: "stretch", justifyContent: "center", paddingRight: spacing.lg },
+  dot: { backgroundColor: colors.text, borderRadius: 3, height: 5, width: 5 },
+  // Boards K02–K03: why she is here, a soft 50 inset with its 200 rule.
   inset: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
+    ...surfaces.soft,
     borderRadius: radii.inset,
-    gap: spacing.sm,
+    gap: spacing.smd,
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  insetTitle: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 12,
-    letterSpacing: 12 * 0.12,
-    textTransform: "uppercase",
+  meta: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  name: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
-  meta: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  name: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 16 },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: typography.body,
+    lineHeight: 21,
   },
   reasonLine: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
+  reasonText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   reasons: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 19 },
+  // Board K01: the WhatsApp ring, white with a 1.5 pt 400 outline.
   ring: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: 18,
-    borderWidth: 1,
+    borderWidth: 1.5,
     height: 36,
     justifyContent: "center",
     width: 36,
   },
   row: { alignItems: "center", flexDirection: "row", minHeight: 72 },
-  rowBody: { flex: 1, gap: 3 },
+  rowBody: { flex: 1, gap: spacing.xxs },
   rowMain: {
     alignItems: "center",
     flex: 1,
     flexDirection: "row",
     gap: spacing.md,
-    paddingLeft: spacing.mdLg,
+    paddingLeft: spacing.lg,
     paddingVertical: spacing.md,
   },
   whatsApp: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
