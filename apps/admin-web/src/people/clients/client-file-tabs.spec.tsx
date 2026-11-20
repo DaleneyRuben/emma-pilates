@@ -36,6 +36,9 @@ const upcoming: AssistantClientBookingDto[] = [
     // Thursday 5 November 2026, 18:30 in Bolivia.
     startsAt: "2026-11-05T22:30:00.000Z",
     endsAt: "2026-11-05T23:20:00.000Z",
+    capacity: 12,
+    bookedCount: 4,
+    attendeeInitials: ["VQ", "SG", "IM"],
     actionable: true,
   },
   {
@@ -49,6 +52,9 @@ const upcoming: AssistantClientBookingDto[] = [
     branchName: "Centro",
     startsAt: "2026-11-06T13:00:00.000Z",
     endsAt: "2026-11-06T13:50:00.000Z",
+    capacity: 10,
+    bookedCount: 10,
+    attendeeInitials: [],
     actionable: true,
   },
 ];
