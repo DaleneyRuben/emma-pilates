@@ -1,0 +1,1215 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-20T12:00:00Z"
+ },
+ "title": "Rosa Emma · App del equipo",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "E-A01.dc.html": {
+   "x": 0,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A01 · Iniciar sesión"
+  },
+  "E-A02.dc.html": {
+   "x": 470,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A02 · Iniciar sesión · credenciales incorrectas"
+  },
+  "E-A03.dc.html": {
+   "x": 940,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A03 · Iniciar sesión · demasiados intentos"
+  },
+  "E-A04.dc.html": {
+   "x": 1410,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A04 · Recuperar contraseña"
+  },
+  "E-A05.dc.html": {
+   "x": 1880,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A05 · Recuperar contraseña · revisa tu correo"
+  },
+  "E-A06.dc.html": {
+   "x": 2350,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A06 · Crear contraseña · activar cuenta"
+  },
+  "E-A07.dc.html": {
+   "x": 2820,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A07 · Crear contraseña · cuenta activa"
+  },
+  "E-A08.dc.html": {
+   "x": 3290,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A08 · Crear contraseña · invitación vencida"
+  },
+  "E-A09.dc.html": {
+   "x": 3760,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A09 · Restablecer contraseña · enlace vencido"
+  },
+  "E-A10.dc.html": {
+   "x": 4230,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A10 · Cambio de correo · confirmado"
+  },
+  "E-A11.dc.html": {
+   "x": 4700,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A11 · Permiso de notificaciones · primer inicio"
+  },
+  "E-A12.dc.html": {
+   "x": 5170,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A12 · Cargando · igual en toda la app"
+  },
+  "E-A13.dc.html": {
+   "x": 5640,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "A13 · Error de carga · igual en toda la app"
+  },
+  "E-I01.dc.html": {
+   "x": 0,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I01 · Mi agenda · hoy con próxima clase"
+  },
+  "E-I02.dc.html": {
+   "x": 470,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I02 · Mi agenda · hoy todo cancelado (pliegue abierto)"
+  },
+  "E-I03.dc.html": {
+   "x": 940,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I03 · Mi agenda · otro día de la semana"
+  },
+  "E-I04.dc.html": {
+   "x": 1410,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I04 · Mi agenda · día sin clases"
+  },
+  "E-I05.dc.html": {
+   "x": 1880,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I05 · Lista de la clase · quién viene"
+  },
+  "E-I06.dc.html": {
+   "x": 2350,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I06 · Tomar asistencia · falta marcar"
+  },
+  "E-I07.dc.html": {
+   "x": 2820,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I07 · Tomar asistencia · antes de empezar"
+  },
+  "E-I08.dc.html": {
+   "x": 3290,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I08 · Tomar asistencia · guardada"
+  },
+  "E-I09.dc.html": {
+   "x": 3760,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I09 · Lista de la clase · sin reservas"
+  },
+  "E-I10.dc.html": {
+   "x": 4230,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I10 · Reportar una falla · por unidad"
+  },
+  "E-I11.dc.html": {
+   "x": 4700,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I11 · Reportar una falla · por cantidad"
+  },
+  "E-I12.dc.html": {
+   "x": 5170,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I12 · Reportar una falla · sucursal sin equipos"
+  },
+  "E-I13.dc.html": {
+   "x": 5640,
+   "y": 1564,
+   "w": 390,
+   "h": 844,
+   "title": "I13 · Reportar una falla · enviado"
+  },
+  "E-N01.dc.html": {
+   "x": 0,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N01 · Mi agenda · próxima cita y después"
+  },
+  "E-N02.dc.html": {
+   "x": 470,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N02 · Mi agenda · ¿cancelar esta evaluación?"
+  },
+  "E-N03.dc.html": {
+   "x": 940,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N03 · Mi agenda · evaluación cancelada"
+  },
+  "E-N04.dc.html": {
+   "x": 1410,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N04 · Mi agenda · sin evaluaciones"
+  },
+  "E-N05.dc.html": {
+   "x": 1880,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N05 · Mi disponibilidad · con horarios"
+  },
+  "E-N06.dc.html": {
+   "x": 2350,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N06 · Mi disponibilidad · sin horarios"
+  },
+  "E-N07.dc.html": {
+   "x": 2820,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N07 · Nuevo horario · vacío"
+  },
+  "E-N08.dc.html": {
+   "x": 3290,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N08 · Editar horario · con reservas"
+  },
+  "E-N09.dc.html": {
+   "x": 3760,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N09 · Rueda de hora · hora de fin"
+  },
+  "E-N10.dc.html": {
+   "x": 4230,
+   "y": 2828,
+   "w": 390,
+   "h": 844,
+   "title": "N10 · Editar horario · ¿aplicar el cambio?"
+  },
+  "E-S01.dc.html": {
+   "x": 0,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S01 · Hoy · próxima clase, pendientes y más tarde"
+  },
+  "E-S02.dc.html": {
+   "x": 470,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S02 · Hoy · ya no quedan clases"
+  },
+  "E-S03.dc.html": {
+   "x": 940,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S03 · Hoy · buscando una clienta"
+  },
+  "E-S04.dc.html": {
+   "x": 1410,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S04 · Caja · sin pagos en efectivo"
+  },
+  "E-S05.dc.html": {
+   "x": 1880,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S05 · Caja · conteo con diferencia"
+  },
+  "E-S06.dc.html": {
+   "x": 2350,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S06 · Caja · ¿cerrar la caja de hoy?"
+  },
+  "E-S07.dc.html": {
+   "x": 2820,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S07 · Caja · cerrada"
+  },
+  "E-S08.dc.html": {
+   "x": 3290,
+   "y": 4092,
+   "w": 390,
+   "h": 844,
+   "title": "S08 · Cerrar caja · desde Pagos (administración), sin efectivo"
+  },
+  "E-C01.dc.html": {
+   "x": 0,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C01 · Buscar clienta · inicio"
+  },
+  "E-C02.dc.html": {
+   "x": 470,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C02 · Buscar clienta · resultados"
+  },
+  "E-C03.dc.html": {
+   "x": 940,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C03 · Buscar clienta · sin resultados"
+  },
+  "E-C04.dc.html": {
+   "x": 1410,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C04 · Buscar clienta · coordinadora"
+  },
+  "E-C05.dc.html": {
+   "x": 1880,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C05 · Nueva clienta · completando"
+  },
+  "E-C05b.dc.html": {
+   "x": 2350,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C05b · Nueva clienta · recomendación con código"
+  },
+  "E-C06.dc.html": {
+   "x": 2820,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C06 · Nueva clienta · faltan datos"
+  },
+  "E-C07.dc.html": {
+   "x": 3290,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C07 · Nueva clienta · se registró sola desde la app"
+  },
+  "E-C08.dc.html": {
+   "x": 3760,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C08 · Ficha · plan activo (asistente)"
+  },
+  "E-C09.dc.html": {
+   "x": 4230,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C09 · Ficha · congelada y con el próximo plan pagado"
+  },
+  "E-C10.dc.html": {
+   "x": 4700,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C10 · Ficha · sin plan activo (asistente)"
+  },
+  "E-C11.dc.html": {
+   "x": 5170,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C11 · Ficha · plan vencido"
+  },
+  "E-C12.dc.html": {
+   "x": 5640,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C12 · Ficha · cuenta pendiente de activación"
+  },
+  "E-C13.dc.html": {
+   "x": 6110,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C13 · Ficha · menú de la invitación"
+  },
+  "E-C14.dc.html": {
+   "x": 6580,
+   "y": 5356,
+   "w": 390,
+   "h": 844,
+   "title": "C14 · Ficha · coordinadora (contacto en lugar de venta)"
+  },
+  "E-R01.dc.html": {
+   "x": 0,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R01 · Reservar una clase · hoy"
+  },
+  "E-R02.dc.html": {
+   "x": 470,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R02 · Reservar una clase · sin clases de ese tipo"
+  },
+  "E-R03.dc.html": {
+   "x": 940,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R03 · Detalle de clase · puede reservar"
+  },
+  "E-R04.dc.html": {
+   "x": 1410,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R04 · Detalle de clase · llena, lista de espera"
+  },
+  "E-R05.dc.html": {
+   "x": 1880,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R05 · Detalle de clase · sin clases disponibles"
+  },
+  "E-R06.dc.html": {
+   "x": 2350,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R06 · Detalle de clase · la API no deja reservar"
+  },
+  "E-R07.dc.html": {
+   "x": 2820,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R07 · Reservas · próximas (tras reservar)"
+  },
+  "E-R08.dc.html": {
+   "x": 3290,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R08 · Reservas · ¿cancelar esta reserva?"
+  },
+  "E-R09.dc.html": {
+   "x": 3760,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R09 · Reservas · sin reservas próximas"
+  },
+  "E-R10.dc.html": {
+   "x": 4230,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R10 · Historial de clases"
+  },
+  "E-R11.dc.html": {
+   "x": 4700,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R11 · Historial · vacío"
+  },
+  "E-R12.dc.html": {
+   "x": 5170,
+   "y": 6620,
+   "w": 390,
+   "h": 844,
+   "title": "R12 · Reprogramar clase"
+  },
+  "E-P01.dc.html": {
+   "x": 0,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P01 · Elige un plan"
+  },
+  "E-P02.dc.html": {
+   "x": 470,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P02 · Registrar pago · efectivo"
+  },
+  "E-P03.dc.html": {
+   "x": 940,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P03 · Registrar pago · efectivo con factura"
+  },
+  "E-P04.dc.html": {
+   "x": 1410,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P04 · Registrar pago · renovación"
+  },
+  "E-P05.dc.html": {
+   "x": 1880,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P05 · Registrar pago · QR sin comprobante"
+  },
+  "E-P06.dc.html": {
+   "x": 2350,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P06 · Pago registrado · efectivo"
+  },
+  "E-P07.dc.html": {
+   "x": 2820,
+   "y": 7884,
+   "w": 390,
+   "h": 844,
+   "title": "P07 · Comprobante enviado · QR"
+  },
+  "E-K01.dc.html": {
+   "x": 0,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "K01 · Para contactar · lista"
+  },
+  "E-K02.dc.html": {
+   "x": 470,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "K02 · Para contactar · hoja de la clienta"
+  },
+  "E-K03.dc.html": {
+   "x": 940,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "K03 · Para contactar · hoja sin teléfono"
+  },
+  "E-K04.dc.html": {
+   "x": 1410,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "K04 · Para contactar · contactada"
+  },
+  "E-K05.dc.html": {
+   "x": 1880,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "K05 · Para contactar · vacío"
+  },
+  "E-H01.dc.html": {
+   "x": 2350,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "H01 · Horario · asistente"
+  },
+  "E-H02.dc.html": {
+   "x": 2820,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "H02 · Horario · administradora (solo lectura)"
+  },
+  "E-H03.dc.html": {
+   "x": 3290,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "H03 · Horario · coordinadora (solo lectura)"
+  },
+  "E-H04.dc.html": {
+   "x": 3760,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "H04 · Horario · día todo cancelado"
+  },
+  "E-H05.dc.html": {
+   "x": 4230,
+   "y": 9148,
+   "w": 390,
+   "h": 844,
+   "title": "H05 · Horario · día sin clases"
+  },
+  "E-D01.dc.html": {
+   "x": 0,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D01 · Pagos pendientes · con pagos por confirmar"
+  },
+  "E-D02.dc.html": {
+   "x": 470,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D02 · Pagos pendientes · todo al día"
+  },
+  "E-D03.dc.html": {
+   "x": 940,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D03 · Pagos pendientes · tras confirmar"
+  },
+  "E-D04.dc.html": {
+   "x": 1410,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D04 · Revisar pago · con descuento y factura"
+  },
+  "E-D05.dc.html": {
+   "x": 1880,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D05 · Revisar pago · rechazar"
+  },
+  "E-D06.dc.html": {
+   "x": 2350,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D06 · Revisar pago · confirmado (solo lectura)"
+  },
+  "E-D07.dc.html": {
+   "x": 2820,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D07 · Congelamientos · con un pedido"
+  },
+  "E-D08.dc.html": {
+   "x": 3290,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D08 · Congelamientos · sin pedidos"
+  },
+  "E-D09.dc.html": {
+   "x": 3760,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D09 · Revisar congelamiento · pedido"
+  },
+  "E-D10.dc.html": {
+   "x": 4230,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D10 · Revisar congelamiento · aprobado"
+  },
+  "E-D11.dc.html": {
+   "x": 4700,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D11 · Rechazar congelamiento"
+  },
+  "E-D12.dc.html": {
+   "x": 5170,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D12 · Cancelar una clase · otro día"
+  },
+  "E-D13.dc.html": {
+   "x": 5640,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D13 · Cancelar una clase · hoy ya no hay"
+  },
+  "E-D14.dc.html": {
+   "x": 6110,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D14 · Cancelar clase · confirmación"
+  },
+  "E-D15.dc.html": {
+   "x": 6580,
+   "y": 10412,
+   "w": 390,
+   "h": 844,
+   "title": "D15 · Cancelar clase · hecho"
+  },
+  "E-D16.dc.html": {
+   "x": 0,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D16 · Facturas · por subir"
+  },
+  "E-D17.dc.html": {
+   "x": 470,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D17 · Facturas · subidas"
+  },
+  "E-D18.dc.html": {
+   "x": 940,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D18 · Facturas · nada por subir"
+  },
+  "E-D19.dc.html": {
+   "x": 1410,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D19 · Factura del pago · por emitir"
+  },
+  "E-D20.dc.html": {
+   "x": 1880,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D20 · Factura del pago · de dónde sale el archivo"
+  },
+  "E-D21.dc.html": {
+   "x": 2350,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D21 · Factura del pago · emitida"
+  },
+  "E-D22.dc.html": {
+   "x": 2820,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D22 · Factura del pago · no se pudo subir"
+  },
+  "E-D23.dc.html": {
+   "x": 3290,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D23 · Ver la app como… · el equipo"
+  },
+  "E-D24.dc.html": {
+   "x": 3760,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D24 · Ver la app como… · confirmar"
+  },
+  "E-D25.dc.html": {
+   "x": 4230,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D25 · Viendo como Daniela · franja sobre su agenda"
+  },
+  "E-D26.dc.html": {
+   "x": 4700,
+   "y": 11676,
+   "w": 390,
+   "h": 844,
+   "title": "D26 · Viendo como Daniela · su perfil"
+  },
+  "E-F01.dc.html": {
+   "x": 0,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F01 · Perfil · instructora"
+  },
+  "E-F02.dc.html": {
+   "x": 470,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F02 · Perfil · asistente"
+  },
+  "E-F03.dc.html": {
+   "x": 940,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F03 · Perfil · administradora"
+  },
+  "E-F04.dc.html": {
+   "x": 1410,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F04 · Perfil · ¿cerrar sesión?"
+  },
+  "E-F05.dc.html": {
+   "x": 1880,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F05 · Perfil · contraseña actualizada"
+  },
+  "E-F06.dc.html": {
+   "x": 2350,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F06 · Notificaciones · con avisos sin leer"
+  },
+  "E-F07.dc.html": {
+   "x": 2820,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F07 · Notificaciones · grupo abierto y permiso desactivado"
+  },
+  "E-F08.dc.html": {
+   "x": 3290,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F08 · Notificaciones · vacías"
+  },
+  "E-F09.dc.html": {
+   "x": 3760,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F09 · Cambiar contraseña"
+  },
+  "E-F10.dc.html": {
+   "x": 4230,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F10 · Cambiar contraseña · la actual no es correcta"
+  },
+  "E-F11.dc.html": {
+   "x": 4700,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F11 · Enviar comentarios"
+  },
+  "E-F12.dc.html": {
+   "x": 5170,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F12 · Enviar comentarios · gracias"
+  },
+  "E-F13.dc.html": {
+   "x": 5640,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F13 · Tu código de referido"
+  },
+  "E-F14.dc.html": {
+   "x": 6110,
+   "y": 12940,
+   "w": 390,
+   "h": 844,
+   "title": "F14 · Tu código de referido · editar"
+  },
+  "E-M01.dc.html": {
+   "x": 0,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M01 · Mis pagos · último pago (instructora)"
+  },
+  "E-M02.dc.html": {
+   "x": 470,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M02 · Mis pagos · periodo en curso (coordinadora)"
+  },
+  "E-M03.dc.html": {
+   "x": 940,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M03 · Mis pagos · por cobrar (nutricionista)"
+  },
+  "E-M04.dc.html": {
+   "x": 1410,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M04 · Mis pagos · vacío (instructora)"
+  },
+  "E-M05.dc.html": {
+   "x": 1880,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M05 · Mis pagos · asistente, desde Perfil"
+  },
+  "E-M06.dc.html": {
+   "x": 2350,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M06 · Liquidación · pagada"
+  },
+  "E-M07.dc.html": {
+   "x": 2820,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M07 · Liquidación · un concepto por día"
+  },
+  "E-M08.dc.html": {
+   "x": 3290,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M08 · Mi QR de cobro · vencido"
+  },
+  "E-M09.dc.html": {
+   "x": 3760,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M09 · Mi QR de cobro · vigente"
+  },
+  "E-M10.dc.html": {
+   "x": 4230,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M10 · Mi QR de cobro · sin subir"
+  },
+  "E-M11.dc.html": {
+   "x": 4700,
+   "y": 14204,
+   "w": 390,
+   "h": 844,
+   "title": "M11 · Mi QR de cobro · ¿hasta cuándo vale?"
+  }
+ },
+ "order": [
+  "E-A01.dc.html",
+  "E-A02.dc.html",
+  "E-A03.dc.html",
+  "E-A04.dc.html",
+  "E-A05.dc.html",
+  "E-A06.dc.html",
+  "E-A07.dc.html",
+  "E-A08.dc.html",
+  "E-A09.dc.html",
+  "E-A10.dc.html",
+  "E-A11.dc.html",
+  "E-A12.dc.html",
+  "E-A13.dc.html",
+  "E-I01.dc.html",
+  "E-I02.dc.html",
+  "E-I03.dc.html",
+  "E-I04.dc.html",
+  "E-I05.dc.html",
+  "E-I06.dc.html",
+  "E-I07.dc.html",
+  "E-I08.dc.html",
+  "E-I09.dc.html",
+  "E-I10.dc.html",
+  "E-I11.dc.html",
+  "E-I12.dc.html",
+  "E-I13.dc.html",
+  "E-N01.dc.html",
+  "E-N02.dc.html",
+  "E-N03.dc.html",
+  "E-N04.dc.html",
+  "E-N05.dc.html",
+  "E-N06.dc.html",
+  "E-N07.dc.html",
+  "E-N08.dc.html",
+  "E-N09.dc.html",
+  "E-N10.dc.html",
+  "E-S01.dc.html",
+  "E-S02.dc.html",
+  "E-S03.dc.html",
+  "E-S04.dc.html",
+  "E-S05.dc.html",
+  "E-S06.dc.html",
+  "E-S07.dc.html",
+  "E-S08.dc.html",
+  "E-C01.dc.html",
+  "E-C02.dc.html",
+  "E-C03.dc.html",
+  "E-C04.dc.html",
+  "E-C05.dc.html",
+  "E-C05b.dc.html",
+  "E-C06.dc.html",
+  "E-C07.dc.html",
+  "E-C08.dc.html",
+  "E-C09.dc.html",
+  "E-C10.dc.html",
+  "E-C11.dc.html",
+  "E-C12.dc.html",
+  "E-C13.dc.html",
+  "E-C14.dc.html",
+  "E-R01.dc.html",
+  "E-R02.dc.html",
+  "E-R03.dc.html",
+  "E-R04.dc.html",
+  "E-R05.dc.html",
+  "E-R06.dc.html",
+  "E-R07.dc.html",
+  "E-R08.dc.html",
+  "E-R09.dc.html",
+  "E-R10.dc.html",
+  "E-R11.dc.html",
+  "E-R12.dc.html",
+  "E-P01.dc.html",
+  "E-P02.dc.html",
+  "E-P03.dc.html",
+  "E-P04.dc.html",
+  "E-P05.dc.html",
+  "E-P06.dc.html",
+  "E-P07.dc.html",
+  "E-K01.dc.html",
+  "E-K02.dc.html",
+  "E-K03.dc.html",
+  "E-K04.dc.html",
+  "E-K05.dc.html",
+  "E-H01.dc.html",
+  "E-H02.dc.html",
+  "E-H03.dc.html",
+  "E-H04.dc.html",
+  "E-H05.dc.html",
+  "E-D01.dc.html",
+  "E-D02.dc.html",
+  "E-D03.dc.html",
+  "E-D04.dc.html",
+  "E-D05.dc.html",
+  "E-D06.dc.html",
+  "E-D07.dc.html",
+  "E-D08.dc.html",
+  "E-D09.dc.html",
+  "E-D10.dc.html",
+  "E-D11.dc.html",
+  "E-D12.dc.html",
+  "E-D13.dc.html",
+  "E-D14.dc.html",
+  "E-D15.dc.html",
+  "E-D16.dc.html",
+  "E-D17.dc.html",
+  "E-D18.dc.html",
+  "E-D19.dc.html",
+  "E-D20.dc.html",
+  "E-D21.dc.html",
+  "E-D22.dc.html",
+  "E-D23.dc.html",
+  "E-D24.dc.html",
+  "E-D25.dc.html",
+  "E-D26.dc.html",
+  "E-F01.dc.html",
+  "E-F02.dc.html",
+  "E-F03.dc.html",
+  "E-F04.dc.html",
+  "E-F05.dc.html",
+  "E-F06.dc.html",
+  "E-F07.dc.html",
+  "E-F08.dc.html",
+  "E-F09.dc.html",
+  "E-F10.dc.html",
+  "E-F11.dc.html",
+  "E-F12.dc.html",
+  "E-F13.dc.html",
+  "E-F14.dc.html",
+  "E-M01.dc.html",
+  "E-M02.dc.html",
+  "E-M03.dc.html",
+  "E-M04.dc.html",
+  "E-M05.dc.html",
+  "E-M06.dc.html",
+  "E-M07.dc.html",
+  "E-M08.dc.html",
+  "E-M09.dc.html",
+  "E-M10.dc.html",
+  "E-M11.dc.html"
+ ],
+ "notes": {
+  "t0": {
+   "x": 0,
+   "y": 40,
+   "text": "Acceso sin sesión, permiso de notificaciones y estados comunes · todos los roles",
+   "kind": "title1",
+   "maxW": 6110
+  },
+  "t1": {
+   "x": 0,
+   "y": 1304,
+   "text": "Instructora · Agenda, lista de la clase y fallas",
+   "kind": "title1",
+   "maxW": 6110
+  },
+  "t2": {
+   "x": 0,
+   "y": 2568,
+   "text": "Nutricionista · Agenda y disponibilidad",
+   "kind": "title1",
+   "maxW": 4700
+  },
+  "t3": {
+   "x": 0,
+   "y": 3832,
+   "text": "Asistente · Hoy y Caja (Cerrar caja también la abre administración desde Pagos)",
+   "kind": "title1",
+   "maxW": 3760
+  },
+  "t4": {
+   "x": 0,
+   "y": 5096,
+   "text": "Clientas · asistente, coordinadora y administración",
+   "kind": "title1",
+   "maxW": 7050
+  },
+  "t5": {
+   "x": 0,
+   "y": 6360,
+   "text": "Reservar y reservas · asistente, coordinadora y administración",
+   "kind": "title1",
+   "maxW": 5640
+  },
+  "t6": {
+   "x": 0,
+   "y": 7624,
+   "text": "Registrar pago · asistente y administración",
+   "kind": "title1",
+   "maxW": 3290
+  },
+  "t7": {
+   "x": 0,
+   "y": 8888,
+   "text": "Coordinadora · Para contactar, y Horario de los tres roles",
+   "kind": "title1",
+   "maxW": 4700
+  },
+  "t8": {
+   "x": 0,
+   "y": 10152,
+   "text": "Administración · Pagos, congelamientos y cancelar clases",
+   "kind": "title1",
+   "maxW": 7050
+  },
+  "t9": {
+   "x": 0,
+   "y": 11416,
+   "text": "Administración · Facturas y Ver la app como",
+   "kind": "title1",
+   "maxW": 5170
+  },
+  "t10": {
+   "x": 0,
+   "y": 12680,
+   "text": "Perfil y notificaciones · todos los roles",
+   "kind": "title1",
+   "maxW": 6580
+  },
+  "t11": {
+   "x": 0,
+   "y": 13944,
+   "text": "Mis pagos y QR de cobro · instructora, nutricionista, coordinadora y asistente",
+   "kind": "title1",
+   "maxW": 5170
+  }
+ },
+ "designSystems": []
+}

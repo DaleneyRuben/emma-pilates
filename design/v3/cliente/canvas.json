@@ -1,0 +1,1232 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-20T12:00:00Z"
+ },
+ "title": "Rosa Emma · App de clientas",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "C02-inicio-con-plan.dc.html": {
+   "x": 0,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02 · Inicio con plan"
+  },
+  "C02s-inicio-con-plan-abajo.dc.html": {
+   "x": 470,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02s · Inicio con plan · desplazado hasta abajo"
+  },
+  "C02b-inicio-sin-plan.dc.html": {
+   "x": 940,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02b · Inicio sin plan"
+  },
+  "C02c-inicio-pago-en-revision.dc.html": {
+   "x": 1410,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02c · Inicio · pago en revisión (sin plan)"
+  },
+  "C02c2-inicio-renovacion-en-revision.dc.html": {
+   "x": 1880,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02c2 · Inicio · renovación en revisión (con plan)"
+  },
+  "C02d-inicio-pago-rechazado.dc.html": {
+   "x": 2350,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02d · Inicio · pago rechazado (sin plan)"
+  },
+  "C02d2-inicio-renovacion-rechazada.dc.html": {
+   "x": 2820,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02d2 · Inicio · renovación rechazada (con plan)"
+  },
+  "C02e-inicio-plan-por-vencer.dc.html": {
+   "x": 3290,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02e · Inicio · plan por vencer"
+  },
+  "C02f-inicio-clase-de-invitada.dc.html": {
+   "x": 3760,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02f · Inicio · clase gratis de invitada"
+  },
+  "C02g-inicio-plan-congelado.dc.html": {
+   "x": 4230,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02g · Inicio · plan congelado"
+  },
+  "C02h-inicio-agrega-tu-celular.dc.html": {
+   "x": 4700,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02h · Inicio · hoja «Agrega tu celular»"
+  },
+  "C02i-inicio-cargando-error.dc.html": {
+   "x": 5170,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C02i · Inicio · cargando, error y sin conexión"
+  },
+  "C19-notificaciones.dc.html": {
+   "x": 5640,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C19 · Notificaciones"
+  },
+  "C19b-notificaciones-vacio.dc.html": {
+   "x": 6110,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "C19b · Notificaciones vacío (permiso apagado)"
+  },
+  "CP-permiso-notificaciones.dc.html": {
+   "x": 6580,
+   "y": 300,
+   "w": 390,
+   "h": 844,
+   "title": "CP · Hoja «No te pierdas ninguna clase»"
+  },
+  "C03-reservar.dc.html": {
+   "x": 0,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03 · Reservar · clases del día"
+  },
+  "C03a-reservar-cargando-error.dc.html": {
+   "x": 470,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03a · Reservar · cargando y error"
+  },
+  "C03b-reservar-filtro-vacio.dc.html": {
+   "x": 940,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03b · Reservar · filtro sin clases"
+  },
+  "C03c-reservar-dia-vacio.dc.html": {
+   "x": 1410,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03c · Reservar · día sin clases"
+  },
+  "C03d-reservar-otra-fecha.dc.html": {
+   "x": 1880,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03d · Reservar · hoja «Elige otra fecha»"
+  },
+  "C03e-reservar-sucursal.dc.html": {
+   "x": 2350,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03e · Reservar · elegir sucursal"
+  },
+  "C03f-reservar-aviso-semanal.dc.html": {
+   "x": 2820,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03f · Reservar · variantes del aviso semanal"
+  },
+  "C03g-reservar-dia-congelado.dc.html": {
+   "x": 3290,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C03g · Reservar · día con plan congelado"
+  },
+  "C04-detalle-clase.dc.html": {
+   "x": 3760,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04 · Detalle de clase · puede reservar"
+  },
+  "C04a-detalle-cargando-error.dc.html": {
+   "x": 4230,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04a · Detalle · cargando y error"
+  },
+  "C04b-detalle-clase-llena.dc.html": {
+   "x": 4700,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04b · Detalle · clase llena, lista de espera"
+  },
+  "C04g-detalle-en-lista-de-espera.dc.html": {
+   "x": 5170,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04g · Detalle · ya en la lista de espera"
+  },
+  "C04h-detalle-lista-cerrada.dc.html": {
+   "x": 5640,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04h · Detalle · lista de espera cerrada"
+  },
+  "C04c-detalle-sin-plan.dc.html": {
+   "x": 6110,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04c · Detalle · sin plan"
+  },
+  "C04d-detalle-sin-clases.dc.html": {
+   "x": 6580,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04d · Detalle · sin clases en el plan"
+  },
+  "C04e-detalle-pago-en-revision.dc.html": {
+   "x": 7050,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04e · Detalle · pago en revisión"
+  },
+  "C04f-detalle-pago-rechazado.dc.html": {
+   "x": 7520,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04f · Detalle · pago rechazado"
+  },
+  "C04i-detalle-comprobando-pago.dc.html": {
+   "x": 7990,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04i · Detalle · comprobando el pago"
+  },
+  "C04j-detalle-dia-congelado.dc.html": {
+   "x": 8460,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04j · Detalle · plan congelado ese día"
+  },
+  "C04k-detalle-error-al-reservar.dc.html": {
+   "x": 8930,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04k · Detalle · error al reservar"
+  },
+  "C04n-detalle-permiso-notificaciones.dc.html": {
+   "x": 9400,
+   "y": 1844,
+   "w": 390,
+   "h": 844,
+   "title": "C04n · Detalle · hoja de notificaciones tras reservar"
+  },
+  "C05-mis-reservas.dc.html": {
+   "x": 0,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05 · Mis reservas · próximas"
+  },
+  "C05i-mis-reservas-dentro-de-la-ventana.dc.html": {
+   "x": 470,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05i · Mis reservas · dentro de la ventana de cancelación y error"
+  },
+  "C05a-mis-reservas-cargando-error.dc.html": {
+   "x": 940,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05a · Mis reservas · cargando y error"
+  },
+  "C05b-mis-reservas-vacio.dc.html": {
+   "x": 1410,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05b · Mis reservas · vacío"
+  },
+  "C05c-cancelar-reserva.dc.html": {
+   "x": 1880,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05c · Hoja «¿Cancelar esta reserva?»"
+  },
+  "C05f-salir-de-la-lista.dc.html": {
+   "x": 2350,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05f · Hoja «¿Salir de la lista de espera?»"
+  },
+  "C05g-mis-reservas-avisos.dc.html": {
+   "x": 2820,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05g · Mis reservas · avisos tras cada acción"
+  },
+  "C05d-historial.dc.html": {
+   "x": 3290,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05d · Historial"
+  },
+  "C05e-historial-vacio.dc.html": {
+   "x": 3760,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C05e · Historial vacío"
+  },
+  "C06-reprogramar.dc.html": {
+   "x": 4230,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C06 · Reprogramar · clase elegida"
+  },
+  "C06n-reprogramar-sin-elegir.dc.html": {
+   "x": 4700,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C06n · Reprogramar · sin elegir todavía"
+  },
+  "C06b-reprogramar-sin-opciones.dc.html": {
+   "x": 5170,
+   "y": 3388,
+   "w": 390,
+   "h": 844,
+   "title": "C06b · Reprogramar · sin otras clases"
+  },
+  "C08-elige-tu-plan.dc.html": {
+   "x": 0,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C08 · Elige tu plan"
+  },
+  "C08b-elige-tu-plan-pocos-lugares.dc.html": {
+   "x": 470,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C08b · Elige tu plan · pocos lugares con descuento"
+  },
+  "C08r-elige-tu-plan-renovar.dc.html": {
+   "x": 940,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C08r · Elige tu plan · renovar"
+  },
+  "C08x-elige-tu-plan-cargando-vacio-error.dc.html": {
+   "x": 1410,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C08x · Elige tu plan · cargando, sin planes y error"
+  },
+  "C09-detalle-del-plan.dc.html": {
+   "x": 1880,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C09 · Detalle del plan"
+  },
+  "C09r-detalle-del-plan-renovacion.dc.html": {
+   "x": 2350,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C09r · Detalle del plan · renovación"
+  },
+  "C09g-detalle-del-plan-clase-reservada.dc.html": {
+   "x": 2820,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C09g · Detalle del plan · inicio antes de una clase reservada y error"
+  },
+  "C10-pago.dc.html": {
+   "x": 3290,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C10 · Pago por transferencia"
+  },
+  "C10a-pago-qr-ampliado.dc.html": {
+   "x": 3760,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C10a · Pago · QR ampliado y guardado"
+  },
+  "C10b-pago-con-factura.dc.html": {
+   "x": 4230,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C10b · Pago · comprobante listo y con factura"
+  },
+  "C10c-pago-factura-sin-completar.dc.html": {
+   "x": 4700,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C10c · Pago · factura sin completar"
+  },
+  "C10e-pago-errores.dc.html": {
+   "x": 5170,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C10e · Pago · no se guardó el QR y falló la subida"
+  },
+  "C11-pago-en-revision.dc.html": {
+   "x": 5640,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C11 · Estado del pago · en revisión"
+  },
+  "C11b-pago-confirmado.dc.html": {
+   "x": 6110,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C11b · Estado del pago · confirmado"
+  },
+  "C11c-pago-rechazado.dc.html": {
+   "x": 6580,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C11c · Estado del pago · rechazado"
+  },
+  "C12-mi-plan.dc.html": {
+   "x": 7050,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12 · Mi plan · activo"
+  },
+  "C12n-mi-plan-siguiente-pagado.dc.html": {
+   "x": 7520,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12n · Mi plan · por vencer con el siguiente ya pagado"
+  },
+  "C12a-mi-plan-sin-plan.dc.html": {
+   "x": 7990,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12a · Mi plan · sin plan"
+  },
+  "C12b-mi-plan-vencido.dc.html": {
+   "x": 8460,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12b · Mi plan · vencido"
+  },
+  "C12k-mi-plan-clase-de-invitada.dc.html": {
+   "x": 8930,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12k · Mi plan · clase gratis de invitada"
+  },
+  "C12h-mi-plan-no-se-puede-congelar.dc.html": {
+   "x": 9400,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12h · Mi plan · congelar no disponible"
+  },
+  "C12c-mi-plan-congelamiento-en-revision.dc.html": {
+   "x": 9870,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12c · Mi plan · congelamiento en revisión"
+  },
+  "C12c2-retirar-solicitud.dc.html": {
+   "x": 10340,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12c2 · Hoja «¿Retirar tu solicitud?»"
+  },
+  "C12d-mi-plan-congelamiento-aprobado.dc.html": {
+   "x": 10810,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12d · Mi plan · congelamiento aprobado"
+  },
+  "C12e-mi-plan-congelado-ahora.dc.html": {
+   "x": 11280,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12e · Mi plan · congelado ahora"
+  },
+  "C12f-mi-plan-congelamiento-no-aprobado.dc.html": {
+   "x": 11750,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12f · Mi plan · congelamiento no aprobado"
+  },
+  "C12i-congelar-plan.dc.html": {
+   "x": 12220,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12i · Congelar plan · fechas elegidas"
+  },
+  "C12i2-congelar-plan-errores.dc.html": {
+   "x": 12690,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12i2 · Congelar plan · faltan datos y día no permitido"
+  },
+  "C12j-congelar-plan-bloqueado.dc.html": {
+   "x": 13160,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C12j · Congelar plan · bloqueado"
+  },
+  "C17-mis-facturas.dc.html": {
+   "x": 13630,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C17 · Mis facturas"
+  },
+  "C17b-mis-facturas-vacio.dc.html": {
+   "x": 14100,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C17b · Mis facturas · vacío"
+  },
+  "C17c-factura.dc.html": {
+   "x": 14570,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C17c · Factura lista"
+  },
+  "C17d-factura-en-preparacion.dc.html": {
+   "x": 15040,
+   "y": 4932,
+   "w": 390,
+   "h": 844,
+   "title": "C17d · Factura en preparación"
+  },
+  "C13-evaluacion-reserva.dc.html": {
+   "x": 0,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13 · Evaluación · reserva tu evaluación"
+  },
+  "C13a-evaluacion-cargando-error.dc.html": {
+   "x": 470,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13a · Evaluación · cargando y errores"
+  },
+  "C13b-evaluacion-sin-plan.dc.html": {
+   "x": 940,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13b · Evaluación · sin plan"
+  },
+  "C13n-evaluacion-sin-horarios.dc.html": {
+   "x": 1410,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13n · Evaluación · sin horarios"
+  },
+  "C13u-evaluacion-mes-usado.dc.html": {
+   "x": 1880,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13u · Evaluación · ya usaste la de este mes"
+  },
+  "C13d-evaluacion-gratis-reservada.dc.html": {
+   "x": 2350,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13d · Evaluación · cita gratis y «¿Otra evaluación?»"
+  },
+  "C13c-evaluacion-pagada-sin-comprobante.dc.html": {
+   "x": 2820,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13c · Evaluación · pagada sin comprobante"
+  },
+  "C13e-evaluacion-pago-en-revision.dc.html": {
+   "x": 3290,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13e · Evaluación · pago en revisión"
+  },
+  "C13h-evaluacion-pago-rechazado.dc.html": {
+   "x": 3760,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13h · Evaluación · pago rechazado"
+  },
+  "C13f-evaluacion-pagada.dc.html": {
+   "x": 4230,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13f · Evaluación · pagada"
+  },
+  "C13g-evaluacion-turno-liberado.dc.html": {
+   "x": 4700,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13g · Evaluación · el estudio liberó tu turno"
+  },
+  "C15-evaluaciones-varias-y-anteriores.dc.html": {
+   "x": 5170,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C15 · Evaluación · varias citas y anteriores"
+  },
+  "C13v-evaluacion-mover.dc.html": {
+   "x": 5640,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13v · Evaluación · elegir el nuevo horario"
+  },
+  "C13w-evaluacion-hoja-mover.dc.html": {
+   "x": 6110,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13w · Hoja «¿Mover tu evaluación?»"
+  },
+  "C13x-evaluacion-hoja-cancelar.dc.html": {
+   "x": 6580,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C13x · Hoja «¿Cancelar esta evaluación?»"
+  },
+  "C15c-evaluacion-hoja-comprobante.dc.html": {
+   "x": 7050,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C15c · Hoja «Sube tu comprobante»"
+  },
+  "C14-confirma-tu-cita-gratis.dc.html": {
+   "x": 7520,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C14 · Confirma tu cita · gratis"
+  },
+  "C14b-confirma-tu-cita-pagada.dc.html": {
+   "x": 7990,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C14b · Confirma tu cita · pagada, falta comprobante"
+  },
+  "C14c-confirma-tu-cita-comprobante-listo.dc.html": {
+   "x": 8460,
+   "y": 6476,
+   "w": 390,
+   "h": 844,
+   "title": "C14c · Confirma tu cita · comprobante listo y error"
+  },
+  "C18-perfil.dc.html": {
+   "x": 0,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C18 · Perfil"
+  },
+  "C18s-perfil-abajo.dc.html": {
+   "x": 470,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C18s · Perfil · desplazado hasta abajo"
+  },
+  "C18t-perfil-contrasena-actualizada.dc.html": {
+   "x": 940,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C18t · Perfil · contraseña actualizada"
+  },
+  "C18l-perfil-cerrar-sesion.dc.html": {
+   "x": 1410,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C18l · Hoja «¿Cerrar sesión?»"
+  },
+  "C18a-perfil-cargando-error.dc.html": {
+   "x": 1880,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C18a · Perfil · cargando y error"
+  },
+  "C22-editar-perfil.dc.html": {
+   "x": 2350,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C22 · Editar perfil"
+  },
+  "C22b-editar-perfil-errores-y-correo.dc.html": {
+   "x": 2820,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C22b · Editar perfil · errores y cambio de correo pendiente"
+  },
+  "C23-cambiar-contrasena.dc.html": {
+   "x": 3290,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C23 · Cambiar contraseña"
+  },
+  "C25-enviar-comentarios.dc.html": {
+   "x": 3760,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C25 · Enviar comentarios"
+  },
+  "C25e-enviar-comentarios-limite.dc.html": {
+   "x": 4230,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C25e · Enviar comentarios · límite del día"
+  },
+  "C25b-comentario-enviado.dc.html": {
+   "x": 4700,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C25b · Comentario enviado"
+  },
+  "C24-cerrar-mi-cuenta.dc.html": {
+   "x": 5170,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C24 · Cerrar mi cuenta"
+  },
+  "C24b-cerrar-cuenta-pago-en-revision.dc.html": {
+   "x": 5640,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C24b · Cerrar mi cuenta · pago en revisión"
+  },
+  "C16-invita-a-una-amiga.dc.html": {
+   "x": 6110,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16 · Invita a una amiga"
+  },
+  "C16b-invita-sin-invitadas.dc.html": {
+   "x": 6580,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16b · Invita a una amiga · sin invitadas"
+  },
+  "C16c-editar-codigo.dc.html": {
+   "x": 7050,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16c · Hoja «Editar tu código» · disponible"
+  },
+  "C16d-codigo-en-uso.dc.html": {
+   "x": 7520,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16d · Hoja «Editar tu código» · ya está en uso"
+  },
+  "C16e-confirmar-codigo.dc.html": {
+   "x": 7990,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16e · Hoja «¿Cambiar tu código?»"
+  },
+  "C16f-codigo-actualizado.dc.html": {
+   "x": 8460,
+   "y": 8020,
+   "w": 390,
+   "h": 844,
+   "title": "C16f · Invita a una amiga · código actualizado"
+  },
+  "C01-iniciar-sesion.dc.html": {
+   "x": 0,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01 · Iniciar sesión"
+  },
+  "C01e-iniciar-sesion-error.dc.html": {
+   "x": 470,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01e · Iniciar sesión · correo o contraseña incorrectos"
+  },
+  "C01t-iniciar-sesion-demasiados-intentos.dc.html": {
+   "x": 940,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01t · Iniciar sesión · demasiados intentos"
+  },
+  "C01n-iniciar-sesion-cuenta-cerrada.dc.html": {
+   "x": 1410,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01n · Iniciar sesión · aviso de cuenta cerrada"
+  },
+  "C01f-iniciar-sesion-face-id.dc.html": {
+   "x": 1880,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01f · Iniciar sesión · con Face ID"
+  },
+  "C01b-registrate.dc.html": {
+   "x": 2350,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01b · Crea tu cuenta"
+  },
+  "C01b2-registrate-errores.dc.html": {
+   "x": 2820,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01b2 · Crea tu cuenta · datos por revisar y código"
+  },
+  "C01c-revisa-tu-correo.dc.html": {
+   "x": 3290,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01c · Revisa tu correo (registro)"
+  },
+  "C01o-revisa-tu-correo-opciones.dc.html": {
+   "x": 3760,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01o · Hoja «Opciones»"
+  },
+  "C01x-cancelar-registro.dc.html": {
+   "x": 4230,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01x · Hoja «¿Cancelar tu registro?»"
+  },
+  "C01m-cambiar-correo.dc.html": {
+   "x": 4700,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01m · Cambiar correo (registro)"
+  },
+  "C01v-registro-vencio.dc.html": {
+   "x": 5170,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01v · El registro venció"
+  },
+  "C01k-correo-verificado.dc.html": {
+   "x": 5640,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C01k · Correo verificado (enlace)"
+  },
+  "C20-recuperar-contrasena.dc.html": {
+   "x": 6110,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C20 · Recuperar contraseña"
+  },
+  "C20l-recuperar-limite.dc.html": {
+   "x": 6580,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C20l · Recuperar contraseña · demasiadas solicitudes"
+  },
+  "C20b-recuperar-enviado.dc.html": {
+   "x": 7050,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C20b · Recuperar contraseña · enviado"
+  },
+  "C21-crear-contrasena.dc.html": {
+   "x": 7520,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21 · Crea tu contraseña (activar cuenta)"
+  },
+  "C21r-crear-contrasena-nueva.dc.html": {
+   "x": 7990,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21r · Crea una contraseña nueva (restablecer)"
+  },
+  "C21b-cuenta-activada.dc.html": {
+   "x": 8460,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21b · Tu cuenta está activa"
+  },
+  "C21c-enlace-vencido.dc.html": {
+   "x": 8930,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21c · Este enlace ya no es válido"
+  },
+  "C21e-enlace-vencido-restablecer.dc.html": {
+   "x": 9400,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21e · Este enlace ya no es válido (restablecer)"
+  },
+  "C21d-invitacion-eliminada.dc.html": {
+   "x": 9870,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C21d · Esta invitación ya no está activa"
+  },
+  "C26-cambio-de-correo-enlace.dc.html": {
+   "x": 10340,
+   "y": 9564,
+   "w": 390,
+   "h": 844,
+   "title": "C26 · Enlace de cambio de correo"
+  }
+ },
+ "order": [
+  "C02-inicio-con-plan.dc.html",
+  "C02s-inicio-con-plan-abajo.dc.html",
+  "C02b-inicio-sin-plan.dc.html",
+  "C02c-inicio-pago-en-revision.dc.html",
+  "C02c2-inicio-renovacion-en-revision.dc.html",
+  "C02d-inicio-pago-rechazado.dc.html",
+  "C02d2-inicio-renovacion-rechazada.dc.html",
+  "C02e-inicio-plan-por-vencer.dc.html",
+  "C02f-inicio-clase-de-invitada.dc.html",
+  "C02g-inicio-plan-congelado.dc.html",
+  "C02h-inicio-agrega-tu-celular.dc.html",
+  "C02i-inicio-cargando-error.dc.html",
+  "C19-notificaciones.dc.html",
+  "C19b-notificaciones-vacio.dc.html",
+  "CP-permiso-notificaciones.dc.html",
+  "C03-reservar.dc.html",
+  "C03a-reservar-cargando-error.dc.html",
+  "C03b-reservar-filtro-vacio.dc.html",
+  "C03c-reservar-dia-vacio.dc.html",
+  "C03d-reservar-otra-fecha.dc.html",
+  "C03e-reservar-sucursal.dc.html",
+  "C03f-reservar-aviso-semanal.dc.html",
+  "C03g-reservar-dia-congelado.dc.html",
+  "C04-detalle-clase.dc.html",
+  "C04a-detalle-cargando-error.dc.html",
+  "C04b-detalle-clase-llena.dc.html",
+  "C04g-detalle-en-lista-de-espera.dc.html",
+  "C04h-detalle-lista-cerrada.dc.html",
+  "C04c-detalle-sin-plan.dc.html",
+  "C04d-detalle-sin-clases.dc.html",
+  "C04e-detalle-pago-en-revision.dc.html",
+  "C04f-detalle-pago-rechazado.dc.html",
+  "C04i-detalle-comprobando-pago.dc.html",
+  "C04j-detalle-dia-congelado.dc.html",
+  "C04k-detalle-error-al-reservar.dc.html",
+  "C04n-detalle-permiso-notificaciones.dc.html",
+  "C05-mis-reservas.dc.html",
+  "C05i-mis-reservas-dentro-de-la-ventana.dc.html",
+  "C05a-mis-reservas-cargando-error.dc.html",
+  "C05b-mis-reservas-vacio.dc.html",
+  "C05c-cancelar-reserva.dc.html",
+  "C05f-salir-de-la-lista.dc.html",
+  "C05g-mis-reservas-avisos.dc.html",
+  "C05d-historial.dc.html",
+  "C05e-historial-vacio.dc.html",
+  "C06-reprogramar.dc.html",
+  "C06n-reprogramar-sin-elegir.dc.html",
+  "C06b-reprogramar-sin-opciones.dc.html",
+  "C08-elige-tu-plan.dc.html",
+  "C08b-elige-tu-plan-pocos-lugares.dc.html",
+  "C08r-elige-tu-plan-renovar.dc.html",
+  "C08x-elige-tu-plan-cargando-vacio-error.dc.html",
+  "C09-detalle-del-plan.dc.html",
+  "C09r-detalle-del-plan-renovacion.dc.html",
+  "C09g-detalle-del-plan-clase-reservada.dc.html",
+  "C10-pago.dc.html",
+  "C10a-pago-qr-ampliado.dc.html",
+  "C10b-pago-con-factura.dc.html",
+  "C10c-pago-factura-sin-completar.dc.html",
+  "C10e-pago-errores.dc.html",
+  "C11-pago-en-revision.dc.html",
+  "C11b-pago-confirmado.dc.html",
+  "C11c-pago-rechazado.dc.html",
+  "C12-mi-plan.dc.html",
+  "C12n-mi-plan-siguiente-pagado.dc.html",
+  "C12a-mi-plan-sin-plan.dc.html",
+  "C12b-mi-plan-vencido.dc.html",
+  "C12k-mi-plan-clase-de-invitada.dc.html",
+  "C12h-mi-plan-no-se-puede-congelar.dc.html",
+  "C12c-mi-plan-congelamiento-en-revision.dc.html",
+  "C12c2-retirar-solicitud.dc.html",
+  "C12d-mi-plan-congelamiento-aprobado.dc.html",
+  "C12e-mi-plan-congelado-ahora.dc.html",
+  "C12f-mi-plan-congelamiento-no-aprobado.dc.html",
+  "C12i-congelar-plan.dc.html",
+  "C12i2-congelar-plan-errores.dc.html",
+  "C12j-congelar-plan-bloqueado.dc.html",
+  "C17-mis-facturas.dc.html",
+  "C17b-mis-facturas-vacio.dc.html",
+  "C17c-factura.dc.html",
+  "C17d-factura-en-preparacion.dc.html",
+  "C13-evaluacion-reserva.dc.html",
+  "C13a-evaluacion-cargando-error.dc.html",
+  "C13b-evaluacion-sin-plan.dc.html",
+  "C13n-evaluacion-sin-horarios.dc.html",
+  "C13u-evaluacion-mes-usado.dc.html",
+  "C13d-evaluacion-gratis-reservada.dc.html",
+  "C13c-evaluacion-pagada-sin-comprobante.dc.html",
+  "C13e-evaluacion-pago-en-revision.dc.html",
+  "C13h-evaluacion-pago-rechazado.dc.html",
+  "C13f-evaluacion-pagada.dc.html",
+  "C13g-evaluacion-turno-liberado.dc.html",
+  "C15-evaluaciones-varias-y-anteriores.dc.html",
+  "C13v-evaluacion-mover.dc.html",
+  "C13w-evaluacion-hoja-mover.dc.html",
+  "C13x-evaluacion-hoja-cancelar.dc.html",
+  "C15c-evaluacion-hoja-comprobante.dc.html",
+  "C14-confirma-tu-cita-gratis.dc.html",
+  "C14b-confirma-tu-cita-pagada.dc.html",
+  "C14c-confirma-tu-cita-comprobante-listo.dc.html",
+  "C18-perfil.dc.html",
+  "C18s-perfil-abajo.dc.html",
+  "C18t-perfil-contrasena-actualizada.dc.html",
+  "C18l-perfil-cerrar-sesion.dc.html",
+  "C18a-perfil-cargando-error.dc.html",
+  "C22-editar-perfil.dc.html",
+  "C22b-editar-perfil-errores-y-correo.dc.html",
+  "C23-cambiar-contrasena.dc.html",
+  "C25-enviar-comentarios.dc.html",
+  "C25e-enviar-comentarios-limite.dc.html",
+  "C25b-comentario-enviado.dc.html",
+  "C24-cerrar-mi-cuenta.dc.html",
+  "C24b-cerrar-cuenta-pago-en-revision.dc.html",
+  "C16-invita-a-una-amiga.dc.html",
+  "C16b-invita-sin-invitadas.dc.html",
+  "C16c-editar-codigo.dc.html",
+  "C16d-codigo-en-uso.dc.html",
+  "C16e-confirmar-codigo.dc.html",
+  "C16f-codigo-actualizado.dc.html",
+  "C01-iniciar-sesion.dc.html",
+  "C01e-iniciar-sesion-error.dc.html",
+  "C01t-iniciar-sesion-demasiados-intentos.dc.html",
+  "C01n-iniciar-sesion-cuenta-cerrada.dc.html",
+  "C01f-iniciar-sesion-face-id.dc.html",
+  "C01b-registrate.dc.html",
+  "C01b2-registrate-errores.dc.html",
+  "C01c-revisa-tu-correo.dc.html",
+  "C01o-revisa-tu-correo-opciones.dc.html",
+  "C01x-cancelar-registro.dc.html",
+  "C01m-cambiar-correo.dc.html",
+  "C01v-registro-vencio.dc.html",
+  "C01k-correo-verificado.dc.html",
+  "C20-recuperar-contrasena.dc.html",
+  "C20l-recuperar-limite.dc.html",
+  "C20b-recuperar-enviado.dc.html",
+  "C21-crear-contrasena.dc.html",
+  "C21r-crear-contrasena-nueva.dc.html",
+  "C21b-cuenta-activada.dc.html",
+  "C21c-enlace-vencido.dc.html",
+  "C21e-enlace-vencido-restablecer.dc.html",
+  "C21d-invitacion-eliminada.dc.html",
+  "C26-cambio-de-correo-enlace.dc.html"
+ ],
+ "notes": {
+  "n-inicio": {
+   "x": 0,
+   "y": 20,
+   "text": "Inicio",
+   "kind": "title1",
+   "maxW": 7050
+  },
+  "s-C02f": {
+   "x": 3760,
+   "y": 1204,
+   "w": 390,
+   "text": "El mismo bloque, ya usada: «Tu plan · Trimestral 24 clases» / «Empieza el mar 17 nov» / «Tu clase de invitada ya se usó.» + «Mi plan». Sin plan siguiente: «Clase de invitada usada» / «mar 17, 08:00» + «Comprar un plan».",
+   "size": "s"
+  },
+  "n-reservar": {
+   "x": 0,
+   "y": 1564,
+   "text": "Reservar",
+   "kind": "title1",
+   "maxW": 9870
+  },
+  "s-C04k": {
+   "x": 8930,
+   "y": 2748,
+   "w": 390,
+   "text": "Otros mensajes en el mismo lugar: «Ya usaste tus clases de esta semana.» · «Tu plan está congelado hasta el 22 nov.» · «Esa clase todavía no abre para reservar.» · «La clase ya no tiene lugares.» · «No pudimos completar la reserva. Inténtalo de nuevo.»",
+   "size": "s"
+  },
+  "n-mis-reservas": {
+   "x": 0,
+   "y": 3108,
+   "text": "Mis reservas",
+   "kind": "title1",
+   "maxW": 5640
+  },
+  "n-planes-y-pagos": {
+   "x": 0,
+   "y": 4652,
+   "text": "Planes y pagos",
+   "kind": "title1",
+   "maxW": 15510
+  },
+  "n-evaluaciones": {
+   "x": 0,
+   "y": 6196,
+   "text": "Evaluaciones",
+   "kind": "title1",
+   "maxW": 8930
+  },
+  "n-perfil": {
+   "x": 0,
+   "y": 7740,
+   "text": "Perfil",
+   "kind": "title1",
+   "maxW": 8930
+  },
+  "n-acceso": {
+   "x": 0,
+   "y": 9284,
+   "text": "Acceso",
+   "kind": "title1",
+   "maxW": 10810
+  },
+  "s-C01k": {
+   "x": 5640,
+   "y": 10468,
+   "w": 390,
+   "text": "Mientras verifica: «Verificando correo» / «Estamos verificando tu enlace.» Enlace vencido: «Enlace no válido» / «Este enlace venció o ya fue utilizado.» + «Ir a iniciar sesión».",
+   "size": "s"
+  },
+  "s-C26": {
+   "x": 10340,
+   "y": 10468,
+   "w": 390,
+   "text": "Otros resultados del enlace, misma pantalla: «Confirmando tu correo» / «Estamos confirmando tu enlace.» · «Enlace vencido» / «Este enlace venció o ya fue utilizado. Pide el cambio de nuevo desde Editar perfil.» · «Enlace no válido» / «Este enlace no es válido.» · «Correo no disponible» / «Ese correo ya está en uso. Pide el cambio con otro correo desde Editar perfil.»",
+   "size": "s"
+  }
+ },
+ "designSystems": []
+}

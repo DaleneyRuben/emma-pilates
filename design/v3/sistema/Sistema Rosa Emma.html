@@ -1,0 +1,140 @@
+<title>Sistema visual Emma</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: reference sheet — brand anchors, tonal scales, roles, type, space, components. Single light look on purpose. */
+:root {
+  --fondo:#F9F4F2; --fondo-app:#F9E7DF; --banda:#E7CCBF; --medio:#B78380; --sup:#FFFBFB; --hund:#FEF6F2; --texto:#93615D; --suave:#93615D; --tenue:#93615D;
+  --borde:#E7CCBF; --borde-f:#CDA697; --prim:#93615D; --sobre-prim:#FFFBFB; --dest:#93615D; --sobre-dest:#FFFBFB;
+  --acento:#B78380; --ac-suave:#93615D; --sobre-ac:#FFFBFB; --aviso:#FEF6F2;
+  --serif:"Lora",Georgia,serif; --sans:"Work Sans",-apple-system,"Segoe UI",sans-serif;
+  --sh1:0 1px 2px rgba(47,26,24,.06), 0 2px 8px rgba(47,26,24,.06); --sh2:0 2px 4px rgba(47,26,24,.06), 0 12px 32px rgba(47,26,24,.10);
+}
+body { background:var(--fondo); color:var(--texto); font-family:var(--sans); font-size:15px; line-height:1.5; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:40px 64px; }
+.wrap { max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:48px; }
+h1 { font-family:var(--serif); font-weight:500; font-size:40px; line-height:1.1; margin:4px 0 8px; text-wrap:balance; }
+h2 { font-family:var(--serif); font-weight:500; font-size:26px; margin:0 0 6px; }
+.eyebrow { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--tenue); }
+.lead { max-width:62ch; color:var(--suave); margin:0; }
+section > p { max-width:65ch; color:var(--suave); margin:0 0 18px; }
+.brand { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+.bsw { border-radius:16px; padding:56px 14px 14px; display:flex; flex-direction:column; gap:2px; box-shadow:var(--sh1); }
+.bsw b { font-size:14px; } .bsw span { font-size:12px; font-variant-numeric:tabular-nums; }
+.scale { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.scale-name { font-size:13px; font-weight:700; }
+.sws { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); border-radius:14px; overflow:hidden; box-shadow:var(--sh1); }
+.sw { padding:64px 8px 10px; display:flex; flex-direction:column; font-size:11px; min-width:0; } .sw span { font-size:10px; opacity:.85; font-variant-numeric:tabular-nums; } .sw b { font-size:13px; } .sw em { font-style:normal; font-size:11px; font-weight:700; min-height:16px; }
+.phone { max-width:390px; margin:0 auto; background:var(--fondo-app); border-radius:36px; overflow:hidden; box-shadow:var(--sh2); } .ph-band { background:var(--banda); padding:44px 20px 20px; } .ph-t { font-family:var(--serif); font-size:28px; color:var(--texto); } .ph-body { padding:16px; display:flex; flex-direction:column; gap:12px; } .ph-row { display:flex; gap:12px; } .ph-m { background:var(--medio); color:var(--sobre-prim); border-radius:18px; padding:12px 16px; display:flex; flex-direction:column; justify-content:center; } .ph-m b { font-family:var(--serif); font-weight:500; font-size:32px; line-height:1; } .ph-m span { font-size:19px; font-weight:700; line-height:1.2; }
+.levels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } .levels div { border-radius:18px; padding:18px; min-height:132px; display:flex; flex-direction:column; gap:6px; box-shadow:var(--sh1); } .levels b { font-family:var(--serif); font-weight:500; font-size:22px; } .levels span { font-size:13px; }
+.roles { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.role { border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:4px; min-height:118px; }
+.role b { font-size:14px; } .role b.big { font-family:var(--serif); font-weight:500; font-size:28px; } .rolewrap { display:flex; flex-direction:column; gap:8px; } .rolewrap p { margin:0; font-size:12px; color:var(--texto); } .role span { font-size:13px; } .role small { font-size:11px; margin-top:auto; opacity:.9; }
+.type { background:var(--sup); border-radius:20px; box-shadow:var(--sh1); padding:8px 24px; }
+.trow { display:grid; grid-template-columns:150px minmax(0,1fr); gap:20px; align-items:baseline; padding:14px 0; border-bottom:1px solid var(--borde); }
+.trow:last-child { border-bottom:0; } .trow .meta { font-size:12px; color:var(--tenue); }
+.grid2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.panel { background:var(--fondo-app); border-radius:20px; box-shadow:var(--sh1); padding:20px; display:flex; flex-direction:column; gap:14px; min-width:0; }
+.panel h3 { margin:0; font-family:var(--serif); font-weight:500; font-size:22px; color:var(--texto); }
+.row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.btn { display:inline-flex; align-items:center; justify-content:center; height:48px; padding:0 20px; border-radius:14px; font:600 15px var(--sans); border:0; cursor:pointer; }
+.btn-p { background:var(--prim); color:var(--sobre-prim); box-shadow:var(--sh1); } .btn-s { background:var(--sup); color:var(--texto); box-shadow:inset 0 0 0 1.5px var(--borde-f); } .btn-t { background:none; color:var(--texto); text-decoration:underline; text-underline-offset:4px; }
+.btn:focus-visible { outline:3px solid var(--acento); outline-offset:2px; }
+.chip { display:inline-flex; align-items:center; height:34px; padding:0 14px; border-radius:999px; font-size:13px; font-weight:600; background:var(--sup); box-shadow:inset 0 0 0 1px var(--borde-f); }
+.chip.on { background:var(--dest); color:var(--sobre-dest); box-shadow:none; }
+.tchip { display:inline-flex; align-items:center; gap:8px; height:30px; padding:0 12px; border-radius:999px; font-size:12px; font-weight:700; } .tchip i { width:8px; height:8px; border-radius:4px; }
+.field label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+.field input { width:100%; box-sizing:border-box; height:48px; border-radius:12px; border:1.5px solid var(--borde-f); background:var(--sup); padding:0 14px; font:15px var(--sans); color:var(--texto); }
+.field small { display:block; font-size:12px; color:var(--tenue); margin-top:6px; }
+.hero { background:var(--dest); color:var(--sobre-dest); border-radius:22px; padding:20px; display:flex; flex-direction:column; gap:4px; box-shadow:var(--sh2); }
+.hero .ey { font-size:11px; font-weight:700; letter-spacing:.14em; opacity:.85; } .hero .t { font-family:var(--serif); font-size:26px; }
+.who { display:flex; gap:6px; margin-top:8px; } .av { width:30px; height:30px; border-radius:15px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; background:var(--sup); color:var(--dest); }
+.crow { display:flex; align-items:center; gap:14px; background:var(--sup); border-radius:16px; padding:12px 14px; box-shadow:var(--sh1); }
+.crow .tm { font-family:var(--serif); font-size:20px; min-width:56px; } .crow .bar { width:4px; align-self:stretch; border-radius:2px; }
+.crow .tx { flex:1; display:flex; flex-direction:column; } .crow .tx b { font-size:15px; } .crow .tx span { font-size:13px; color:var(--suave); }
+.mini { height:36px; padding:0 14px; font-size:13px; border-radius:12px; }
+.plan { display:flex; align-items:center; gap:14px; background:var(--sup); border-radius:18px; padding:14px; box-shadow:var(--sh1); }
+.ring { position:relative; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; } .ring svg { position:absolute; inset:0; }
+.ring > span { display:flex; flex-direction:column; align-items:center; line-height:1.05; } .ring b { font-family:var(--serif); font-weight:500; font-size:18px; } .ring small { font-size:11px; }
+.stat.m { background:var(--medio); color:var(--sobre-prim); } .stat.m span { color:var(--sobre-prim); font-size:19px; letter-spacing:0; text-transform:none; font-weight:700; } .stat { background:var(--sup); border-radius:18px; padding:14px 16px; box-shadow:var(--sh1); display:flex; flex-direction:column; gap:2px; } .stat b { font-family:var(--serif); font-weight:500; font-size:26px; } .stat span { font-size:12px; font-weight:600; color:var(--tenue); letter-spacing:.08em; text-transform:uppercase; }
+.tab { display:flex; justify-content:space-around; background:var(--sup); border-radius:22px; padding:8px; box-shadow:var(--sh2); } .tab span { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; padding:8px 12px; border-radius:14px; color:var(--suave); } .tab span.on { background:var(--prim); color:var(--sobre-prim); font-weight:700; }
+table { width:100%; border-collapse:collapse; font-size:14px; } th { text-align:left; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--tenue); padding:10px 12px; border-bottom:1px solid var(--borde); }
+td { padding:12px; border-bottom:1px solid var(--borde); } tr:last-child td { border-bottom:0; } td.num { font-variant-numeric:tabular-nums; }
+.pill { display:inline-flex; height:26px; align-items:center; padding:0 10px; border-radius:999px; font-size:12px; font-weight:700; }
+.space { display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; } .space div { display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12px; color:var(--tenue); } .space i { display:block; background:var(--acento); border-radius:4px; }
+.elev { display:flex; gap:16px; flex-wrap:wrap; } .elev div { width:180px; height:96px; border-radius:18px; background:var(--sup); display:flex; align-items:center; justify-content:center; font-size:13px; }
+.rules { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } .rules div { background:var(--sup); border-radius:16px; padding:16px; box-shadow:var(--sh1); } .rules b { display:block; margin-bottom:4px; } .rules span { font-size:14px; color:var(--suave); }
+@media (max-width:820px) { .phone { max-width:390px; margin:0 auto; background:var(--fondo-app); border-radius:36px; overflow:hidden; box-shadow:var(--sh2); } .ph-band { background:var(--banda); padding:44px 20px 20px; } .ph-t { font-family:var(--serif); font-size:28px; color:var(--texto); } .ph-body { padding:16px; display:flex; flex-direction:column; gap:12px; } .ph-row { display:flex; gap:12px; } .ph-m { background:var(--medio); color:var(--sobre-prim); border-radius:18px; padding:12px 16px; display:flex; flex-direction:column; justify-content:center; } .ph-m b { font-family:var(--serif); font-weight:500; font-size:32px; line-height:1; } .ph-m span { font-size:19px; font-weight:700; line-height:1.2; }
+.levels { grid-template-columns:1fr; } .brand { grid-template-columns:repeat(2,minmax(0,1fr)); } .roles,.rules { grid-template-columns:repeat(2,minmax(0,1fr)); } .grid2 { grid-template-columns:1fr; } .sws { grid-template-columns:repeat(4,minmax(0,1fr)); } .trow { grid-template-columns:1fr; gap:4px; } }
+@media (max-width:480px) { .roles,.rules { grid-template-columns:1fr; } h1 { font-size:32px; } }
+</style>
+<div class="wrap">
+<header><div class="eyebrow">Emma Pilates Studio</div><h1>Sistema visual Emma</h1>
+<p class="lead">Tus cuatro rosas son un mismo color en cuatro claridades. Por eso forman una sola escala, «Rosa Emma», que va del casi blanco al rosa profundo y pasa exactamente por cada uno. El tono más oscuro es el rosa profundo. El crema es el fondo. Cada combinación de texto y fondo cumple el contraste mínimo de lectura (4,5 a 1).</p></header>
+
+<section><h2>Los cinco colores de la marca</h2><p>No cambian. En la escala de abajo cada uno ocupa su lugar según qué tan claro es.</p>
+<div class="brand"><div class="bsw" style="background:#E7CCBF;color:#93615D"><b>Rubor</b><span>#E7CCBF</span></div><div class="bsw" style="background:#CDA697;color:#93615D"><b>Rosa arcilla</b><span>#CDA697</span></div><div class="bsw" style="background:#B78380;color:#FFFBFB"><b>Palo de rosa</b><span>#B78380</span></div><div class="bsw" style="background:#93615D;color:#FFFBFB"><b>Rosa profundo</b><span>#93615D</span></div><div class="bsw" style="background:#F9F4F2;color:#93615D"><b>Crema</b><span>#F9F4F2</span></div></div></section>
+
+<section><h2>La escala Rosa Emma</h2><p>Siete tonos del 50 al 600. El rubor es el 200, la rosa arcilla el 400, el palo de rosa el 500 y el rosa profundo el 600, que es el más oscuro. No hay tonos más oscuros que él.</p>
+<div class="sws"><div class="sw" style="background:#FEF6F2;color:#93615D"><b>50</b><em>&nbsp;</em><span>#FEF6F2</span></div><div class="sw" style="background:#F9E7DF;color:#93615D"><b>100</b><em>&nbsp;</em><span>#F9E7DF</span></div><div class="sw pin" style="background:#E7CCBF;color:#93615D"><b>200</b><em>Rubor</em><span>#E7CCBF</span></div><div class="sw" style="background:#DAB9AB;color:#93615D"><b>300</b><em>&nbsp;</em><span>#DAB9AB</span></div><div class="sw pin" style="background:#CDA697;color:#93615D"><b>400</b><em>Rosa arcilla</em><span>#CDA697</span></div><div class="sw pin" style="background:#B78380;color:#FFFBFB"><b>500</b><em>Palo de rosa</em><span>#B78380</span></div><div class="sw pin" style="background:#93615D;color:#FFFBFB"><b>600</b><em>Rosa profundo</em><span>#93615D</span></div></div></section>
+
+<section><h2>La variedad viene del contraste</h2><p>Con un solo color, las pantallas se diferencian por claridad: mucho claro, algo de medio y un toque de oscuro. A eso se suman la tipografía, el espacio y las fotos del estudio.</p>
+<div class="levels"><div style="background:#F9E7DF;color:#93615D"><b>Claro · casi todo</b><span>Fondo de pantalla (100) y franjas (200), con tarjetas blancas encima.</span></div><div style="background:#FFFBFB;color:#93615D;box-shadow:inset 0 10px 0 #CDA697, var(--sh1);padding-top:28px"><b>Medio · detalles</b><span>Iconos, iniciales, barras de tipo y bordes, sin texto encima. 300 a 500.</span></div><div style="background:#93615D;color:#FFFBFB"><b>Oscuro · lo importante</b><span>Rosa profundo: todo el texto, el botón principal y un bloque destacado. 600.</span></div></div></section>
+
+
+<section><h2>Así se ve una pantalla</h2><p>Fondo 100, franja 200 con el título grande, bloque destacado en rosa profundo, un bloque medio en palo de rosa y tarjetas blancas con el texto chico.</p>
+<div class="phone"><div class="ph-band"><span class="ph-t">Hola, Lucía</span></div>
+<div class="ph-body"><div class="hero"><span class="ey">TU PRÓXIMA CLASE · MAÑANA</span><span class="t">Vie 20 · 10:00</span><span>Reformer · Achumani · Daniela Ortiz</span></div>
+<div class="ph-row"><div class="ph-m"><b>7</b><span>clases</span></div><div class="plan" style="flex:1"><span class="ring" style="width:58px;height:58px"><svg viewBox="0 0 86 86" width="58" height="58"><circle cx="43" cy="43" r="36" fill="none" stroke="#E7CCBF" stroke-width="8"/><circle cx="43" cy="43" r="36" fill="none" stroke="#93615D" stroke-width="8" stroke-linecap="round" stroke-dasharray="162.9 226.2" transform="rotate(-90 43 43)"/></svg><span><b>18</b><small>de 25</small></span></span><span style="display:flex;flex-direction:column"><b>Trimestral 24</b><span style="font-size:13px">vence lun 8 feb</span></span></div></div>
+<div class="crow"><span class="bar" style="background:#93615D"></span><span class="tm">18:00</span><span class="tx"><b>Reformer Pilates</b><span>Daniela · 5 libres</span></span><button class="btn btn-p mini">Reservar</button></div>
+<div class="tab"><span class="on">Inicio</span><span>Reservar</span><span>Mis reservas</span><span>Perfil</span></div></div></div></section>
+
+<section><h2>Para qué se usa cada color</h2><p>Como el tono más oscuro es el rosa profundo, el texto chico solo se lee sobre blanco. Por eso el color va en las zonas grandes (el fondo de la pantalla, las franjas y los bloques sólidos) y el texto chico va en tarjetas blancas encima. Sobre el fondo y las franjas solo van títulos grandes.</p>
+<div class="roles"><div class="rolewrap"><div class="role" style="background:#F9E7DF;color:#93615D;"><b class="big">fondo</b></div><p><b>fondo</b> · Fondo de la pantalla. Lleva el color.<br>#F9E7DF · contraste 4.3:1 · solo títulos grandes</p></div><div class="rolewrap"><div class="role" style="background:#E7CCBF;color:#93615D;"><b class="big">banda</b></div><p><b>banda</b> · Encabezados y franjas de sección<br>#E7CCBF · contraste 3.4:1 · solo títulos grandes</p></div><div class="role" style="background:#FFFBFB;color:#93615D;box-shadow:inset 0 0 0 1px #E7CCBF"><b>superficie</b><span>Tarjetas: aquí va todo el texto chico</span><small>#FFFBFB · contraste 5.0:1</small></div><div class="rolewrap"><div class="role" style="background:#B78380;color:#FFFBFB;"><b class="big">medio</b></div><p><b>medio</b> · Bloques de color secundarios<br>#B78380 · contraste 3.1:1 · solo títulos grandes</p></div><div class="role" style="background:#93615D;color:#FFFBFB;"><b>destacado</b><span>El bloque más importante</span><small>#93615D · contraste 5.0:1</small></div><div class="role" style="background:#93615D;color:#FFFBFB;"><b>primario</b><span>Botón principal y filtro elegido</span><small>#93615D · contraste 5.0:1</small></div><div class="rolewrap"><div class="role" style="background:#CDA697;color:#93615D;"><b class="big">borde-fuerte</b></div><p><b>borde-fuerte</b> · Bordes, iconos e iniciales<br>#CDA697 · contraste sin texto encima</p></div><div class="role" style="background:#FEF6F2;color:#93615D;"><b>superficie-hundida</b><span>Buscadores y avisos dentro de tarjetas</span><small>#FEF6F2 · contraste 4.8:1</small></div></div></section>
+
+<section><h2>Tipografía</h2><p>Lora para títulos y números grandes, Work Sans para todo lo demás. Una sola escala en las tres superficies.</p>
+<div class="type">
+<div class="trow"><span class="meta">Título de página · Lora 32</span><span style="font-family:var(--serif);font-size:32px">Hoy en Achumani</span></div>
+<div class="trow"><span class="meta">Bloque destacado · Lora 26</span><span style="font-family:var(--serif);font-size:26px">Vie 20 · 10:00</span></div>
+<div class="trow"><span class="meta">Número de tarjeta · Lora 20</span><span style="font-family:var(--serif);font-size:20px">25 clases</span></div>
+<div class="trow"><span class="meta">Título de fila · Work Sans 15 semibold</span><span style="font-size:15px;font-weight:600">Reformer Pilates</span></div>
+<div class="trow"><span class="meta">Texto · Work Sans 15</span><span style="font-size:15px">Te quedan 3 clases esta semana.</span></div>
+<div class="trow"><span class="meta">Dato chico · Work Sans 13</span><span style="font-size:13px;color:var(--suave)">Achumani · Daniela Ortiz · 5 libres</span></div>
+<div class="trow"><span class="meta">Etiqueta · Work Sans 11 mayúsculas</span><span class="eyebrow">Tu próxima clase · mañana</span></div>
+</div></section>
+
+<section><h2>Espacio, bordes y profundidad</h2><p>Todo se mide en múltiplos de 4 px. Las tarjetas se separan del fondo con una sombra suave y no con bordes gruesos.</p>
+<div class="space"><div><i style="width:4px;height:4px"></i>4</div><div><i style="width:8px;height:8px"></i>8</div><div><i style="width:12px;height:12px"></i>12</div><div><i style="width:16px;height:16px"></i>16</div><div><i style="width:24px;height:24px"></i>24</div><div><i style="width:32px;height:32px"></i>32</div><div><i style="width:48px;height:48px"></i>48</div></div>
+<div class="elev" style="margin-top:18px"><div style="box-shadow:var(--sh1)">Tarjeta</div><div style="box-shadow:var(--sh2)">Bloque destacado</div><div style="box-shadow:inset 0 0 0 1.5px var(--borde-f)">Campo y botón secundario</div></div></section>
+
+<section><h2>Piezas de la app</h2>
+<div class="grid2">
+<div class="panel"><h3>Bloque destacado y plan</h3>
+<div class="hero"><span class="ey">TU PRÓXIMA CLASE · MAÑANA</span><span class="t">Vie 20 · 10:00</span><span>Reformer · Achumani · Daniela Ortiz</span><div class="who"><span class="av">LF</span><span class="av">EP</span><span class="av">MP</span></div></div>
+<div class="plan"><span class="ring" style="width:58px;height:58px"><svg viewBox="0 0 86 86" width="58" height="58"><circle cx="43" cy="43" r="36" fill="none" stroke="#E7CCBF" stroke-width="8"/><circle cx="43" cy="43" r="36" fill="none" stroke="#93615D" stroke-width="8" stroke-linecap="round" stroke-dasharray="162.9 226.2" transform="rotate(-90 43 43)"/></svg><span><b>18</b><small>de 25</small></span></span><span style="display:flex;flex-direction:column"><b>Trimestral 24 clases</b><span style="font-size:13px;color:var(--suave)">Te quedan 7 · vence lun 8 feb</span></span></div></div>
+<div class="panel"><h3>Filas de clase y tipos</h3>
+<div class="row"><span class="tchip" style="background:#FEF6F2;color:#93615D"><i style="background:#93615D"></i>Reformer</span><span class="tchip" style="background:#FEF6F2;color:#93615D"><i style="background:#DAB9AB"></i>Mat</span><span class="tchip" style="background:#FEF6F2;color:#93615D"><i style="background:#B78380"></i>Cadillac</span></div>
+<div class="crow"><span class="bar" style="background:#93615D"></span><span class="tm">18:00</span><span class="tx"><b>Reformer Pilates</b><span>Daniela · 5 libres</span></span><button class="btn btn-p mini">Reservar</button></div><div class="crow"><span class="bar" style="background:#DAB9AB"></span><span class="tm">19:00</span><span class="tx"><b>Mat Pilates</b><span>Daniela · Último lugar</span></span><button class="btn btn-p mini">Reservar</button></div><div class="crow"><span class="bar" style="background:#B78380"></span><span class="tm">20:00</span><span class="tx"><b>Cadillac Pilates</b><span>Daniela · Llena</span></span><button class="btn btn-s mini">Lista de espera</button></div></div>
+<div class="panel"><h3>Botones, filtros y campos</h3>
+<div class="row"><button class="btn btn-p">Reservar una clase</button><button class="btn btn-s">Ver mi plan</button><button class="btn btn-t">Cancelar</button></div>
+<div class="row"><span class="chip on">Todas</span><span class="chip">Reformer</span><span class="chip">Mat</span><span class="chip">Cadillac</span></div>
+<div class="field"><label for="cel">Celular</label><input id="cel" value="+591 7"><small>Ej.: +591 71234567</small></div></div>
+<div class="panel"><h3>Números y barra de abajo</h3>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"><div class="stat m"><span>Por revisar</span><b>2 comprobantes</b></div><div class="stat"><span>Facturas</span><b>1 por subir</b></div></div>
+<div class="tab"><span class="on">Inicio</span><span>Reservar</span><span>Mis reservas</span><span>Perfil</span></div></div>
+</div></section>
+
+<section><h2>Piezas de la web</h2>
+<div class="panel" style="overflow-x:auto"><h3>Tabla</h3>
+<table><thead><tr><th>Clienta</th><th>Plan</th><th>Monto</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>
+<tr><td><span style="display:inline-flex;align-items:center;gap:10px"><span class="av" style="background:var(--acento);color:var(--sup)">VP</span><b>Valeria Prueba</b></span></td><td>8 clases · QR</td><td class="num">Bs 502</td><td>mar 17 nov</td><td><span class="pill" style="background:var(--dest);color:var(--sobre-dest)">Por revisar</span></td></tr>
+<tr><td><span style="display:inline-flex;align-items:center;gap:10px"><span class="av" style="background:var(--acento);color:var(--sup)">EP</span><b>Elena Prueba</b></span></td><td>12 clases · QR</td><td class="num">Bs 697</td><td>dom 15 nov</td><td><span class="pill" style="background:var(--ac-suave);color:var(--sobre-ac)">Confirmado</span></td></tr>
+<tr><td><span style="display:inline-flex;align-items:center;gap:10px"><span class="av" style="background:var(--acento);color:var(--sup)">RV</span><b>Rocío Vargas</b></span></td><td>4 clases · QR</td><td class="num">Bs 247</td><td>dom 8 nov</td><td><span class="pill" style="background:var(--aviso);color:var(--sobre-ac)">Rechazado</span></td></tr>
+</tbody></table></div></section>
+
+<section><h2>Reglas</h2>
+<div class="rules">
+<div><b>Un solo color fuerte por pantalla</b><span>El bloque destacado o el botón principal, en rosa profundo. Todo lo demás, en tarjetas claras.</span></div>
+<div><b>Color atrás, texto en tarjetas blancas</b><span>El fondo de la pantalla es el 100 y las franjas el 200. Todo el texto chico va en rosa profundo dentro de tarjetas blancas. Sobre el 100, el 200 y el 500 solo van títulos grandes (24 px o 19 px en negrita).</span></div>
+<div><b>Nunca una pantalla vacía</b><span>Si hoy no hay nada, el bloque destacado muestra lo próximo (mañana, la siguiente clase o reservar).</span></div>
+</div></section>
+</div>
