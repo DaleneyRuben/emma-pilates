@@ -49,8 +49,8 @@ import { PaymentStartDays } from "./payment-start-days";
 
 type ConfirmNavigation = {
   goBack: () => void;
-  // Back to the search, dropping plan and payment (S10 «Volver a Clientas»).
-  popTo: (screen: "ClientSearch") => void;
+  // Back to the tab's root, dropping plan and payment (S10 «Volver a Clientas»).
+  popToTop: () => void;
 };
 
 type Sent = { kind: "cash"; result: AssistantCashPaymentDto } | { kind: "transfer" };
@@ -187,7 +187,8 @@ export function ConfirmCashPaymentScreen({
             kind={sent.kind}
             onBack={() => {
               if (workspace.split) workspace.show({ view: "overview", clientId });
-              navigation.popTo("ClientSearch");
+              // Back to the tab's root: Clientas' search, or Hoy when the sale began there (E7).
+              navigation.popToTop();
             }}
             scheduled={renewalStartsOn !== undefined}
             startsOn={nextStart === undefined ? undefined : formatListDate(nextStart)}

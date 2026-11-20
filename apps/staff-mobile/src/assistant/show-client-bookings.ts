@@ -20,7 +20,7 @@ export function useShowClientBookings() {
   return (params: ClientContext & { confirmed: ConfirmedBooking }) => {
     if (workspace.split) {
       workspace.show({ view: "bookings", ...params });
-      navigation.dispatch(StackActions.popTo("ClientSearch"));
+      navigation.dispatch(StackActions.popToTop());
       return;
     }
     navigation.dispatch((state) => {

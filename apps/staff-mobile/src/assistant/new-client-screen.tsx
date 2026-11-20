@@ -40,7 +40,7 @@ import { SelfRegisteredNotice } from "./self-registered-notice";
 
 type NewClientNavigation = {
   goBack: () => void;
-  popTo: (screen: "ClientSearch") => void;
+  popToTop: () => void;
   // The form is done once the account exists, so the overview replaces it.
   replace: (screen: "ClientOverview", params: { clientId: string; reopened?: boolean }) => void;
 };
@@ -100,7 +100,8 @@ export function NewClientScreen() {
   const openClient = (clientId: string, reopened = false) => {
     if (workspace.split) {
       workspace.show({ view: "overview", clientId, reopened });
-      navigation.popTo("ClientSearch");
+      // Back to the tab's root: Clientas' search, or Hoy when the sale began there (E7).
+      navigation.popToTop();
       return;
     }
     navigation.replace("ClientOverview", { clientId, reopened });
