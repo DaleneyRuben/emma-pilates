@@ -59,7 +59,7 @@ describe('coordinator pay statements', () => {
     await world?.stop();
   });
 
-  it('drafts the hand-checked month, pays once, and hides it from her', async () => {
+  it('drafts the hand-checked month, pays once, and shows her only her own', async () => {
     const prisma = world.prisma;
     const coordinatorId = deterministicId('staff-member:carolina');
     const emmaId = deterministicId('staff-member:emma');
@@ -303,9 +303,18 @@ describe('coordinator pay statements', () => {
         ),
       ),
     ).resolves.toBe('back_office_access_denied');
-    await expect(
-      codeOf(statements().listOwnStatements(await coordinator())),
-    ).resolves.toBe('back_office_access_denied');
+    // ADR-0111: she reads her own statement, and a Trainer never sees it.
+    const own = await statements().listOwnStatements(await coordinator());
+    expect(own.map((row) => row.id)).toEqual([listed[0].id]);
+    expect(own[0]).toMatchObject({
+      state: 'approved',
+      staffMemberId: coordinatorId,
+    });
+    expect(
+      (await statements().listOwnStatements(await trainer())).map(
+        (row) => row.id,
+      ),
+    ).not.toContain(listed[0].id);
     await expect(
       codeOf(statements().listStatements({ month: december }, await trainer())),
     ).resolves.toBe('back_office_access_denied');

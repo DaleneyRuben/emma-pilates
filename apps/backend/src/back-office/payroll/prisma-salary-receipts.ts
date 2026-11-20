@@ -8,13 +8,14 @@ import {
 import {
   BackOfficeError,
   requireAdministrator,
-  requireTrainer,
+  requirePayee,
 } from '../back-office-errors';
 
 type ReceiptCommand = { salaryPaymentId: string; variant: ReceiptVariant };
 
 // BKO-008: Nómina reads any Salary Payment's receipt for the Administrator;
-// «Mis pagos» reads a Trainer's own, and someone else's reads as missing.
+// «Mis pagos» reads a paid Staff Member's own (ADR-0111), and someone else's
+// reads as missing.
 export const createPrismaSalaryReceipts = (prisma: PrismaClient) => {
   const read = async (
     command: ReceiptCommand,
@@ -50,7 +51,7 @@ export const createPrismaSalaryReceipts = (prisma: PrismaClient) => {
     readOwnSalaryReceipt: async (
       command: ReceiptCommand,
       principal: AuthenticatedPrincipal,
-    ) => read(command, requireTrainer(principal)),
+    ) => read(command, requirePayee(principal)),
   };
 };
 

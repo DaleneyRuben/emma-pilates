@@ -31,7 +31,9 @@ import {
   run,
   type BackOfficeOperations,
 } from '../back-office-http';
-import { civilText, parsePayPeriod, type PayPeriod } from './pay-period';
+import { civilStatement } from './own-pay-views';
+import { OwnPayController } from './own-pay.controller';
+import { parsePayPeriod, type PayPeriod } from './pay-period';
 import {
   parsePayStatementApproval,
   PayStatementApprovalDto,
@@ -40,22 +42,7 @@ import {
 } from './pay-statements.dto';
 import { TrainerSalaryPaymentsController } from './trainer-salary-payments.controller';
 
-const toDto = <
-  Statement extends {
-    month: Date;
-    periodStart: Date;
-    periodEnd: Date;
-    approvableOn: Date;
-  },
->(
-  statement: Statement,
-) => ({
-  ...statement,
-  month: civilText(statement.month),
-  periodStart: civilText(statement.periodStart),
-  periodEnd: civilText(statement.periodEnd),
-  approvableOn: civilText(statement.approvableOn),
-});
+const toDto = civilStatement;
 
 const requirePeriod = (query: {
   month?: string;
@@ -174,8 +161,8 @@ export class AdministratorPayStatementsController extends BackOfficeController {
   }
 }
 
-// BKO-007: the Coordinator never reads her own statement. The endpoint
-// exists so the denial is explicit rather than a missing route.
+// BKO-007 kept this route for the Coordinator's explicit denial; since
+// ADR-0111 it answers her own statements, like `staff-members/current`.
 @Controller({ path: 'coordinator/pay-statements', version: '1' })
 @ApiBearerAuth()
 export class CoordinatorPayStatementsController extends BackOfficeController {
@@ -201,6 +188,8 @@ export class CoordinatorPayStatementsController extends BackOfficeController {
   }
 }
 
+// ADR-0111: kept for the released Staff app; any paid Staff Member reads her
+// own here, and the current app reads `staff-members/current/pay-statements`.
 @Controller({ path: 'trainer/pay-statements', version: '1' })
 @ApiBearerAuth()
 export class TrainerPayStatementsController extends BackOfficeController {
@@ -231,4 +220,5 @@ export const payrollControllers = [
   CoordinatorPayStatementsController,
   TrainerPayStatementsController,
   TrainerSalaryPaymentsController,
+  OwnPayController,
 ];
