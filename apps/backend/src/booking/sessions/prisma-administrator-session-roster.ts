@@ -20,7 +20,10 @@ const isActiveFounder = (
 // position is the entry's place among the open ones (joinedAt, then id, as
 // promotion reads them).
 export const findAdministratorSessionRoster =
-  (prisma: PrismaClient): FindAdministratorSessionRoster =>
+  (
+    prisma: PrismaClient,
+    now: () => Date = () => new Date(),
+  ): FindAdministratorSessionRoster =>
   async (sessionId) => {
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -60,6 +63,7 @@ export const findAdministratorSessionRoster =
       prisma,
       session.bookings.map((booking) => booking.clientId),
       session.startsAt,
+      now(),
     );
 
     return {

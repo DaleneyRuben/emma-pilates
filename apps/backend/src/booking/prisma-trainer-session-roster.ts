@@ -8,7 +8,7 @@ const outcomes = { ATTENDED: 'attended', NO_SHOW: 'no_show' } as const;
 // The Trainer's class roster and attendance: the booked Clients in booking
 // order with the outcome she recorded, if any.
 export const findTrainerSessionRoster =
-  (prisma: PrismaClient) =>
+  (prisma: PrismaClient, now: () => Date = () => new Date()) =>
   async (sessionId: string): Promise<TrainerSessionRoster | null> => {
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
@@ -37,6 +37,7 @@ export const findTrainerSessionRoster =
       prisma,
       session.bookings.map((booking) => booking.clientId),
       session.startsAt,
+      now(),
     );
 
     return {
