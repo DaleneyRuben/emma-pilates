@@ -9,7 +9,7 @@ describe("PrimaryButton while busy", () => {
 
     const button = screen.getByRole("button", { name: "Iniciar sesión" });
     // FIX-089: Rosa profundo, radius 12.
-    expect(button).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 12, minHeight: 52 });
+    expect(button).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 16, minHeight: 52 });
     expect(screen.getByTestId("primary-button-spinner")).toBeOnTheScreen();
     expect(screen.getByText("Iniciar sesión")).toHaveStyle({ opacity: 0 });
   });
@@ -52,8 +52,8 @@ describe("PrimaryButton palette B", () => {
     const screen = await render(<PrimaryButton label="Reservar clase" />);
 
     expect(screen.getByText("Reservar clase")).toHaveStyle({
-      color: "#F9F4F2",
-      fontFamily: "WorkSans_600SemiBold",
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
       fontSize: 16,
     });
   });
@@ -62,7 +62,7 @@ describe("PrimaryButton palette B", () => {
     const screen = await render(<PrimaryButton label="Sí, cancelar" tone="error" />);
 
     expect(screen.getByRole("button", { name: "Sí, cancelar" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#93615D",
       borderWidth: 1.5,
     });
@@ -79,7 +79,7 @@ describe("PrimaryButton palette B", () => {
     );
 
     expect(screen.getByRole("button", { name: "Reservar clase" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FEF6F2",
       borderColor: "#CDA697",
       borderWidth: 1.5,
     });

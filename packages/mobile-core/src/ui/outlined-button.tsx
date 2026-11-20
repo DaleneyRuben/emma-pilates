@@ -5,8 +5,8 @@ import { fontFamilies } from "./fonts";
 import { colors, radii, typography } from "./tokens";
 
 /**
- * The secondary action of the cards and confirmation sheets (palette B,
- * FIX-089): Crema with a Rosa profundo outline. The destructive tone looks the
+ * The secondary action of the cards and confirmation sheets (Rosa Emma):
+ * white with a 1.5 pt 600 outline. The destructive tone looks the
  * same; a confirmation guards it instead of red.
  */
 export function OutlinedButton({
@@ -52,13 +52,17 @@ const styles = StyleSheet.create({
     borderRadius: radii.button,
     borderWidth: 1.5,
     justifyContent: "center",
-    minHeight: 48,
+    minHeight: 52,
+    paddingHorizontal: 18,
   },
-  outlinedDisabled: { borderColor: colors.border },
+  outlinedDisabled: {
+    backgroundColor: colors.disabledBackground,
+    borderColor: colors.borderStrong,
+  },
   outlinedLabel: {
     color: colors.primary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
 });

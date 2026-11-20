@@ -40,8 +40,8 @@ describe("PushPermissionSheet", () => {
       textAlign: "center",
     });
     expect(screen.getByTestId("push-permission-sheet")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderTopLeftRadius: 24,
+      backgroundColor: "#FFFBFB",
+      borderTopLeftRadius: 28,
     });
     expect(screen.getByTestId("push-permission-disc")).not.toHaveStyle({
       backgroundColor: "#E7CCBF",

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, spacing, typography } from "./tokens";
+import { colors, spacing, surfaces, typography } from "./tokens";
 
 /**
  * A one-line warning (follow-up 225 §7): the alert glyph alone, no disc
@@ -26,11 +26,8 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   row: {
+    ...surfaces.soft,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: 14,
-    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.md,
     paddingHorizontal: spacing.lg,

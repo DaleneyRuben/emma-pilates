@@ -8,13 +8,16 @@ export function unreadCountLabel(count: number): string {
   return count > 9 ? "9+" : String(count);
 }
 
-/** The unread count in Palo de rosa profundo, never Error red (follow-up 73). */
+/** The unread count in rosa profundo, never Error red (follow-up 73). */
 export function UnreadCountPill({
   count,
+  inverted = false,
   ring = false,
   testID,
 }: {
   count: number;
+  /** White with a 600 count, on a 600 surface such as the open tab's pill. */
+  inverted?: boolean;
   /** The 2 px white ring the Perfil tab badge draws over the icon. */
   ring?: boolean;
   testID?: string;
@@ -25,20 +28,24 @@ export function UnreadCountPill({
     <View
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={[styles.pill, ring && styles.ring]}
+      style={[styles.pill, ring && styles.ring, inverted && styles.inverted]}
       testID={testID}
     >
-      <Text style={styles.label}>{unreadCountLabel(count)}</Text>
+      <Text style={[styles.label, inverted && styles.invertedLabel]}>
+        {unreadCountLabel(count)}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  inverted: { backgroundColor: colors.card },
+  invertedLabel: { color: colors.primary },
   label: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   pill: {
     alignItems: "center",
@@ -50,7 +57,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   ring: {
-    borderColor: colors.background,
+    borderColor: colors.card,
     borderWidth: 2,
     minHeight: 22,
     minWidth: 22,

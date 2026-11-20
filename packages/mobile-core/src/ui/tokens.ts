@@ -1,79 +1,105 @@
-// FIX-089 (palette B, owner 2026-11-19): every screen uses only these five
-// colours. Text is always Rosa profundo; hierarchy comes from size and weight.
-export const brand = {
-  rubor: "#E7CCBF",
-  arcilla: "#CDA697",
-  paloDeRosa: "#B78380",
-  rosaProfundo: "#93615D",
-  crema: "#F9F4F2",
+// Rosa Emma (follow-up 284, owner 2026-11-20): one scale of seven tones plus
+// crema and white. Rosa profundo (600) is the darkest tone. Colour lives in
+// large areas (screen 100, header band 200, solid 600 and 500 blocks); small
+// text sits only on white, 50 or 600.
+export const rosa = {
+  50: "#FEF6F2",
+  100: "#F9E7DF",
+  200: "#E7CCBF",
+  300: "#DAB9AB",
+  400: "#CDA697",
+  500: "#B78380",
+  600: "#93615D",
 } as const;
 
-const { rubor, arcilla, paloDeRosa, rosaProfundo, crema } = brand;
+export const brand = {
+  rubor: rosa[200],
+  arcilla: rosa[400],
+  paloDeRosa: rosa[500],
+  rosaProfundo: rosa[600],
+  crema: "#F9F4F2",
+  white: "#FFFBFB",
+} as const;
 
-// Token names predate palette B; each keeps its role and takes one of the five
-// colours so every screen picks the palette up.
+const white = brand.white;
+const ink = rosa[600];
+
+// Token names predate Rosa Emma; each keeps its role so every screen picks the
+// new look up.
 export const colors = {
-  background: crema,
-  surface: crema,
-  white: crema,
-  card: crema,
-  // The hero block: Palo de rosa with large Crema text only.
-  emphasis: paloDeRosa,
-  onEmphasis: crema,
-  // Dividers between rows of a group.
-  hairline: rubor,
-  surfaceSubtle: crema,
-  rowHover: rubor,
-  // The primary button and the selected chip: Rosa profundo with Crema labels.
-  primary: rosaProfundo,
-  onPrimary: crema,
-  primaryHover: paloDeRosa,
-  primaryPressed: paloDeRosa,
-  // Soft backgrounds: exception pills, the form summary, the class time box.
-  primaryTint: rubor,
-  primaryWash: rubor,
-  primaryOnTint: rosaProfundo,
-  primaryDeep: rosaProfundo,
+  // The screen and the header band.
+  background: rosa[100],
+  surface: rosa[100],
+  band: rosa[200],
+  // Cards, sheets, inputs and the tab bar.
+  white,
+  card: white,
+  // The screen's one strong block: 600 with white text.
+  emphasis: ink,
+  onEmphasis: white,
+  // Secondary blocks: 500 with large white text only.
+  medio: rosa[500],
+  onMedio: white,
+  // Dividers between the rows inside a white card.
+  hairline: rosa[100],
+  surfaceSubtle: rosa[50],
+  rowHover: rosa[50],
+  // The primary button and the selected chip or tab: 600 with white labels.
+  primary: ink,
+  onPrimary: white,
+  primaryHover: rosa[500],
+  primaryPressed: rosa[500],
+  // Soft insets on white: exception pills, notices, the class time box.
+  primaryTint: rosa[50],
+  primaryWash: rosa[50],
+  primaryOnTint: ink,
+  primaryDeep: ink,
   // Initials circles.
-  secondaryAccent: paloDeRosa,
-  secondaryTint: rubor,
-  text: rosaProfundo,
-  textSecondary: rosaProfundo,
-  textMuted: rosaProfundo,
-  textSubtle: rosaProfundo,
-  borderStrong: arcilla,
-  border: arcilla,
-  divider: rubor,
-  rule: rubor,
+  secondaryAccent: ink,
+  secondaryTint: rosa[50],
+  text: ink,
+  textSecondary: ink,
+  textMuted: ink,
+  textSubtle: ink,
+  // Outlines (inputs, outlined chips) and the soft inset's 1px rule.
+  borderStrong: rosa[400],
+  border: rosa[400],
+  borderSoft: rosa[200],
+  divider: rosa[100],
+  rule: rosa[200],
   // States are said with words and weight, never with green, amber or red.
-  success: rosaProfundo,
-  successText: rosaProfundo,
-  warning: rosaProfundo,
-  warningText: rosaProfundo,
-  error: rosaProfundo,
-  errorText: rosaProfundo,
-  errorSurface: rubor,
-  errorDisabledBorder: arcilla,
-  errorDisabledText: rosaProfundo,
-  warningTitle: rosaProfundo,
-  warningBody: rosaProfundo,
-  successTint: rubor,
-  warningTint: rubor,
-  warningRule: arcilla,
-  errorTint: rubor,
-  errorPill: rubor,
-  neutralTint: crema,
-  neutralWash: crema,
-  neutralPill: rubor,
-  accentTint: rubor,
-  accentWash: rubor,
-  inkTint: crema,
-  // Disabled: Crema with an Arcilla border, always with a reason line.
-  disabledBackground: crema,
-  disabledText: rosaProfundo,
-  // Quiet icons (chevrons, empty-state glyphs) meet 3:1 on Crema.
-  iconQuiet: paloDeRosa,
-  scrim: "rgba(147,97,93,0.35)",
+  success: ink,
+  successText: ink,
+  warning: ink,
+  warningText: ink,
+  error: ink,
+  errorText: ink,
+  errorSurface: rosa[50],
+  errorDisabledBorder: rosa[400],
+  errorDisabledText: ink,
+  warningTitle: ink,
+  warningBody: ink,
+  successTint: rosa[50],
+  warningTint: rosa[50],
+  warningRule: rosa[400],
+  errorTint: rosa[50],
+  errorPill: rosa[50],
+  neutralTint: rosa[50],
+  neutralWash: rosa[50],
+  neutralPill: rosa[50],
+  accentTint: rosa[50],
+  accentWash: rosa[50],
+  inkTint: rosa[50],
+  // Disabled: 50 with a 400 outline, always with a reason line.
+  disabledBackground: rosa[50],
+  disabledText: ink,
+  iconQuiet: ink,
+  // Class-type bars.
+  typeReformer: ink,
+  typeMat: rosa[300],
+  typeCadillac: rosa[500],
+  typeOther: rosa[400],
+  scrim: "rgba(147,97,93,0.42)",
 } as const;
 
 export const spacing = {
@@ -93,28 +119,29 @@ export const spacing = {
   xxxl: 40,
 } as const;
 
-// Cards round at 16 on every surface (web too, FIX-089); the hero at 18;
-// chips, notices, insets and sheets keep 12.
 export const radii = {
-  // FIX-089: primary and secondary buttons round at 12.
-  button: 12,
+  button: 16,
   control: 8,
-  inset: 12,
-  card: 16,
-  frame: 16,
+  inset: 14,
+  card: 20,
+  frame: 20,
+  hero: 24,
+  // The header band's lower corners and a sheet's upper corners.
+  band: 28,
   pill: 999,
 } as const;
 
 export const typography = {
   display: 44,
+  // Lora titles: the band's 30, a hero's 28, a section's 24, a card's 22.
   title: 30,
+  hero: 28,
+  section: 24,
   titleSecondary: 22,
   price: 26,
-  // The Lora titles of the S02 and S13 cards and the Lora 19 of 03, S07, S11, and S15 (MOB-042).
   titleCard: 20,
   titleSmall: 19,
   bodyLarge: 17,
-  // The names on S04's results, S15's rows, and 02's tiles (MOB-042).
   bodyMedium: 16,
   body: 15,
   label: 12,
@@ -122,31 +149,38 @@ export const typography = {
   tabLabel: 11,
 } as const;
 
-// FIX-089: flat surfaces. Cards carry a 1px Arcilla border instead of a shadow.
-const noShadow = {
-  elevation: 0,
-  shadowColor: rosaProfundo,
-  shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0,
-  shadowRadius: 0,
-} as const;
+const cardShadow = "0 1px 2px rgba(147,97,93,0.08), 0 4px 14px rgba(147,97,93,0.10)";
 
 export const shadows = {
-  button: noShadow,
-  card: noShadow,
+  button: { boxShadow: "0 1px 2px rgba(147,97,93,0.06), 0 2px 8px rgba(147,97,93,0.06)" },
+  card: { boxShadow: cardShadow },
+  hero: { boxShadow: "0 10px 28px rgba(147,97,93,0.30)" },
+  // A fixed footer or the tab bar: the card shadow, cast upward.
+  footer: { boxShadow: "0 -1px 2px rgba(147,97,93,0.08), 0 -4px 14px rgba(147,97,93,0.10)" },
+  sheet: { boxShadow: "0 -12px 32px rgba(147,97,93,0.25)" },
+  // The tab bar's 1 pt 200 rule on top.
+  tabBar: { boxShadow: "0 -1px 0 #E7CCBF" },
+  toast: { boxShadow: "0 10px 28px rgba(147,97,93,0.35)" },
 } as const;
 
 const cardBox = {
   backgroundColor: colors.card,
-  borderColor: colors.border,
   borderRadius: radii.card,
-  borderWidth: 1,
+  boxShadow: cardShadow,
 } as const;
 
-/** Cards are Crema with a 1px Arcilla border; the screen's one hero block is
- * Palo de rosa, radius 18, with large Crema text. */
+/** White cards with a soft rosa shadow; the screen's one hero block is 600,
+ * radius 24, with white text; the medio block is 500 with large white text. */
 export const surfaces = {
   card: cardBox,
   flatCard: cardBox,
-  emphasis: { backgroundColor: colors.emphasis, borderRadius: 18 },
+  emphasis: { backgroundColor: colors.emphasis, borderRadius: radii.hero, ...shadows.hero },
+  medio: { backgroundColor: colors.medio, borderRadius: radii.card },
+  // A soft inset on white: 50 with a 1px 200 rule.
+  soft: {
+    backgroundColor: rosa[50],
+    borderColor: rosa[200],
+    borderRadius: 16,
+    borderWidth: 1,
+  },
 } as const;

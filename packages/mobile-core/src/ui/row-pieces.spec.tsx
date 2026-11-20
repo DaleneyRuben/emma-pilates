@@ -75,7 +75,7 @@ describe("AvatarCircle", () => {
     const letter = screen.getByText("V");
     expect(letter).toHaveStyle({ color: "#93615D", fontFamily: "Lora_400Regular", fontSize: 16 });
     expect(screen.getByTestId("avatar-circle")).toHaveStyle({
-      backgroundColor: "#E7CCBF",
+      backgroundColor: "#FEF6F2",
       borderRadius: 21,
       height: 42,
       width: 42,

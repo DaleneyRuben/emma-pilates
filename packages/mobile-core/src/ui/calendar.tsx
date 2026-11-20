@@ -177,7 +177,7 @@ const dotSize = 40;
 const styles = StyleSheet.create({
   arrow: {
     alignItems: "center",
-    backgroundColor: colors.card,
+    backgroundColor: colors.surfaceSubtle,
     borderRadius: radii.inset,
     height: 44,
     justifyContent: "center",

@@ -10,15 +10,15 @@ describe("OutlinedButton", () => {
     const screen = await render(<OutlinedButton label="Ver historial" onPress={jest.fn()} />);
 
     expect(screen.getByRole("button", { name: "Ver historial" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#93615D",
-      borderRadius: 12,
+      borderRadius: 16,
       borderWidth: 1.5,
-      minHeight: 48,
+      minHeight: 52,
     });
     expect(screen.getByText("Ver historial")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
+      fontFamily: "WorkSans_700Bold",
     });
   });
 
@@ -35,7 +35,7 @@ describe("OutlinedButton", () => {
 
     const button = screen.getByTestId("logout-confirm");
     expect(button).toBe(screen.getByRole("button", { name: "Cerrar sesión" }));
-    expect(button).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#93615D" });
+    expect(button).toHaveStyle({ backgroundColor: "#FFFBFB", borderColor: "#93615D" });
     expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
     await fireEvent.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);

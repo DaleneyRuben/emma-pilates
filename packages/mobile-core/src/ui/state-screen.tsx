@@ -5,7 +5,7 @@ import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, spacing, surfaces, typography } from "./tokens";
 
 type Action = { label: string; onPress: () => void; testID?: string };
 
@@ -14,12 +14,12 @@ export type StateScreenProps = {
   children?: ReactNode;
   icon?: GlyphName;
   /**
-   * `centred` (the default) fills the space between the top bar and the tab
-   * bar and centres the block both ways; `inList` is the same block without
-   * the vertical centring; `card` draws it on Lino, as the system board does.
+   * Every layout draws the white state card (Rosa Emma). `centred` (the
+   * default) fills the space under the header and keeps the card at its top;
+   * `inList` and `card` place it in the flow of a list.
    */
   layout?: "card" | "centred" | "inList";
-  /** One Texto tenue note; keep it to two lines of copy. */
+  /** One note; keep it to two lines of copy. */
   note?: string;
   primaryAction?: Action;
   testID?: string;
@@ -46,16 +46,21 @@ export function StateScreen({
   title,
 }: StateScreenProps) {
   const hasActions = primaryAction !== undefined || textAction !== undefined;
-  return (
-    <View style={[styles.block, layouts[layout]]} testID={testID}>
+  const block = (
+    <View
+      style={[styles.block, styles.card, layout === "inList" && styles.inList]}
+      testID={layout === "centred" ? undefined : testID}
+    >
       {icon === undefined ? null : (
-        <Glyph
-          color={colors.text}
-          name={icon}
-          size={32}
-          strokeWidth={1.5}
-          testID={`${testIDPrefix}-icon-${icon}`}
-        />
+        <View style={styles.disc} testID={`${testIDPrefix}-disc`}>
+          <Glyph
+            color={colors.text}
+            name={icon}
+            size={28}
+            strokeWidth={1.6}
+            testID={`${testIDPrefix}-icon-${icon}`}
+          />
+        </View>
       )}
       <Text accessibilityRole="header" style={styles.title}>
         {title}
@@ -70,21 +75,36 @@ export function StateScreen({
       ) : null}
     </View>
   );
+  if (layout !== "centred") return block;
+  // The full-screen state keeps its card at the top of the space it fills.
+  return (
+    <View style={styles.centred} testID={testID}>
+      {block}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.xs, marginTop: spacing.sm, minWidth: 220 },
+  actions: { alignSelf: "stretch", gap: spacing.xs, marginTop: spacing.xs },
   block: { alignItems: "center", gap: spacing.md },
+  // Rosa Emma: every state is a white card, its glyph on a 50 disc.
   card: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 1,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
+    ...surfaces.card,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.xl + spacing.xs,
   },
-  centred: { flex: 1, justifyContent: "center", paddingHorizontal: spacing.lg },
-  inList: { paddingHorizontal: spacing.lg, paddingVertical: spacing.xxl },
+  centred: { flex: 1 },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderSoft,
+    borderRadius: 32,
+    borderWidth: 1,
+    height: 64,
+    justifyContent: "center",
+    width: 64,
+  },
+  inList: { alignSelf: "stretch" },
   note: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
@@ -95,10 +115,8 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: typography.section,
+    lineHeight: 29,
     textAlign: "center",
   },
 });
-
-const layouts = { card: styles.card, centred: styles.centred, inList: styles.inList } as const;

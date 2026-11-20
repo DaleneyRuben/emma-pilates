@@ -4,7 +4,7 @@ import type { TextInputProps } from "react-native";
 
 import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, spacing, typography } from "./tokens";
+import { colors, radii, spacing, typography } from "./tokens";
 
 const dotsOnly = /^[\s•·*.●]+$/;
 
@@ -106,16 +106,16 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
     lineHeight: 18,
   },
-  // FormB: Crema, a 1 pt Arcilla outline, radius 10, at least 48 pt to touch.
+  // Rosa Emma: white, a 1.5 pt 400 outline, radius 14, 52 pt high.
   input: {
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: 10,
-    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
     color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: 16,
-    minHeight: 48,
+    minHeight: 52,
     paddingHorizontal: spacing.mdLg,
   },
   inputError: {

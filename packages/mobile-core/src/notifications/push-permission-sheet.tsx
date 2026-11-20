@@ -4,7 +4,7 @@ import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { colors, radii, shadows, spacing, typography } from "../ui/tokens";
 
 // ADR-0067: the project's own explanation; only its yes opens the system
 // prompt. Design follow-up 91 refines the sheet; the client v2 board «CP»
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     width: 72,
   },
-  handle: { backgroundColor: colors.hairline, borderRadius: radii.pill, height: 4, width: 36 },
+  handle: { backgroundColor: colors.band, borderRadius: radii.pill, height: 5, width: 40 },
   reason: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
@@ -75,9 +75,10 @@ const styles = StyleSheet.create({
   },
   sheet: {
     alignItems: "center",
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    ...shadows.sheet,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: radii.band,
+    borderTopRightRadius: radii.band,
     gap: spacing.md,
     paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.xlSm,

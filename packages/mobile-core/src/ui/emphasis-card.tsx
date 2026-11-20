@@ -22,7 +22,7 @@ export type EmphasisCardProps = {
   title?: string;
 };
 
-/** The screen's one Rosa profundo card (follow-up 225 §5): radius 20, padding 20. */
+/** The screen's one solid 600 hero (Rosa Emma): radius 24, padding 20, white text. */
 export function EmphasisCard({
   action,
   children,
@@ -75,17 +75,17 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "600",
+    fontWeight: "700",
   },
-  card: { ...surfaces.emphasis, gap: spacing.md, padding: spacing.xlSm },
+  card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
   eyebrow: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   note: {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 24,
-    lineHeight: 29,
+    fontSize: typography.hero,
+    lineHeight: 31,
   },
 });

@@ -38,14 +38,12 @@ export function BranchPickerPill({
 
 const styles = StyleSheet.create({
   label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  name: { fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
+  name: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   pill: {
     alignItems: "center",
     alignSelf: "flex-start",
     backgroundColor: colors.card,
-    borderColor: colors.borderStrong,
     borderRadius: radii.pill,
-    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.smLg,
     minHeight: 44,

@@ -5,10 +5,10 @@ import { StateScreen } from "./state-screen";
 
 const hidden = { includeHiddenElements: true };
 
-// Follow-up 225 §6: an empty, pending, success, or error state centred in the
-// space between the top bar and the tab bar (C05b, C11, C11c).
+// Rosa Emma (C05b, E-A13): every empty, pending, success, or error state is a
+// white card with its glyph on a 50 disc, a Lora 24 title and a note.
 describe("StateScreen", () => {
-  it("centres the glyph alone, a Lora 24 title, and a note, all Rosa profundo", async () => {
+  it("draws the glyph on a disc, a Lora 24 title, and a note in a white card", async () => {
     const screen = await render(
       <StateScreen
         icon="calendar"
@@ -18,17 +18,22 @@ describe("StateScreen", () => {
       />,
     );
 
-    expect(screen.getByTestId("state")).toHaveStyle({
+    expect(screen.getByTestId("state")).toHaveStyle({ flex: 1 });
+    expect(screen.getByText("Aún no tienes reservas").parent).toHaveStyle({
       alignItems: "center",
-      flex: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
       gap: 12,
-      justifyContent: "center",
     });
-    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
+    expect(screen.getByTestId("state-screen-disc", hidden)).toHaveStyle({
+      backgroundColor: "#FEF6F2",
+      borderColor: "#E7CCBF",
+      height: 64,
+      width: 64,
+    });
     const glyph = screen.getByTestId("state-screen-icon-calendar", hidden);
     expect(glyph).toHaveProp("stroke", "#93615D");
-    expect(glyph).toHaveProp("strokeWidth", 1.5);
-    expect(glyph).toHaveProp("width", 32);
+    expect(glyph).toHaveProp("width", 28);
     expect(screen.getByText("Aún no tienes reservas")).toHaveStyle({
       color: "#93615D",
       fontFamily: "Lora_400Regular",
@@ -43,12 +48,12 @@ describe("StateScreen", () => {
     expect(screen.getByText("Aún no tienes reservas")).toHaveProp("accessibilityRole", "header");
   });
 
-  it("says an error in words, with the same plain glyph", async () => {
+  it("says an error in words, with the same glyph on its disc", async () => {
     const screen = await render(
       <StateScreen icon="cross" title="No pudimos confirmar tu pago" tone="error" />,
     );
 
-    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
+    expect(screen.getByTestId("state-screen-disc", hidden)).toBeOnTheScreen();
     expect(screen.getByTestId("state-screen-icon-cross", hidden)).toHaveProp("stroke", "#93615D");
   });
 
@@ -68,17 +73,17 @@ describe("StateScreen", () => {
     );
 
     const primary = screen.getByTestId("go-home");
-    expect(primary).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 12 });
+    expect(primary).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 16 });
     await fireEvent.press(primary);
     expect(home).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Ver mis pagos")).toHaveStyle({ color: "#93615D" });
     await fireEvent.press(screen.getByRole("button", { name: "Ver mis pagos" }));
     expect(book).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Detalles")).toBeOnTheScreen();
-    expect(screen.getByTestId("state-screen-actions")).toHaveStyle({ marginTop: 8 });
+    expect(screen.getByTestId("state-screen-actions")).toHaveStyle({ alignSelf: "stretch" });
   });
 
-  it("stands in a list without the vertical centring, bare or on Lino", async () => {
+  it("stands in a list as the same card, without filling the screen", async () => {
     const screen = await render(
       <>
         <StateScreen icon="bell" layout="inList" testID="bare" title="Sin avisos" />
@@ -88,26 +93,11 @@ describe("StateScreen", () => {
 
     const bare = StyleSheet.flatten(screen.getByTestId("bare").props.style);
     expect(bare).not.toHaveProperty("flex");
-    expect(bare).not.toHaveProperty("backgroundColor");
     expect(screen.getByTestId("card")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 16,
-      borderWidth: 1,
-      paddingHorizontal: 24,
-      paddingVertical: 32,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 28,
     });
-  });
-});
-
-// FIX-082, FIX-089: `plainIcon` is kept for callers; every glyph is plain.
-describe("StateScreen with a plain icon", () => {
-  it("draws the glyph without the disc", async () => {
-    const screen = await render(
-      <StateScreen icon="receipt" plainIcon title="Aún no tienes facturas" />,
-    );
-
-    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
-    expect(screen.getByTestId("state-screen-icon-receipt", hidden)).toHaveProp("stroke", "#93615D");
   });
 });

@@ -17,15 +17,15 @@ describe("NextClassHero", () => {
       />,
     );
 
-    expect(screen.getByTestId("next-class-hero")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("next-class-hero")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "Lora_400Regular",
       fontSize: 26,
     });
     expect(screen.getByText("PRÓXIMA · EN 40 MIN")).toHaveStyle({ fontWeight: "700" });
     expect(screen.getByText("2 de 8")).toBeOnTheScreen();
-    expect(screen.getByText("Achumani · Lucía y Elena")).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getByText("Achumani · Lucía y Elena")).toHaveStyle({ color: "#FFFBFB" });
     await fireEvent.press(screen.getByRole("button"));
     expect(onPress).toHaveBeenCalled();
   });
@@ -41,7 +41,7 @@ describe("NextClassHero attendees", () => {
 
     const circles = screen.getAllByTestId("hero-attendee");
     expect(circles).toHaveLength(2);
-    expect(circles[0]).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(circles[0]).toHaveStyle({ backgroundColor: "#FFFBFB" });
     expect(screen.getByText("LM")).toHaveStyle({ color: "#93615D" });
     expect(screen.getByTestId("next-class-hero").props.accessibilityLabel).toMatch(/Vienen 2 más$/);
   });
@@ -78,12 +78,11 @@ describe("ClassRow in a ClassList", () => {
     );
 
     expect(screen.getByTestId("class-list")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     expect(screen.getAllByTestId("class-row-time")[0]).toHaveStyle({
-      backgroundColor: "#E7CCBF",
+      backgroundColor: "#FEF6F2",
       borderRadius: 10,
     });
     expect(screen.getByText("16:00")).toHaveStyle({ fontWeight: "700" });

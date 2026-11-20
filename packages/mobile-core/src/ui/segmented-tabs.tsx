@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { colors, shadows, spacing, typography } from "./tokens";
 
 export type SegmentedTabsProps<Key extends string> = {
   accessibilityLabel?: string;
@@ -76,23 +76,22 @@ const styles = StyleSheet.create({
   },
   labelSelected: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontWeight: "700",
   },
   segment: {
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 12,
     flex: 1,
     height: 44,
     justifyContent: "center",
   },
-  // FIX-089: the chosen segment is Rosa profundo with a Crema label.
+  // Rosa Emma: the chosen segment is 600 with a white label on a white track.
   selected: { backgroundColor: colors.primary },
   track: {
+    ...shadows.card,
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: 16,
     flexDirection: "row",
     gap: spacing.xs,
     padding: spacing.xs,

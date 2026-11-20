@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } fro
 import { Chevron } from "./chevron";
 import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, spacing, surfaces, typography } from "./tokens";
 
 export type IconRowProps = {
   /** A quiet chevron at the end, for a row that opens something. */
@@ -95,12 +95,7 @@ export function IconRowGroup({
 
 const styles = StyleSheet.create({
   errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  group: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 1,
-  },
+  group: { ...surfaces.card, overflow: "hidden" },
   // 16 side padding + 18 glyph + 12 gap.
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 46 },
   // The label keeps its width; a long value wraps under itself instead.
@@ -108,8 +103,9 @@ const styles = StyleSheet.create({
     color: colors.text,
     flexGrow: 1,
     flexShrink: 0,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
   // Without a value the label is the row's note: it wraps instead of running off.
   labelAlone: { flexShrink: 1 },
@@ -125,8 +121,9 @@ const styles = StyleSheet.create({
   value: {
     color: colors.textMuted,
     flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
     textAlign: "right",
   },
 });

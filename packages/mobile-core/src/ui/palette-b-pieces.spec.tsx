@@ -11,7 +11,6 @@ import {
   PersonAvatar,
   PhoneField,
   SeatPill,
-  StateScreen,
 } from "../index";
 import { bolivia } from "../account/phone-number";
 
@@ -28,7 +27,7 @@ describe("Chip", () => {
     });
     expect(screen.getByRole("button", { name: "Hoy" })).toBeSelected();
     expect(screen.getByText("Hoy")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "WorkSans_600SemiBold",
     });
   });
@@ -39,7 +38,7 @@ describe("Chip", () => {
 
     const chip = screen.getByRole("button", { name: "Mañana" });
     expect(chip).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
       borderWidth: 1,
     });
@@ -54,7 +53,7 @@ describe("ExceptionPill", () => {
   it("says the exception in bold Rosa profundo on Rubor", async () => {
     const screen = await render(<ExceptionPill>Por vencer</ExceptionPill>);
 
-    expect(screen.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(screen.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(screen.getByText("Por vencer")).toHaveStyle({
       color: "#93615D",
       fontFamily: "WorkSans_600SemiBold",
@@ -76,7 +75,7 @@ describe("FormErrorSummary (FormB)", () => {
   it("counts what is missing on Rubor and lists the fields", async () => {
     const screen = await render(<FormErrorSummary fields={["Clases", "Precio"]} />);
 
-    expect(screen.getByTestId("form-error-summary")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(screen.getByTestId("form-error-summary")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(screen.getByText("Faltan 2 datos para guardar")).toHaveStyle({ fontWeight: "700" });
     expect(screen.getByText("Clases · Precio")).toBeOnTheScreen();
   });
@@ -109,9 +108,11 @@ describe("FormField (FormB)", () => {
     expect(screen.getByText("Celular")).toHaveStyle({ fontSize: 14, fontWeight: "600" });
     expect(screen.getByText("Ej.: 77712345")).toHaveStyle({ fontSize: 13 });
     expect(screen.getByLabelText("Celular")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      minHeight: 52,
     });
   });
 
@@ -170,12 +171,6 @@ describe("no tinted discs behind icons", () => {
     expect(screen.queryByTestId("icon-row-disc", hidden)).toBeNull();
   });
 
-  it("draws a state screen's icon without a disc", async () => {
-    const screen = await render(<StateScreen icon="calendar" title="Sin clases" />);
-
-    expect(screen.queryByTestId("state-screen-disc", hidden)).toBeNull();
-  });
-
   it("draws a notice without a disc", async () => {
     const screen = await render(<NoticeRow message="Esto no se puede deshacer." />);
 
@@ -187,7 +182,7 @@ describe("PersonAvatar", () => {
   it("draws Crema initials on a Palo de rosa circle", async () => {
     const screen = await render(<PersonAvatar name="Carla Prueba" photoUri={null} size={40} />);
 
-    expect(screen.getByText("CP")).toHaveStyle({ color: "#F9F4F2", fontWeight: "700" });
-    expect(screen.toJSON()).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByText("CP")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
+    expect(screen.toJSON()).toHaveStyle({ backgroundColor: "#93615D" });
   });
 });

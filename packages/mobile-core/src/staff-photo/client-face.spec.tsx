@@ -56,7 +56,7 @@ describe("ClientFace", () => {
     );
 
     const letters = screen.getByText("SP");
-    expect(letters).toHaveStyle({ color: "#F9F4F2" });
-    expect(letters.parent).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(letters).toHaveStyle({ color: "#FFFBFB" });
+    expect(letters.parent).toHaveStyle({ backgroundColor: "#93615D" });
   });
 });

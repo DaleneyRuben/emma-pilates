@@ -17,9 +17,9 @@ describe("NoticeRow", () => {
 
     expect(screen.getByTestId("notice")).toHaveStyle({
       alignItems: "center",
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 14,
+      backgroundColor: "#FEF6F2",
+      borderColor: "#E7CCBF",
+      borderRadius: 16,
       borderWidth: 1,
       flexDirection: "row",
       gap: 12,

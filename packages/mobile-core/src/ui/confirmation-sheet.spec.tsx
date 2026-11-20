@@ -27,7 +27,7 @@ describe("ConfirmationSheet", () => {
     const screen = await renderSheet();
 
     const sheet = within(screen.getByTestId("logout-sheet"));
-    expect(sheet.getByText("¿Cerrar sesión?")).toHaveStyle({ fontFamily: "Lora_500Medium" });
+    expect(sheet.getByText("¿Cerrar sesión?")).toHaveStyle({ fontFamily: "Lora_400Regular" });
     expect(
       sheet.getByText(
         "Vuelves al inicio de sesión y tendrás que entrar de nuevo con tu correo y contraseña.",
@@ -35,7 +35,7 @@ describe("ConfirmationSheet", () => {
     ).toBeOnTheScreen();
     const confirm = sheet.getByTestId("logout-confirm");
     expect(confirm).toBe(sheet.getByRole("button", { name: "Cerrar sesión" }));
-    expect(confirm).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#93615D" });
+    expect(confirm).toHaveStyle({ backgroundColor: "#FFFBFB", borderColor: "#93615D" });
     expect(sheet.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
     expect(sheet.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });

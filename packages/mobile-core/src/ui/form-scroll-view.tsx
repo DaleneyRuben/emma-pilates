@@ -7,6 +7,8 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { bandScroll } from "./screen";
+
 /**
  * A form's scrolling column that moves up above the keyboard. Android draws
  * edge to edge (Expo 57), so the window no longer resizes for the keyboard
@@ -70,6 +72,8 @@ export function FormScrollView({
             : undefined
         }
         ref={scroller}
+        // A header band inside the form reaches the screen's edges.
+        style={bandScroll}
       >
         {children}
       </ScrollView>

@@ -19,7 +19,7 @@ type PrimaryButtonProps = {
   tone?: "error" | "primary";
 };
 
-/** The screen's one solid action: Rosa profundo with a Crema label (palette B). */
+/** The screen's one solid action: 600 with a white label (Rosa Emma). */
 export function PrimaryButton({
   label,
   onPress,
@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: colors.disabledBackground,
-    borderColor: colors.border,
+    borderColor: colors.borderStrong,
   },
   label: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.bodyMedium,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   quietLabel: {
     color: colors.primary,

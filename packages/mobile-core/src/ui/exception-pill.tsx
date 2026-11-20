@@ -32,9 +32,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-start",
     backgroundColor: colors.primaryTint,
+    borderColor: colors.borderSoft,
     borderRadius: radii.pill,
+    borderWidth: 1,
     justifyContent: "center",
-    minHeight: 24,
-    paddingHorizontal: spacing.smLg,
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
   },
 });

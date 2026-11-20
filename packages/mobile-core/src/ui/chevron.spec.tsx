@@ -22,7 +22,7 @@ describe("Chevron", () => {
   it("takes the quiet tone of the Perfil menu rows", async () => {
     const screen = await render(<Chevron tone="quiet" />);
 
-    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#B78380");
+    expect(screen.getByTestId("chevron", hidden)).toHaveProp("stroke", "#93615D");
   });
 
   it("points down or up in Texto tenue at 16 pt for the Branch picker", async () => {

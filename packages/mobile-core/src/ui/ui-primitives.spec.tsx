@@ -25,12 +25,12 @@ describe("mobile UI primitives", () => {
     });
   });
 
-  // MOB-038: every Client and Staff frame draws its screen on Superficie.
-  it("draws application screens on Superficie, as the mobile frames do", async () => {
+  // Rosa Emma: every Client and Staff screen is drawn on 100.
+  it("draws application screens on 100, as the boards do", async () => {
     const screen = await render(<Screen testID="app-screen" />);
 
     expect(screen.getByTestId("app-screen")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#F9E7DF",
     });
   });
 

@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } fro
 
 import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, spacing, typography } from "./tokens";
+import { colors, shadows, spacing, typography } from "./tokens";
 
 export type BrandToastProps = {
   /** One line under the title, such as «Te quedan 9 clases en tu plan». */
@@ -77,16 +77,16 @@ const styles = StyleSheet.create({
   text: { flex: 1, gap: spacing.xxs },
   title: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
   toast: {
+    ...shadows.toast,
     alignItems: "center",
     backgroundColor: colors.primary,
-    borderRadius: 14,
+    borderRadius: 18,
     bottom: spacing.lg,
-    elevation: 6,
     flexDirection: "row",
     gap: spacing.md,
     left: spacing.lg,
@@ -96,9 +96,5 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     position: "absolute",
     right: spacing.lg,
-    shadowColor: colors.text,
-    shadowOffset: { height: 8, width: 0 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
   },
 });

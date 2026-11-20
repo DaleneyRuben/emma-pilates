@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, spacing, typography } from "./tokens";
 
 /** «Faltan N datos para guardar» (FormB, FIX-089); `action` names another verb. */
 export function missingFieldsTitle(count: number, action = "guardar"): string {
@@ -37,7 +37,9 @@ export function FormErrorSummary({
 const styles = StyleSheet.create({
   box: {
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.card,
+    borderColor: colors.borderStrong,
+    borderRadius: 14,
+    borderWidth: 1.5,
     gap: spacing.sm,
     padding: spacing.lg,
   },
