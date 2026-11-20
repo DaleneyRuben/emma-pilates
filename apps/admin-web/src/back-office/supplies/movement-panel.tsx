@@ -22,6 +22,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { refreshBranchSupplies } from "../back-office-cache";
@@ -218,11 +219,7 @@ export function SupplyMovementForm({
               </FormItem>
             )}
           />
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button

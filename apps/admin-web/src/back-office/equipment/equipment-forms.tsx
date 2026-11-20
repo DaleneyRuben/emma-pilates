@@ -7,6 +7,7 @@ import {
 import { fieldMessageClass } from "../../components/form/form";
 import { FormErrorSummaryBox } from "../../components/form/form-error-summary";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
@@ -18,11 +19,7 @@ import {
 } from "./equipment-queries";
 
 export function Failure({ message }: { message: string | null }) {
-  return message === null ? null : (
-    <p role="alert" className="text-nota text-texto">
-      {message}
-    </p>
-  );
+  return message === null ? null : <InlineError>{message}</InlineError>;
 }
 
 // AW37 «Agregar» (follow-up 270): the type's first free number filled in,
@@ -109,7 +106,7 @@ export function AddUnitForm({
             <p
               key="help"
               id={`${numberId}-help`}
-              className="text-ayuda text-texto"
+              className="tipo-secundario text-texto"
             >
               {help}
             </p>
@@ -195,10 +192,10 @@ export function ReportIssueForm({
             className="mt-0.5 size-4 accent-primario"
           />
           <div className="flex flex-col gap-0.5">
-            <label htmlFor={outId} className="text-cuerpo text-texto">
+            <label htmlFor={outId} className="tipo-cuerpo text-texto">
               No se puede usar
             </label>
-            <p id={`${outId}-help`} className="text-ayuda text-texto">
+            <p id={`${outId}-help`} className="tipo-secundario text-texto">
               Márcalo si nadie debería usarlo hasta que lo arreglen.
             </p>
           </div>
@@ -239,7 +236,7 @@ export function DescriptionField({
         aria-describedby={`${id}-example`}
         onChange={(event) => onChange(event.target.value)}
       />
-      <p id={`${id}-example`} className="text-ayuda text-texto">
+      <p id={`${id}-example`} className="tipo-secundario text-texto">
         {`Ej.: ${example}`}
       </p>
       {error === null ? null : (

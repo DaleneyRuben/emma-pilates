@@ -29,6 +29,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { formatBolivianos } from "../../lib/money";
@@ -145,7 +146,7 @@ export function ExpensePanelForm({
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
           <FormErrorSummary />
-          <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+          <p className="rounded-control bg-aviso px-3 py-2 tipo-secundario text-texto">
             {expense === undefined
               ? `Se registra en la sucursal ${branch.name}.`
               : `Sucursal ${branch.name}: un gasto no cambia de sucursal.`}
@@ -253,11 +254,7 @@ export function ExpensePanelForm({
               </FormItem>
             )}
           />
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button type="submit" size="lg" busy={change.isPending}>

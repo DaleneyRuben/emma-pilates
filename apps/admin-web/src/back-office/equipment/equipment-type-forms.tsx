@@ -140,7 +140,7 @@ export function NewTypeForm({
           onChange={setName}
         />
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1.5 text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
+          <legend className="mb-1.5 tipo-compacto-600 text-texto">
             ¿Cómo lo llevas?
           </legend>
           {trackingChoices.map(([value, title, note]) => (
@@ -160,10 +160,8 @@ export function NewTypeForm({
                 className="mt-1 size-4 accent-primario"
               />
               <span className="flex flex-col gap-0.5">
-                <span className="text-cuerpo font-medium text-texto">
-                  {title}
-                </span>
-                <span className="text-ayuda text-texto">{note}</span>
+                <span className="tipo-titulo-fila text-texto">{title}</span>
+                <span className="tipo-secundario text-texto">{note}</span>
               </span>
             </label>
           ))}
@@ -182,7 +180,10 @@ export function NewTypeForm({
               aria-describedby={`${quantityId}-example`}
               onChange={(event) => setQuantity(event.target.value.trim())}
             />
-            <p id={`${quantityId}-example`} className="text-ayuda text-texto">
+            <p
+              id={`${quantityId}-example`}
+              className="tipo-secundario text-texto"
+            >
               Ej.: 0
             </p>
             {quantityError === null ? null : (
@@ -192,7 +193,7 @@ export function NewTypeForm({
             )}
           </div>
         ) : null}
-        <p className="text-ayuda text-texto">
+        <p className="tipo-secundario text-texto">
           El tipo es para todo el estudio. Cómo se lleva no se puede cambiar
           después.
         </p>
@@ -280,20 +281,20 @@ export function EditTypeForm({
             error={nameError}
             onChange={setName}
           />
-          <p className="text-ayuda text-texto">
+          <p className="tipo-compacto text-texto">
             {`${trackingLong[type.tracking]} No se puede cambiar.`}
           </p>
           <div className="flex flex-col items-start gap-1.5 border-t border-borde pt-4">
             <Button
               type="button"
               variant="link"
-              className="h-auto px-0 text-texto hover:text-texto disabled:bg-transparent"
+              className="h-auto px-0 text-texto disabled:bg-transparent"
               disabled={!removable}
               onClick={() => setConfirming(true)}
             >
               Quitar tipo
             </Button>
-            <p className="text-ayuda text-texto">
+            <p className="tipo-secundario text-texto">
               {removable
                 ? "Deja de aparecer en todas las sucursales. Su historial queda."
                 : typeInUse[type.tracking]}

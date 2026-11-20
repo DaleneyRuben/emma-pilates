@@ -12,6 +12,7 @@ import {
 import { SidePanel } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
 import { useAdminRole } from "../../session/admin-role";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
@@ -110,11 +111,7 @@ function BranchEquipment({ branch }: { branch: Branch }) {
         }
       />
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
-      {failure === null ? null : (
-        <p role="alert" className="text-nota text-texto">
-          {failure}
-        </p>
-      )}
+      {failure === null ? null : <InlineError>{failure}</InlineError>}
       {failed !== undefined ? (
         <QueryFailure
           error={failed.error}

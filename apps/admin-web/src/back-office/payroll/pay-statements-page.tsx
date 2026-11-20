@@ -10,6 +10,9 @@ import {
 } from "../../components/page/query-failure";
 import { PageHeader } from "../../components/page/page-header";
 import { Button } from "../../components/ui/button";
+import { EmptyState } from "../../components/ui/empty-state";
+import { InlineError } from "../../components/ui/inline-error";
+import { TextLink } from "../../components/ui/text-link";
 import { boliviaMonth, boliviaToday } from "../../lib/bolivia-time";
 import { PayPeriodPicker } from "./pay-period-picker";
 import {
@@ -34,7 +37,7 @@ const noPeriod: PayPeriodQuery = { month: "" };
 // what happened.
 function DoneNotice({ notice }: { notice: ApprovedNotice }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-nota text-texto">
+    <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 tipo-compacto text-texto">
       <p role="status" className="flex min-w-[220px] flex-1 items-start gap-3">
         <CheckCircle2
           size={18}
@@ -122,9 +125,7 @@ export function PayStatementsPage({
       />
       <PayPeriodPicker search={search} onChange={change} />
       {draft.isError ? (
-        <p role="alert" className="text-ayuda text-texto">
-          No pudimos calcular el período.
-        </p>
+        <InlineError>No pudimos calcular el período.</InlineError>
       ) : null}
       {notice === null ? null : <DoneNotice notice={notice} />}
       {shown.kind === "month" && search.month === boliviaMonth() ? (
@@ -139,22 +140,19 @@ export function PayStatementsPage({
       ) : statements === undefined ? (
         <LoadingNotice>Cargando los pagos…</LoadingNotice>
       ) : statements.length === 0 ? (
-        <p className="text-cuerpo text-texto">
+        <EmptyState>
           {approvedCount === 0 ? (
             `${shown.label}: sin pagos calculados.`
           ) : (
             <>
               {`${shown.label}: todos los sueldos están aprobados. Están en `}
-              <Link
-                to="/dinero/sueldos/pagados"
-                className="font-medium text-texto underline-offset-2 hover:underline"
-              >
-                Pagados
-              </Link>
+              <TextLink asChild inline>
+                <Link to="/dinero/sueldos/pagados">Pagados</Link>
+              </TextLink>
               .
             </>
           )}
-        </p>
+        </EmptyState>
       ) : (
         <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
           {statements.map((statement) => (

@@ -7,6 +7,7 @@ import {
   uploadFailureMessage,
   uploadImage,
 } from "../../api/upload-image";
+import { fieldMessageClass } from "../../components/form/form";
 import { Button } from "../../components/ui/button";
 import { ReceiptDialog } from "../../payments/receipt-dialog";
 
@@ -93,10 +94,8 @@ export function SalaryReceiptField({
   return (
     <div className="flex flex-col gap-1.5">
       <span className="flex items-baseline gap-2">
-        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-          Comprobante
-        </span>
-        <span className="text-ayuda text-texto">Obligatorio</span>
+        <span className="tipo-compacto-600 text-texto">Comprobante</span>
+        <span className="tipo-secundario text-texto">Obligatorio</span>
       </span>
       <input
         ref={input}
@@ -113,7 +112,7 @@ export function SalaryReceiptField({
       {status.kind === "uploading" ? (
         <p
           role="status"
-          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center text-nota text-texto"
+          className="rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center tipo-secundario text-texto"
         >
           Subiendo el comprobante…
         </p>
@@ -122,13 +121,13 @@ export function SalaryReceiptField({
           type="button"
           aria-describedby={hintId}
           onClick={() => input.current?.click()}
-          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie text-nota font-medium text-texto hover:border-primario focus-visible:shadow-foco"
+          className="flex h-24 flex-col items-center justify-center gap-2 rounded-control border border-dashed border-borde-fuerte bg-superficie-hundida tipo-titulo-fila text-texto hover:border-primario focus-visible:shadow-foco"
         >
           <ImagePlus
             size={20}
             strokeWidth={1.6}
             aria-hidden="true"
-            className="text-primario"
+            className="text-texto"
           />
           Subir foto del comprobante
         </button>
@@ -140,9 +139,9 @@ export function SalaryReceiptField({
             className="size-14 flex-none rounded-[6px] border border-borde object-cover"
           />
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="text-nota text-texto">Comprobante adjunto</span>
+            <span className="tipo-cuerpo text-texto">Comprobante adjunto</span>
             {value?.kind === "uploaded" ? (
-              <span className="truncate text-ayuda text-texto">
+              <span className="truncate tipo-secundario text-texto">
                 {value.name}
               </span>
             ) : null}
@@ -167,11 +166,11 @@ export function SalaryReceiptField({
         </div>
       )}
       {status.kind === "failed" ? (
-        <p role="alert" className="text-nota text-texto">
+        <p role="alert" className={fieldMessageClass}>
           {status.message}
         </p>
       ) : (
-        <p id={hintId} className="text-ayuda text-texto">
+        <p id={hintId} className="tipo-secundario text-texto">
           {value === null
             ? `Sin comprobante no se puede ${action} el pago. JPG, PNG o WebP, hasta 10 MB.`
             : value.kind === "attached"

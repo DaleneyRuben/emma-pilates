@@ -9,6 +9,7 @@ import {
 } from "../../components/page/query-failure";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
+import { InlineError } from "../../components/ui/inline-error";
 import { StatusPill } from "../../components/ui/status-pill";
 import { cn } from "../../lib/cn";
 import { backOfficeProblem } from "../back-office-problems";
@@ -31,15 +32,13 @@ function IssueRow({
   return (
     <li className="flex flex-col gap-3 border-t border-borde-fuerte px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="text-cuerpo font-medium text-texto">
-          {issueTitle(issue)}
-        </p>
-        <p className="text-cuerpo text-texto">{issue.description}</p>
-        <p className="text-nota text-texto tabular">
+        <p className="tipo-titulo-fila text-texto">{issueTitle(issue)}</p>
+        <p className="tipo-cuerpo text-texto">{issue.description}</p>
+        <p className="tipo-secundario text-texto tabular">
           {`Reportó ${issue.reportedByName} · ${formatDateTime(issue.reportedAt)}`}
         </p>
         {issue.resolvedAt === null ? null : (
-          <p className="text-nota text-texto tabular">
+          <p className="tipo-secundario text-texto tabular">
             {`${issue.writtenOff ? "Dada de baja" : "Resuelta"} por ${issue.resolvedByName ?? ""} · ${formatDateTime(issue.resolvedAt)}`}
           </p>
         )}
@@ -132,10 +131,10 @@ export function EquipmentIssuesCard({
       <div
         className={cn(
           "flex flex-wrap items-center justify-between gap-3 px-5 py-3.5",
-          urgent ? "bg-destacado text-blanco" : "border-b border-borde",
+          urgent ? "bg-destacado text-sobre-primario" : "border-b border-borde",
         )}
       >
-        <h2 id={titleId} className="font-serif text-[26px] leading-tight">
+        <h2 id={titleId} className="tipo-titulo-seccion">
           {status === "open"
             ? `Fallas abiertas · ${issues.data?.length ?? 0}`
             : "Fallas resueltas"}
@@ -154,9 +153,9 @@ export function EquipmentIssuesCard({
         />
       </div>
       {failure === null ? null : (
-        <p role="alert" className="px-4 pt-3 text-nota text-texto">
-          {failure}
-        </p>
+        <div className="px-4 pt-3">
+          <InlineError>{failure}</InlineError>
+        </div>
       )}
       {issues.isPending ? (
         <div className="px-4 py-3">
@@ -171,7 +170,7 @@ export function EquipmentIssuesCard({
           />
         </div>
       ) : issues.data.length === 0 ? (
-        <p className="px-4 py-4 text-nota text-texto">
+        <p className="px-4 py-4 tipo-compacto text-texto">
           {status === "open"
             ? "No hay fallas abiertas."
             : "Todavía no hay fallas resueltas."}

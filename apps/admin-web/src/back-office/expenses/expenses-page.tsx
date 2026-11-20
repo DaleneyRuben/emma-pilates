@@ -64,7 +64,7 @@ const expenseColumns = (open: (row: AdminExpenseDto) => void) => [
             </span>
             <StatusPill tone="neutral">Eliminado</StatusPill>
           </span>
-          <span className="text-nota text-texto">
+          <span className="tipo-secundario text-texto">
             {voidedLine(row.original)}
           </span>
         </span>
@@ -191,8 +191,10 @@ function BranchExpenses({
             />
           </div>
           {search.borrados === true ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <h2 className="font-serif text-titulo-2 text-texto">
+            // Follow-up 285: its link is small text, so the heading row is a
+            // white card, never loose on the page 100 (rule 3).
+            <div className="flex flex-wrap items-center gap-3 rounded-tarjeta bg-superficie px-5 py-3.5 shadow-tarjeta">
+              <h2 className="tipo-titulo-bloque text-texto">
                 Gastos borrados de {formatMonth(month)}
               </h2>
               <Button variant="link" onClick={() => showEliminated(false)}>

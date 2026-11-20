@@ -9,6 +9,8 @@ import {
   QueryFailure,
 } from "../../components/page/query-failure";
 import { Button } from "../../components/ui/button";
+import { EmptyState } from "../../components/ui/empty-state";
+import { InlineError } from "../../components/ui/inline-error";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { backOfficeProblem } from "../back-office-problems";
 import { CategoryAdder } from "./category-adder";
@@ -26,10 +28,10 @@ function CategoryRow({
 }) {
   return (
     <li className="flex min-h-[48px] items-center justify-between gap-3 px-4 py-1.5">
-      <span className="text-cuerpo text-texto">{category.name}</span>
+      <span className="tipo-cuerpo text-texto">{category.name}</span>
       <span className="flex items-center gap-2">
         {category.inUse ? (
-          <span className="text-ayuda text-texto">En uso</span>
+          <span className="tipo-secundario text-texto">En uso</span>
         ) : null}
         <Button
           variant="ghost"
@@ -42,7 +44,7 @@ function CategoryRow({
           }
           disabled={category.inUse}
           onClick={onDelete}
-          className="text-texto hover:text-texto"
+          className="text-texto"
         >
           <Trash2 size={16} strokeWidth={1.6} aria-hidden="true" />
         </Button>
@@ -82,15 +84,11 @@ export function ExpenseCategoriesEditor() {
 
   return (
     <div className="flex flex-1 flex-col gap-5 px-7 py-4">
-      <p className="text-cuerpo text-texto">
+      <p className="tipo-cuerpo text-texto">
         Todo el estudio · agrupan los gastos de cada sucursal en el reporte.
       </p>
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
-      {failure === null ? null : (
-        <p role="alert" className="text-nota text-texto">
-          {failure}
-        </p>
-      )}
+      {failure === null ? null : <InlineError>{failure}</InlineError>}
       {query.isPending ? (
         <LoadingNotice>Cargando categorías…</LoadingNotice>
       ) : query.isError ? (
@@ -102,9 +100,9 @@ export function ExpenseCategoriesEditor() {
       ) : (
         <section className="flex w-full flex-col overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta">
           {query.data.length === 0 ? (
-            <p className="px-4 py-6 text-center text-nota text-texto">
+            <EmptyState bare>
               Todavía no hay categorías. Agrega la primera abajo.
-            </p>
+            </EmptyState>
           ) : (
             <ul
               aria-label="Categorías de gasto"

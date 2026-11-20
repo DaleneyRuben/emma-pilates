@@ -20,6 +20,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { backOfficeProblem } from "../back-office-problems";
@@ -164,13 +165,11 @@ export function SupplyPanelForm({
             />
           ) : (
             <div className="flex flex-col gap-1.5">
-              <p className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-                Cantidad en stock
-              </p>
-              <p className="rounded-control border border-borde bg-superficie px-3 py-2.5 text-cuerpo text-texto tabular">
+              <p className="tipo-compacto-600 text-texto">Cantidad en stock</p>
+              <p className="rounded-control border border-borde bg-superficie-hundida px-3 py-2.5 tipo-cuerpo text-texto tabular">
                 {unitsLabel(supply.quantityOnHand)}
               </p>
-              <p className="text-ayuda text-texto">
+              <p className="tipo-secundario text-texto">
                 Cambia solo con «Registrar retiro» y «Registrar reposición».
               </p>
             </div>
@@ -193,11 +192,7 @@ export function SupplyPanelForm({
               </FormItem>
             )}
           />
-          {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
-              {failure}
-            </p>
-          )}
+          {failure === null ? null : <InlineError>{failure}</InlineError>}
         </SidePanelBody>
         <SidePanelFooter>
           <Button type="submit" size="lg" busy={change.isPending}>
@@ -206,7 +201,7 @@ export function SupplyPanelForm({
           {supply === undefined ? null : (
             <Button
               variant="link"
-              className="self-center text-texto hover:text-texto"
+              className="self-center"
               onClick={() => setConfirming(true)}
             >
               Archivar insumo

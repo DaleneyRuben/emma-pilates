@@ -6,6 +6,7 @@ import { BodyScrollLock } from "../../../components/ui/body-scroll-lock";
 import { buttonVariants } from "../../../components/ui/button";
 import { closeButtonClass } from "../../../components/ui/sheet";
 import { StatusPill } from "../../../components/ui/status-pill";
+import { TextLink } from "../../../components/ui/text-link";
 import { cn } from "../../../lib/cn";
 
 export type PayoutQrView =
@@ -26,8 +27,9 @@ const fileName = (name: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")}.jpg`;
 
-const actionClass =
-  "inline-flex h-[44px] items-center gap-1.5 text-celda font-medium text-texto hover:text-primario-presionado";
+// Follow-up 285: Ampliar and Guardar QR are links (`enlace`); hover
+// thickens the underline and never changes the colour (rule 6).
+const actionClass = "inline-flex h-[44px] items-center gap-1.5";
 
 function Notice({
   tone,
@@ -42,7 +44,7 @@ function Notice({
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-marco border border-dashed p-5 text-celda",
+        "flex flex-col gap-2 rounded-marco border border-dashed p-5 tipo-compacto text-texto",
         tone === "error"
           ? "border-borde-fuerte bg-aviso"
           : "border-borde-fuerte bg-superficie",
@@ -52,11 +54,9 @@ function Notice({
         size={28}
         strokeWidth={1.4}
         aria-hidden="true"
-        className={tone === "error" ? "text-texto" : "text-primario"}
+        className="text-texto"
       />
-      <span className={cn("font-semibold", tone === "error" && "text-texto")}>
-        {title}
-      </span>
+      <span className="tipo-titulo-fila">{title}</span>
       <span>{children}</span>
     </div>
   );
@@ -93,10 +93,12 @@ export function PayoutQrCard({
 
   const src = `${qr.imageUrl}?variant=readable`;
   const save = (
-    <a href={src} download={fileName(staffName)} className={actionClass}>
-      <Download size={16} strokeWidth={1.3} aria-hidden="true" />
-      Guardar QR
-    </a>
+    <TextLink asChild className={actionClass}>
+      <a href={src} download={fileName(staffName)}>
+        <Download size={16} strokeWidth={1.3} aria-hidden="true" />
+        Guardar QR
+      </a>
+    </TextLink>
   );
 
   return (
@@ -109,17 +111,13 @@ export function PayoutQrCard({
         <img src={src} alt={label} className="size-[190px] object-contain" />
       </button>
       <div className="flex justify-center gap-6">
-        <button
-          type="button"
-          onClick={() => setEnlarged(true)}
-          className={actionClass}
-        >
+        <TextLink onClick={() => setEnlarged(true)} className={actionClass}>
           <Maximize2 size={16} strokeWidth={1.3} aria-hidden="true" />
           Ampliar
-        </button>
+        </TextLink>
         {save}
       </div>
-      <span className="flex flex-col items-center text-center text-nota text-texto">
+      <span className="flex flex-col items-center text-center tipo-secundario text-texto">
         <span>{label}</span>
         <span>{`Vale hasta el ${formatListDate(qr.validUntil)}`}</span>
       </span>
@@ -134,7 +132,7 @@ export function PayoutQrCard({
           >
             <BodyScrollLock />
             <div className="flex w-full items-center gap-3">
-              <Dialog.Title className="flex-1 font-serif text-titulo-panel">
+              <Dialog.Title className="flex-1 tipo-titulo-seccion text-texto">
                 {label}
               </Dialog.Title>
               <Dialog.Close aria-label="Cerrar" className={closeButtonClass}>
@@ -146,7 +144,7 @@ export function PayoutQrCard({
               alt=""
               className="size-[min(520px,100%)] object-contain"
             />
-            <span className="text-nota text-texto">
+            <span className="tipo-compacto text-texto">
               {`Vale hasta el ${formatListDate(qr.validUntil)}`}
             </span>
             <a

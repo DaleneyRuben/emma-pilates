@@ -33,14 +33,12 @@ function MissingNotice({ count }: { count: number }) {
   return (
     <section
       role="status"
-      className="flex flex-col gap-0.5 rounded-control border border-borde-fuerte bg-aviso px-3 py-2.5"
+      className="flex flex-col gap-0.5 rounded-tarjeta bg-destacado px-5 py-4 text-sobre-primario shadow-destacado"
     >
-      <p className="text-cuerpo font-medium text-texto">
+      <p className="tipo-destacado">
         {`${plural(count, "día", "días")} con ventas en efectivo sin cierre`}
       </p>
-      <p className="text-nota text-texto">
-        Revisa con la asistente qué pasó esos días.
-      </p>
+      <p className="tipo-cuerpo">Revisa con la asistente qué pasó esos días.</p>
     </section>
   );
 }
@@ -48,12 +46,8 @@ function MissingNotice({ count }: { count: number }) {
 function EmptyMonth() {
   return (
     <span className="flex flex-col items-center gap-1">
-      <span className="text-texto">
-        No hubo ventas en efectivo ni cierres en este mes.
-      </span>
-      <span className="text-nota text-texto">
-        Prueba con otro mes o con otra sucursal.
-      </span>
+      <span>No hubo ventas en efectivo ni cierres en este mes.</span>
+      <span>Prueba con otro mes o con otra sucursal.</span>
     </span>
   );
 }
@@ -100,7 +94,9 @@ function BranchCashCloses({
             emptyMessage={<EmptyMonth />}
           />
           {query.data.days.length === 0 ? null : (
-            <p className="text-nota text-texto tabular">
+            // Follow-up 285: the month summary is small text, so it sits in a
+            // white card, never loose on the page 100 (rule 3).
+            <p className="rounded-tarjeta bg-superficie px-5 py-3 tipo-secundario text-texto tabular shadow-tarjeta">
               {summary(query.data)}
             </p>
           )}

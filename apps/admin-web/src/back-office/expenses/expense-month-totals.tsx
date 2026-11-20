@@ -35,14 +35,14 @@ export function ExpenseMonthTotals({
     expenseReportQueryOptions(monthRange(month), branchId),
   );
 
+  // Rosa Emma (RW-gastos), follow-up 285: the month's total is the 600
+  // block beside the table, white on Rosa profundo.
   return (
     <section
       aria-label={`Total de ${formatMonth(month)}`}
-      className="flex flex-col gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3.5 text-rosa-600"
+      className="flex flex-col gap-3 rounded-tarjeta bg-destacado px-4 py-3.5 text-sobre-primario shadow-destacado"
     >
-      <h2 className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] uppercase">
-        {monthName(month)}
-      </h2>
+      <h2 className="tipo-etiqueta">{monthName(month)}</h2>
       {report.isPending ? (
         <LoadingNotice>Sumando el mes…</LoadingNotice>
       ) : report.isError ? (
@@ -53,20 +53,20 @@ export function ExpenseMonthTotals({
         />
       ) : (
         <>
-          <p className="font-serif text-cifra-grande leading-tight whitespace-nowrap tabular">
+          <p className="tipo-cifra-grande whitespace-nowrap">
             {formatBolivianos(report.data.expensesCentavos)}
           </p>
           {report.data.byCategory.length === 0 ? (
-            <p className="text-nota">Sin gastos este mes.</p>
+            <p className="tipo-compacto">Sin gastos este mes.</p>
           ) : (
             <ul className="flex flex-col divide-y divide-rosa-200 rounded-control border border-rosa-200">
               {report.data.byCategory.map((line) => (
                 <li
                   key={line.expenseCategoryId}
-                  className="flex items-center justify-between gap-3 px-3 py-2 text-nota"
+                  className="flex items-center justify-between gap-3 px-3 py-2 tipo-compacto"
                 >
                   <span>{line.expenseCategoryName}</span>
-                  <span className="font-semibold whitespace-nowrap tabular">
+                  <span className="whitespace-nowrap tabular">
                     {formatBolivianos(line.totalCentavos)}
                   </span>
                 </li>
@@ -77,7 +77,7 @@ export function ExpenseMonthTotals({
       )}
       <Button
         variant="link"
-        className="self-start underline"
+        className="self-start text-sobre-primario"
         onClick={() => onShowEliminated(!showingEliminated)}
       >
         {showingEliminated ? "Volver a los gastos" : "Ver gastos borrados"}
