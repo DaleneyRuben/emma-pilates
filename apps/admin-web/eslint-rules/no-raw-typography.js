@@ -57,7 +57,7 @@ function isRaw(token) {
     /^font-/.test(utility) ||
     /^(leading|tracking)-/.test(utility) ||
     /^(uppercase|lowercase|capitalize)$/.test(utility) ||
-    /^(underline|overline|line-through)$/.test(utility) ||
+    /^(underline|overline)$/.test(utility) ||
     /^(underline-offset|decoration)-/.test(utility)
   );
 }
