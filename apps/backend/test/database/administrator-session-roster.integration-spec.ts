@@ -170,13 +170,36 @@ describe('the Administrator’s Session roster on PostgreSQL', () => {
       asClient(second),
     );
 
+    const lost = await createClientWithSubscription(prisma);
+    await prisma.founderMembership.create({
+      data: {
+        clientId: lost.clientId,
+        number: 8,
+        since: clock,
+        status: 'LOST',
+        lostAt: clock,
+      },
+    });
+    const cata = await commands.create(
+      { sessionId: fixture.sessionId },
+      asClient(lost),
+    );
+    const afterBoth = () => session.startsAt;
+
     await expect(
-      findAdministratorSessionRoster(prisma)(fixture.sessionId),
+      findAdministratorSessionRoster(prisma, afterBoth)(fixture.sessionId),
     ).resolves.toMatchObject({
       bookings: [
         { bookingId: ana.id, classNumber: 2, founder: false },
         { bookingId: bea.id, classNumber: 1, founder: true },
+        { bookingId: cata.id, classNumber: 1, founder: false },
       ],
+    });
+    // Opened before the earlier class is held, it does not count yet.
+    await expect(
+      findAdministratorSessionRoster(prisma, () => clock)(fixture.sessionId),
+    ).resolves.toMatchObject({
+      bookings: [{ bookingId: ana.id, classNumber: 1 }, {}, {}],
     });
   });
 
