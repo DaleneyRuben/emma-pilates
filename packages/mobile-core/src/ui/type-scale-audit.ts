@@ -1,6 +1,6 @@
 import { StyleSheet, type TextStyle } from "react-native";
 
-import { rosa } from "./tokens";
+import { brand, rosa } from "./tokens";
 import {
   largeTextVariants,
   maxTextScale,
@@ -22,6 +22,17 @@ type Rendered = RenderedNode | RenderedNode[] | null;
 /** Rule 3: only titles, figures and destacado stand on 100, 200 or 500. */
 const colouredGrounds = new Set<string>([rosa[100], rosa[200], rosa[300], rosa[400], rosa[500]]);
 const tones = new Set<string>(Object.values(textTones));
+const initialsVariants = new Set<TextVariant>(["pastilla", "destacado"]);
+/** White text belongs on 600 and 500; ink never sits on them (contrast). */
+const darkGrounds = new Set<string>([rosa[500], rosa[600]]);
+const lightGrounds = new Set<string>([
+  rosa[50],
+  rosa[100],
+  rosa[200],
+  brand.crema,
+  brand.white,
+  "#FFFFFF",
+]);
 const fieldFaces = new Set<string>([typeFaces.regular, typeFaces.italic]);
 
 function textOf(node: RenderedNode): string {
@@ -73,7 +84,19 @@ function auditText(node: RenderedNode, ground: string | undefined, opacity: numb
   const problems: string[] = [];
   if (!tones.has(String(style.color))) problems.push(`${label} has colour ${String(style.color)}`);
   if (!scaleCap(node)) problems.push(`${label} grows past 1.3 times with the phone's text size`);
+  // Only initials inside a fixed disc may stay put (rule 9).
+  if (node.props.allowFontScaling === false && !initialsVariants.has(variant)) {
+    problems.push(`${label} does not grow with the phone's text size`);
+  }
   if (opacity > 0 && opacity < 1) problems.push(`${label} is transparent (${opacity})`);
+  if (ground !== undefined) {
+    if (style.color === textTones.onDark && lightGrounds.has(ground)) {
+      problems.push(`${label} is white on ${ground}`);
+    }
+    if (style.color === textTones.ink && darkGrounds.has(ground)) {
+      problems.push(`${label} is ink on ${ground}`);
+    }
+  }
   if (ground !== undefined && colouredGrounds.has(ground) && !largeTextVariants.includes(variant)) {
     problems.push(`${label} is small text (${variant}) on ${ground}`);
   }
@@ -93,9 +116,14 @@ function auditField(node: RenderedNode): string[] {
     tones.has(String(style.color)) &&
     tones.has(String(node.props.placeholderTextColor)) &&
     scaleCap(node);
-  return onScale
-    ? []
-    : [`${label} is off the scale (${style.fontFamily ?? "–"} ${style.fontSize ?? "–"})`];
+  if (!onScale) {
+    return [`${label} is off the scale (${style.fontFamily ?? "–"} ${style.fontSize ?? "–"})`];
+  }
+  // Rule 7: italic is for the example text only.
+  const typed = typeof node.props.value === "string" && node.props.value.length > 0;
+  return typed && style.fontFamily === typeFaces.italic
+    ? [`${label} is italic with text in it`]
+    : [];
 }
 
 function walk(node: RenderedNode | string, ground: string | undefined, opacity: number): string[] {

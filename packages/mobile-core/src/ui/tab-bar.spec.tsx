@@ -9,7 +9,9 @@ describe("TabBarButton", () => {
     const onPress = jest.fn();
     const screen = await render(
       <TabBarButton aria-selected onPress={onPress} testID="tab-home">
-        <Text variant="pastilla">Inicio</Text>
+        <Text tone="onDark" variant="pastilla">
+          Inicio
+        </Text>
       </TabBarButton>,
     );
 

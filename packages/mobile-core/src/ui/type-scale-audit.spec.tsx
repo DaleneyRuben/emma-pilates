@@ -8,8 +8,9 @@ import { offScaleTexts } from "./type-scale-audit";
 async function audit(element: React.ReactElement) {
   const screen = await render(element);
   const rendered = screen.toJSON();
-  // The off-scale samples must not reach the setup's own audit.
-  await screen.unmount();
+  // The off-scale samples must not reach the setup's own audit, which checks
+  // a tree as it unmounts: swap them for an empty view first.
+  await screen.rerender(<View />);
   return offScaleTexts(rendered);
 }
 
@@ -111,6 +112,59 @@ describe("offScaleTexts", () => {
       "«Tu plan actual vence el 3 de diciembre.» is small text (secundario) on #F9E7DF",
       "«Mi plan» is small text (pastilla) on #B78380",
     ]);
+  });
+
+  it("reports white text off 600 or 500 and ink text on them", async () => {
+    expect(
+      await audit(
+        <>
+          <View style={{ backgroundColor: "#FFFBFB" }}>
+            <Text tone="onDark" variant="titulo-fila">
+              Todas
+            </Text>
+          </View>
+          <View style={{ backgroundColor: "#93615D" }}>
+            <Text variant="boton">Reservar</Text>
+            <Text tone="onDark" variant="pastilla">
+              Hoy
+            </Text>
+          </View>
+          <View style={{ backgroundColor: "#B78380" }}>
+            <Text tone="onDark" variant="cifra-grande">
+              5
+            </Text>
+          </View>
+        </>,
+      ),
+    ).toEqual(["«Todas» is white on #FFFBFB", "«Reservar» is ink on #93615D"]);
+  });
+
+  it("lets only initials stop growing with the phone's text size", async () => {
+    expect(
+      await audit(
+        <>
+          <Text allowFontScaling={false} variant="pastilla">
+            LF
+          </Text>
+          <Text allowFontScaling={false} variant="cuerpo">
+            Tu clase
+          </Text>
+        </>,
+      ),
+    ).toEqual(["«Tu clase» does not grow with the phone's text size"]);
+  });
+
+  it("reports an italic field that already holds text", async () => {
+    expect(
+      await audit(
+        <TextInput
+          {...fieldTextProps("")}
+          accessibilityLabel="Nombre"
+          defaultValue=""
+          value="Lucía"
+        />,
+      ),
+    ).toEqual(["field «Nombre» is italic with text in it"]);
   });
 
   it("checks a field's value and its italic example text", async () => {
