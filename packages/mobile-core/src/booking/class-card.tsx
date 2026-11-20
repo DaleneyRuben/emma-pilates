@@ -18,6 +18,7 @@ export function placesLabel(booked: number, capacity: number): string {
  */
 export function NextClassHero({
   accessibilityLabel,
+  action,
   attendees = [],
   detail,
   eyebrow,
@@ -27,6 +28,8 @@ export function NextClassHero({
   title,
 }: {
   accessibilityLabel?: string;
+  /** A control under the hero's group, such as «Cancelar reserva» (C05). */
+  action?: ReactNode;
   /** Who else is coming, by initials. */
   attendees?: readonly string[];
   detail?: string;
@@ -53,23 +56,29 @@ export function NextClassHero({
   ]
     .filter(Boolean)
     .join(", ");
-  if (onPress === undefined) {
-    return (
+  const group =
+    onPress === undefined ? (
       <View accessibilityLabel={label} accessible style={styles.hero} testID={testID}>
         {content}
       </View>
+    ) : (
+      <Pressable
+        accessibilityLabel={label}
+        accessibilityRole="button"
+        onPress={onPress}
+        style={({ pressed }) => [styles.hero, pressed && styles.pressed]}
+        testID={testID}
+      >
+        {content}
+      </Pressable>
     );
-  }
+  if (action === undefined) return group;
+  // The action stays outside the hero's accessible group, on the same 600.
   return (
-    <Pressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [styles.hero, pressed && styles.pressed]}
-      testID={testID}
-    >
-      {content}
-    </Pressable>
+    <View style={styles.heroWithAction}>
+      {group}
+      <View style={styles.heroAction}>{action}</View>
+    </View>
   );
 }
 
@@ -232,6 +241,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   hero: { ...surfaces.emphasis, gap: spacing.smd, padding: spacing.xlSm },
+  heroAction: {
+    alignItems: "flex-end",
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.xlSm,
+  },
+  heroWithAction: { ...surfaces.emphasis },
   heroDetail: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyMedium,

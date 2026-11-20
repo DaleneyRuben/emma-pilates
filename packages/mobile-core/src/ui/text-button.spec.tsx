@@ -18,21 +18,28 @@ describe("TextButton testID", () => {
   });
 });
 
-// Follow-up 225 §4: a Text button is Rosa enlace Work Sans 600 15 with no
-// underline and a 44 pt tap height; the Error tone is 226's «Cancelar reserva».
-describe("TextButton v2 look", () => {
-  it("draws Rosa enlace Work Sans 600 15 without an underline, 44 pt tall", async () => {
+// Rosa Emma: a Text button is rosa profundo Work Sans 700 15 with a 44 pt tap
+// height, underlined only where the board draws a link; the Error tone is
+// 226's «Cancelar reserva».
+describe("TextButton", () => {
+  it("draws rosa profundo Work Sans 700 15 without an underline, 44 pt tall", async () => {
     const screen = await render(<TextButton label="Ahora no" onPress={jest.fn()} />);
 
     const label = screen.getByText("Ahora no");
     expect(label).toHaveStyle({
       color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
+      fontFamily: "WorkSans_700Bold",
       fontSize: 15,
-      fontWeight: "600",
+      fontWeight: "700",
     });
     expect(StyleSheet.flatten(label.props.style)).not.toHaveProperty("textDecorationLine");
     expect(screen.getByRole("button", { name: "Ahora no" })).toHaveStyle({ minHeight: 44 });
+  });
+
+  it("underlines a link when asked", async () => {
+    const screen = await render(<TextButton label="Volver" onPress={jest.fn()} underline />);
+
+    expect(screen.getByText("Volver")).toHaveStyle({ textDecorationLine: "underline" });
   });
 
   it("draws the Error tone in #93615D", async () => {

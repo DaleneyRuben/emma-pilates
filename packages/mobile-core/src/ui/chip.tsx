@@ -38,6 +38,7 @@ export function Chip({
   onPress,
   role = "button",
   selected,
+  size = "regular",
   testID,
 }: {
   accessibilityLabel?: string;
@@ -45,6 +46,8 @@ export function Chip({
   onPress: () => void;
   role?: "button" | "radio";
   selected: boolean;
+  /** «compact»: 36 high with a 13 pt bold label, as Reservar's type filter. */
+  size?: "compact" | "regular";
   testID?: string;
 }) {
   return (
@@ -54,15 +57,30 @@ export function Chip({
       accessibilityState={role === "radio" ? { checked: selected } : { selected }}
       hitSlop={{ bottom: 3, left: 0, right: 0, top: 3 }}
       onPress={onPress}
-      style={[styles.chip, chipStyles.box, selected && chipStyles.boxSelected]}
+      style={[
+        styles.chip,
+        size === "compact" && styles.compact,
+        chipStyles.box,
+        selected && chipStyles.boxSelected,
+      ]}
       testID={testID}
     >
-      <Text style={[chipStyles.label, selected && chipStyles.labelSelected]}>{label}</Text>
+      <Text
+        style={[
+          chipStyles.label,
+          size === "compact" && styles.compactLabel,
+          selected && chipStyles.labelSelected,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  compact: { minHeight: 36 },
+  compactLabel: { fontFamily: fontFamilies.bodyBold, fontSize: 13, fontWeight: "700" },
   chip: {
     alignItems: "center",
     borderRadius: radii.pill,
