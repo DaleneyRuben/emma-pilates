@@ -1,4 +1,5 @@
 import type { AdminPromotionContactDto } from "@pilates/api-contracts";
+import { ClientCounts } from "./client-counts";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -159,6 +160,7 @@ export function ClientsPage({
   );
   const filter: ReactNode = (
     <div className="flex flex-col gap-3">
+      {query.data === undefined ? null : <ClientCounts page={query.data} />}
       <SearchFilter
         label="Buscar por nombre, correo o teléfono"
         value={search.q ?? ""}
