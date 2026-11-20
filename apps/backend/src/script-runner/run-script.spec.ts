@@ -85,6 +85,37 @@ describe('the Run Script runner', () => {
     ]);
   });
 
+  it('hands the script the Activation Link email services when the job has them', async () => {
+    const { store } = fakeStore();
+    const authenticationEmail = {
+      boss: { send: () => Promise.resolve(null) },
+      digestEmail: () => new Uint8Array(),
+      linkCipher: {
+        encrypt: () => ({ encryptedLinkSecret: '', encryptionKeyId: '' }),
+      },
+    };
+    let seen: unknown;
+
+    await runScript({
+      command: command(),
+      scripts: {
+        demo: {
+          run: (context) => {
+            seen = context.authenticationEmail;
+            return Promise.resolve();
+          },
+        },
+      },
+      store,
+      prisma: {} as PrismaClient,
+      now: () => now,
+      log: () => undefined,
+      authenticationEmail,
+    });
+
+    expect(seen).toBe(authenticationEmail);
+  });
+
   it('records a failure with the error and reports it', async () => {
     const { store, finished } = fakeStore();
 
