@@ -48,6 +48,8 @@ const expenseSchema = z.object({
     zero: "El monto debe ser mayor a cero.",
   }),
   date: pastCivilDateField("Elige la fecha del gasto."),
+  // W11 A: what it was, optional.
+  detail: z.string().trim().max(120, "Escribe hasta 120 caracteres."),
 });
 type ExpenseInput = z.input<typeof expenseSchema>;
 type ExpenseOutput = z.output<typeof expenseSchema>;
@@ -58,10 +60,13 @@ export function ExpensePanelForm({
   branch,
   expense,
   onDone,
+  onSavedOn,
 }: {
   branch: Branch;
   expense: AdminExpenseDto | undefined;
   onDone: (notice?: string) => void;
+  /** The saved Expense's date, so the page can show its month. */
+  onSavedOn?: (incurredOn: string) => void;
 }) {
   const categories = useQuery(expenseCategoriesQueryOptions());
   const change = useExpenseChange(branch.id);
@@ -75,6 +80,7 @@ export function ExpensePanelForm({
       amountCentavos:
         expense === undefined ? "" : bolivianosText(expense.amountCentavos),
       date: expense?.incurredOn ?? "",
+      detail: expense?.detail ?? "",
     },
   });
   const none = categories.isSuccess && categories.data.length === 0;
@@ -86,17 +92,23 @@ export function ExpensePanelForm({
       amountCentavos: values.amountCentavos,
       incurredOn: values.date,
     };
+    const detail = values.detail === "" ? null : values.detail;
     const categoryName =
       categories.data?.find((item) => item.id === input.expenseCategoryId)
         ?.name ?? "";
     try {
       if (expense === undefined) {
-        const record = { branchId: branch.id, ...input };
+        const record = {
+          branchId: branch.id,
+          ...input,
+          ...(detail === null ? {} : { detail }),
+        };
         await change.mutateAsync({
           kind: "record",
           input: record,
           idempotencyKey: keyFor(record),
         });
+        onSavedOn?.(input.incurredOn);
         onDone(
           `Gasto de ${formatBolivianos(input.amountCentavos)} en ${categoryName} registrado en ${branch.name}.`,
         );
@@ -105,7 +117,8 @@ export function ExpensePanelForm({
       if (
         input.expenseCategoryId === expense.expenseCategoryId &&
         input.amountCentavos === expense.amountCentavos &&
-        input.incurredOn === expense.incurredOn
+        input.incurredOn === expense.incurredOn &&
+        detail === (expense.detail ?? null)
       ) {
         onDone();
         return;
@@ -113,8 +126,9 @@ export function ExpensePanelForm({
       await change.mutateAsync({
         kind: "correct",
         expenseId: expense.id,
-        input,
+        input: { ...input, detail },
       });
+      onSavedOn?.(input.incurredOn);
       onDone(`Guardamos la corrección del gasto de ${categoryName}.`);
     } catch (error) {
       const problem = backOfficeProblem(error);
@@ -190,6 +204,22 @@ export function ExpensePanelForm({
               </Button>
             )}
           </div>
+          <FormField
+            control={form.control}
+            name="detail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Detalle (opcional)</FormLabel>
+                <FormControl>
+                  <Input maxLength={120} {...field} />
+                </FormControl>
+                <FormDescription>
+                  <ExampleHint example="Productos de limpieza" />
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="amountCentavos"

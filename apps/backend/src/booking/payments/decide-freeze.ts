@@ -70,6 +70,7 @@ type DecideFreezeDependencies = {
     freezeId: string;
     decidedByAccountId: string;
     decidedAt: Date;
+    refusalReason: string | null;
   }): Promise<void>;
   record(notification: NewNotification): Promise<void>;
   now(): Date;
@@ -81,24 +82,12 @@ const requireOperations = (principal: AuthenticatedPrincipal): void => {
   if (!runsOperations(principal)) throw new FreezeAccessDeniedError();
 };
 
-export type DecideFreezeCommand = {
-  freezeId: string;
-  decision: 'approved' | 'refused';
-  /**
-   * E9: why a refusal was made, told to the Client in her notification only.
-   * The Freeze row has no column for it: persisting it needs a migration
-   * (owner's approval) in a later change.
-   */
-  refusalReason?: string;
-};
-
-const refusalMessage = (refusalReason: string | undefined): string =>
-  refusalReason === undefined
-    ? 'Tu solicitud de congelamiento fue rechazada.'
-    : `Tu solicitud de congelamiento fue rechazada. Motivo: ${refusalReason}`;
-
 export const decideFreeze = async (
-  command: DecideFreezeCommand,
+  command: {
+    freezeId: string;
+    decision: 'approved' | 'refused';
+    refusalReason?: string;
+  },
   dependencies: DecideFreezeDependencies,
 ): Promise<{ state: 'approved' | 'refused' }> => {
   requireOperations(dependencies.principal);
@@ -116,8 +105,9 @@ export const decideFreeze = async (
     decidedByAccountId: dependencies.principal.accountId,
     decidedAt,
   };
+  const refusalReason = command.refusalReason ?? null;
   if (command.decision === 'approved') await dependencies.approve(input);
-  else await dependencies.refuse(input);
+  else await dependencies.refuse({ ...input, refusalReason });
 
   const approved = command.decision === 'approved';
   await dependencies.record({
@@ -128,7 +118,9 @@ export const decideFreeze = async (
     title: approved ? 'Congelamiento aprobado' : 'Congelamiento rechazado',
     message: approved
       ? approvalMessage(freeze)
-      : refusalMessage(command.refusalReason),
+      : refusalReason === null
+        ? 'Tu solicitud de congelamiento fue rechazada.'
+        : `Tu solicitud de congelamiento fue rechazada. Motivo: ${refusalReason}`,
     destination: { type: 'subscription', id: freeze.subscriptionId },
     occurredAt: decidedAt,
   });

@@ -9,8 +9,8 @@ import { signIn } from "./support/session";
 
 // AW03 through the real backend: a one-off Session created next Saturday
 // at Centro, where the fixtures schedule nothing, then moved an hour later
-// from Editar clase.
-test("creates a one-off Session and moves it from Editar clase", async ({
+// from the class panel's Editar tab.
+test("creates a one-off Session and moves it from the Editar tab", async ({
   page,
 }) => {
   const monday = addDays(weekStartOf(boliviaToday()), 7);
@@ -53,10 +53,20 @@ test("creates a one-off Session and moves it from Editar clase", async ({
   await expect(created).toContainText("11:00 – 12:15");
 
   await created.click();
-  const edit = page.getByRole("dialog", { name: "Editar clase" });
-  // A one-off Session belongs to no series: no «Solo esta clase» choice.
-  await expect(edit.getByLabel("Solo esta clase")).toHaveCount(0);
-  await expect(edit.getByText("Reformer Pilates")).toBeVisible();
+  // FIX-091 (W1): the panel is titled by the class and opens on Reservas.
+  const edit = page.getByRole("dialog", {
+    name: / · 11:00 · Reformer Pilates$/,
+  });
+  await expect(edit.getByRole("tab", { name: "Reservas · 0" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  // A one-off Session belongs to no series: no Serie semanal tab.
+  await expect(edit.getByRole("tab", { name: "Serie semanal" })).toHaveCount(0);
+  await edit.getByRole("tab", { name: "Editar" }).click();
+  await expect(
+    edit.getByRole("tabpanel").getByText("Reformer Pilates", { exact: true }),
+  ).toBeVisible();
   await expect(edit.getByLabel("Fecha")).toHaveValue(formatCivilDate(saturday));
   await expect(edit.getByLabel("Duración")).toHaveValue("75");
   await expect(

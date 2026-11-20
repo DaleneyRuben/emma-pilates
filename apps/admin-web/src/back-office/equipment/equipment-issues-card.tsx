@@ -10,6 +10,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { StatusPill } from "../../components/ui/status-pill";
+import { cn } from "../../lib/cn";
 import { backOfficeProblem } from "../back-office-problems";
 import { damagedLabel, issueSubject, issueTitle } from "./equipment-format";
 import {
@@ -28,7 +29,7 @@ function IssueRow({
   onAsk?: (asking: Asking) => void;
 }) {
   return (
-    <li className="flex flex-col gap-3 border-t border-divisor px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
+    <li className="flex flex-col gap-3 border-t border-borde px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="text-cuerpo font-medium text-texto">
           {issueTitle(issue)}
@@ -50,7 +51,6 @@ function IssueRow({
         {onAsk !== undefined && issue.quantity !== null ? (
           <Button
             variant="link"
-            className="text-error hover:text-error-texto"
             onClick={() => onAsk({ kind: "write-off", issue })}
           >
             Dar de baja
@@ -92,7 +92,7 @@ const confirmCopy = ({ kind, issue }: Asking) => {
   };
 };
 
-// AW37's «Fallas abiertas» (FIX-067): a unit's faults and a stock's damage,
+// AW37's «Fallas abiertas» (FIX-067, above the table since FIX-091 W10 A): a unit's faults and a stock's damage,
 // newest first, or the resolved ones.
 export function EquipmentIssuesCard({
   branchId,
@@ -108,6 +108,8 @@ export function EquipmentIssuesCard({
   const issues = useQuery(branchIssuesQueryOptions(branchId, status));
   const change = useEquipmentChange(branchId);
   const copy = asking === null ? null : confirmCopy(asking);
+  // FIX-091 (W10 A): open faults sit above the table in a Rubor block.
+  const urgent = status === "open" && (issues.data?.length ?? 0) > 0;
 
   const confirm = async () => {
     if (asking === null || copy === null) return;
@@ -124,9 +126,17 @@ export function EquipmentIssuesCard({
   return (
     <section
       aria-labelledby={titleId}
-      className="flex flex-col rounded-marco border border-borde bg-lino"
+      className={cn(
+        "flex flex-col rounded-marco border border-borde",
+        urgent ? "bg-rubor" : "bg-lino",
+      )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisor px-4 py-3">
+      <div
+        className={cn(
+          "flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3",
+          urgent ? "border-borde" : "border-divisor",
+        )}
+      >
         <h2 id={titleId} className="font-serif text-[19px] text-texto">
           {status === "open"
             ? `Fallas abiertas · ${issues.data?.length ?? 0}`

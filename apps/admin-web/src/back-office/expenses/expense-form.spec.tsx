@@ -11,6 +11,7 @@ import {
   maintenance,
   repair,
   repairSeptember,
+  expenseReportHandler,
 } from "../../test/expense-fixtures";
 import {
   apiUrl,
@@ -45,7 +46,7 @@ describe("AW14 Expense form on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     tableReads = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), expenseReportHandler());
   });
 
   it("records an Expense at the selected Branch after validating it", async () => {
@@ -203,10 +204,12 @@ describe("AW14 Expense form on a desktop browser", () => {
         "Guardamos la corrección del gasto de Reparación.",
       ),
     ).toBeInTheDocument();
+    // W11 A: an edit always says its detail, null when there is none.
     expect(updated).toEqual({
       expenseCategoryId: repair.id,
       amountCentavos: 50_000,
       incurredOn: "2026-09-15",
+      detail: null,
     });
   });
 
@@ -238,7 +241,7 @@ describe("AW14 Expense form on a desktop browser", () => {
 describe("AW14 Expense form on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), expenseReportHandler()));
 
   it("fills the screen and opens the category adder when none exist yet", async () => {
     server.use(

@@ -298,6 +298,7 @@ export const refuseFreeze = async (
     freezeId: string;
     decidedByAccountId: string;
     decidedAt: Date;
+    refusalReason: string | null;
   },
 ): Promise<void> => {
   const row = await transaction.freeze.findUniqueOrThrow({
@@ -315,6 +316,9 @@ export const refuseFreeze = async (
     metadata: {
       subscriptionId: row.subscriptionId,
       planEndsOn: civilOf(row.subscription.endsOn),
+      ...(input.refusalReason === null
+        ? {}
+        : { refusalReason: input.refusalReason }),
     },
   });
   const claimed = await transaction.freeze.updateMany({
@@ -323,6 +327,7 @@ export const refuseFreeze = async (
       state: FreezeState.REFUSED,
       decidedByAccountId: input.decidedByAccountId,
       decidedAt: input.decidedAt,
+      refusalReason: input.refusalReason,
       auditRecordId,
     },
   });

@@ -7,6 +7,7 @@ import {
   maintenanceSeptember,
   repairSeptember,
   voidedRepair,
+  expenseReportHandler,
 } from "../../test/expense-fixtures";
 import {
   apiUrl,
@@ -33,7 +34,7 @@ describe("Gastos: editing and eliminating an Expense", () => {
   beforeEach(() => {
     items = [repairSeptember, maintenanceSeptember];
     voidBody = undefined;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), expenseReportHandler());
     server.use(
       categoriesHandler(),
       http.get(apiUrl(expensesPath), () => jsonResponse(expensePage(items))),
@@ -186,7 +187,7 @@ describe("Gastos on a narrow browser: the row actions", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), expenseReportHandler());
     server.use(
       categoriesHandler(),
       http.get(apiUrl(expensesPath), () =>

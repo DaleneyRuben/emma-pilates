@@ -43,17 +43,22 @@ export class FreezeRequestDto {
   state!: 'requested';
 }
 
-// E9 (staff redesign): a refusal may say why, and the Client reads it in her
-// «Congelamiento rechazado» notification. The Freeze row has no column for it,
-// so it is NOT persisted: storing it needs a migration (owner's approval) later.
+// W16 B/C: an optional reason travels with a refusal only; blank is none.
 const decideFreezeSchema = z
   .strictObject({
     decision: z.enum(['approved', 'refused']),
-    refusalReason: z.string().trim().min(1).max(300).optional(),
+    refusalReason: z.string().trim().max(300).optional(),
   })
   .refine(
-    (value) =>
-      value.refusalReason === undefined || value.decision === 'refused',
+    (body) =>
+      body.decision === 'refused' ||
+      body.refusalReason === undefined ||
+      body.refusalReason === '',
+  )
+  .transform(({ refusalReason, ...body }) =>
+    refusalReason === undefined || refusalReason === ''
+      ? body
+      : { ...body, refusalReason },
   );
 
 export class DecideFreezeDto {
@@ -61,10 +66,9 @@ export class DecideFreezeDto {
   decision!: 'approved' | 'refused';
 
   @ApiPropertyOptional({
-    minLength: 1,
     maxLength: 300,
     description:
-      'Only with a refusal: why, sent to the Client in her notification. Not stored on the Freeze (no column yet).',
+      'Why it is refused, sent to the Client; only with a refusal (W16)',
   })
   refusalReason?: string;
 }
@@ -100,6 +104,13 @@ export class FreezeReviewDto {
 
   @ApiProperty()
   planName!: string;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Classes her Plan has left, as Revisar congelamiento says (FIX-091)',
+  })
+  remainingClassAllowance?: number;
 
   @ApiProperty({ format: 'date' })
   startsOn!: string;
@@ -138,6 +149,13 @@ export class FreezeReviewDto {
       'The Staff Member who approved or refused it, or the Client who withdrew it',
   })
   decidedByName?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Why it was refused, as the Client was told (W16)',
+  })
+  refusalReason?: string | null;
 }
 
 export class FreezeSummaryDto {

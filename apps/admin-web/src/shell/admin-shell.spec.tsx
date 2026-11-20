@@ -154,11 +154,8 @@ describe("admin shell", () => {
       expect(within(topBar).getByText("Emma")).toBeInTheDocument();
       expect(within(topBar).getByText("Pilates Studio")).toBeInTheDocument();
       expect(
-        within(topBar).getByRole("combobox", { name: "Buscar en todo" }),
-      ).toHaveAttribute(
-        "placeholder",
-        "Buscar una clienta, una clase, un pago o una página",
-      );
+        within(topBar).getByRole("combobox", { name: "Buscar una clienta" }),
+      ).toHaveAttribute("placeholder", "Buscar una clienta");
       expect(
         await within(topBar).findByRole("button", { name: "Sucursal Centro" }),
       ).toBeInTheDocument();

@@ -31,9 +31,10 @@ const nowrapFigures = async (page: Page) => {
   await expect(month).toBeVisible();
   await expect(month).toHaveCSS("white-space", "nowrap");
   await expect(amount).toHaveCSS("white-space", "nowrap");
-  for (const name of ["Ingresos", "Gastos", "Neto"]) {
+  // FIX-091 (W5 B): the three figures are Entró, Salió and Quedó.
+  for (const name of ["Entró", "Salió", "Quedó"]) {
     await expect(
-      page.getByRole("region", { name }).getByRole("heading", { name }),
+      page.getByRole("region", { name }).getByText(/Bs /).first(),
     ).toHaveCSS("white-space", "nowrap");
   }
 };

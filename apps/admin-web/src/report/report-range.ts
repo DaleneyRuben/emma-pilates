@@ -10,9 +10,9 @@ export type ReportMonth = {
   netCentavos: number;
 };
 
-/** AW16 opens on the last six Bolivia months, today included. */
+/** FIX-091 (W5 B): AW16 opens on «Este mes», the Bolivia month so far. */
 export const defaultReportRange = (today: string) => ({
-  from: `${addMonths(today.slice(0, 7), -5)}-01`,
+  from: `${today.slice(0, 7)}-01`,
   to: today,
 });
 

@@ -1,33 +1,36 @@
+import type { FreezeReviewDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { CatalogPage } from "../../catalog/catalog-page";
-import { ListFilter } from "../../components/table/list-filter";
+import { FilterChips } from "../../components/ui/filter-chips";
 import { decidedFreezeColumns, pendingFreezeColumns } from "./freeze-columns";
 import {
   decidedFreezesQueryOptions,
   requestedFreezesQueryOptions,
 } from "./freeze-queries";
+import { FreezeReviewPanel } from "./freeze-review-panel";
 
 type FreezeView = "pending" | "decided";
 
-const viewOptions: readonly { value: FreezeView; label: string }[] = [
-  { value: "pending", label: "Por revisar" },
-  { value: "decided", label: "Decididas" },
-];
-
-function ViewFilter({
+// FIX-091 (W16 A): the two views as chips, the pending one with its count.
+function ViewChips({
   view,
+  pending,
   onChange,
 }: {
   view: FreezeView;
+  pending: number | undefined;
   onChange: (view: FreezeView) => void;
 }) {
   return (
-    <ListFilter
-      label="Vista"
+    <FilterChips<FreezeView>
+      label="Congelamientos"
       value={view}
-      options={viewOptions}
-      onChange={onChange}
+      options={[
+        { value: "pending", label: "Por decidir", count: pending },
+        { value: "decided", label: "Decididos" },
+      ]}
+      onChange={(next) => onChange(next ?? "pending")}
     />
   );
 }
@@ -40,20 +43,12 @@ const listProps = {
   onPageChange: () => undefined,
 };
 
-function PendingFreezes({
-  filter,
-  notice,
-  onNotice,
-}: {
-  filter: ReactNode;
-  notice: string | null;
-  onNotice: (message: string) => void;
-}) {
+function PendingFreezes({ filter }: { filter: ReactNode }) {
   const query = useQuery(requestedFreezesQueryOptions());
   return (
-    <CatalogPage
+    <CatalogPage<FreezeReviewDto>
       {...listProps}
-      subtitle={notice ?? "Solicitudes pendientes de una clienta."}
+      subtitle="Solicitudes pendientes de una clienta."
       emptyMessage={
         <span className="text-texto-secundario">
           No hay solicitudes pendientes.
@@ -61,23 +56,34 @@ function PendingFreezes({
       }
       filter={filter}
       query={query}
-      columns={() => pendingFreezeColumns(onNotice)}
+      columns={(open) => pendingFreezeColumns(open)}
+      panelTitles={{
+        create: "Congelamiento",
+        edit: (freeze) => `${freeze.clientName} · congelamiento`,
+      }}
+      renderForm={(freeze, done) =>
+        freeze === undefined ? null : (
+          <FreezeReviewPanel freeze={freeze} onDone={done} />
+        )
+      }
+      footer={
+        query.data === undefined || query.data.totalItems === 0 ? null : (
+          <p className="text-nota text-texto-tenue">
+            Aprobar o rechazar se hace dentro de cada solicitud; rechazar pide
+            confirmación.
+          </p>
+        )
+      }
     />
   );
 }
 
-function DecidedFreezes({
-  filter,
-  notice,
-}: {
-  filter: ReactNode;
-  notice: string | null;
-}) {
+function DecidedFreezes({ filter }: { filter: ReactNode }) {
   const query = useQuery(decidedFreezesQueryOptions());
   return (
     <CatalogPage
       {...listProps}
-      subtitle={notice ?? "Solicitudes aprobadas, rechazadas o retiradas."}
+      subtitle="Solicitudes aprobadas, rechazadas o retiradas."
       emptyMessage={
         <span className="text-texto-secundario">
           Todavía no hay congelamientos decididos.
@@ -91,15 +97,22 @@ function DecidedFreezes({
 }
 
 // Findings 52/53: the pending requests show what approving does to the plan
-// end; «Decididas» keeps the approved and refused ones as history.
+// end; «Decididos» keeps the approved and refused ones as history. FIX-091
+// (W16 A + B): each pending one is decided in its review panel.
 export function FreezesPage() {
   const [view, setView] = useState<FreezeView>("pending");
-  const [notice, setNotice] = useState<string | null>(null);
-  const filter = <ViewFilter view={view} onChange={setView} />;
+  const pending = useQuery(requestedFreezesQueryOptions());
+  const filter = (
+    <ViewChips
+      view={view}
+      pending={pending.data?.totalItems}
+      onChange={setView}
+    />
+  );
 
   return view === "pending" ? (
-    <PendingFreezes filter={filter} notice={notice} onNotice={setNotice} />
+    <PendingFreezes filter={filter} />
   ) : (
-    <DecidedFreezes filter={filter} notice={notice} />
+    <DecidedFreezes filter={filter} />
   );
 }

@@ -9,6 +9,7 @@ import {
 } from "../test/msw";
 import { findBrandedLoading } from "../test/branded-loading";
 import { renderAdmin } from "../test/render-admin";
+import { classTypesPath } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
 import {
   studioSettings,
@@ -48,16 +49,26 @@ describe("AW36 Reglas del estudio", () => {
     server.use(...signedInHandlers());
   });
 
-  it("opens from the global search, as an Ajustes tab", async () => {
+  // FIX-091 (W9 B): the global search finds Clientas only; the rail opens it.
+  it("opens from the rail, as an Ajustes tab", async () => {
     server.use(...settingsHandlers());
+    // The rail opens Ajustes on its first tab, Tipos de clase.
+    server.use(
+      http.get(apiUrl(classTypesPath), () =>
+        jsonResponse({ items: [], page: 1, pageSize: 20, totalItems: 0 }),
+      ),
+    );
     const { user } = renderAdmin("/");
 
-    await user.type(
-      await screen.findByRole("combobox", { name: "Buscar en todo" }),
-      "reglas",
+    await user.click(
+      within(
+        await screen.findByRole("navigation", { name: "Secciones" }),
+      ).getByRole("link", { name: "Ajustes" }),
     );
     await user.click(
-      screen.getByRole("option", { name: "Ajustes · Reglas del estudio" }),
+      within(
+        await screen.findByRole("navigation", { name: "Páginas de Ajustes" }),
+      ).getByRole("link", { name: "Reglas del estudio" }),
     );
 
     await heading();

@@ -25,4 +25,14 @@ export interface AdminFeedbackPageDto {
    * @minimum 0
    */
   newCount: number;
+  /**
+   * Every Feedback «Revisado»
+   * @minimum 0
+   */
+  reviewedCount: number;
+  /**
+   * Every Feedback «Resuelto»
+   * @minimum 0
+   */
+  resolvedCount: number;
 }

@@ -30,4 +30,25 @@ describe("dayItems with a cancelled class", () => {
       live.id,
     ]);
   });
+
+  // FIX-091 (W2, Horario B): a cancelled class is a thin line, so the hour
+  // it held can take a new class.
+  it("leaves the hour under a cancelled class free for a new one", () => {
+    const day = dayOfNextWeek(0);
+    const cancelled = {
+      ...mondayReformer,
+      endsAt: boliviaInstant(day, "08:00"),
+      cancellation: {
+        cause: "studio" as const,
+        cancelledAt: boliviaInstant(day, "06:00"),
+        bookedCount: 0,
+      },
+    };
+
+    const slots = dayItems(day, [7], [cancelled]).filter(
+      (item) => item.kind === "slot",
+    );
+
+    expect(slots.map((item) => item.hour)).toEqual([7]);
+  });
 });

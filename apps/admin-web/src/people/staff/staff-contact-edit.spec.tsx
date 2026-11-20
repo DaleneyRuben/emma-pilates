@@ -68,7 +68,9 @@ describe("AW24 Editar miembro contact", () => {
     await user.clear(name);
     await user.type(name, "Camila Rojas Vaca");
     await user.type(phone, "70000001");
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -98,7 +100,9 @@ describe("AW24 Editar miembro contact", () => {
     expect(
       within(panel).getByRole("radio", { name: "Instructor" }),
     ).toBeChecked();
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -118,7 +122,9 @@ describe("AW24 Editar miembro contact", () => {
     const { panel, user } = await openMember("Emma Vargas");
 
     await user.clear(within(panel).getByLabelText("Celular"));
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     expect(
       await within(panel).findByText(
@@ -134,7 +140,9 @@ describe("AW24 Editar miembro contact", () => {
 
     await user.clear(within(panel).getByLabelText("Nombre"));
     await user.type(within(panel).getByLabelText("Celular"), "12345");
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     expect(await within(panel).findByText("Escribe el nombre.")).toBeVisible();
     expect(
@@ -164,7 +172,9 @@ describe("AW24 Editar miembro contact", () => {
     await user.click(
       within(panel).getByRole("radio", { name: "Administradora" }),
     );
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -191,7 +201,9 @@ describe("AW24 Editar miembro contact", () => {
     await user.click(
       within(panel).getByRole("radio", { name: "Administradora" }),
     );
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -219,7 +231,9 @@ describe("AW24 Editar miembro contact", () => {
     await user.clear(name);
     await user.type(name, "Emma Vargas Paz");
     await user.click(within(panel).getByRole("radio", { name: "Asistente" }));
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     expect(
       await within(panel).findByText(
@@ -242,7 +256,9 @@ describe("AW24 Editar miembro contact", () => {
     const name = within(panel).getByLabelText("Nombre");
     await user.clear(name);
     await user.type(name, "Valentina Soria Paz");
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([

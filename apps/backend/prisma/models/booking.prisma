@@ -115,6 +115,8 @@ model Freeze {
   endsOn             DateTime    @map("ends_on") @db.Date
   reason             String
   state              FreezeState @default(REQUESTED)
+  // W16 B/C (owner 2026-11-19): why it was refused, sent to the Client.
+  refusalReason      String?     @map("refusal_reason")
   decidedByAccountId String?     @map("decided_by_account_id") @db.Uuid
   decidedAt          DateTime?   @map("decided_at") @db.Timestamptz(3)
   auditRecordId      String?     @map("audit_record_id") @db.Uuid

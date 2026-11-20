@@ -9,8 +9,7 @@ import type { DecideFreezeDtoDecision } from "./decideFreezeDtoDecision";
 export interface DecideFreezeDto {
   decision: DecideFreezeDtoDecision;
   /**
-   * Only with a refusal: why, sent to the Client in her notification. Not stored on the Freeze (no column yet).
-   * @minLength 1
+   * Why it is refused, sent to the Client; only with a refusal (W16)
    * @maxLength 300
    */
   refusalReason?: string;

@@ -4,6 +4,7 @@ import { centro, equipetrol } from "../../test/booking-handlers";
 import {
   categoriesHandler,
   expensePage,
+  expenseReportHandler,
   expenseRow,
   expensesPath,
   maintenanceSeptember,
@@ -42,7 +43,7 @@ describe("AW13 Gastos on a desktop browser", () => {
   beforeEach(() => {
     reads.length = 0;
     server.use(...signedInHandlers());
-    server.use(categoriesHandler());
+    server.use(categoriesHandler(), expenseReportHandler());
   });
 
   it("lists the selected Branch's Expenses with their category, amount, and date", async () => {
@@ -152,17 +153,17 @@ describe("AW13 Gastos on a desktop browser", () => {
     expect(reads.at(-1)?.get("branchId")).toBe(equipetrol.id);
   });
 
-  it("says when the Branch has no Expenses, in all or in one category", async () => {
+  it("says when the month has no Expenses, in all or in one category", async () => {
     server.use(expenseTable(() => jsonResponse(expensePage([]))));
-    const { user } = renderAdmin("/dinero/gastos");
+    const { user } = renderAdmin("/dinero/gastos?month=2026-09");
     expect(
-      await screen.findByText("Todavía no hay gastos en esta sucursal."),
+      await screen.findByText("No hay gastos en septiembre de 2026."),
     ).toBeVisible();
 
     await user.selectOptions(screen.getByLabelText("Categoría"), repair.id);
     expect(
       await screen.findByText(
-        "No hay gastos de esta categoría en esta sucursal.",
+        "No hay gastos de esta categoría en septiembre de 2026.",
       ),
     ).toBeVisible();
   });
@@ -199,7 +200,7 @@ describe("AW13 Gastos on a narrow browser", () => {
   useNarrowViewport();
   beforeEach(() => {
     server.use(...signedInHandlers());
-    server.use(categoriesHandler());
+    server.use(categoriesHandler(), expenseReportHandler());
   });
 
   it("labels each card's cells", async () => {

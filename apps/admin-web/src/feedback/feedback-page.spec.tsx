@@ -46,7 +46,7 @@ describe("AW38 Comentarios (REL-012)", () => {
     server.use(...signedInHandlers());
   });
 
-  it("lists the feedback with its type, app, version, and status", async () => {
+  it("lists the feedback with its sender, type, app, version, and status", async () => {
     server.use(
       feedbackList(() => jsonResponse(feedbackPage([problem, suggestion]))),
     );
@@ -54,23 +54,52 @@ describe("AW38 Comentarios (REL-012)", () => {
     await heading();
 
     const row = await rowOf(/No puedo ver mis reservas/);
+    expect(within(row).getByText("VQ")).toBeInTheDocument();
+    expect(within(row).getByText("Valeria Quiroga")).toBeInTheDocument();
     expect(within(row).getByText("Problema")).toBeInTheDocument();
-    expect(within(row).getByText("App de clientas")).toBeInTheDocument();
-    expect(within(row).getByText("1.0.1 (3) · Android 14")).toBeInTheDocument();
+    expect(
+      within(row).getByText("App de clientas · 1.0.1 (3) · Android 14"),
+    ).toBeInTheDocument();
     expect(within(row).getByText("jue 22 oct · 20:30")).toBeInTheDocument();
-    expect(within(row).getByText("Nuevo")).toBeInTheDocument();
+    // FIX-091 (W3 B): «Nuevo» is a plain word, no pill.
+    const fresh = within(row).getByText("Nuevo");
+    expect(fresh).not.toHaveAttribute("data-status-pill");
     const resolved = await rowOf(/Sería útil/);
     expect(within(resolved).getByText("Resuelto")).toBeInTheDocument();
-    expect(within(resolved).getByText("App del personal")).toBeInTheDocument();
     expect(
-      screen.getByText("Desde las dos apps · 1 comentario nuevo"),
-    ).toBeVisible();
+      within(resolved).getByText("App del personal · 1.0.1 (4) · iOS 18.2"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Desde las dos apps")).toBeVisible();
     expect(
       within(screen.getByRole("navigation", { name: "Secciones" })).getByRole(
         "link",
         { name: "Comentarios" },
       ),
     ).toHaveAttribute("aria-current", "page");
+  });
+
+  // FIX-091 (W3 B): three counters over the table, studio-wide.
+  it("counts the unread, reviewed, and resolved comments on top", async () => {
+    server.use(
+      feedbackList(() =>
+        jsonResponse({
+          ...feedbackPage([problem, suggestion]),
+          newCount: 19,
+          reviewedCount: 1,
+          resolvedCount: 0,
+        }),
+      ),
+    );
+    renderAdmin("/comentarios");
+
+    const unread = await screen.findByRole("region", { name: "Sin leer" });
+    expect(within(unread).getByText("19")).toBeVisible();
+    expect(
+      within(screen.getByRole("region", { name: "Revisados" })).getByText("1"),
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole("region", { name: "Resueltos" })).getByText("0"),
+    ).toBeVisible();
   });
 
   // FIX-090: «Página 2 de 1 · Todavía no hay comentarios» never shows.
@@ -118,8 +147,17 @@ describe("AW38 Comentarios (REL-012)", () => {
     const { user } = renderAdmin("/comentarios");
     await rowOf(/No puedo ver mis reservas/);
 
-    await user.selectOptions(screen.getByLabelText("Estado"), "Nuevo");
-    await user.selectOptions(screen.getByLabelText("App"), "App del personal");
+    await user.click(
+      within(screen.getByRole("group", { name: "Estado" })).getByRole(
+        "button",
+        { name: "Nuevo" },
+      ),
+    );
+    await user.click(
+      within(screen.getByRole("group", { name: "App" })).getByRole("button", {
+        name: "App del personal",
+      }),
+    );
 
     await waitFor(() => {
       const last = reads.at(-1);

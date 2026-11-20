@@ -8,7 +8,7 @@ import type { ListAdminClientsFilter } from "./listAdminClientsFilter";
 
 export type ListAdminClientsParams = {
   /**
-   * One chip of Clientas › Todas: the plan state or a live Fundadora place
+   * One chip of Clientas › Todas: the plan state, a live Fundadora place, a Plan ending within 3 days, or an active Plan with no class ahead
    */
   filter?: ListAdminClientsFilter;
   /**

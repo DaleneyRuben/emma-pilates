@@ -2,13 +2,13 @@ import { formatListDate } from "@pilates/api-contracts";
 import type { FreezeReviewDto } from "@pilates/api-contracts";
 import { createColumnHelper } from "@tanstack/react-table";
 import { ClientPhoto } from "../../components/client-photo";
+import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
-import { DecisionCell } from "./decision-cell";
+import { formatDayRange } from "../../lib/day-range";
 import {
   freezeDayCount,
   freezeDecidedBy,
   freezeDecidedPlanEnd,
-  freezePendingPlanEnd,
 } from "./freeze-format";
 
 const columns = createColumnHelper<FreezeReviewDto>();
@@ -55,27 +55,50 @@ const periodColumns = [
 ];
 
 // Finding 52: the approver sees what approving does to the plan end.
-export const pendingFreezeColumns = (onDone: (message: string) => void) => [
+// FIX-091 (W16 A): what she asks, its days, and the end approving produces,
+// with «Revisar»; the Plan, the end before, the reason, and the decision are
+// in the review panel it opens.
+export const pendingFreezeColumns = (open: (row: FreezeReviewDto) => void) => [
   clientColumn,
-  ...periodColumns,
+  columns.display({
+    id: "asks",
+    header: "Pide",
+    cell: ({ row }) =>
+      quiet(formatDayRange(row.original.startsOn, row.original.endsOn)),
+  }),
+  columns.display({
+    id: "days",
+    header: "Días",
+    meta: { card: "hidden" },
+    cell: ({ row }) =>
+      quiet(freezeDayCount(row.original.startsOn, row.original.endsOn)),
+  }),
   columns.display({
     id: "planEnd",
-    header: "Vence",
-    meta: { card: "detail", cardLabel: "Vence" },
-    cell: ({ row }) => quiet(freezePendingPlanEnd(row.original)),
-  }),
-  columns.accessor("reason", {
-    header: "Motivo",
-    meta: { card: "detail" },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
+    header: "Vencería",
+    meta: { card: "detail", cardLabel: "Vencería" },
+    cell: ({ row }) => {
+      const after = row.original.planEndsOnAfter;
+      return quiet(after == null ? undefined : formatListDate(after));
+    },
   }),
   columns.display({
-    id: "decision",
-    header: "Decisión",
+    id: "review",
+    header: "",
     meta: { card: "actions" },
-    cell: ({ row }) => <DecisionCell freeze={row.original} onDone={onDone} />,
+    cell: ({ row }) => (
+      <Button
+        size="sm"
+        variant="link"
+        className="underline"
+        onClick={(event) => {
+          event.stopPropagation();
+          open(row.original);
+        }}
+      >
+        Revisar
+      </Button>
+    ),
   }),
 ];
 
@@ -85,13 +108,21 @@ export const decidedFreezeColumns = () => [
   ...periodColumns,
   columns.accessor("state", {
     header: "Resultado",
-    cell: ({ getValue }) =>
+    cell: ({ row, getValue }) =>
       getValue() === "approved" ? (
         <StatusPill tone="exito">Aprobada</StatusPill>
       ) : getValue() === "withdrawn" ? (
         <StatusPill tone="neutral">Retirada</StatusPill>
       ) : (
-        <StatusPill tone="error">Rechazada</StatusPill>
+        <span className="flex flex-col items-start gap-1">
+          <StatusPill tone="error">Rechazada</StatusPill>
+          {/* W16 B/C: what the Client was told. */}
+          {row.original.refusalReason == null ? null : (
+            <span className="text-nota text-texto-tenue">
+              {row.original.refusalReason}
+            </span>
+          )}
+        </span>
       ),
   }),
   columns.display({

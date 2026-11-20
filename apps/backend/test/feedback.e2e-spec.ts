@@ -87,6 +87,8 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
       pageSize: 20,
       totalItems: 1,
       newCount: 3,
+      reviewedCount: 2,
+      resolvedCount: 1,
     });
     operations.export.mockResolvedValue([row]);
     operations.triage.mockResolvedValue(row);
@@ -207,6 +209,8 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
             pageSize: 20,
             totalItems: 1,
             newCount: 3,
+            reviewedCount: 2,
+            resolvedCount: 1,
           }),
         );
       expect(operations.list).toHaveBeenCalledWith(

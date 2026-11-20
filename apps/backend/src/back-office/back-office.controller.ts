@@ -198,6 +198,13 @@ export class AdministratorExpensesController extends BackOfficeController {
   })
   @ApiQuery({ name: 'from', required: false, format: 'date' })
   @ApiQuery({ name: 'to', required: false, format: 'date' })
+  @ApiQuery({
+    name: 'voided',
+    required: false,
+    type: Boolean,
+    description:
+      'Only eliminated (true) or only standing (false); both when absent',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiOkResponse({ type: AdminExpensePageDto })

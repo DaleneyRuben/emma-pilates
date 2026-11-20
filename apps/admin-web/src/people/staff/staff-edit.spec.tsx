@@ -75,7 +75,9 @@ describe("AW24 Editar miembro", () => {
     await user.click(
       within(panel).getByRole("checkbox", { name: "Equipetrol" }),
     );
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(
@@ -117,7 +119,9 @@ describe("AW24 Editar miembro", () => {
     await user.click(
       within(panel).getByRole("checkbox", { name: "Equipetrol" }),
     );
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -143,7 +147,9 @@ describe("AW24 Editar miembro", () => {
     await user.click(
       within(panel).getByRole("checkbox", { name: "Equipetrol" }),
     );
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     expect(
       await within(panel).findByText(/Cámbiale la instructora desde Horario/),
@@ -169,7 +175,9 @@ describe("AW24 Editar miembro", () => {
     expect(
       within(panel).getByText("Todas las sucursales (implícito por el rol)"),
     ).toBeVisible();
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(sent).toEqual([
@@ -186,7 +194,9 @@ describe("AW24 Editar miembro", () => {
     server.use(list());
     const { panel, user } = await openMember("Emma Vargas");
 
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
 
     await waitFor(() =>
       expect(
@@ -314,7 +324,7 @@ describe("AW24 Editar miembro", () => {
     ).toBeVisible();
     expect(within(panel).queryByRole("radio")).not.toBeInTheDocument();
     expect(
-      within(panel).queryByRole("button", { name: "Guardar" }),
+      within(panel).queryByRole("button", { name: /^Guardar/ }),
     ).not.toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", { name: "Desactivar cuenta" }),
@@ -333,7 +343,7 @@ describe("AW24 Editar miembro", () => {
     expect(within(panel).getByText("Instructora")).toBeVisible();
     expect(within(panel).getByText("Centro")).toBeVisible();
     expect(
-      within(panel).queryByRole("button", { name: "Guardar" }),
+      within(panel).queryByRole("button", { name: /^Guardar/ }),
     ).not.toBeInTheDocument();
   });
 });

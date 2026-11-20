@@ -78,6 +78,8 @@ const storeWith = (overrides: Partial<FeedbackStore> = {}): FeedbackStore => ({
     pageSize: 20,
     totalItems: 1,
     newCount: 1,
+    reviewedCount: 0,
+    resolvedCount: 0,
   }),
   listAll: jest.fn().mockResolvedValue([row]),
   recordExport: jest.fn().mockResolvedValue(undefined),
@@ -266,6 +268,8 @@ describe('Feedback triage on the admin web (REL-012, ADR-0054)', () => {
       pageSize: 20,
       totalItems: 1,
       newCount: 1,
+      reviewedCount: 0,
+      resolvedCount: 0,
     });
     expect(store.list).toHaveBeenCalledWith({
       page: 2,

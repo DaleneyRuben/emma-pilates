@@ -35,11 +35,7 @@ export function DeactivateAction({
 
   return (
     <>
-      <Button
-        variant="link"
-        className="self-center text-error hover:text-error-texto"
-        onClick={() => setConfirming(true)}
-      >
+      <Button variant="secondary" size="lg" onClick={() => setConfirming(true)}>
         Desactivar cuenta
       </Button>
       <ConfirmDialog

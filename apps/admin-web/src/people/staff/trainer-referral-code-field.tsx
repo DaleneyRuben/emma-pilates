@@ -1,140 +1,47 @@
-import {
-  getGetStaffMemberReferralCodeQueryKey,
-  getStaffMemberReferralCode,
-  setStaffMemberReferralCode,
-  type TrainerReferralCodeDto,
-} from "@pilates/api-contracts";
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { useId, useState, type KeyboardEvent } from "react";
-import { adminFetch } from "../../api/fetcher";
-import { isApiError } from "../../api/problem";
-import { Button } from "../../components/ui/button";
+import { useId } from "react";
+import { ExampleHint } from "../../components/form/example-hint";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-
-const referralCodeQueryOptions = (staffMemberId: string) =>
-  queryOptions({
-    queryKey: getGetStaffMemberReferralCodeQueryKey(staffMemberId),
-    queryFn: async ({ signal }) =>
-      (await getStaffMemberReferralCode(staffMemberId, { signal }, adminFetch))
-        .data as TrainerReferralCodeDto,
-  });
-
-const refusals: Record<string, string> = {
-  referral_code_in_use: "Ese código ya lo tiene otra clienta o instructora.",
-  referral_code_blocked: "Ese código no está permitido.",
-  referral_code_malformed: "Usa de 3 a 20 letras, números o guiones.",
-  staff_member_not_trainer: "Solo una instructora tiene código personal.",
-};
-
-const failureMessage = (error: unknown): string =>
-  (isApiError(error) ? refusals[error.code] : undefined) ??
-  "No pudimos guardar el código. Inténtalo de nuevo.";
-
-function CodeEditor({ current }: { current: TrainerReferralCodeDto }) {
-  const queryClient = useQueryClient();
-  const id = useId();
-  const [code, setCode] = useState(current.referralCode ?? "");
-  const [notice, setNotice] = useState<string | null>(null);
-  const save = useMutation({
-    mutationFn: async (referralCode: string | null) =>
-      (
-        await setStaffMemberReferralCode(
-          current.staffMemberId,
-          { referralCode },
-          undefined,
-          adminFetch,
-        )
-      ).data as TrainerReferralCodeDto,
-    onSuccess: (saved) => {
-      queryClient.setQueryData(
-        getGetStaffMemberReferralCodeQueryKey(saved.staffMemberId),
-        saved,
-      );
-      setCode(saved.referralCode ?? "");
-      setNotice(
-        saved.referralCode === null
-          ? "Quitamos el código."
-          : `Código guardado: ${saved.referralCode}.`,
-      );
-    },
-  });
-
-  const submit = () => {
-    setNotice(null);
-    const trimmed = code.trim();
-    save.mutate(trimmed === "" ? null : trimmed);
-  };
-  // The field sits inside the Role form; Enter saves the code, not the Role.
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    submit();
-  };
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>Código personal</Label>
-      <div className="flex gap-2">
-        <Input
-          id={id}
-          autoComplete="off"
-          aria-invalid={save.isError}
-          className="font-mono tracking-wider"
-          value={code}
-          onChange={(event) => {
-            setCode(event.target.value);
-            setNotice(null);
-          }}
-          onKeyDown={onKeyDown}
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          className="h-[44px]"
-          busy={save.isPending}
-          onClick={submit}
-        >
-          Guardar código
-        </Button>
-      </div>
-      <p className="text-ayuda text-texto-tenue">Ej.: CARLA</p>
-      {save.isError ? (
-        <p role="alert" className="text-ayuda text-error-texto">
-          {failureMessage(save.error)}
-        </p>
-      ) : notice === null ? (
-        <p className="text-ayuda text-texto-tenue">
-          Las clientas que se registran con este código quedan como traídas por
-          ella.
-        </p>
-      ) : (
-        <p role="status" className="text-ayuda text-exito-texto">
-          {notice}
-        </p>
-      )}
-    </div>
-  );
-}
+import type { ReferralCodeDraft } from "./use-referral-code-draft";
 
 // BKM-011 (follow-up 143): a Trainer's personal Referral Code on AW24.
+// Enter submits the whole panel, as in any other field.
 export function TrainerReferralCodeField({
-  staffMemberId,
+  draft,
 }: {
-  staffMemberId: string;
+  draft: ReferralCodeDraft;
 }) {
-  const query = useQuery(referralCodeQueryOptions(staffMemberId));
-  if (query.data === undefined) {
-    return query.isError ? (
+  const id = useId();
+  if (draft.query.data === undefined) {
+    return draft.query.isError ? (
       <p className="text-ayuda text-texto-tenue">
         No pudimos leer su código personal.
       </p>
     ) : null;
   }
-  return <CodeEditor current={query.data} />;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id}>Código personal</Label>
+      <Input
+        id={id}
+        autoComplete="off"
+        aria-invalid={draft.error !== null}
+        aria-describedby={`${id}-help`}
+        className="font-mono tracking-wider"
+        value={draft.value}
+        onChange={(event) => draft.change(event.target.value)}
+      />
+      <p id={`${id}-help`} className="text-ayuda text-texto-tenue">
+        <ExampleHint example="CARLA">
+          Las clientas que se registran con este código quedan como traídas por
+          ella.
+        </ExampleHint>
+      </p>
+      {draft.error === null ? null : (
+        <p role="alert" className="text-ayuda text-error-texto">
+          {draft.error}
+        </p>
+      )}
+    </div>
+  );
 }

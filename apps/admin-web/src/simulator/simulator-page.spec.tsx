@@ -30,6 +30,8 @@ describe("Simulador on a desktop browser", () => {
     const { user } = renderAdmin("/informes/simulador");
     expect(await heading()).toBeVisible();
     expect(screen.getByText(/Nada se guarda/)).toBeVisible();
+    const assumptions = screen.getByRole("region", { name: "Tus supuestos" });
+    expect(within(assumptions).getAllByRole("textbox")).toHaveLength(8);
 
     await fill(user, "Clases por semana", "33");
     await fill(user, "Clientas por clase", "4");
@@ -42,9 +44,21 @@ describe("Simulador on a desktop browser", () => {
 
     // 143 classes × 4 × Bs 70 = Bs 40.040; tax Bs 6.406,40; Trainer pay
     // 143 × Bs 65 = Bs 9.295.
-    const result = screen.getByRole("region", { name: "Resultado" });
+    const result = screen.getByRole("region", { name: "Quedaría al mes" });
     expect(within(result).getByText("Bs 3.163,60")).toBeVisible();
     expect(within(result).getByText(/143 clases/)).toBeVisible();
+    // FIX-091 (W12 A): what would come in and go out, beside the inputs.
+    const flows = screen.getByRole("list", { name: "Entraría y saldría" });
+    expect(
+      within(within(flows).getByText("Entraría").closest("li")!).getByText(
+        "Bs 40.040",
+      ),
+    ).toBeVisible();
+    expect(
+      within(within(flows).getByText("Saldría").closest("li")!).getByText(
+        "Bs 36.876,40",
+      ),
+    ).toBeVisible();
     expect(
       within(
         screen.getByRole("region", { name: "Punto de equilibrio" }),
@@ -105,7 +119,7 @@ describe("Simulador on a desktop browser", () => {
       ),
     ).toBeVisible();
     expect(
-      within(screen.getByRole("region", { name: "Resultado" })).getByText(
+      within(screen.getByRole("region", { name: "Quedaría al mes" })).getByText(
         "Bs 17.692,40",
       ),
     ).toBeVisible();

@@ -8,6 +8,7 @@ import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { clientPhotoOf } from '../client/client-photo-of';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import { containsPattern } from '../search-pattern';
+import { readLastClassDates } from './directory-last-class';
 import { directoryPlan, directoryPlanSelect } from './directory-plan';
 import type {
   AdministratorClientDirectory,
@@ -64,14 +65,23 @@ export const createPrismaAdministratorClients = (
   const catalog = createCatalogRepository(prisma);
 
   const directory: AdministratorClientDirectory = {
-    list: async ({ page, pageSize, query, filter, today }) => {
-      const search = Prisma.sql`${searchCondition(query)} ${directoryFilterCondition(filter, today)}`;
+    list: async ({ page, pageSize, query, filter, today, now }) => {
+      const search = Prisma.sql`${searchCondition(query)} ${directoryFilterCondition(filter, today, now)}`;
+      // FIX-091: «Por vencer» and «Sin reservar» say how many they hold.
+      const chipCount = (chip: 'expiring' | 'unbooked') =>
+        prisma.$queryRaw<{ total: bigint }[]>`
+            SELECT count(*) AS total
+            FROM booking.clients c
+            JOIN system.accounts a ON a.client_id = c.id
+            WHERE c.deleted_at IS NULL ${directoryFilterCondition(chip, today, now)}`;
       const [
         matches,
         [counted],
         studioClientCount,
         activePlanClientCount,
         founderClientCount,
+        [expiring],
+        [unbooked],
       ] = await Promise.all([
         prisma.$queryRaw<{ id: string }[]>`
             SELECT c.id
@@ -92,9 +102,11 @@ export const createPrismaAdministratorClients = (
         prisma.client.count({
           where: { ...withAccount, founderMembership: liveFounderPlace },
         }),
+        chipCount('expiring'),
+        chipCount('unbooked'),
       ]);
       const pageIds = matches.map(({ id }) => id);
-      const [rows, lastEnds, nextPlans] = await Promise.all([
+      const [rows, lastEnds, nextPlans, lastClasses] = await Promise.all([
         prisma.client.findMany({
           where: { id: { in: pageIds } },
           select: {
@@ -140,6 +152,7 @@ export const createPrismaAdministratorClients = (
           orderBy: [{ startsOn: 'desc' }, { id: 'desc' }],
           select: { clientId: true, ...directoryPlanSelect },
         }),
+        readLastClassDates(prisma, pageIds, now),
       ]);
       // The earliest later Plan wins: rows come latest first.
       const nextPlanOf = new Map(
@@ -194,6 +207,7 @@ export const createPrismaAdministratorClients = (
                   row.referralReceived?.referrer.name ??
                   null,
                 clientSince: boliviaDate(row.createdAt),
+                lastClassOn: lastClasses.get(row.id) ?? null,
               },
             ],
           ];
@@ -207,6 +221,8 @@ export const createPrismaAdministratorClients = (
         studioClientCount,
         activePlanClientCount,
         founderClientCount,
+        expiringClientCount: Number(expiring?.total ?? 0),
+        unbookedClientCount: Number(unbooked?.total ?? 0),
       };
     },
 

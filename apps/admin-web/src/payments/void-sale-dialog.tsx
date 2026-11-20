@@ -6,7 +6,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminFetch } from "../api/fetcher";
 import { isApiError } from "../api/problem";
-import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
 
@@ -17,15 +16,19 @@ const problems: Record<string, string> = {
 };
 
 // «Anular venta» corrects a mistake. It returns no money (decisions §4.3).
-export function VoidSaleAction({
+// FIX-091 (W4 B): the row's «⋯» menu opens it.
+export function VoidSaleDialog({
   paymentId,
   clientName,
+  open,
+  onOpenChange: setOpen,
 }: {
   paymentId: string;
   clientName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [failure, setFailure] = useState<string | null>(null);
   const voidSale = useMutation({
@@ -57,47 +60,35 @@ export function VoidSaleAction({
   };
 
   return (
-    <>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={() => {
-          setFailure(null);
-          setOpen(true);
-        }}
-      >
-        Anular venta
-      </Button>
-      <ConfirmDialog
-        open={open}
-        onOpenChange={setOpen}
-        title={`¿Anular la venta de ${clientName}?`}
-        confirmLabel="Anular venta"
-        pending={reason.trim() === ""}
-        busy={voidSale.isPending}
-        onConfirm={() => void confirm()}
-      >
-        <p>
-          El plan termina y las reservas futuras se cancelan. El dinero no se
-          devuelve: una anulación corrige un error.
+    <ConfirmDialog
+      open={open}
+      onOpenChange={setOpen}
+      title={`¿Anular la venta de ${clientName}?`}
+      confirmLabel="Anular venta"
+      pending={reason.trim() === ""}
+      busy={voidSale.isPending}
+      onConfirm={() => void confirm()}
+    >
+      <p>
+        El plan termina y las reservas futuras se cancelan. El dinero no se
+        devuelve: una anulación corrige un error.
+      </p>
+      <label className="flex flex-col gap-1 text-texto">
+        <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          Motivo
+        </span>
+        <Input
+          aria-label="Motivo"
+          value={reason}
+          maxLength={300}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      </label>
+      {failure === null ? null : (
+        <p role="alert" className="text-error-texto">
+          {failure}
         </p>
-        <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-            Motivo
-          </span>
-          <Input
-            aria-label="Motivo"
-            value={reason}
-            maxLength={300}
-            onChange={(event) => setReason(event.target.value)}
-          />
-        </label>
-        {failure === null ? null : (
-          <p role="alert" className="text-error-texto">
-            {failure}
-          </p>
-        )}
-      </ConfirmDialog>
-    </>
+      )}
+    </ConfirmDialog>
   );
 }

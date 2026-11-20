@@ -10,6 +10,11 @@ type Session = AdministratorSessionAvailabilityDto;
 
 // FIX-084: tall enough for four short lines (type, time, trainer, places).
 const hourHeight = 80;
+// FIX-091 (W2, Horario B): a cancelled class is one thin line at its start.
+const cancelledLineHeight = 22;
+
+const hourLines = (color: string) =>
+  `repeating-linear-gradient(to bottom, transparent 0, transparent ${hourHeight - 1}px, var(${color}) ${hourHeight - 1}px, var(${color}) ${hourHeight}px)`;
 
 /** The hours the grid spans: 06:00–22:00, widened to fit every Session. */
 function hourRange(sessions: readonly Session[]) {
@@ -65,16 +70,15 @@ export function WeekGrid({
               role="columnheader"
               className={cn(
                 "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto-tenue uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
-                day === today && "font-bold text-primario",
+                // FIX-091 (W2, Horario B): today's column in Rubor.
+                day === today && "bg-rubor font-bold text-primario",
               )}
             >
               {tab.weekday}
               <span className="font-serif text-fila tracking-normal text-texto normal-case tabular">
                 {tab.day}
               </span>
-              {day === today ? (
-                <span className="tracking-normal normal-case">· hoy</span>
-              ) : null}
+              {day === today ? <span>· hoy</span> : null}
             </span>
           );
         })}
@@ -104,12 +108,14 @@ export function WeekGrid({
             role="cell"
             className={cn(
               "relative border-l border-divisor",
-              // FIX-089: today is framed in Arcilla, not filled.
-              day === today && "inset-ring-2 inset-ring-arcilla",
+              day === today && "bg-rubor",
             )}
             style={{
               height,
-              backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${hourHeight - 1}px, var(--color-divisor) ${hourHeight - 1}px, var(--color-divisor) ${hourHeight}px)`,
+              // On Rubor the hour lines are drawn in Arcilla to stay visible.
+              backgroundImage: hourLines(
+                day === today ? "--color-arcilla" : "--color-divisor",
+              ),
             }}
           >
             {dayItems(day, hours, sessions).map((item) => {
@@ -128,6 +134,18 @@ export function WeekGrid({
                 );
               }
               const { session } = item;
+              const top = ((item.minutes - first * 60) / 60) * hourHeight + 1;
+              if ((session.cancellation ?? null) !== null) {
+                return (
+                  <SessionBlock
+                    key={session.id}
+                    session={session}
+                    onOpen={onOpen}
+                    className="absolute inset-x-1"
+                    style={{ top, height: cancelledLineHeight }}
+                  />
+                );
+              }
               const minutes =
                 (new Date(session.endsAt).getTime() -
                   new Date(session.startsAt).getTime()) /
@@ -140,7 +158,7 @@ export function WeekGrid({
                   className="absolute inset-x-1"
                   short={(minutes / 60) * hourHeight - 2 < 76}
                   style={{
-                    top: ((item.minutes - first * 60) / 60) * hourHeight + 1,
+                    top,
                     height: Math.max((minutes / 60) * hourHeight - 2, 44),
                   }}
                 />

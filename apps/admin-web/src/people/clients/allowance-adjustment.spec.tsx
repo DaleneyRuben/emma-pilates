@@ -53,7 +53,7 @@ describe("AW22 courtesy and class return", () => {
     });
     await user.click(
       await within(panel).findByRole("button", {
-        name: "Agregar clase de cortesía",
+        name: "Dar clase de cortesía",
       }),
     );
     const dialog = await screen.findByRole("alertdialog", {

@@ -61,6 +61,8 @@ const emptyPage = {
   studioClientCount: 0,
   activePlanClientCount: 0,
   founderClientCount: 0,
+  expiringClientCount: 0,
+  unbookedClientCount: 0,
 };
 
 const directory = (
@@ -88,11 +90,13 @@ describe('Administrator Client directory', () => {
         { directory: clients, now: () => now },
       ),
     ).resolves.toEqual(emptyPage);
+    // «Última clase» counts only classes that already started (FIX-091).
     expect(clients.list).toHaveBeenCalledWith({
       page: 2,
       pageSize: 10,
       query: 'lucia',
       today,
+      now,
     });
   });
 
@@ -109,6 +113,7 @@ describe('Administrator Client directory', () => {
       pageSize: 20,
       filter: 'founder',
       today,
+      now,
     });
   });
 
@@ -124,6 +129,7 @@ describe('Administrator Client directory', () => {
       page: 1,
       pageSize: 20,
       today,
+      now,
     });
   });
 
@@ -282,6 +288,7 @@ describe('exportAdministratorClients', () => {
       query: 'vale',
       filter: 'active',
       today,
+      now,
     });
     expect(clients.recordExport).toHaveBeenCalledWith({
       actor: {

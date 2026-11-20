@@ -3,14 +3,14 @@ import { useId, useState } from "react";
 import { PageHeader } from "../components/page/page-header";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { cn } from "../lib/cn";
+import { StatTile } from "../components/ui/stat-tile";
 import { formatBolivianos, formatSignedBolivianos } from "../lib/money";
 import { staffProfileQueryOptions } from "../session/staff-profile-query";
 import { ProjectionSection } from "./projection-section";
-import { simulateMonth } from "./simulate-month";
+import { simulateMonth, type SimulatorInput } from "./simulate-month";
 
 const cardClass =
-  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
+  "flex flex-col gap-4 rounded-marco border border-arcilla bg-crema p-6 max-md:p-4";
 
 // The owner's opening month: 33 classes a week, 4 students paying about Bs 70
 // a class (diagnosis 3.4), Trainer pay of Bs 65 with up to 4 students and
@@ -59,37 +59,19 @@ function Field({
   );
 }
 
-function Figure({
-  name,
-  figure,
-  line,
-  rule,
-}: {
-  name: string;
-  figure: string;
-  line: string;
-  rule: string;
-}) {
+// FIX-091 (W12 A): Entraría and Saldría under the result, one row each.
+function Flow({ name, figure }: { name: string; figure: string }) {
   return (
-    <section
-      aria-label={name}
-      className={cn(
-        "flex flex-col gap-1.5 rounded-marco border-t-[3px] border border-borde bg-lino px-5 py-4",
-        rule,
-      )}
-    >
-      <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-        {name}
-      </h2>
-      <p className="font-serif text-cifra-grande leading-tight text-texto tabular">
-        {figure}
-      </p>
-      <p className="text-nota text-texto-tenue">{line}</p>
-    </section>
+    <li className="flex items-baseline justify-between gap-3 border-t border-divisor px-4 py-3 first:border-t-0">
+      <span className="text-celda">{name}</span>
+      <span className="text-celda font-semibold tabular">{figure}</span>
+    </li>
   );
 }
 
-function Calculator({ draft }: { draft: Draft }) {
+// The draft as the calculation's input, or null while a field is not a
+// whole number or the tax is 100 % or more.
+function parseDraft(draft: Draft): SimulatorInput | null {
   const classesPerWeek = whole(draft.classesPerWeek);
   const studentsPerClass = whole(draft.studentsPerClass);
   const clientPricePerClassCentavos = amount(draft.clientPricePerClass);
@@ -98,24 +80,20 @@ function Calculator({ draft }: { draft: Draft }) {
   const extraStudentCentavos = amount(draft.extraStudentPay);
   const fixedCostsCentavos = amount(draft.fixedCosts);
   const taxRatePercent = whole(draft.taxRate);
-  const ready =
-    classesPerWeek !== null &&
-    studentsPerClass !== null &&
-    clientPricePerClassCentavos !== null &&
-    classCentavos !== null &&
-    includedStudents !== null &&
-    extraStudentCentavos !== null &&
-    fixedCostsCentavos !== null &&
-    taxRatePercent !== null &&
-    taxRatePercent < 100;
-  if (!ready) {
-    return (
-      <p role="alert" className="text-ayuda text-error-texto">
-        Escribe números enteros. El impuesto tiene que ser menor que 100.
-      </p>
-    );
+  if (
+    classesPerWeek === null ||
+    studentsPerClass === null ||
+    clientPricePerClassCentavos === null ||
+    classCentavos === null ||
+    includedStudents === null ||
+    extraStudentCentavos === null ||
+    fixedCostsCentavos === null ||
+    taxRatePercent === null ||
+    taxRatePercent >= 100
+  ) {
+    return null;
   }
-  const input = {
+  return {
     classesPerWeek,
     studentsPerClass,
     clientPricePerClassCentavos,
@@ -123,29 +101,43 @@ function Calculator({ draft }: { draft: Draft }) {
     fixedCostsCentavos,
     taxRatePercent,
   };
+}
+
+function Result({ input }: { input: SimulatorInput }) {
+  const { fixedCostsCentavos, taxRatePercent } = input;
   const month = simulateMonth(input);
   return (
-    <>
-      <div className="grid gap-3 md:grid-cols-2">
-        <Figure
-          name="Resultado"
-          rule={month.resultCentavos < 0 ? "border-t-error" : "border-t-exito"}
-          figure={formatSignedBolivianos(month.resultCentavos)}
-          line={`${month.classes} clases · ingreso ${formatBolivianos(month.incomeCentavos)}`}
+    <div className="flex flex-col gap-3">
+      <StatTile
+        label="Quedaría al mes"
+        emphasis
+        figure={formatSignedBolivianos(month.resultCentavos)}
+        line={`${month.classes} clases · ingreso ${formatBolivianos(month.incomeCentavos)}`}
+      />
+      <ul
+        aria-label="Entraría y saldría"
+        className="flex flex-col rounded-marco border border-arcilla bg-crema text-rosa-profundo"
+      >
+        <Flow name="Entraría" figure={formatBolivianos(month.incomeCentavos)} />
+        <Flow
+          name="Saldría"
+          figure={formatBolivianos(
+            month.taxCentavos +
+              fixedCostsCentavos +
+              month.variableCostsCentavos,
+          )}
         />
-        <Figure
-          name="Punto de equilibrio"
-          rule="border-t-texto"
-          figure={formatBolivianos(month.breakEvenCentavos)}
-          line="Ingreso en caja que cubre los costos fijos, el pago a instructoras y el impuesto"
-        />
-      </div>
+      </ul>
+      <StatTile
+        label="Punto de equilibrio"
+        figure={formatBolivianos(month.breakEvenCentavos)}
+        line="Ingreso en caja que cubre los costos fijos, el pago a instructoras y el impuesto"
+      />
       {/* FIX-088: the owner's check in words and bolivianos. */}
       <p className="text-nota text-texto-tenue tabular">
         {`(costos fijos ${formatBolivianos(fixedCostsCentavos)} + pago a instructoras ${formatBolivianos(month.variableCostsCentavos)}) ÷ (1 − ${taxRatePercent} % de impuesto) = ${formatBolivianos(month.breakEvenCentavos)}`}
       </p>
-      <ProjectionSection input={input} />
-    </>
+    </div>
   );
 }
 
@@ -156,6 +148,8 @@ export function SimulatorPage() {
   const [draft, setDraft] = useState(opening);
   const change = (key: keyof Draft) => (value: string) =>
     setDraft((current) => ({ ...current, [key]: value }));
+  const assumptionsId = useId();
+  const input = parseDraft(draft);
 
   if (profile.data !== undefined && profile.data.role !== "administrator") {
     return (
@@ -177,51 +171,66 @@ export function SimulatorPage() {
         title="Simulador"
         subtitle="Prueba un mes con otros números. Nada se guarda: es un cálculo de este momento."
       />
-      <section className={cardClass}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field
-            label="Clases por semana"
-            value={draft.classesPerWeek}
-            onChange={change("classesPerWeek")}
-          />
-          <Field
-            label="Clientas por clase"
-            value={draft.studentsPerClass}
-            onChange={change("studentsPerClass")}
-          />
-          <Field
-            label="Precio por clase para la clienta (Bs)"
-            value={draft.clientPricePerClass}
-            onChange={change("clientPricePerClass")}
-          />
-          <Field
-            label="Pago por clase a la instructora (Bs)"
-            value={draft.trainerClassPay}
-            onChange={change("trainerClassPay")}
-          />
-          <Field
-            label="Clientas incluidas en el pago"
-            value={draft.includedStudents}
-            onChange={change("includedStudents")}
-          />
-          <Field
-            label="Pago por clienta extra (Bs)"
-            value={draft.extraStudentPay}
-            onChange={change("extraStudentPay")}
-          />
-          <Field
-            label="Costos fijos (Bs)"
-            value={draft.fixedCosts}
-            onChange={change("fixedCosts")}
-          />
-          <Field
-            label="Impuestos (%)"
-            value={draft.taxRate}
-            onChange={change("taxRate")}
-          />
-        </div>
-      </section>
-      <Calculator draft={draft} />
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <section aria-labelledby={assumptionsId} className={cardClass}>
+          <h2
+            id={assumptionsId}
+            className="font-sans text-etiqueta-campo font-semibold tracking-[0.14em] text-rosa-profundo uppercase"
+          >
+            Tus supuestos
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field
+              label="Clases por semana"
+              value={draft.classesPerWeek}
+              onChange={change("classesPerWeek")}
+            />
+            <Field
+              label="Clientas por clase"
+              value={draft.studentsPerClass}
+              onChange={change("studentsPerClass")}
+            />
+            <Field
+              label="Precio por clase para la clienta (Bs)"
+              value={draft.clientPricePerClass}
+              onChange={change("clientPricePerClass")}
+            />
+            <Field
+              label="Pago por clase a la instructora (Bs)"
+              value={draft.trainerClassPay}
+              onChange={change("trainerClassPay")}
+            />
+            <Field
+              label="Clientas incluidas en el pago"
+              value={draft.includedStudents}
+              onChange={change("includedStudents")}
+            />
+            <Field
+              label="Pago por clienta extra (Bs)"
+              value={draft.extraStudentPay}
+              onChange={change("extraStudentPay")}
+            />
+            <Field
+              label="Costos fijos (Bs)"
+              value={draft.fixedCosts}
+              onChange={change("fixedCosts")}
+            />
+            <Field
+              label="Impuestos (%)"
+              value={draft.taxRate}
+              onChange={change("taxRate")}
+            />
+          </div>
+        </section>
+        {input === null ? (
+          <p role="alert" className="text-ayuda text-error-texto">
+            Escribe números enteros. El impuesto tiene que ser menor que 100.
+          </p>
+        ) : (
+          <Result input={input} />
+        )}
+      </div>
+      {input === null ? null : <ProjectionSection input={input} />}
     </div>
   );
 }

@@ -218,7 +218,7 @@ describe("The Client file's tabs", () => {
     expect(await within(panel).findByText("5 de 8")).toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", {
-        name: "Agregar clase de cortesía",
+        name: "Dar clase de cortesía",
       }),
     ).not.toBeInTheDocument();
     expect(

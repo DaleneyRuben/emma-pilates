@@ -1,4 +1,10 @@
-import { grantedLine, owedLine, pastCampaignLine } from "./campaign-copy";
+import {
+  giveLabel,
+  grantedLine,
+  owedLine,
+  pastCampaignLine,
+  totalLine,
+} from "./campaign-copy";
 
 describe("campaign copy", () => {
   // FIX-064 (walkthrough finding 90): nobody is left out any more. A Client
@@ -16,6 +22,15 @@ describe("campaign copy", () => {
   it("agrees the result with one or several Clients", () => {
     expect(grantedLine(1, 1)).toBe("1 clienta recibió 1 clase extra.");
     expect(grantedLine(7, 2)).toBe("7 clientas recibieron 2 clases extra.");
+  });
+
+  // FIX-091 (W13 A): the panel's summary and its button count every class.
+  it("counts the classes the campaign gives in total", () => {
+    expect(totalLine(1)).toBe("Vas a regalar 1 clase en total");
+    expect(totalLine(24)).toBe("Vas a regalar 24 clases en total");
+    expect(giveLabel(1)).toBe("Regalar 1 clase");
+    expect(giveLabel(24)).toBe("Regalar 24 clases");
+    expect(giveLabel(null)).toBe("Regalar las clases");
   });
 
   it("names at most ten Clients and counts the rest", () => {
