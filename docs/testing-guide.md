@@ -3635,7 +3635,9 @@ take about a minute:
     Quiroga, **Confirmar la reserva**: the page stays on Horario, says
     "Valeria Quiroga quedó reservada." and lists her under «Reservaron (1)».
 22. **The type scale and contrast (follow-up 285, Test 190).** Every admin
-    route (27 signed in as Paola, 4 signed out) at 1440 and at 420 px: every
+    route (27 signed in as Paola, 4 signed out), plus a Client's panel, a
+    Staff Member's panel, the new class panel and the Branch selector open,
+    at 1440 and at 420 px: every
     visible text keeps to one of the scale's styles, none is under 12 px,
     small text sits only on white, crema, 50 or 600, no text is dimmed by
     opacity, capitals come only from `etiqueta`, and axe's `color-contrast`
@@ -3645,9 +3647,9 @@ take about a minute:
 the two parts of item 5. `laptop.spec.ts` is the two widths of item 15.
 `date-fields.spec.ts` runs item 16 at both widths, and `simulator.spec.ts`
 runs item 20 at both widths; `horario-booking.spec.ts` is item 21.
-`type-scale.spec.ts` is item 22, one test per route and width (62). With
-the files the items above do not name, twenty-three files make twenty-nine
-journeys and the 62 type checks.
+`type-scale.spec.ts` is item 22, one test per route or open panel and width
+(70). With the files the items above do not name, twenty-three files make
+twenty-nine journeys and the 70 type checks.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -11772,9 +11774,10 @@ A. **Automated.** From `apps/admin-web`:
      any text colour but `text-texto` and `text-sobre-primario` in class
      strings. `pnpm exec jest eslint-rules` checks the rule itself.
    - `pnpm exec playwright test e2e/type-scale.spec.ts` (Test 31, item 22)
-     measures every route at 1440 and at 420 px with the rules of
+     measures every route and four open panels at 1440 and at 420 px with
+     the rules of
      `design/v3/sistema/revisor/revisar.cjs` and axe's `color-contrast`.
-     Expected: 62 passed, every `type-audit` line «0 off the rules, 0
+     Expected: 70 passed, every `type-audit` line «0 off the rules, 0
      contrast». On `main` before this change the same check counted 1021 of
      2341 texts off the rules and 2 contrast failures.
 B. **By eye, at 1440 and at 420 px** (Paola, `emma-local-2026`):
