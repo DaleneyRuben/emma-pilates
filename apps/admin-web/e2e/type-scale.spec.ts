@@ -56,6 +56,10 @@ async function audit(page: Page, narrow: boolean): Promise<string[]> {
   const contrast = axe.violations.flatMap(({ nodes }) =>
     nodes.map((node) => `contrast: ${node.target.join(" ")}`),
   );
+  // The before and after figures of the PR come from this line.
+  console.log(
+    `type-audit ${new URL(page.url()).pathname} ${narrow ? 420 : 1440}: ${texts.length} texts, ${type.length} off the rules, ${contrast.length} contrast`,
+  );
   return [...type, ...contrast];
 }
 
@@ -71,7 +75,7 @@ for (const width of [1440, 420]) {
   const narrow = width <= 420;
 
   test.describe(`the type scale at ${width} px`, () => {
-    test.describe.configure({ mode: "serial" });
+    // One signed-in page for the routes; a failed route only re-signs in.
     let page: Page;
 
     test.beforeAll(async ({ browser }) => {
