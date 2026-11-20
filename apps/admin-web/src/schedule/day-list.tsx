@@ -46,14 +46,19 @@ export function DayList({
               aria-selected={selected}
               onClick={() => onDayChange(date)}
               className={cn(
-                "flex min-w-[52px] shrink-0 flex-col items-center rounded-control border px-2 py-1.5 text-ayuda",
+                "flex min-w-[48px] flex-1 flex-col items-center gap-0.5 rounded-boton px-0.5 py-2 text-nota",
                 selected ? selectedClass : unselectedClass,
-                // FIX-091 (W2, Horario B): today stays in Rubor.
-                date === today && !selected && "bg-rosa-200",
+                // Rosa Emma (RW-horario-420): today rings on 50 while
+                // another day is chosen.
+                date === today &&
+                  !selected &&
+                  "bg-superficie-hundida inset-ring-[1.5px] inset-ring-primario",
               )}
             >
               <span>{tab.weekday}</span>
-              <span className="font-serif text-fila tabular">{tab.day}</span>
+              <span className="font-serif text-[20px] leading-tight tabular">
+                {tab.day}
+              </span>
               {date === today ? (
                 <span className="text-pie leading-none">hoy</span>
               ) : null}

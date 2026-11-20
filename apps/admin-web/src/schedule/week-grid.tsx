@@ -8,8 +8,9 @@ import { dayItems, hourLabel, sessionSpan } from "./week-slots";
 
 type Session = AdministratorSessionAvailabilityDto;
 
-// FIX-084: tall enough for four short lines (type, time, trainer, places).
-const hourHeight = 80;
+// W2 (verification 2026-11-20): a class is two lines (type; trainer and
+// places), so an hour needs less height than FIX-084's four.
+const hourHeight = 64;
 // FIX-091 (W2, Horario B): a cancelled class is one thin line at its start.
 const cancelledLineHeight = 22;
 
@@ -69,13 +70,14 @@ export function WeekGrid({
               key={day}
               role="columnheader"
               className={cn(
-                "flex items-baseline gap-1 px-1.5 py-2.5 text-cabecera-tabla font-medium tracking-[0.08em] text-texto uppercase lg:gap-1 lg:px-1 lg:tracking-[0.04em] xl:gap-1.5 xl:px-3 xl:tracking-[0.14em]",
-                // FIX-091 (W2, Horario B): today's column in Rubor.
-                day === today && "bg-rosa-200 font-bold text-primario",
+                // Rosa Emma (RW-horario): a white pill per day; today's is
+                // solid Rosa profundo with «· HOY», its column only soft 50.
+                "flex items-baseline justify-center gap-1.5 rounded-panel bg-superficie px-1.5 py-[9px] text-etiqueta font-bold tracking-[0.12em] text-texto uppercase",
+                day === today && "bg-primario text-blanco",
               )}
             >
               {tab.weekday}
-              <span className="font-serif text-fila tracking-normal text-texto normal-case tabular">
+              <span className="text-titulo-3 font-bold tracking-normal tabular">
                 {tab.day}
               </span>
               {day === today ? <span>· hoy</span> : null}
@@ -85,7 +87,8 @@ export function WeekGrid({
       </div>
       <div
         role="row"
-        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] lg:grid-cols-7 xl:grid-cols-[56px_repeat(7,minmax(0,1fr))]"
+        className="grid grid-cols-[44px_repeat(7,minmax(0,1fr))] gap-1.5 lg:grid-cols-7 xl:grid-cols-[64px_repeat(7,minmax(0,1fr))]"
+        style={{ backgroundImage: hourLines("--color-borde") }}
       >
         <div
           aria-hidden="true"
@@ -95,7 +98,7 @@ export function WeekGrid({
           {hours.map((hour, index) => (
             <span
               key={hour}
-              className="absolute right-2 -translate-y-1/2 text-ayuda text-texto tabular"
+              className="absolute left-0 -translate-y-1/2 text-ayuda font-bold text-texto tabular xl:text-grande"
               style={{ top: index * hourHeight }}
             >
               {index === 0 ? null : hourLabel(hour)}
@@ -107,16 +110,10 @@ export function WeekGrid({
             key={day}
             role="cell"
             className={cn(
-              "relative border-l border-borde",
-              day === today && "bg-rosa-200",
+              "relative",
+              day === today && "rounded-panel bg-superficie-hundida",
             )}
-            style={{
-              height,
-              // On Rubor the hour lines are drawn in Arcilla to stay visible.
-              backgroundImage: hourLines(
-                day === today ? "--color-rosa-400" : "--color-borde",
-              ),
-            }}
+            style={{ height }}
           >
             {dayItems(day, hours, sessions).map((item) => {
               if (item.kind === "slot") {

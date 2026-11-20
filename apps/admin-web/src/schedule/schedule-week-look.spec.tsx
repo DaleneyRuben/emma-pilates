@@ -71,7 +71,7 @@ describe("W2 Horario: today marked softly, compact classes, cancelled lines", ()
     });
     expect(lines.map((line) => line.textContent)).toEqual([
       "Reformer Pilates",
-      `${mondayReformer.trainerName.split(" ")[0]} · 4 de 8`,
+      `${mondayReformer.trainerName.split(" ")[0]} · 4 de ${mondayReformer.capacity}`,
     ]);
     const full = screen.getByRole("button", { name: /^Mat Pilates, 16:00/ });
     expect(
