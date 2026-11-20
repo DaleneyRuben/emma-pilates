@@ -51,8 +51,9 @@ describe("Assistant Client flows", () => {
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    expect(screen.getByText("Plan activo")).toBeOnTheScreen();
-    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    // Staff pick E4 A: the plan in a Palo de rosa block.
+    expect(screen.getByText("Activa")).toBeOnTheScreen();
+    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#B78380" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();
