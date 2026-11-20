@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   count: {
     color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
   },
   countedChip: { gap: 0, height: 70 },
