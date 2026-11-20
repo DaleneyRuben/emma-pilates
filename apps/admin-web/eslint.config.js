@@ -3,6 +3,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
+import noRawTypography from "./eslint-rules/no-raw-typography.js";
 
 export default tseslint.config(
   { ignores: ["dist", "coverage"] },
@@ -29,6 +30,20 @@ export default tseslint.config(
         { max: 400, skipBlankLines: true, skipComments: true },
       ],
     },
+  },
+  {
+    // Follow-up 285: typography comes from the tipo-* classes of index.css.
+    // The typography module describes the scale and is the one exemption.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/**/*.spec.{ts,tsx}",
+      "src/test/**",
+      "src/components/ui/typography.ts",
+    ],
+    plugins: {
+      typography: { rules: { "no-raw-typography": noRawTypography } },
+    },
+    rules: { "typography/no-raw-typography": "error" },
   },
   {
     // shadcn primitives re-export Radix parts next to their styled components.
