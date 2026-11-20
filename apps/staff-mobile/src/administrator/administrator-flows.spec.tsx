@@ -170,7 +170,7 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByLabelText("Por confirmar · 2 · Bs 1.340 en total")).toBeOnTheScreen();
     expect(screen.getByText("Por confirmar · 2")).toBeOnTheScreen();
     expect(screen.getByText("Bs 1.340")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
+      fontFamily: "Lora_500Medium",
       fontSize: 34,
     });
     expect(screen.getByText("Paquete de 8 clases · ayer, 19:40")).toBeOnTheScreen();
@@ -189,7 +189,7 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByText("Pendiente")).toHaveStyle({ fontFamily: "WorkSans_700Bold" });
     expect(screen.getByText("Pendiente").parent).not.toHaveStyle({ borderRadius: 999 });
     // v2 S12: the amount on the hero, the transfer and its time as rows.
-    expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 36 });
+    expect(screen.getByText("Bs 560")).toHaveStyle({ fontSize: 34 });
     expect(screen.getByText("Transferencia")).toBeOnTheScreen();
     expect(screen.getByText(/^Enviado el \S+ \d+ \S+ · 19:40$/)).toBeOnTheScreen();
     expect(screen.getByText("Comprobante")).toBeOnTheScreen();

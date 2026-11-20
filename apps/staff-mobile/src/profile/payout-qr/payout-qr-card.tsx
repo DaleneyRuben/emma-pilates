@@ -1,15 +1,15 @@
 import type { PayoutQrDto } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   FullScreenImage,
   Glyph,
   radii,
   spacing,
   surfaces,
+  Text,
 } from "@pilates/mobile-core";
 import { useState } from "react";
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, StyleSheet, View } from "react-native";
 
 import { payoutQrStateLine } from "./payout-qr-copy";
 import { usePayoutQrImage } from "./use-payout-qr-image";
@@ -27,12 +27,6 @@ export function PayoutQrCard({ qr }: { qr: PayoutQrDto }) {
   const size =
     ratio >= 1 ? { width: box, height: box / ratio } : { width: box * ratio, height: box };
   const line = payoutQrStateLine(qr);
-  const tone =
-    qr.standing === "expired"
-      ? styles.error
-      : qr.standing === "expiring"
-        ? styles.warning
-        : styles.ok;
 
   return (
     <View style={styles.card}>
@@ -54,12 +48,15 @@ export function PayoutQrCard({ qr }: { qr: PayoutQrDto }) {
       </View>
       <View style={styles.state}>
         <Glyph
-          color={tone.color}
+          color={colors.text}
           name={qr.standing === "valid" ? "check" : qr.standing === "expiring" ? "clock" : "alert"}
           size={18}
           strokeWidth={1.5}
         />
-        <Text style={[styles.stateText, tone]}>{line}</Text>
+        {/* The standing in words and weight, in the one ink (follow-up 285). */}
+        <Text style={styles.stateText} variant="titulo-fila">
+          {line}
+        </Text>
       </View>
       <FullScreenImage
         aspectRatio={ratio}
@@ -84,8 +81,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: 22,
   },
-  error: { color: colors.error },
-  ok: { color: colors.successText },
   // E-M09: the QR on white with a 1 pt 200 ring, so it scans.
   qrBox: {
     backgroundColor: colors.white,
@@ -96,6 +91,5 @@ const styles = StyleSheet.create({
   },
   placeholder: { alignItems: "center", justifyContent: "center" },
   state: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  stateText: { fontFamily: fontFamilies.bodyBold, fontSize: 15, fontWeight: "700" },
-  warning: { color: colors.warningText },
+  stateText: { flexShrink: 1 },
 });

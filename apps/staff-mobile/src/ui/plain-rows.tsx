@@ -1,14 +1,6 @@
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { Chevron, colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View, type AccessibilityState } from "react-native";
+import { Pressable, StyleSheet, View, type AccessibilityState } from "react-native";
 
 /**
  * FIX-083: one Lino card of rows split by full hairlines, with no icon discs
@@ -42,7 +34,6 @@ export function PlainRow({
   indent = false,
   label,
   onPress,
-  strong = false,
   testID,
   value,
 }: {
@@ -55,7 +46,6 @@ export function PlainRow({
   indent?: boolean;
   label: string;
   onPress?: () => void;
-  strong?: boolean;
   testID?: string;
   value?: string;
 }) {
@@ -67,10 +57,10 @@ export function PlainRow({
         <View style={styles.dotSpace} />
       )}
       <View style={styles.body}>
-        <Text style={[styles.label, strong && styles.strong]}>{label}</Text>
-        {detail === undefined ? null : <Text style={styles.detail}>{detail}</Text>}
+        <Text variant="titulo-fila">{label}</Text>
+        {detail === undefined ? null : <Text variant="secundario">{detail}</Text>}
       </View>
-      {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
+      {value === undefined ? null : <Text variant="compacto">{value}</Text>}
       {chevron === "none" || onPress === undefined ? null : (
         <Chevron direction={chevron} size={16} strokeWidth={1.5} tone="quiet" />
       )}
@@ -105,7 +95,6 @@ export function PlainRow({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   dot: {
     backgroundColor: colors.primary,
     borderRadius: radii.pill,
@@ -117,12 +106,6 @@ const styles = StyleSheet.create({
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   indent: { paddingLeft: spacing.xl + spacing.lg },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "flex-start",
@@ -131,12 +114,5 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
-  },
-  strong: { fontFamily: fontFamilies.bodyMedium },
-  value: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
   },
 });

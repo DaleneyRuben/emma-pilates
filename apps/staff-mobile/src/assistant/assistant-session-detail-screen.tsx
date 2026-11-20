@@ -7,9 +7,7 @@ import {
   formatListDate,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
-  colors,
   formatSessionMinutes,
   formatTimeRange,
   IconRow,
@@ -21,9 +19,8 @@ import {
   Screen,
   spacing,
   StaffFace,
+  Text,
   TextButton,
-  typography,
-  fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -252,15 +249,19 @@ export function AssistantSessionDetailScreen({
             </View>
           ) : null}
           {booked ? (
-            <BodyText style={styles.note}>La clienta ya tiene esta clase reservada.</BodyText>
+            <Text style={styles.note} variant="secundario">
+              La clienta ya tiene esta clase reservada.
+            </Text>
           ) : full ? (
             waitlisted ? (
-              <BodyText style={styles.note}>La clienta ya está en la lista de espera.</BodyText>
+              <Text style={styles.note} variant="secundario">
+                La clienta ya está en la lista de espera.
+              </Text>
             ) : (
               <>
-                <BodyText style={styles.note}>
+                <Text style={styles.note} variant="secundario">
                   {`Si se libera un lugar, le avisamos a ${firstName}.`}
-                </BodyText>
+                </Text>
                 <PrimaryButton
                   busy={submitting}
                   label="Anotarla en la lista de espera"
@@ -271,9 +272,9 @@ export function AssistantSessionDetailScreen({
             )
           ) : hasAllowance ? (
             <>
-              <BodyText style={styles.note}>
+              <Text style={styles.note} variant="secundario">
                 Se descuenta 1 clase de su plan. Le avisamos por notificación.
-              </BodyText>
+              </Text>
               <PrimaryButton
                 busy={submitting}
                 label={`Reservar para ${firstName}`}
@@ -284,9 +285,9 @@ export function AssistantSessionDetailScreen({
           ) : (
             <>
               <PrimaryButton disabled label={`Reservar para ${firstName}`} />
-              <BodyText style={styles.note}>
+              <Text style={styles.note} variant="secundario">
                 La clienta no tiene clases disponibles en su plan.
-              </BodyText>
+              </Text>
               <TextButton
                 label="Registrar pago"
                 onPress={() =>
@@ -304,12 +305,6 @@ export function AssistantSessionDetailScreen({
 const styles = StyleSheet.create({
   column: { gap: 0 },
   gapped: { gap: spacing.md },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   screen: { paddingHorizontal: spacing.xlSm },
 });

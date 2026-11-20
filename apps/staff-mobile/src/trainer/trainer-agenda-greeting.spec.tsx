@@ -69,6 +69,6 @@ describe("Trainer agenda greeting and times", () => {
     await waitFor(() => {
       expect(screen.getByText("10:00 · Reformer Pilates")).toBeOnTheScreen();
     });
-    expect(screen.getByText("TERMINÓ A LAS 10:50")).toBeOnTheScreen();
+    expect(screen.getByText("Terminó a las 10:50")).toBeOnTheScreen();
   });
 });

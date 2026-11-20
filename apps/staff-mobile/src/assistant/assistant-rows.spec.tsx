@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
 import {
@@ -33,11 +33,9 @@ describe("Assistant rows", () => {
 
     const row = screen.getByRole("button", { name: "Ver clienta Lucía Fernández" });
     expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
-    // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
-    expect(screen.getByText("LF")).toHaveStyle({
-      color: "#FFFBFB",
-      fontFamily: "WorkSans_600SemiBold",
-    });
+    // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle, in
+    // pastilla under 44 pt (follow-up 285).
+    expect(screen.getByText("LF")).toHaveStyle({ ...textVariants.pastilla, color: "#FFFBFB" });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#93615D", fontSize: 16 });
     expect(screen.getByText("🇧🇴 +591 70011001 · lucia@example.com")).toHaveStyle({
       color: "#93615D",

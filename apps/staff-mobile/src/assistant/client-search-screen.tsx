@@ -1,7 +1,7 @@
 import { colors, Screen, spacing } from "@pilates/mobile-core";
 import { staffRoleLabel, useGetCurrentStaffMemberProfile } from "@pilates/api-contracts";
 import { useNavigation } from "@react-navigation/native";
-import { Keyboard, StyleSheet, Text, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -14,7 +14,7 @@ import {
   ClientSearchField,
   ClientSearchResults,
   NewClientLink,
-  searchStyles,
+  SearchHint,
   useClientSearch,
 } from "./client-search-parts";
 
@@ -79,11 +79,7 @@ export function ClientSearchScreen() {
         />
       ) : (
         <>
-          <View style={searchStyles.hintCard}>
-            <Text style={searchStyles.hint}>
-              Escribe al menos dos letras o números para buscar.
-            </Text>
-          </View>
+          <SearchHint>Escribe al menos dos letras o números para buscar.</SearchHint>
           {newClientLink}
         </>
       )}

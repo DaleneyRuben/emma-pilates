@@ -2,16 +2,14 @@ import { formatMoney } from "@pilates/api-contracts";
 import {
   ClassList,
   ClassRow,
-  colors,
-  fontFamilies,
   Screen,
   ScreenHeader,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { BackBar } from "../ui/back-bar";
 import { bodyScroll, CardLabel, RowCard } from "../ui/card-pieces";
@@ -37,12 +35,13 @@ function UndatedRows({ lines }: { lines: UndatedPayLine[] }) {
         // Lines have no identity of their own; their order is the statement's.
         <View key={index} style={styles.row}>
           <View style={styles.rowBody}>
-            <Text style={styles.rowTitle}>{line.title}</Text>
+            <Text variant="titulo-fila">{line.title}</Text>
             {undatedNote(line) === null ? null : (
-              <Text style={styles.note}>{undatedNote(line)}</Text>
+              <Text variant="secundario">{undatedNote(line)}</Text>
             )}
           </View>
-          <Text style={styles.amount}>{formatMoney(line.amountCentavos)}</Text>
+          {/* Board E-M07: a line's amount at the row end in `titulo-fila`. */}
+          <Text variant="titulo-fila">{formatMoney(line.amountCentavos)}</Text>
         </View>
       ))}
     </RowCard>
@@ -116,19 +115,11 @@ export function PayGroupScreen({ route }: { route: { params: PayGroupParams } })
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "700",
-  },
   body: { flex: 1 },
   content: { gap: spacing.sm },
   day: { gap: spacing.sm },
   // E-M07: the day's heading is a white strip of its own.
   dayStrip: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -138,12 +129,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   rowBody: { flex: 1, gap: 2 },
-  rowTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

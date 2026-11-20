@@ -4,12 +4,11 @@ import {
   ClientFace,
   colors,
   ExceptionPill,
-  fontFamilies,
   radii,
   spacing,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { PersonRow } from "../ui/person-row";
 
@@ -59,7 +58,9 @@ export function ComingRow({
 function NewPill() {
   return (
     <View style={styles.newPill}>
-      <Text style={styles.newLabel}>Nueva</Text>
+      <Text tone="onDark" variant="pastilla">
+        Nueva
+      </Text>
     </View>
   );
 }
@@ -91,7 +92,7 @@ export function AttendanceRow({
         size={36}
       />
       <View style={styles.body}>
-        <Text style={styles.name}>{booking.clientName}</Text>
+        <Text variant="titulo-fila">{booking.clientName}</Text>
         {isFirstClass(booking) ? <ExceptionPill>Primera clase</ExceptionPill> : null}
         {/* Board I06: her class number rides the same soft tag. */}
         {ordinal === undefined ? null : (
@@ -112,7 +113,7 @@ export function AttendanceRow({
               style={[styles.choice, chipStyles.box, selected && chipStyles.boxSelected]}
               testID={`roster-${choice.outcome}-${booking.bookingId}`}
             >
-              <Text style={[styles.choiceLabel, selected && chipStyles.labelSelected]}>
+              <Text tone={selected ? "onDark" : "ink"} variant="compacto">
                 {choice.label}
               </Text>
             </Pressable>
@@ -132,20 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: spacing.mdLg,
   },
-  choiceLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   choices: { flexDirection: "row", gap: spacing.smd },
-  name: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  newLabel: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
   newPill: {
     alignItems: "center",
     backgroundColor: colors.primary,

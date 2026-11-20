@@ -9,7 +9,6 @@ import {
   ClientFace,
   colors,
   EmphasisCard,
-  fontFamilies,
   formatNotificationTime,
   Glyph,
   LoadingState,
@@ -17,13 +16,13 @@ import {
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 
@@ -165,8 +164,8 @@ export function PendingPaymentsScreen({
           >
             <Glyph color={colors.successText} name="check" size={22} strokeWidth={1.7} />
             <View style={styles.allClearText}>
-              <Text style={styles.allClearTitle}>Todo al día</Text>
-              <Text style={styles.allClearNote}>No hay pagos por confirmar</Text>
+              <Text variant="titulo-fila">Todo al día</Text>
+              <Text variant="secundario">No hay pagos por confirmar</Text>
             </View>
           </View>
         ) : (
@@ -179,8 +178,12 @@ export function PendingPaymentsScreen({
             >
               <EmphasisCard eyebrow={`Por confirmar · ${payments.length}`}>
                 <View style={styles.totalLine}>
-                  <Text style={styles.total}>{formatMoney(total)}</Text>
-                  <Text style={styles.totalWord}>en total</Text>
+                  <Text tone="onDark" variant="cifra-grande">
+                    {formatMoney(total)}
+                  </Text>
+                  <Text tone="onDark" variant="destacado">
+                    en total
+                  </Text>
                 </View>
               </EmphasisCard>
             </View>
@@ -223,31 +226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  allClearNote: {
-    color: colors.textSubtle,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
   allClearText: { flex: 1, gap: spacing.xxs },
-  allClearTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   screen: { paddingHorizontal: spacing.xlSm },
-  total: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 40,
-  },
   totalLine: { alignItems: "baseline", flexDirection: "row", flexWrap: "wrap", gap: spacing.smLg },
-  totalWord: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.titleSmall,
-    fontWeight: "700",
-  },
 });

@@ -6,20 +6,19 @@ import {
 } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   NoticeRow,
   PersonAvatar,
   phoneWithFlag,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
   useStaffPhoto,
   radii,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { loadImageUpload } from "../uploads/load-image-upload";
@@ -124,12 +123,12 @@ export function StaffPhotoSummary({
           ) : null}
         </View>
         <View style={styles.body}>
-          <Text style={styles.name}>{member.name}</Text>
-          <Text style={styles.detail}>{member.email}</Text>
-          {member.phone ? <Text style={styles.detail}>{phoneWithFlag(member.phone)}</Text> : null}
+          <Text variant="titulo-bloque">{member.name}</Text>
+          <Text variant="secundario">{member.email}</Text>
+          {member.phone ? <Text variant="secundario">{phoneWithFlag(member.phone)}</Text> : null}
           <View style={styles.actions}>
             {!editable ? null : state.status === "uploading" || state.status === "removing" ? (
-              <Text style={styles.busy}>
+              <Text variant="secundario">
                 {state.status === "uploading" ? "Subiendo foto…" : "Quitando foto…"}
               </Text>
             ) : (
@@ -144,7 +143,7 @@ export function StaffPhotoSummary({
         </View>
       </View>
       {state.status === "failed" ? <NoticeRow message={state.message} /> : null}
-      <Text style={styles.note}>{note}</Text>
+      <Text variant="secundario">{note}</Text>
     </View>
   );
 }
@@ -158,7 +157,7 @@ function TintButton({ label, onPress }: { label: string; onPress: () => void }) 
       onPress={onPress}
       style={({ pressed }) => [styles.tint, pressed && styles.pressed]}
     >
-      <Text style={styles.tintLabel}>{label}</Text>
+      <Text variant="boton-chico">{label}</Text>
     </Pressable>
   );
 }
@@ -173,10 +172,6 @@ const styles = StyleSheet.create({
   },
   block: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   body: { flex: 1, gap: spacing.xxs },
-  busy: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
   summary: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
   // FIX-089: the secondary button, Crema with a Rosa profundo outline.
@@ -189,12 +184,6 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: "center",
     paddingHorizontal: 14,
-  },
-  tintLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
   },
   // Marfil at 55 % with the busy ring (follow-up 241 §2), only while uploading.
   veil: {

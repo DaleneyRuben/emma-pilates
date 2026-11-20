@@ -1,12 +1,4 @@
-import {
-  colors,
-  fontFamilies,
-  PrimaryButton,
-  radii,
-  spacing,
-  TextButton,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, PrimaryButton, radii, spacing, Text, TextButton } from "@pilates/mobile-core";
 import { useEffect, useRef, useState } from "react";
 import {
   Modal,
@@ -14,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
@@ -39,8 +30,10 @@ type WheelOption = { value: number; text: string; label: string; enabled: boolea
 
 /**
  * One column of S17b's wheel: five rows tall, the chosen one in the middle
- * on a Lino band. It snaps to a row when scrolled and moves to a row when
- * tapped; rows the field cannot take are faint and do nothing.
+ * on a 50 band with its 200 rule (board N09). Every row is `cifra` in ink,
+ * chosen or not: the choice shows in the band, never in the face (follow-up
+ * 285 rule 4). It snaps to a row when scrolled and moves to a row when tapped;
+ * rows the field cannot take are struck through and do nothing.
  */
 function WheelColumn({
   options,
@@ -96,24 +89,20 @@ function WheelColumn({
         testID={testID}
       >
         {options.map((option) => {
-          const chosen = option.value === selected;
           return (
             <Pressable
               accessibilityLabel={option.label}
               accessibilityRole="button"
-              accessibilityState={{ disabled: !option.enabled, selected: chosen }}
+              accessibilityState={{
+                disabled: !option.enabled,
+                selected: option.value === selected,
+              }}
               disabled={!option.enabled}
               key={option.value}
               onPress={() => onSelect(option.value)}
               style={styles.row}
             >
-              <Text
-                style={[
-                  styles.rowText,
-                  chosen && styles.rowTextChosen,
-                  !option.enabled && styles.rowTextOff,
-                ]}
-              >
+              <Text strike={!option.enabled} variant="cifra">
                 {option.text}
               </Text>
             </Pressable>
@@ -173,11 +162,12 @@ export function TimeWheelSheet({
         <View style={styles.sheet} testID="time-wheel-sheet">
           <View style={styles.grab} />
           <View style={styles.readout}>
-            <Text style={styles.title}>{field === "start" ? "Hora de inicio" : "Hora de fin"}</Text>
-            <Text accessibilityLiveRegion="polite" style={styles.time}>
+            {/* Board N09: the field's name in `cuerpo` over the time. */}
+            <Text variant="cuerpo">{field === "start" ? "Hora de inicio" : "Hora de fin"}</Text>
+            <Text accessibilityLiveRegion="polite" variant="cifra-grande">
               {displayTime(localTimeOf(draft))}
             </Text>
-            <Text style={styles.note}>{note}</Text>
+            <Text variant="secundario">{note}</Text>
           </View>
           <View style={styles.wheel}>
             <WheelColumn
@@ -228,22 +218,8 @@ const styles = StyleSheet.create({
     height: 5,
     width: 40,
   },
-  note: { fontFamily: fontFamilies.body, color: colors.text, fontSize: 14 },
   readout: { alignItems: "center", gap: spacing.xs },
   row: { alignItems: "center", height: row, justifyContent: "center" },
-  rowText: {
-    fontFamily: fontFamilies.display,
-    color: colors.text,
-    fontSize: 20,
-    fontVariant: ["tabular-nums"],
-  },
-  rowTextChosen: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  rowTextOff: { color: colors.borderStrong },
   sheet: {
     backgroundColor: colors.white,
     borderTopLeftRadius: radii.band,
@@ -252,18 +228,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.smLg,
-  },
-  time: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    fontVariant: ["tabular-nums"],
-  },
-  title: {
-    fontFamily: fontFamilies.bodyMedium,
-    color: colors.text,
-    fontSize: typography.body,
-    fontWeight: "500",
   },
   wheel: { flexDirection: "row", gap: spacing.sm },
 });

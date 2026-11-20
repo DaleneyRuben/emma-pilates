@@ -1,8 +1,6 @@
 import { decideFreeze, useGetFreezeReview } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
-  fontFamilies,
   LoadingState,
   NoticeRow,
   OutlinedButton,
@@ -11,11 +9,12 @@ import {
   Screen,
   spacing,
   surfaces,
+  Text,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -148,7 +147,7 @@ export function ReviewFreezeScreen({ route }: { route: { params: { freezeId: str
           {error}
           {decision === undefined ? null : (
             <View style={styles.decision}>
-              <Text style={styles.decisionText}>{decision}</Text>
+              <Text variant="cuerpo">{decision}</Text>
             </View>
           )}
         </ScrollView>
@@ -181,7 +180,6 @@ const styles = StyleSheet.create({
   column: { alignSelf: "center", flex: 1, width: "100%" },
   // E-D10: who decided and when, in a white card.
   decision: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  decisionText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { maxWidth: 560 },
 });

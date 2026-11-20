@@ -1,13 +1,6 @@
-import {
-  colors,
-  Glyph,
-  type MobileImpersonation,
-  spacing,
-  typography,
-  fontFamilies,
-} from "@pilates/mobile-core";
+import { colors, Glyph, type MobileImpersonation, spacing, Text } from "@pilates/mobile-core";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { staffRoleLabel } from "@pilates/api-contracts";
@@ -51,8 +44,10 @@ export function ImpersonationBanner({
       <View style={styles.row}>
         <Glyph color={colors.white} name="eye" size={18} strokeWidth={1.6} />
         <View style={styles.text}>
-          <Text numberOfLines={1} style={styles.title}>{`Viendo como ${name}`}</Text>
-          <Text numberOfLines={1} style={styles.detail}>
+          <Text numberOfLines={1} tone="onDark" variant="titulo-fila">
+            {`Viendo como ${name}`}
+          </Text>
+          <Text numberOfLines={1} tone="onDark" variant="secundario">
             {`${staffRoleLabel(impersonation.role, impersonation.gender)} · Quedan ${minutesLeft(impersonation.expiresAt, now)} min`}
           </Text>
         </View>
@@ -63,20 +58,18 @@ export function ImpersonationBanner({
           style={({ pressed }) => [styles.exit, pressed && styles.exitPressed]}
           testID="impersonation-exit"
         >
-          <Text style={styles.exitText}>Salir</Text>
+          <Text tone="onDark" variant="boton-chico">
+            Salir
+          </Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-// Rosa Emma (E-D25): the 600 strip with white text and an outlined «Salir».
+// Rosa Emma (E-D25): the 600 strip with white text and an outlined «Salir»
+// (`boton-chico`: a small button, not a link).
 const styles = StyleSheet.create({
-  detail: {
-    fontFamily: fontFamilies.body,
-    color: colors.white,
-    fontSize: typography.label,
-  },
   exit: {
     alignItems: "center",
     borderColor: colors.white,
@@ -87,12 +80,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   exitPressed: { opacity: 0.7 },
-  exitText: {
-    fontFamily: fontFamilies.bodyBold,
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: "700",
-  },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -104,10 +91,4 @@ const styles = StyleSheet.create({
   // plus the strip, so their own safe-area views add nothing more.
   strip: { backgroundColor: colors.emphasis, left: 0, position: "absolute", right: 0, top: 0 },
   text: { flex: 1 },
-  title: {
-    fontFamily: fontFamilies.bodyBold,
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: "700",
-  },
 });

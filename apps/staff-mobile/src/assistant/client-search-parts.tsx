@@ -7,7 +7,7 @@ import {
   ClientFace,
   colors,
   ExceptionPill,
-  fontFamilies,
+  fieldTextProps,
   Glyph,
   IconRowGroup,
   LineIcon,
@@ -17,13 +17,13 @@ import {
   spacing,
   StateScreen,
   surfaces,
-  typography,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useEffect, useState, type ReactElement } from "react";
 import { Circle, Path } from "react-native-svg";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { PersonRow } from "../ui/person-row";
@@ -76,7 +76,9 @@ export function NewClientLink({ onPress }: { onPress: () => void }) {
       <LineIcon color={colors.text} size={18} strokeWidth={1.7}>
         <Path d="M12 5v14M5 12h14" />
       </LineIcon>
-      <Text style={styles.newClientLabel}>{newClientLabel}</Text>
+      <Text style={styles.newClientLabel} variant="titulo-fila">
+        {newClientLabel}
+      </Text>
       <Chevron size={16} strokeWidth={1.5} tone="muted" />
     </Pressable>
   );
@@ -93,6 +95,7 @@ export function ClientSearchField({ search }: { search: ClientSearch }) {
         <Path d="M16 16l4 4" />
       </LineIcon>
       <TextInput
+        {...fieldTextProps(text)}
         accessibilityLabel={placeholder}
         autoCapitalize="none"
         autoCorrect={false}
@@ -100,8 +103,7 @@ export function ClientSearchField({ search }: { search: ClientSearch }) {
         onChangeText={setText}
         onFocus={() => setFocused(true)}
         placeholder="Nombre, teléfono o correo"
-        placeholderTextColor={colors.textMuted}
-        style={styles.input}
+        style={[fieldTextProps(text).style, styles.input]}
         testID="client-search-input"
         value={text}
       />
@@ -137,13 +139,7 @@ export function ClientSearchResults({
   const fetcher = useStaffFetcher();
   const { refreshControl, results } = search;
   if (results.isPending) {
-    return (
-      <View style={styles.hintCard}>
-        <Text accessibilityLabel="Buscando clientas" style={styles.hint}>
-          Buscando…
-        </Text>
-      </View>
-    );
+    return <SearchHint accessibilityLabel="Buscando clientas">Buscando…</SearchHint>;
   }
   if (results.isError || results.data.status !== 200) {
     return (
@@ -202,22 +198,22 @@ export function ClientSearchResults({
   );
 }
 
-// A quiet line never sits on the 100 screen: it reads in Lora on a white card.
-export const searchStyles = StyleSheet.create({
-  hint: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    lineHeight: 29,
-    textAlign: "center",
-  },
-  hintCard: {
-    ...surfaces.card,
-    alignItems: "center",
-    paddingHorizontal: spacing.xlSm,
-    paddingVertical: spacing.xlSm,
-  },
-});
+/** A quiet line of the search: a `cuerpo` sentence on a white card, never on the 100 screen. */
+export function SearchHint({
+  accessibilityLabel,
+  children,
+}: {
+  accessibilityLabel?: string;
+  children: string;
+}) {
+  return (
+    <View style={styles.hintCard}>
+      <Text accessibilityLabel={accessibilityLabel} style={styles.hint} variant="cuerpo">
+        {children}
+      </Text>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   clear: { alignItems: "center", height: 32, justifyContent: "center", width: 32 },
@@ -234,15 +230,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   fieldActive: { borderColor: colors.primary },
-  hint: searchStyles.hint,
-  hintCard: searchStyles.hintCard,
-  input: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 16,
-    minHeight: 52,
+  hint: { textAlign: "center" },
+  hintCard: {
+    ...surfaces.card,
+    alignItems: "center",
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.xlSm,
   },
+  input: { flex: 1, minHeight: 52 },
   list: {
     gap: spacing.md,
     paddingBottom: spacing.xxl,
@@ -258,13 +253,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  newClientLabel: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
+  newClientLabel: { flex: 1 },
   pressed: { opacity: 0.7 },
   // The list reaches the screen's sides so the cards' shadows show.
   scroll: { marginHorizontal: -spacing.xlSm },

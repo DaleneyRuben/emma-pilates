@@ -10,6 +10,7 @@ import {
   QueryFailure,
   Screen,
   spacing,
+  surfaces,
   usePullToRefresh,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -117,12 +118,15 @@ export function TodayScreen() {
         <View style={styles.top}>
           <RootHeader bell eyebrow={eyebrow} title={title} />
           {branch !== null && branches.options.length > 1 ? (
-            <BranchField
-              onSelect={branches.select}
-              options={branches.options}
-              selectedId={branch.id}
-              selectedName={branch.name}
-            />
+            // Small text never sits on the 100 screen (follow-up 285 rule 3).
+            <View style={styles.branchCard} testID="today-branch-card">
+              <BranchField
+                onSelect={branches.select}
+                options={branches.options}
+                selectedId={branch.id}
+                selectedName={branch.name}
+              />
+            </View>
           ) : null}
           <ClientSearchField search={search} />
         </View>
@@ -133,6 +137,7 @@ export function TodayScreen() {
 }
 
 const styles = StyleSheet.create({
+  branchCard: { ...surfaces.card, paddingHorizontal: spacing.mdLg, paddingVertical: spacing.smLg },
   day: {
     gap: spacing.md,
     paddingBottom: spacing.xxl,

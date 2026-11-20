@@ -1,5 +1,5 @@
 import { formatMoney } from "@pilates/api-contracts";
-import { colors } from "@pilates/mobile-core";
+import type { TextTone } from "@pilates/mobile-core";
 
 // «520», «520,5», «520,50», or «520.50» typed into «Efectivo contado», in
 // centavos; anything else (thousands separators included) is unreadable.
@@ -16,15 +16,12 @@ export function formatSignedBolivianos(centavos: number): string {
   return `${centavos > 0 ? "+" : "−"}${formatMoney(Math.abs(centavos))}`;
 }
 
-export type DifferenceTone = { label: string; text: string; tint: string };
+// The difference says itself in words; its text keeps the one ink (follow-up 285).
+export type DifferenceTone = { label: string; tone: TextTone };
 
 export function describeDifference(centavos: number): DifferenceTone {
-  if (centavos === 0) {
-    return { label: "Cuadra", text: colors.successText, tint: colors.successTint };
-  }
-  return centavos < 0
-    ? { label: "Falta efectivo", text: colors.errorText, tint: colors.errorTint }
-    : { label: "Sobra efectivo", text: colors.warningText, tint: colors.warningTint };
+  if (centavos === 0) return { label: "Cuadra", tone: "ink" };
+  return { label: centavos < 0 ? "Falta efectivo" : "Sobra efectivo", tone: "ink" };
 }
 
 // «Cuadra», «Falta Bs 10,00», «Sobra Bs 5,50»: the difference as Cerrar caja reads it (FIX-083).

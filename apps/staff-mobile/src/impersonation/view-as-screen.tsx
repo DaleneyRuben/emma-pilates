@@ -2,8 +2,6 @@ import { useListBranches, useListStaffMembers, type StaffMemberDto } from "@pila
 import {
   ConfirmationSheet,
   EmptyState,
-  fontFamilies,
-  colors,
   IconRow,
   IconRowGroup,
   LoadingState,
@@ -12,11 +10,11 @@ import {
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -141,7 +139,9 @@ export function ViewAsScreen() {
               ))}
             </RowCard>
             <View style={styles.footnoteCard}>
-              <Text style={styles.footnote}>Nunca aparece otra persona de administración.</Text>
+              <Text style={styles.footnote} variant="secundario">
+                Nunca aparece otra persona de administración.
+              </Text>
             </View>
           </>
         )}
@@ -177,12 +177,7 @@ const styles = StyleSheet.create({
     maxWidth: 600,
     width: "100%",
   },
-  footnote: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  footnote: { textAlign: "center" },
   footnoteCard: {
     ...surfaces.card,
     paddingHorizontal: spacing.mdLg,

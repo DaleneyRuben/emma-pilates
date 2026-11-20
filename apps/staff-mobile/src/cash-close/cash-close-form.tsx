@@ -2,18 +2,18 @@ import { recordCashClose, type CashCloseDto, formatMoney } from "@pilates/api-co
 import {
   colors,
   ConfirmationSheet,
-  fontFamilies,
+  fieldTextProps,
   FormField,
   NoticeRow,
   PrimaryButton,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { randomUUID } from "expo-crypto";
 import { useState, type ReactNode } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 
 import { RowCard } from "../ui/card-pieces";
 import { ValueRow } from "../ui/value-row";
@@ -123,7 +123,7 @@ export function CashCloseForm({
         onPress={() => setConfirming(true)}
         testID="cash-close-submit"
       />
-      <Text style={[styles.quiet, styles.centered]}>
+      <Text style={styles.centered} variant="secundario">
         Te pediremos confirmar: un cierre no se puede deshacer.
       </Text>
     </>
@@ -133,23 +133,23 @@ export function CashCloseForm({
     <CashCloseFrame footer={footer} root={root}>
       {lead}
       <View style={styles.card}>
-        <Text style={styles.question}>{question}</Text>
+        <Text variant="titulo-fila">{question}</Text>
         <View style={[styles.amount, (focused || counted !== "") && styles.amountFocused]}>
-          <Text style={styles.currency}>Bs</Text>
+          <Text variant="titulo-fila">Bs</Text>
           <TextInput
+            {...fieldTextProps(counted, "cifra-grande")}
             accessibilityLabel={question}
             keyboardType="decimal-pad"
             onBlur={() => setFocused(false)}
             onChangeText={setCounted}
             onFocus={() => setFocused(true)}
             placeholder="0"
-            placeholderTextColor={colors.iconQuiet}
-            style={styles.input}
+            style={[fieldTextProps(counted, "cifra-grande").style, styles.input]}
             testID="cash-close-counted"
             value={counted}
           />
         </View>
-        <Text style={styles.quiet}>Cuenta los billetes antes de mirar el total esperado.</Text>
+        <Text variant="cuerpo">Cuenta los billetes antes de mirar el total esperado.</Text>
       </View>
       {/* FIX-090: what the payments expect only reads once she has counted. */}
       {countedCentavos === null || difference === null || differenceCentavos === null ? null : (
@@ -178,7 +178,7 @@ export function CashCloseForm({
             <ValueRow
               label="Diferencia"
               value={
-                <Text style={[styles.differenceValue, { color: difference.text }]}>
+                <Text tone={difference.tone} variant="titulo-fila">
                   {differenceValue(differenceCentavos)}
                 </Text>
               }
@@ -187,7 +187,7 @@ export function CashCloseForm({
         </RowCard>
       )}
       <View style={styles.card}>
-        <Text style={styles.sales}>{describeCashSales(cashPaymentCount, branch.name)}</Text>
+        <Text variant="cuerpo">{describeCashSales(cashPaymentCount, branch.name)}</Text>
         {differenceCentavos === null || differenceCentavos === 0 ? null : (
           <FormField
             label="Nota"
@@ -242,34 +242,6 @@ const styles = StyleSheet.create({
   amountFocused: { borderColor: colors.primary, borderWidth: 2 },
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   centered: { textAlign: "center" },
-  currency: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyLarge,
-    fontWeight: "700",
-  },
-  differenceValue: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "700",
-  },
-  input: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    fontVariant: ["tabular-nums"],
-    padding: 0,
-  },
+  input: { flex: 1, padding: 0 },
   note: { minHeight: 88, paddingTop: spacing.md, textAlignVertical: "top" },
-  question: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
-  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  sales: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
 });

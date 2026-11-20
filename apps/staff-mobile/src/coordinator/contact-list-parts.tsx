@@ -4,15 +4,14 @@ import {
   ClientFace,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   LineIcon,
   NoticeRow,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, View } from "react-native";
 import { Path } from "react-native-svg";
 
 import { CardLabel } from "../ui/card-pieces";
@@ -61,9 +60,9 @@ export function ContactRow({
           tone="neutral"
         />
         <View style={styles.rowBody}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.reasons}>{reasons}</Text>
-          <Text style={styles.meta}>{contactRowMeta(item)}</Text>
+          <Text variant="titulo-fila">{item.name}</Text>
+          <Text variant="secundario">{reasons}</Text>
+          <Text variant="secundario">{contactRowMeta(item)}</Text>
         </View>
       </Pressable>
       {href === null ? null : (
@@ -129,19 +128,17 @@ export function ContactSheet({
       tone="primary"
       visible
     >
-      <Text style={styles.meta}>{contactSheetMeta(item)}</Text>
+      <Text variant="secundario">{contactSheetMeta(item)}</Text>
       <View style={styles.inset}>
         <CardLabel>Por qué está aquí</CardLabel>
         {contactReasonLabels(item.reasons).map((label) => (
           <View key={label} style={styles.reasonLine}>
             <View style={styles.dot} />
-            <Text style={styles.reasonText}>{label}</Text>
+            <Text variant="cuerpo">{label}</Text>
           </View>
         ))}
       </View>
-      {href === null ? (
-        <Text style={styles.note}>{contactMissingPhoneNote(item.phone)}</Text>
-      ) : null}
+      {href === null ? <Text variant="cuerpo">{contactMissingPhoneNote(item.phone)}</Text> : null}
       {failed ? (
         <View accessibilityRole="alert">
           <NoticeRow message={`No pudimos marcar a ${item.name}. Inténtalo de nuevo.`} />
@@ -162,22 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  meta: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  name: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 21,
-  },
   reasonLine: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  reasonText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  reasons: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 19 },
   // Board K01: the WhatsApp ring, white with a 1.5 pt 400 outline.
   ring: {
     alignItems: "center",

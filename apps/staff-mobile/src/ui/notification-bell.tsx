@@ -1,7 +1,7 @@
 import { useGetUnreadNotificationCount } from "@pilates/api-contracts";
-import { colors, fontFamilies, Glyph, radii, unreadCountLabel } from "@pilates/mobile-core";
+import { colors, Glyph, radii, Text, unreadCountLabel } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -30,9 +30,11 @@ export function NotificationBell() {
     >
       <Glyph color={colors.text} name="bell" size={20} strokeWidth={1.6} />
       {count > 0 ? (
-        <Text style={styles.count} testID="notification-bell-count">
-          {unreadCountLabel(count)}
-        </Text>
+        <View style={styles.count}>
+          <Text testID="notification-bell-count" tone="onDark" variant="pastilla">
+            {unreadCountLabel(count)}
+          </Text>
+        </View>
       ) : null}
     </Pressable>
   );
@@ -47,21 +49,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 44,
   },
+  // The count rides a 600 disc: white `pastilla`, the disc grows with it.
   count: {
+    alignItems: "center",
     backgroundColor: colors.primary,
     borderRadius: radii.pill,
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "600",
-    height: 18,
-    lineHeight: 18,
+    justifyContent: "center",
+    minHeight: 18,
     minWidth: 18,
-    overflow: "hidden",
     paddingHorizontal: 4,
     position: "absolute",
     right: 2,
-    textAlign: "center",
     top: 2,
   },
   pressed: { opacity: 0.7 },

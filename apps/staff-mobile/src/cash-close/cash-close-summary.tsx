@@ -1,16 +1,8 @@
 import { formatMoney } from "@pilates/api-contracts";
 import type { CashCloseDto } from "@pilates/api-contracts";
-import {
-  colors,
-  fontFamilies,
-  PrimaryButton,
-  spacing,
-  StateScreen,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { PrimaryButton, spacing, StateScreen, surfaces, Text } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { clockTime } from "../nutritionist/nutritionist-format";
 import { RowCard } from "../ui/card-pieces";
@@ -21,7 +13,8 @@ import { formatSignedBolivianos } from "./cash-close-format";
 /**
  * S25 «Caja cerrada» (E-S07): after recording, or when the day was already
  * closed. Who closed it on a white card, the difference large on a 500 block,
- * the counts on their own card, and the way on in the white footer.
+ * the counts on their own card, and the way on in the white footer. On the
+ * 500 block only large text: the figure in `cifra-grande`, its word `destacado`.
  */
 export function CashCloseSummary({
   close,
@@ -56,8 +49,12 @@ export function CashCloseSummary({
         accessible
         style={styles.difference}
       >
-        <Text style={styles.amount}>{formatSignedBolivianos(close.differenceCentavos)}</Text>
-        <Text style={styles.label}>Diferencia</Text>
+        <Text tone="onDark" variant="cifra-grande">
+          {formatSignedBolivianos(close.differenceCentavos)}
+        </Text>
+        <Text tone="onDark" variant="destacado">
+          Diferencia
+        </Text>
       </View>
       <RowCard>
         <ValueRow label="Efectivo esperado" value={formatMoney(close.expectedCentavos)} />
@@ -69,23 +66,10 @@ export function CashCloseSummary({
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.onMedio,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 46,
-  },
   difference: {
     ...surfaces.medio,
     gap: spacing.xxs,
     paddingHorizontal: spacing.xlSm,
     paddingVertical: spacing.lgXl,
-  },
-  label: {
-    color: colors.onMedio,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.titleSmall,
-    fontWeight: "700",
   },
 });

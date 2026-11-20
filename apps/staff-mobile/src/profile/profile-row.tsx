@@ -1,14 +1,5 @@
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  Glyph,
-  type GlyphName,
-  radii,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, colors, Glyph, type GlyphName, radii, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * A Perfil settings row (S23): `IconRow`'s shape with the unread count in
@@ -23,7 +14,6 @@ export function ProfileRow({
   testID,
   tone = "default",
   value,
-  valueTone,
 }: {
   badge?: number;
   icon: GlyphName;
@@ -34,8 +24,9 @@ export function ProfileRow({
   /** A short value before the chevron, such as the Trainer's code. */
   value?: string;
   /**
-   * FIX-072: a payout QR's standing, in plain spacing (not a code), amber when
-   * it expires soon and Error once expired.
+   * FIX-072: marks the value as a payout QR's standing. Kept for callers: the
+   * standing is said in words, in the one ink and the same `compacto` as any
+   * other value (follow-up 285).
    */
   valueTone?: "muted" | "warning" | "error";
 }) {
@@ -57,21 +48,19 @@ export function ProfileRow({
       <View style={styles.disc}>
         <Glyph color={colors.text} name={icon} size={22} strokeWidth={1.6} />
       </View>
-      <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
+      <Text style={styles.label} variant="titulo-fila">
+        {label}
+      </Text>
       {badge > 0 ? (
         <View style={styles.badge} testID="notifications-row-badge">
-          <Text style={styles.badgeLabel}>{badge > 9 ? "9+" : String(badge)}</Text>
+          <Text allowFontScaling={false} tone="onDark" variant="pastilla">
+            {badge > 9 ? "9+" : String(badge)}
+          </Text>
         </View>
       ) : null}
       {value === undefined ? null : (
-        <Text
-          style={[
-            styles.value,
-            valueTone !== undefined && styles.plainValue,
-            valueTone === "warning" && styles.warningValue,
-            valueTone === "error" && styles.errorValue,
-          ]}
-        >
+        // E-F01: the value, a code or a standing, in `compacto` with no hand-made spacing.
+        <Text style={styles.value} variant="compacto">
           {value}
         </Text>
       )}
@@ -91,23 +80,10 @@ const styles = StyleSheet.create({
     minWidth: 24,
     paddingHorizontal: spacing.sm,
   },
-  badgeLabel: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", justifyContent: "center", width: 24 },
-  errorLabel: { color: colors.text },
-  // E-F01: the row's label in Work Sans 16 SemiBold, its value 14 SemiBold.
-  label: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
+  // E-F01: the row's label takes the room; its value keeps to 60 percent.
+  label: { flex: 1 },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
@@ -117,14 +93,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.smd,
   },
-  errorValue: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  plainValue: { letterSpacing: 0 },
-  warningValue: { color: colors.warningText, fontFamily: fontFamilies.bodyMedium },
-  value: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-    letterSpacing: 1.1,
-  },
+  value: { flexShrink: 1, maxWidth: "60%" },
 });

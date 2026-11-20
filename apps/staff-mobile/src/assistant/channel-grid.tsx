@@ -3,16 +3,17 @@ import {
   chipStyles,
   type AcquisitionChannelChoice,
   colors,
-  fontFamilies,
+  InlineError,
   spacing,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, View } from "react-native";
 
 /**
  * S05's «¿Cómo nos conoció?» as a two-column grid of Lino tiles (walkthrough
  * 20) in palette B: the chosen one Rosa profundo (FIX-089). Same answers as
- * the shared chip field.
+ * the shared chip field. The chosen tile changes its ground, never its
+ * weight (follow-up 285).
  */
 export function ChannelGrid({
   error,
@@ -49,25 +50,20 @@ export function ChannelGrid({
               ]}
               testID={`acquisition-channel-${option.value}`}
             >
-              <Text style={[chipStyles.label, selected && chipStyles.labelSelected]}>
+              <Text tone={selected ? "onDark" : "ink"} variant="compacto">
                 {option.label}
               </Text>
             </Pressable>
           );
         })}
       </View>
-      {error === undefined ? null : (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {error}
-        </Text>
-      )}
+      {error === undefined ? null : <InlineError field>{error}</InlineError>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   alert: { borderColor: colors.error, borderWidth: 2 },
-  error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
   field: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   tile: {

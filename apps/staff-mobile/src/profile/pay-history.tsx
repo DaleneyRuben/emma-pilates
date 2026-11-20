@@ -1,18 +1,19 @@
 import { formatMoney } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto, PayStatementDto } from "@pilates/api-contracts";
-import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, colors, Glyph, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { RowCard } from "../ui/card-pieces";
 import { type StatementStatus, statementStatus, statusLine } from "./pay-ledger";
 import { payPeriodHeading } from "./pay-period-heading";
 
-// Each status keeps one icon and one colour, here and on the statement screen.
+// Each status keeps one icon, here and on the statement screen; its words say
+// the status in the one ink (follow-up 285: never a colour of its own).
 export const statusTone = {
-  paid: { glyph: "check", color: colors.successText },
-  unpaid: { glyph: "clock", color: colors.warningText },
-  open: { glyph: "hourglass", color: colors.primaryOnTint },
-} as const satisfies Record<StatementStatus["kind"], unknown>;
+  paid: { glyph: "check", tone: "ink" },
+  unpaid: { glyph: "clock", tone: "ink" },
+  open: { glyph: "hourglass", tone: "ink" },
+} as const satisfies Record<StatementStatus["kind"], { glyph: string; tone: "ink" | "onDark" }>;
 
 // Finding 111, proposal B: one compact row per statement, newest first; a
 // row opens the statement's own screen.
@@ -41,13 +42,15 @@ export function PayHistory({
             testID="pay-history-row"
           >
             <View style={styles.body}>
-              <Text style={styles.period}>{heading}</Text>
+              <Text variant="titulo-fila">{heading}</Text>
               <View style={styles.status}>
-                <Glyph color={tone.color} name={tone.glyph} size={15} strokeWidth={1.6} />
-                <Text style={[styles.statusText, { color: tone.color }]}>{statusLine(status)}</Text>
+                <Glyph color={colors.text} name={tone.glyph} size={15} strokeWidth={1.6} />
+                <Text tone={tone.tone} variant="secundario">
+                  {statusLine(status)}
+                </Text>
               </View>
             </View>
-            <Text style={styles.amount}>{formatMoney(statement.totalCentavos)}</Text>
+            <Text variant="cifra">{formatMoney(statement.totalCentavos)}</Text>
             <Chevron size={16} strokeWidth={1.5} tone="muted" />
           </Pressable>
         );
@@ -57,19 +60,7 @@ export function PayHistory({
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSmall,
-    fontVariant: ["tabular-nums"],
-  },
   body: { flex: 1, gap: spacing.xs },
-  period: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
   pressed: { backgroundColor: colors.surfaceSubtle },
   row: {
     alignItems: "center",
@@ -81,5 +72,4 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   status: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  statusText: { fontFamily: fontFamilies.body, fontSize: typography.note },
 });

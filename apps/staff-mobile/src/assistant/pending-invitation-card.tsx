@@ -7,21 +7,20 @@ import {
 import {
   colors,
   ConfirmationSheet,
-  fontFamilies,
   FormField,
   NoticeRow,
   OutlinedButton,
   radii,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
   useCountdown,
   WaitNotice,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { SoftNote } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -168,7 +167,7 @@ export function PendingInvitationCard({
       style={styles.more}
       testID="pending-card-more"
     >
-      <Text style={styles.moreDots}>⋯</Text>
+      <Text variant="boton">⋯</Text>
     </Pressable>
   );
 
@@ -268,13 +267,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     width: 40,
-  },
-  moreDots: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.titleSmall,
-    fontWeight: "700",
-    lineHeight: 22,
   },
   pendingCard: { ...surfaces.card, padding: spacing.lg },
 });

@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react-native";
+import { textVariants } from "@pilates/mobile-core";
 
 import { SessionRow } from "./session-row";
 
@@ -9,14 +10,17 @@ describe("Staff SessionRow", () => {
       <SessionRow places="3 de 8" subtitle="Centro" time="07:00" title="Reformer" />,
     );
 
-    // MOB-074: «07:00» never breaks into «07:0» and «0».
-    expect(screen.getByText("07:00")).toHaveProp("numberOfLines", 1);
+    // MOB-074: «07:00» never breaks into «07:0» and «0»: the time column never
+    // shrinks below its width, and grows with the text size instead of
+    // truncating (follow-up 285: no numberOfLines, the time is a cifra).
+    expect(screen.getByTestId("class-row-time")).toHaveTextContent("07:00");
     expect(screen.getByTestId("class-row-time")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
+      ...textVariants.cifra,
+      flexShrink: 0,
       minWidth: 62,
     });
     expect(screen.getByTestId("type-bar")).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(screen.getByText("3 de 8")).toHaveStyle({ color: "#93615D", fontWeight: "700" });
+    expect(screen.getByText("3 de 8")).toHaveStyle({ ...textVariants.pastilla, color: "#93615D" });
     expect(screen.queryByTestId("exception-pill")).toBeNull();
   });
 

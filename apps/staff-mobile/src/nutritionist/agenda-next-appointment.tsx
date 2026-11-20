@@ -1,15 +1,6 @@
 import type { NutritionistAgendaEntryDto } from "@pilates/api-contracts";
-import {
-  colors,
-  fontFamilies,
-  initials,
-  LineIcon,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, initials, LineIcon, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Linking, Pressable, StyleSheet, View } from "react-native";
 import { Path } from "react-native-svg";
 
 import {
@@ -44,20 +35,32 @@ export function NextAppointment({
         accessible
         style={styles.body}
       >
-        <Text style={styles.eyebrow}>{started ? "En curso" : "Próxima cita"}</Text>
-        <Text style={styles.title}>{nextAppointmentTitle(entry, today)}</Text>
+        <Text tone="onDark" variant="etiqueta">
+          {started ? "En curso" : "Próxima cita"}
+        </Text>
+        <Text tone="onDark" variant="titulo-bloque">
+          {nextAppointmentTitle(entry, today)}
+        </Text>
         <View style={styles.client}>
           <View style={styles.circle}>
-            <Text style={styles.initials}>{initials(entry.clientName)}</Text>
+            <Text allowFontScaling={false} variant="pastilla">
+              {initials(entry.clientName)}
+            </Text>
           </View>
           <View style={styles.who}>
-            <Text style={styles.name}>{entry.clientName}</Text>
-            <Text style={styles.detail}>{nextAppointmentDetail(entry)}</Text>
+            <Text tone="onDark" variant="titulo-fila">
+              {entry.clientName}
+            </Text>
+            <Text tone="onDark" variant="secundario">
+              {nextAppointmentDetail(entry)}
+            </Text>
           </View>
         </View>
       </View>
       {href === null ? (
-        <Text style={styles.detail}>{missingWhatsAppNote(entry)}</Text>
+        <Text tone="onDark" variant="secundario">
+          {missingWhatsAppNote(entry)}
+        </Text>
       ) : (
         <Pressable
           accessibilityLabel="Escribirle por WhatsApp"
@@ -69,7 +72,7 @@ export function NextAppointment({
           <LineIcon color={colors.primary} size={20} strokeWidth={1.6}>
             <Path d="M4.5 5.5h15v10h-9l-4.5 4v-4h-1.5z" />
           </LineIcon>
-          <Text style={styles.whatsAppLabel}>Escribirle por WhatsApp</Text>
+          <Text variant="boton">Escribirle por WhatsApp</Text>
         </Pressable>
       )}
       {started ? null : (
@@ -81,7 +84,9 @@ export function NextAppointment({
           style={({ pressed }) => [styles.cancel, pressed && styles.pressed]}
           testID={`cancel-evaluation-${entry.evaluationId}`}
         >
-          <Text style={styles.cancelLabel}>Cancelar evaluación</Text>
+          <Text tone="onDark" variant="enlace">
+            Cancelar evaluación
+          </Text>
         </Pressable>
       )}
     </View>
@@ -92,13 +97,6 @@ const styles = StyleSheet.create({
   block: { ...surfaces.emphasis, gap: spacing.md, padding: spacing.xlSm },
   body: { gap: spacing.sm },
   cancel: { alignItems: "center", justifyContent: "center", minHeight: 44 },
-  cancelLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
   circle: {
     alignItems: "center",
     backgroundColor: colors.onEmphasis,
@@ -108,35 +106,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   client: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  detail: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
-  eyebrow: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
-  initials: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
-  name: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 16,
-    fontWeight: "700",
-  },
   pressed: { opacity: 0.85 },
-  title: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 28,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 34,
-  },
   who: { flex: 1, gap: spacing.xxs },
   // Board N01: the white «light» button inside the hero, its glyph first.
   whatsApp: {
@@ -149,11 +119,5 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     minHeight: 48,
     paddingHorizontal: spacing.lg,
-  },
-  whatsAppLabel: {
-    color: colors.primary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
   },
 });

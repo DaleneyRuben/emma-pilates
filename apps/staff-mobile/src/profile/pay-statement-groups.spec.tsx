@@ -67,7 +67,7 @@ describe("Staff statement by concept", () => {
     const detail = within(screen.getByTestId("pay-statement"));
     const total = within(detail.getByTestId("pay-statement-total"));
     expect(total.getByText("Total")).toBeOnTheScreen();
-    expect(total.getByText("Bs 264,90")).toHaveStyle({ fontSize: 36 });
+    expect(total.getByText("Bs 264,90")).toHaveStyle({ fontSize: 34 });
     expect(total.getByText("En curso · se aprueba desde el mié 18 nov")).toBeOnTheScreen();
     // The payment strip still says where the money stands.
     expect(detail.getByText("Todavía sin aprobar")).toBeOnTheScreen();

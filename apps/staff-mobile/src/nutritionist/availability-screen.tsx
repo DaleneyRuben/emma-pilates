@@ -6,20 +6,18 @@ import {
 } from "@pilates/api-contracts";
 import {
   Chevron,
-  colors,
-  fontFamilies,
   LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
   spacing,
   StateScreen,
-  typography,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
 import { TabFooter } from "../ui/tab-footer";
@@ -159,19 +157,19 @@ export function AvailabilityScreen() {
                 style={({ pressed }) => [styles.row, pressed && styles.pressed]}
               >
                 <View style={styles.tag}>
-                  <Text style={styles.tagText}>{weekdayTag(block.weekday)}</Text>
+                  <Text variant="titulo-fila">{weekdayTag(block.weekday)}</Text>
                 </View>
                 <View style={styles.body}>
-                  <Text style={styles.range}>
+                  <Text variant="titulo-fila">
                     {`${displayTime(block.startsAtLocal)} – ${displayTime(block.endsAtLocal)}`}
                   </Text>
-                  <Text style={styles.muted}>
+                  <Text variant="secundario">
                     {[
                       `${block.slotsPerWeek} turnos · ${bookedLabel(block.upcomingBookedCount)}`,
                       ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
                     ].join(" · ")}
                   </Text>
-                  {dates === null ? null : <Text style={styles.dates}>{dates}</Text>}
+                  {dates === null ? null : <Text variant="secundario">{dates}</Text>}
                 </View>
                 <Chevron size={16} strokeWidth={1.5} tone="muted" />
               </Pressable>
@@ -188,15 +186,7 @@ const styles = StyleSheet.create({
   // Board N06: the empty card sits in the middle of the space under the band.
   balance: { flex: 1 },
   body: { flex: 1, gap: spacing.xxs },
-  dates: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
-  range: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -209,10 +199,4 @@ const styles = StyleSheet.create({
   state: { paddingTop: spacing.md },
   // FIX-089: the weekday is a word in weight, with no tinted disc behind it.
   tag: { justifyContent: "center", width: 40 },
-  tagText: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-  },
 });

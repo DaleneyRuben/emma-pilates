@@ -1,14 +1,6 @@
 import type { EquipmentDto } from "@pilates/api-contracts";
-import {
-  chipStyles,
-  colors,
-  fontFamilies,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { chipStyles, colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, Switch, View } from "react-native";
 
 import { CardLabel } from "../ui/card-pieces";
 
@@ -49,11 +41,11 @@ export function UnitTiles({
                 selected && chipStyles.boxSelected,
               ]}
             >
-              <Text style={[styles.tileNumber, selected && chipStyles.labelSelected]}>
+              <Text tone={selected ? "onDark" : "ink"} variant="titulo-fila">
                 {`N.º ${piece.number}`}
               </Text>
               {out ? (
-                <Text style={[styles.tileOut, selected && styles.onSelected]}>
+                <Text style={styles.tileOut} tone={selected ? "onDark" : "ink"} variant="pastilla">
                   fuera de servicio
                 </Text>
               ) : null}
@@ -61,7 +53,7 @@ export function UnitTiles({
           );
         })}
       </View>
-      {units.length === 1 ? <Text style={styles.helper}>Es el único de esta sucursal.</Text> : null}
+      {units.length === 1 ? <Text variant="secundario">Es el único de esta sucursal.</Text> : null}
     </View>
   );
 }
@@ -90,7 +82,12 @@ export function missingStep({
 export function MissingStep({ message }: { message: string | null }) {
   if (message === null) return null;
   return (
-    <Text accessibilityLiveRegion="polite" style={styles.missing} testID="report-fault-missing">
+    <Text
+      accessibilityLiveRegion="polite"
+      style={styles.missing}
+      testID="report-fault-missing"
+      variant="secundario"
+    >
       {message}
     </Text>
   );
@@ -117,7 +114,7 @@ function StepButton({
       onPress={onPress}
       style={[styles.step, disabled && styles.stepDisabled]}
     >
-      <Text style={styles.stepSymbol}>{symbol}</Text>
+      <Text variant="boton">{symbol}</Text>
     </Pressable>
   );
 }
@@ -134,15 +131,13 @@ export function DamageCounter({
   if (usable === 0)
     return (
       <View style={styles.card}>
-        <Text style={styles.muted}>
-          No hay ninguno que se pueda usar: ya están todos reportados.
-        </Text>
+        <Text variant="cuerpo">No hay ninguno que se pueda usar: ya están todos reportados.</Text>
       </View>
     );
   return (
     <View style={styles.card}>
-      <Text style={styles.usable}>{`Hay ${usable} que se pueden usar`}</Text>
-      <Text style={styles.question}>¿Cuántos se dañaron?</Text>
+      <Text variant="titulo-fila">{`Hay ${usable} que se pueden usar`}</Text>
+      <Text variant="cuerpo">¿Cuántos se dañaron?</Text>
       <View style={styles.stepper}>
         <StepButton
           disabled={count <= 1}
@@ -155,6 +150,7 @@ export function DamageCounter({
           accessibilityLiveRegion="polite"
           style={styles.count}
           testID="report-fault-count"
+          variant="cifra-grande"
         >
           {String(count)}
         </Text>
@@ -185,8 +181,8 @@ export function OutOfServiceSwitch({
       style={styles.switchRow}
     >
       <View style={styles.switchText}>
-        <Text style={styles.switchLabel}>No se puede usar</Text>
-        <Text style={styles.helper}>Nadie debería usarlo hasta que lo arreglen.</Text>
+        <Text variant="titulo-fila">No se puede usar</Text>
+        <Text variant="secundario">Nadie debería usarlo hasta que lo arreglen.</Text>
       </View>
       <Switch
         accessibilityElementsHidden
@@ -202,17 +198,7 @@ export function OutOfServiceSwitch({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
-  count: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 30,
-    minWidth: 40,
-    textAlign: "center",
-  },
-  helper: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  onSelected: { color: colors.onPrimary },
-  question: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  count: { minWidth: 40, textAlign: "center" },
   // Board I11: the stepper's square buttons, white with a 600 outline.
   step: {
     alignItems: "center",
@@ -224,20 +210,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 48,
   },
-  stepDisabled: { opacity: 0.4 },
-  stepSymbol: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 24,
-    fontWeight: "600",
-  },
+  // The system's disabled look (audit c3): the 50 ground and the 400 outline,
+  // the symbol in full ink; never dimmed.
+  stepDisabled: { backgroundColor: colors.surfaceSubtle, borderColor: colors.borderStrong },
   stepper: { alignItems: "center", flexDirection: "row", gap: spacing.xlSm },
-  switchLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   switchRow: {
     ...surfaces.card,
     alignItems: "center",
@@ -247,12 +223,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   switchText: { flex: 1, gap: spacing.xxs },
-  missing: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  missing: { textAlign: "center" },
   tile: {
     alignItems: "center",
     borderRadius: radii.inset,
@@ -261,26 +232,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.smd,
     width: 72,
   },
-  tileNumber: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
-  tileOut: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "600",
-    lineHeight: 14,
-    textAlign: "center",
-  },
+  tileOut: { textAlign: "center" },
   tileWithNote: { height: 58 },
   tiles: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  usable: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
 });

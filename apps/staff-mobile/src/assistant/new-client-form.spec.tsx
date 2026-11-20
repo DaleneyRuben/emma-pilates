@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
 import { assistantRoutes, openClientSearch } from "./assistant-fixtures";
@@ -37,7 +37,7 @@ describe("Nueva clienta form", () => {
       borderWidth: 1.5,
     });
     expect(screen.queryByPlaceholderText("correo@ejemplo.com")).toBeNull();
-    expect(screen.getByText("Ej.: lucia@gmail.com")).toHaveStyle({ fontSize: 13 });
+    expect(screen.getByText("Ej.: lucia@gmail.com")).toHaveStyle(textVariants.secundario);
   });
 
   it("sums up what is missing at the top and marks each field on save", async () => {
@@ -57,7 +57,8 @@ describe("Nueva clienta form", () => {
         borderWidth: 2,
       });
     }
-    expect(screen.getByText("Escribe el nombre.")).toHaveStyle({ fontWeight: "700" });
+    // Follow-up 285: a field's error is a secundario line under it.
+    expect(screen.getByText("Escribe el nombre.")).toHaveStyle(textVariants.secundario);
     expect(invited).not.toHaveBeenCalled();
 
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");

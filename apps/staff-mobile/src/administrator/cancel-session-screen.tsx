@@ -1,24 +1,23 @@
 import { capacityLabel } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
-  colors,
-  fontFamilies,
   formatTimeRange,
   IconRow,
+  InlineError,
   NoticeRow,
   PrimaryButton,
   Screen,
   spacing,
   StateScreen,
   surfaces,
+  Text,
   TextButton,
-  typography,
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -121,10 +120,10 @@ export function CancelSessionScreen({
       {header}
       <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         <View style={styles.card}>
-          <Text style={styles.title}>{session.classTypeName}</Text>
-          <Text style={styles.muted}>{`${day} · ${time}`}</Text>
-          <Text style={styles.muted}>{`${session.trainerName} · ${session.branchName}`}</Text>
-          <Text style={styles.muted}>{capacityLabel(session.bookedCount, session.capacity)}</Text>
+          <Text variant="titulo-bloque">{session.classTypeName}</Text>
+          <Text variant="cuerpo">{`${day} · ${time}`}</Text>
+          <Text variant="cuerpo">{`${session.trainerName} · ${session.branchName}`}</Text>
+          <Text variant="cuerpo">{capacityLabel(session.bookedCount, session.capacity)}</Text>
         </View>
         {empty ? null : (
           <RowCard label="Qué va a pasar">
@@ -158,7 +157,7 @@ export function CancelSessionScreen({
       <FooterPanel>
         {failure === null ? null : (
           <View accessibilityLabel={failure} accessibilityRole="alert">
-            <Text style={styles.failure}>{failure}</Text>
+            <InlineError style={styles.failure}>{failure}</InlineError>
           </View>
         )}
         <PrimaryButton
@@ -176,13 +175,6 @@ export function CancelSessionScreen({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smd, padding: spacing.lg },
-  failure: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    textAlign: "center",
-  },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  failure: { textAlign: "center" },
   screen: { paddingHorizontal: spacing.xlSm },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.section },
 });

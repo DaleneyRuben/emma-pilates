@@ -1,16 +1,15 @@
 import { formatListDate } from "@pilates/api-contracts";
 import {
   addCivilDays,
-  colors,
-  fontFamilies,
   nextPlanStartOptions,
   spacing,
   StartDateStrip,
   startDateOptions,
   surfaces,
+  Text,
   useStudioRules,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -45,7 +44,7 @@ export function PaymentStartDays({
           selected={selected}
           title="Empieza"
         />
-        <Text style={styles.line}>
+        <Text variant="cuerpo">
           {`El nuevo empieza el ${formatListDate(selected)}; se puede elegir hasta el ${formatListDate(last)}.`}
         </Text>
       </View>
@@ -70,5 +69,4 @@ export function PaymentStartDays({
 
 const styles = StyleSheet.create({
   block: { ...surfaces.card, gap: spacing.md, overflow: "hidden", padding: spacing.lg },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15, lineHeight: 21 },
 });

@@ -3,7 +3,9 @@ import {
   popTabToRootOnPress,
   TabBarButton,
   tabBarHidden,
+  TabLabel,
   tabBarStyle,
+  tabBarItemStyle,
   tabBarTints,
 } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -56,7 +58,6 @@ import { TrainerAgendaScreen } from "../trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "../trainer/trainer-roster-screen";
 import { ContactsTabIcon } from "./contacts-tab-icon";
 import { StaffTabIcon, type StaffTabIconName } from "./staff-tab-icon";
-import { TabLabel } from "./tab-label";
 
 // Design follow-up 254 § 3 (owner, 2026-11-06): the bar stays while browsing
 // and hides only inside these tasks, which end on a button at the bottom.
@@ -161,8 +162,9 @@ const tabOptions =
       ),
     // A drawn label gives the tab no name of its own.
     tabBarAccessibilityLabel: title,
-    tabBarLabel: ({ color, focused }: { color: string; focused: boolean }) => (
-      <TabLabel color={color} focused={focused} title={title} />
+    // Core's label: `pastilla`, white on the open tab's pill, never shrunk.
+    tabBarLabel: ({ focused }: { focused: boolean }) => (
+      <TabLabel focused={focused}>{title}</TabLabel>
     ),
     tabBarStyle: tabBarHidden(taskRoutes, getFocusedRouteNameFromRoute(route), root)
       ? { display: "none" as const }
@@ -202,6 +204,7 @@ const tabConfig = {
     // Rosa Emma: the open tab is a 600 pill with white icon and label.
     ...tabBarTints,
     tabBarButton: TabBarButton,
+    tabBarItemStyle,
     tabBarLabelPosition: "below-icon",
   },
 } as const;

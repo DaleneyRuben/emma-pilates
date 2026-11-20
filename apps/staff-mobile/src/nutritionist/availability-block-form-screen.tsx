@@ -10,7 +10,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   Glyph,
   NoticeRow,
   PrimaryButton,
@@ -18,14 +17,14 @@ import {
   Screen,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -159,8 +158,9 @@ export function AvailabilityBlockFormScreen({
         }}
         style={styles.timeField}
       >
-        <Text style={styles.timeLabel}>{label}</Text>
-        <Text style={[styles.timeValue, value === null && styles.timePlaceholder]}>{shown}</Text>
+        <Text variant="secundario">{label}</Text>
+        {/* Board N07: «Elegir» in `cuerpo`; the chosen time in `cifra`. */}
+        <Text variant={value === null ? "cuerpo" : "cifra"}>{shown}</Text>
       </Pressable>
     );
   };
@@ -207,7 +207,7 @@ export function AvailabilityBlockFormScreen({
         ) : branches[0] === undefined ? null : (
           <View style={styles.card}>
             <CardLabel>Sucursal</CardLabel>
-            <Text style={styles.fixedBranch}>{branches[0].name}</Text>
+            <Text variant="titulo-fila">{branches[0].name}</Text>
           </View>
         )}
         <View style={styles.card}>
@@ -242,7 +242,7 @@ export function AvailabilityBlockFormScreen({
           {turnos > 0 ? (
             <View style={styles.turnos}>
               <Glyph color={colors.text} name="clock" size={22} strokeWidth={1.6} />
-              <Text style={styles.turnosText}>
+              <Text style={styles.turnosText} variant="cuerpo">
                 {[
                   `${countLabel(turnos, "turno", "turnos")} de 45 min`,
                   ...(booked > 0
@@ -252,12 +252,12 @@ export function AvailabilityBlockFormScreen({
               </Text>
             </View>
           ) : (
-            <Text style={styles.muted}>
+            <Text variant="cuerpo">
               El sistema generará turnos de evaluación individuales dentro de este horario.
             </Text>
           )}
           {booked > 0 && editing ? (
-            <Text style={styles.muted}>
+            <Text variant="secundario">
               {`${countLabel(booked, "evaluación reservada se mantiene", "evaluaciones reservadas se mantienen")}.`}
             </Text>
           ) : null}
@@ -308,16 +308,9 @@ const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   dateStrip: { flexGrow: 0, marginHorizontal: -spacing.lg },
   dates: { flexDirection: "row", gap: 6, paddingHorizontal: spacing.lg },
-  fixedBranch: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
-  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   pills: pillRow,
   screen: { paddingHorizontal: spacing.xlSm },
-  // Board N07: the time boxes, white with a 1.5 pt 400 outline and the time in Lora.
+  // Board N07: the time boxes, white with a 1.5 pt 400 outline and the time in `cifra`.
   timeField: {
     backgroundColor: colors.card,
     borderColor: colors.borderStrong,
@@ -328,23 +321,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.smLg,
   },
-  timeLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  timePlaceholder: { fontStyle: "italic" },
-  timeValue: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontVariant: ["tabular-nums"],
-  },
   times: { flexDirection: "row", gap: spacing.smLg },
   turnos: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
-  turnosText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 21,
-  },
+  turnosText: { flex: 1 },
   // v2 S17: the seven day tiles share the width, 4 pt apart (board N07).
   weekdays: { flexDirection: "row", gap: spacing.xs },
 });

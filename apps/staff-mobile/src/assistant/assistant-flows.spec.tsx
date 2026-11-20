@@ -47,7 +47,8 @@ describe("Assistant Client flows", () => {
     });
     // FIX-083 (Ficha pick A): one clear Lino plan card, then «Reservar clase».
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("5")).toHaveStyle({ fontSize: 44 });
+    // Follow-up 285: the count is `cifra-grande`, its unit `destacado`.
+    expect(screen.getByText("5")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 34 });
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();

@@ -1,20 +1,21 @@
 import {
   colors,
-  fontFamilies,
   Glyph,
   type GlyphName,
   PrimaryButton,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 /**
  * A white card with a line icon, a title and one line (E-C10 «Sin plan
  * activo», E-C12 «Cuenta pendiente de activación»), with an optional action.
- * `display` sets the title in Lora 22, as «Sin plan activo» reads.
+ * As the boards draw them (follow-up 285): a row-like card has a `titulo-fila`
+ * title over a `secundario` line; `display` («Sin plan activo», the card that
+ * stands in for the plan) has a `titulo-bloque` title over a `cuerpo` note.
  */
 export function StateCard({
   action,
@@ -42,9 +43,9 @@ export function StateCard({
           <Glyph color={colors.text} name={icon} size={22} strokeWidth={1.6} />
         </View>
         <View style={styles.body}>
-          <Text style={[styles.title, display && styles.displayTitle]}>{title}</Text>
+          <Text variant={display ? "titulo-bloque" : "titulo-fila"}>{title}</Text>
           {note === undefined ? null : (
-            <Text style={[styles.note, display && styles.displayNote]}>{note}</Text>
+            <Text variant={display ? "cuerpo" : "secundario"}>{note}</Text>
           )}
         </View>
         {trailing}
@@ -62,19 +63,5 @@ const styles = StyleSheet.create({
   disc: { alignItems: "center", paddingTop: 1, width: 24 },
   displayCard: { gap: spacing.mdLg, padding: spacing.lgXl },
   displayDisc: { paddingTop: spacing.xs },
-  displayNote: { fontFamily: fontFamilies.body, fontSize: typography.body, lineHeight: 22 },
-  displayTitle: {
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontWeight: "400",
-    lineHeight: 28,
-  },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   row: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 16,
-    fontWeight: "700",
-  },
 });

@@ -1,5 +1,10 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
-import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
+import {
+  boliviaCivilDate,
+  civilDateRange,
+  clearMobileQueryCache,
+  textVariants,
+} from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
 import { assistantRoutes, minute, openLucia, session, soonBooking } from "./assistant-fixtures";
@@ -50,7 +55,7 @@ describe("Assistant reschedule option card", () => {
 
     expect(button).toHaveStyle({ borderColor: "transparent", borderWidth: 2 });
     expect(card.getByTestId("class-row-time")).toHaveTextContent(/^\d\d:\d\d$/);
-    expect(card.getByTestId("class-row-time")).toHaveStyle({ fontFamily: "Lora_400Regular" });
+    expect(card.getByTestId("class-row-time")).toHaveStyle(textVariants.cifra);
     expect(card.getByText("Reformer Pilates")).toHaveStyle({ color: "#93615D" });
     // FIX-041: her face (here her initials) leads her name.
     expect(card.getByText("EV")).toBeOnTheScreen();

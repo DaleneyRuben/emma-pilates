@@ -1,12 +1,5 @@
-import {
-  agendaDayChipLabel,
-  chipStyles,
-  colors,
-  fontFamilies,
-  radii,
-  spacing,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { agendaDayChipLabel, chipStyles, radii, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet } from "react-native";
 
 const blockProblems: Record<string, string> = {
   availability_block_overlap: "Se superpone con otro de tus horarios.",
@@ -55,12 +48,15 @@ export function Pill({
       onPress={onPress}
       style={[styles.pill, chipStyles.box, fill && styles.fill, selected && chipStyles.boxSelected]}
     >
-      <Text style={[chipStyles.label, selected && chipStyles.labelSelected]}>{label}</Text>
+      {/* The same `compacto` chosen or not: only the ground and the tone change. */}
+      <Text tone={selected ? "onDark" : "ink"} variant="compacto">
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
-/** S17's «A partir del» tile: the weekday (or «Hoy») over the Lora day number. */
+/** S17's «A partir del» tile: the weekday (or «Hoy») over the `cifra` day number. */
 export function DateTile({
   accessibilityLabel,
   date,
@@ -83,10 +79,12 @@ export function DateTile({
       onPress={onPress}
       style={[styles.tile, chipStyles.box, selected && chipStyles.boxSelected]}
     >
-      <Text style={[styles.tileWeekday, selected && chipStyles.labelSelected]}>
+      <Text tone={selected ? "onDark" : "ink"} variant="pastilla">
         {date === today ? "Hoy" : weekday.toLowerCase()}
       </Text>
-      <Text style={[styles.tileDay, selected && styles.tileDaySelected]}>{day}</Text>
+      <Text tone={selected ? "onDark" : "ink"} variant="cifra">
+        {day}
+      </Text>
     </Pressable>
   );
 }
@@ -112,13 +110,5 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     width: 48,
-  },
-  tileDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  tileDaySelected: { color: colors.onPrimary },
-  tileWeekday: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "600",
   },
 });

@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
 import { assistantRoutes, openLucia } from "./assistant-fixtures";
@@ -8,7 +8,7 @@ jest.setTimeout(20_000);
 
 const hidden = { includeHiddenElements: true };
 
-// MOB-041: S21's frame centres a quiet calendar, a Lora 21 title, a note, and
+// MOB-041: S21's frame centres a quiet calendar, a titulo-fila title, a note, and
 // «Reservar una clase» under them; S07's «Sucursal:» row ends in a 16 pt
 // Texto tenue chevron pointing down.
 describe("Assistant Client Bookings empty state", () => {
@@ -27,10 +27,7 @@ describe("Assistant Client Bookings empty state", () => {
     await waitFor(() => {
       expect(screen.getByText("No tiene reservas próximas")).toBeOnTheScreen();
     });
-    expect(screen.getByText("No tiene reservas próximas")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 24,
-    });
+    expect(screen.getByText("No tiene reservas próximas")).toHaveStyle(textVariants["titulo-fila"]);
     const calendar = screen.getByTestId("empty-state-icon-calendar", hidden);
     expect(calendar).toHaveProp("stroke", "#93615D");
     expect(calendar).toHaveProp("width", 28);

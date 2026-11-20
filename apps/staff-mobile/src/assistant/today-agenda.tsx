@@ -6,18 +6,16 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
-  colors,
-  fontFamilies,
   LoadingState,
   placesLabel,
   QueryFailure,
   spacing,
   surfaces,
-  typography,
+  Text,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { RowCard } from "../ui/card-pieces";
 import { ScheduleClassRow } from "../schedule/schedule-class-card";
@@ -80,7 +78,9 @@ export function TodayAgenda({ branchId, pending }: { branchId: string; pending: 
   if (next === undefined) {
     return frame(
       <View style={styles.emptyCard}>
-        <Text style={styles.empty}>Hoy no quedan clases en esta sucursal.</Text>
+        <Text style={styles.empty} variant="cuerpo">
+          Hoy no quedan clases en esta sucursal.
+        </Text>
       </View>,
     );
   }
@@ -99,13 +99,7 @@ export function TodayAgenda({ branchId, pending }: { branchId: string; pending: 
 
 const styles = StyleSheet.create({
   agenda: { gap: spacing.md },
-  // E-S02: the quiet line reads in Lora on its own white card.
-  empty: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    lineHeight: 29,
-    textAlign: "center",
-  },
+  // E-S02: the quiet sentence is `cuerpo` on its own white card, never Lora.
+  empty: { textAlign: "center" },
   emptyCard: { ...surfaces.card, paddingHorizontal: spacing.xlSm, paddingVertical: spacing.xl },
 });

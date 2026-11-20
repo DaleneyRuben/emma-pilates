@@ -60,8 +60,8 @@ describe("Trainer roster empty state (UX-009)", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Sin reservas")).toHaveStyle({
-        fontFamily: "Lora_400Regular",
-        fontSize: 24,
+        fontFamily: "WorkSans_600SemiBold",
+        fontSize: 16,
         textAlign: "center",
       });
     });

@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -39,12 +39,10 @@ describe("Staff unread language", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones, 3 sin leer" })).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("notification-bell-count")).toHaveStyle({
-      backgroundColor: "#93615D",
-      color: "#FFFBFB",
-      fontFamily: "WorkSans_600SemiBold",
-      fontSize: 12,
-    });
+    // Follow-up 285: the count is a white pastilla inside the 600 badge.
+    const count = screen.getByTestId("notification-bell-count");
+    expect(count).toHaveStyle({ ...textVariants.pastilla, color: "#FFFBFB" });
+    expect(count.parent).toHaveStyle({ backgroundColor: "#93615D" });
   });
 
   it("shows the unread count on S23's Notificaciones row", async () => {

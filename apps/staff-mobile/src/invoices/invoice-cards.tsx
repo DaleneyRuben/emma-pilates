@@ -8,7 +8,6 @@ import {
   CardActionRow,
   cardWithActionRow,
   colors,
-  fontFamilies,
   FullScreenImage,
   Glyph,
   loadPrivateImageWithRatio,
@@ -16,11 +15,11 @@ import {
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -35,8 +34,8 @@ export function InvoiceDropCard({ busy }: { busy: boolean }) {
           <Glyph name="receipt" size={28} strokeWidth={1.6} />
         )}
       </View>
-      <Text style={styles.title}>{busy ? "Subiendo la factura…" : "Sube la factura emitida"}</Text>
-      <Text style={styles.muted}>PDF o foto, hasta 10 MB</Text>
+      <Text variant="titulo-fila">{busy ? "Subiendo la factura…" : "Sube la factura emitida"}</Text>
+      <Text variant="secundario">PDF o foto, hasta 10 MB</Text>
     </View>
   );
 }
@@ -76,10 +75,10 @@ export function InvoiceFileCard({
           />
         )}
         <View style={styles.fileText}>
-          <Text numberOfLines={1} style={styles.title}>
+          <Text numberOfLines={1} variant="titulo-fila">
             {file.fileName}
           </Text>
-          <Text style={styles.muted}>
+          <Text variant="secundario">
             {`Subida por ${file.uploadedByName} · ${formatDateTime(file.uploadedAt)}`}
           </Text>
         </View>
@@ -113,7 +112,6 @@ const styles = StyleSheet.create({
   },
   fileRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   fileText: { flex: 1, gap: 2 },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   thumb: {
     alignItems: "center",
     backgroundColor: colors.surfaceSubtle,
@@ -123,11 +121,5 @@ const styles = StyleSheet.create({
     height: 56,
     justifyContent: "center",
     width: 44,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
   },
 });
