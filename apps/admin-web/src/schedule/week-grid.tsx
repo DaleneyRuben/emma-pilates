@@ -69,14 +69,12 @@ export function WeekGrid({
               className={cn(
                 // Rosa Emma (RW-horario): a white pill per day; today's is
                 // solid Rosa profundo with «· HOY», its column only soft 50.
-                "flex items-baseline justify-center gap-1.5 rounded-panel bg-superficie px-1.5 py-[9px] text-etiqueta font-bold tracking-[0.12em] text-texto uppercase",
-                day === today && "bg-primario text-blanco",
+                "flex items-baseline justify-center gap-1.5 rounded-panel bg-superficie px-1.5 py-[9px] tipo-etiqueta text-texto",
+                day === today && "bg-primario text-sobre-primario",
               )}
             >
               {tab.weekday}
-              <span className="text-titulo-3 font-bold tracking-normal tabular">
-                {tab.day}
-              </span>
+              <span className="tipo-titulo-fila tabular">{tab.day}</span>
               {day === today ? <span>· hoy</span> : null}
             </span>
           );
@@ -95,7 +93,7 @@ export function WeekGrid({
           {hours.map((hour, index) => (
             <span
               key={hour}
-              className="absolute left-0 -translate-y-1/2 text-ayuda font-bold text-texto tabular xl:text-grande"
+              className="absolute left-0 -translate-y-1/2 tipo-destacado text-texto tabular"
               style={{ top: index * hourHeight }}
             >
               {index === 0 ? null : hourLabel(hour)}

@@ -12,6 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  fieldMessageClass,
 } from "../components/form/form";
 import { FormErrorSummary } from "../components/form/form-error-summary";
 import { parseCivilDate } from "../components/form/civil-date";
@@ -139,10 +140,10 @@ export function OccurrenceForm({
         <SidePanelBody>
           <FormErrorSummary />
           <div className="flex flex-col gap-1.5">
-            <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-              Tipo de clase
-            </span>
-            <p className="text-cuerpo text-texto">{session.classTypeName}</p>
+            <span className="tipo-etiqueta text-texto">Tipo de clase</span>
+            <p className="tipo-titulo-fila text-texto">
+              {session.classTypeName}
+            </p>
           </div>
           <FormField
             control={form.control}
@@ -190,7 +191,7 @@ export function OccurrenceForm({
               )}
             />
           </div>
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Si cambias el día o la hora, avisamos a las clientas con reserva.
           </p>
           <DurationField />
@@ -213,7 +214,7 @@ export function OccurrenceForm({
             )}
           />
           {failure === null ? null : (
-            <p role="alert" className="text-nota text-texto">
+            <p role="alert" className={fieldMessageClass}>
               {failure}
             </p>
           )}

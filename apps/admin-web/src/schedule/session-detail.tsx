@@ -81,8 +81,8 @@ export function SessionDetail({
           <SeriesPauseNotice schedule={schedule} />
         )}
         {past ? (
-          <p className="flex items-center gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 text-celda text-texto">
-            <Lock size={16} aria-hidden="true" className="text-rosa-600" />
+          <p className="flex items-center gap-2 rounded-tarjeta bg-superficie shadow-tarjeta px-4 py-3 tipo-compacto text-texto">
+            <Lock size={16} aria-hidden="true" className="text-texto" />
             Clase pasada: solo lectura.
           </p>
         ) : null}

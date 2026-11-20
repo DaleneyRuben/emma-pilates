@@ -27,7 +27,7 @@ export function MinutesInput({
       <input
         inputMode="numeric"
         className={cn(
-          "h-full min-w-0 flex-1 bg-transparent text-cuerpo text-texto tabular outline-none",
+          "h-full min-w-0 flex-1 bg-transparent tipo-cuerpo text-texto tabular outline-none",
           compact ? "pr-2 pl-2.5" : "px-3",
         )}
         {...props}
@@ -35,7 +35,7 @@ export function MinutesInput({
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-full items-center border-l border-borde bg-superficie text-nota text-texto",
+          "flex h-full items-center border-l border-borde bg-superficie tipo-secundario text-texto",
           compact ? "px-2" : "px-3",
         )}
       >

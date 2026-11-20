@@ -32,15 +32,15 @@ export function CancelledSessionView({
           {causeLabel(cancellation.cause)}
         </StatusPill>
       </div>
-      <p className="flex items-center gap-3 rounded-tarjeta border-l-4 border-primario bg-superficie px-4 py-3 text-celda text-texto">
+      <p className="flex items-center gap-3 rounded-tarjeta border-l-4 border-primario bg-superficie px-4 py-3 tipo-compacto text-texto">
         <CalendarX
           size={18}
           aria-hidden="true"
-          className="shrink-0 text-rosa-600"
+          className="shrink-0 text-texto"
         />
         {cancellationNote(cancellation)}
       </p>
-      <dl className="divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta text-celda">
+      <dl className="divide-y divide-borde rounded-tarjeta bg-superficie tipo-compacto text-texto shadow-tarjeta">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <dt className="text-texto">Instructora</dt>
           <dd>{session.trainerName}</dd>

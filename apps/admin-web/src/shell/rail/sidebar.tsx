@@ -14,7 +14,7 @@ export function Sidebar() {
         aria-label="Secciones"
         className="sticky top-0 flex max-h-svh flex-col gap-0.5 overflow-y-auto px-4 py-7"
       >
-        <span className="px-3 pb-6 font-serif text-[20px] leading-tight whitespace-nowrap text-blanco">
+        <span className="px-3 pb-6 tipo-titulo-bloque whitespace-nowrap text-sobre-primario">
           Emma Pilates Studio
         </span>
         {destinations.map((destination) => (

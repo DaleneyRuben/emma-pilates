@@ -47,7 +47,10 @@ describe("W2 Horario: today marked softly, compact classes, cancelled lines", ()
       header.textContent?.includes("hoy"),
     );
     expect(todayIndex).toBeGreaterThanOrEqual(0);
-    expect(headers[todayIndex]).toHaveClass("bg-primario", "text-blanco");
+    expect(headers[todayIndex]).toHaveClass(
+      "bg-primario",
+      "text-sobre-primario",
+    );
     expect(cells[todayIndex]).toHaveClass("bg-superficie-hundida");
     expect(cells[todayIndex]).not.toHaveClass("bg-rosa-200");
     const otherDay = (todayIndex + 1) % 7;

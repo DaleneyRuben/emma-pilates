@@ -5,9 +5,11 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  fieldMessageClass,
 } from "../components/form/form";
 import { CivilTimeInput } from "../components/form/civil-time-input";
 import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
 import { Select } from "../components/ui/select";
 import { MinutesInput } from "./duration-field";
 import { WeekdayOptions } from "./session-options";
@@ -25,9 +27,9 @@ export function WeeklyRowsField() {
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-        Días y horas
-      </span>
+      <Label asChild>
+        <span>Días y horas</span>
+      </Label>
       {fields.map((item, index) => (
         <FormField
           key={item.id}
@@ -94,7 +96,7 @@ export function WeeklyRowsField() {
               </div>
               <FormMessage />
               {formState.errors.rows?.[index]?.durationMinutes ? (
-                <p className="text-ayuda text-texto">
+                <p className={fieldMessageClass}>
                   {formState.errors.rows[index].durationMinutes.message}
                 </p>
               ) : null}
@@ -106,14 +108,14 @@ export function WeeklyRowsField() {
         <Button
           type="button"
           variant="link"
-          className="self-start text-nota"
+          className="self-start"
           onClick={() => append(nextRow(rows.at(-1)))}
         >
           <Plus size={14} strokeWidth={2} aria-hidden="true" />
           Agregar día
         </Button>
       ) : null}
-      <p className="text-ayuda text-texto">
+      <p className="tipo-secundario text-texto">
         Cada día puede durar distinto; empieza en 60 minutos.
       </p>
     </div>

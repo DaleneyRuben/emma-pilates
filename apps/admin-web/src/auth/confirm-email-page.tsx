@@ -80,21 +80,21 @@ export function ConfirmEmailPage({ token }: { token: string | undefined }) {
   return (
     <AuthLayout>
       {outcome === "loading" ? (
-        <p role="status" className="text-center text-cuerpo text-texto">
+        <p role="status" className="text-center tipo-cuerpo text-texto">
           Confirmando tu correo…
         </p>
       ) : outcome === "unavailable" ? (
-        <p role="alert" className="text-center text-cuerpo text-texto">
+        <p role="alert" className="text-center tipo-cuerpo text-texto">
           No pudimos confirmar el correo. Inténtalo de nuevo en unos minutos.
         </p>
       ) : (
         <>
           <div className="flex flex-col items-center gap-3 text-center">
             <MessageDisc icon={copy[outcome].icon} />
-            <h1 className="font-serif text-titulo-1 text-texto">
+            <h1 className="tipo-titulo-pagina text-texto">
               {copy[outcome].title}
             </h1>
-            <p className="text-cuerpo text-texto">{copy[outcome].line}</p>
+            <p className="tipo-cuerpo text-texto">{copy[outcome].line}</p>
           </div>
           <Link to="/iniciar-sesion" className={buttonVariants({ size: "lg" })}>
             Ir a iniciar sesión

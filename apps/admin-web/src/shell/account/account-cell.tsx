@@ -42,7 +42,7 @@ export function AccountCell() {
       className={cn(
         narrow
           ? "flex size-11 items-center justify-center rounded-full focus-visible:shadow-foco-solido"
-          : cn(bandPillClass, "gap-2.5 pr-3 pl-1.5 text-left font-normal"),
+          : cn(bandPillClass, "gap-2.5 pr-3 pl-1.5 text-left"),
       )}
     >
       <StaffPhoto
@@ -55,8 +55,8 @@ export function AccountCell() {
         <span className="sr-only">{name}</span>
       ) : (
         <span className="flex flex-col">
-          <span className="text-nota leading-tight font-bold">{name}</span>
-          <span className="text-nota leading-tight">
+          <span className="tipo-titulo-fila">{name}</span>
+          <span className="tipo-secundario">
             {profile === undefined ? "" : roleLabelOf(profile)}
           </span>
         </span>

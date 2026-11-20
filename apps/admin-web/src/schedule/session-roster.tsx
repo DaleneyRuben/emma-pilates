@@ -20,7 +20,7 @@ function RosterSection({
   const id = useId();
   return (
     <section aria-labelledby={id} className="flex flex-col gap-2">
-      <h3 id={id} className="text-celda font-semibold text-texto">
+      <h3 id={id} className="tipo-titulo-fila text-texto">
         {title}
       </h3>
       {children}
@@ -32,8 +32,7 @@ function RosterSection({
 // Client in her Palo de rosa circle.
 const listClass =
   "divide-y divide-borde rounded-tarjeta bg-superficie shadow-tarjeta";
-const rowClass =
-  "flex min-h-[56px] items-center gap-3 px-4 py-2.5 text-celda text-texto";
+const rowClass = "flex min-h-[56px] items-center gap-3 px-4 py-2.5 text-texto";
 
 /** W1: «Primera clase», «12.ª clase», with « · Fundadora» for a founder. */
 function bookingNote(booking: AdministratorRosterBookingDto): string | null {
@@ -66,11 +65,11 @@ function BookedRow({
         size={40}
       />
       <span className="flex flex-1 flex-col">
-        <span className="font-bold">{booking.clientName}</span>
-        {note === null ? null : <span className="text-ayuda">{note}</span>}
+        <span className="tipo-titulo-fila">{booking.clientName}</span>
+        {note === null ? null : <span className="tipo-secundario">{note}</span>}
       </span>
       {outcome === undefined ? null : (
-        <span className="text-ayuda">{outcome}</span>
+        <span className="tipo-secundario">{outcome}</span>
       )}
       {action}
     </li>
@@ -92,7 +91,7 @@ export function SessionRoster({
     <>
       <RosterSection title={`Reservaron (${roster.bookings.length})`}>
         {roster.bookings.length === 0 ? (
-          <p className="text-celda text-texto">Nadie reservó todavía.</p>
+          <p className="tipo-cuerpo text-texto">Nadie reservó todavía.</p>
         ) : (
           <ul className={listClass}>
             {roster.bookings.map((booking) => (
@@ -110,7 +109,7 @@ export function SessionRoster({
           <ol className={listClass}>
             {roster.waitlist.map((entry) => (
               <li key={entry.waitlistEntryId} className={rowClass}>
-                <span className="w-6 font-serif text-titulo-3 text-rosa-600 tabular">
+                <span className="w-6 tipo-cuerpo text-texto tabular">
                   {entry.position}
                 </span>
                 <ClientPhoto
@@ -119,8 +118,8 @@ export function SessionRoster({
                   size={40}
                 />
                 <span className="flex flex-1 flex-col">
-                  <span className="font-medium">{entry.clientName}</span>
-                  <span className="text-ayuda text-texto">
+                  <span className="tipo-titulo-fila">{entry.clientName}</span>
+                  <span className="tipo-secundario text-texto">
                     Entra sola si se libera un lugar
                   </span>
                 </span>

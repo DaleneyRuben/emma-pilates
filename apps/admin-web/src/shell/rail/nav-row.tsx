@@ -29,25 +29,25 @@ export function NavRow({
       aria-current={current ? "page" : undefined}
       aria-label={countedName(destination.label, count)}
       className={cn(
-        "flex items-center gap-3 rounded-boton px-3.5 text-blanco hover:bg-blanco/10 focus-visible:shadow-foco-solido",
-        large
-          ? "min-h-12 gap-3.5 text-cuerpo-grande"
-          : "min-h-[43px] text-cuerpo",
-        current && "bg-blanco font-bold text-texto hover:bg-blanco",
+        "flex items-center gap-3 rounded-boton px-3.5 tipo-titulo-fila text-sobre-primario hover:bg-blanco/10 focus-visible:shadow-foco-solido",
+        large ? "min-h-12 gap-3.5" : "min-h-[43px]",
+        current && "bg-blanco text-texto hover:bg-blanco",
       )}
     >
       <DestinationIcon
         icon={destination.icon}
         size={large ? 22 : 20}
-        className={current ? "text-texto" : "text-blanco"}
+        className={current ? "text-texto" : "text-sobre-primario"}
       />
       <span className="flex-1">{destination.label}</span>
       {count === undefined ? null : (
         <span
           aria-hidden="true"
           className={cn(
-            "inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 text-pie font-bold tabular",
-            current ? "bg-rosa-600 text-blanco" : "bg-blanco text-texto",
+            "inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 tipo-pastilla tabular",
+            current
+              ? "bg-primario text-sobre-primario"
+              : "bg-blanco text-texto",
           )}
         >
           {countFormat.format(count.value)}

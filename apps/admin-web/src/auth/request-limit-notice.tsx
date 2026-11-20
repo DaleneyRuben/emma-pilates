@@ -23,12 +23,12 @@ export function WaitNotice({
       <Clock3
         size={18}
         strokeWidth={1.4}
-        className="mt-px flex-none text-primario"
+        className="mt-px flex-none text-texto"
         aria-hidden="true"
       />
       <div className="flex flex-col gap-0.5">
-        <span className="text-cuerpo text-texto">{message}</span>
-        <span className="tabular text-nota text-texto">
+        <span className="tipo-cuerpo text-texto">{message}</span>
+        <span className="tipo-secundario text-texto tabular">
           {`${waitLabel} ${formatWait(seconds)}.`}
         </span>
       </div>

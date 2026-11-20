@@ -69,8 +69,8 @@ function CancelledBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full items-center overflow-hidden rounded-[8px] bg-superficie-hundida px-2.5 text-left text-pie leading-tight text-texto inset-ring inset-ring-borde-fuerte transition-shadow hover:bg-blanco focus-visible:shadow-foco",
-        layout === "list" && "min-h-11 rounded-panel text-celda",
+        "flex w-full items-center overflow-hidden rounded-[8px] bg-superficie-hundida px-2.5 text-left tipo-secundario text-texto inset-ring inset-ring-borde-fuerte transition-shadow hover:bg-blanco focus-visible:shadow-foco",
+        layout === "list" && "min-h-11 rounded-panel tipo-compacto",
         className,
       )}
     >
@@ -189,15 +189,12 @@ function StandingBlock({
         <span className="flex min-w-0 flex-col gap-px">
           <span
             data-line=""
-            className="flex items-center gap-1.5 text-nota leading-tight font-bold break-words"
+            className="flex items-center gap-1.5 tipo-pastilla break-words"
           >
             {flag === undefined ? null : <EquipmentDot />}
             {session.classTypeName}
           </span>
-          <span
-            data-line=""
-            className="truncate text-pie leading-tight tabular"
-          >
+          <span data-line="" className="truncate tipo-secundario tabular">
             {gridLine(session)}
           </span>
         </span>
@@ -225,19 +222,17 @@ function StandingBlock({
           typeBar(session.classTypeName),
         )}
       />
-      <span className="font-serif text-[24px] leading-tight tabular">
-        {start}
-      </span>
+      <span className="tipo-cifra">{start}</span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="flex items-center gap-1.5 text-[16px] leading-tight font-bold">
+        <span className="flex items-center gap-1.5 tipo-titulo-fila">
           {flag === undefined ? null : <EquipmentDot />}
           {session.classTypeName}
         </span>
-        <span className="text-nota leading-tight tabular">
+        <span className="tipo-secundario tabular">
           {start} – {end}
           {short ? ` · ${occupancy(session)}` : null}
         </span>
-        <span className="flex items-center text-nota leading-tight break-words">
+        <span className="flex items-center tipo-secundario break-words">
           {/* Follow-up 242: her photo leads her name, when she has one. */}
           {session.trainerPhoto === null ? null : (
             <StaffPhoto
@@ -250,9 +245,7 @@ function StandingBlock({
           <span className="min-w-0">{session.trainerName}</span>
         </span>
         {short ? null : (
-          <span className="text-nota leading-tight tabular">
-            {occupancy(session)}
-          </span>
+          <span className="tipo-secundario tabular">{occupancy(session)}</span>
         )}
       </span>
     </button>

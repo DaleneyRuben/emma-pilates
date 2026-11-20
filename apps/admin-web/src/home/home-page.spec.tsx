@@ -187,13 +187,20 @@ describe("Inicio for the Administrator", () => {
     expect(new Set(ranges).size).toBe(1);
   });
 
-  it("summarizes today's classes at the selected Branch in one line", async () => {
+  it("summarizes today's classes at the selected Branch as three figures", async () => {
     renderAdmin("/");
 
     const today = await screen.findByRole("region", { name: "Hoy" });
-    expect(
-      within(today).getByText("0 clases · 0 reservas · — ocupación"),
-    ).toBeVisible();
+    for (const [figure, label] of [
+      ["0", "clases"],
+      ["0", "reservas"],
+      ["—", "ocupación"],
+    ] as const) {
+      const caption = within(today).getByText(label);
+      expect(caption).toHaveClass("tipo-secundario");
+      expect(caption.previousElementSibling).toHaveTextContent(figure);
+      expect(caption.previousElementSibling).toHaveClass("tipo-cifra");
+    }
     expect(within(today).getByText("Sin clases hoy.")).toBeVisible();
     expect(
       within(today).getByRole("link", { name: "Ver horario" }),
@@ -225,7 +232,11 @@ describe("Inicio for the Administrator", () => {
       name: "Recomendaciones",
     });
     const rows = await within(section).findAllByRole("listitem");
-    expect(rows.map((row) => row.querySelector("p")?.textContent)).toEqual([
+    // Three groups, then «Ver las N» as the white list's last row.
+    expect(rows).toHaveLength(4);
+    expect(
+      rows.slice(0, 3).map((row) => row.querySelector("p")?.textContent),
+    ).toEqual([
       "Revisa el horario de Daniela Ortiz",
       "Revisa el horario de Valeria Peña",
       "Revisa el horario de Emma Vargas",
@@ -236,7 +247,7 @@ describe("Inicio for the Administrator", () => {
       ),
     ).toBeVisible();
     expect(
-      within(section).getByRole("link", { name: "Ver las 10" }),
+      within(rows[3]!).getByRole("link", { name: "Ver las 10" }),
     ).toHaveAttribute("href", "/informes");
     expect(screen.queryByText("Recalcular")).toBeNull();
   });

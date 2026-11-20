@@ -1,27 +1,28 @@
 import type { StaffProfileDto } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Separator } from "../../components/ui/separator";
 import { cn } from "../../lib/cn";
 import { roleLabelOf } from "./role-label";
 import { useLogout } from "./use-logout";
 
 const rowClass =
-  "flex h-9 w-full items-center px-4 text-left text-fila-menu hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none";
+  "flex h-9 w-full items-center px-4 text-left tipo-compacto hover:bg-superficie-hundida focus-visible:bg-superficie-hundida focus-visible:shadow-none";
 
 function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
   const { logout, failed, pending } = useLogout();
 
   return (
     <div className="flex flex-col gap-3 p-4">
-      <p className="font-medium text-texto">¿Cerrar sesión?</p>
-      <p className="text-ayuda text-texto">
+      <p className="tipo-titulo-fila text-texto">¿Cerrar sesión?</p>
+      <p className="tipo-compacto text-texto">
         Se descartará cualquier panel sin guardar.
       </p>
       {failed ? (
-        <p role="alert" className="text-ayuda text-texto">
+        <InlineError>
           No pudimos cerrar la sesión. Inténtalo de nuevo.
-        </p>
+        </InlineError>
       ) : null}
       <Button
         variant="destructive"
@@ -72,11 +73,13 @@ export function AccountMenu({
   return (
     <div className="flex flex-col py-2">
       <div className="flex flex-col gap-0.5 px-4 pt-1 pb-3">
-        <span className="text-celda font-medium text-texto">
+        <span className="tipo-titulo-fila text-texto">
           {profile?.name ?? ""}
         </span>
-        <span className="text-ayuda text-texto">{profile?.email ?? ""}</span>
-        <span className="pt-1 text-ayuda text-texto">
+        <span className="tipo-secundario text-texto">
+          {profile?.email ?? ""}
+        </span>
+        <span className="pt-1 tipo-secundario text-texto">
           {roleLabelOf(profile)}
         </span>
       </div>
@@ -91,7 +94,7 @@ export function AccountMenu({
         </button>
         <button
           type="button"
-          className={cn(rowClass, "text-texto hover:text-texto")}
+          className={cn(rowClass, "text-texto")}
           // Back from the confirmation, focus returns to the row it left.
           autoFocus={cancelled}
           onClick={() => setConfirming(true)}

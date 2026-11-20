@@ -107,11 +107,11 @@ export function CancelSessionAction({
   return (
     <>
       {note === null ? null : (
-        <p className="text-center text-ayuda text-texto">{note}</p>
+        <p className="text-center tipo-secundario text-texto">{note}</p>
       )}
       <Button
         variant="link"
-        className="self-center text-texto hover:text-texto"
+        className="self-center"
         onClick={() => setConfirming(true)}
       >
         Cancelar esta clase

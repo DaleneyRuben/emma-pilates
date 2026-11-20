@@ -4,6 +4,7 @@ import { countFormat } from "../components/table/pagination";
 import {
   segmentBadgeClass,
   segmentClass,
+  segmentCompactClass,
   segmentCurrentClass,
   segmentedBarClass,
 } from "../components/ui/segmented";
@@ -49,7 +50,7 @@ export function DestinationTabs() {
                       segmentBadgeClass,
                       tab.to === place.tab.to
                         ? "bg-blanco text-texto"
-                        : "bg-rosa-600 text-blanco",
+                        : "bg-primario text-sobre-primario",
                     )}
                   >
                     {countFormat.format(count.value)}
@@ -70,7 +71,7 @@ export function DestinationTabs() {
               key={view.to}
               item={view}
               current={view.to === place.page.to}
-              className={cn(segmentClass, "h-9 px-3.5 text-celda")}
+              className={cn(segmentClass, segmentCompactClass)}
               currentClassName={segmentCurrentClass}
             >
               {view === place.tab ? (view.viewLabel ?? view.label) : view.label}

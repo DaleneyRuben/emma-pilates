@@ -50,7 +50,7 @@ export function SessionBookingsTab({
           <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
         ) : roster.isError ? (
           <div role="alert" className="flex items-center gap-3">
-            <p className="flex-1 text-celda text-texto">
+            <p className="flex-1 tipo-cuerpo text-texto">
               No pudimos cargar quiénes reservaron.
             </p>
             <Button

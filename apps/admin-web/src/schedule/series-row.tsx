@@ -47,7 +47,7 @@ export function SeriesPauseNotice({
       <div className="flex items-center gap-2">
         <StatusPill tone="advertencia">Serie en pausa</StatusPill>
       </div>
-      <p className="flex items-center gap-3 rounded-tarjeta border-l-4 border-texto bg-superficie px-4 py-3 text-celda text-texto">
+      <p className="flex items-center gap-3 rounded-tarjeta border-l-4 border-texto bg-superficie px-4 py-3 tipo-compacto text-texto">
         <CirclePause
           size={18}
           aria-hidden="true"
@@ -100,7 +100,7 @@ export function SeriesRow({
 
   return (
     <div className="flex flex-col gap-2 border-t border-borde px-7 pt-4 pb-6">
-      <p className="text-nota text-texto">
+      <p className="tipo-secundario text-texto">
         Serie semanal · cada {weekday} {boliviaParts(session.startsAt).time}
       </p>
       <div className="flex flex-wrap gap-2">
