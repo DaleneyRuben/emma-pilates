@@ -1,6 +1,6 @@
-// Clipped-text checker: flags text whose box falls outside an ancestor that clips (overflow hidden/clip/auto),
+// Clipped-text checker for design/v3 boards (follow-up 285): flags text whose box falls outside an ancestor that clips (overflow hidden/clip/auto),
 // and text truncated with an ellipsis. Usage: node cortes.cjs <width> <height> <file.html>...
-const { chromium } = require('/Users/rubendaleney/projects/emma/apps/admin-web/node_modules/@playwright/test');
+const { chromium } = require(require('path').resolve(__dirname, '../../../../apps/admin-web/node_modules/@playwright/test'));
 const path = require('path');
 const [width, height, ...files] = process.argv.slice(2);
 (async () => {
@@ -32,5 +32,5 @@ const [width, height, ...files] = process.argv.slice(2);
     total++; if (found.length) { bad++; console.log(path.basename(f) + ': ' + found.join(' | ')); }
     await p.close();
   }
-  console.log(`\n${total} archivo(s), ${bad} con textos cortados`); await b.close();
+  console.log(`\n${total} archivo(s), ${bad} con textos cortados`); await b.close(); process.exit(bad ? 1 : 0);
 })();
