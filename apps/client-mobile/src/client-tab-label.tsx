@@ -22,6 +22,6 @@ export function ClientTabLabel({
 }
 
 const styles = StyleSheet.create({
-  focused: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  focused: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   label: { fontFamily: fontFamilies.body, fontSize: typography.label },
 });

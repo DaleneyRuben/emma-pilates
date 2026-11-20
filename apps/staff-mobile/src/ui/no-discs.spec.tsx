@@ -26,7 +26,7 @@ function backgrounds(node: Node | Node[]): string[] {
 }
 
 // FIX-089: no tinted disc behind an icon; a person without a photo is her
-// initials in bold Crema on a Palo de rosa circle (ListaC).
+// initials in bold white on a rosa profundo circle.
 describe("Staff rows without discs", () => {
   it("draws S10's «Pide factura» switch without a Rubor fill", async () => {
     const screen = await render(
@@ -68,14 +68,14 @@ describe("Staff rows without discs", () => {
     expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
   });
 
-  it("draws a person's initials in bold Crema on Palo de rosa", async () => {
+  it("draws a person's initials in bold white on rosa profundo", async () => {
     const screen = await render(<PersonRow name="Carla Mendoza" />);
 
     expect(screen.getByText("CM")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "WorkSans_600SemiBold",
       fontWeight: "700",
     });
-    expect(screen.getByText("CM").parent).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByText("CM").parent).toHaveStyle({ backgroundColor: "#93615D" });
   });
 });

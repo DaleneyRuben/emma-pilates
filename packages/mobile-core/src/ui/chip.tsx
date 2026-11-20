@@ -11,8 +11,8 @@ import { colors, radii, spacing } from "./tokens";
 export const chipStyles = StyleSheet.create({
   box: {
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
   },
   boxSelected: {
     backgroundColor: colors.primary,
@@ -20,13 +20,14 @@ export const chipStyles = StyleSheet.create({
   },
   label: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyMedium,
     fontSize: 14,
+    fontWeight: "500",
   },
   labelSelected: {
     color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontWeight: "700",
   },
 });
 

@@ -44,7 +44,7 @@ describe("TodayHero", () => {
 
     expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen();
     expect(screen.getByText("PRÓXIMA · EN 49 MIN")).toBeOnTheScreen();
-    expect(screen.getByText("12:00 · Mat Pilates")).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getByText("12:00 · Mat Pilates")).toHaveStyle({ color: "#FFFBFB" });
     await fireEvent.press(screen.getByTestId("schedule-session-b"));
     expect(onPress).toHaveBeenCalled();
   });

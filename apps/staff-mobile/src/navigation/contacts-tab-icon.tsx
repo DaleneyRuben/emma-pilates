@@ -14,7 +14,7 @@ export function ContactsTabIcon({ color, focused }: { color: string; focused: bo
     <View>
       <StaffTabIcon color={color} focused={focused} name="contacts" />
       <View pointerEvents="none" style={styles.badge}>
-        <UnreadCountPill count={count} ring testID="contact-list-count" />
+        <UnreadCountPill count={count} inverted={focused} testID="contact-list-count" />
       </View>
     </View>
   );

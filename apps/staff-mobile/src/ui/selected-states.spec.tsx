@@ -9,19 +9,19 @@ import { FilterChips } from "./filter-chips";
 import { PersonRow } from "./person-row";
 
 const rosaProfundo = "#93615D";
-const crema = "#F9F4F2";
-const arcilla = "#CDA697";
+const crema = "#FFFBFB";
 const noop = () => undefined;
 
 type Element = ReturnType<Awaited<ReturnType<typeof render>>["getByText"]>;
 
 function expectSelected(box: Element, label: Element) {
   expect(box).toHaveStyle({ backgroundColor: rosaProfundo });
-  expect(label).toHaveStyle({ color: crema, fontFamily: "WorkSans_600SemiBold" });
+  expect(label).toHaveStyle({ color: crema, fontFamily: "WorkSans_700Bold" });
 }
 
 function expectUnselected(box: Element) {
-  expect(box).toHaveStyle({ backgroundColor: crema, borderColor: arcilla, borderWidth: 1 });
+  // Rosa Emma: a chip keeps its 1.5 pt 400 outline; a day tile, the card shadow.
+  expect(box).toHaveStyle({ backgroundColor: crema });
 }
 
 // A box under 44 pt reaches 44 with its hit slop.
@@ -122,7 +122,7 @@ describe("Staff selected states", () => {
     expectSelected(screen.getByRole("button", { name: "Lun" }), screen.getByText("Lun"));
     expectUnselected(screen.getByRole("button", { name: "Mar" }));
     expectUnselected(screen.getByRole("button", { name: "Viernes 9" }));
-    expect(screen.getByText("Mar")).toHaveStyle({ fontFamily: "WorkSans_400Regular" });
+    expect(screen.getByText("Mar")).toHaveStyle({ fontFamily: "WorkSans_500Medium" });
   });
 
   it("draws the chosen unit tile the same way", async () => {

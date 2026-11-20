@@ -4,6 +4,7 @@ import {
   type TrainerRosterBookingDto,
 } from "@pilates/api-contracts";
 import {
+  bandScroll,
   BrandToast,
   colors,
   EmptyState,
@@ -14,8 +15,8 @@ import {
   PrimaryButton,
   QueryFailure,
   Screen,
-  spacing,
   SectionTitle,
+  spacing,
   TextButton,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -135,7 +136,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
     <Screen style={styles.screen}>
       <ScrollView
         contentContainerStyle={[styles.content, backBarScroll.content, tablet && styles.tablet]}
-        style={backBarScroll.scroll}
+        style={[backBarScroll.scroll, bandScroll]}
       >
         <BackBar back="Mi agenda" onBack={() => navigation.goBack()} />
         <RosterBlock

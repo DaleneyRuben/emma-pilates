@@ -10,7 +10,7 @@ import { ancestorBackgrounds } from "./test-support";
 
 const hidden = { includeHiddenElements: true };
 const rubor = "#E7CCBF";
-const initialsCircle = { backgroundColor: "#B78380" };
+const initialsCircle = { backgroundColor: "#93615D" };
 
 // FIX-089 (palette B): no tinted disc behind an icon, and every initials
 // circle is Palo de rosa with Crema initials, like the shared PersonAvatar.
@@ -45,7 +45,7 @@ describe("Client icons and initials in palette B", () => {
     const screen = await render(<ReferredList referred={[referred]} />);
 
     const initials = screen.getByText("CM");
-    expect(initials).toHaveStyle({ color: "#F9F4F2", fontFamily: "WorkSans_600SemiBold" });
+    expect(initials).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_600SemiBold" });
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 
@@ -53,7 +53,7 @@ describe("Client icons and initials in palette B", () => {
     const screen = await render(<ClientAvatar name="Carla Méndez" photoUri={null} size={44} />);
 
     const initials = screen.getByText("CM");
-    expect(initials).toHaveStyle({ color: "#F9F4F2", fontFamily: "WorkSans_600SemiBold" });
+    expect(initials).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_600SemiBold" });
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 
@@ -75,7 +75,7 @@ describe("Client icons and initials in palette B", () => {
     );
 
     const initials = screen.getByText("GF");
-    expect(initials).toHaveStyle({ color: "#F9F4F2" });
+    expect(initials).toHaveStyle({ color: "#FFFBFB" });
     expect(ancestorBackgrounds(initials)[0]).toBe(initialsCircle.backgroundColor);
   });
 });

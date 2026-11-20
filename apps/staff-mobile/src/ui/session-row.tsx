@@ -2,8 +2,8 @@ import { ClassRow, ExceptionPill } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
 
 /**
- * A class on a staff list (ClaseE, FIX-089): the shared class row, the time in
- * a Rubor box, the class over one quiet line, and the places «N de M». Only
+ * A class on a staff list (Rosa Emma): the shared class row, the type bar and
+ * the time in Lora, the class over one quiet line, and the places «N de M». Only
  * an exception («Completa», «Ya reservada») takes a pill, in their place.
  * Put rows in a `ClassList`, or pass `standalone` for a row on its own card.
  */

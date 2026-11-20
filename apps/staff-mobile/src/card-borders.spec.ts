@@ -17,13 +17,14 @@ function sources(directory: string): string[] {
   });
 }
 
-// A QR code's frame and the time wheel's band are not cards.
-const notCards = new Set(["band", "qrBox"]);
+// A QR code's frame, the time wheel's band and the round white discs on the
+// header band (the bell) are not cards.
+const notCards = new Set(["band", "bell", "qrBox"]);
 
-// FIX-089: a card is Crema with a 1 pt Arcilla border (surfaces.card), so a
-// rounded Crema block never stands without its outline.
+// Rosa Emma: a card is white with the soft rosa shadow (surfaces.card), so a
+// rounded white block never stands without its shadow or an outline.
 describe("Staff cards", () => {
-  it("draw their Arcilla border", () => {
+  it("carry the card shadow or an outline", () => {
     const bare = sources(__dirname).flatMap((path) =>
       [...readFileSync(path, "utf8").matchAll(/(\w+): \{([^{}]*)\}/g)]
         .filter(
@@ -32,7 +33,7 @@ describe("Staff cards", () => {
             /backgroundColor: colors\.(card|surface|white)\b/.test(body) &&
             /borderRadius/.test(body) &&
             !/radii\.pill/.test(body) &&
-            !/borderWidth/.test(body),
+            !/borderWidth|\.\.\.(surfaces|shadows)\./.test(body),
         )
         .map(([, name]) => `${path.slice(__dirname.length + 1)} ${name}`),
     );

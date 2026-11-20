@@ -1,12 +1,14 @@
 import {
   AuthenticationFlow,
-  colors,
+  createTabStackScreenLayout,
   EmailChangeLinkScreen,
   MobileQueryProvider,
-  type MobileNavigationProps,
-  createTabStackScreenLayout,
   returnTabsToRoot,
+  TabBarButton,
   tabBarHidden,
+  tabBarStyle,
+  tabBarTints,
+  type MobileNavigationProps,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -141,7 +143,6 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
-const tabBarStyle = { backgroundColor: colors.card, borderTopColor: colors.border };
 
 const tabCount = 4;
 
@@ -179,8 +180,9 @@ const ClientTabs = createBottomTabNavigator({
   // Labels stay under the icons on a tablet too.
   screenOptions: {
     headerShown: false,
-    tabBarActiveTintColor: colors.text,
-    tabBarInactiveTintColor: colors.text,
+    // Rosa Emma: the open tab is a 600 pill with white icon and label.
+    ...tabBarTints,
+    tabBarButton: TabBarButton,
     tabBarLabelPosition: "below-icon",
   },
   screens: {

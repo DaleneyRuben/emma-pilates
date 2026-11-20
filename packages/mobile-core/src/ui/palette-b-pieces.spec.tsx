@@ -28,7 +28,7 @@ describe("Chip", () => {
     expect(screen.getByRole("button", { name: "Hoy" })).toBeSelected();
     expect(screen.getByText("Hoy")).toHaveStyle({
       color: "#FFFBFB",
-      fontFamily: "WorkSans_600SemiBold",
+      fontFamily: "WorkSans_700Bold",
     });
   });
 
@@ -40,7 +40,7 @@ describe("Chip", () => {
     expect(chip).toHaveStyle({
       backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderWidth: 1.5,
     });
     expect(chip).toHaveProp("hitSlop", { bottom: 3, left: 0, right: 0, top: 3 });
     expect(screen.getByText("Mañana")).toHaveStyle({ color: "#93615D" });

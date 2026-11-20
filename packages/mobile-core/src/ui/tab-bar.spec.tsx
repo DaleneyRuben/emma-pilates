@@ -13,7 +13,7 @@ describe("TabBarButton", () => {
       </TabBarButton>,
     );
 
-    expect(screen.getByTestId("tab-bar-pill")).toHaveStyle({
+    expect(screen.getByTestId("open-tab-pill")).toHaveStyle({
       backgroundColor: "#93615D",
       borderRadius: 16,
     });
@@ -28,7 +28,7 @@ describe("TabBarButton", () => {
       </TabBarButton>,
     );
 
-    expect(screen.queryByTestId("tab-bar-pill")).toBeNull();
+    expect(screen.queryByTestId("open-tab-pill")).toBeNull();
   });
 
   it("draws the bar white with white tints on the pill", () => {

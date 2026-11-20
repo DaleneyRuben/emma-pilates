@@ -1,8 +1,10 @@
 import {
-  colors,
   createTabStackScreenLayout,
   popTabToRootOnPress,
+  TabBarButton,
   tabBarHidden,
+  tabBarStyle,
+  tabBarTints,
 } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -147,8 +149,6 @@ const payScreens = {
 };
 const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: CancelSessionScreen };
 
-const tabBarStyle = { backgroundColor: colors.card, borderTopWidth: 0 };
-
 const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>
   ({ route }: { route: RouteProp<ParamListBase> }) => ({
@@ -199,9 +199,9 @@ const tabConfig = {
   screenListeners: popTabToRootOnPress,
   screenOptions: {
     headerShown: false,
-    // FIX-089: every label is Rosa profundo; the open tab is the bold one.
-    tabBarActiveTintColor: colors.text,
-    tabBarInactiveTintColor: colors.text,
+    // Rosa Emma: the open tab is a 600 pill with white icon and label.
+    ...tabBarTints,
+    tabBarButton: TabBarButton,
     tabBarLabelPosition: "below-icon",
   },
 } as const;

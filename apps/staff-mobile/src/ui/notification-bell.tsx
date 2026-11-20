@@ -8,8 +8,8 @@ import { useStaffFetcher } from "../staff-fetcher";
 type BellNavigation = { navigate: (screen: "Notifications") => void };
 
 /**
- * The bell on a role root (v2 S02, S04, S11, S15): a 44 pt target with no disc
- * (FIX-089) and the unread count in Rosa profundo with Crema. Perfil is a tab
+ * The bell on a role root (Rosa Emma): a 44 pt white disc on the band and
+ * the unread count in rosa profundo with white. Perfil is a tab
  * now, so the avatar is gone.
  */
 export function NotificationBell() {
@@ -41,6 +41,8 @@ export function NotificationBell() {
 const styles = StyleSheet.create({
   bell: {
     alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 22,
     height: 44,
     justifyContent: "center",
     width: 44,

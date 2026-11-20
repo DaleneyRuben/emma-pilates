@@ -25,7 +25,7 @@ export function TabBarButton({
     <Pressable {...props} aria-selected={selected} style={style}>
       <View
         style={[styles.pill, selected && styles.selected]}
-        testID={selected ? "tab-bar-pill" : undefined}
+        testID={selected ? "open-tab-pill" : undefined}
       >
         {children}
       </View>

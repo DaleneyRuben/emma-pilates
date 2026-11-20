@@ -46,8 +46,9 @@ const styles = StyleSheet.create({
   tint: { color: colors.primaryOnTint },
   value: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: 15,
+    fontWeight: "700",
     fontVariant: ["tabular-nums"],
     textAlign: "right",
   },

@@ -36,7 +36,7 @@ describe("The Client tab bar", () => {
     });
     const open = within(screen.getByTestId("tab-home", hidden)).getByText("Inicio", hidden);
     const closed = within(screen.getByTestId("tab-booking", hidden)).getByText("Reservar", hidden);
-    expect(open).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_600SemiBold" });
+    expect(open).toHaveStyle({ color: "#FFFBFB", fontFamily: "WorkSans_700Bold" });
     expect(closed).toHaveStyle({ color: "#93615D", fontFamily: "WorkSans_400Regular" });
     expect(closed).toHaveStyle({ fontSize: 12 });
   });

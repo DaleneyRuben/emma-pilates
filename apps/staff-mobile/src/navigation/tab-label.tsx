@@ -18,6 +18,6 @@ export function TabLabel({
 }
 
 const styles = StyleSheet.create({
-  focused: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  focused: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   label: { fontFamily: fontFamilies.bodyMedium, fontSize: 12, fontWeight: "500" },
 });
