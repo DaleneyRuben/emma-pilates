@@ -63,6 +63,7 @@ numbered tests.
 | Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 186) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
 | Staff app redesign picks | The Trainer's week with classes per day and the next class with who is coming (E1), the roster before and during the class with «Vino» / «No vino» (E6), the statement as a «TOTAL» block whose concepts open by day (E2), «Mis pagos» for every paid role (E8), the Palo de rosa Plan, the role's actions and the Coordinator's WhatsApp, Llamar and Anotar contacto on the client file (E4), Registrar pago with large options, a day strip and the invoice switch (E3), the Nutritionist's next appointment with WhatsApp (E5), the Assistant's «Hoy» (E7), and the freeze review with a refusal reason (E9) (Test 187) | The client file's Pagos and Evaluaciones rows need staff endpoints not built yet; transfer receipts are not on the Assistant's Hoy because only the Administrator confirms them |
 | Rosa Emma in the apps        | Both apps on the approved Rosa Emma system: the 200 header band behind the status bar, the 600 hero, 500 blocks, white cards with the rosa shadow, the 600 tab pill, class-type bars, and the joined undated lines of an old Liquidación (Test 189) | The boards in `design/v3/cliente` and `design/v3/equipo` are the reference; a screen the boards never drew keeps the shared pieces' look |
+| Type scale in the apps       | Every text in both apps is one of the follow-up 285 styles: Lora 500 only for titles and figures, Work Sans for everything else, no text under 12 pt, small text only on white, 50 or 600, italic field examples, the same weight for a chosen chip or tab, text that grows with the phone up to 1.3 times (Test 191) | Text at the phone's largest accessibility sizes stops growing at 1.3 times by design |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 
 ## Where each designed screen is tested
@@ -11735,8 +11736,9 @@ E. **Buttons, chips and tabs.** The primary button is 600, 52 pt, radius 16,
    Android too; with five staff tabs, «Para contactar» and «Disponibilidad»
    stay on one line.
 F. **States, sheets and footers.** Empty, error and success states are white
-   cards with the glyph on a 50 disc and a Lora 24 title; a load failure has
-   «Reintentar» inside the card. Confirmation sheets are white with a grabber
+   cards with the glyph on a 50 disc and a Work Sans 16/600 title over a 15
+   pt note (Test 191); a load failure says its sentence in Work Sans 15 and
+   has «Reintentar» inside the card. Confirmation sheets are white with a grabber
    and radius 28. A screen's fixed button sits in a white footer with an
    upward shadow, its hint inside the footer.
 G. **Liquidación (verification E2).** As a Trainer whose statement was drafted
@@ -11745,3 +11747,54 @@ G. **Liquidación (verification E2).** As a Trainer whose statement was drafted
    one row, «Mínimo no alcanzado · 54 × Bs 25» with «Bs 1.350», instead of 54
    rows. A newer statement still lists its classes by day with time, type and
    Branch.
+
+## Test 191: the type scale in the Client and Staff apps (follow-up 285)
+
+The owner's type scale (2026-11-20, design follow-up 285): thirteen styles and
+four named variants, the same names as the admin web. JavaScript only: no
+migration, no API change, no native build. Use the Test 5A fixtures (password
+`emma-local-2026`), run the API, the worker and both Metro servers on your own
+ports, and walk the iPhone 16 Pro, the iPad Pro 11 and the Android emulator
+with each screen next to its board in `design/v3/cliente` or
+`design/v3/equipo`.
+
+A. **Two families, one ink.** Titles and figures are Lora at one weight: the
+   band title 30, a section, sheet or dialog title 24, a card or 600-block
+   title 22, figures 24 and big figures 34 (Inicio's «5», Mi plan's count,
+   Pagos pendientes' total, the Caja count). Everything else is Work Sans:
+   a row's first line 16 semibold, buttons 16 bold (small ones 14), sentences
+   15, table cells and chips 14, second lines and hints 13, rótulos 12 bold in
+   spaced capitals and pills 12 bold. Text is rosa profundo, or white on 600;
+   nothing is faded.
+B. **No sentence in Lora.** A load failure («No pudimos cargar tus
+   reservas.»), an empty state's note, the Clientas search hint («Escribe al
+   menos dos letras…») and «Hoy no quedan clases…» read in Work Sans. An
+   empty or error state's title is Work Sans 16 semibold.
+C. **Small text on white.** On the 100 screen, the 200 band and a 500 block you
+   only see titles, figures and 19 pt bold text. Check the sheets that used to
+   be 100: the phone prompt (Perfil › teléfono vacío), «Otra fecha» in
+   Reservar, the country picker of a phone field, and the enlarged transfer
+   QR. They are white. Congelar plan's calendar and its «Toca el primer día»
+   line sit in one white card; in Mi plan › Renovar the «Tu plan actual vence
+   el…» line and the start-date note are on white. On Hoy, with two Branches,
+   the «Sucursal» line sits in a white card.
+D. **Same weight, any state.** A chosen chip, day, segment, tab or time-wheel
+   row changes its ground (600) and turns white; its letters keep their
+   weight. The open tab's label is 12 bold like the others, never shrunk:
+   «Disponibilidad» and «Para contactar» stay whole.
+E. **Fields.** An empty field's example («tu@correo.com», «Buscar clienta»)
+   is italic in the same ink; once you type, the text is upright. Labels are
+   14 semibold; hints and field errors 13. The Caja count is typed in Lora 34.
+F. **Links.** «¿Olvidaste tu contraseña?», «Volver», «Ver», «Ocultar» and
+   «Cerrar mi cuenta» are 14 bold and underlined; a link inside a sentence
+   («Regístrate») is the sentence's size, bold and underlined.
+G. **Disabled.** A disabled invitation row in the Staff app and the «−» of
+   Reportar una falla at its limit are in full ink with an outline or a 50
+   ground, and say why in words. The time wheel's unavailable hours are
+   struck through, not pale.
+H. **Larger text.** In Settings › Accessibility › Display & Text Size › Larger
+   Text, drag to the largest standard size (not the accessibility sizes) and
+   reopen Inicio, Reservar and Hoy: text grows, nothing is cut with «…», the
+   class times stay whole. At the accessibility sizes text stops growing at
+   1.3 times by design.
+
