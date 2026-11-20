@@ -1,4 +1,10 @@
 import { useId, type KeyboardEvent } from "react";
+import {
+  segmentClass,
+  segmentCompactClass,
+  segmentCurrentClass,
+  segmentedBarClass,
+} from "../../components/ui/segmented";
 import { cn } from "../../lib/cn";
 import type { AdminRole } from "../../session/admin-role";
 
@@ -19,8 +25,8 @@ const allTabs: readonly {
 const clientFileTabsFor = (role: AdminRole) =>
   allTabs.filter((tab) => role === "administrator" || !tab.administratorOnly);
 
-// P03 / P11: the Client file's tabs on an Arena hairline, the chosen one in
-// Rosa enlace over a Rosa profundo underline, like the destination tabs.
+// P03 / P11: the Client file's tabs as a panel's compact segmented bar; the
+// chosen one changes background, never weight (follow-up 285, rule 4).
 // Arrow keys move between them (WAI-ARIA tabs).
 export function ClientFileTabs({
   role,
@@ -51,7 +57,7 @@ export function ClientFileTabs({
     <div
       role="tablist"
       aria-label="Ficha de la clienta"
-      className="-mt-2 flex gap-1 overflow-x-auto border-b border-borde px-7"
+      className={cn(segmentedBarClass, "-mt-2 mx-7")}
     >
       {tabs.map((tab, index) => {
         const selected = tab.value === value;
@@ -67,9 +73,9 @@ export function ClientFileTabs({
             onClick={() => onChange(tab.value)}
             onKeyDown={(event) => move(event, index)}
             className={cn(
-              "-mb-px inline-flex h-11 shrink-0 items-center border-b-2 border-transparent px-3 text-cuerpo text-texto hover:text-texto focus-visible:shadow-foco",
-              selected &&
-                "border-rosa-600 font-semibold text-texto hover:text-texto",
+              segmentClass,
+              segmentCompactClass,
+              selected && segmentCurrentClass,
             )}
           >
             {tab.label}

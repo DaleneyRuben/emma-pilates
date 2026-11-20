@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { ActionRow } from "../../components/panel/action-rows";
+import { fieldMessageClass } from "../../components/form/form";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 
@@ -83,9 +84,7 @@ export function AllowanceAdjustmentAction({
       >
         <p>{copy.note}</p>
         <label className="flex flex-col gap-1 text-texto">
-          <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase">
-            Clases
-          </span>
+          <span className="tipo-compacto-600 text-texto">Clases</span>
           <Input
             aria-label="Clases"
             type="number"
@@ -95,7 +94,7 @@ export function AllowanceAdjustmentAction({
           />
         </label>
         {failure === null ? null : (
-          <p role="alert" className="text-texto">
+          <p role="alert" className={fieldMessageClass}>
             {failure}
           </p>
         )}

@@ -1,8 +1,9 @@
 import type { StaffMemberDto } from "@pilates/api-contracts";
-import { CircleAlert, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useRef } from "react";
 import { StaffPhoto } from "../../components/staff-photo";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { staffPhotoAccept, useStaffPhoto } from "./use-staff-photo";
 
 const busyLabels = {
@@ -40,7 +41,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
           ) : null}
         </StaffPhoto>
         <div className="flex min-w-0 flex-col gap-2">
-          <span className="font-serif text-titulo-2 leading-tight break-words text-texto">
+          <span className="tipo-titulo-seccion break-words text-texto">
             {member.name}
           </span>
           {editable ? (
@@ -61,7 +62,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
               {busy ? (
                 <span
                   role="status"
-                  className="inline-flex min-h-9 items-center text-nota text-texto"
+                  className="inline-flex min-h-9 items-center tipo-secundario text-texto"
                 >
                   {busyLabels[status.kind]}
                 </span>
@@ -86,7 +87,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
                   )}
                 </span>
               )}
-              <span className="text-ayuda text-texto">
+              <span className="tipo-secundario text-texto">
                 JPG, PNG o WebP, hasta 5 MB.
               </span>
             </>
@@ -94,18 +95,7 @@ export function StaffPhotoBlock({ member }: { member: StaffMemberDto }) {
         </div>
       </div>
       {status.kind === "failed" ? (
-        <div
-          role="alert"
-          className="flex items-center gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-3.5 py-2.5 text-nota text-texto"
-        >
-          <CircleAlert
-            size={20}
-            strokeWidth={1.6}
-            aria-hidden="true"
-            className="flex-none text-rosa-600"
-          />
-          {status.message}
-        </div>
+        <InlineError>{status.message}</InlineError>
       ) : null}
     </div>
   );

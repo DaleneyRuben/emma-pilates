@@ -20,6 +20,7 @@ import { ActionList } from "../../components/panel/action-rows";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { ClientPhoto } from "../../components/client-photo";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { StatusPill } from "../../components/ui/status-pill";
 import { PageNotice } from "../../components/page/page-notice";
 import { useAdminRole, type AdminRole } from "../../session/admin-role";
@@ -98,14 +99,14 @@ function ClientSummary({
     <>
       <div className="flex items-center gap-3">
         <ClientPhoto name={client.name} photo={client.photo} size={40} />
-        <p className="text-nota text-texto">
+        <p className="tipo-compacto text-texto">
           Clienta desde {formatListDate(client.clientSince)}
         </p>
       </div>
       {client.accountStatus === "pending" ? (
         <div className="flex flex-col gap-1 rounded-control border border-borde-fuerte bg-aviso px-3 py-2">
           <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             Todavía no abrió el enlace del correo para crear su contraseña.
           </p>
         </div>
@@ -122,7 +123,7 @@ function ClientSummary({
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde-fuerte bg-superficie px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto">
+          <span className="rounded-control border border-borde-fuerte bg-superficie-hundida px-2 py-0.5 tipo-titulo-fila text-texto tabular">
             {client.referralCode}
           </span>
         </SummaryRow>
@@ -195,9 +196,7 @@ export function ClientDetailPanel({
           ) : query.isError ? (
             isApiError(query.error) &&
             query.error.code === "client_not_found" ? (
-              <p role="alert" className="text-cuerpo text-texto">
-                Esta clienta ya no existe.
-              </p>
+              <InlineError>Esta clienta ya no existe.</InlineError>
             ) : (
               <QueryFailure
                 error={query.error}
@@ -248,7 +247,7 @@ export function ClientDetailPanel({
       (editing && granted === null) ? null : (
         <SidePanelFooter>
           {granted === null ? null : (
-            <p role="status" className="text-nota text-texto">
+            <p role="status" className="tipo-secundario text-texto">
               {granted}
             </p>
           )}

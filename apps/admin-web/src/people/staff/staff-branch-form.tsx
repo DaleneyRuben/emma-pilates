@@ -3,6 +3,7 @@ import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  fieldMessageClass,
   Form,
   FormField,
   FormItem,
@@ -18,6 +19,7 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffContact } from "./staff-read-only";
@@ -34,11 +36,11 @@ function BranchChips({
 }) {
   const branches = useQuery(activeBranchesQueryOptions());
   if (branches.isPending) {
-    return <p className="text-ayuda text-texto">Cargando sucursales…</p>;
+    return <p className="tipo-secundario text-texto">Cargando sucursales…</p>;
   }
   if (branches.isError) {
     return (
-      <p role="alert" className="text-ayuda text-texto">
+      <p role="alert" className={fieldMessageClass}>
         No pudimos cargar las sucursales.
       </p>
     );
@@ -99,7 +101,7 @@ export function StaffBranchForm({
         <SidePanelBody>
           <FormErrorSummary />
           <StaffPhotoBlock member={member} />
-          <p className="rounded-control border border-borde bg-superficie px-3 py-2 text-ayuda text-texto">
+          <p className="rounded-control border border-borde bg-superficie px-3 py-2 tipo-secundario text-texto">
             Puedes cambiar sus sedes y su foto. Invitar y cambiar roles lo hace
             Administración.
           </p>
@@ -109,11 +111,7 @@ export function StaffBranchForm({
             name="branchIds"
             render={({ field }) => <BranchChips field={field} />}
           />
-          {failure !== null ? (
-            <p role="alert" className="text-ayuda text-texto">
-              {failure}
-            </p>
-          ) : null}
+          {failure !== null ? <InlineError>{failure}</InlineError> : null}
         </SidePanelBody>
         <SidePanelFooter>
           <Button type="submit" disabled={change.isPending}>

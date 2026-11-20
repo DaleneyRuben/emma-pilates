@@ -26,6 +26,7 @@ import {
 } from "../../components/form/phone-value";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { Button } from "../../components/ui/button";
+import { InlineError } from "../../components/ui/inline-error";
 import { Input } from "../../components/ui/input";
 
 const profileSchema = (stored: string | null) =>
@@ -109,14 +110,14 @@ export function ClientProfileForm({
         <PhoneFormField control={form.control} name="phone" />
         <SummaryBlock title="Correo">
           <SummaryRow label="Correo">{client.email}</SummaryRow>
-          <p className="px-3 py-2 text-ayuda text-texto">
+          <p className="px-3 py-2 tipo-secundario text-texto">
             La clienta cambia su correo desde su app.
           </p>
         </SummaryBlock>
         {failed ? (
-          <p role="alert" className="text-nota text-texto">
+          <InlineError>
             No pudimos guardar los cambios. Inténtalo de nuevo.
-          </p>
+          </InlineError>
         ) : null}
         <div className="flex gap-2">
           <Button type="button" variant="neutral" size="sm" onClick={onCancel}>

@@ -66,7 +66,8 @@ function PendingFreezes({ filter }: { filter: ReactNode }) {
       }
       footer={
         query.data === undefined || query.data.totalItems === 0 ? null : (
-          <p className="text-nota text-texto">
+          // Follow-up 285 (rule 3): in a white card, never loose on the 100.
+          <p className="rounded-tarjeta bg-superficie px-4 py-3 tipo-compacto text-texto shadow-tarjeta">
             Aprobar o rechazar se hace dentro de cada solicitud; rechazar pide
             confirmación.
           </p>

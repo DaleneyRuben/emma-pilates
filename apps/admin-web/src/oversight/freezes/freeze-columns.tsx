@@ -25,7 +25,7 @@ const clientColumn = columns.accessor("clientName", {
         name={row.original.clientName}
         photo={row.original.clientPhoto}
       />
-      <span className="text-cuerpo font-bold text-texto">
+      <span className="tipo-titulo-fila text-texto">
         {row.original.clientName}
       </span>
     </span>
@@ -90,7 +90,6 @@ export const pendingFreezeColumns = (open: (row: FreezeReviewDto) => void) => [
       <Button
         size="sm"
         variant="link"
-        className="underline"
         onClick={(event) => {
           event.stopPropagation();
           open(row.original);
@@ -118,7 +117,7 @@ export const decidedFreezeColumns = () => [
           <StatusPill tone="error">Rechazada</StatusPill>
           {/* W16 B/C: what the Client was told. */}
           {row.original.refusalReason == null ? null : (
-            <span className="text-nota text-texto">
+            <span className="tipo-secundario text-texto">
               {row.original.refusalReason}
             </span>
           )}

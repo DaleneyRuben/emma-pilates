@@ -34,10 +34,10 @@ const referralColumns = () => [
     header: "Clienta que refiere",
     cell: ({ row }) => (
       <span className="flex flex-col">
-        <span className="font-medium text-texto">
+        <span className="tipo-titulo-fila text-texto">
           {row.original.referrerName}
         </span>
-        <span className="text-ayuda text-texto">
+        <span className="tipo-secundario text-texto">
           {count(
             row.original.referrerReferralCount,
             "referida en total",
@@ -101,11 +101,9 @@ function EmptyReferrals({ searching }: { searching: boolean }) {
           : "Todavía no hay referidos."}
       </span>
       {searching ? (
-        <span className="text-nota text-texto">
-          Revisa cómo escribiste el nombre de la clienta.
-        </span>
+        <span>Revisa cómo escribiste el nombre de la clienta.</span>
       ) : null}
-      <span className="text-ayuda text-texto">
+      <span>
         Un referido nace cuando una clienta se registra con el código de otra.
       </span>
     </span>

@@ -21,7 +21,7 @@ export function IndicatorChart({
       aria-label="Clases dictadas"
       className="m-0 flex min-w-0 flex-col gap-3 rounded-tarjeta bg-superficie shadow-tarjeta px-5 py-4"
     >
-      <h2 className="text-titulo-panel text-texto">Clases dictadas</h2>
+      <h2 className="tipo-titulo-seccion text-texto">Clases dictadas</h2>
       {/* FIX-088: as wide as the card, never past a 420 px screen. */}
       <div className="h-48 w-full max-w-[480px] min-w-0">
         <ResponsiveContainer

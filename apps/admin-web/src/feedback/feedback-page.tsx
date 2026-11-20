@@ -5,6 +5,7 @@ import type { SearchChange } from "../catalog/catalog-search";
 import { ClientPhoto } from "../components/client-photo";
 import { countFormat } from "../components/table/pagination";
 import { Button } from "../components/ui/button";
+import { InlineError } from "../components/ui/inline-error";
 import { FilterChips } from "../components/ui/filter-chips";
 import { saveFile } from "../lib/save-file";
 import { feedbackColumns } from "./feedback-columns";
@@ -54,7 +55,7 @@ function EmptyFeedback({ filtered }: { filtered: boolean }) {
           ? "Ningún comentario con estos filtros."
           : "Todavía no hay comentarios."}
       </span>
-      <span className="text-nota text-texto">
+      <span>
         Llegan desde «Enviar comentarios», en el Perfil de las dos apps.
       </span>
     </span>
@@ -127,12 +128,9 @@ export function FeedbackPage({
             />
           </div>
           {exportFeedback.isError ? (
-            <p
-              role="alert"
-              className="rounded-control bg-aviso px-3 py-2 text-nota text-texto"
-            >
+            <InlineError>
               No pudimos exportar los comentarios. Inténtalo de nuevo.
-            </p>
+            </InlineError>
           ) : null}
         </div>
       }

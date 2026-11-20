@@ -2,6 +2,7 @@ import { formatListDate } from "@pilates/api-contracts";
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useId, useState } from "react";
 import { isApiError } from "../../api/problem";
+import { fieldMessageClass } from "../../components/form/form";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
@@ -17,7 +18,7 @@ type Result = { ok: true; message: string } | { ok: false; message: string };
 
 // AW24 draws the card's actions as full-width quiet buttons; FIX-089 makes
 // them the secondary button (Crema, Rosa profundo border), 44 px tall.
-const cardButton = "h-[44px] w-full text-fila-menu";
+const cardButton = "h-[44px] w-full";
 
 /**
  * AW24's pending invitation (follow-ups 35–36, WEB-012): the address with
@@ -102,13 +103,13 @@ export function PendingInvitation({
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
           />
-          <p className="text-ayuda text-texto">
+          <p className="tipo-secundario text-texto">
             {`Los enlaces enviados a ${email} dejarán de funcionar; enviaremos uno nuevo de 7 días.`}
           </p>
         </div>
       ) : (
         <div className="flex items-center justify-between gap-2.5">
-          <span className="break-all text-fila-menu text-texto">{email}</span>
+          <span className="break-all tipo-titulo-fila text-texto">{email}</span>
           <Button
             variant="link"
             size="sm"
@@ -122,12 +123,12 @@ export function PendingInvitation({
           </Button>
         </div>
       )}
-      <p className="text-nota leading-normal text-texto">
+      <p className="tipo-compacto text-texto">
         {expiresAt === null || expiresAt === undefined
           ? "El último enlace ya no es válido; envía uno nuevo."
           : `El enlace vence el ${formatListDate(boliviaParts(expiresAt).date)}.`}
       </p>
-      <p className="text-ayuda text-texto">
+      <p className="tipo-secundario text-texto">
         Si no activa su cuenta en 30 días desde el último envío o cambio, la
         invitación se elimina. Es distinto de los 7 días de cada enlace.
       </p>
@@ -162,11 +163,11 @@ export function PendingInvitation({
         </Button>
       )}
       {result === null ? null : result.ok ? (
-        <p role="status" className="text-ayuda text-texto">
+        <p role="status" className="tipo-secundario text-texto">
           {result.message}
         </p>
       ) : (
-        <p role="alert" className="text-ayuda text-texto">
+        <p role="alert" className={fieldMessageClass}>
           {result.message}
         </p>
       )}

@@ -13,6 +13,7 @@ import {
 import { useId, useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
+import { fieldMessageClass } from "../../components/form/form";
 import { SummaryRow } from "../../components/panel/summary-rows";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -110,7 +111,7 @@ function AcquisitionForm({
           ))}
         </Select>
         {missingChannel ? (
-          <p role="alert" className="text-ayuda text-texto">
+          <p role="alert" className={fieldMessageClass}>
             Elige cómo nos conoció.
           </p>
         ) : null}
@@ -124,11 +125,11 @@ function AcquisitionForm({
           value={code}
           onChange={(event) => setCode(event.target.value.toUpperCase())}
         />
-        <p className="text-ayuda text-texto">
+        <p className="tipo-secundario text-texto">
           De una clienta o de una instructora. Si lo escribes, decide el canal.
         </p>
         {correction.isError ? (
-          <p role="alert" className="text-ayuda text-texto">
+          <p role="alert" className={fieldMessageClass}>
             {failureMessage(correction.error)}
           </p>
         ) : null}
@@ -170,7 +171,7 @@ function AcquisitionRows({
             {channelLabels[acquisition.channel]}
           </span>
           {answeredOtherwise ? (
-            <span className="text-ayuda text-texto">
+            <span className="tipo-secundario text-texto">
               Ella respondió: {channelLabels[acquisition.declaredChannel]}
             </span>
           ) : null}
@@ -178,7 +179,7 @@ function AcquisitionRows({
       </SummaryRow>
       {acquisition.referralCode === null ? null : (
         <SummaryRow label="Código">
-          <span className="rounded-control border border-borde-fuerte bg-superficie px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto">
+          <span className="rounded-control border border-borde-fuerte bg-superficie-hundida px-2 py-0.5 tipo-titulo-fila text-texto tabular">
             {acquisition.referralCode}
           </span>
         </SummaryRow>
@@ -208,10 +209,7 @@ export function ClientAcquisitionBlock({ clientId }: { clientId: string }) {
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-3">
-        <h3
-          id={titleId}
-          className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto uppercase"
-        >
+        <h3 id={titleId} className="tipo-etiqueta text-texto">
           ¿Cómo nos conociste?
         </h3>
         {query.data === undefined || editing ? null : (
@@ -226,7 +224,7 @@ export function ClientAcquisitionBlock({ clientId }: { clientId: string }) {
         )}
       </div>
       {query.data === undefined ? (
-        <p className="text-nota text-texto">
+        <p className="tipo-cuerpo text-texto">
           {query.isError ? "No pudimos leer este dato." : "Cargando…"}
         </p>
       ) : editing ? (

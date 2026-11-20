@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { ExampleHint } from "../../components/form/example-hint";
+import { fieldMessageClass } from "../../components/form/form";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import type { ReferralCodeDraft } from "./use-referral-code-draft";
@@ -14,9 +15,7 @@ export function TrainerReferralCodeField({
   const id = useId();
   if (draft.query.data === undefined) {
     return draft.query.isError ? (
-      <p className="text-ayuda text-texto">
-        No pudimos leer su código personal.
-      </p>
+      <p className={fieldMessageClass}>No pudimos leer su código personal.</p>
     ) : null;
   }
   return (
@@ -27,18 +26,18 @@ export function TrainerReferralCodeField({
         autoComplete="off"
         aria-invalid={draft.error !== null}
         aria-describedby={`${id}-help`}
-        className="font-mono tracking-wider"
+        className="tipo-titulo-fila"
         value={draft.value}
         onChange={(event) => draft.change(event.target.value)}
       />
-      <p id={`${id}-help`} className="text-ayuda text-texto">
+      <p id={`${id}-help`} className="tipo-secundario text-texto">
         <ExampleHint example="CARLA">
           Las clientas que se registran con este código quedan como traídas por
           ella.
         </ExampleHint>
       </p>
       {draft.error === null ? null : (
-        <p role="alert" className="text-ayuda text-texto">
+        <p role="alert" className={fieldMessageClass}>
           {draft.error}
         </p>
       )}

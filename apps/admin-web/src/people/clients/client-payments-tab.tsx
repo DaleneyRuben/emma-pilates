@@ -1,6 +1,7 @@
 import { formatDateTime } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { TextLink } from "../../components/ui/text-link";
 import { formatBolivianos } from "../../lib/money";
 import { methodLabels } from "../../payments/payments-csv";
 import { PaymentStatePill } from "../../payments/payment-state-pill";
@@ -34,7 +35,7 @@ export function ClientPaymentsTab({
               detail={`${formatDateTime(payment.submittedAt)} · ${methodLabels[payment.method]}`}
               aside={
                 <span className="flex flex-col items-end gap-1">
-                  <span className="font-serif text-fila text-texto tabular">
+                  <span className="tipo-cifra text-texto">
                     {formatBolivianos(payment.amountDueCentavos)}
                   </span>
                   <PaymentStatePill state={payment.state} />
@@ -44,13 +45,14 @@ export function ClientPaymentsTab({
           ))
         }
       </ClientFileSection>
-      <Link
-        to="/dinero/pagos"
-        search={{ page: 1, pageSize: 20, status: "all", q: clientName }}
-        className="self-start rounded-control text-nota font-medium text-texto hover:underline focus-visible:shadow-foco"
-      >
-        Ver en Dinero
-      </Link>
+      <TextLink asChild className="self-start rounded-control">
+        <Link
+          to="/dinero/pagos"
+          search={{ page: 1, pageSize: 20, status: "all", q: clientName }}
+        >
+          Ver en Dinero
+        </Link>
+      </TextLink>
     </>
   );
 }

@@ -2,6 +2,7 @@ import type { AdminPromotionContactDto } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { ConfirmDialog } from "../../../components/ui/confirm-dialog";
+import { InlineError } from "../../../components/ui/inline-error";
 import { useWithdrawPromotionContact } from "./closed-account-queries";
 
 // BE-022: a «stop» request erases a former Client's contact for good
@@ -36,7 +37,6 @@ export function WithdrawContactAction({
         variant="link"
         size="sm"
         aria-label={`Dejar de enviar a ${contact.name}`}
-        className="text-texto hover:text-texto"
         onClick={() => {
           setFailed(false);
           setOpen(true);
@@ -56,13 +56,13 @@ export function WithdrawContactAction({
           Borramos su nombre, correo y teléfono de esta lista. Usa esto cuando
           la persona te pida que paremos.
         </p>
-        <p className="font-medium text-texto">
+        <p className="tipo-titulo-fila text-texto">
           Esta acción no se puede deshacer.
         </p>
         {failed ? (
-          <p role="alert" className="text-texto">
+          <InlineError>
             No pudimos borrar el contacto. Inténtalo de nuevo.
-          </p>
+          </InlineError>
         ) : null}
       </ConfirmDialog>
     </>

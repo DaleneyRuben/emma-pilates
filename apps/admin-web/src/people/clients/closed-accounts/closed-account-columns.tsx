@@ -17,16 +17,14 @@ export const closedAccountColumns = (onWithdrawn: (notice: string) => void) => [
     cell: ({ row }) => (
       <span className="flex items-center gap-2.5">
         <ClientPhoto name={row.original.name} photo={null} />
-        <span className="text-cuerpo font-bold text-texto">
-          {row.original.name}
-        </span>
+        <span className="tipo-titulo-fila text-texto">{row.original.name}</span>
       </span>
     ),
   }),
   columns.accessor("email", {
     header: "Contacto",
     cell: ({ row }) => (
-      <span className="flex flex-col text-nota text-texto">
+      <span className="flex flex-col tipo-secundario text-texto">
         <span className="break-all">{row.original.email}</span>
         {/* No «Celular incompleto» warning: nobody can complete it now. */}
         {row.original.phone === null ? (
