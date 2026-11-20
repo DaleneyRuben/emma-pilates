@@ -33,9 +33,9 @@ test("exports the unbilled sales and uploads a cash sale's invoice", async ({
   expect(lines[1]).toContain("Renata Soliz,Plan,Paquete de 8 clases,Efectivo,");
   expect(lines[1]).toMatch(/,Confirmado,4567891,Renata Soliz,No,,$/);
 
-  await row
-    .getByRole("button", { name: "Subir factura: Renata Soliz" })
-    .click();
+  // FIX-091 (W4 B): «Subir factura» is in the row's «⋯» menu.
+  await row.getByRole("button", { name: "Acciones de Renata Soliz" }).click();
+  await page.getByRole("menuitem", { name: "Subir factura" }).click();
   const panel = page.getByRole("dialog", { name: "Factura" });
   await panel.getByLabel("Archivo de la factura").setInputFiles({
     name: "factura-000123.pdf",

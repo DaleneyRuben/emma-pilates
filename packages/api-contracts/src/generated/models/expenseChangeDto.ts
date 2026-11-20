@@ -14,4 +14,10 @@ export interface ExpenseChangeDto {
   amountCentavos: number;
   /** Today or earlier in Bolivia */
   incurredOn: string;
+  /**
+   * Optional detail; blank or null clears it, absent keeps it (W11 A)
+   * @maxLength 120
+   * @nullable
+   */
+  detail?: string | null;
 }

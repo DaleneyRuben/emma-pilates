@@ -11,10 +11,11 @@ import {
   sessionsPath,
 } from "../test/schedule-fixtures";
 import { signedInHandlers } from "../test/session-handlers";
+import { classPanelName } from "../test/class-panel";
 
 // Walkthrough finding 81 (FIX-056): after «Reservar a una clienta» the
 // roster said «Reservaron (1)» while the panel header still read «0 de 8
-// lugares». The header counts what the roster now holds.
+// lugares». The header, and the Reservas tab, count what the roster holds.
 const mariana = clientRow("Mariana Peña");
 const before = ["Ana Quiroga", "Lucía Fernández", "Sofía Rojas", "Isabel Vaca"];
 
@@ -65,14 +66,17 @@ describe("Editar clase header after a booking", () => {
       within(panel).getByRole("button", { name: "Confirmar la reserva" }),
     );
 
-    const detail = await screen.findByRole("dialog", { name: "Editar clase" });
+    const detail = await screen.findByRole("dialog", { name: classPanelName });
     expect(
       await within(detail).findByText("Mariana Peña quedó reservada."),
     ).toBeInTheDocument();
     expect(
       await within(detail).findByText(
-        new RegExp(`· 5 de ${mondayReformer.capacity} lugares`),
+        new RegExp(`^5 de ${mondayReformer.capacity} lugares ·`),
       ),
+    ).toBeInTheDocument();
+    expect(
+      within(detail).getByRole("tab", { name: "Reservas · 5" }),
     ).toBeInTheDocument();
   });
 });

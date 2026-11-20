@@ -22,6 +22,8 @@ export const clientDirectoryFilters = [
   'all',
   ...directorySubscriptionStatuses,
   'founder',
+  'expiring',
+  'unbooked',
 ] as const satisfies readonly (ClientDirectoryFilter | 'all')[];
 
 export class AdminClientDto {
@@ -123,6 +125,16 @@ export class AdminClientDto {
     description: 'Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)',
   })
   clientSince!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Bolivia civil date of the latest class she kept that already started, not counting a no-show; null if none (FIX-091)',
+  })
+  lastClassOn?: string | null;
 }
 
 export class AdminClientPageDto {
@@ -155,6 +167,22 @@ export class AdminClientPageDto {
     description: 'Clients of the studio holding a live Fundadora place',
   })
   founderClientCount!: number;
+
+  @ApiProperty({
+    minimum: 0,
+    required: false,
+    description:
+      'Clients of the studio whose active Plan ends within 3 days: «Por vencer» (FIX-091)',
+  })
+  expiringClientCount?: number;
+
+  @ApiProperty({
+    minimum: 0,
+    required: false,
+    description:
+      'Clients of the studio with an active Plan and no class booked ahead: «Sin reservar» (FIX-091)',
+  })
+  unbookedClientCount?: number;
 }
 
 export class AdminClientClosureOutlookDto {
@@ -261,6 +289,16 @@ export class AdminClientExportRowDto {
 
   @ApiProperty({ format: 'date', description: 'Bolivia civil date she joined' })
   clientSince!: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'date',
+    nullable: true,
+    required: false,
+    description:
+      'Bolivia civil date of her latest class kept, as the list’s «Última clase»; null if none (FIX-091)',
+  })
+  lastClassOn?: string | null;
 }
 
 export class AdminClientExportDto {

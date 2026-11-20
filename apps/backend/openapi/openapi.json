@@ -4834,14 +4834,16 @@
             "name": "filter",
             "required": false,
             "in": "query",
-            "description": "One chip of Clientas › Todas: the plan state or a live Fundadora place",
+            "description": "One chip of Clientas › Todas: the plan state, a live Fundadora place, a Plan ending within 3 days, or an active Plan with no class ahead",
             "schema": {
               "enum": [
                 "all",
                 "active",
                 "expired",
                 "none",
-                "founder"
+                "founder",
+                "expiring",
+                "unbooked"
               ],
               "type": "string"
             }
@@ -4909,7 +4911,9 @@
                 "active",
                 "expired",
                 "none",
-                "founder"
+                "founder",
+                "expiring",
+                "unbooked"
               ],
               "type": "string"
             }
@@ -9568,6 +9572,15 @@
             "in": "query",
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "voided",
+            "required": false,
+            "in": "query",
+            "description": "Only eliminated (true) or only standing (false); both when absent",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -15164,6 +15177,11 @@
           "planName": {
             "type": "string"
           },
+          "remainingClassAllowance": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Classes her Plan has left, as Revisar congelamiento says (FIX-091)"
+          },
           "startsOn": {
             "type": "string",
             "format": "date"
@@ -15204,6 +15222,11 @@
             "type": "string",
             "nullable": true,
             "description": "The Staff Member who approved or refused it, or the Client who withdrew it"
+          },
+          "refusalReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why it was refused, as the Client was told (W16)"
           }
         },
         "required": [
@@ -15226,6 +15249,11 @@
               "approved",
               "refused"
             ]
+          },
+          "refusalReason": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Why it is refused, sent to the Client; only with a refusal (W16)"
           }
         },
         "required": [
@@ -15859,6 +15887,12 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date she joined (FIX-065: the CSV’s «Desde»)"
+          },
+          "lastClassOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Bolivia civil date of the latest class she kept that already started, not counting a no-show; null if none (FIX-091)"
           }
         },
         "required": [
@@ -15915,6 +15949,16 @@
             "type": "number",
             "minimum": 0,
             "description": "Clients of the studio holding a live Fundadora place"
+          },
+          "expiringClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio whose active Plan ends within 3 days: «Por vencer» (FIX-091)"
+          },
+          "unbookedClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio with an active Plan and no class booked ahead: «Sin reservar» (FIX-091)"
           }
         },
         "required": [
@@ -15957,6 +16001,12 @@
             "type": "string",
             "format": "date",
             "description": "Bolivia civil date she joined"
+          },
+          "lastClassOn": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Bolivia civil date of her latest class kept, as the list’s «Última clase»; null if none (FIX-091)"
           }
         },
         "required": [
@@ -19592,6 +19642,11 @@
             "format": "date",
             "description": "Bolivia civil date"
           },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "description": "What it was, as Gastos «Detalle» shows it (W11 A)"
+          },
           "voidedAt": {
             "type": "string",
             "format": "date-time",
@@ -19614,6 +19669,7 @@
           "expenseCategoryName",
           "amountCentavos",
           "incurredOn",
+          "detail",
           "voidedAt",
           "voidedByName",
           "voidReason"
@@ -19665,6 +19721,12 @@
             "type": "string",
             "format": "date",
             "description": "Today or earlier in Bolivia"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120,
+            "description": "Optional detail; blank or null clears it (W11 A)"
           }
         },
         "required": [
@@ -19690,6 +19752,12 @@
             "type": "string",
             "format": "date",
             "description": "Today or earlier in Bolivia"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120,
+            "description": "Optional detail; blank or null clears it, absent keeps it (W11 A)"
           }
         },
         "required": [
@@ -20999,6 +21067,16 @@
             "type": "number",
             "minimum": 0,
             "description": "Every Feedback still «Nuevo»"
+          },
+          "reviewedCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback «Revisado»"
+          },
+          "resolvedCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Feedback «Resuelto»"
           }
         },
         "required": [
@@ -21006,7 +21084,9 @@
           "page",
           "pageSize",
           "totalItems",
-          "newCount"
+          "newCount",
+          "reviewedCount",
+          "resolvedCount"
         ]
       },
       "AdminFeedbackExportDto": {

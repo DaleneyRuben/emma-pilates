@@ -1,28 +1,20 @@
 import { screen, within } from "@testing-library/react";
 import { http } from "msw";
-import { centro } from "../../test/booking-handlers";
 import {
-  branchEquipment,
   brokenSpring,
   equipmentHandlers,
   equipmentIssuesPath,
   equipmentPath,
   piece,
   reformer5,
-  reformerType,
 } from "../../test/equipment-fixtures";
-import {
-  apiUrl,
-  jsonResponse,
-  problemResponse,
-  server,
-  useMockServer,
-} from "../../test/msw";
+import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
 import { renderAdmin } from "../../test/render-admin";
 import {
   coordinatorHandlers,
   signedInHandlers,
 } from "../../test/session-handlers";
+import { typeDetail } from "../../test/equipment-table";
 import { useNarrowViewport } from "../../test/viewport";
 
 const bodies: unknown[] = [];
@@ -35,16 +27,8 @@ const recordPost = (path: string, respond: () => Response) =>
 
 const sectionOf = async (name: RegExp) =>
   (await screen.findByRole("region", { name })) as HTMLElement;
-const rowOf = (section: HTMLElement, name: RegExp) =>
-  within(section).getByRole("row", { name });
-
-const openAddReformer = async () => {
-  const { user } = renderAdmin("/estudio/equipos");
-  const reformers = await sectionOf(/^Reformer ·/);
-  await user.click(within(reformers).getByRole("button", { name: "Agregar" }));
-  const panel = await screen.findByRole("dialog", { name: "Agregar Reformer" });
-  return { user, panel, field: within(panel).getByLabelText("Número") };
-};
+const unitOf = (detail: HTMLElement, name: string) =>
+  within(detail).getByText(name).closest("li") as HTMLElement;
 
 // AW37 (BKO-004, FIX-067 option A): one section per equipment type.
 describe("AW37 Equipos on a desktop browser", () => {
@@ -54,7 +38,7 @@ describe("AW37 Equipos on a desktop browser", () => {
     server.use(...signedInHandlers());
   });
 
-  it("draws one section per type in API order with its count and how it is kept", async () => {
+  it("draws one table row per type in API order with its counts", async () => {
     server.use(...equipmentHandlers());
     renderAdmin("/estudio/equipos");
 
@@ -63,38 +47,50 @@ describe("AW37 Equipos on a desktop browser", () => {
         "Sucursal Centro · 5 tipos de equipo · 3 fallas abiertas",
       ),
     ).toBeVisible();
-    await sectionOf(/^Reformer ·/);
-    const names = screen
-      .getAllByRole("heading", { level: 2 })
-      .map((heading) => heading.textContent)
-      .filter((text) => !text?.startsWith("Fallas"));
-    expect(names).toEqual([
-      "Reformer · 4 unidades",
-      "Cadillac · 1 unidad",
-      "Mat · 0 unidades",
-      "Aros · 0 en total",
-      "Balones · 12 en total",
+    const table = await screen.findByRole("table", { name: "Equipos" });
+    const rows = within(table)
+      .getAllByRole("row")
+      .slice(1)
+      .map((row) =>
+        within(row)
+          .getAllByRole("cell")
+          .map((cell) => cell.textContent),
+      );
+    expect(rows).toEqual([
+      ["ReformerCon número", "4", "2", "2", "Ver Reformer"],
+      ["CadillacCon número", "1", "1", "—", "Ver Cadillac"],
+      ["MatCon número", "0", "0", "—", "Ver Mat"],
+      ["ArosPor cantidad", "0", "0", "—", "Ver Aros"],
+      ["BalonesPor cantidad", "12", "11", "1", "Ver Balones"],
     ]);
+    expect(screen.queryByRole("region", { name: /^Reformer ·/ })).toBeNull();
+  });
 
-    const reformers = await sectionOf(/^Reformer ·/);
-    expect(within(reformers).getByText("Con número")).toBeInTheDocument();
+  it("opens a type's units and stock from its row", async () => {
+    server.use(...equipmentHandlers());
+    const { user } = renderAdmin("/estudio/equipos");
+
+    const reformers = await typeDetail(user, "Reformer");
+    expect(reformers).toHaveAccessibleName("Reformer · 4 unidades");
     expect(
-      within(rowOf(reformers, /Reformer 5/)).getByText("Fuera de servicio"),
+      screen.getByRole("button", { name: "Ocultar Reformer" }),
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(unitOf(reformers, "Reformer 5")).getByText("Fuera de servicio"),
     ).toBeInTheDocument();
     expect(
-      within(rowOf(reformers, /Reformer 2/)).getByText("Con falla"),
+      within(unitOf(reformers, "Reformer 2")).getByText("Con falla"),
     ).toBeInTheDocument();
     expect(
-      within(rowOf(reformers, /Reformer 1/)).getByText("Funciona"),
+      within(unitOf(reformers, "Reformer 1")).getByText("Funciona"),
     ).toBeInTheDocument();
     expect(
-      within(await sectionOf(/^Mat ·/)).getByText(
+      within(await typeDetail(user, "Mat")).getByText(
         "Sin unidades en esta sucursal.",
       ),
     ).toBeInTheDocument();
 
-    const balls = await sectionOf(/^Balones ·/);
-    expect(within(balls).getByText("Por cantidad")).toBeInTheDocument();
+    const balls = await typeDetail(user, "Balones");
     expect(within(balls).getByText("en esta sucursal")).toBeInTheDocument();
     expect(within(balls).getByText("11 se pueden usar")).toBeInTheDocument();
     expect(within(balls).getByText("1 dañado")).toBeInTheDocument();
@@ -102,13 +98,23 @@ describe("AW37 Equipos on a desktop browser", () => {
       within(balls).queryByRole("button", { name: "Agregar" }),
     ).not.toBeInTheDocument();
     expect(
-      within(await sectionOf(/^Aros ·/)).getByRole("button", {
+      within(await typeDetail(user, "Aros")).getByRole("button", {
         name: "Registrar daño",
       }),
     ).toBeDisabled();
     expect(
       screen.queryByRole("button", { name: "Nuevo equipo" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("puts the faults above the equipment table", async () => {
+    server.use(...equipmentHandlers());
+    renderAdmin("/estudio/equipos");
+    const faults = await sectionOf(/^Fallas abiertas · 3/);
+    const table = await screen.findByRole("table", { name: "Equipos" });
+    expect(
+      faults.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("lists unit faults and stock damage together in Fallas abiertas", async () => {
@@ -137,100 +143,6 @@ describe("AW37 Equipos on a desktop browser", () => {
     ).toHaveLength(1);
   });
 
-  it("opens Agregar with the type's first free number and adds the unit", async () => {
-    server.use(
-      ...equipmentHandlers(),
-      recordPost(equipmentPath, () => jsonResponse(piece("reformer", 4), 201)),
-    );
-    const { user, panel, field } = await openAddReformer();
-    expect(field).toHaveValue("4");
-    expect(
-      within(panel).getByText("Se mostrará como Reformer 4."),
-    ).toBeInTheDocument();
-    await user.click(within(panel).getByRole("button", { name: "Agregar" }));
-    expect(await screen.findByText("Agregamos Reformer 4.")).toBeVisible();
-    expect(bodies).toEqual([
-      { branchId: centro.id, typeId: reformerType.id, number: 4 },
-    ]);
-  });
-
-  it("warns about a taken number while typing and blocks Agregar (finding 103)", async () => {
-    server.use(...equipmentHandlers());
-    const { user, panel, field } = await openAddReformer();
-    await user.clear(field);
-    await user.type(field, "1");
-    expect(within(panel).getByRole("alert")).toHaveTextContent(
-      "Ya hay un Reformer 1 en esta sucursal. El primer número libre es el 4.",
-    );
-    expect(field).toHaveAttribute("aria-invalid", "true");
-    expect(
-      within(panel).queryByText(/Se mostrará como/),
-    ).not.toBeInTheDocument();
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeDisabled();
-
-    await user.clear(field);
-    expect(
-      within(panel).getByText("Del 1 al 99, único por tipo en esta sucursal."),
-    ).toBeInTheDocument();
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeDisabled();
-
-    await user.type(field, "7");
-    expect(
-      within(panel).getByText("Se mostrará como Reformer 7."),
-    ).toBeInTheDocument();
-    expect(within(panel).queryByRole("alert")).not.toBeInTheDocument();
-    expect(field).toHaveAttribute("aria-invalid", "false");
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeEnabled();
-  });
-
-  it("keeps the server's refusal for a number taken meanwhile", async () => {
-    server.use(
-      ...equipmentHandlers(),
-      recordPost(equipmentPath, () =>
-        problemResponse(409, "equipment_number_taken"),
-      ),
-    );
-    const { user, panel, field } = await openAddReformer();
-    await user.click(within(panel).getByRole("button", { name: "Agregar" }));
-    expect(await within(panel).findByRole("alert")).toHaveTextContent(
-      "Ya hay un Reformer 4 en esta sucursal.",
-    );
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeDisabled();
-    await user.clear(field);
-    await user.type(field, "6");
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeEnabled();
-  });
-
-  it("refreshes the units after a number taken meanwhile", async () => {
-    let items = branchEquipment;
-    server.use(
-      http.get(apiUrl(equipmentPath), () => jsonResponse({ items })),
-      ...equipmentHandlers(),
-      recordPost(equipmentPath, () => {
-        items = [...branchEquipment, piece("reformer", 4)];
-        return problemResponse(409, "equipment_number_taken");
-      }),
-    );
-    const { user, panel } = await openAddReformer();
-    await user.click(within(panel).getByRole("button", { name: "Agregar" }));
-    expect(await within(panel).findByRole("alert")).toHaveTextContent(
-      "Ya hay un Reformer 4 en esta sucursal. El primer número libre es el 6.",
-    );
-    expect(
-      within(panel).getByRole("button", { name: "Agregar" }),
-    ).toBeDisabled();
-  });
-
   it("records a fault from a row", async () => {
     server.use(
       ...equipmentHandlers(),
@@ -239,9 +151,9 @@ describe("AW37 Equipos on a desktop browser", () => {
       ),
     );
     const { user } = renderAdmin("/estudio/equipos");
-    const reformers = await sectionOf(/^Reformer ·/);
+    const reformers = await typeDetail(user, "Reformer");
     await user.click(
-      within(rowOf(reformers, /Reformer 1/)).getByRole("button", {
+      within(unitOf(reformers, "Reformer 1")).getByRole("button", {
         name: "Registrar falla",
       }),
     );
@@ -293,9 +205,9 @@ describe("AW37 Equipos on a desktop browser", () => {
       await screen.findByText("Marcamos resuelta la falla de Reformer 5."),
     ).toBeVisible();
 
-    const reformers = await sectionOf(/^Reformer ·/);
+    const reformers = await typeDetail(user, "Reformer");
     await user.click(
-      within(rowOf(reformers, /Reformer 5/)).getByRole("button", {
+      within(unitOf(reformers, "Reformer 5")).getByRole("button", {
         name: "Dar de baja",
       }),
     );
@@ -331,17 +243,21 @@ describe("AW37 Equipos on a desktop browser", () => {
 
   it("still shows every type in a Branch without equipment", async () => {
     server.use(...equipmentHandlers({ items: [], stocks: [], open: [] }));
-    renderAdmin("/estudio/equipos");
+    const { user } = renderAdmin("/estudio/equipos");
     expect(
       await screen.findByText(
         "Sucursal Centro · 5 tipos de equipo · 0 fallas abiertas",
       ),
     ).toBeVisible();
+    for (const name of ["Reformer", "Cadillac", "Mat"]) {
+      expect(
+        within(await typeDetail(user, name)).getByText(
+          "Sin unidades en esta sucursal.",
+        ),
+      ).toBeInTheDocument();
+    }
     expect(
-      await screen.findAllByText("Sin unidades en esta sucursal."),
-    ).toHaveLength(3);
-    expect(
-      within(await sectionOf(/^Balones ·/)).getByText("0 se pueden usar"),
+      within(await typeDetail(user, "Balones")).getByText("0 se pueden usar"),
     ).toBeInTheDocument();
   });
 });
@@ -352,8 +268,8 @@ describe("AW37 Equipos for a Coordinator", () => {
 
   it("adds units but neither creates nor edits types", async () => {
     server.use(...equipmentHandlers());
-    renderAdmin("/estudio/equipos");
-    const reformers = await sectionOf(/^Reformer ·/);
+    const { user } = renderAdmin("/estudio/equipos");
+    const reformers = await typeDetail(user, "Reformer");
     expect(
       within(reformers).getByRole("button", { name: "Agregar" }),
     ).toBeInTheDocument();
@@ -371,10 +287,10 @@ describe("AW37 Equipos on a narrow browser", () => {
   useNarrowViewport();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("keeps the sections and its destination in the drawer", async () => {
+  it("keeps the table and its destination in the drawer", async () => {
     server.use(...equipmentHandlers());
     const { user } = renderAdmin("/estudio/equipos");
-    await sectionOf(/^Reformer ·/);
+    await typeDetail(user, "Reformer");
     await user.click(screen.getByRole("button", { name: "Abrir menú" }));
     expect(
       within(await screen.findByRole("dialog", { name: "Menú" })).getByRole(

@@ -95,6 +95,22 @@ export const holdingCount = (holding: TypeHolding) =>
     ? plural(holding.units.length, "unidad", "unidades")
     : `${holding.stock.quantity} en total`;
 
+/** FIX-091 (W10 A): a type's row in the Equipos table. */
+export const holdingSummary = (holding: TypeHolding) =>
+  holding.tracking === "unit"
+    ? {
+        total: holding.units.length,
+        working: holding.units.filter((unit) => unit.status === "working")
+          .length,
+        faults: holding.units.filter((unit) => unit.status !== "working")
+          .length,
+      }
+    : {
+        total: holding.stock.quantity,
+        working: holding.stock.usable,
+        faults: holding.stock.damaged,
+      };
+
 /** Quitar tipo waits until this Branch holds none of it. */
 export const holdsNone = (holding: TypeHolding) =>
   holding.tracking === "unit"

@@ -49,11 +49,13 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
     );
     renderAdmin("/clientas/congelamientos");
 
+    // FIX-091 (W16 A): the row names the end approving produces; the end
+    // before it is in the review panel.
     const row = await rowOf("Valeria Quiroga");
-    expect(within(row).getByText("vie 5 feb → vie 12 feb")).toBeInTheDocument();
+    expect(within(row).getByText("vie 12 feb")).toBeInTheDocument();
     expect(within(row).getByText("7 días")).toBeInTheDocument();
     expect(
-      within(row).getByRole("button", { name: "Aprobar" }),
+      within(row).getByRole("button", { name: "Revisar" }),
     ).toBeInTheDocument();
     const older = await rowOf("Daniela Rojas");
     expect(within(older).getByText("—")).toBeInTheDocument();
@@ -83,7 +85,7 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
       await screen.findByText("No hay solicitudes pendientes."),
     ).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText("Vista"), "Decididas");
+    await user.click(screen.getByRole("button", { name: "Decididos" }));
 
     const approved = await rowOf("Valeria Quiroga");
     expect(within(approved).getByText("Aprobada")).toBeInTheDocument();
@@ -117,7 +119,7 @@ describe("Congelamientos: plan end and decided requests (findings 52/53)", () =>
     const { user } = renderAdmin("/clientas/congelamientos");
     await screen.findByText("No hay solicitudes pendientes.");
 
-    await user.selectOptions(screen.getByLabelText("Vista"), "Decididas");
+    await user.click(screen.getByRole("button", { name: "Decididos" }));
 
     expect(
       await screen.findByText("Todavía no hay congelamientos decididos."),

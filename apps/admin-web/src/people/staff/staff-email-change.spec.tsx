@@ -73,7 +73,9 @@ describe("AW24 Editar miembro email change", () => {
       ),
     ).toBeVisible();
 
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
     const dialog = await screen.findByRole("alertdialog", {
       name: "¿Cambiar el correo de Camila?",
     });
@@ -88,7 +90,9 @@ describe("AW24 Editar miembro email change", () => {
     await user.click(within(dialog).getByRole("button", { name: "Volver" }));
     expect(sent).toEqual([]);
 
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
     await user.click(
       within(
         await screen.findByRole("alertdialog", {
@@ -178,7 +182,9 @@ describe("AW24 Editar miembro email change", () => {
     });
     await user.clear(email);
     await user.type(email, "paola@example.com");
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
     await user.click(
       within(await screen.findByRole("alertdialog")).getByRole("button", {
         name: "Enviar enlace",
@@ -244,7 +250,9 @@ describe("AW24 Editar miembro email change", () => {
     });
     await user.clear(email);
     await user.type(email, "paola@example.com");
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
     await user.click(
       within(await screen.findByRole("alertdialog")).getByRole("button", {
         name: "Enviar enlace",
@@ -277,7 +285,9 @@ describe("AW24 Editar miembro email change", () => {
     });
     await user.clear(email);
     await user.type(email, newEmail);
-    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+    await user.click(
+      within(panel).getByRole("button", { name: "Guardar cambios" }),
+    );
     await user.click(
       within(await screen.findByRole("alertdialog")).getByRole("button", {
         name: "Enviar enlace",

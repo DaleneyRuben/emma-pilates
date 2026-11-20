@@ -1,44 +1,27 @@
+import { formatListDate, type PastCampaignDto } from "@pilates/api-contracts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { isApiError } from "../api/problem";
-import { wholeNumberField } from "../components/form/number-field";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../components/form/form";
-import { FormErrorSummary } from "../components/form/form-error-summary";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
+import { DataTable } from "../components/table/data-table";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
-import { Input } from "../components/ui/input";
+import { grantedLine, owedLine } from "./campaign-copy";
 import {
-  grantedLine,
-  owedLine,
-  pastCampaignLine,
-  recipientLine,
-} from "./campaign-copy";
+  campaignSchema,
+  type CampaignInput,
+  type CampaignOutput,
+} from "./campaign-form";
+import { CampaignPanel } from "./campaign-panel";
 import {
   campaignPreviewQueryOptions,
   useCampaignGrant,
 } from "./campaign-queries";
-
-const campaignSchema = z.object({
-  name: z.string().trim().min(1, "Escribe el nombre de la campaña.").max(80),
-  classes: wholeNumberField(1, 4, "Entre 1 y 4 clases."),
-});
-
-type CampaignInput = z.input<typeof campaignSchema>;
-type CampaignOutput = z.output<typeof campaignSchema>;
 
 const failureMessage = (error: unknown): string => {
   if (!isApiError(error)) {
@@ -50,17 +33,28 @@ const failureMessage = (error: unknown): string => {
   return "No pudimos dar las clases. Inténtalo de nuevo.";
 };
 
-const cardClass =
-  "flex flex-col gap-4 rounded-marco border border-borde bg-lino p-6 max-md:p-4";
+// The API keeps each campaign's name and its latest grant only, so the
+// history has no count of Clients or classes (FIX-091 gap).
+const historyColumns: ColumnDef<PastCampaignDto>[] = [
+  { accessorKey: "name", header: "Campaña" },
+  {
+    id: "grantedAt",
+    header: "Fecha",
+    cell: ({ row }) => formatListDate(row.original.grantedAt),
+    meta: { align: "right" },
+  },
+];
 
 // AW21 (BKM-015): the Administrator grants extra classes for a campaign, a
 // start of year or a holiday, to every active Client, founders included
 // (FIX-064). A Client without a current Plan is named: her next Plan collects
-// the classes. Never a discount.
+// the classes. Never a discount. FIX-091 (W13 A): the campaigns already
+// given, and the form in the «Nueva campaña» panel.
 export function CampaignPage() {
   const preview = useQuery(campaignPreviewQueryOptions());
   const queryClient = useQueryClient();
   const grant = useCampaignGrant();
+  const [panelOpen, setPanelOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<{
@@ -73,12 +67,12 @@ export function CampaignPage() {
     defaultValues: { name: "", classes: "1" },
   });
 
-  const typedName = useWatch({ control: form.control, name: "name" });
-
-  const submit = form.handleSubmit(() => {
+  // Closing the panel discards what was typed (side-panel convention).
+  const changePanel = (open: boolean) => {
+    if (!open) form.reset();
     setFailure(null);
-    setConfirming(true);
-  });
+    setPanelOpen(open);
+  };
 
   const confirm = async () => {
     const values = campaignSchema.parse(form.getValues());
@@ -98,35 +92,28 @@ export function CampaignPage() {
         queryKey: campaignPreviewQueryOptions().queryKey,
       });
       setConfirming(false);
+      setPanelOpen(false);
     } catch (error) {
       setFailure(failureMessage(error));
       setConfirming(false);
     }
   };
 
-  const owed =
-    preview.data === undefined ? null : owedLine(preview.data.owed ?? []);
-  // An older backend answers without `pastCampaigns`.
-  const repeated = pastCampaignLine(
-    typedName,
-    preview.data?.pastCampaigns ?? [],
-  );
-
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
         title="Clases de campaña"
         subtitle="Clases extra para el inicio de año o las vacaciones. No cambia ningún precio."
+        actions={
+          preview.data === undefined ? undefined : (
+            <Button onClick={() => changePanel(true)}>Nueva campaña</Button>
+          )
+        }
       />
       {result === null ? null : (
         <PageNotice>
           {`${grantedLine(result.granted, result.classes)} ${result.owed ?? ""}`.trim()}
         </PageNotice>
-      )}
-      {failure === null ? null : (
-        <p role="alert" className="text-nota text-error">
-          {failure}
-        </p>
       )}
       {preview.isPending ? (
         <LoadingNotice>Cargando las clientas…</LoadingNotice>
@@ -137,63 +124,28 @@ export function CampaignPage() {
           onRetry={() => void preview.refetch()}
         />
       ) : (
-        <section className={cardClass}>
-          <p className="text-nota text-texto-secundario">
-            {recipientLine(preview.data.recipientCount)}
-          </p>
-          {owed === null ? null : (
-            <p className="text-nota text-texto-tenue">{owed}</p>
-          )}
-          <Form {...form}>
-            <form onSubmit={submit} noValidate className="flex flex-col gap-4">
-              <FormErrorSummary />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre de la campaña</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    {repeated === null ? null : (
-                      <p
-                        role="status"
-                        className="rounded-tarjeta bg-advertencia-tinte px-4 py-3 text-celda text-advertencia-texto"
-                      >
-                        {repeated}
-                      </p>
-                    )}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="classes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Clases extra</FormLabel>
-                    <FormControl>
-                      <Input inputMode="numeric" {...field} />
-                    </FormControl>
-                    <FormDescription>Entre 1 y 4 clases.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* FIX-064 (finding 90): only when there is no active Client. */}
-              <Button
-                type="submit"
-                size="lg"
-                className="self-start"
-                disabled={preview.data.recipientCount === 0}
-              >
-                Dar las clases
-              </Button>
-            </form>
-          </Form>
-        </section>
+        <>
+          <section aria-label="Campañas dadas" className="flex flex-col gap-3">
+            <DataTable
+              columns={historyColumns}
+              // An older backend answers without `pastCampaigns`.
+              rows={preview.data.pastCampaigns ?? []}
+              rowId={(campaign) => campaign.name}
+              emptyMessage="Aún no diste ninguna campaña."
+            />
+          </section>
+          <CampaignPanel
+            open={panelOpen}
+            onOpenChange={changePanel}
+            form={form}
+            preview={preview.data}
+            failure={failure}
+            onSubmit={() => {
+              setFailure(null);
+              setConfirming(true);
+            }}
+          />
+        </>
       )}
       <ConfirmDialog
         open={confirming}

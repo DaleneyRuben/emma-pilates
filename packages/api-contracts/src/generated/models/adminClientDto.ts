@@ -68,4 +68,9 @@ export interface AdminClientDto {
   invitedByName: string | null;
   /** Bolivia civil date she joined (FIX-065: the CSV’s «Desde») */
   clientSince: string;
+  /**
+   * Bolivia civil date of the latest class she kept that already started, not counting a no-show; null if none (FIX-091)
+   * @nullable
+   */
+  lastClassOn?: string | null;
 }

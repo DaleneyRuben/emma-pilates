@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 
 const uuid = z.uuid();
@@ -223,6 +223,12 @@ export class AdminExpenseDto {
   incurredOn!: string;
   @ApiProperty({
     type: String,
+    nullable: true,
+    description: 'What it was, as Gastos «Detalle» shows it (W11 A)',
+  })
+  detail!: string | null;
+  @ApiProperty({
+    type: String,
     format: 'date-time',
     nullable: true,
     description:
@@ -257,6 +263,13 @@ export class ExpenseInputDto {
   amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Today or earlier in Bolivia' })
   incurredOn!: string;
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    maxLength: 120,
+    description: 'Optional detail; blank or null clears it (W11 A)',
+  })
+  detail?: string | null;
 }
 
 export class ExpenseChangeDto {
@@ -265,7 +278,24 @@ export class ExpenseChangeDto {
   amountCentavos!: number;
   @ApiProperty({ format: 'date', description: 'Today or earlier in Bolivia' })
   incurredOn!: string;
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    maxLength: 120,
+    description:
+      'Optional detail; blank or null clears it, absent keeps it (W11 A)',
+  })
+  detail?: string | null;
 }
+
+// W11 A: a blank detail is no detail.
+const expenseDetail = z
+  .string()
+  .trim()
+  .max(120)
+  .nullable()
+  .optional()
+  .transform((value) => (value === '' ? null : value));
 
 export const parseExpenseCategoryInput = (value: unknown) =>
   z.strictObject({ name: text(60) }).safeParse(value);
@@ -277,6 +307,7 @@ export const parseExpenseInput = (value: unknown) =>
       expenseCategoryId: uuid,
       amountCentavos: centavos,
       incurredOn: civilDate,
+      detail: expenseDetail,
     })
     .safeParse(value);
 
@@ -286,6 +317,7 @@ export const parseExpenseChange = (value: unknown) =>
       expenseCategoryId: uuid,
       amountCentavos: centavos,
       incurredOn: civilDate,
+      detail: expenseDetail,
     })
     .safeParse(value);
 
@@ -296,6 +328,11 @@ export const parseExpenseQuery = (value: unknown) =>
       expenseCategoryId: uuid.optional(),
       from: civilDate.optional(),
       to: civilDate.optional(),
+      // FIX-091 (W11 B): only the standing or only the eliminated ones.
+      voided: z
+        .enum(['true', 'false'])
+        .transform((flag) => flag === 'true')
+        .optional(),
       ...paging,
     })
     .safeParse(value);

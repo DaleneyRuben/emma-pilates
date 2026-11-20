@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Emma Pilates Studio</title>
-    <meta name="description" content="Emma Pilates Studio: privacidad, soporte y cierre de cuenta de las apps." />
+    <meta name="description" content="Emma Pilates Studio: soporte, privacidad y cierre de cuenta de las apps." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,30 +14,39 @@
     <link rel="stylesheet" href="/estilos.css" />
   </head>
   <body>
-    <div class="marco">
-      <header class="cabecera">
-        <a class="marca" href="/" aria-current="page">Emma Pilates Studio</a>
-        <nav class="navegacion" aria-label="Páginas">
-          <a href="/privacidad">Privacidad</a>
-          <a href="/soporte">Soporte</a>
-          <a href="/eliminar-cuenta">Cerrar cuenta</a>
-        </nav>
-      </header>
-
-      <main class="hoja">
-        <h1>Emma Pilates Studio</h1>
-        <p>
-          Reserva tus clases, revisa tu plan y paga desde la app <strong>Emma Pilates</strong>. Aquí encuentras la
-          información sobre las apps del estudio:
-        </p>
-        <ul>
-          <li><a href="/privacidad">Política de privacidad</a></li>
-          <li><a href="/soporte">Soporte</a></li>
-          <li><a href="/eliminar-cuenta">Cerrar mi cuenta</a></li>
-        </ul>
-      </main>
-
-      <footer class="pie">Emma Pilates Studio</footer>
-    </div>
+    <header class="cabecera">
+      <a class="marca" href="/" aria-current="page">Emma <span>Pilates Studio</span></a>
+      <nav class="navegacion" aria-label="Páginas">
+        <a href="/soporte">Soporte</a>
+        <span aria-hidden="true">·</span>
+        <a href="/privacidad">Privacidad</a>
+        <span aria-hidden="true">·</span>
+        <a href="/eliminar-cuenta">Cerrar mi cuenta</a>
+      </nav>
+    </header>
+    <main class="portada">
+      <h1>Emma Pilates Studio</h1>
+      <p>Desde aquí puedes pedir ayuda, leer nuestra política de privacidad o cerrar tu cuenta.</p>
+      <ul class="enlaces">
+        <li>
+          <a class="tarjeta" href="/soporte">
+            <strong>Soporte</strong>
+            <span>Escríbenos y te respondemos en el día</span>
+          </a>
+        </li>
+        <li>
+          <a class="tarjeta" href="/privacidad">
+            <strong>Privacidad</strong>
+            <span>Qué datos guardamos y para qué</span>
+          </a>
+        </li>
+        <li>
+          <a class="tarjeta" href="/eliminar-cuenta">
+            <strong>Cerrar mi cuenta</strong>
+            <span>Cómo pedirlo y qué pasa con tus datos</span>
+          </a>
+        </li>
+      </ul>
+    </main>
   </body>
 </html>

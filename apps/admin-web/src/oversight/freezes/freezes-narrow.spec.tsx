@@ -23,22 +23,22 @@ const pending: FreezeReviewDto = {
   decidedByName: null,
 };
 
-// FIX-088 review: a phone card still names the reason and the new plan end,
-// since Congelamientos has no panel to read them in before deciding.
+// FIX-088 review: a phone card names what she asks and the new plan end;
+// FIX-091 (W16 B) moves the reason and the decision into the review panel.
 describe("Congelamientos on a phone", () => {
   useMockServer();
   useNarrowViewport();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("keeps the reason, the plan end and the decision in the card", async () => {
+  it("keeps the days asked, the plan end and «Revisar» in the card", async () => {
     server.use(http.get(apiUrl(freezesPath), () => jsonResponse([pending])));
     renderAdmin("/clientas/congelamientos");
 
     const row = (await screen.findByText("Valeria Quiroga")).closest("tr")!;
     const card = compactCard(row);
     expect(card.compact).toBe(true);
-    expect(card.detail).toContain("Viaje");
-    expect(card.detail).toContain("vie 5 feb → vie 12 feb");
-    expect(within(row).getByRole("button", { name: "Aprobar" })).toBeVisible();
+    expect(card.detail).toContain("mar 10 al lun 16 nov");
+    expect(card.detail).toContain("Vencería vie 12 feb");
+    expect(within(row).getByRole("button", { name: "Revisar" })).toBeVisible();
   });
 });

@@ -26,6 +26,23 @@ const voidedSale = paymentRow("09", "Camila Rojas", {
 
 const voids: { reason: string }[] = [];
 
+const statusChip = (name: string) =>
+  within(screen.getByRole("group", { name: "Estado" })).getByRole("button", {
+    name,
+  });
+
+// FIX-091 (W4 B): «Anular venta» lives in the row's «⋯» menu.
+const voidFromMenu = async (
+  user: { click: (element: Element) => Promise<void> },
+  row: HTMLElement,
+  clientName: string,
+) => {
+  await user.click(
+    within(row).getByRole("button", { name: `Acciones de ${clientName}` }),
+  );
+  await user.click(screen.getByRole("menuitem", { name: "Anular venta" }));
+};
+
 describe("AW28 Anular venta", () => {
   useMockServer();
   beforeEach(() => {
@@ -59,13 +76,10 @@ describe("AW28 Anular venta", () => {
     );
     const { user } = renderAdmin("/dinero/pagos");
     await screen.findByRole("heading", { level: 1, name: "Pagos" });
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Estado" }),
-      "confirmed",
-    );
+    await user.click(statusChip("Confirmados"));
     const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
       .parentElement as HTMLElement;
-    await user.click(within(row).getByRole("button", { name: "Anular venta" }));
+    await voidFromMenu(user, row, "Valeria Quiroga");
 
     const dialog = await screen.findByRole("alertdialog", {
       name: /Anular la venta/,
@@ -86,16 +100,38 @@ describe("AW28 Anular venta", () => {
     await waitFor(() =>
       expect(voids).toEqual([{ reason: "Se registró el plan equivocado" }]),
     );
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Estado" }),
-      "voided",
-    );
+    await user.click(statusChip("Anulados"));
     const voided = (await screen.findByRole("cell", { name: /Camila Rojas/ }))
       .parentElement as HTMLElement;
     expect(
       within(voided).getByText("Se registró el plan equivocado"),
     ).toBeVisible();
     expect(within(voided).getByText("Anulado")).toBeVisible();
+  });
+
+  it("keeps a click inside the dialog from opening the row's panel", async () => {
+    const withInvoice = {
+      ...valeriaPayment,
+      invoiceData: { taxId: "1020304050", name: "Estudio Valeria SRL" },
+    };
+    server.use(
+      http.get(apiUrl(paymentsPath), () =>
+        jsonResponse(paymentPage([withInvoice], { pendingCount: 0 })),
+      ),
+    );
+    const { user } = renderAdmin("/dinero/pagos");
+    await screen.findByRole("heading", { level: 1, name: "Pagos" });
+    await user.click(statusChip("Confirmados"));
+    const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
+      .parentElement as HTMLElement;
+    await voidFromMenu(user, row, "Valeria Quiroga");
+
+    const dialog = await screen.findByRole("alertdialog", {
+      name: /Anular la venta/,
+    });
+    await user.click(within(dialog).getByRole("textbox", { name: "Motivo" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("keeps the dialog open when the void is refused", async () => {
@@ -110,7 +146,7 @@ describe("AW28 Anular venta", () => {
     const { user } = renderAdmin("/dinero/pagos?status=confirmed");
     const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
       .parentElement as HTMLElement;
-    await user.click(within(row).getByRole("button", { name: "Anular venta" }));
+    await voidFromMenu(user, row, "Valeria Quiroga");
     const dialog = await screen.findByRole("alertdialog");
     fireEvent.change(within(dialog).getByRole("textbox", { name: "Motivo" }), {
       target: { value: "Un error de caja" },
@@ -141,7 +177,9 @@ describe("AW28 Anular venta", () => {
       .parentElement as HTMLElement;
 
     expect(
-      within(row).queryByRole("button", { name: "Anular venta" }),
+      within(row).queryByRole("button", {
+        name: "Acciones de Lucía Fernández",
+      }),
     ).not.toBeInTheDocument();
   });
 });

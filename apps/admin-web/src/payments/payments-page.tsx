@@ -1,54 +1,42 @@
-import { formatDateTime } from "@pilates/api-contracts";
-import type { AdminPaymentDto } from "@pilates/api-contracts";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createColumnHelper } from "@tanstack/react-table";
 import { Download } from "lucide-react";
-import { CatalogPage, RowOpener } from "../catalog/catalog-page";
+import { CatalogPage } from "../catalog/catalog-page";
 import type { SearchChange } from "../catalog/catalog-search";
-import { ListFilter } from "../components/table/list-filter";
 import { countFormat } from "../components/table/pagination";
 import { SearchFilter } from "../components/table/search-filter";
 import { Button } from "../components/ui/button";
-import { ClientPhoto } from "../components/client-photo";
-import { formatBolivianos } from "../lib/money";
+import { chipClass, selectedClass } from "../components/ui/chip";
+import { FilterChips } from "../components/ui/filter-chips";
+import { cn } from "../lib/cn";
 import { saveFile } from "../lib/save-file";
-import { InvoiceCell } from "./invoice-cell";
 import { InvoicePanel } from "./invoice-panel";
 import { fetchAllPayments } from "./invoice-queries";
+import { canOpenPayment, paymentColumns } from "./payment-columns";
 import { paymentTableQueryOptions } from "./payment-queries";
 import { PaymentReviewPanel } from "./payment-review-panel";
 import type { PaymentSearch, PaymentStatusFilter } from "./payment-search";
-import { PaymentStatePill } from "./payment-state-pill";
-import { methodLabels, paymentsCsv, paymentsCsvName } from "./payments-csv";
-import { VoidSaleAction } from "./void-sale-action";
+import { paymentsCsv, paymentsCsvName } from "./payments-csv";
 
-type InvoiceFilter = "all" | "unissued";
+type StatusChip = Exclude<PaymentStatusFilter, "all">;
 
-const invoiceOptions: { value: InvoiceFilter; label: string }[] = [
-  { value: "all", label: "Todas" },
-  { value: "unissued", label: "Factura por subir" },
-];
-
-const statusOptions: { value: PaymentStatusFilter; label: string }[] = [
-  { value: "all", label: "Todos" },
-  { value: "pending", label: "Pendiente" },
-  { value: "confirmed", label: "Confirmado" },
-  { value: "rejected", label: "Rechazado" },
-  { value: "voided", label: "Anulado" },
-];
+// FIX-091 (W4 B): the Estado filter as chips, the review queue with its
+// studio-wide count.
+const statusOptions = (pendingCount: number | undefined) =>
+  [
+    { value: undefined, label: "Todos" },
+    { value: "pending", label: "Por revisar", count: pendingCount },
+    { value: "confirmed", label: "Confirmados" },
+    { value: "rejected", label: "Rechazados" },
+    { value: "voided", label: "Anulados" },
+  ] as const;
 
 const nouns: Record<PaymentStatusFilter, [string, string]> = {
   all: ["pago", "pagos"],
-  pending: ["pago pendiente", "pagos pendientes"],
+  pending: ["pago por revisar", "pagos por revisar"],
   confirmed: ["pago confirmado", "pagos confirmados"],
   rejected: ["pago rechazado", "pagos rechazados"],
   voided: ["venta anulada", "ventas anuladas"],
 };
-
-const waiting = (count: number) =>
-  count === 0
-    ? "Todo el estudio · ningún pago por QR por revisar"
-    : `Todo el estudio · ${countFormat.format(count)} ${count === 1 ? "pago por QR esperando" : "pagos por QR esperando"} revisión`;
 
 const empty: Record<PaymentStatusFilter, [string, string?]> = {
   pending: [
@@ -88,107 +76,6 @@ function EmptyPayments({ search }: { search: PaymentSearch }) {
   );
 }
 
-const columns = createColumnHelper<AdminPaymentDto>();
-
-// A transfer to review, or (FIX-044) a sale whose invoice is uploaded here.
-const canOpenPayment = (row: AdminPaymentDto) =>
-  row.state === "pending" ||
-  row.invoiceData !== null ||
-  row.invoiceFile !== null;
-
-const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
-  columns.accessor("clientName", {
-    header: "Clienta",
-    cell: ({ row }) => (
-      <span className="flex items-center gap-2.5">
-        <ClientPhoto
-          name={row.original.clientName}
-          photo={row.original.clientPhoto}
-        />
-        {canOpenPayment(row.original) ? (
-          <RowOpener
-            label={row.original.clientName}
-            onOpen={() => open(row.original)}
-          />
-        ) : (
-          <span className="font-medium text-texto">
-            {row.original.clientName}
-          </span>
-        )}
-      </span>
-    ),
-  }),
-  columns.accessor("kind", {
-    header: "Tipo",
-    meta: { card: "hidden" },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">
-        {getValue() === "evaluation" ? "Evaluación" : "Plan"}
-      </span>
-    ),
-  }),
-  columns.accessor("planName", {
-    header: "Plan",
-    meta: { card: "detail", cardOrder: 1 },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{getValue()}</span>
-    ),
-  }),
-  columns.accessor("method", {
-    header: "Método",
-    meta: { card: "hidden" },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario">{methodLabels[getValue()]}</span>
-    ),
-  }),
-  // The amount paid (ADR-0082); Credit is retired (PAY-005).
-  columns.accessor("amountDueCentavos", {
-    header: "Monto",
-    meta: { card: "detail", cardOrder: 2, align: "right" },
-    cell: ({ getValue }) => (
-      <span className="text-texto tabular">{formatBolivianos(getValue())}</span>
-    ),
-  }),
-  columns.accessor((row) => row.decidedAt ?? row.submittedAt, {
-    id: "fecha",
-    header: "Fecha",
-    meta: { card: "detail", cardOrder: 3 },
-    cell: ({ getValue }) => (
-      <span className="text-texto-secundario tabular">
-        {formatDateTime(getValue())}
-      </span>
-    ),
-  }),
-  columns.accessor("state", {
-    header: "Estado",
-    cell: ({ row }) => (
-      <span className="inline-flex flex-col gap-1">
-        <PaymentStatePill state={row.original.state} />
-        {row.original.voidReason ? (
-          <span className="text-ayuda text-texto-tenue">
-            {row.original.voidReason}
-          </span>
-        ) : null}
-        {row.original.state === "confirmed" &&
-        row.original.kind !== "evaluation" ? (
-          <VoidSaleAction
-            paymentId={row.original.id}
-            clientName={row.original.clientName}
-          />
-        ) : null}
-      </span>
-    ),
-  }),
-  columns.display({
-    id: "invoice",
-    header: "Factura",
-    meta: { card: "actions" },
-    cell: ({ row }) => (
-      <InvoiceCell payment={row.original} onOpen={() => open(row.original)} />
-    ),
-  }),
-];
-
 // AW28 (ADR-0006): every transfer Payment of the studio, for review from a
 // desk; the Staff app's queue (S11/S12) works on the same Payments. Since
 // PAY-007 the cash sales are listed too, with the Invoice Data, the
@@ -215,9 +102,7 @@ export function PaymentsPage({
   return (
     <CatalogPage
       title="Pagos"
-      subtitle={
-        query.data === undefined ? undefined : waiting(query.data.pendingCount)
-      }
+      subtitle="Todo el estudio"
       loadingMessage="Cargando pagos…"
       what="los pagos"
       emptyMessage={<EmptyPayments search={search} />}
@@ -239,7 +124,7 @@ export function PaymentsPage({
         </Button>
       }
       filter={
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3">
           <SearchFilter
             label="Buscar por clienta"
             value={search.q ?? ""}
@@ -247,23 +132,33 @@ export function PaymentsPage({
               onSearchChange({ q: text === "" ? undefined : text, page: 1 })
             }
           />
-          <ListFilter
-            label="Estado"
-            value={search.status}
-            options={statusOptions}
-            onChange={(status) => onSearchChange({ status, page: 1 })}
-          />
-          <ListFilter
-            label="Factura"
-            value={search.invoice ?? "all"}
-            options={invoiceOptions}
-            onChange={(invoice) =>
-              onSearchChange({
-                invoice: invoice === "all" ? undefined : invoice,
-                page: 1,
-              })
-            }
-          />
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <FilterChips<StatusChip>
+              label="Estado"
+              value={search.status === "all" ? undefined : search.status}
+              options={statusOptions(query.data?.pendingCount)}
+              onChange={(status) =>
+                onSearchChange({ status: status ?? "all", page: 1 })
+              }
+            />
+            <button
+              type="button"
+              aria-pressed={search.invoice === "unissued"}
+              onClick={() =>
+                onSearchChange({
+                  invoice:
+                    search.invoice === "unissued" ? undefined : "unissued",
+                  page: 1,
+                })
+              }
+              className={cn(
+                chipClass,
+                search.invoice === "unissued" && selectedClass,
+              )}
+            >
+              Factura por subir
+            </button>
+          </div>
           {exportPayments.isError ? (
             <p
               role="alert"

@@ -26,7 +26,8 @@ import {
   equipmentTypesQueryOptions,
   useEquipmentChange,
 } from "./equipment-queries";
-import { EquipmentSections, type EquipmentAction } from "./equipment-sections";
+import { EquipmentTable } from "./equipment-table";
+import type { EquipmentAction } from "./equipment-type-detail";
 import { DamageForm, QuantityForm } from "./equipment-stock-forms";
 import { EditTypeForm, NewTypeForm } from "./equipment-type-forms";
 
@@ -35,7 +36,7 @@ type Panel = { mode: "closed" } | { mode: "create-type" } | EquipmentAction;
 const panelTitle = (panel: Panel): string => {
   switch (panel.mode) {
     case "create-type":
-      return "Nuevo tipo";
+      return "Nuevo tipo de equipo";
     case "report":
       return `Registrar falla · ${pieceName(panel.piece)}`;
     case "add":
@@ -103,7 +104,7 @@ function BranchEquipment({ branch }: { branch: Branch }) {
           administrator ? (
             <Button onClick={() => open({ mode: "create-type" })}>
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Nuevo tipo
+              Nuevo tipo de equipo
             </Button>
           ) : undefined
         }
@@ -125,7 +126,7 @@ function BranchEquipment({ branch }: { branch: Branch }) {
       ) : (
         <>
           <EquipmentIssuesCard branchId={branch.id} onNotice={setNotice} />
-          <EquipmentSections
+          <EquipmentTable
             holdings={holdings}
             canEditTypes={administrator}
             onAction={open}

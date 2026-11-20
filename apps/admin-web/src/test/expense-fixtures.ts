@@ -37,6 +37,7 @@ export const expenseRow = (
   expenseCategoryName: expenseCategory.name,
   amountCentavos,
   incurredOn,
+  detail: null,
   voidedAt: null,
   voidedByName: null,
   voidReason: null,
@@ -68,6 +69,41 @@ export const expensePage = (
   totalItems: items.length,
   ...extra,
 });
+
+export const expenseReportPath = "/api/v1/administrator/reports/expenses";
+
+// FIX-091 (W11 B): the month's totals per category beside the table, read
+// from AW16's expense report for the selected Branch.
+export const expenseReportHandler = (
+  byCategory: {
+    category: AdminExpenseCategoryDto;
+    totalCentavos: number;
+  }[] = [],
+  onRead: (params: URLSearchParams) => void = () => undefined,
+) =>
+  http.get(apiUrl(expenseReportPath), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    onRead(params);
+    const expensesCentavos = byCategory.reduce(
+      (sum, row) => sum + row.totalCentavos,
+      0,
+    );
+    return jsonResponse({
+      from: params.get("from"),
+      until: params.get("until"),
+      branchId: params.get("branchId"),
+      totalCentavos: expensesCentavos,
+      expensesCentavos,
+      salaryPaymentsCentavos: 0,
+      byCategory: byCategory.map(({ category: row, totalCentavos }) => ({
+        expenseCategoryId: row.id,
+        expenseCategoryName: row.name,
+        totalCentavos,
+      })),
+      months: [],
+      generatedAt: "2026-11-19T12:00:00.000Z",
+    });
+  });
 
 // AW15's list and AW14's Categoría choice read every Expense Category.
 export const categoriesHandler = (

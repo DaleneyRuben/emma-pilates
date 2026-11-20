@@ -14,6 +14,10 @@ overrides:
   # via expo's @expo/cli and @expo/code-signing-certificates (^1.3.3), whose
   # lockfile entry stayed on 1.4.0.
   node-forge: ^1.4.2
+  # «Effect: ReDoS in Schema.TemplateLiteral compiled regex» (high): effect
+  # <=3.22.0 via @hookform/resolvers' optional peer. 3.22.1 is the patched
+  # 3.x release the resolvers' ^3.10.3 range accepts.
+  effect: ^3.22.1
 
 allowBuilds:
   "@nestjs/core": true

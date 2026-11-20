@@ -11,11 +11,13 @@ test("confirms one transfer and rejects another with a reason", async ({
   await sendTransfer("mariana@example.com");
   await sendTransfer("sofia@example.com");
   await signIn(page, "/dinero/pagos");
-  await expect(
-    page.getByText("Todo el estudio · 2 pagos por QR esperando revisión"),
-  ).toBeVisible();
+  // FIX-091 (W4 B): the review queue's count is on its chip.
+  const queue = page
+    .getByRole("group", { name: "Estado" })
+    .getByRole("button", { name: /^Por revisar/ });
+  await expect(queue).toHaveText("Por revisar · 2");
 
-  await page.getByRole("button", { name: "Mariana Peña" }).click();
+  await page.getByRole("button", { name: "Mariana Peña", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "Revisar pago" });
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
   // Mariana has no earlier Plan, so this sale reserves her founder place
@@ -51,11 +53,9 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(
     page.getByRole("button", { name: "Mariana Peña", exact: true }),
   ).toHaveCount(0);
-  await expect(
-    page.getByText("Todo el estudio · 1 pago por QR esperando revisión"),
-  ).toBeVisible();
+  await expect(queue).toHaveText("Por revisar · 1");
 
-  await page.getByRole("button", { name: "Sofía Guzmán" }).click();
+  await page.getByRole("button", { name: "Sofía Guzmán", exact: true }).click();
   await expect(panel.getByText("Monto a verificar")).toBeVisible();
   await panel.getByRole("button", { name: "Rechazar" }).click();
   const reason = panel.getByRole("textbox", { name: "Motivo del rechazo" });
@@ -67,9 +67,7 @@ test("confirms one transfer and rejects another with a reason", async ({
   await expect(
     page.getByText("Pago de Sofía Guzmán rechazado: le avisamos el motivo."),
   ).toBeVisible();
-  await expect(
-    page.getByText("Todo el estudio · ningún pago por QR por revisar"),
-  ).toBeVisible();
+  await expect(queue).toHaveText("Por revisar · 0");
 
   // Decided Payments stay as history under Todos and never open again.
   await page.goto("/dinero/pagos?status=all");

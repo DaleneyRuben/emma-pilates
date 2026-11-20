@@ -147,16 +147,23 @@ function BranchSchedule({
                 onOpen={openSession}
               />
             ) : (
-              <WeekGrid
-                monday={monday}
-                today={today}
-                sessions={sessions.data}
-                onOpen={openSession}
-                onCreate={(start) => {
-                  setNotice(null);
-                  setPanel({ mode: "create", start });
-                }}
-              />
+              <>
+                <WeekGrid
+                  monday={monday}
+                  today={today}
+                  sessions={sessions.data}
+                  onOpen={openSession}
+                  onCreate={(start) => {
+                    setNotice(null);
+                    setPanel({ mode: "create", start });
+                  }}
+                />
+                {standingCount(sessions.data) < sessions.data.length ? (
+                  <p className="text-nota text-texto-tenue">
+                    Las canceladas quedan como una línea fina.
+                  </p>
+                ) : null}
+              </>
             )}
           </>
         )}

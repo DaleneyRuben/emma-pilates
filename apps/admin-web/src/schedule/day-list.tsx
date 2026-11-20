@@ -3,6 +3,7 @@ import { addDays, boliviaParts, formatDayTab } from "../lib/bolivia-time";
 import { selectedClass, unselectedClass } from "../components/ui/chip";
 import { cn } from "../lib/cn";
 import { SessionBlock } from "./session-block";
+import { cancellationOf } from "./session-cancellation";
 
 type Session = AdministratorSessionAvailabilityDto;
 
@@ -47,6 +48,8 @@ export function DayList({
               className={cn(
                 "flex min-w-[52px] shrink-0 flex-col items-center rounded-control border px-2 py-1.5 text-ayuda",
                 selected ? selectedClass : unselectedClass,
+                // FIX-091 (W2, Horario B): today stays in Rubor.
+                date === today && !selected && "bg-rubor",
               )}
             >
               <span>{tab.weekday}</span>
@@ -69,7 +72,10 @@ export function DayList({
               key={session.id}
               session={session}
               onOpen={onOpen}
-              className="min-h-[64px]"
+              layout="list"
+              className={
+                cancellationOf(session) === null ? "min-h-[64px]" : undefined
+              }
             />
           ))
         )}

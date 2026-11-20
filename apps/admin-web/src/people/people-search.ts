@@ -3,9 +3,12 @@ import { listSearchSchema } from "../components/table/pagination";
 
 /**
  * Clientas › Todas's chips after «Todas» (follow-up 232, WEB-040); «closed»
- * lists the former Clients who asked for promotions (FIX-065).
+ * lists the former Clients who asked for promotions (FIX-065); «expiring»
+ * and «unbooked» are W8 A's «Por vencer» and «Sin reservar» (FIX-091).
  */
 export const clientFilters = [
+  "expiring",
+  "unbooked",
   "active",
   "none",
   "expired",

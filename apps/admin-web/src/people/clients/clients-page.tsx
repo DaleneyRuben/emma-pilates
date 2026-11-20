@@ -51,6 +51,9 @@ const emptyChip: Record<Exclude<ClientFilter, "closed">, string> = {
   none: "Ninguna clienta sin plan.",
   expired: "Ninguna clienta con el plan vencido.",
   founder: "Ninguna clienta fundadora.",
+  // FIX-091 (W8 A).
+  expiring: "Ninguna clienta con el plan por vencer.",
+  unbooked: "Todas las clientas con plan tienen una clase reservada.",
 };
 
 function EmptyDirectory({
@@ -170,6 +173,10 @@ export function ClientsPage({
       <ClientFilterChips
         value={search.filter}
         onChange={(chip) => changeSearch({ filter: chip, page: 1 })}
+        counts={{
+          expiring: query.data?.expiringClientCount,
+          unbooked: query.data?.unbookedClientCount,
+        }}
       />
       {search.filter === "founder" && role === "administrator" ? (
         <FounderPlaces />

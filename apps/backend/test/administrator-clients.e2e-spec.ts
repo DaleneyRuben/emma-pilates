@@ -33,6 +33,8 @@ const row = {
   founderNumber: 3,
   invitedByName: 'Sofía Guzmán',
   clientSince: new Date('2025-07-02T00:00:00.000Z'),
+  // FIX-091 (W8 A): «Última clase», her latest class already started.
+  lastClassOn: new Date('2026-09-18T00:00:00.000Z'),
 };
 const directoryPage = {
   items: [row],
@@ -42,6 +44,8 @@ const directoryPage = {
   studioClientCount: 148,
   activePlanClientCount: 96,
   founderClientCount: 12,
+  expiringClientCount: 4,
+  unbookedClientCount: 9,
 };
 const detail = {
   id: clientId,
@@ -139,7 +143,12 @@ describe('administrator Client endpoints (e2e)', () => {
         expect(body).toEqual({
           ...directoryPage,
           items: [
-            { ...row, planEndsOn: '2026-09-30', clientSince: '2025-07-02' },
+            {
+              ...row,
+              planEndsOn: '2026-09-30',
+              clientSince: '2025-07-02',
+              lastClassOn: '2026-09-18',
+            },
           ],
         }),
       );
@@ -178,6 +187,24 @@ describe('administrator Client endpoints (e2e)', () => {
     );
   });
 
+  // FIX-091 (W8 A): «Por vencer» and «Sin reservar», each with its count.
+  it('takes the «Por vencer» and «Sin reservar» chips and answers their counts', async () => {
+    for (const filter of ['expiring', 'unbooked']) {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/administrator/clients?filter=${filter}`)
+        .set('authorization', bearer)
+        .expect(200);
+      expect(operations.list).toHaveBeenLastCalledWith(
+        { page: 1, pageSize: 20, filter },
+        expect.anything(),
+      );
+      expect(response.body).toMatchObject({
+        expiringClientCount: 4,
+        unbookedClientCount: 9,
+      });
+    }
+  });
+
   // FIX-065 (walkthrough finding 91): «Exportar CSV» downloads what the chip
   // and the search show.
   it('exports the chip and search with the CSV columns and never caches it', async () => {
@@ -196,6 +223,7 @@ describe('administrator Client endpoints (e2e)', () => {
               email: 'lucia@example.com',
               phone: '+591 70011001',
               clientSince: '2025-07-02',
+              lastClassOn: '2026-09-18',
             },
           ],
         }),

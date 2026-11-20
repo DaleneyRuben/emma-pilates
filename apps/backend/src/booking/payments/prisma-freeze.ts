@@ -173,7 +173,11 @@ export const createFreezeCommands = (
     });
 
   const decide = async (
-    command: { freezeId: string; decision: 'approved' | 'refused' },
+    command: {
+      freezeId: string;
+      decision: 'approved' | 'refused';
+      refusalReason?: string;
+    },
     principal: AuthenticatedPrincipal,
   ): Promise<{ state: 'approved' | 'refused' }> =>
     retrySerializable(() =>

@@ -43,13 +43,34 @@ export class FreezeRequestDto {
   state!: 'requested';
 }
 
-const decideFreezeSchema = z.strictObject({
-  decision: z.enum(['approved', 'refused']),
-});
+// W16 B/C: an optional reason travels with a refusal only; blank is none.
+const decideFreezeSchema = z
+  .strictObject({
+    decision: z.enum(['approved', 'refused']),
+    refusalReason: z.string().trim().max(300).optional(),
+  })
+  .refine(
+    (body) =>
+      body.decision === 'refused' ||
+      body.refusalReason === undefined ||
+      body.refusalReason === '',
+  )
+  .transform(({ refusalReason, ...body }) =>
+    refusalReason === undefined || refusalReason === ''
+      ? body
+      : { ...body, refusalReason },
+  );
 
 export class DecideFreezeDto {
   @ApiProperty({ enum: ['approved', 'refused'] })
   decision!: 'approved' | 'refused';
+
+  @ApiPropertyOptional({
+    maxLength: 300,
+    description:
+      'Why it is refused, sent to the Client; only with a refusal (W16)',
+  })
+  refusalReason?: string;
 }
 
 export const parseDecideFreeze = (value: unknown): DecideFreezeDto | null => {
@@ -83,6 +104,13 @@ export class FreezeReviewDto {
 
   @ApiProperty()
   planName!: string;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Classes her Plan has left, as Revisar congelamiento says (FIX-091)',
+  })
+  remainingClassAllowance?: number;
 
   @ApiProperty({ format: 'date' })
   startsOn!: string;
@@ -121,6 +149,13 @@ export class FreezeReviewDto {
       'The Staff Member who approved or refused it, or the Client who withdrew it',
   })
   decidedByName?: string | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Why it was refused, as the Client was told (W16)',
+  })
+  refusalReason?: string | null;
 }
 
 export class FreezeSummaryDto {

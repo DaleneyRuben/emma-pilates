@@ -3,6 +3,7 @@ import { page } from "./booking-handlers";
 import {
   categoriesHandler,
   expensePage,
+  expenseReportHandler,
   expensesPath,
 } from "./expense-fixtures";
 import { apiUrl, jsonResponse } from "./msw";
@@ -24,6 +25,7 @@ export const emptyPageHandlers = () => [
   promotionList([]),
   http.get(apiUrl(expensesPath), () => jsonResponse(expensePage([]))),
   categoriesHandler(() => []),
+  expenseReportHandler(),
   http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([]))),
   http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
     jsonResponse({ items: [], totalItems: 0 }),

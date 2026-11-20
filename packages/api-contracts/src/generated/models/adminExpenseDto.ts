@@ -15,6 +15,11 @@ export interface AdminExpenseDto {
   /** Bolivia civil date */
   incurredOn: string;
   /**
+   * What it was, as Gastos «Detalle» shows it (W11 A)
+   * @nullable
+   */
+  detail: string | null;
+  /**
    * Set once the Expense is eliminated; it then counts for nothing
    * @nullable
    */

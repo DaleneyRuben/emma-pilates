@@ -1,21 +1,27 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { Lock, UserPlus } from "lucide-react";
+import { Lock } from "lucide-react";
+import { useId, useState } from "react";
 import { PageNotice } from "../components/page/page-notice";
-import { LoadingNotice } from "../components/page/query-failure";
-import { Button } from "../components/ui/button";
 import { useEquipmentFlag } from "./equipment-flag-data";
 import { EquipmentFlagNote } from "./equipment-flags";
-import { SessionEditForm } from "./session-edit-form";
-import { SessionRoster } from "./session-roster";
-import { hasStarted, seatsTaken } from "./session-seats";
+import { branchSchedulesQueryOptions } from "./schedule-queries";
+import { SeriesPauseNotice } from "./series-row";
+import { SessionBookingsTab } from "./session-bookings-tab";
+import { SessionEditTab } from "./session-edit-tab";
 import { sessionRosterQueryOptions } from "./session-roster-queries";
+import { hasStarted, seatsTaken } from "./session-seats";
+import { SessionSeriesTab } from "./session-series-tab";
+import { SessionTabPanel, SessionTabs, type SessionTab } from "./session-tabs";
 
 type Session = AdministratorSessionAvailabilityDto;
 
-// WEB-039: the class panel. Who booked and who waits come first; a class
-// still to come adds «Reservar a una clienta» beside them (FIX-042, proposal
-// A) and the edit form, a past one stays read-only.
+// WEB-039, FIX-091 (W1, Editar clase A): the class panel. What concerns the
+// whole class (a notice, missing Equipment, a paused series) sits on top;
+// below, the tabs Reservas (who booked and who waits, and booking a Client),
+// Editar (this class alone, and cancelling it) and Serie semanal (the rest of
+// a weekly series, pausing and ending it; absent for a one-off class). A past
+// class stays read-only: its bookings alone, with no tabs.
 export function SessionDetail({
   session,
   branchId,
@@ -29,71 +35,83 @@ export function SessionDetail({
   onBook: () => void;
   onDone: (notice: string | null) => void;
 }) {
+  const idBase = useId();
+  const [tab, setTab] = useState<SessionTab>("reservas");
   const roster = useQuery(sessionRosterQueryOptions(session.id));
+  const schedules = useQuery({
+    ...branchSchedulesQueryOptions(branchId),
+    enabled: session.sessionScheduleId !== null,
+  });
+  const schedule = schedules.data?.find(
+    (candidate) => candidate.id === session.sessionScheduleId,
+  );
   const past = hasStarted(session);
   const flag = useEquipmentFlag(session.id);
+  const booked = roster.data?.bookings.length ?? session.bookedCount;
   const full =
     seatsTaken(session, roster.data?.bookings.length) >= session.capacity;
+  const tabs: { value: SessionTab; label: string }[] = [
+    { value: "reservas", label: `Reservas · ${booked}` },
+    { value: "editar", label: "Editar" },
+    ...(session.sessionScheduleId === null
+      ? []
+      : [{ value: "serie" as const, label: "Serie semanal" }]),
+  ];
 
-  const book = past ? null : (
-    <Button
-      variant="secondary"
-      size="sm"
-      onClick={onBook}
-      aria-label={
-        full ? "Agregar a la lista de espera" : "Reservar a una clienta"
-      }
-    >
-      <UserPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-      {full ? "Lista de espera" : "Reservar"}
-    </Button>
+  const bookings = (
+    <SessionBookingsTab
+      roster={roster}
+      full={full}
+      past={past}
+      onBook={onBook}
+    />
   );
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-col gap-5 px-7 py-4">
+      <div className="flex flex-col gap-5 px-7 pt-4 empty:hidden">
         {notice === null ? null : <PageNotice>{notice}</PageNotice>}
         {flag === undefined ? null : <EquipmentFlagNote flag={flag} />}
+        {schedule === undefined || past ? null : (
+          <SeriesPauseNotice schedule={schedule} />
+        )}
         {past ? (
           <p className="flex items-center gap-2 rounded-tarjeta border border-borde bg-lino px-4 py-3 text-celda text-texto-secundario">
             <Lock size={16} aria-hidden="true" className="text-rosa-profundo" />
             Clase pasada: solo lectura.
           </p>
         ) : null}
-        {roster.isPending ? (
-          // WEB-045: the button where the roster's header puts it, and the
-          // logo centred across the panel under it, not squeezed beside it.
-          <div className="flex flex-col gap-3">
-            {book === null ? null : (
-              <div className="flex min-h-9 justify-end">{book}</div>
-            )}
-            <LoadingNotice>Cargando quiénes reservaron…</LoadingNotice>
-          </div>
-        ) : roster.isError ? (
-          <div role="alert" className="flex items-center gap-3">
-            <p className="flex-1 text-celda text-texto-secundario">
-              No pudimos cargar quiénes reservaron.
-            </p>
-            <Button
-              variant="neutral"
-              size="sm"
-              onClick={() => void roster.refetch()}
-            >
-              Reintentar
-            </Button>
-            {book}
-          </div>
-        ) : (
-          <SessionRoster roster={roster.data} action={book} />
-        )}
       </div>
-      {past ? null : (
-        <SessionEditForm
-          key={session.id}
-          session={session}
-          branchId={branchId}
-          onDone={onDone}
-        />
+      {past ? (
+        bookings
+      ) : (
+        <>
+          <div className="pt-4">
+            <SessionTabs
+              tabs={tabs}
+              value={tab}
+              onChange={setTab}
+              idBase={idBase}
+            />
+          </div>
+          <SessionTabPanel tab={tab} idBase={idBase}>
+            {tab === "reservas" ? bookings : null}
+            {tab === "editar" ? (
+              <SessionEditTab
+                session={session}
+                branchId={branchId}
+                onDone={onDone}
+              />
+            ) : null}
+            {tab === "serie" ? (
+              <SessionSeriesTab
+                session={session}
+                branchId={branchId}
+                onDone={onDone}
+              />
+            ) : null}
+          </SessionTabPanel>
+        </>
       )}
     </div>
   );

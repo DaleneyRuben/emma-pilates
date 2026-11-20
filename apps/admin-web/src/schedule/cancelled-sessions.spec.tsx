@@ -73,9 +73,9 @@ describe("FIX-042 cancelled classes stay in the Horario", () => {
       name: "Mat Pilates, 16:00, Daniela Ortiz, Cancelada · mínimo no alcanzado",
     });
     expect(asked?.get("includeCancelled")).toBe("true");
-    // FIX-084 (Horario A): a faint dashed outline that reads «cancelada · mínimo».
+    // FIX-091 (W2, Horario B): one thin line that reads «cancelada · mínimo».
     expect(minimum).toHaveTextContent("cancelada · mínimo");
-    expect(minimum).toHaveClass("border-dashed");
+    expect(minimum).toHaveAttribute("data-cancelled", "line");
     expect(
       screen.getByRole("button", {
         name: "Reformer Pilates, 18:30, Valeria Peña, Cancelada por el estudio",

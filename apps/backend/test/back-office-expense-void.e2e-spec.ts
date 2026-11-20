@@ -44,7 +44,7 @@ describe('expense void endpoint (e2e)', () => {
         meaningfulActivity: boolean,
       ) => Promise<AuthenticatedPrincipal>
     >();
-  const expenses = { voidExpense: operation() };
+  const expenses = { voidExpense: operation(), listExpenses: operation() };
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue({
@@ -123,5 +123,36 @@ describe('expense void endpoint (e2e)', () => {
       .expect(({ body }) =>
         expect((body as { code: string }).code).toBe('expense_voided'),
       );
+  });
+
+  // FIX-091 (W11 B): Gastos lists the standing Expenses and, apart, the
+  // eliminated ones; without the filter the list keeps answering both.
+  it('lists only the standing or only the eliminated Expenses on request', async () => {
+    expenses.listExpenses.mockResolvedValue({
+      items: [voided],
+      page: 1,
+      pageSize: 20,
+      totalItems: 1,
+    });
+    const list = (query: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/administrator/expenses?branchId=${other}${query}`)
+        .set('authorization', bearer);
+    await list('&voided=true').expect(200);
+    expect(expenses.listExpenses).toHaveBeenLastCalledWith(
+      { branchId: other, voided: true, page: 1, pageSize: 20 },
+      expect.anything(),
+    );
+    await list('&voided=false').expect(200);
+    expect(expenses.listExpenses).toHaveBeenLastCalledWith(
+      { branchId: other, voided: false, page: 1, pageSize: 20 },
+      expect.anything(),
+    );
+    await list('').expect(200);
+    expect(expenses.listExpenses).toHaveBeenLastCalledWith(
+      { branchId: other, page: 1, pageSize: 20 },
+      expect.anything(),
+    );
+    await list('&voided=maybe').expect(400);
   });
 });

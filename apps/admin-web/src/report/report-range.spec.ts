@@ -6,13 +6,14 @@ import {
 } from "./report-range";
 
 describe("the report's range", () => {
-  it("opens on the last six Bolivia months up to today", () => {
+  // FIX-091 (W5 B): «Este mes» is the chip the page opens on.
+  it("opens on the Bolivia month so far", () => {
     expect(defaultReportRange("2026-09-24")).toEqual({
-      from: "2026-04-01",
+      from: "2026-09-01",
       to: "2026-09-24",
     });
     expect(defaultReportRange("2026-02-10")).toEqual({
-      from: "2025-09-01",
+      from: "2026-02-01",
       to: "2026-02-10",
     });
   });

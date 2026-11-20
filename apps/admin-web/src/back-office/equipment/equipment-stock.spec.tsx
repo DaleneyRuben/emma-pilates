@@ -18,6 +18,7 @@ import {
   server,
   useMockServer,
 } from "../../test/msw";
+import { typeDetail } from "../../test/equipment-table";
 import { renderAdmin } from "../../test/render-admin";
 import { signedInHandlers } from "../../test/session-handlers";
 
@@ -32,13 +33,12 @@ const record =
 const recordPost = record("post");
 const recordPut = record("put");
 
-const ballsSection = async () =>
-  (await screen.findByRole("region", { name: /^Balones ·/ })) as HTMLElement;
-
 const openOnBalls = async (action: string, title: string) => {
   const { user } = renderAdmin("/estudio/equipos");
   await user.click(
-    within(await ballsSection()).getByRole("button", { name: action }),
+    within(await typeDetail(user, "Balones")).getByRole("button", {
+      name: action,
+    }),
   );
   return { user, panel: await screen.findByRole("dialog", { name: title }) };
 };

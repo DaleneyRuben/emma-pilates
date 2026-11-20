@@ -1,8 +1,5 @@
-import { capacityLabel, formatDateTime } from "@pilates/api-contracts";
-import type {
-  AdministratorSessionAvailabilityDto,
-  AdministratorSessionRosterDto,
-} from "@pilates/api-contracts";
+import { formatDateTime } from "@pilates/api-contracts";
+import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +11,7 @@ import { CancelledSessionView } from "./cancelled-session-view";
 import { cancellationOf } from "./session-cancellation";
 import { SessionCreateForm, type SessionStart } from "./session-create-form";
 import { SessionDetail } from "./session-detail";
+import { classOccupancyLine, classPanelTitle } from "./session-panel-title";
 import { seatsTaken } from "./session-seats";
 import { sessionRosterQueryOptions } from "./session-roster-queries";
 
@@ -23,24 +21,6 @@ export type SessionPanelState =
   | { mode: "closed" }
   | { mode: "create"; start?: SessionStart }
   | { mode: "edit"; session: Session };
-
-// AW03: "8 de 10 lugares · 3 en lista de espera" (invariant 4).
-// The roster refreshes after a booking while the panel keeps the Session it
-// opened with, so its counts win (finding 81).
-const occupancyLine = (
-  session: Session,
-  roster: AdministratorSessionRosterDto | undefined,
-) => {
-  const waiting = Math.max(session.waitlistCount, roster?.waitlist.length ?? 0);
-  return [
-    formatDateTime(session.startsAt),
-    capacityLabel(
-      seatsTaken(session, roster?.bookings.length),
-      session.capacity,
-    ),
-    ...(waiting > 0 ? [`${waiting} en lista de espera`] : []),
-  ].join(" · ");
-};
 
 // WEB-039: «Reservar a una clienta» replaces the class detail inside the
 // panel, with a way back; the success notice then shows on the detail.
@@ -124,14 +104,14 @@ export function SessionPanel({
             ? "Clase cancelada"
             : booking
               ? "Reservar a una clienta"
-              : "Editar clase"
+              : classPanelTitle(session)
       }
       description={
         session === null
           ? `Sucursal ${branch.name} · sala única`
           : booking || cancellation !== null
             ? `${session.classTypeName} · ${formatDateTime(session.startsAt)}`
-            : occupancyLine(session, roster.data)
+            : classOccupancyLine(session, roster.data)
       }
     >
       {state.mode === "create" ? (

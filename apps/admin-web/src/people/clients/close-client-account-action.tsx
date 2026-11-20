@@ -8,7 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
-import { Button } from "../../components/ui/button";
+import { ActionRow } from "../../components/panel/action-rows";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { describeClosureForAdministrator } from "./close-client-account-lines";
 
@@ -51,18 +51,13 @@ export function CloseClientAccountAction({
   };
 
   return (
-    <>
-      <Button
-        variant="destructive"
-        size="sm"
-        className="self-start"
-        onClick={() => {
-          setOutcome(null);
-          setOpen(true);
-        }}
-      >
-        Cerrar cuenta
-      </Button>
+    <ActionRow
+      label="Cerrar cuenta"
+      onClick={() => {
+        setOutcome(null);
+        setOpen(true);
+      }}
+    >
       <ConfirmDialog
         open={open}
         onOpenChange={setOpen}
@@ -100,6 +95,6 @@ export function CloseClientAccountAction({
           </p>
         ) : null}
       </ConfirmDialog>
-    </>
+    </ActionRow>
   );
 }

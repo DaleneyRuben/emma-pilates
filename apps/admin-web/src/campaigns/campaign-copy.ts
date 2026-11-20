@@ -14,6 +14,16 @@ export const grantedLine = (count: number, classes: number): string => {
     : `${count} clientas recibieron ${clase}.`;
 };
 
+// FIX-091 (W13 A): the panel's summary and its button.
+const classCount = (total: number): string =>
+  total === 1 ? "1 clase" : `${total} clases`;
+
+export const totalLine = (total: number): string =>
+  `Vas a regalar ${classCount(total)} en total`;
+
+export const giveLabel = (total: number | null): string =>
+  total === null ? "Regalar las clases" : `Regalar ${classCount(total)}`;
+
 // FIX-064 (walkthrough finding 90): every active Client gets the classes. A
 // Client without a current Plan gets them when her next Plan is activated.
 // Every lapsed Client is owed, so the list can be long.
