@@ -1,25 +1,37 @@
-import { ActivityIndicator, StyleSheet, Text, type StyleProp, type TextStyle } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+
+import { Text } from "./text";
+import type { TextTone, TextVariant } from "./type-scale";
 
 /**
  * A button's label, or while its request is in flight a spinner in its place
- * (follow-up 93). The label stays, invisible, so the button keeps its size.
+ * (follow-up 93). The label stays, invisible, so the button keeps its size;
+ * the wrapper hides it, never the text's own style (follow-up 285, rule 5).
  */
 export function ButtonLabel({
   busy = false,
   label,
   spinnerColor,
-  style,
   testID = "button-spinner",
+  tone = "ink",
+  variant = "boton",
 }: {
   busy?: boolean;
   label: string;
   spinnerColor: string;
-  style?: StyleProp<TextStyle>;
   testID?: string;
+  /** `onDark` on a 600 fill, `ink` everywhere else. */
+  tone?: TextTone;
+  /** `boton` for every button, `boton-chico` for a small one. */
+  variant?: Extract<TextVariant, "boton" | "boton-chico">;
 }) {
   return (
     <>
-      <Text style={[style, busy && styles.hidden]}>{label}</Text>
+      <View style={busy && styles.hidden} testID={busy ? "button-label-hidden" : undefined}>
+        <Text tone={tone} variant={variant}>
+          {label}
+        </Text>
+      </View>
       {busy ? (
         <ActivityIndicator
           color={spinnerColor}

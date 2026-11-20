@@ -1,7 +1,8 @@
 import { act, fireEvent, render } from "@testing-library/react-native";
-import { DeviceEventEmitter, Platform, ScrollView, Text } from "react-native";
+import { DeviceEventEmitter, Platform, ScrollView } from "react-native";
 
 import { FormScrollView } from "./form-scroll-view";
+import { Text } from "./text";
 
 async function showKeyboard(screenY: number) {
   await act(async () => {
@@ -14,7 +15,7 @@ async function showKeyboard(screenY: number) {
 async function renderForm() {
   const screen = await render(
     <FormScrollView testID="form">
-      <Text>Correo electrónico</Text>
+      <Text variant="cuerpo">Correo electrónico</Text>
     </FormScrollView>,
   );
   await fireEvent(screen.getByTestId("form"), "layout", {
@@ -63,7 +64,7 @@ describe.each(["ios", "android"] as const)("FormScrollView on %s", (os) => {
         .mockImplementation(() => undefined);
       await render(
         <FormScrollView revealEndWithKeyboard testID="form">
-          <Text>Comentario</Text>
+          <Text variant="cuerpo">Comentario</Text>
         </FormScrollView>,
       );
       return scrollToEnd;

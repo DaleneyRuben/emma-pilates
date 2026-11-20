@@ -43,6 +43,15 @@ export const tabBarStyle = {
   paddingTop: Platform.OS === "android" ? 0 : spacing.sm,
 } as const;
 
+/**
+ * Each tab as wide as its icon and label, plus an even share of the rest of
+ * the bar (boards E-C04, E-F05): five staff tabs keep «Para contactar» and
+ * «Disponibilidad» whole at 12 pt, which equal columns cut (follow-up 285).
+ */
+// React Navigation gives each item `flex: 1`, whose basis of 0 wins over an
+// "auto" basis: `flex: 0` drops it, and the explicit grow and shrink return.
+export const tabBarItemStyle = { flex: 0, flexBasis: "auto", flexGrow: 1, flexShrink: 1 } as const;
+
 export const tabBarTints = {
   tabBarActiveTintColor: colors.onPrimary,
   tabBarInactiveTintColor: colors.text,

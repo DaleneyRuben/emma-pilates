@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
-import { colors, spacing, surfaces, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing, surfaces } from "./tokens";
 
 type Action = { label: string; onPress: () => void; testID?: string };
 
@@ -26,6 +26,8 @@ export type StateScreenProps = {
   /** The prefix of the disc and glyph ids, `state-screen` unless told otherwise. */
   testIDPrefix?: string;
   textAction?: Action;
+  /** A short title in `titulo-fila`, five words at most and no full stop; a
+   * sentence goes in `note` (follow-up 285). */
   title: string;
   /** Kept for callers: every glyph is plain since FIX-089. */
   plainIcon?: boolean;
@@ -33,7 +35,11 @@ export type StateScreenProps = {
   tone?: "brand" | "error";
 };
 
-/** An empty, pending, success, or error state (follow-up 225 §6). */
+/**
+ * An empty, pending, success, or error state (follow-up 225 §6): the title in
+ * `titulo-fila` and the note in `cuerpo`, centred on the white card
+ * (follow-up 285).
+ */
 export function StateScreen({
   children,
   icon,
@@ -62,10 +68,14 @@ export function StateScreen({
           />
         </View>
       )}
-      <Text accessibilityRole="header" style={styles.title}>
+      <Text accessibilityRole="header" style={styles.centredText} variant="titulo-fila">
         {title}
       </Text>
-      {note === undefined ? null : <Text style={styles.note}>{note}</Text>}
+      {note === undefined ? null : (
+        <Text style={styles.centredText} variant="cuerpo">
+          {note}
+        </Text>
+      )}
       {children}
       {hasActions ? (
         <View style={styles.actions} testID={`${testIDPrefix}-actions`}>
@@ -94,6 +104,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl + spacing.xs,
   },
   centred: { flex: 1 },
+  centredText: { textAlign: "center" },
   disc: {
     alignItems: "center",
     backgroundColor: colors.surfaceSubtle,
@@ -105,18 +116,4 @@ const styles = StyleSheet.create({
     width: 64,
   },
   inList: { alignSelf: "stretch" },
-  note: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
-    textAlign: "center",
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 29,
-    textAlign: "center",
-  },
 });

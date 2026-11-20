@@ -131,24 +131,6 @@ export const radii = {
   pill: 999,
 } as const;
 
-export const typography = {
-  display: 44,
-  // Lora titles: the band's 30, a hero's 28, a section's 24, a card's 22.
-  title: 30,
-  hero: 28,
-  section: 24,
-  titleSecondary: 22,
-  price: 26,
-  titleCard: 20,
-  titleSmall: 19,
-  bodyLarge: 17,
-  bodyMedium: 16,
-  body: 15,
-  label: 12,
-  note: 13,
-  tabLabel: 11,
-} as const;
-
 const cardShadow = "0 1px 2px rgba(147,97,93,0.08), 0 4px 14px rgba(147,97,93,0.10)";
 
 export const shadows = {

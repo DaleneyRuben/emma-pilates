@@ -1,30 +1,26 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, spacing, surfaces, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing, surfaces } from "./tokens";
 
 /**
  * A one-line warning (follow-up 225 §7): the alert glyph alone, no disc
- * (FIX-089), and the line on a Crema card with an Arcilla outline.
+ * (FIX-089), and the line in `cuerpo` on a Crema card with an Arcilla outline.
  */
 export function NoticeRow({ message, testID }: { message: string; testID?: string }) {
   return (
     <View style={styles.row} testID={testID}>
       <Glyph color={colors.error} name="alert" size={20} strokeWidth={1.6} />
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.message} variant="cuerpo">
+        {message}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  message: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 21,
-  },
+  message: { flex: 1 },
   row: {
     ...surfaces.soft,
     alignItems: "center",

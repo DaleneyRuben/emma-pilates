@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet } from "react-native";
 
 import { ButtonLabel } from "./button-label";
-import { fontFamilies } from "./fonts";
-import { colors, radii, typography } from "./tokens";
+import { colors, radii } from "./tokens";
 
 /**
  * The secondary action of the cards and confirmation sheets (Rosa Emma):
- * white with a 1.5 pt 600 outline. The destructive tone looks the
- * same; a confirmation guards it instead of red.
+ * white with a 1.5 pt 600 outline and an ink `boton` label. The destructive
+ * tone looks the same; a confirmation guards it instead of red. Disabled, it
+ * turns to the 50 ground; the label keeps its weight (follow-up 285).
  */
 export function OutlinedButton({
   busy = false,
@@ -33,18 +33,12 @@ export function OutlinedButton({
       style={[styles.outlined, disabled && !busy && styles.outlinedDisabled]}
       testID={testID}
     >
-      <ButtonLabel
-        busy={busy}
-        label={label}
-        spinnerColor={colors.primary}
-        style={[styles.outlinedLabel, disabled && !busy && styles.disabledLabel]}
-      />
+      <ButtonLabel busy={busy} label={label} spinnerColor={colors.primary} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  disabledLabel: { fontFamily: fontFamilies.bodyMedium, fontWeight: "500" },
   outlined: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -58,11 +52,5 @@ const styles = StyleSheet.create({
   outlinedDisabled: {
     backgroundColor: colors.disabledBackground,
     borderColor: colors.borderStrong,
-  },
-  outlinedLabel: {
-    color: colors.primary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
   },
 });

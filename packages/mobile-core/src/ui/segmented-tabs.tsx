@@ -1,12 +1,13 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, shadows, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, shadows, spacing } from "./tokens";
 
 export type SegmentedTabsProps<Key extends string> = {
   accessibilityLabel?: string;
   onSelect: (key: Key) => void;
-  /** `disabled` greys a segment that cannot be chosen now (S10 after a payment is sent). */
+  /** `disabled` marks a segment that cannot be chosen now (S10 after a payment is sent):
+   * it ignores taps and says so to a screen reader; its label stays ink. */
   options: readonly { disabled?: boolean; key: Key; label: string; testID?: string }[];
   selected: Key;
   testID?: string;
@@ -15,8 +16,8 @@ export type SegmentedTabsProps<Key extends string> = {
 /**
  * A two- or three-way switch under a screen title (follow-up 225 §9), as the
  * staff canvas draws it to keep one emphasis per screen: a Lino track, the
- * selected segment Rosa tinte with a 1.5 pt Palo de rosa ring, every label
- * Rosa enlace.
+ * selected segment 600 with a white label, every label `boton-chico` in the
+ * same weight (follow-up 285).
  */
 export function SegmentedTabs<Key extends string>({
   accessibilityLabel,
@@ -50,13 +51,7 @@ export function SegmentedTabs<Key extends string>({
             style={[styles.segment, isSelected && styles.selected]}
             testID={option.testID}
           >
-            <Text
-              style={[
-                styles.label,
-                isSelected && styles.labelSelected,
-                option.disabled === true && styles.disabled,
-              ]}
-            >
+            <Text tone={isSelected ? "onDark" : "ink"} variant="boton-chico">
               {option.label}
             </Text>
           </Pressable>
@@ -67,18 +62,6 @@ export function SegmentedTabs<Key extends string>({
 }
 
 const styles = StyleSheet.create({
-  disabled: { color: colors.disabledText },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
-  },
-  labelSelected: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontWeight: "700",
-  },
   segment: {
     alignItems: "center",
     borderRadius: 12,

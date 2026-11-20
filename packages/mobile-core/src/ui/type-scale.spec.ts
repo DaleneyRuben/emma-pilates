@@ -75,3 +75,17 @@ describe("the Rosa Emma type scale", () => {
     expect(maxTextScale).toBe(1.3);
   });
 });
+
+describe("the loaded fonts", () => {
+  it("are the four faces the scale uses and the field example's italic", () => {
+    const { fontAssets } = require("./fonts") as { fontAssets: Record<string, unknown> };
+
+    expect(Object.keys(fontAssets).sort()).toEqual([
+      "Lora_500Medium",
+      "WorkSans_400Regular",
+      "WorkSans_400Regular_Italic",
+      "WorkSans_600SemiBold",
+      "WorkSans_700Bold",
+    ]);
+  });
+});

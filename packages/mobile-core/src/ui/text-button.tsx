@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { spacing } from "./tokens";
 
 type TextButtonProps = {
   disabled?: boolean;
@@ -9,22 +9,19 @@ type TextButtonProps = {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
-  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's;
-   * «error» for a destructive card action (follow-up 226). */
+  /** Kept for callers: «error» and «onTint» draw the same ink link, since an
+   * error is said in words, never in colour (follow-up 285). */
   tone?: "default" | "error" | "onTint";
-  /** Bold and underlined, as the boards draw a link in a footer or on 600. */
+  /** @deprecated Every standalone link is underlined (follow-up 285). */
   underline?: boolean;
 };
 
-export function TextButton({
-  disabled = false,
-  label,
-  onPress,
-  style,
-  testID,
-  tone = "default",
-  underline = false,
-}: TextButtonProps) {
+/**
+ * A standalone link or action, such as «Volver» or «¿Olvidaste tu
+ * contraseña?» (follow-up 285): `enlace`, Work Sans 14 · 700, underlined, in
+ * ink, with a 44 pt tap height.
+ */
+export function TextButton({ disabled = false, label, onPress, style, testID }: TextButtonProps) {
   return (
     <Pressable
       accessibilityLabel={label}
@@ -36,16 +33,7 @@ export function TextButton({
       style={[styles.button, style]}
       testID={testID}
     >
-      <Text
-        style={[
-          styles.label,
-          underline && styles.underline,
-          tone === "error" && styles.error,
-          disabled && styles.disabled,
-        ]}
-      >
-        {label}
-      </Text>
+      <Text variant="enlace">{label}</Text>
     </Pressable>
   );
 }
@@ -57,19 +45,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: spacing.sm,
   },
-  disabled: {
-    color: colors.disabledText,
-  },
-  error: {
-    color: colors.error,
-  },
-  // Follow-up 225 §4: Rosa enlace, which already reads on Lino and Rosa tinte,
-  // so «onTint» draws the same; no underline.
-  label: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
-  underline: { textDecorationLine: "underline" },
 });

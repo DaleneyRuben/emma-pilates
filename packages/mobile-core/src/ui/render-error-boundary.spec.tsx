@@ -1,8 +1,8 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { reportCaughtRenderError } from "../monitoring/error-reporting";
 import { RenderErrorBoundary } from "./render-error-boundary";
+import { Text } from "./text";
 
 jest.mock("../monitoring/error-reporting", () => ({ reportCaughtRenderError: jest.fn() }));
 
@@ -13,7 +13,7 @@ function Child({ fails }: { fails: boolean }) {
   if (fails) {
     throw new Error("mob-053 probe");
   }
-  return <Text>Pantalla recuperada</Text>;
+  return <Text variant="cuerpo">Pantalla recuperada</Text>;
 }
 
 describe("RenderErrorBoundary", () => {

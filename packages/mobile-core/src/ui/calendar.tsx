@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { Chevron } from "./chevron";
-import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 const weekdays = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 const months = [
@@ -56,8 +56,11 @@ function placeIn(day: string, start: string | null, end: string | null): Place {
 /**
  * DES-015 (follow-up 259): a month calendar, Monday first, with ‹ › between
  * `firstMonth` and `lastMonth` ("YYYY-MM"). It draws the range from
- * `rangeStart` to `rangeEnd` and mutes the days `isOff` names, which stay
- * tappable so the screen can say why. Days are civil dates ("YYYY-MM-DD").
+ * `rangeStart` to `rangeEnd` and strikes the days `isOff` names, never
+ * dimmed; they stay tappable so the screen can say why. Days are civil dates
+ * ("YYYY-MM-DD"). The month is `titulo-bloque`, the weekday initials
+ * `pastilla` and the days `cuerpo` (follow-up 285). Small text: put the
+ * calendar on a white card, never straight on the 100 screen.
  */
 export function Calendar({
   firstMonth,
@@ -99,7 +102,7 @@ export function Calendar({
             <Chevron testID="calendar-previous" tone="muted" />
           </View>
         </Pressable>
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text accessibilityRole="header" variant="titulo-bloque">
           {title}
         </Text>
         <Pressable
@@ -121,7 +124,7 @@ export function Calendar({
         style={styles.week}
       >
         {header.map((letter, column) => (
-          <Text key={column} style={styles.weekday}>
+          <Text key={column} style={styles.weekday} variant="pastilla">
             {letter}
           </Text>
         ))}
@@ -157,9 +160,7 @@ export function Calendar({
                   filled && styles.filled,
                 ]}
               >
-                <Text
-                  style={[styles.number, off && styles.numberOff, filled && styles.numberFilled]}
-                >
+                <Text strike={off} tone={filled ? "onDark" : "ink"} variant="cuerpo">
                   {String(Number(day.slice(8)))}
                 </Text>
               </View>
@@ -216,18 +217,7 @@ const styles = StyleSheet.create({
   flip: { transform: [{ rotate: "180deg" }] },
   grid: { flexDirection: "row", flexWrap: "wrap" },
   monthBar: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
-  number: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  numberFilled: { color: colors.white, fontFamily: fontFamilies.bodyStrong },
-  numberOff: { color: colors.iconQuiet, textDecorationLine: "line-through" },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.titleSmall },
   today: { borderColor: colors.primary, borderWidth: 1.5 },
   week: { flexDirection: "row" },
-  weekday: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    letterSpacing: 0.6,
-    textAlign: "center",
-    width: `${100 / 7}%`,
-  },
+  weekday: { textAlign: "center", width: `${100 / 7}%` },
 });

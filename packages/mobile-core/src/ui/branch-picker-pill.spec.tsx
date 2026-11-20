@@ -1,6 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { BranchPickerPill } from "./branch-picker-pill";
+import { textVariants } from "./type-scale";
 
 const hidden = { includeHiddenElements: true };
 
@@ -22,11 +23,10 @@ describe("BranchPickerPill", () => {
       minHeight: 44,
       paddingHorizontal: 16,
     });
-    expect(screen.getByText("Sucursal:")).toHaveStyle({ color: "#93615D", fontSize: 14 });
-    expect(screen.getByText("Centro")).toHaveStyle({
+    // Board C03: «Sucursal: Achumani» in `compacto` 14/400, one line.
+    expect(screen.getByText("Sucursal: Centro")).toHaveStyle({
+      ...textVariants.compacto,
       color: "#93615D",
-      fontSize: 14,
-      fontWeight: "700",
     });
     const pin = screen.getByTestId("glyph-pin", hidden);
     expect(pin).toHaveProp("width", 17);

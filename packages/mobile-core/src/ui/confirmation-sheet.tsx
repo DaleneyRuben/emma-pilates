@@ -1,12 +1,12 @@
 import type { PropsWithChildren } from "react";
-import { Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, StyleSheet, View } from "react-native";
 
-import { BodyText } from "./body-text";
-import { fontFamilies } from "./fonts";
 import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
+import { SheetTitle } from "./sheet-title";
+import { Text } from "./text";
 import { TextButton } from "./text-button";
-import { colors, radii, shadows, spacing, typography } from "./tokens";
+import { colors, radii, shadows, spacing } from "./tokens";
 
 type ConfirmationSheetProps = PropsWithChildren<{
   visible: boolean;
@@ -31,7 +31,7 @@ type ConfirmationSheetProps = PropsWithChildren<{
 
 /**
  * The bottom confirmation sheet of the frames (05, 15, S14, S15, S17, S24):
- * a white sheet over the scrim with a Lora title, the lines that explain the
+ * a white sheet over the scrim with its `SheetTitle`, the lines that explain the
  * consequence, the action, and a quiet link back (UX-002).
  */
 export function ConfirmationSheet({
@@ -65,9 +65,9 @@ export function ConfirmationSheet({
       <View style={styles.backdrop}>
         <View style={styles.sheet} testID={testID}>
           <View style={styles.grabber} />
-          <Text style={styles.title}>{title}</Text>
+          <SheetTitle>{title}</SheetTitle>
           {children}
-          {note === undefined ? null : <BodyText>{note}</BodyText>}
+          {note === undefined ? null : <Text variant="cuerpo">{note}</Text>}
           <PrimaryButton
             busy={busy}
             disabled={locked && !busy}
@@ -113,11 +113,5 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl + spacing.xxs,
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.md,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 29,
   },
 });

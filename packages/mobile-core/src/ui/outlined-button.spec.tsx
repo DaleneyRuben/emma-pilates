@@ -1,6 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { OutlinedButton } from "./outlined-button";
+import { textVariants } from "./type-scale";
 
 // UX-002: the secondary action every confirmation sheet draws, shared by both
 // apps. FIX-089 (palette B): Crema with a 1.5 Rosa profundo border; the
@@ -17,8 +18,8 @@ describe("OutlinedButton", () => {
       minHeight: 52,
     });
     expect(screen.getByText("Ver historial")).toHaveStyle({
+      ...textVariants.boton,
       color: "#93615D",
-      fontFamily: "WorkSans_700Bold",
     });
   });
 
@@ -55,7 +56,7 @@ describe("OutlinedButton", () => {
     expect(button).toBeBusy();
     expect(button).toBeDisabled();
     expect(screen.getByTestId("button-spinner")).toBeOnTheScreen();
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ opacity: 0 });
+    expect(screen.getByTestId("button-label-hidden")).toHaveStyle({ opacity: 0 });
     await fireEvent.press(button);
     expect(onPress).not.toHaveBeenCalled();
   });

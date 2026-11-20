@@ -1,6 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { CardActionRow, cardWithActionRow } from "./card-action-row";
+import { textVariants } from "./type-scale";
 
 // Follow-up 226 §1: under a card's content, an Arena hairline and then the
 // action as a right-aligned text button; the card's bottom padding drops to 4.
@@ -19,7 +20,10 @@ describe("CardActionRow", () => {
       flexDirection: "row",
       justifyContent: "flex-end",
     });
-    expect(screen.getByText("Reprogramar")).toHaveStyle({ color: "#93615D", fontSize: 15 });
+    expect(screen.getByText("Reprogramar")).toHaveStyle({
+      ...textVariants.enlace,
+      color: "#93615D",
+    });
     await fireEvent.press(button);
     expect(onPress).toHaveBeenCalledTimes(1);
   });

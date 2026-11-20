@@ -1,9 +1,9 @@
 import { fireEvent, render as renderScreen } from "@testing-library/react-native";
 import type { ReactElement } from "react";
-import { Text } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { FullScreenImage } from "./full-screen-image";
+import { Text } from "./text";
 
 // The viewer's own provider starts from its parent's metrics, as in the app.
 const metrics = {
@@ -48,7 +48,7 @@ describe("FullScreenImage", () => {
   it("shows a banner between the top row and the image", async () => {
     const screen = await render(
       <FullScreenImage
-        banner={<Text>QR guardado en tus fotos.</Text>}
+        banner={<Text variant="destacado">QR guardado en tus fotos.</Text>}
         label="Código QR ampliado"
         onClose={jest.fn()}
         title="QR del estudio"

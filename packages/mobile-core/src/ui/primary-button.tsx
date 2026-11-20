@@ -1,8 +1,8 @@
-import { Pressable, StyleSheet, Text, View, type GestureResponderEvent } from "react-native";
+import { Pressable, StyleSheet, View, type GestureResponderEvent } from "react-native";
 
 import { ButtonLabel } from "./button-label";
-import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 type PrimaryButtonProps = {
   label: string;
@@ -19,7 +19,11 @@ type PrimaryButtonProps = {
   tone?: "error" | "primary";
 };
 
-/** The screen's one solid action: 600 with a white label (Rosa Emma). */
+/**
+ * The screen's one solid action: 600 with a white `boton` label (Rosa Emma,
+ * follow-up 285). Disabled, it turns to the 50 ground with a 400 outline and
+ * says why under it in `secundario`; the label keeps its weight.
+ */
 export function PrimaryButton({
   label,
   onPress,
@@ -53,8 +57,8 @@ export function PrimaryButton({
         busy={busy}
         label={label}
         spinnerColor={quiet ? colors.primary : colors.onPrimary}
-        style={[styles.label, quiet && styles.quietLabel, greyed && styles.disabledLabel]}
         testID="primary-button-spinner"
+        tone={quiet ? "ink" : "onDark"}
       />
     </Pressable>
   );
@@ -62,7 +66,9 @@ export function PrimaryButton({
   return (
     <View style={styles.withReason}>
       {button}
-      <Text style={styles.reason}>{disabledReason}</Text>
+      <Text style={styles.reason} variant="secundario">
+        {disabledReason}
+      </Text>
     </View>
   );
 }
@@ -89,25 +95,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.disabledBackground,
     borderColor: colors.borderStrong,
   },
-  label: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
-  quietLabel: {
-    color: colors.primary,
-  },
-  disabledLabel: {
-    color: colors.disabledText,
-    fontFamily: fontFamilies.bodyMedium,
-    fontWeight: "500",
-  },
-  reason: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  reason: { textAlign: "center" },
   withReason: { gap: spacing.smd },
 });
