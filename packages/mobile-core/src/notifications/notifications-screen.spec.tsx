@@ -263,7 +263,7 @@ describe("NotificationsScreen", () => {
       includeHiddenElements: true,
     });
     expect(bell).toHaveProp("stroke", "#93615D");
-    expect(bell).toHaveProp("width", 32);
+    expect(bell).toHaveProp("width", 28);
     expect(
       screen.getByText("Aquí te avisaremos sobre tus clases, pagos y evaluaciones."),
     ).toHaveStyle({ color: "#93615D", fontSize: 15 });

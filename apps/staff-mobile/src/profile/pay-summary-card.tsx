@@ -33,9 +33,8 @@ const styles = StyleSheet.create({
   note: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 21,
-    marginTop: -6,
   },
   total: {
     color: colors.onEmphasis,

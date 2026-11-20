@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { dayChipLabel } from "../time/session-format";
 import { fontFamilies } from "../ui/fonts";
 import { SectionTitle } from "../ui/section-title";
-import { colors, radii, spacing } from "../ui/tokens";
+import { colors, radii, shadows, spacing } from "../ui/tokens";
 import { startDateOptions, type StartDateOption } from "./start-date-options";
 
 /**
@@ -143,11 +143,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   chip: {
+    ...shadows.card,
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.button,
-    borderWidth: 1,
+    borderRadius: radii.inset,
     gap: spacing.xxs,
     height: 72,
     justifyContent: "center",
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
     minWidth: 52,
     paddingHorizontal: spacing.sm,
   },
-  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipSelected: { backgroundColor: colors.primary },
   day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   row: { gap: spacing.sm },
   selectedText: { color: colors.onPrimary },

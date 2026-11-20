@@ -17,6 +17,8 @@ import {
   QueryFailure,
   Screen,
   ScreenTopBar,
+  StateScreen,
+  surfaces,
   SectionTitle,
   spacing,
   typography,
@@ -42,9 +44,9 @@ type SubscriptionNavigation = {
 };
 
 /**
- * C12 Mi plan on DES-015's option A (follow-up 259, findings 51 and 54): the
- * plan card is the one colour; notices are an unfilled list; the Freeze is a
- * neutral card; renewing and freezing are rows. Reservar lives on the tab bar.
+ * C12 Mi plan (Rosa Emma): the plan card is the 600 hero; renewing sits with
+ * its hint in a white card; notices, details and freezing are white cards.
+ * Reservar lives on the tab bar.
  */
 export function SubscriptionScreen() {
   const navigation = useNavigation<SubscriptionNavigation>();
@@ -86,8 +88,15 @@ export function SubscriptionScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText>Aún no tienes un plan. Elige el paquete que mejor te acomode.</BodyText>
-        <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
+        {/* Rosa Emma C12a: the white state card with its disc and the action. */}
+        <StateScreen
+          icon="card"
+          layout="card"
+          note="Elige el paquete que mejor te acomode."
+          title="Aún no tienes un plan."
+        >
+          <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
+        </StateScreen>
       </Screen>
     );
   }
@@ -148,7 +157,8 @@ export function SubscriptionScreen() {
           </View>
         )}
         {canRenew ? (
-          <View style={styles.renew}>
+          // Rosa Emma C12: the button and its hint together in a white card.
+          <View style={styles.renew} testID="subscription-renew">
             <PrimaryButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
             <BodyText style={styles.renewNote}>{renewNote}</BodyText>
           </View>
@@ -167,12 +177,14 @@ export function SubscriptionScreen() {
         )}
         <DetailRows rows={details} title="Detalles" />
         {expired || (guestPass !== null && nextSubscription == null) ? (
-          <View style={styles.section}>
+          <View>
             <SectionTitle>Elige tu próximo plan</SectionTitle>
-            <BodyText style={styles.note}>
-              {purchaseNote(studioRules?.plansFromPriceCentavos)}
-            </BodyText>
-            <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
+            <View style={styles.purchase} testID="subscription-purchase">
+              <BodyText style={styles.note}>
+                {purchaseNote(studioRules?.plansFromPriceCentavos)}
+              </BodyText>
+              <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
+            </View>
           </View>
         ) : guestPass === null && canFreeze ? (
           <View>
@@ -207,15 +219,21 @@ function purchaseNote(fromCentavos: number | null | undefined): string {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  note: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
-  renew: { gap: spacing.smd },
-  renewNote: {
-    color: colors.textMuted,
-    fontSize: typography.note,
-    textAlign: "center",
+  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  note: {
+    color: colors.text,
     fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  purchase: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
+  renew: { ...surfaces.card, gap: spacing.smLg, padding: spacing.mdLg },
+  renewNote: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+    textAlign: "center",
   },
   screen: { gap: spacing.lg },
-  section: { gap: spacing.md },
 });

@@ -43,7 +43,7 @@ describe("Client text styles", () => {
   });
 
   it("pair a weight with the family drawn in it", () => {
-    const strong = /fontFamilies\.(bodyStrong|heading|headingStrong|display)\b/;
+    const strong = /fontFamilies\.(bodyStrong|bodyBold|heading|headingStrong|display)\b/;
     const medium = /fontFamilies\.(bodyMedium|heading|headingStrong|display)\b/;
     const mismatched = textStyles()
       .filter(({ body }) => {

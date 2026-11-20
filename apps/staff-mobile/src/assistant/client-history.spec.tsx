@@ -34,14 +34,18 @@ describe("Assistant Client history (S22)", () => {
     await waitFor(() => {
       expect(screen.getByText("Asistió a")).toBeOnTheScreen();
     });
-    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 26 });
+    // Rosa Emma C05d: the summary is the 600 hero, each month a white card
+    // under its 50 header strip.
+    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 28 });
+    expect(screen.getByTestId("class-history-summary")).toHaveStyle({
+      backgroundColor: "#93615D",
+    });
     expect(screen.getByText("Septiembre 2026").parent).toHaveStyle({
-      borderBottomColor: "#CDA697",
-      borderBottomWidth: 1,
+      backgroundColor: "#FEF6F2",
     });
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
-    expect(screen.getByText("15")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
+    expect(screen.getByText("15")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
     // 15 and 8 September are both Tuesdays.
     expect(screen.getAllByText("mar")).toHaveLength(2);
 
@@ -49,7 +53,7 @@ describe("Assistant Client history (S22)", () => {
     expect(rows).toHaveLength(3);
     expect(StyleSheet.flatten(rows[0].props.style)).not.toHaveProperty("backgroundColor");
     expect(StyleSheet.flatten(rows[0].props.style)).toMatchObject({
-      borderBottomColor: "#E7CCBF",
+      borderBottomColor: "#F9E7DF",
       borderBottomWidth: 1,
     });
     expect(StyleSheet.flatten(rows[2].props.style)).not.toHaveProperty("borderBottomWidth");

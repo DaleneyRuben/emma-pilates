@@ -35,7 +35,7 @@ describe("Assistant rows", () => {
     expect(row).toHaveStyle({ alignItems: "center", flexDirection: "row", minHeight: 64 });
     // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
     expect(screen.getByText("LF")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "WorkSans_600SemiBold",
     });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#93615D", fontSize: 16 });
@@ -60,7 +60,7 @@ describe("Assistant rows", () => {
     // FIX-089 (ClaseE): today's only class leads as the hero, the places
     // «N de M», no pill.
     const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
-    expect(card.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(card.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#FFFBFB" });
     expect(card.getByText(/ · Emma Vargas$/)).toBeOnTheScreen();
     expect(card.getByText("6 de 12")).toBeOnTheScreen();
     expect(card.queryByTestId("exception-pill")).toBeNull();
@@ -69,7 +69,7 @@ describe("Assistant rows", () => {
     ).toBeOnTheScreen();
   });
 
-  // FIX-089: a full class is the exception, so only it takes the Rubor pill.
+  // FIX-089: a full class is the exception, so only it takes the 50 pill.
   it("draws a full class with the exception pill", async () => {
     const full = { ...session, id: "session-full", bookedCount: 12, availableSeats: 0 };
     const screen = await openLucia({
@@ -87,7 +87,7 @@ describe("Assistant rows", () => {
       .map((card) => within(card));
     expect(cards[0].getByText("6 de 12")).toBeOnTheScreen();
     expect(cards[0].queryByTestId("exception-pill")).toBeNull();
-    expect(cards[1].getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(cards[1].getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(cards[1].getByText("Completa")).toBeOnTheScreen();
   });
 });

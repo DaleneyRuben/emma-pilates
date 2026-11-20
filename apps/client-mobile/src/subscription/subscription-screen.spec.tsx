@@ -56,9 +56,8 @@ describe("Client Subscription detail", () => {
   it("shows the active Plan with allowance and dates", async () => {
     const screen = await openSubscription(subscription("active", 5));
 
-    // C12: the plan card, then «Detalles» as rows. FIX-082 (Mi plan option A):
-    // a light Lino card with the name and a status dot.
-    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    // C12: the plan card, then «Detalles» as rows. Rosa Emma: the 600 hero.
+    expect(screen.getByTestId("subscription-hero")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("Paquete de 12 clases")).toBeOnTheScreen();
     expect(screen.getByText("Activo")).toBeOnTheScreen();
     expect(screen.getByText("5")).toBeOnTheScreen();

@@ -64,13 +64,23 @@ export function EmailChangeSection() {
   return (
     <View accessibilityLabel="Cambio de correo pendiente" style={styles.card}>
       <Text style={styles.title}>Revisa tu correo nuevo</Text>
-      <BodyText>
+      <BodyText style={styles.body}>
         Te enviamos un enlace a {pending.email}. Ábrelo dentro de 24 horas para confirmar el cambio;
         hasta entonces sigues entrando con tu correo actual.
       </BodyText>
       <View style={styles.actions}>
-        <TextButton disabled={busy} label="Reenviar correo" onPress={() => void resend()} />
-        <TextButton disabled={busy} label="Cancelar cambio" onPress={() => void cancel()} />
+        <TextButton
+          disabled={busy}
+          label="Reenviar correo"
+          onPress={() => void resend()}
+          style={styles.link}
+        />
+        <TextButton
+          disabled={busy}
+          label="Cancelar cambio"
+          onPress={() => void cancel()}
+          style={styles.link}
+        />
       </View>
       {notice === null ? null : <BodyText style={styles.notice}>{notice}</BodyText>}
     </View>
@@ -81,14 +91,21 @@ export function EmailChangeSection() {
 export const normalizeEmail = (email: string): string => email.trim().toLowerCase();
 
 const styles = StyleSheet.create({
-  actions: { flexDirection: "row", gap: spacing.md },
-  // Palette B (FIX-089): a Crema card with an Arcilla outline, not a tint.
-  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
+  actions: { flexDirection: "row", gap: spacing.xlSm },
+  body: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  // C22b: the pending change on the soft 50 inset inside the fields' card.
+  card: {
+    ...surfaces.soft,
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  link: { minHeight: 32, paddingHorizontal: 0 },
   notice: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
 });

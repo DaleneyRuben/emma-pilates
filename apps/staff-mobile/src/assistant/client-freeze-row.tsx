@@ -3,8 +3,9 @@ import {
   boliviaCivilDate,
   colors,
   fontFamilies,
-  radii,
+  Glyph,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
@@ -30,7 +31,7 @@ export function freezeLines(
   return null;
 }
 
-/** Staff pick E4 A: the Freeze on its own row, Crema with an Arcilla border. */
+/** Staff pick E4 A (E-C09): the Freeze on its own white card, a snowflake ahead. */
 export function ClientFreezeRow({ freeze }: { freeze: Freeze | null | undefined }) {
   const lines = freezeLines(freeze, boliviaCivilDate(new Date()));
   if (lines === null) return null;
@@ -40,27 +41,30 @@ export function ClientFreezeRow({ freeze }: { freeze: Freeze | null | undefined 
       style={styles.row}
       testID="client-freeze-row"
     >
-      <Text style={styles.title}>{lines.title}</Text>
-      <Text style={styles.note}>{lines.note}</Text>
+      <Glyph color={colors.text} name="snowflake" size={22} strokeWidth={1.6} />
+      <View style={styles.body}>
+        <Text style={styles.title}>{lines.title}</Text>
+        <Text style={styles.note}>{lines.note}</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  body: { flex: 1, gap: spacing.xxs },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.button,
-    borderWidth: 1,
-    gap: spacing.xxs,
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.mdLg,
   },
   title: {
     color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
+    fontSize: typography.bodyMedium,
     fontWeight: "600",
   },
 });

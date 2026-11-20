@@ -5,7 +5,6 @@ import {
   fontFamilies,
   radii,
   spacing,
-  typography,
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text } from "react-native";
 
@@ -51,6 +50,8 @@ export function Pill({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={{ selected }}
+      // The 38–40 pt tiles reach 44 with the slop.
+      hitSlop={{ bottom: 3, left: 0, right: 0, top: 3 }}
       onPress={onPress}
       style={[styles.pill, chipStyles.box, fill && styles.fill, selected && chipStyles.boxSelected]}
     >
@@ -90,46 +91,34 @@ export function DateTile({
   );
 }
 
-export function SectionLabel({ children }: { children: string }) {
-  return <Text style={styles.label}>{children}</Text>;
-}
-
 export const pillRow = { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm } as const;
 
+// Boards N07–N08: the day tiles are 40 tall with radius 12; the date tiles 48
+// wide; both keep palette B's chosen and outlined looks.
 const styles = StyleSheet.create({
-  // S17's 12 pt section title; the chips are palette B's (FIX-089).
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    marginTop: spacing.md,
-    textTransform: "uppercase",
-  },
   pill: {
     alignItems: "center",
-    borderRadius: radii.button,
+    borderRadius: radii.pill,
     justifyContent: "center",
-    minHeight: 44,
+    minHeight: 38,
     minWidth: 48,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.mdLg,
   },
-  fill: { flex: 1, minWidth: 0, paddingHorizontal: 0 },
+  fill: { borderRadius: 12, flex: 1, minHeight: 40, minWidth: 0, paddingHorizontal: 0 },
   tile: {
     alignItems: "center",
-    borderRadius: 14,
+    borderRadius: 12,
     gap: spacing.xxs,
     height: 60,
     justifyContent: "center",
-    width: 52,
+    width: 48,
   },
   tileDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   tileDaySelected: { color: colors.onPrimary },
   tileWeekday: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: "600",
   },
 });

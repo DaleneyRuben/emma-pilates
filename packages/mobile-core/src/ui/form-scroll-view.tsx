@@ -7,6 +7,8 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { useBandScroll } from "./screen";
+
 /**
  * A form's scrolling column that moves up above the keyboard. Android draws
  * edge to edge (Expo 57), so the window no longer resizes for the keyboard
@@ -19,6 +21,7 @@ import {
  * whenever the column shrinks while it is, the form scrolls to its end.
  */
 export function FormScrollView({
+  band = false,
   children,
   contentContainerStyle,
   footer,
@@ -27,6 +30,8 @@ export function FormScrollView({
   style,
   testID,
 }: PropsWithChildren<{
+  /** The header band scrolls inside the form (sign-in): reach the screen's edges. */
+  band?: boolean;
   contentContainerStyle?: StyleProp<ViewStyle>;
   footer?: ReactNode;
   keyboardVerticalOffset?: number;
@@ -35,6 +40,7 @@ export function FormScrollView({
   testID?: string;
 }>) {
   const scroller = useRef<ScrollView>(null);
+  const bleed = useBandScroll();
   const keyboardUp = useRef(false);
 
   useEffect(() => {
@@ -60,7 +66,9 @@ export function FormScrollView({
       testID={testID}
     >
       <ScrollView
-        contentContainerStyle={contentContainerStyle}
+        contentContainerStyle={
+          band ? [bleed.contentContainerStyle, contentContainerStyle] : contentContainerStyle
+        }
         keyboardShouldPersistTaps="handled"
         onLayout={
           revealEndWithKeyboard
@@ -70,6 +78,7 @@ export function FormScrollView({
             : undefined
         }
         ref={scroller}
+        style={band ? bleed.style : undefined}
       >
         {children}
       </ScrollView>

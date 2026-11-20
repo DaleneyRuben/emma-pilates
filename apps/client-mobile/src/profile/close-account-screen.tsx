@@ -9,18 +9,22 @@ import {
   BodyText,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
+  footerScreen,
   FormField,
   FormScrollView,
-  IconRow,
-  IconRowGroup,
+  Glyph,
   LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
+  rosa,
   Screen,
   ScreenTopBar,
   spacing,
   StateScreen,
+  surfaces,
   TextButton,
   type GlyphName,
   typography,
@@ -28,7 +32,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
@@ -150,12 +154,12 @@ export function CloseAccountScreen() {
   }
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={[styles.screen, footerScreen]}>
       {header}
       <FormScrollView
         contentContainerStyle={styles.content}
         footer={
-          <View style={styles.footer}>
+          <FooterPanel>
             {failed ? (
               <View accessibilityRole="alert" style={styles.failure}>
                 <BodyText style={styles.failureText}>
@@ -175,24 +179,38 @@ export function CloseAccountScreen() {
               tone="error"
             />
             <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
-          </View>
+          </FooterPanel>
         }
         keyboardVerticalOffset={spacing.xxl}
       >
-        <BodyText style={styles.lead}>
-          Esto pasa al cerrar tu cuenta en Emma Pilates Studio:
-        </BodyText>
-        <IconRowGroup testID="close-account-lines">
-          {closure.lines.map((line) => (
-            <IconRow icon={consequenceIcon(line)} key={line} label={line} />
+        {/* C24: the lead, the consequences, then the data note, the consent
+            and the password, each on a white card. */}
+        <View style={styles.card}>
+          <BodyText style={styles.lead}>
+            Esto pasa al cerrar tu cuenta en Emma Pilates Studio:
+          </BodyText>
+        </View>
+        <View style={styles.lines} testID="close-account-lines">
+          {closure.lines.map((line, index) => (
+            <View key={line} style={[styles.line, index > 0 && styles.divided]}>
+              <View style={styles.disc}>
+                <Glyph
+                  color={colors.text}
+                  name={consequenceIcon(line)}
+                  size={16}
+                  strokeWidth={1.6}
+                />
+              </View>
+              <Text style={styles.lineText}>{line}</Text>
+            </View>
           ))}
-        </IconRowGroup>
-        <BodyText style={styles.note}>
-          Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
-          sin tus datos, para su contabilidad.
-        </BodyText>
-        <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
-        <View style={styles.field}>
+        </View>
+        <View style={styles.card}>
+          <BodyText style={styles.note}>
+            Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
+            sin tus datos, para su contabilidad.
+          </BodyText>
+          <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
           <FormField
             autoCapitalize="none"
             error={passwordError}
@@ -212,20 +230,44 @@ export function CloseAccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.mdLg, paddingBottom: spacing.lg },
+  card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lg },
+  content: { gap: spacing.smLg, paddingBottom: spacing.lg },
+  disc: {
+    alignItems: "center",
+    backgroundColor: rosa[50],
+    borderRadius: 16,
+    height: 32,
+    justifyContent: "center",
+    width: 32,
+  },
+  divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
+  // C25e's way: the failure on 50 with a 1.5 pt 400 rule, above the button.
   failure: {
     backgroundColor: colors.errorTint,
-    borderRadius: radii.control,
-    padding: spacing.smLg,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
   },
-  failureText: {
-    color: colors.errorText,
-    fontSize: typography.note,
+  failureText: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: 14 },
+  lead: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  line: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.smLg,
+  },
+  lineText: {
+    color: colors.text,
+    flex: 1,
     fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+    paddingTop: spacing.smd,
   },
-  field: { gap: spacing.sm },
-  footer: { gap: spacing.xs, paddingTop: spacing.md },
-  lead: { color: colors.text },
+  lines: { ...surfaces.card, overflow: "hidden" },
   note: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.md },
 });

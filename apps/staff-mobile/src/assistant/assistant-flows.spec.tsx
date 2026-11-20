@@ -47,12 +47,12 @@ describe("Assistant Client flows", () => {
     });
     // FIX-083 (Ficha pick A): one clear Lino plan card, then «Reservar clase».
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("5")).toHaveStyle({ fontSize: 40 });
+    expect(screen.getByText("5")).toHaveStyle({ fontSize: 44 });
     expect(screen.getByText("clases disponibles")).toBeOnTheScreen();
     expect(screen.getByText("5 de 8 del plan · vence el lun 12 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
-    expect(screen.getByText("Activa")).toBeOnTheScreen(); // E4 A: a Palo de rosa block
-    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByText("Activa")).toBeOnTheScreen(); // E4 A: the 600 hero
+    expect(screen.getByTestId("client-plan-card")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Registrar pago" })).toBeOnTheScreen();
     expect(screen.getByTestId("client-overview-bookings")).toBeOnTheScreen();

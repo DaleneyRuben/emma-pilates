@@ -48,7 +48,7 @@ describe("Assistant booked Session", () => {
       expect(card.getByText("Ya reservada")).toBeOnTheScreen();
     });
     expect(card.queryByText("6 de 12")).toBeNull();
-    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#F9F4F2" });
+    expect(card.getByText("Ya reservada")).toHaveStyle({ color: "#FFFBFB" });
   });
 
   it("keeps the seat count on a Session she only waits for", async () => {

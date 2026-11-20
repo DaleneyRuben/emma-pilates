@@ -103,7 +103,7 @@ describe("Client Reservar, palette B", () => {
     const screen = await openBrowse([session("s-1", 1, 7, 3), session("s-2", 2, 8, 3)]);
 
     const notice = screen.getByTestId("browse-week-notice");
-    expect(notice).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(notice).toHaveStyle({ backgroundColor: "#FFFBFB" });
     expect(within(notice).getByText("Te quedan 3 clases esta semana")).toBeOnTheScreen();
     expect(screen.getAllByText(/clases esta semana/)).toHaveLength(1);
     expect(within(notice).getByTestId("glyph-calendar", hidden)).toHaveProp("stroke", "#93615D");
@@ -144,10 +144,8 @@ describe("Client Reservar, palette B", () => {
     ]);
 
     expect(screen.getByTestId("browse-session-group")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 16,
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     expect(screen.getAllByTestId("class-list-divider")).toHaveLength(2);
     const rows = screen
@@ -156,13 +154,13 @@ describe("Client Reservar, palette B", () => {
     expect(screen.queryByTestId("seat-pill")).toBeNull();
     const seats = {
       color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
-      fontWeight: "600" as const,
+      fontFamily: "WorkSans_700Bold",
+      fontWeight: "700" as const,
     };
     expect(rows[0].getByText("5 de 12")).toHaveStyle(seats);
     expect(rows[1].getByText("Quedan 2 lugares")).toHaveStyle(seats);
     expect(rows[2].getByText("Lleno")).toHaveStyle(seats);
-    expect(rows[0].getByTestId("class-row-time")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(rows[0].getByTestId("type-bar", hidden)).toHaveStyle({ backgroundColor: "#93615D" });
     expect(rows[0].getByTestId("chevron", hidden)).toBeOnTheScreen();
   });
 
@@ -174,25 +172,29 @@ describe("Client Reservar, palette B", () => {
       backgroundColor: "#93615D",
       minHeight: 38,
     });
-    expect(strip.getByText("Todas")).toHaveStyle({ color: "#F9F4F2" });
+    expect(strip.getByText("Todas")).toHaveStyle({ color: "#FFFBFB" });
     expect(strip.getByRole("button", { name: "Mat Pilates" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderWidth: 1.5,
     });
     expect(strip.getByText("Mat Pilates")).toHaveStyle({ color: "#93615D" });
   });
 
-  it("draws the days as chips, the chosen one Rosa profundo", async () => {
+  it("draws the days as white tiles in the band, the chosen one Rosa profundo", async () => {
     const screen = await openBrowse([session("s-1", 1, 7, 3)], 14);
 
+    expect(screen.getByTestId("browse-header")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(
+      within(screen.getByTestId("browse-header")).getByTestId("browse-day-strip"),
+    ).toBeTruthy();
     expect(screen.getByTestId("browse-day-other")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 14,
     });
     expect(screen.getByText("Otra")).toHaveStyle({ color: "#93615D" });
     const chosen = screen.getByTestId(`browse-day-${addCivilDays(today, 0)}`);
     expect(chosen).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(within(chosen).getByText("Hoy")).toHaveStyle({ color: "#F9F4F2", fontSize: 12 });
+    expect(within(chosen).getByText("Hoy")).toHaveStyle({ color: "#FFFBFB", fontSize: 12 });
   });
 });

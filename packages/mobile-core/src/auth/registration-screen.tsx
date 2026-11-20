@@ -136,7 +136,15 @@ export function RegistrationScreen({
     <AuthenticationScreen
       brand={false}
       footer={
-        <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
+        <>
+          <PrimaryButton
+            busy={submitting}
+            disabled={waitSeconds > 0}
+            label="Crear cuenta"
+            onPress={submit}
+          />
+          <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
+        </>
       }
       topBar={{ onBack, title: "Crea tu cuenta" }}
     >
@@ -215,12 +223,6 @@ export function RegistrationScreen({
           <Text style={styles.referralLabel}>⌄</Text>
         </Pressable>
       )}
-      <PrimaryButton
-        busy={submitting}
-        disabled={waitSeconds > 0}
-        label="Crear cuenta"
-        onPress={submit}
-      />
     </AuthenticationScreen>
   );
 }
@@ -233,9 +235,10 @@ const styles = StyleSheet.create({
     fontSize: typography.note,
   },
   referralLabel: {
-    color: colors.primaryDeep,
-    fontFamily: fontFamilies.body,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: 14,
+    fontWeight: "600",
   },
   referralToggle: {
     alignItems: "center",

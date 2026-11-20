@@ -6,12 +6,14 @@ import {
   BodyText,
   BrandToast,
   colors,
+  fontFamilies,
   LoadingState,
   QueryFailure,
   Screen,
   ScreenTopBar,
   SectionTitle,
   spacing,
+  surfaces,
   usePullToRefresh,
   useRefetchOnFocus,
   useTransientNotice,
@@ -87,10 +89,12 @@ export function ReferralsScreen() {
         <View>
           <SectionTitle>Tus invitadas</SectionTitle>
           {referred.length === 0 ? (
-            // FIX-082 (Invita option A): plain text; sharing is on the card.
-            <BodyText style={styles.empty}>
-              Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
-            </BodyText>
+            // Rosa Emma C16b: the quiet line in a white card; sharing is above.
+            <View style={styles.emptyCard} testID="referrals-empty">
+              <BodyText style={styles.empty}>
+                Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
+              </BodyText>
+            </View>
           ) : (
             <ReferredList referred={referred} />
           )}
@@ -102,7 +106,8 @@ export function ReferralsScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  empty: { color: colors.textMuted },
+  content: { gap: spacing.md, paddingBottom: spacing.xxl },
+  empty: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  emptyCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
   screen: { gap: spacing.lg },
 });

@@ -59,7 +59,7 @@ describe("Cerrar caja (S25)", () => {
 
     // FIX-083 (Cerrar caja pick A), FIX-090: count first; the expected cash
     // and the difference only read once she has typed her count.
-    expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({ fontSize: 30 });
+    expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({ fontSize: 40 });
     expect(
       screen.getByText("Cuenta los billetes antes de mirar el total esperado."),
     ).toBeOnTheScreen();

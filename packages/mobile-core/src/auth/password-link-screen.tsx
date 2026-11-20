@@ -153,61 +153,93 @@ export function PasswordLinkScreen({
 
   if (state === "loading") {
     return (
-      <AuthenticationScreen title="Comprobando enlace">
+      <AuthenticationScreen staff={audience === "staff"} title="Comprobando enlace">
         <BodyText>Estamos comprobando tu enlace seguro.</BodyText>
       </AuthenticationScreen>
     );
   }
 
+  const staff = audience === "staff";
+  const text = staff ? authStyles.centered : undefined;
+  const toLogin = <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />;
+
   if (state === "activated") {
     return (
       <AuthenticationScreen
+        actions={toLogin}
         badge={{ icon: "check", tone: "success" }}
+        staff={staff}
         title="Tu cuenta está activa"
       >
-        <BodyText style={authStyles.centered}>
+        <BodyText style={text}>
           Tu correo quedó verificado. Inicia sesión con tu correo y la contraseña que acabas de
           crear.
         </BodyText>
-        <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
       </AuthenticationScreen>
     );
   }
 
   if (state === "removed") {
     return (
-      <AuthenticationScreen badge={deadLinkBadge} title="Esta invitación ya no está activa">
-        <BodyText style={authStyles.centered}>{deadLinkCopy[audience].removed}</BodyText>
-        <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
+      <AuthenticationScreen
+        actions={toLogin}
+        badge={deadLinkBadge}
+        brand={staff}
+        staff={staff}
+        title="Esta invitación ya no está activa"
+      >
+        <BodyText style={text}>{deadLinkCopy[audience].removed}</BodyText>
       </AuthenticationScreen>
     );
   }
 
   if (state === "expired") {
     return (
-      <AuthenticationScreen badge={deadLinkBadge} title="Este enlace ya no es válido">
-        {activation ? (
-          <>
-            <BodyText style={authStyles.centered}>{deadLinkCopy[audience].expired}</BodyText>
-            <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
-          </>
-        ) : (
-          <>
-            <BodyText style={authStyles.centered}>
-              Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola
-              vez. Pide uno nuevo.
-            </BodyText>
-            <PrimaryButton label="Pedir un enlace nuevo" onPress={onRequestRecovery} />
-            <TextButton label="Volver a iniciar sesión" onPress={onLogin} />
-          </>
-        )}
+      <AuthenticationScreen
+        actions={
+          activation ? (
+            toLogin
+          ) : (
+            <>
+              <PrimaryButton label="Pedir un enlace nuevo" onPress={onRequestRecovery} />
+              <TextButton
+                label="Volver a iniciar sesión"
+                onPress={onLogin}
+                style={staff ? undefined : authStyles.pill}
+              />
+            </>
+          )
+        }
+        badge={deadLinkBadge}
+        brand={staff}
+        staff={staff}
+        title="Este enlace ya no es válido"
+      >
+        <BodyText style={text}>
+          {activation
+            ? deadLinkCopy[audience].expired
+            : "Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola vez. Pide uno nuevo."}
+        </BodyText>
       </AuthenticationScreen>
     );
   }
 
+  // C21 pins the button in a white footer; E-A06 keeps it in the card.
+  const save = (
+    <PrimaryButton
+      busy={isSubmitting}
+      disabled={!isValid}
+      label={activation ? "Activar cuenta" : "Guardar contraseña"}
+      onPress={submit}
+    />
+  );
+
   return (
     <AuthenticationScreen
+      actions={staff ? save : undefined}
       eyebrow={activation ? "Activar cuenta" : "Restablecer contraseña"}
+      footer={staff ? undefined : save}
+      staff={staff}
       title={activation ? "Crea tu contraseña" : "Crea una contraseña nueva"}
     >
       <BodyText>
@@ -247,12 +279,6 @@ export function PasswordLinkScreen({
             value={value}
           />
         )}
-      />
-      <PrimaryButton
-        busy={isSubmitting}
-        disabled={!isValid}
-        label={activation ? "Activar cuenta" : "Guardar contraseña"}
-        onPress={submit}
       />
     </AuthenticationScreen>
   );

@@ -39,7 +39,7 @@ describe("BrandToast", () => {
     expect(screen.getByTestId("toast")).toHaveStyle({
       alignItems: "center",
       backgroundColor: "#93615D",
-      borderRadius: 14,
+      borderRadius: 18,
       bottom: 16,
       flexDirection: "row",
       gap: 12,
@@ -48,16 +48,16 @@ describe("BrandToast", () => {
       right: 16,
     });
     expect(screen.getByText("Reserva confirmada")).toHaveStyle({
-      color: "#F9F4F2",
-      fontFamily: "WorkSans_600SemiBold",
-      fontSize: 15,
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
+      fontSize: 16,
     });
     expect(screen.getByText("Te quedan 9 clases en tu plan")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontSize: 13,
     });
     const check = screen.getByTestId("glyph-check", hidden);
-    expect(check).toHaveProp("stroke", "#F9F4F2");
+    expect(check).toHaveProp("stroke", "#FFFBFB");
     expect(check).toHaveProp("width", 20);
   });
 
@@ -67,7 +67,7 @@ describe("BrandToast", () => {
 
     const close = screen.getByRole("button", { name: "Cerrar aviso" });
     expect(close).toHaveStyle({ height: 44, width: 44 });
-    expect(screen.getByTestId("glyph-cross", hidden)).toHaveProp("stroke", "#F9F4F2");
+    expect(screen.getByTestId("glyph-cross", hidden)).toHaveProp("stroke", "#FFFBFB");
     await fireEvent.press(close);
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId("glyph-check", hidden)).toBeOnTheScreen();

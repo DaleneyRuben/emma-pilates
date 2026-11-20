@@ -1,4 +1,12 @@
-import { Chevron, colors, fontFamilies, radii, spacing, typography } from "@pilates/mobile-core";
+import {
+  Chevron,
+  colors,
+  fontFamilies,
+  radii,
+  spacing,
+  surfaces,
+  typography,
+} from "@pilates/mobile-core";
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type AccessibilityState } from "react-native";
 
@@ -106,16 +114,15 @@ const styles = StyleSheet.create({
     width: 8,
   },
   dotSpace: { width: 8 },
-  group: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
-    overflow: "hidden",
-  },
+  group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   indent: { paddingLeft: spacing.xl + spacing.lg },
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "flex-start",
@@ -126,5 +133,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   strong: { fontFamily: fontFamilies.bodyMedium },
-  value: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  value: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });

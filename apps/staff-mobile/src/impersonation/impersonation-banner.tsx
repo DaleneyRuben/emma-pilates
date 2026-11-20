@@ -49,7 +49,7 @@ export function ImpersonationBanner({
   return (
     <View accessibilityRole="header" style={[styles.strip, { paddingTop: insets.top }]}>
       <View style={styles.row}>
-        <Glyph color={colors.white} name="eye" size={16} strokeWidth={1.5} />
+        <Glyph color={colors.white} name="eye" size={18} strokeWidth={1.6} />
         <View style={styles.text}>
           <Text numberOfLines={1} style={styles.title}>{`Viendo como ${name}`}</Text>
           <Text numberOfLines={1} style={styles.detail}>
@@ -70,42 +70,44 @@ export function ImpersonationBanner({
   );
 }
 
+// Rosa Emma (E-D25): the 600 strip with white text and an outlined «Salir».
 const styles = StyleSheet.create({
   detail: {
     fontFamily: fontFamilies.body,
     color: colors.white,
     fontSize: typography.label,
-    opacity: 0.85,
   },
   exit: {
     alignItems: "center",
-    borderRadius: 8,
+    borderColor: colors.white,
+    borderRadius: spacing.md,
+    borderWidth: 1.5,
     justifyContent: "center",
-    minHeight: 44,
-    paddingHorizontal: spacing.sm,
+    minHeight: 36,
+    paddingHorizontal: spacing.lg,
   },
-  exitPressed: { backgroundColor: colors.emphasis },
+  exitPressed: { opacity: 0.7 },
   exitText: {
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     color: colors.white,
-    fontSize: typography.note,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "700",
   },
   row: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.sm,
+    gap: spacing.smLg,
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
   // Over the top inset; navigation.tsx pushes the screens down by the inset
   // plus the strip, so their own safe-area views add nothing more.
-  strip: { backgroundColor: colors.primaryDeep, left: 0, position: "absolute", right: 0, top: 0 },
-  text: { flex: 1, gap: 2 },
+  strip: { backgroundColor: colors.emphasis, left: 0, position: "absolute", right: 0, top: 0 },
+  text: { flex: 1 },
   title: {
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     color: colors.white,
-    fontSize: typography.note,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

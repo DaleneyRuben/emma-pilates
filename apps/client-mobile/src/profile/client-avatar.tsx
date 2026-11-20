@@ -2,14 +2,17 @@ import { colors, fontFamilies, initials, radii } from "@pilates/mobile-core";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 // The Perfil avatar (18, 22): the photo centre-cropped by the circle, or the
-// initials when the Client has none (prompt 22, follow-up 60 §1): bold Crema
-// on Palo de rosa, like every initials circle in palette B (FIX-089).
+// initials when the Client has none (prompt 22, follow-up 60 §1): bold white
+// on 600, or 600 on a white disc over the Perfil hero (C18, Rosa Emma).
 export function ClientAvatar({
   name,
+  onEmphasis = false,
   photoUri,
   size,
 }: {
   name: string;
+  /** Sits on the 600 hero, so the disc turns white. */
+  onEmphasis?: boolean;
   photoUri: string | null;
   size: number;
 }) {
@@ -25,8 +28,14 @@ export function ClientAvatar({
     );
   }
   return (
-    <View style={[styles.avatar, frame]}>
-      <Text style={[styles.avatarText, { fontSize: Math.round(size * 0.32) }]}>
+    <View style={[styles.avatar, onEmphasis && styles.avatarLight, frame]}>
+      <Text
+        style={[
+          styles.avatarText,
+          onEmphasis && styles.avatarTextLight,
+          { fontSize: Math.round(size * 0.32) },
+        ]}
+      >
         {initials(name)}
       </Text>
     </View>
@@ -40,10 +49,12 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     justifyContent: "center",
   },
+  avatarLight: { backgroundColor: colors.card },
   avatarText: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyStrong,
     fontWeight: "600",
   },
+  avatarTextLight: { color: colors.text },
   photo: { backgroundColor: colors.emphasis },
 });

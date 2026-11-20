@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
     backgroundColor: colors.accentWash,
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
     flexShrink: 0,
     justifyContent: "center",
   },

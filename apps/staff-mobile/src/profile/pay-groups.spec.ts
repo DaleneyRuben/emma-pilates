@@ -124,8 +124,52 @@ describe("linesByDay", () => {
 
     expect(days).toEqual([]);
     expect(undated).toEqual([
-      { title: "Ana Rojas", note: "Plan 30 días · 10 % de Bs 450", amountCentavos: 4_500 },
-      { title: "3 clientas", note: null, amountCentavos: 6_500 },
+      {
+        title: "Ana Rojas",
+        note: "Plan 30 días · 10 % de Bs 450",
+        count: 1,
+        unitCentavos: 4_500,
+        amountCentavos: 4_500,
+      },
+      { title: "3 clientas", note: null, count: 1, unitCentavos: 6_500, amountCentavos: 6_500 },
     ]);
+  });
+
+  // Verification E2: a statement drafted before its lines named the class
+  // listed 54 identical «Mínimo no alcanzado · Bs 25» rows. Identical undated
+  // lines now stand as one row with their count and sum.
+  it("joins identical undated lines into one with their count and sum", () => {
+    const { undated } = linesByDay([
+      ...Array.from({ length: 54 }, () => line("minimum_not_met", "Mínimo no alcanzado", 2_500)),
+      line("minimum_not_met", "Mínimo no alcanzado", 3_000),
+    ]);
+
+    expect(undated).toEqual([
+      {
+        title: "Mínimo no alcanzado",
+        note: null,
+        count: 54,
+        unitCentavos: 2_500,
+        amountCentavos: 135_000,
+      },
+      {
+        title: "Mínimo no alcanzado",
+        note: null,
+        count: 1,
+        unitCentavos: 3_000,
+        amountCentavos: 3_000,
+      },
+    ]);
+  });
+
+  // Two Clients with the same name and Plan are two commissions, not one
+  // person twice: only identical class lines join.
+  it("never joins identical commission lines", () => {
+    const { undated } = linesByDay([
+      line("commission", "Ana Rojas · Plan 30 días · 10 % de Bs 450", 4_500),
+      line("commission", "Ana Rojas · Plan 30 días · 10 % de Bs 450", 4_500),
+    ]);
+
+    expect(undated.map((row) => row.count)).toEqual([1, 1]);
   });
 });

@@ -1,4 +1,3 @@
-import { bookingRejectionMessage } from "./booking-rejection-copy";
 import {
   createBooking,
   getGetCurrentClientSubscriptionQueryKey,
@@ -18,8 +17,9 @@ import {
   Screen,
   ScreenHeader,
   ScreenTopBar,
-  SectionTitle,
+  shadows,
   spacing,
+  surfaces,
   typography,
   usePushNotifications,
   useStudioRules,
@@ -32,11 +32,11 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { formatCivilDate } from "../home/home-format";
 import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
 import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
 import { FrozenBookingFooter } from "./frozen-booking-footer";
+import { problemMessage, usesLine } from "./session-detail-copy";
 import { SessionFacts } from "./session-facts";
 import { SessionHero } from "./session-hero";
 
@@ -60,29 +60,6 @@ type DetailNavigation = {
     ): void;
   };
 };
-
-function problemMessage(body: unknown): string | null {
-  if (typeof body !== "object" || body === null) return null;
-  const code = (body as { code?: unknown }).code;
-  const detail = (body as { detail?: unknown }).detail;
-  if (code === "booking_during_freeze" && typeof detail === "string") {
-    const date = /until (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
-    if (date !== undefined) return `Tu plan está congelado hasta el ${formatCivilDate(date)}.`;
-  }
-  if (code === "booking_before_start_date" && typeof detail === "string") {
-    const date = /: (\d{4}-\d{2}-\d{2})$/.exec(detail)?.[1];
-    if (date !== undefined) return `Podrás reservar a partir del ${formatCivilDate(date)}.`;
-  }
-  return typeof code === "string" ? bookingRejectionMessage(code) : null;
-}
-
-/** C4 A: what Reservar takes, from the Subscription that covers the class. */
-function usesLine(covering: { remainingClassAllowance: number; extraClasses?: number } | null) {
-  const classes = (covering?.remainingClassAllowance ?? 0) + (covering?.extraClasses ?? 0);
-  if (classes === 1) return "Usarás tu última clase.";
-  if (classes > 1) return `Usarás 1 de tus ${classes} clases.`;
-  return "Se descuenta 1 clase de tu plan";
-}
 
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<DetailNavigation>();
@@ -270,20 +247,27 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           full={full}
         />
         {classesLeftLine === null ? null : (
-          <BodyText style={styles.note}>{classesLeftLine}</BodyText>
+          <View style={styles.weekNotice} testID="session-week-notice">
+            <BodyText style={styles.weekLine}>{classesLeftLine}</BodyText>
+          </View>
         )}
         {detail.classType.description.length === 0 ? null : (
-          <View>
-            <SectionTitle>Sobre la clase</SectionTitle>
+          <View style={styles.aboutCard}>
+            <BodyText accessibilityRole="header" style={styles.aboutTitle}>
+              Sobre la clase
+            </BodyText>
             <BodyText style={styles.about}>{detail.classType.description}</BodyText>
           </View>
         )}
       </ScrollView>
-      <View style={styles.actions}>
+      {/* C04: the action and its line sit on the white footer. */}
+      <View style={styles.actions} testID="session-footer">
         {message !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.message}>
-            {message}
-          </BodyText>
+          <View style={styles.messageBox}>
+            <BodyText accessibilityRole="alert" style={styles.message}>
+              {message}
+            </BodyText>
+          </View>
         ) : null}
         {frozenOnClassDay && view?.freeze != null ? (
           <FrozenBookingFooter
@@ -293,9 +277,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           />
         ) : full ? (
           waitlisted ? (
-            <BodyText style={styles.note}>Ya estás en la lista de espera.</BodyText>
+            <BodyText style={[styles.status, styles.statusTall]}>
+              Ya estás en la lista de espera.
+            </BodyText>
           ) : !waitlistOpen ? (
-            <BodyText style={styles.note}>
+            <BodyText style={styles.status}>
               Falta poco para la clase, así que la lista de espera ya cerró.
             </BodyText>
           ) : (
@@ -348,18 +334,65 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 const styles = StyleSheet.create({
   about: {
     color: colors.text,
-    fontSize: typography.body,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
     fontFamily: fontFamilies.body,
   },
-  actions: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.md },
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  message: { color: colors.errorText },
+  aboutCard: { ...surfaces.card, gap: spacing.smd, padding: spacing.lg },
+  aboutTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
+  // A white panel from edge to edge with the card shadow cast upward.
+  actions: {
+    ...shadows.footer,
+    backgroundColor: colors.card,
+    gap: spacing.sm,
+    marginHorizontal: -spacing.lg,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.mdLg,
+  },
+  content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
+  message: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  messageBox: {
+    backgroundColor: colors.primaryTint,
+    borderColor: colors.borderStrong,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
   note: {
     color: colors.textMuted,
     fontSize: typography.note,
+    lineHeight: 18,
     textAlign: "center",
     fontFamily: fontFamilies.body,
   },
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.md, paddingBottom: 0 },
+  status: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+    lineHeight: 21,
+    paddingVertical: spacing.sm,
+    textAlign: "center",
+  },
+  statusTall: { paddingVertical: spacing.md },
+  weekLine: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.note,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  weekNotice: { ...surfaces.soft, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
 });

@@ -6,7 +6,9 @@ import {
   loadPrivateImageWithRatio,
   radii,
   spacing,
+  surfaces,
   TextButton,
+  typography,
 } from "@pilates/mobile-core";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -16,7 +18,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 
 export type FrontDeskReceipt = { imageAssetId: string };
 
-/** S10 QR: the studio QR to show the Client, with the exact amount above it. */
+/** S10 QR (E-P05): the studio QR to show the Client, the exact amount beside it. */
 export function StudioQrCard({ amount }: { amount: string }) {
   const fetcher = useStaffFetcher();
   const qr = useQuery({
@@ -26,10 +28,6 @@ export function StudioQrCard({ amount }: { amount: string }) {
   });
   return (
     <View style={styles.card}>
-      <View style={styles.amountRow}>
-        <Text style={styles.muted}>Monto exacto a transferir</Text>
-        <Text style={styles.amount}>{amount}</Text>
-      </View>
       <View
         accessibilityLabel="QR del estudio para transferir"
         accessibilityRole="image"
@@ -42,7 +40,11 @@ export function StudioQrCard({ amount }: { amount: string }) {
           />
         ) : null}
       </View>
-      <Text style={[styles.muted, styles.centred]}>QR del estudio · muéstraselo a la clienta</Text>
+      <View style={styles.amountColumn}>
+        <Text style={styles.amountLabel}>Monto exacto a transferir</Text>
+        <Text style={styles.amount}>{amount}</Text>
+        <Text style={styles.muted}>QR del estudio · muéstraselo a la clienta</Text>
+      </View>
     </View>
   );
 }
@@ -71,7 +73,7 @@ export function FrontDeskReceiptCard({
       <View style={styles.choice} testID="front-desk-receipt-choice">
         <View style={styles.head}>
           <View style={styles.disc}>
-            <Glyph color={colors.primary} name="camera" size={18} />
+            <Glyph color={colors.text} name="camera" size={22} strokeWidth={1.6} />
           </View>
           <View style={styles.body}>
             <Text style={styles.title}>Comprobante</Text>
@@ -80,25 +82,25 @@ export function FrontDeskReceiptCard({
             </Text>
           </View>
         </View>
-        <SourceButton
-          icon="camera"
-          label="Fotografiar comprobante"
-          onPress={() => choose("camera")}
-          testID="front-desk-photograph"
-        />
-        <SourceButton
-          icon="image"
-          label="Elegir de la galería"
-          onPress={() => choose("library")}
-          testID="front-desk-gallery"
-        />
+        <View style={styles.sources}>
+          <SourceButton
+            label="Fotografiar comprobante"
+            onPress={() => choose("camera")}
+            testID="front-desk-photograph"
+          />
+          <SourceButton
+            label="Elegir de la galería"
+            onPress={() => choose("library")}
+            testID="front-desk-gallery"
+          />
+        </View>
       </View>
     );
   }
   return (
     <View style={styles.receipt} testID="front-desk-receipt">
       <View style={styles.disc}>
-        <Glyph color={colors.primary} name="check" size={18} strokeWidth={1.6} />
+        <Glyph color={colors.text} name="check" size={22} strokeWidth={1.6} />
       </View>
       <View style={styles.body}>
         <Text style={styles.title}>Comprobante listo</Text>
@@ -109,13 +111,12 @@ export function FrontDeskReceiptCard({
   );
 }
 
+// E-P05: the two sources side by side, white with a 600 outline.
 function SourceButton({
-  icon,
   label,
   onPress,
   testID,
 }: {
-  icon: "camera" | "image";
   label: string;
   onPress: () => void;
   testID: string;
@@ -128,54 +129,43 @@ function SourceButton({
       style={({ pressed }) => [styles.source, pressed && styles.pressed]}
       testID={testID}
     >
-      <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       <Text style={styles.sourceLabel}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  amount: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 28 },
-  amountRow: { alignItems: "center", gap: spacing.xxs },
+  amount: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 32, lineHeight: 38 },
+  amountColumn: { flex: 1, gap: spacing.xxs },
+  amountLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   body: { flex: 1, gap: spacing.xxs },
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
-    gap: spacing.md,
-    padding: spacing.xlSm,
-  },
-  centred: { textAlign: "center" },
-  choice: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
-    gap: spacing.md,
+    flexDirection: "row",
+    gap: spacing.mdLg,
     padding: spacing.lg,
   },
+  choice: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
-  disc: { alignItems: "center", justifyContent: "center", width: 24 },
-  head: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  disc: { alignItems: "center", paddingTop: 1, width: 24 },
+  head: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
+  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   qr: { height: undefined, width: "100%" },
   qrBox: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
+    borderColor: colors.borderSoft,
     borderRadius: radii.inset,
-    height: 180,
+    borderWidth: 1,
+    height: 140,
     justifyContent: "center",
-    padding: spacing.md,
-    width: 180,
+    padding: spacing.sm,
+    width: 140,
   },
   receipt: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     paddingLeft: spacing.lg,
@@ -183,24 +173,30 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   pressed: { opacity: 0.85 },
-  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
+  // FIX-089: the secondary button, white with a 600 outline.
   source: {
     alignItems: "center",
     backgroundColor: colors.card,
     borderColor: colors.primary,
     borderRadius: radii.button,
     borderWidth: 1.5,
-    flexDirection: "row",
-    gap: spacing.sm,
+    flex: 1,
     justifyContent: "center",
     minHeight: 48,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.sm,
   },
   sourceLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
+    textAlign: "center",
   },
-  title: { color: colors.text, fontFamily: fontFamilies.bodyMedium, fontSize: 15 },
+  sources: { flexDirection: "row", gap: spacing.smLg },
+  title: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
+  },
 });

@@ -48,7 +48,12 @@ export function FreezeRow({
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
   detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
+  name: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 16,
+    fontWeight: "600",
+  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",

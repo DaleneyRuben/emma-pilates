@@ -10,6 +10,8 @@ import {
   BodyText,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
   formatStartTime,
   LoadingState,
   PrimaryButton,
@@ -18,9 +20,9 @@ import {
   Screen,
   ScreenTopBar,
   SectionTitle,
+  spacing,
   StateScreen,
   surfaces,
-  spacing,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -143,18 +145,20 @@ export function RescheduleScreen({
   const options = alternatives.data ?? [];
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <ScrollView contentContainerStyle={styles.content}>
         <View>
           <SectionTitle>Tu reserva actual</SectionTitle>
           <View style={styles.current}>
-            <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
-            <View style={styles.currentBody}>
-              <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
-              <Text style={styles.currentDetails}>
-                {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
-              </Text>
+            <View style={styles.currentRow}>
+              <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
+              <View style={styles.currentBody}>
+                <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
+                <Text style={styles.currentDetails}>
+                  {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
+                </Text>
+              </View>
             </View>
             {options.length === 0 ? null : (
               <View style={styles.replaced}>
@@ -193,14 +197,17 @@ export function RescheduleScreen({
             </RescheduleOptions>
           </View>
         )}
+        {failure !== null ? (
+          <View style={styles.failureBox}>
+            <BodyText accessibilityRole="alert" style={styles.failure}>
+              {failure}
+            </BodyText>
+          </View>
+        ) : null}
       </ScrollView>
-      {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      ) : null}
       {!loading && !failed && options.length > 0 ? (
-        <View style={styles.footer}>
+        // C06: the line and the button sit on the white footer.
+        <FooterPanel testID="reschedule-footer">
           <BodyText style={styles.note}>
             {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
           </BodyText>
@@ -213,47 +220,67 @@ export function RescheduleScreen({
             onPress={() => void confirm()}
             testID="reschedule-confirm"
           />
-        </View>
+        </FooterPanel>
       ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
+  content: { gap: spacing.md, paddingBottom: spacing.lg },
   current: {
     ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   currentBody: { flex: 1, gap: spacing.xxs },
   currentDetails: {
-    color: colors.textMuted,
+    color: colors.text,
     fontSize: typography.note,
     fontFamily: fontFamilies.body,
   },
-  currentTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  failure: { color: colors.errorText },
-  footer: { gap: spacing.sm, paddingBottom: spacing.sm },
+  currentRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  currentTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    lineHeight: 25,
+  },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  failureBox: {
+    ...surfaces.soft,
+    borderColor: colors.borderStrong,
+    borderWidth: 1.5,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontSize: typography.note,
     textAlign: "center",
     fontFamily: fontFamilies.body,
   },
   replaced: {
-    backgroundColor: colors.hairline,
+    alignSelf: "flex-start",
+    backgroundColor: colors.primaryTint,
+    borderColor: colors.borderSoft,
     borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
   },
   replacedText: {
     color: colors.text,
     fontSize: typography.label,
-    fontWeight: "600",
-    fontFamily: fontFamilies.bodyStrong,
+    fontWeight: "700",
+    fontFamily: fontFamilies.bodyBold,
   },
-  screen: { gap: spacing.md },
+  screen: { gap: spacing.md, paddingBottom: 0 },
 });

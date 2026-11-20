@@ -37,7 +37,7 @@ export function ReceiptRow({
         testID={testID}
       >
         <View style={styles.icon}>
-          <Glyph color={colors.text} name="upload" size={20} strokeWidth={1.5} />
+          <Glyph color={colors.text} name="upload" size={18} strokeWidth={1.7} />
         </View>
         <View style={styles.body}>
           <Text style={styles.label}>
@@ -45,7 +45,7 @@ export function ReceiptRow({
           </Text>
           <Text style={styles.note}>JPG o PNG · hasta 5 MB</Text>
         </View>
-        <Chevron size={16} strokeWidth={1.5} tone="muted" />
+        <Chevron size={18} strokeWidth={1.7} tone="muted" />
       </Pressable>
     );
   }
@@ -83,9 +83,21 @@ export function ReceiptRow({
 const styles = StyleSheet.create({
   attached: { alignItems: "center", flex: 1, flexDirection: "row", gap: spacing.md },
   body: { flex: 1, gap: spacing.xxs },
-  // FIX-089: the glyph alone, no tinted disc.
-  icon: { alignItems: "center", justifyContent: "center", width: 24 },
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  // Rosa Emma C10: the glyph on a 36 pt 50 disc.
+  icon: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  label: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   remove: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   row: {
@@ -93,8 +105,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 64,
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.md,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
   thumbnail: { borderRadius: radii.control, height: 44, width: 36 },

@@ -28,13 +28,13 @@ describe("Nueva clienta form", () => {
     clearMobileQueryCache();
   });
 
-  it("draws Crema fields with an Arcilla outline and the example under the email", async () => {
+  it("draws white fields with a 400 outline and the example under the email", async () => {
     const screen = await openNewClient();
 
     expect(screen.getByLabelText("Nombre")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderWidth: 1.5,
     });
     expect(screen.queryByPlaceholderText("correo@ejemplo.com")).toBeNull();
     expect(screen.getByText("Ej.: lucia@gmail.com")).toHaveStyle({ fontSize: 13 });
@@ -50,7 +50,7 @@ describe("Nueva clienta form", () => {
     expect(
       screen.getByText("Nombre · Correo electrónico · Celular · ¿Cómo nos conoció?"),
     ).toBeOnTheScreen();
-    expect(screen.getByTestId("form-error-summary")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(screen.getByTestId("form-error-summary")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     for (const label of ["Nombre", "Correo electrónico"]) {
       expect(screen.getByLabelText(label)).toHaveStyle({
         borderColor: "#93615D",

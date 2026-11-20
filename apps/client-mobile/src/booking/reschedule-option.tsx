@@ -8,6 +8,7 @@ import {
   radii,
   spacing,
   surfaces,
+  TypeBar,
   typography,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
@@ -16,7 +17,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { seatsTag } from "./session-row";
 
-/** C06's «Otras clases de hoy»: one Crema card, Rubor hairlines inset 88 (ClaseE). */
+/** C06's «Otras clases de hoy»: one white card, its rows divided by 100 hairlines. */
 export function RescheduleOptions({ children }: { children: ReactNode }) {
   return (
     <View style={styles.group} testID="reschedule-options">
@@ -31,9 +32,9 @@ export function RescheduleOptions({ children }: { children: ReactNode }) {
 }
 
 /**
- * One alternative as a class row (ClaseE, FIX-089): the start in its Rubor
- * box, the class over «Trainer · N de M lugares», and a radio filled in Rosa
- * profundo once chosen.
+ * One alternative as a class row (Rosa Emma C06): the class type's bar, the
+ * start in Lora 22, the class over «Trainer · N de M lugares», and a radio
+ * filled in 600 once chosen.
  */
 export function RescheduleOption({
   onPress,
@@ -53,11 +54,10 @@ export function RescheduleOption({
       style={styles.row}
       testID={`reschedule-option-${session.id}`}
     >
-      <View style={styles.timeBox} testID="reschedule-time">
-        <Text numberOfLines={1} style={styles.time}>
-          {formatStartTime(session.startsAt)}
-        </Text>
-      </View>
+      <TypeBar name={session.classTypeName} />
+      <Text numberOfLines={1} style={styles.time} testID="reschedule-time">
+        {formatStartTime(session.startsAt)}
+      </Text>
       <View style={styles.body}>
         <Text style={styles.title}>{session.classTypeName}</Text>
         <Text style={styles.details}>{`${session.trainerName} · ${seatsTag(session)}`}</Text>
@@ -72,10 +72,10 @@ export function RescheduleOption({
 }
 
 const styles = StyleSheet.create({
-  body: { flex: 1, gap: spacing.xxs },
+  body: { flex: 1, gap: spacing.xxs, minWidth: 0 },
   details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   group: { ...surfaces.card, overflow: "hidden" },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 88 },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
   radio: {
     alignItems: "center",
     borderColor: colors.border,
@@ -91,29 +91,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 64,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
   },
+  // Lora 22 beside the type bar, wider when Android's digits need it.
   time: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
+    flexShrink: 0,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
     fontVariant: ["tabular-nums"],
-    fontWeight: "700",
-  },
-  // ClaseE's time box: 62 × 36, wider when Android's digits need it.
-  timeBox: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: 10,
-    height: 36,
-    justifyContent: "center",
     minWidth: 62,
-    paddingHorizontal: spacing.sm,
   },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
 });

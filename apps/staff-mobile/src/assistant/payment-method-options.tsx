@@ -1,12 +1,7 @@
-import {
-  colors,
-  fontFamilies,
-  radii,
-  SectionTitle,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { CardLabel } from "../ui/card-pieces";
 
 export type PaymentMethod = "cash" | "qr";
 
@@ -17,8 +12,9 @@ const options: { key: PaymentMethod; label: string; next: string }[] = [
 
 /**
  * Staff pick E3 C: «Cómo paga» as two large options, each saying what happens
- * next. Crema with an Arcilla border; the chosen one Rosa profundo with Crema
- * text. The way closed by a pending payment is off (FIX-028).
+ * next, on a white card under its label (E-P02). White with a 400 outline;
+ * the chosen one 600 with white text. The way closed by a pending payment is
+ * off (FIX-028).
  */
 export function PaymentMethodOptions({
   lockedTo,
@@ -30,8 +26,8 @@ export function PaymentMethodOptions({
   selected: PaymentMethod;
 }) {
   return (
-    <View>
-      <SectionTitle>Cómo paga</SectionTitle>
+    <View style={styles.card}>
+      <CardLabel>Cómo paga</CardLabel>
       <View accessibilityLabel="Cómo paga" accessibilityRole="radiogroup" style={styles.row}>
         {options.map((option) => {
           const disabled = lockedTo !== null && lockedTo !== option.key;
@@ -60,22 +56,23 @@ export function PaymentMethodOptions({
 }
 
 const styles = StyleSheet.create({
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   chosen: { backgroundColor: colors.primary, borderColor: colors.primary },
   chosenText: { color: colors.onPrimary },
   label: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.bodyLarge,
     fontWeight: "700",
   },
-  next: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  next: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   option: {
     backgroundColor: colors.card,
-    borderColor: colors.border,
+    borderColor: colors.borderStrong,
     borderRadius: radii.button,
-    borderWidth: 1,
+    borderWidth: 1.5,
     flex: 1,
-    gap: spacing.xs,
+    gap: spacing.xxs,
     justifyContent: "center",
     minHeight: 64,
     paddingHorizontal: spacing.lg,

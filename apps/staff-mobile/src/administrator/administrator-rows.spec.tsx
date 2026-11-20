@@ -88,7 +88,7 @@ describe("Administrator rows", () => {
 
     // FIX-089 (ListaC): bold Crema initials on a Palo de rosa circle.
     expect(screen.getByText("CM")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "WorkSans_600SemiBold",
     });
     expect(screen.getByText("Carla Mendoza")).toHaveStyle({ color: "#93615D", fontSize: 16 });
@@ -96,7 +96,9 @@ describe("Administrator rows", () => {
       color: "#93615D",
       fontSize: 13,
     });
-    expect(screen.getByText("Bs 560")).toHaveStyle({
+    // Rosa Emma (E-D01): the total leads as the hero, so the row's own amount is read in its row.
+    const row = within(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }));
+    expect(row.getByText("Bs 560")).toHaveStyle({
       fontFamily: "Lora_400Regular",
       fontSize: 18,
       fontVariant: ["tabular-nums"],
@@ -119,12 +121,12 @@ describe("Administrator rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
-    expect(cards[0].getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(cards[0].getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#FFFBFB" });
     expect(cards[0].getByText("6 de 12")).toBeOnTheScreen();
     expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen();
-    expect(cards[1].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 15 });
+    expect(cards[1].getByText("Reformer Pilates")).toHaveStyle({ fontSize: 16 });
     expect(cards[1].getByText("Emma Vargas")).toHaveStyle({ color: "#93615D", fontSize: 13 });
-    expect(cards[1].getByText("0 de 12")).toHaveStyle({ fontWeight: "600" });
+    expect(cards[1].getByText("0 de 12")).toHaveStyle({ fontWeight: "700" });
     expect(screen.queryByTestId("exception-pill")).toBeNull();
     expect(screen.getByTestId("class-list")).toBeOnTheScreen();
   });

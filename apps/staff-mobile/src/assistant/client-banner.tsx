@@ -1,4 +1,4 @@
-import { ClientFace, colors, fontFamilies, radii, spacing } from "@pilates/mobile-core";
+import { ClientFace, colors, fontFamilies, spacing, surfaces } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -37,16 +37,13 @@ export function ClientBanner({
 
 const styles = StyleSheet.create({
   banner: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.button,
     flexDirection: "row",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.smLg,
   },
-  name: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  text: { color: colors.textMuted, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  name: { color: colors.text, fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
+  text: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
 });

@@ -13,14 +13,19 @@ import {
   boliviaCivilDate,
   colors,
   fontFamilies,
+  footerEdges,
+  FooterPanel,
+  Glyph,
   LoadingState,
   NextPlanStartChooser,
   PrimaryButton,
   QueryFailure,
+  radii,
   Screen,
   ScreenTopBar,
   spacing,
   StartDateChooser,
+  surfaces,
   typography,
   useStudioRules,
 } from "@pilates/mobile-core";
@@ -160,7 +165,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   };
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={detail.name} />
       <ScrollView contentContainerStyle={styles.content}>
         <PlanHero plan={detail} />
@@ -189,20 +194,15 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
           />
         )}
         {firstStart === null || renewalStartsOn !== undefined ? null : beforeGuestClass ? (
-          <BodyText accessibilityRole="alert" style={styles.error}>
-            {bookedClassRule}
-          </BodyText>
+          <Aside alert text={bookedClassRule} />
         ) : (
-          <BodyText style={styles.help}>{bookedClassRule}</BodyText>
+          <Aside text={bookedClassRule} />
         )}
         <PlanBreakdown plan={detail} />
-        {error === null ? null : (
-          <BodyText accessibilityRole="alert" style={styles.error}>
-            {error}
-          </BodyText>
-        )}
+        {error === null ? null : <Aside alert text={error} />}
       </ScrollView>
-      <View style={styles.footer}>
+      {/* Rosa Emma C09: the button and its line on a white panel cast upward. */}
+      <FooterPanel testID="plan-detail-footer">
         <BodyText style={styles.note}>Pagas por QR y subes tu comprobante</BodyText>
         <PrimaryButton
           busy={busy}
@@ -210,21 +210,55 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
           onPress={() => void continueToPayment()}
           testID="plan-continue-to-payment"
         />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
 
+/**
+ * A line under the start dates or the breakdown (Rosa Emma C09g): an alert
+ * on 50 with its outline and glyph, a quiet rule in a white card.
+ */
+function Aside({ alert = false, text }: { alert?: boolean; text: string }) {
+  return (
+    <View style={[styles.aside, alert && styles.asideAlert]}>
+      {alert ? <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} /> : null}
+      <BodyText accessibilityRole={alert ? "alert" : undefined} style={styles.asideText}>
+        {text}
+      </BodyText>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.lg },
-  error: { color: colors.errorText },
-  help: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
-  footer: { gap: spacing.sm, paddingBottom: spacing.sm, paddingTop: spacing.sm },
+  aside: {
+    ...surfaces.card,
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  asideAlert: {
+    backgroundColor: colors.errorSurface,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+    boxShadow: "none",
+  },
+  asideText: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  content: { gap: spacing.md, paddingBottom: spacing.lg },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
+    fontFamily: fontFamilies.body,
     fontSize: typography.note,
     textAlign: "center",
-    fontFamily: fontFamilies.body,
   },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.lg, paddingBottom: 0 },
 });

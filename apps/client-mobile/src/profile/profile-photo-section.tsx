@@ -9,6 +9,7 @@ import {
   colors,
   fontFamilies,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -88,9 +89,19 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
         </BodyText>
       ) : (
         <View style={styles.actions}>
-          <TextButton disabled={busy} label="Cambiar foto" onPress={() => void change()} />
+          <TextButton
+            disabled={busy}
+            label="Cambiar foto"
+            onPress={() => void change()}
+            style={styles.link}
+          />
           {client.photo === null || state.status === "removing" ? null : (
-            <TextButton disabled={busy} label="Quitar foto" onPress={() => void remove()} />
+            <TextButton
+              disabled={busy}
+              label="Quitar foto"
+              onPress={() => void remove()}
+              style={styles.link}
+            />
           )}
         </View>
       )}
@@ -104,7 +115,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
 }
 
 const styles = StyleSheet.create({
-  actions: { flexDirection: "row", gap: spacing.md },
+  actions: { flexDirection: "row", gap: spacing.xlSm },
   error: { color: colors.errorText, textAlign: "center" },
   note: {
     color: colors.textMuted,
@@ -112,5 +123,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: fontFamilies.body,
   },
-  section: { alignItems: "center", gap: spacing.sm },
+  link: { paddingHorizontal: 0 },
+  // C22: the photo and its links on their own white card.
+  section: { ...surfaces.card, alignItems: "center", gap: spacing.smLg, padding: spacing.lgXl },
 });

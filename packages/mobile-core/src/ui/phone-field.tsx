@@ -5,7 +5,7 @@ import type { PhoneCountry } from "../account/phone-number";
 import { Chevron } from "./chevron";
 import { CountryPicker } from "./country-picker";
 import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { colors, radii, spacing, typography } from "./tokens";
 
 export type PhoneValue = { country: PhoneCountry; digits: string };
 
@@ -90,11 +90,11 @@ export function PhoneField({
 const styles = StyleSheet.create({
   box: {
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: 10,
-    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
     flexDirection: "row",
-    minHeight: 48,
+    minHeight: 52,
     overflow: "hidden",
   },
   boxError: { borderColor: colors.error, borderWidth: 2 },

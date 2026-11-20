@@ -50,7 +50,7 @@ async function openAsCoordinator(extra: Parameters<typeof routeFetcher>[0] = {})
   return screen;
 }
 
-// Staff pick E4 A: the plan in a Palo de rosa block, the Freeze on its own
+// Staff pick E4 A (E-C08, E-C09): the plan as the 600 hero, the Freeze on its own
 // row, and the actions on top according to the role.
 describe("Ficha de la clienta, pick E4 A", () => {
   afterEach(async () => {
@@ -59,11 +59,11 @@ describe("Ficha de la clienta, pick E4 A", () => {
     jest.mocked(Linking.openURL).mockClear();
   });
 
-  it("puts the plan in a Palo de rosa block", async () => {
+  it("puts the plan in the 600 hero", async () => {
     const screen = await openLucia(assistantRoutes());
 
     const block = screen.getByTestId("client-plan-card");
-    expect(block).toHaveStyle({ backgroundColor: brand.paloDeRosa });
+    expect(block).toHaveStyle({ backgroundColor: brand.rosaProfundo });
     const inside = within(block);
     expect(inside.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(inside.getByText("Activa")).toBeOnTheScreen();
@@ -86,7 +86,7 @@ describe("Ficha de la clienta, pick E4 A", () => {
     expect(screen.queryByText("Último contacto")).toBeNull();
   });
 
-  it("shows the Freeze on its own row, Crema with an Arcilla border", async () => {
+  it("shows the Freeze on its own white card", async () => {
     const startsOn = civilIn(2);
     const endsOn = civilIn(4);
     const screen = await openLucia({
@@ -102,7 +102,7 @@ describe("Ficha de la clienta, pick E4 A", () => {
     });
 
     const row = screen.getByTestId("client-freeze-row");
-    expect(row).toHaveStyle({ backgroundColor: brand.crema, borderColor: brand.arcilla });
+    expect(row).toHaveStyle({ backgroundColor: brand.white, borderRadius: 20 });
     expect(
       within(row).getByText(
         `Congelado del ${formatListDate(startsOn)} al ${formatListDate(endsOn)}`,

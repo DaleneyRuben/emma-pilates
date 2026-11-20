@@ -88,7 +88,7 @@ describe("Client Home Promotions carousel", () => {
     // FIX-082 (Inicio option A): the promotion leads Inicio without a section
     // label, its headline in the 20 pt card title.
     expect(screen.queryByText("Novedades del estudio")).toBeNull();
-    expect(screen.getByText("Nueva sala de Reformer en Urubó")).toHaveStyle({ fontSize: 20 });
+    expect(screen.getByText("Nueva sala de Reformer en Urubó")).toHaveStyle({ fontSize: 22 });
     expect(
       screen.getByText("Desde el lunes 5 abrimos la segunda sala con seis camas nuevas."),
     ).toBeOnTheScreen();
@@ -128,7 +128,7 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByLabelText("Cargando promociones")).not.toBeOnTheScreen();
     });
     expect(screen.queryByTestId("promotions-carousel")).not.toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
   });
 
   it("hides the section when the list fails and keeps the rest of Home", async () => {
@@ -144,7 +144,7 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByLabelText("Cargando promociones")).not.toBeOnTheScreen();
     });
     expect(screen.queryByTestId("promotions-carousel")).not.toBeOnTheScreen();
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeOnTheScreen();
   });
 
@@ -201,6 +201,6 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.queryByTestId("promotions-carousel")).not.toBeOnTheScreen();
     });
     expect(reads).toBe(2);
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
   });
 });

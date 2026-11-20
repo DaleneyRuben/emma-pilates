@@ -1,15 +1,14 @@
 import { useGetUnreadNotificationCount, type ClientProfileDto } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   formatSessionDate,
   Glyph,
   radii,
+  ScreenHeader,
   spacing,
-  typography,
   UnreadCountPill,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { ClientAvatar } from "../profile/client-avatar";
@@ -26,8 +25,9 @@ export function bellLabel(unread: number): string {
 }
 
 /**
- * 02's top (follow-up 225 §10): today's date and the greeting, then the bell
- * with the unread pill and the avatar. The unread count lives here, not on the
+ * 02's top (Rosa Emma C02): the band with today's date on a white capsule,
+ * the bell on a white disc with the unread pill and the avatar, then the
+ * greeting. The unread count lives here, not on the
  * Perfil tab (walkthrough n.º 11).
  */
 export function HomeHeader({
@@ -45,40 +45,43 @@ export function HomeHeader({
   const photoUri = useClientPhoto(profile.photo?.imageAssetId ?? null);
 
   return (
-    <View style={styles.row}>
-      <View style={styles.greeting}>
-        <Text style={styles.date}>{todayLabel(new Date())}</Text>
-        <Text accessibilityLabel="Inicio" accessibilityRole="header" style={styles.title}>
-          {`Hola, ${firstName(profile.name)}`}
-        </Text>
-      </View>
-      <Pressable
-        accessibilityLabel={bellLabel(count)}
-        accessibilityRole="button"
-        onPress={onNotifications}
-        style={({ pressed }) => [styles.bell, pressed && styles.pressed]}
-        testID="home-bell"
-      >
-        <Glyph color={colors.text} name="bell" size={20} strokeWidth={1.6} />
-        <View pointerEvents="none" style={styles.badge}>
-          <UnreadCountPill count={count} testID="home-bell-badge" />
+    <ScreenHeader
+      action={
+        <View style={styles.actions}>
+          <Pressable
+            accessibilityLabel={bellLabel(count)}
+            accessibilityRole="button"
+            onPress={onNotifications}
+            style={({ pressed }) => [styles.bell, pressed && styles.pressed]}
+            testID="home-bell"
+          >
+            <Glyph color={colors.text} name="bell" size={22} strokeWidth={1.7} />
+            <View pointerEvents="none" style={styles.badge}>
+              <UnreadCountPill count={count} ring testID="home-bell-badge" />
+            </View>
+          </Pressable>
+          <Pressable
+            accessibilityLabel="Tu perfil"
+            accessibilityRole="button"
+            onPress={onProfile}
+            style={({ pressed }) => pressed && styles.pressed}
+            testID="home-avatar"
+          >
+            <ClientAvatar name={profile.name} photoUri={photoUri} size={44} />
+          </Pressable>
         </View>
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Tu perfil"
-        accessibilityRole="button"
-        onPress={onProfile}
-        style={({ pressed }) => pressed && styles.pressed}
-        testID="home-avatar"
-      >
-        <ClientAvatar name={profile.name} photoUri={photoUri} size={44} />
-      </Pressable>
-    </View>
+      }
+      eyebrow={todayLabel(new Date())}
+      testID="home-header"
+      title={`Hola, ${firstName(profile.name)}`}
+      titleLabel="Inicio"
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  badge: { position: "absolute", right: spacing.xs, top: spacing.xs },
+  actions: { alignItems: "center", flexDirection: "row", gap: spacing.smLg },
+  badge: { position: "absolute", right: -spacing.xs, top: -spacing.xs },
   bell: {
     alignItems: "center",
     backgroundColor: colors.card,
@@ -87,22 +90,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 44,
   },
-  date: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
-  greeting: { flex: 1, gap: spacing.xs },
   pressed: { opacity: 0.7 },
-  row: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  // EncabezadoA (FIX-089): the root title in the shared 30 pt Lora 500.
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.title,
-    fontWeight: "500",
-  },
 });

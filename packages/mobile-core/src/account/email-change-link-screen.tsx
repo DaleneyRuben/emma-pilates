@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
 
 import type { EmailChangeCompletionResultDto } from "@pilates/api-contracts";
 
@@ -7,7 +6,6 @@ import { AuthenticationScreen, authStyles } from "../auth/auth-layout";
 import { BodyText } from "../ui/body-text";
 import type { OutcomeBadgeProps } from "../ui/outcome-badge";
 import { PrimaryButton } from "../ui/primary-button";
-import { spacing } from "../ui/tokens";
 
 type Outcome = EmailChangeCompletionResultDto["status"];
 
@@ -93,18 +91,20 @@ export function EmailChangeLinkScreen({
 
   const shown = outcome === null ? confirming : (audience === "staff" ? staffCopy : copy)[outcome];
 
+  const staff = audience === "staff";
+  // C26 and E-A10: the outcome on the band (client) or in the card (staff).
   return (
-    <AuthenticationScreen badge={shown.badge} title={shown.title}>
-      <BodyText style={authStyles.centered}>{shown.body}</BodyText>
-      {outcome === null ? null : (
-        <View style={styles.footer}>
+    <AuthenticationScreen
+      actions={
+        outcome === null ? undefined : (
           <PrimaryButton label="Continuar" onPress={() => onDone(outcome === "changed")} />
-        </View>
-      )}
+        )
+      }
+      badge={shown.badge}
+      staff={staff}
+      title={shown.title}
+    >
+      <BodyText style={staff ? authStyles.centered : undefined}>{shown.body}</BodyText>
     </AuthenticationScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  footer: { paddingTop: spacing.lg },
-});

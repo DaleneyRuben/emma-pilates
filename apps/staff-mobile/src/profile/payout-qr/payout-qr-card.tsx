@@ -76,12 +76,26 @@ export function PayoutQrCard({ qr }: { qr: PayoutQrDto }) {
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, alignItems: "center", gap: spacing.md, padding: 22 },
-  error: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  card: {
+    ...surfaces.card,
+    alignItems: "center",
+    gap: spacing.md,
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingTop: 22,
+  },
+  error: { color: colors.error },
   ok: { color: colors.successText },
-  qrBox: { backgroundColor: colors.white, borderRadius: radii.inset, padding: spacing.md },
+  // E-M09: the QR on white with a 1 pt 200 ring, so it scans.
+  qrBox: {
+    backgroundColor: colors.white,
+    borderColor: colors.borderSoft,
+    borderRadius: radii.inset,
+    borderWidth: 1,
+    padding: spacing.md,
+  },
   placeholder: { alignItems: "center", justifyContent: "center" },
   state: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  stateText: { fontFamily: fontFamilies.body, fontSize: 15 },
+  stateText: { fontFamily: fontFamilies.bodyBold, fontSize: 15, fontWeight: "700" },
   warning: { color: colors.warningText },
 });

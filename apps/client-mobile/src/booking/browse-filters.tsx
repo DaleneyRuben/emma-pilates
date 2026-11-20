@@ -1,13 +1,15 @@
 import {
+  BodyText,
   BranchPickerPill,
   Chip,
-  chipStyles,
   colors,
   dayChipLabel,
   fontFamilies,
   Glyph,
+  PickerCheck,
   radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
@@ -46,8 +48,8 @@ export function BranchLine({
 }
 
 /**
- * 03's day strip: 60-high day chips, today as «Hoy», the chosen day in Rosa
- * profundo with Crema labels (palette B chips, FIX-089). The seven days share
+ * C03's day strip inside the band: 64-high white tiles, today as «Hoy», the
+ * chosen day in 600 with white labels (Rosa Emma). The seven days share
  * the width: 48-wide chips clipped the last one on a 411-wide Android phone
  * (MOB-074).
  */
@@ -80,10 +82,10 @@ export function DayStrip({
             accessibilityState={{ selected: isSelected }}
             key={date}
             onPress={() => onSelect(date)}
-            style={[styles.dayChip, chipStyles.box, isSelected && chipStyles.boxSelected]}
+            style={[styles.dayChip, isSelected && styles.dayChipSelected]}
             testID={`browse-day-${date}`}
           >
-            <Text style={[styles.dayWeekday, isSelected && chipStyles.labelSelected]}>
+            <Text style={[styles.dayWeekday, isSelected && styles.onSelected]}>
               {date === today ? "Hoy" : label.weekday}
             </Text>
             <Text style={[styles.dayNumber, isSelected && styles.onSelected]}>{label.day}</Text>
@@ -125,7 +127,7 @@ export function DayStripOther({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.dayChip, chipStyles.box, selected && chipStyles.boxSelected]}
+      style={[styles.dayChip, selected && styles.dayChipSelected]}
       testID="browse-day-other"
     >
       <Text style={selected ? [styles.dayNumber, styles.onSelected] : styles.otherLabel}>
@@ -135,7 +137,47 @@ export function DayStripOther({
   );
 }
 
-/** 03's Class Type filter: a row of palette B chips (FIX-089). */
+/**
+ * C03e: the Branches on a white card under the band, the chosen one in bold
+ * with its check.
+ */
+export function BranchSheet({
+  branches,
+  onSelect,
+  selectedId,
+}: {
+  branches: readonly { address: string; id: string; name: string }[];
+  onSelect: (id: string) => void;
+  selectedId: string | undefined;
+}) {
+  return (
+    <View style={styles.branchSheet}>
+      <BodyText style={styles.sheetTitle}>Elige una sucursal</BodyText>
+      {branches.map((branch, index) => (
+        <Pressable
+          accessibilityLabel={branch.name}
+          accessibilityRole="button"
+          accessibilityState={{ selected: branch.id === selectedId }}
+          key={branch.id}
+          onPress={() => onSelect(branch.id)}
+          style={[styles.branchRow, index > 0 && styles.branchRule]}
+        >
+          <View style={styles.branchText}>
+            <Text
+              style={[styles.branchRowName, branch.id === selectedId && styles.branchNameSelected]}
+            >
+              {branch.name}
+            </Text>
+            <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
+          </View>
+          <PickerCheck selected={branch.id === selectedId} testID={`picker-check-${branch.id}`} />
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+/** C03's Class Type filter: a row of Rosa Emma chips under the band. */
 export function ClassTypeStrip({
   onSelect,
   options,
@@ -166,31 +208,71 @@ export function ClassTypeStrip({
 }
 
 const styles = StyleSheet.create({
-  branch: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  branchLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  branchName: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  // The fixed Branch rides on the band's white capsule, like the picker pill.
+  branch: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    flexDirection: "row",
+    gap: spacing.sm,
+    minHeight: 40,
+    paddingHorizontal: spacing.mdLg,
+  },
+  branchAddress: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  branchLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
+  branchName: { color: colors.text, fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
+  // Rosa Emma marks the chosen Branch by weight, not another colour (FIX-089).
+  branchNameSelected: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  branchRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+    paddingVertical: spacing.mdLg,
+  },
+  branchRowName: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.bodyMedium,
+    fontWeight: "500",
+  },
+  branchRule: { borderTopColor: colors.hairline, borderTopWidth: 1 },
+  branchSheet: { ...surfaces.card, gap: spacing.xxs, padding: spacing.lg },
+  branchText: { flex: 1, gap: spacing.xxs },
   dayChip: {
     alignItems: "center",
-    borderRadius: radii.button,
-    gap: spacing.xxs,
+    backgroundColor: colors.card,
+    borderRadius: radii.inset,
+    gap: 3,
     flex: 1,
     height: 64,
     justifyContent: "center",
     minWidth: 0,
   },
+  dayChipSelected: { backgroundColor: colors.primary },
   dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  dayRow: { flexDirection: "row", gap: spacing.sm },
+  dayRow: { flexDirection: "row", gap: 5 },
   dayWeekday: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
+    fontWeight: "700",
   },
   onSelected: { color: colors.onPrimary },
   otherLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "600",
+    fontWeight: "700",
+  },
+  sheetTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.14,
+    textTransform: "uppercase",
   },
   // Horizontal strips keep their natural height: spare tablet height would
   // stretch them and an open Branch list would squash them.

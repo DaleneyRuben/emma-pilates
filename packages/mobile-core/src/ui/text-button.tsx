@@ -12,6 +12,8 @@ type TextButtonProps = {
   /** «onTint» for a link on Palo de rosa tinte, such as a pending card's;
    * «error» for a destructive card action (follow-up 226). */
   tone?: "default" | "error" | "onTint";
+  /** Bold and underlined, as the boards draw a link in a footer or on 600. */
+  underline?: boolean;
 };
 
 export function TextButton({
@@ -21,6 +23,7 @@ export function TextButton({
   style,
   testID,
   tone = "default",
+  underline = false,
 }: TextButtonProps) {
   return (
     <Pressable
@@ -33,7 +36,14 @@ export function TextButton({
       style={[styles.button, style]}
       testID={testID}
     >
-      <Text style={[styles.label, tone === "error" && styles.error, disabled && styles.disabled]}>
+      <Text
+        style={[
+          styles.label,
+          underline && styles.underline,
+          tone === "error" && styles.error,
+          disabled && styles.disabled,
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -57,8 +67,9 @@ const styles = StyleSheet.create({
   // so «onTint» draws the same; no underline.
   label: {
     color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "600",
+    fontWeight: "700",
   },
+  underline: { textDecorationLine: "underline" },
 });

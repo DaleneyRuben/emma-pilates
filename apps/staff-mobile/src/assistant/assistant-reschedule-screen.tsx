@@ -4,10 +4,11 @@ import {
   type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   civilDateRange,
+  ClassRow,
   colors,
+  ExceptionPill,
   formatTimeRange,
   hasStarted,
   LoadingState,
@@ -15,21 +16,22 @@ import {
   QueryFailure,
   radii,
   Screen,
-  SeatPill,
-  SessionCard,
   spacing,
   StaffFace,
+  surfaces,
   typography,
   fontFamilies,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { BackBar } from "../ui/back-bar";
+import { startTime } from "../ui/session-time";
 import { ClientBanner } from "./client-banner";
 import { useShowClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
@@ -111,97 +113,158 @@ export function AssistantRescheduleScreen({
   };
 
   const options = alternatives.data ?? [];
+  const offered = !alternatives.isPending && !alternatives.isError && options.length > 0;
 
+  // E-R12: the band and the white footer stay put; the choice scrolls between.
   return (
-    <Screen style={styles.screen}>
+    <Screen
+      edges={offered ? taskEdges : undefined}
+      style={[styles.screen, offered && bodyScroll.taskScreen]}
+    >
       <BackBar onBack={() => navigation.goBack()} title="Reprogramar clase" />
-      <ClientBanner action="Viendo reservas de" clientName={clientName} clientPhoto={clientPhoto} />
-      <View style={styles.current}>
-        <BodyText style={styles.currentLabel}>Reserva actual</BodyText>
-        <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
-        <BodyText>
-          {`${booking.trainerName} · ${formatTimeRange(booking.startsAt, booking.endsAt)}`}
-        </BodyText>
-      </View>
-      <BodyText>Puedes cambiarla por otra clase disponible el mismo día.</BodyText>
-      {alternatives.isPending ? (
-        <LoadingState label="Cargando alternativas" />
-      ) : alternatives.isError ? (
-        <QueryFailure
-          label="No pudimos cargar las clases del día."
-          onRetry={() => void alternatives.refetch()}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+        <ClientBanner
+          action="Viendo reservas de"
+          clientName={clientName}
+          clientPhoto={clientPhoto}
         />
-      ) : options.length === 0 ? (
-        <BodyText>No hay otras clases disponibles ese día.</BodyText>
-      ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          {options.map((session) => {
-            const selected = session.id === selectedId;
-            return (
-              <SessionCard
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-                footerEnd={
-                  <SeatPill>
-                    {session.availableSeats === 1
-                      ? "1 lugar libre"
-                      : `${session.availableSeats} lugares libres`}
-                  </SeatPill>
-                }
-                key={session.id}
-                onPress={() => setSelectedId(session.id)}
-                selected={selected}
-                time={formatTimeRange(session.startsAt, session.endsAt)}
-                title={session.classTypeName}
-                trainerFace={
-                  <StaffFace
-                    fetcher={fetcher}
-                    name={session.trainerName}
-                    photo={session.trainerPhoto}
-                    size={20}
-                  />
-                }
-                trainerName={session.trainerName}
-              />
-            );
-          })}
-        </ScrollView>
-      )}
-      {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      ) : null}
-      {!alternatives.isPending && !alternatives.isError && options.length > 0 ? (
-        <PrimaryButton
-          busy={submitting}
-          disabled={selectedId === null}
-          label="Confirmar cambio"
-          onPress={() => void confirm()}
-        />
+        <View style={styles.current}>
+          <CardLabel>Reserva actual</CardLabel>
+          <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
+          <Text style={styles.currentLine}>
+            {`${booking.trainerName} · ${formatTimeRange(booking.startsAt, booking.endsAt)}`}
+          </Text>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.lead}>Puedes cambiarla por otra clase disponible el mismo día.</Text>
+        </View>
+        {alternatives.isPending ? (
+          <LoadingState label="Cargando alternativas" />
+        ) : alternatives.isError ? (
+          <QueryFailure
+            label="No pudimos cargar las clases del día."
+            onRetry={() => void alternatives.refetch()}
+          />
+        ) : options.length === 0 ? (
+          <View style={styles.card}>
+            <Text style={styles.quiet}>No hay otras clases disponibles ese día.</Text>
+          </View>
+        ) : (
+          options.map((session) => (
+            <RescheduleOption
+              fetcher={fetcher}
+              key={session.id}
+              onPress={() => setSelectedId(session.id)}
+              selected={session.id === selectedId}
+              session={session}
+            />
+          ))
+        )}
+        {failure !== null && !offered ? (
+          <Text accessibilityRole="alert" style={styles.failure}>
+            {failure}
+          </Text>
+        ) : null}
+      </ScrollView>
+      {offered ? (
+        <FooterPanel>
+          {failure !== null ? (
+            <Text accessibilityRole="alert" style={styles.failure}>
+              {failure}
+            </Text>
+          ) : null}
+          <PrimaryButton
+            busy={submitting}
+            disabled={selectedId === null}
+            label="Confirmar cambio"
+            onPress={() => void confirm()}
+          />
+        </FooterPanel>
       ) : null}
     </Screen>
   );
 }
 
+/**
+ * One same-day class to move to (E-R12): the class row with its type bar and
+ * Lora time, the free seats as a pill, ringed in 600 once chosen.
+ */
+function RescheduleOption({
+  fetcher,
+  onPress,
+  selected,
+  session,
+}: {
+  fetcher: typeof globalThis.fetch;
+  onPress: () => void;
+  selected: boolean;
+  session: SessionAvailabilityDto;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={[styles.option, selected && styles.optionSelected]}
+    >
+      <ClassRow
+        detail={session.trainerName}
+        detailLead={
+          <StaffFace
+            fetcher={fetcher}
+            name={session.trainerName}
+            photo={session.trainerPhoto}
+            size={20}
+          />
+        }
+        end={
+          <ExceptionPill>
+            {session.availableSeats === 1
+              ? "1 lugar libre"
+              : `${session.availableSeats} lugares libres`}
+          </ExceptionPill>
+        }
+        standalone
+        time={startTime(session.startsAt, session.endsAt)}
+        title={session.classTypeName}
+      />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  card: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  // The booking she leaves: a soft 50 inset, not a card to tap.
   current: {
-    backgroundColor: colors.divider,
-    borderRadius: radii.inset,
-    gap: spacing.xxs,
-    opacity: 0.85,
-    padding: spacing.lg,
+    ...surfaces.soft,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
-  currentLabel: {
-    fontFamily: fontFamilies.body,
-    color: colors.textMuted,
-    fontSize: typography.label,
-  },
+  currentLine: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   currentTitle: {
-    fontFamily: fontFamilies.body,
-    color: colors.textSecondary,
-    fontSize: typography.bodyLarge,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
-  failure: { color: colors.errorText },
-  list: { gap: spacing.md, paddingBottom: spacing.lg },
-  screen: { gap: spacing.md },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.note,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  lead: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+    lineHeight: 21,
+  },
+  option: { borderColor: "transparent", borderRadius: radii.card + 2, borderWidth: 2 },
+  optionSelected: { borderColor: colors.primary },
+  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

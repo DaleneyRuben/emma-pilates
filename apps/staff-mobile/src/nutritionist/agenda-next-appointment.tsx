@@ -3,12 +3,14 @@ import {
   colors,
   fontFamilies,
   initials,
+  LineIcon,
   radii,
   spacing,
   surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Path } from "react-native-svg";
 
 import {
   appointmentWhatsAppHref,
@@ -21,7 +23,7 @@ import { clockTime } from "./nutritionist-format";
 
 /**
  * E5 B «Próxima cita grande» (owner 2026-11-19): the next appointment in the
- * screen's one Palo de rosa block, her initials in a Crema circle,
+ * screen's one 600 hero, her initials in a white circle,
  * «Escribirle por WhatsApp», and «Cancelar evaluación» inside while it can be.
  */
 export function NextAppointment({
@@ -64,6 +66,9 @@ export function NextAppointment({
           style={({ pressed }) => [styles.whatsApp, pressed && styles.pressed]}
           testID={`whatsapp-evaluation-${entry.evaluationId}`}
         >
+          <LineIcon color={colors.primary} size={20} strokeWidth={1.6}>
+            <Path d="M4.5 5.5h15v10h-9l-4.5 4v-4h-1.5z" />
+          </LineIcon>
           <Text style={styles.whatsAppLabel}>Escribirle por WhatsApp</Text>
         </Pressable>
       )}
@@ -89,9 +94,9 @@ const styles = StyleSheet.create({
   cancel: { alignItems: "center", justifyContent: "center", minHeight: 44 },
   cancelLabel: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "600",
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
   circle: {
@@ -106,10 +111,10 @@ const styles = StyleSheet.create({
   detail: { color: colors.onEmphasis, fontFamily: fontFamilies.body, fontSize: 14 },
   eyebrow: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    fontWeight: "700",
+    letterSpacing: typography.label * 0.14,
     textTransform: "uppercase",
   },
   initials: {
@@ -118,7 +123,12 @@ const styles = StyleSheet.create({
     fontSize: typography.label,
     fontWeight: "700",
   },
-  name: { color: colors.onEmphasis, fontFamily: fontFamilies.bodyStrong, fontSize: 16 },
+  name: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 16,
+    fontWeight: "700",
+  },
   pressed: { opacity: 0.85 },
   title: {
     color: colors.onEmphasis,
@@ -128,18 +138,22 @@ const styles = StyleSheet.create({
     lineHeight: 34,
   },
   who: { flex: 1, gap: spacing.xxs },
+  // Board N01: the white «light» button inside the hero, its glyph first.
   whatsApp: {
     alignItems: "center",
     backgroundColor: colors.onEmphasis,
     borderRadius: radii.button,
+    flexDirection: "row",
+    gap: spacing.sm,
     justifyContent: "center",
+    marginTop: spacing.xs,
     minHeight: 48,
     paddingHorizontal: spacing.lg,
   },
   whatsAppLabel: {
     color: colors.primary,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

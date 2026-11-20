@@ -46,10 +46,16 @@ describe("LoadingState", () => {
     expect(screen.getByTestId("loading-state-logo")).toBeOnTheScreen();
   });
 
-  it("draws the logo 240 pt wide on a phone and 300 pt on a tablet", async () => {
+  // E-A12 (Rosa Emma): the logo on a white disc, 120 pt on a phone, 150 on a tablet.
+  it("draws the logo on a white disc, larger on a tablet", async () => {
     const phone = await render(<LoadingState label="Cargando clases" />);
     await advance(400);
-    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
+    expect(phone.getByTestId("loading-state-disc")).toHaveStyle({
+      backgroundColor: "#FFFBFB",
+      borderRadius: 60,
+      width: 120,
+    });
+    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 100, height: 43 });
     await phone.unmount();
 
     const phoneWindow = Dimensions.get("window");
@@ -58,7 +64,8 @@ describe("LoadingState", () => {
     try {
       const tablet = await render(<LoadingState label="Cargando clases" />);
       await advance(400);
-      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 300, height: 129 });
+      expect(tablet.getByTestId("loading-state-disc")).toHaveStyle({ width: 150 });
+      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 126, height: 54 });
     } finally {
       Dimensions.set({ window: phoneWindow, screen: phoneWindow });
     }
@@ -81,7 +88,7 @@ describe("LoadingState", () => {
 
     await advance(400);
 
-    expect(screen.getByTestId("loading-state-logo")).toHaveStyle({
+    expect(screen.getByTestId("loading-state-disc")).toHaveStyle({
       opacity: 1,
       transform: [{ scale: 1 }],
     });

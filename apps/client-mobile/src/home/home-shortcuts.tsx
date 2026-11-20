@@ -11,9 +11,9 @@ import {
 import type { PropsWithChildren } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-// 02's «Accesos rápidos» on v2 (follow-up 225 §10): Lino tiles; without a
-// Plan, the booking row is locked at 60 %. FIX-082 (design audit 2026-11-18):
-// no tinted disc behind the icon, which takes the muted text colour.
+// 02's «Accesos rápidos» (Rosa Emma C02s, C02b): a Lora 24 section title,
+// white tiles with the icon on a 40 pt 50 disc and a bold 15 label; without a
+// Plan, the booking row is a locked soft inset with the icon on a white disc.
 export function ShortcutSection({ children }: PropsWithChildren) {
   return (
     <View>
@@ -31,8 +31,12 @@ export function ShortcutTiles({ children }: PropsWithChildren) {
   );
 }
 
-function TileIcon({ icon }: { icon: GlyphName }) {
-  return <Glyph color={colors.textMuted} name={icon} size={18} strokeWidth={1.5} />;
+function TileIcon({ icon, onWhite }: { icon: GlyphName; onWhite?: boolean }) {
+  return (
+    <View style={onWhite ? styles.disc : styles.discOnSoft} testID="shortcut-disc">
+      <Glyph color={colors.text} name={icon} size={onWhite ? 20 : 18} strokeWidth={1.7} />
+    </View>
+  );
 }
 
 /** The locked «Reservar una clase» row without a Plan: a note and the lock. */
@@ -45,20 +49,14 @@ export function LockedShortcutRow({ label, note }: { label: string; note: string
       accessibilityRole="button"
       accessibilityState={{ disabled: true }}
       disabled
-      style={[styles.row, styles.locked]}
+      style={styles.row}
     >
       <TileIcon icon="calendar" />
       <View style={styles.rowBody}>
         <Text style={styles.rowTitle}>{label}</Text>
         <Text style={styles.note}>{note}</Text>
       </View>
-      <Glyph
-        color={colors.textMuted}
-        name="lock"
-        size={18}
-        strokeWidth={1.5}
-        testID="shortcut-lock"
-      />
+      <Glyph color={colors.text} name="lock" size={20} strokeWidth={1.7} testID="shortcut-lock" />
     </Pressable>
   );
 }
@@ -87,47 +85,61 @@ export function ShortcutTile({
       accessibilityLabel={label}
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.tile, wide && styles.tileWide, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
     >
-      <TileIcon icon={icon} />
-      <Text style={wide ? styles.rowTitle : styles.tileTitle}>{label}</Text>
+      <TileIcon icon={icon} onWhite />
+      <Text style={styles.tileTitle}>{label}</Text>
       {wide ? <Text style={styles.note}>{note}</Text> : null}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  locked: { opacity: 0.6 },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  discOnSoft: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  note: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
   pressed: { opacity: 0.7 },
   row: {
-    ...surfaces.card,
+    ...surfaces.soft,
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
   rowTitle: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyStrong,
     fontSize: typography.bodyMedium,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   stack: { gap: spacing.md },
-  tile: {
-    ...surfaces.card,
-    flex: 1,
-    gap: spacing.smLg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.mdLg,
-  },
+  tile: { ...surfaces.card, flex: 1, gap: spacing.sm, padding: spacing.mdLg },
   tileTitle: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
   },
-  tileWide: { gap: spacing.md, padding: spacing.lg },
   tiles: { flexDirection: "row", gap: spacing.md },
 });

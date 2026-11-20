@@ -3,6 +3,7 @@ import {
   chipStyles,
   colors,
   fontFamilies,
+  shadows,
   spacing,
 } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
@@ -50,6 +51,7 @@ export function DayStrip({
               styles.chip,
               counts !== undefined && styles.countedChip,
               chipStyles.box,
+              styles.tile,
               isSelected && chipStyles.boxSelected,
             ]}
             testID={`${testIDPrefix}-${date}`}
@@ -132,6 +134,8 @@ const styles = StyleSheet.create({
   day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   onSelected: { color: colors.onPrimary },
   strip: { flexDirection: "row", flexGrow: 0, flexShrink: 0, gap: spacing.smd },
+  // Rosa Emma: the days are white tiles lifted by the card shadow, no outline.
+  tile: { ...shadows.card, borderWidth: 0 },
   weekday: {
     color: colors.text,
     fontFamily: fontFamilies.bodyMedium,

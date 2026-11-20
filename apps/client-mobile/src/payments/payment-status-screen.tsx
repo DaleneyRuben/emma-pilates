@@ -1,7 +1,6 @@
 import { useGetCurrentClientSubscription, useGetCurrentPayment } from "@pilates/api-contracts";
 import {
-  BodyText,
-  colors,
+  footerEdges,
   LoadingState,
   QueryFailure,
   Screen,
@@ -87,10 +86,11 @@ export function PaymentStatusScreen() {
     subscription.data?.status === 200 ? (subscription.data.data.subscription ?? null) : null;
 
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={footerEdges} style={styles.screen}>
       <PaymentStatusView
         busy={retrying}
         endsOn={active?.endsOn}
+        error={error}
         onHome={goHome}
         onPrimary={
           current.state === "confirmed"
@@ -104,16 +104,10 @@ export function PaymentStatusScreen() {
           current.state === "confirmed" || current.state === "rejected" ? current.state : "pending"
         }
       />
-      {error === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          {error}
-        </BodyText>
-      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  error: { color: colors.errorText, textAlign: "center" },
-  screen: { gap: spacing.lg },
+  screen: { gap: spacing.lg, paddingBottom: 0 },
 });

@@ -30,6 +30,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { FaceRow } from "../ui/face-row";
@@ -94,34 +95,34 @@ export function AssistantSessionDetailScreen({
     overview.data?.status === 200
       ? bookableClasses(overview.data.data.subscription.subscription)
       : undefined;
-  const header = (
-    <>
-      <BackBar back="Reservar una clase" onBack={() => navigation.goBack()} />
-      <ClientBanner
-        action="Reservando para"
-        clientName={clientName}
-        clientPhoto={clientPhoto}
-        detail={
-          left === undefined
-            ? undefined
-            : `${left} ${left === 1 ? "clase disponible" : "clases disponibles"}`
-        }
-      />
-    </>
+  const back = <BackBar back="Reservar una clase" onBack={() => navigation.goBack()} />;
+  const banner = (
+    <ClientBanner
+      action="Reservando para"
+      clientName={clientName}
+      clientPhoto={clientPhoto}
+      detail={
+        left === undefined
+          ? undefined
+          : `${left} ${left === 1 ? "clase disponible" : "clases disponibles"}`
+      }
+    />
   );
 
   if (session.isPending) {
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <LoadingState label="Cargando clase" />
       </Screen>
     );
   }
   if (session.isError || session.data.status !== 200) {
     return (
-      <Screen style={styles.screen}>
-        {header}
+      <Screen style={[styles.screen, styles.gapped]}>
+        {back}
+        {banner}
         <QueryFailure label="No pudimos cargar la clase." onRetry={() => void session.refetch()} />
       </Screen>
     );
@@ -207,11 +208,13 @@ export function AssistantSessionDetailScreen({
     }
   };
 
+  // E-R03: the band and the white footer stay put; the class scrolls between.
   return (
-    <Screen style={styles.screen}>
-      <CenteredCard maxWidth={640}>
-        {header}
-        <ScrollView contentContainerStyle={styles.content}>
+    <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
+      <CenteredCard maxWidth={640} style={styles.column}>
+        {back}
+        <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+          {banner}
           <CapacitySummary
             availableSeats={detail.availableSeats}
             capacity={detail.capacity}
@@ -242,7 +245,7 @@ export function AssistantSessionDetailScreen({
             />
           </IconRowGroup>
         </ScrollView>
-        <View style={styles.actions}>
+        <FooterPanel>
           {message !== null ? (
             <View accessibilityLabel={message} accessibilityRole="alert">
               <NoticeRow message={message} />
@@ -292,20 +295,21 @@ export function AssistantSessionDetailScreen({
               />
             </>
           )}
-        </View>
+        </FooterPanel>
       </CenteredCard>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
-  content: { gap: spacing.lg, paddingBottom: spacing.lg },
+  column: { gap: 0 },
+  gapped: { gap: spacing.md },
   note: {
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    color: colors.textMuted,
     fontSize: typography.note,
+    lineHeight: 18,
     textAlign: "center",
   },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

@@ -108,20 +108,20 @@ describe("Invita a una amiga (BKM-014)", () => {
   });
 
   // BKM-017: copy next to the code, and «Editar código» on the card. FIX-082
-  // (Invita option A): one Lino card, the code in Lora, a 44 pt outlined copy
+  // (Invita option A): one white card, the code in Lora, a 44 pt outlined copy
   // icon, «Compartir tu código» right under it and «Editar código» centred.
   it("holds the code, copy, share and edit on one light card", async () => {
     const screen = await openInvita(routeFetcher(routes([])));
 
     const card = await screen.findByTestId("referral-code-card");
-    expect(card).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(card).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
     expect(screen.getByText("Tu código")).toBeOnTheScreen();
     expect(screen.getByText("LUCIA")).toHaveStyle({
       color: "#93615D",
       fontFamily: "Lora_400Regular",
     });
     const copy = screen.getByRole("button", { name: "Copiar código" });
-    expect(copy).toHaveStyle({ borderWidth: 1, height: 44, width: 44 });
+    expect(copy).toHaveStyle({ borderWidth: 1.5, height: 44, width: 44 });
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Compartir tu código" })).toHaveStyle({
       backgroundColor: "#93615D",

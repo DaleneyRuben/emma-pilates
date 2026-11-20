@@ -25,15 +25,16 @@ describe("Staff tab bar", () => {
     });
   });
 
-  // FIX-089: the tab labels are Work Sans in Rosa profundo; the open tab is
-  // told apart by weight.
-  it("labels the open tab in Work Sans SemiBold and the others in Medium", async () => {
+  // Rosa Emma: the open tab is a 600 pill with a bold white label; the others
+  // stay rosa profundo on the white bar.
+  it("labels the open tab in bold white and the others in rosa profundo", async () => {
     const screen = await openLucia(assistantRoutes());
 
     expect(screen.getByText("Clientas")).toHaveStyle({
-      color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
     });
+    expect(screen.getByTestId("open-tab-pill")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("Horario")).toHaveStyle({
       color: "#93615D",
       fontFamily: "WorkSans_500Medium",

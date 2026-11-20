@@ -3,7 +3,6 @@ import {
   BodyText,
   boliviaCivilDate,
   colors,
-  ExceptionPill,
   fontFamilies,
   initials,
   OutlinedButton,
@@ -24,22 +23,29 @@ import {
 import { clockTime, evaluationDate } from "./evaluation-format";
 import { nextEvaluationState } from "./next-evaluation-state";
 
-/** A Crema-outlined action inside the Palo de rosa block. */
+/** A white action inside the 600 block (C13c, C13d). */
 function BlockButton({
   accessibilityLabel,
   label,
   onPress,
+  outlined,
 }: {
   accessibilityLabel: string;
   label: string;
   onPress: () => void;
+  /** On a white card the action keeps a 400 outline. */
+  outlined: boolean;
 }) {
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.blockButton, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.blockButton,
+        outlined && styles.blockButtonOutlined,
+        pressed && styles.pressed,
+      ]}
     >
       <Text style={styles.blockButtonLabel}>{label}</Text>
     </Pressable>
@@ -47,12 +53,14 @@ function BlockButton({
 }
 
 /**
- * C5 pick C «Todo en la cita»: the appointment in one Palo de rosa block,
+ * C5 pick C «Todo en la cita»: the appointment in the 600 hero,
  * «Tu cita · en N días», the date and time in Lora, the Nutritionist's
  * initials with the Branch and the duration, what she pays and «llega 10 min
- * antes», with «Cambiar fecha» and «Cancelar» inside. The state's line stays
- * under it. A slot the studio released draws the card in Crema with the time
- * struck through and the exception on the Rubor pill.
+ * antes», with «Cambiar fecha» and «Cancelar» inside. The state's line sits
+ * on a white card under it. A slot the studio released draws a white card with
+ * the time struck through and the exception on a 600 pill, then the line and
+ * «Elegir turno» on their own white card (C13g). `secondary` draws a later
+ * appointment on a white card, since the screen keeps one hero (C15).
  */
 export function NextEvaluationCard({
   evaluation,
@@ -60,6 +68,7 @@ export function NextEvaluationCard({
   onAttachReceipt,
   onCancel,
   onMove,
+  secondary = false,
   uploading,
 }: {
   evaluation: ClientEvaluationDto;
@@ -68,6 +77,8 @@ export function NextEvaluationCard({
   onAttachReceipt: () => void;
   onCancel: () => void;
   onMove: () => void;
+  /** A later appointment: a white card, not the hero (C15). */
+  secondary?: boolean;
   uploading: boolean;
 }) {
   const shownAt = useMountedAt();
@@ -82,10 +93,14 @@ export function NextEvaluationCard({
           <Text style={styles.releasedDetails}>
             {`${evaluation.durationMinutes} minutos · ${evaluation.nutritionistName} · ${evaluation.branchName}`}
           </Text>
-          <ExceptionPill>{state.chip}</ExceptionPill>
+          <View style={styles.releasedPill} testID="exception-pill">
+            <Text style={styles.releasedPillText}>{state.chip}</Text>
+          </View>
         </View>
-        <BodyText style={styles.line}>{state.line}</BodyText>
-        {moving ? null : <PrimaryButton label="Elegir turno" onPress={onMove} />}
+        <View style={[styles.lineCard, styles.releasedNext]}>
+          <BodyText style={styles.line}>{state.line}</BodyText>
+          {moving ? null : <PrimaryButton label="Elegir turno" onPress={onMove} />}
+        </View>
       </View>
     );
   }
@@ -94,21 +109,25 @@ export function NextEvaluationCard({
   const showActions = !moving && (state.needsReceipt || state.canMove || state.canCancel);
   return (
     <View style={styles.wrapper}>
-      <View style={styles.block} testID="next-evaluation">
-        <Text style={styles.eyebrow}>{appointmentLead(evaluation.startsAt, today)}</Text>
-        <Text style={styles.when}>{appointmentWhen(evaluation.startsAt)}</Text>
+      <View style={secondary ? styles.cardBlock : styles.block} testID="next-evaluation">
+        <Text style={[styles.eyebrow, secondary && styles.onCard]}>
+          {appointmentLead(evaluation.startsAt, today)}
+        </Text>
+        <Text style={[styles.when, secondary && styles.whenOnCard]}>
+          {appointmentWhen(evaluation.startsAt)}
+        </Text>
         <View style={styles.person}>
-          <View style={styles.initials}>
+          <View style={[styles.initials, secondary && styles.initialsOnCard]}>
             <Text allowFontScaling={false} style={styles.initialsText}>
               {initials(evaluation.nutritionistName)}
             </Text>
           </View>
-          <Text style={styles.personText}>
+          <Text style={[styles.personText, secondary && styles.smallOnCard]}>
             {`${evaluation.nutritionistName} · ${evaluation.branchName} · ${evaluation.durationMinutes} min`}
           </Text>
         </View>
         <Text
-          style={styles.payment}
+          style={[styles.payment, secondary && styles.smallOnCard]}
         >{`${appointmentPayment(evaluation)} · llega 10 min antes`}</Text>
         {showActions ? (
           <View style={styles.actions}>
@@ -126,6 +145,7 @@ export function NextEvaluationCard({
                     accessibilityLabel="Cambiar fecha"
                     label="Cambiar fecha"
                     onPress={onMove}
+                    outlined={secondary}
                   />
                 ) : null}
                 {state.canCancel ? (
@@ -133,6 +153,7 @@ export function NextEvaluationCard({
                     accessibilityLabel="Cancelar evaluación"
                     label="Cancelar"
                     onPress={onCancel}
+                    outlined={secondary}
                   />
                 ) : null}
               </View>
@@ -140,7 +161,9 @@ export function NextEvaluationCard({
           </View>
         ) : null}
       </View>
-      <BodyText style={styles.line}>{state.line}</BodyText>
+      <View style={styles.lineCard}>
+        <BodyText style={styles.line}>{state.line}</BodyText>
+      </View>
     </View>
   );
 }
@@ -148,28 +171,30 @@ export function NextEvaluationCard({
 const styles = StyleSheet.create({
   actionRow: { flexDirection: "row", gap: spacing.sm },
   actions: { gap: spacing.sm, marginTop: spacing.sm },
-  block: { ...surfaces.emphasis, gap: spacing.smd, padding: spacing.xlSm },
+  block: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
   blockButton: {
     alignItems: "center",
-    borderColor: colors.onEmphasis,
+    backgroundColor: colors.card,
     borderRadius: radii.button,
-    borderWidth: 1.5,
     flex: 1,
     justifyContent: "center",
     minHeight: 44,
     paddingHorizontal: spacing.sm,
   },
+  blockButtonOutlined: { borderColor: colors.borderStrong, borderWidth: 1.5 },
   blockButtonLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
   },
+  cardBlock: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
   eyebrow: {
     color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
   },
   initials: {
@@ -180,38 +205,61 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 30,
   },
+  initialsOnCard: { backgroundColor: colors.primaryTint },
   initialsText: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 12,
     fontWeight: "700",
   },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  // The state's line on its own white card under the block.
+  lineCard: {
+    ...surfaces.card,
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  onCard: { color: colors.text },
   payment: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
+    fontSize: 14,
     fontWeight: "600",
-    lineHeight: 18,
+    lineHeight: 20,
   },
-  person: { alignItems: "center", flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs },
+  person: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   personText: {
     color: colors.onEmphasis,
     flex: 1,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.body,
     fontSize: 14,
-    fontWeight: "500",
   },
   pressed: { opacity: 0.85 },
-  releasedCard: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
-  releasedDetails: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15 },
+  releasedCard: { ...surfaces.card, gap: spacing.sm, padding: spacing.lgXl },
+  releasedDetails: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   releasedEyebrow: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-    letterSpacing: typography.label * 0.12,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 11 * 0.14,
     textTransform: "uppercase",
+  },
+  releasedNext: { padding: spacing.lg },
+  releasedPill: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.emphasis,
+    borderRadius: radii.pill,
+    justifyContent: "center",
+    minHeight: 28,
+    paddingHorizontal: spacing.md,
+  },
+  releasedPillText: {
+    color: colors.onEmphasis,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.label,
+    fontWeight: "700",
   },
   releasedTime: {
     color: colors.text,
@@ -221,12 +269,24 @@ const styles = StyleSheet.create({
     lineHeight: 44,
     textDecorationLine: "line-through",
   },
+  smallOnCard: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
   when: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 26,
+    fontSize: typography.hero,
     fontVariant: ["tabular-nums"],
-    lineHeight: 30,
+    lineHeight: 31,
+  },
+  whenOnCard: {
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 27,
   },
   wrapper: { gap: spacing.md },
 });

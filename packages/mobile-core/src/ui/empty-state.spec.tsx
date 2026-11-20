@@ -16,7 +16,7 @@ function svgShapes(instance: Instance): Record<string, unknown>[] {
 }
 
 // Follow-up 225 §6: every empty state draws the block of `StateScreen`: a
-// 32 pt glyph alone (no disc since FIX-089), a Lora 24 title, and a 15 note,
+// glyph on a 50 disc (Rosa Emma), a Lora 24 title, and a 15 note,
 // all Rosa profundo. The variants keep where it stands.
 describe("EmptyState", () => {
   it("draws the framed variant as the in-list block on Lino", async () => {
@@ -32,17 +32,15 @@ describe("EmptyState", () => {
     expect(title).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 24, textAlign: "center" });
     const block = title.parent;
     expect(block).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 16,
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     const flat = StyleSheet.flatten(block?.props.style);
     expect(flat).not.toHaveProperty("flex");
-    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
+    expect(screen.getByTestId("empty-state-disc")).toBeOnTheScreen();
     const icon = screen.getByTestId("empty-state-icon-card", hidden);
     expect(icon).toHaveProp("stroke", "#93615D");
-    expect(icon).toHaveProp("width", 32);
+    expect(icon).toHaveProp("width", 28);
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
       color: "#93615D",
       fontSize: 15,
@@ -50,7 +48,7 @@ describe("EmptyState", () => {
     });
   });
 
-  it("draws the panel variant bare and uncentred", async () => {
+  it("draws the panel variant as the same card, uncentred", async () => {
     const screen = await render(
       <EmptyState
         icon="person"
@@ -63,15 +61,14 @@ describe("EmptyState", () => {
     const flat = StyleSheet.flatten(
       screen.getByText("Selecciona un cliente para ver sus detalles").parent?.props.style,
     );
-    expect(flat).not.toHaveProperty("backgroundColor");
+    expect(flat).toHaveProperty("backgroundColor", "#FFFBFB");
     expect(flat).not.toHaveProperty("flex");
-    expect(screen.queryByTestId("empty-state-disc")).toBeNull();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toHaveProp("stroke", "#93615D");
   });
 });
 
 describe("EmptyState plain variant", () => {
-  it("centres the block on the screen", async () => {
+  it("fills the screen with the card at its top", async () => {
     const screen = await render(
       <EmptyState
         icon="clock"
@@ -83,11 +80,11 @@ describe("EmptyState plain variant", () => {
 
     const title = screen.getByText("Aún no tienes clases en tu historial.");
     expect(title).toHaveStyle({ fontSize: 24 });
-    expect(title.parent).toHaveStyle({ alignItems: "center", flex: 1, justifyContent: "center" });
-    expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("backgroundColor");
+    expect(title.parent).toHaveStyle({ alignItems: "center", backgroundColor: "#FFFBFB" });
+    expect(title.parent?.parent).toHaveStyle({ flex: 1 });
     const icon = screen.getByTestId("empty-state-icon-clock", hidden);
     expect(icon).toHaveProp("stroke", "#93615D");
-    expect(icon).toHaveProp("width", 32);
+    expect(icon).toHaveProp("width", 28);
   });
 
   it("stands with the title alone, as S22's does", async () => {

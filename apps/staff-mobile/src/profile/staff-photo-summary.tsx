@@ -11,6 +11,7 @@ import {
   PersonAvatar,
   phoneWithFlag,
   spacing,
+  surfaces,
   TextButton,
   typography,
   useStaffPhoto,
@@ -33,10 +34,11 @@ type ProfileQueryData = { data: StaffProfileDto; status: number; headers: Header
 
 const uploadFailed = "No pudimos subir la foto. Inténtalo de nuevo.";
 const removalFailed = "No pudimos quitar la foto. Inténtalo de nuevo.";
-const avatarSize = 72;
+const avatarSize = 64;
 
 /**
- * S23's summary under proposal A (follow-ups 240–242, 247): her 72 px photo
+ * S23's summary under proposal A (follow-ups 240–242, 247), on its white card
+ * (E-F01): her 64 px photo
  * or initials, her name and email, «Cambiar foto» and «Quitar foto», and the
  * role's note. The photo is saved the moment the upload finishes.
  */
@@ -169,14 +171,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     minHeight: 44,
   },
-  block: { gap: spacing.md },
+  block: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   body: { flex: 1, gap: spacing.xxs },
   busy: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
-  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
+  name: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
   note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
-  summary: { alignItems: "center", flexDirection: "row", gap: spacing.lg },
+  summary: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
   // FIX-089: the secondary button, Crema with a Rosa profundo outline.
   tint: {
     alignItems: "center",
@@ -190,9 +192,9 @@ const styles = StyleSheet.create({
   },
   tintLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
   },
   // Marfil at 55 % with the busy ring (follow-up 241 §2), only while uploading.
   veil: {

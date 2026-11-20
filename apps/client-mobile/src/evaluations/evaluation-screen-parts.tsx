@@ -1,12 +1,5 @@
 import type { ClientEvaluationDto, EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { BodyText, colors, fontFamilies, spacing, surfaces } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
@@ -19,8 +12,8 @@ const turno = (instant: string) => {
 };
 
 /**
- * The band over the turnos while she moves an Evaluation (follow-up 264): a
- * Crema card in palette B, not a tint (FIX-089).
+ * The note over the turnos while she moves an Evaluation (follow-up 264): a
+ * white card with «Volver» as a bold underlined link under the line (C13v).
  */
 export function MovingBand({
   evaluation,
@@ -57,7 +50,7 @@ export function NoSlots({
   return (
     <View style={usedMonthStyles.used}>
       <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
-      <BodyText>Vuelve a revisar en unos días.</BodyText>
+      <BodyText style={usedMonthStyles.note}>Vuelve a revisar en unos días.</BodyText>
     </View>
   );
 }
@@ -65,18 +58,19 @@ export function NoSlots({
 const styles = StyleSheet.create({
   band: {
     ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.sm,
-    paddingLeft: spacing.lg,
-    paddingVertical: spacing.xs,
+    alignItems: "flex-start",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.mdLg,
+    paddingBottom: spacing.xs,
   },
-  bandButton: { justifyContent: "center", minHeight: 44, paddingHorizontal: spacing.md },
+  bandButton: { justifyContent: "center", minHeight: 44 },
   bandButtonLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
+    textDecorationLine: "underline",
   },
-  bandText: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  bandText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
 });

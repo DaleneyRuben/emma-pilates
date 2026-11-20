@@ -29,56 +29,61 @@ const history = [
 const flat = (element: { props: { style?: unknown } } | null | undefined) =>
   StyleSheet.flatten(element?.props.style) as Record<string, unknown>;
 
-// MOB-040: the 07 and S22 frames list each attended class as a row between
-// rules directly on Superficie, not as a card.
+// Rosa Emma (C05d): the summary is the 600 hero and each month a white card
+// with its header strip and the classes divided by hairlines.
 describe("ClassHistoryList", () => {
-  it("opens with the lead and the count since the oldest month", async () => {
+  it("opens with the lead and the count since the oldest month on the hero", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
-    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#93615D", fontSize: 13 });
+    expect(screen.getByText("Has asistido a")).toHaveStyle({ color: "#FFFBFB", fontSize: 14 });
     expect(screen.getByText("3 clases desde agosto")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 26,
+      color: "#FFFBFB",
+      fontFamily: "Lora_400Regular",
+      fontSize: 28,
+    });
+    expect(screen.getByTestId("class-history-summary")).toHaveStyle({
+      backgroundColor: "#93615D",
+      borderRadius: 24,
     });
   });
 
-  it("heads each month with a Borde fuerte rule and its class count", async () => {
+  it("heads each month's white card with a 50 strip and its class count", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     const heading = screen.getByText("Agosto 2026");
-    expect(heading).toHaveStyle({ fontSize: 12, textTransform: "uppercase" });
-    expect(heading.parent).toHaveStyle({ borderBottomColor: "#CDA697", borderBottomWidth: 1 });
-    expect(screen.getByText("2 clases")).toHaveStyle({ color: "#93615D", fontSize: 12 });
+    expect(heading).toHaveStyle({ fontSize: 12, fontWeight: "700", textTransform: "uppercase" });
+    expect(heading.parent).toHaveStyle({ backgroundColor: "#FEF6F2" });
+    expect(heading.parent?.parent).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
+    expect(screen.getByText("2 clases")).toHaveStyle({ color: "#93615D", fontWeight: "700" });
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
   });
 
-  it("draws each class as a ruled row with the day column, never as a white card", async () => {
+  it("draws each class as a row with the day column, divided by hairlines", async () => {
     const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
     const rows = screen.getAllByTestId("class-history-row");
     expect(rows).toHaveLength(3);
     for (const row of rows) {
       expect(flat(row)).not.toHaveProperty("backgroundColor");
-      expect(flat(row)).not.toHaveProperty("borderRadius");
-      expect(flat(row)).toMatchObject({ paddingVertical: 16, gap: 16 });
+      expect(flat(row)).toMatchObject({ paddingVertical: 14, gap: 16 });
     }
     // The last row of a group has no rule under it.
-    expect(flat(rows[1])).toMatchObject({ borderBottomColor: "#E7CCBF", borderBottomWidth: 1 });
+    expect(flat(rows[1])).toMatchObject({ borderBottomColor: "#F9E7DF", borderBottomWidth: 1 });
     expect(flat(rows[2])).not.toHaveProperty("borderBottomWidth");
 
-    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
+    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
     expect(screen.getByText("sáb")).toHaveStyle({
       color: "#93615D",
-      fontSize: 12,
+      fontWeight: "700",
       textTransform: "uppercase",
     });
     expect(screen.getByText("Mat Pilates")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 17,
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 16,
     });
     expect(screen.getByText("Daniela Ortiz · Urubó")).toHaveStyle({
       color: "#93615D",
-      fontSize: 13,
+      fontSize: 14,
     });
   });
 

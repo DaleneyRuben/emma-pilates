@@ -15,7 +15,7 @@ describe("BranchPickerPill", () => {
     expect(pill).toHaveStyle({
       alignItems: "center",
       alignSelf: "flex-start",
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderRadius: 999,
       flexDirection: "row",
       gap: 10,
@@ -26,7 +26,7 @@ describe("BranchPickerPill", () => {
     expect(screen.getByText("Centro")).toHaveStyle({
       color: "#93615D",
       fontSize: 14,
-      fontWeight: "500",
+      fontWeight: "700",
     });
     const pin = screen.getByTestId("glyph-pin", hidden);
     expect(pin).toHaveProp("width", 17);

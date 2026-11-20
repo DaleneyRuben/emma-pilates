@@ -10,20 +10,21 @@ jest.setTimeout(20_000);
 const factValue = (screen: Awaited<ReturnType<typeof openDetail>>["screen"], label: string) =>
   within(screen.getByTestId(`session-fact-${label}`));
 
-// C4 A (decisions of 2026-11-19): the day, the time and the class on one Palo
-// de rosa block; the Trainer, the Branch, the places and the free-cancellation
-// limit in a quiet Crema table; «Reservar esta clase» with what it uses.
+// C4 A (decisions of 2026-11-19, Rosa Emma C04): the day, the time and the
+// class on the 600 hero; the Trainer, the Branch, the places and the
+// free-cancellation limit on a white card; «Reservar esta clase» with what it
+// uses on the white footer.
 describe("Client Session detail layout", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("names the day, the time, the class and its minutes on the Palo de rosa block", async () => {
+  it("names the day, the time, the class and its minutes on the 600 hero", async () => {
     const { screen } = await openDetail({});
 
     const hero = within(screen.getByTestId("session-hero"));
-    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("session-hero")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(hero.getByText(formatTitleDate(startsAt))).toBeOnTheScreen();
     expect(
       hero.getByRole("header", {
@@ -41,7 +42,7 @@ describe("Client Session detail layout", () => {
     const { screen } = await openDetail({});
 
     const table = screen.getByTestId("session-facts");
-    expect(table).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    expect(table).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
     expect(factValue(screen, "trainer").getByText("Instructora")).toBeOnTheScreen();
     expect(factValue(screen, "trainer").getByText("Emma Vargas")).toBeOnTheScreen();
     expect(factValue(screen, "trainer").getByText("EV")).toBeOnTheScreen();
@@ -66,6 +67,9 @@ describe("Client Session detail layout", () => {
 
     expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled();
     expect(screen.getByText("Usarás 1 de tus 25 clases.")).toBeOnTheScreen();
+    const footer = within(screen.getByTestId("session-footer"));
+    expect(screen.getByTestId("session-footer")).toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(footer.getByText("Usarás 1 de tus 25 clases.")).toBeOnTheScreen();
   });
 
   it("counts her live extra classes with the Plan's", async () => {

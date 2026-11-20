@@ -98,13 +98,13 @@ describe("Registration form summary", () => {
       minHeight: 38,
     });
     expect(screen.getByText("Instagram")).toHaveStyle({
-      color: "#F9F4F2",
-      fontFamily: "WorkSans_600SemiBold",
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
     });
     expect(screen.getByRole("radio", { name: "TikTok" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
-      borderWidth: 1,
+      borderWidth: 1.5,
     });
     expect(screen.getByText("¿Cómo nos conociste?")).toHaveStyle({
       fontFamily: "WorkSans_600SemiBold",

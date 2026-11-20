@@ -289,7 +289,7 @@ describe("Client purchase flow", () => {
     expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getByRole("button", { name: "Subir otro comprobante" })).toBeOnTheScreen();
     expect(
-      screen.getByTestId("state-screen-icon-alert", { includeHiddenElements: true }),
+      screen.getByTestId("payment-status-icon-alert", { includeHiddenElements: true }),
     ).toHaveProp("stroke", "#93615D");
   });
 });

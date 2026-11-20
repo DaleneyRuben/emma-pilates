@@ -103,7 +103,7 @@ describe("Client Reservar on a frozen day", () => {
       const chip = screen.getByTestId(`browse-day-${day}`);
       expect(within(chip).getByTestId("glyph-lock", hidden)).toBeTruthy();
       expect(chip.props.accessibilityLabel).toMatch(/, congelado$/);
-      expect(chip).toHaveStyle({ backgroundColor: "#F9F4F2" });
+      expect(chip).toHaveStyle({ backgroundColor: "#FFFBFB" });
     }
     const after = screen.getByTestId(`browse-day-${backOn}`);
     expect(within(after).queryByTestId("glyph-lock", hidden)).toBeNull();

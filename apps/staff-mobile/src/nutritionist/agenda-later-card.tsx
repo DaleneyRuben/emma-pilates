@@ -1,20 +1,14 @@
 import type { NutritionistAgendaEntryDto } from "@pilates/api-contracts";
-import {
-  CardActionRow,
-  cardWithActionRow,
-  colors,
-  fontFamilies,
-  spacing,
-  surfaces,
-} from "@pilates/mobile-core";
+import { colors, fontFamilies, spacing, surfaces, TextButton } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 import { isCancellable, laterAppointmentMeta } from "./agenda-copy";
 import { clockTime } from "./nutritionist-format";
 
 /**
- * A «Después» appointment (E5 B): the Lora time and its length, the Client
- * over her day, kind and payment, and «Cancelar evaluación» while it can be.
+ * A «Después» appointment (E5 B, board N01): the Lora time over its length,
+ * the Client over her day, kind and payment, and «Cancelar evaluación» on
+ * its own row under a hairline while it can be.
  */
 export function LaterAppointmentCard({
   entry,
@@ -27,7 +21,7 @@ export function LaterAppointmentCard({
 }) {
   const cancellable = isCancellable(entry);
   return (
-    <View style={[styles.card, cancellable && cardWithActionRow]}>
+    <View style={[styles.card, cancellable && styles.withAction]}>
       <View
         accessibilityLabel={`${clockTime(entry.startsAt)} ${entry.clientName}`}
         accessible
@@ -45,30 +39,53 @@ export function LaterAppointmentCard({
         </View>
       </View>
       {cancellable ? (
-        <CardActionRow
-          label="Cancelar evaluación"
-          onPress={onCancel}
-          testID={`cancel-evaluation-${entry.evaluationId}`}
-          tone="error"
-        />
+        <View style={styles.action}>
+          <TextButton
+            label="Cancelar evaluación"
+            onPress={onCancel}
+            style={styles.actionButton}
+            testID={`cancel-evaluation-${entry.evaluationId}`}
+            tone="error"
+          />
+        </View>
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  cardBody: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  client: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
-  quiet: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  // Board N01: the action spans the card under a 100 hairline, at its start.
+  action: {
+    alignItems: "flex-start",
+    borderTopColor: colors.hairline,
+    borderTopWidth: 1,
+    marginHorizontal: -spacing.lg,
+    paddingHorizontal: spacing.lg,
+  },
+  actionButton: { paddingHorizontal: 0 },
+  card: {
+    ...surfaces.card,
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  cardBody: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
+  client: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13 },
   time: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 20,
+    fontSize: 22,
     fontVariant: ["tabular-nums"],
   },
-  // «07:00» in Lora 20 runs wider than 56 pt on both platforms (more so on
+  // «07:00» in Lora runs wider than 56 pt on both platforms (more so on
   // Android): a fixed width wrapped it, so 56 is only the floor.
-  timeColumn: { flexShrink: 0, minWidth: 56 },
+  timeColumn: { alignItems: "center", flexShrink: 0, minWidth: 56 },
   who: { flex: 1, gap: spacing.xxs },
+  withAction: { paddingBottom: 0 },
 });

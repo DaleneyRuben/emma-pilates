@@ -13,6 +13,7 @@ import {
   OutlinedButton,
   radii,
   spacing,
+  surfaces,
   TextButton,
   typography,
   useCountdown,
@@ -22,6 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { SoftNote } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { accountEmailLimitCode, resendLimitNotice } from "./assistant-format";
@@ -180,11 +182,12 @@ export function PendingInvitationCard({
         trailing={more}
       >
         {showReopened ? (
-          <Text style={styles.line}>
-            {`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
-          </Text>
+          <SoftNote
+            icon="check"
+            message={`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
+          />
         ) : null}
-        {notice !== null ? <Text style={styles.line}>{notice}</Text> : null}
+        {notice !== null ? <SoftNote icon="check" message={notice} /> : null}
         {failure !== null ? (
           <View accessibilityLabel={failure} accessibilityRole="alert">
             <NoticeRow message={failure} />
@@ -255,20 +258,23 @@ export function PendingInvitationCard({
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.md },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  more: { alignItems: "center", height: 36, justifyContent: "center", width: 36 },
+  block: { gap: spacing.smLg },
+  // E-C12: the menu's way in, a 40 pt circle ringed in 400.
+  more: {
+    alignItems: "center",
+    borderColor: colors.borderStrong,
+    borderRadius: radii.pill,
+    borderWidth: 1.5,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
   moreDots: {
-    fontFamily: fontFamilies.body,
-    color: colors.textMuted,
-    fontSize: 22,
-    lineHeight: 24,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.titleSmall,
+    fontWeight: "700",
+    lineHeight: 22,
   },
-  pendingCard: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.card,
-    padding: spacing.lg,
-  },
+  pendingCard: { ...surfaces.card, padding: spacing.lg },
 });

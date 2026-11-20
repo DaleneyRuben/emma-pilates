@@ -53,4 +53,4 @@ export function ClientRecordsHeader({
   );
 }
 
-const styles = StyleSheet.create({ header: { gap: spacing.lg } });
+const styles = StyleSheet.create({ header: { gap: spacing.md } });

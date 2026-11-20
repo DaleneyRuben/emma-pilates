@@ -33,7 +33,7 @@ describe("Assistant Client Bookings empty state", () => {
     });
     const calendar = screen.getByTestId("empty-state-icon-calendar", hidden);
     expect(calendar).toHaveProp("stroke", "#93615D");
-    expect(calendar).toHaveProp("width", 32);
+    expect(calendar).toHaveProp("width", 28);
     expect(
       screen.getByText("Puedes reservarle una clase desde el horario del estudio."),
     ).toHaveStyle({ color: "#93615D", fontSize: 15 });

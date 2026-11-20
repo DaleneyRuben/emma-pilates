@@ -7,14 +7,16 @@ import {
   type NotificationDto,
 } from "@pilates/api-contracts";
 import {
+  colors,
   EmptyState,
+  fontFamilies,
   LoadingState,
   OutlinedButton,
   QueryFailure,
+  radii,
   Screen,
   ScreenTopBar,
   spacing,
-  TextButton,
   useMobileIdentity,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -22,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 
 import {
   staffNotificationDestination,
@@ -31,6 +33,7 @@ import {
 import { groupNotifications } from "../notifications/notification-groups";
 import { DeniedNotice, NotificationEntries } from "../notifications/notification-entries";
 import { useStaffFetcher } from "../staff-fetcher";
+import { bodyScroll } from "../ui/card-pieces";
 
 const params = { limit: 50 };
 const queryKeys = [getListNotificationsQueryKey(params), getGetUnreadNotificationCountQueryKey()];
@@ -105,14 +108,16 @@ export function StaffNotificationsScreen() {
     return (
       <Screen style={styles.screen}>
         {header()}
-        <DeniedNotice />
-        <EmptyState
-          action={<OutlinedButton label={back.label} onPress={back.onPress} />}
-          icon="bell"
-          message="Te avisaremos aquí cuando haya algo que necesite tu atención."
-          title="No tienes notificaciones."
-          variant="plain"
-        />
+        <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+          <DeniedNotice />
+          <EmptyState
+            action={<OutlinedButton label={back.label} onPress={back.onPress} />}
+            icon="bell"
+            message="Te avisaremos aquí cuando haya algo que necesite tu atención."
+            title="No tienes notificaciones."
+            variant="plain"
+          />
+        </ScrollView>
       </Screen>
     );
   }
@@ -133,16 +138,23 @@ export function StaffNotificationsScreen() {
     <Screen style={styles.screen}>
       {header(
         anyUnread ? (
-          <TextButton
+          // E-F06: a white capsule on the band, never small text on 200.
+          <Pressable
+            accessibilityLabel="Marcar todo leído"
+            accessibilityRole="button"
+            accessibilityState={{ disabled: markAllRead.isPending }}
             disabled={markAllRead.isPending}
-            label="Marcar todo leído"
             onPress={() => markAllRead.mutate()}
-          />
+            style={({ pressed }) => [styles.markAll, pressed && styles.pressed]}
+          >
+            <Text style={styles.markAllLabel}>Marcar todo leído</Text>
+          </Pressable>
         ) : undefined,
       )}
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={bodyScroll.content}
         refreshControl={refreshControl}
+        style={bodyScroll.scroll}
         testID="notifications-scroll"
       >
         <DeniedNotice />
@@ -153,6 +165,19 @@ export function StaffNotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.lg },
+  markAll: {
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    justifyContent: "center",
+    minHeight: 36,
+    paddingHorizontal: spacing.mdLg,
+  },
+  markAllLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  pressed: { opacity: 0.7 },
+  screen: { paddingHorizontal: spacing.xlSm },
 });

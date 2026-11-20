@@ -21,7 +21,7 @@ export type PayGroup = {
 // S29: the statement sums by concept in this order. E2 B names the Trainer's
 // commission by what it pays for.
 const concepts: { kind: LineKind; label: string; color: string }[] = [
-  { kind: "class", label: "Clases dictadas", color: colors.emphasis },
+  { kind: "class", label: "Clases dictadas", color: colors.medio },
   { kind: "minimum_not_met", label: "Canceladas por mínimo", color: colors.border },
   { kind: "commission", label: "Comisiones de primer plan", color: colors.primary },
   { kind: "base", label: "Base", color: colors.primaryTint },

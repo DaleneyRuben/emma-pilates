@@ -5,7 +5,7 @@ import { EmphasisCard, OnEmphasisButton } from "./emphasis-card";
 
 // Follow-up 225 §5 and the boards' Inicio and Detalle del Plan hero cards.
 describe("EmphasisCard", () => {
-  it("draws the Palo de rosa hero at radius 18 and padding 20 with Crema text", async () => {
+  it("draws the 600 hero at radius 24 and padding 20 with white text", async () => {
     const onPress = jest.fn();
     const screen = await render(
       <EmphasisCard
@@ -19,30 +19,30 @@ describe("EmphasisCard", () => {
     );
 
     expect(screen.getByTestId("hero")).toHaveStyle({
-      backgroundColor: "#B78380",
-      borderRadius: 18,
-      gap: 12,
+      backgroundColor: "#93615D",
+      borderRadius: 24,
+      gap: 8,
       padding: 20,
     });
     expect(screen.getByText("Tu plan · 12 clases")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontSize: 12,
       textTransform: "uppercase",
     });
     // FIX-089: a normal fact on the hero is bold Crema text, not a pill.
     expect(screen.getByText("Desde Bs 80")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontSize: 13,
       fontWeight: "700",
     });
     expect(screen.getByText("Desde Bs 80").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(screen.getByText("Elige tu plan y empieza a moverte")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "Lora_400Regular",
-      fontSize: 24,
+      fontSize: 28,
     });
     expect(screen.getByText("Mat y Reformer · paga por QR o en el estudio")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -66,14 +66,14 @@ describe("OnEmphasisButton", () => {
 
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
       alignSelf: "flex-start",
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
       borderRadius: 999,
       minHeight: 44,
       paddingHorizontal: 20,
     });
     expect(screen.getByText("Comprar un plan")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
+      fontFamily: "WorkSans_700Bold",
       fontSize: 15,
     });
   });

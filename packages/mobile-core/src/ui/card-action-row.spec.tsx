@@ -14,7 +14,7 @@ describe("CardActionRow", () => {
     const button = screen.getByTestId("reschedule");
     expect(button).toHaveStyle({ minHeight: 44, paddingHorizontal: 12 });
     expect(button.parent).toHaveStyle({
-      borderTopColor: "#E7CCBF",
+      borderTopColor: "#F9E7DF",
       borderTopWidth: 1,
       flexDirection: "row",
       justifyContent: "flex-end",

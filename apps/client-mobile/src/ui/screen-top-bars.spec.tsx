@@ -92,7 +92,7 @@ describe("The Client screens' top bar", () => {
 
     const bar = screen.getByTestId("screen-top-bar");
     const label = within(bar).getByLabelText(title);
-    expect(label).toHaveStyle({ fontFamily: fontFamilies.heading, fontSize: typography.title });
+    expect(label).toHaveStyle({ fontFamily: fontFamilies.display, fontSize: typography.title });
     expect(screen.getAllByLabelText(title)).toHaveLength(1);
   });
 

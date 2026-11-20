@@ -7,6 +7,7 @@ import {
   fontFamilies,
   radii,
   spacing,
+  typography,
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -44,13 +45,22 @@ export function ComingRow({
           fetcher={fetcher}
           name={booking.clientName}
           photo={booking.clientPhoto}
-          size={36}
+          size={40}
         />
       }
       name={booking.clientName}
       testID={`roster-coming-${booking.bookingId}`}
-      trailing={first ? <ExceptionPill>Nueva</ExceptionPill> : undefined}
+      trailing={first ? <NewPill /> : undefined}
     />
+  );
+}
+
+/** Board I05: «Nueva» is the list's one solid 600 pill. */
+function NewPill() {
+  return (
+    <View style={styles.newPill}>
+      <Text style={styles.newLabel}>Nueva</Text>
+    </View>
   );
 }
 
@@ -83,49 +93,73 @@ export function AttendanceRow({
       <View style={styles.body}>
         <Text style={styles.name}>{booking.clientName}</Text>
         {isFirstClass(booking) ? <ExceptionPill>Primera clase</ExceptionPill> : null}
-        {ordinal === undefined ? null : <Text style={styles.detail}>{ordinal}</Text>}
+        {/* Board I06: her class number rides the same soft tag. */}
+        {ordinal === undefined ? null : (
+          <ExceptionPill testID="roster-class-number">{ordinal}</ExceptionPill>
+        )}
       </View>
-      {choices.map((choice) => {
-        const selected = outcome === choice.outcome;
-        return (
-          <Pressable
-            accessibilityLabel={`${booking.clientName}: ${choice.label}`}
-            accessibilityRole="button"
-            accessibilityState={{ selected }}
-            hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
-            key={choice.outcome}
-            onPress={() => onChoose(choice.outcome)}
-            style={[styles.choice, chipStyles.box, selected && chipStyles.boxSelected]}
-            testID={`roster-${choice.outcome}-${booking.bookingId}`}
-          >
-            <Text style={[styles.choiceLabel, selected && chipStyles.labelSelected]}>
-              {choice.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <View style={styles.choices}>
+        {choices.map((choice) => {
+          const selected = outcome === choice.outcome;
+          return (
+            <Pressable
+              accessibilityLabel={`${booking.clientName}: ${choice.label}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              hitSlop={{ bottom: 4, left: 0, right: 0, top: 4 }}
+              key={choice.outcome}
+              onPress={() => onChoose(choice.outcome)}
+              style={[styles.choice, chipStyles.box, selected && chipStyles.boxSelected]}
+              testID={`roster-${choice.outcome}-${booking.bookingId}`}
+            >
+              <Text style={[styles.choiceLabel, selected && chipStyles.labelSelected]}>
+                {choice.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  body: { flex: 1, gap: spacing.xxs },
+  body: { flex: 1, gap: spacing.xs, minWidth: 0 },
   choice: {
     alignItems: "center",
     borderRadius: radii.pill,
     height: 36,
     justifyContent: "center",
+    paddingHorizontal: spacing.mdLg,
+  },
+  choiceLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
+  choices: { flexDirection: "row", gap: spacing.smd },
+  name: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
+  newLabel: {
+    color: colors.onPrimary,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.label,
+    fontWeight: "700",
+  },
+  newPill: {
+    alignItems: "center",
+    backgroundColor: colors.primary,
+    borderRadius: radii.pill,
+    height: 28,
+    justifyContent: "center",
     paddingHorizontal: spacing.md,
   },
-  choiceLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13 },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15 },
   row: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.sm,
+    gap: spacing.md,
     minHeight: 64,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
 });

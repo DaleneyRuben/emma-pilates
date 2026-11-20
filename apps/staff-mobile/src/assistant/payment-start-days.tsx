@@ -7,6 +7,7 @@ import {
   spacing,
   StartDateStrip,
   startDateOptions,
+  surfaces,
   useStudioRules,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
@@ -17,7 +18,8 @@ import { useStaffFetcher } from "../staff-fetcher";
  * Staff pick E3 C: «Empieza» as a strip of days. A first Plan offers the
  * studio's window from today; a next Plan (booking ADR-0013) offers the day
  * after the current end through 28 days after it, notes that end beside the
- * title and says the chosen start and the last day under the strip.
+ * title and says the chosen start and the last day under the strip. The
+ * strip sits on its own white card (E-P02, E-P04).
  */
 export function PaymentStartDays({
   onSelect,
@@ -51,20 +53,22 @@ export function PaymentStartDays({
   }
   if (studioRules === undefined) return null;
   return (
-    <StartDateStrip
-      onSelect={onSelect}
-      options={startDateOptions({
-        today,
-        startDateLimitDays: studioRules.startDateLimitDays,
-        openingDate: studioRules.openingDate,
-      })}
-      selected={selected}
-      title="Empieza"
-    />
+    <View style={styles.block}>
+      <StartDateStrip
+        onSelect={onSelect}
+        options={startDateOptions({
+          today,
+          startDateLimitDays: studioRules.startDateLimitDays,
+          openingDate: studioRules.openingDate,
+        })}
+        selected={selected}
+        title="Empieza"
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.md },
-  line: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  block: { ...surfaces.card, gap: spacing.md, overflow: "hidden", padding: spacing.lg },
+  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 15, lineHeight: 21 },
 });

@@ -17,15 +17,15 @@ describe("NextClassHero", () => {
       />,
     );
 
-    expect(screen.getByTestId("next-class-hero")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("next-class-hero")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "Lora_400Regular",
-      fontSize: 26,
+      fontSize: 28,
     });
     expect(screen.getByText("PRÓXIMA · EN 40 MIN")).toHaveStyle({ fontWeight: "700" });
     expect(screen.getByText("2 de 8")).toBeOnTheScreen();
-    expect(screen.getByText("Achumani · Lucía y Elena")).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getByText("Achumani · Lucía y Elena")).toHaveStyle({ color: "#FFFBFB" });
     await fireEvent.press(screen.getByRole("button"));
     expect(onPress).toHaveBeenCalled();
   });
@@ -41,7 +41,7 @@ describe("NextClassHero attendees", () => {
 
     const circles = screen.getAllByTestId("hero-attendee");
     expect(circles).toHaveLength(2);
-    expect(circles[0]).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(circles[0]).toHaveStyle({ backgroundColor: "#FFFBFB" });
     expect(screen.getByText("LM")).toHaveStyle({ color: "#93615D" });
     expect(screen.getByTestId("next-class-hero").props.accessibilityLabel).toMatch(/Vienen 2 más$/);
   });
@@ -69,7 +69,7 @@ describe("NextClassHero attendees", () => {
 });
 
 describe("ClassRow in a ClassList", () => {
-  it("puts the time in a Rubor box, the class and branch, and the places at the end", async () => {
+  it("puts the type bar, the time in Lora, the class and branch, and the places at the end", async () => {
     const screen = await render(
       <ClassList>
         <ClassRow detail="Achumani" places="1 de 8" time="16:00" title="Reformer" />
@@ -78,16 +78,14 @@ describe("ClassRow in a ClassList", () => {
     );
 
     expect(screen.getByTestId("class-list")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
-    expect(screen.getAllByTestId("class-row-time")[0]).toHaveStyle({
-      backgroundColor: "#E7CCBF",
-      borderRadius: 10,
-    });
-    expect(screen.getByText("16:00")).toHaveStyle({ fontWeight: "700" });
-    expect(screen.getByText("1 de 8")).toHaveStyle({ fontWeight: "600" });
+    const bars = screen.getAllByTestId("type-bar");
+    expect(bars[0]).toHaveStyle({ backgroundColor: "#93615D", width: 5 });
+    expect(bars[1]).toHaveStyle({ backgroundColor: "#DAB9AB" });
+    expect(screen.getByText("16:00")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
+    expect(screen.getByText("1 de 8")).toHaveStyle({ fontWeight: "700" });
     expect(screen.getAllByTestId("class-list-divider")).toHaveLength(1);
   });
 

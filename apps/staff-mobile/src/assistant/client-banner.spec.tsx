@@ -22,6 +22,6 @@ describe("ClientBanner", () => {
       color: "#93615D",
     });
     expect(screen.getByText("Lucía Fernández")).toHaveStyle({ color: "#93615D" });
-    expect(screen.getByTestId("client-banner")).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(screen.getByTestId("client-banner")).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 });

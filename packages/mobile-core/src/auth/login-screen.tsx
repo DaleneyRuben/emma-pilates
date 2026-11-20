@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -9,12 +9,14 @@ import { emailHint, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
-import { BodyText } from "../ui/body-text";
+import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
+import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
+import { ScreenHeader } from "../ui/screen-header";
 import { TextButton } from "../ui/text-button";
-import { colors, spacing } from "../ui/tokens";
+import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
 
 const loginSchema = z.object({
   email: z.email("Escribe un correo electrónico válido."),
@@ -72,17 +74,21 @@ export function LoginScreen({
 
   return (
     <Screen style={styles.screen}>
-      <FormScrollView contentContainerStyle={styles.content}>
-        {notice === null ? null : (
-          <View accessibilityRole="summary" style={styles.notice}>
-            <BodyText style={styles.noticeText}>{notice}</BodyText>
-          </View>
-        )}
-        {/* v2 C01/S01: the brand and the form sit together, centred in the
-            spare height; only the register prompt stays at the bottom. */}
-        <View style={[styles.main, teamAccess ? styles.mainTeam : null]} testID="login-main">
-          <BrandHeader teamAccess={teamAccess} />
-
+      <FormScrollView band contentContainerStyle={styles.content}>
+        {/* Rosa Emma C01/E-A01: the wordmark on the band, the form in a white
+            card, and «Regístrate» in its own card under it. */}
+        <View style={styles.main} testID="login-main">
+          <ScreenHeader>
+            <View style={styles.band}>
+              <BrandHeader teamAccess={teamAccess} />
+            </View>
+          </ScreenHeader>
+          {notice === null ? null : (
+            <View accessibilityRole="summary" style={styles.notice}>
+              <Glyph color={colors.onEmphasis} name="check" size={20} strokeWidth={1.8} />
+              <Text style={styles.noticeText}>{notice}</Text>
+            </View>
+          )}
           <View style={styles.form}>
             {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
             {retryAfterSeconds > 0 ? (
@@ -146,7 +152,13 @@ export function LoginScreen({
           </View>
         </View>
         {onRegister === undefined ? null : (
-          <FooterPrompt action="Regístrate" onPress={onRegister} prompt="¿No tienes una cuenta?" />
+          <View style={styles.register}>
+            <FooterPrompt
+              action="Regístrate"
+              onPress={onRegister}
+              prompt="¿No tienes una cuenta?"
+            />
+          </View>
         )}
       </FormScrollView>
     </Screen>
@@ -154,32 +166,42 @@ export function LoginScreen({
 }
 
 const styles = StyleSheet.create({
+  band: { paddingBottom: spacing.xs, paddingTop: spacing.xl },
+  // C01n: the closing message is the screen's one 600 block, said in white.
   notice: {
-    backgroundColor: colors.successTint,
-    borderColor: colors.border,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: spacing.mdLg,
-    paddingVertical: spacing.md,
+    alignItems: "center",
+    backgroundColor: colors.emphasis,
+    borderRadius: radii.button,
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
-  noticeText: { color: colors.successText },
+  noticeText: {
+    color: colors.onEmphasis,
+    flex: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+    lineHeight: 21,
+  },
   // A phone-width column, centred on a tablet instead of stretched.
   content: {
     alignSelf: "center",
     flexGrow: 1,
-    gap: spacing.xxxl,
+    gap: spacing.md,
     maxWidth: 480,
+    paddingBottom: spacing.xxl,
     width: "100%",
-    paddingBottom: spacing.xl,
-    paddingTop: spacing.xxxl,
   },
   form: {
-    gap: spacing.lgXl,
+    ...surfaces.card,
+    gap: spacing.mdLg,
+    padding: spacing.xlSm,
   },
-  main: { flexGrow: 1, gap: spacing.xxl, justifyContent: "center" },
-  mainTeam: { gap: spacing.xl },
+  main: { gap: spacing.md },
+  register: { ...surfaces.card, padding: spacing.mdLg },
   screen: {
     backgroundColor: colors.surface,
-    paddingHorizontal: spacing.xlLg,
   },
 });

@@ -32,11 +32,11 @@ describe("Nutritionist agenda rows", () => {
     await waitFor(() => {
       expect(screen.getByText("Valeria Áñez")).toBeOnTheScreen();
     });
-    // v2 S15: the start in Lora 20 and its length, the Client over the kind,
+    // Board N01: the start in Lora 22 and its length, the Client over the kind,
     // and «Cancelar evaluación» as the card's text action.
     expect(screen.getByText("09:00")).toHaveStyle({
       fontFamily: "Lora_400Regular",
-      fontSize: 20,
+      fontSize: 22,
       fontVariant: ["tabular-nums"],
     });
     // MOB-074 walk: the time never wraps in its column.

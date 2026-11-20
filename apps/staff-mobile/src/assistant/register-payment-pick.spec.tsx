@@ -63,11 +63,11 @@ describe("Registrar pago, pick E3 C", () => {
     clearMobileQueryCache();
   });
 
-  it("leads with the Client, the Plan and «A cobrar» on a Palo de rosa block", async () => {
+  it("leads with the Client, the Plan and «A cobrar» on the 600 hero", async () => {
     const screen = await openRegisterPayment();
 
     const block = screen.getByTestId("payment-charge-block");
-    expect(block).toHaveStyle({ backgroundColor: brand.paloDeRosa });
+    expect(block).toHaveStyle({ backgroundColor: brand.rosaProfundo });
     const inside = within(block);
     expect(inside.getByText("Lucía Fernández · Paquete de 12 clases")).toBeOnTheScreen();
     expect(inside.getByText("LF")).toBeOnTheScreen();
@@ -84,7 +84,7 @@ describe("Registrar pago, pick E3 C", () => {
     const qr = screen.getByRole("radio", { name: /^QR/ });
     expect(cash).toHaveProp("accessibilityState", { checked: true, disabled: false });
     expect(cash).toHaveStyle({ backgroundColor: brand.rosaProfundo });
-    expect(qr).toHaveStyle({ backgroundColor: brand.crema, borderColor: brand.arcilla });
+    expect(qr).toHaveStyle({ backgroundColor: brand.white, borderColor: brand.arcilla });
     expect(screen.getByText("Entra a la caja de hoy")).toBeOnTheScreen();
     expect(screen.getByText("Subes el comprobante")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Confirmar Bs 697 en efectivo" })).toBeEnabled();
@@ -176,11 +176,12 @@ describe("Registrar pago, pick E3 C", () => {
     });
   });
 
-  it("paints no Rubor fill anywhere on the screen", async () => {
+  // Rosa Emma: Crema is no card colour any more; cards are white.
+  it("paints no Crema card anywhere on the screen", async () => {
     const screen = await openRegisterPayment();
 
-    expect(backgrounds(screen.toJSON() as Node)).not.toContain(brand.rubor);
+    expect(backgrounds(screen.toJSON() as Node)).not.toContain(brand.crema);
     await fireEvent.press(screen.getByRole("radio", { name: /^QR/ }));
-    expect(backgrounds(screen.toJSON() as Node)).not.toContain(brand.rubor);
+    expect(backgrounds(screen.toJSON() as Node)).not.toContain(brand.crema);
   });
 });

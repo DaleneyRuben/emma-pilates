@@ -4,6 +4,7 @@ import {
   WorkSans_400Regular,
   WorkSans_500Medium,
   WorkSans_600SemiBold,
+  WorkSans_700Bold,
 } from "@expo-google-fonts/work-sans";
 
 export const fontFamilies = {
@@ -14,6 +15,7 @@ export const fontFamilies = {
   body: "WorkSans_400Regular",
   bodyMedium: "WorkSans_500Medium",
   bodyStrong: "WorkSans_600SemiBold",
+  bodyBold: "WorkSans_700Bold",
 } as const;
 
 export const fontAssets = {
@@ -24,4 +26,5 @@ export const fontAssets = {
   [fontFamilies.body]: WorkSans_400Regular,
   [fontFamilies.bodyMedium]: WorkSans_500Medium,
   [fontFamilies.bodyStrong]: WorkSans_600SemiBold,
+  [fontFamilies.bodyBold]: WorkSans_700Bold,
 };

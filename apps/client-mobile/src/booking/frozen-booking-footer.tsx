@@ -4,7 +4,6 @@ import {
   fontFamilies,
   PrimaryButton,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -47,9 +46,9 @@ const styles = StyleSheet.create({
   note: {
     color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
     textAlign: "center",
   },
-  strong: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  strong: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
 });

@@ -1,10 +1,9 @@
 import type { NotificationDto } from "@pilates/api-contracts";
 import {
   BodyText,
-  colors,
   formatNotificationTime,
-  radii,
   spacing,
+  surfaces,
   TextButton,
   usePushNotifications,
 } from "@pilates/mobile-core";
@@ -121,13 +120,12 @@ export function NotificationEntries({
 }
 
 const styles = StyleSheet.create({
+  // E-F07: a white card above the list.
   notice: {
+    ...surfaces.card,
     alignItems: "flex-start",
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.inset,
-    gap: spacing.sm,
-    padding: spacing.lg,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
 });

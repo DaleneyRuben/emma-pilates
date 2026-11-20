@@ -2,7 +2,6 @@ import type { EvaluationSlotDto } from "@pilates/api-contracts";
 import {
   BodyText,
   boliviaCivilDate,
-  chipStyles,
   colors,
   fontFamilies,
   formatBolivianos,
@@ -32,8 +31,8 @@ export function nextSlotsLine(slots: EvaluationSlotDto[]): string {
 }
 
 /**
- * C5 pick C «horarios a un toque»: the next three open slots as Crema boxes
- * with an Arcilla border (no Rubor fill), each opening Confirma tu cita. A
+ * C5 pick C «horarios a un toque»: the next three open slots as soft 50 boxes
+ * with a 400 outline (C13d), each opening Confirma tu cita. A
  * Branch, Nutritionist or price the three do not share goes under the time.
  */
 export function NextSlots({
@@ -66,7 +65,7 @@ export function NextSlots({
               accessibilityRole="button"
               key={slot.id}
               onPress={() => onPick(slot)}
-              style={({ pressed }) => [chipStyles.box, styles.box, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.box, pressed && styles.pressed]}
             >
               <Text style={styles.day}>{dayLabel}</Text>
               <Text style={styles.time}>{time}</Text>
@@ -86,7 +85,9 @@ export function NextSlots({
 const styles = StyleSheet.create({
   box: {
     alignItems: "center",
-    borderRadius: radii.button,
+    backgroundColor: colors.primaryTint,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
     borderWidth: 1.5,
     flex: 1,
     gap: spacing.xxs,
@@ -94,14 +95,19 @@ const styles = StyleSheet.create({
     minHeight: 62,
     paddingVertical: spacing.sm,
   },
-  day: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.label },
+  day: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.label,
+    fontWeight: "600",
+  },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.85 },
   row: { flexDirection: "row", gap: spacing.sm },
   time: {
     color: colors.text,
     fontFamily: fontFamilies.display,
-    fontSize: 18,
+    fontSize: 20,
     fontVariant: ["tabular-nums"],
   },
 });

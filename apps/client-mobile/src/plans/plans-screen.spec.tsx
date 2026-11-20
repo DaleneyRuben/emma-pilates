@@ -125,10 +125,10 @@ describe("Client Plans", () => {
     expect(screen.getAllByText("Bs 560")).toHaveLength(1);
     // Walkthrough n.º 13: the launch banner, never «fundadora».
     expect(screen.getByText("Oferta por tiempo limitado · 15 % en tu plan")).toBeOnTheScreen();
-    // FIX-089: the offer is a Crema card with a plain icon, not a tinted block.
+    // Rosa Emma C08: the offer is a white card with a plain icon, not a tinted block.
     expect(screen.getByTestId("plans-launch-banner")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     expect(screen.queryByText(/fundadora/i)).toBeNull();
     expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();

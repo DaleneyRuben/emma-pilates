@@ -50,12 +50,12 @@ describe("Client Inicio, option A", () => {
     clearMobileQueryCache();
   });
 
-  // EncabezadoA (FIX-089): a root screen's title is the shared 30 pt Lora 500.
+  // Rosa Emma: a root screen's title is the band's 30 pt Lora 400.
   it("titles Inicio like every root screen, with a Rosa profundo bell", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     expect(screen.getByRole("header", { name: "Inicio" })).toHaveStyle({
-      fontFamily: "Lora_500Medium",
+      fontFamily: "Lora_400Regular",
       fontSize: 30,
     });
     expect(screen.getByTestId("glyph-bell", hidden)).toHaveProp("stroke", "#93615D");
@@ -66,20 +66,24 @@ describe("Client Inicio, option A", () => {
 
     const book = screen.getByRole("button", { name: "Reservar una clase" });
     expect(book).toHaveStyle({ backgroundColor: "#93615D", minHeight: 52 });
-    expect(screen.queryByTestId("shortcut-disc")).toBeNull();
+    expect(screen.getAllByTestId("shortcut-disc")).toHaveLength(2);
 
     await fireEvent.press(book);
     // The Reservar tab's Lora 30 heading, not the tab button of the same name.
     await waitFor(() => expect(screen.getByLabelText("Reservar")).toHaveStyle({ fontSize: 30 }));
   });
 
-  it("draws the Plan as a light row with the weekly cap and no Mi plan pill", async () => {
+  it("draws the Plan as a medio count beside a white card, with no Mi plan pill", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     const row = screen.getByTestId("home-plan-card");
-    expect(row).toHaveStyle({ backgroundColor: "#F9F4F2", borderColor: "#CDA697" });
+    // Rosa Emma C02: the count in large white type on 500, the rest on white.
+    expect(screen.getByTestId("home-plan-count")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("home-plan-summary")).toHaveStyle({ backgroundColor: "#FFFBFB" });
     const inRow = within(row);
-    expect(inRow.getByText("Trimestral · 25 restantes")).toBeOnTheScreen();
+    expect(inRow.getByText("25")).toHaveStyle({ color: "#FFFBFB", fontSize: 34 });
+    expect(inRow.getByText("restantes")).toHaveStyle({ fontSize: 19 });
+    expect(inRow.getByText("Trimestral")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te quedan 3 · vence el vie 5 feb")).toBeOnTheScreen();
     expect(inRow.getByTestId("chevron", hidden)).toBeOnTheScreen();
     expect(screen.queryByText("Activo")).toBeNull();
@@ -121,7 +125,8 @@ describe("Client Inicio, option A", () => {
     });
 
     const inRow = within(screen.getByTestId("home-plan-card"));
-    expect(inRow.getByText("Trimestral · 26 restantes")).toBeOnTheScreen();
+    expect(inRow.getByText("26")).toBeOnTheScreen();
+    expect(inRow.getByText("restantes")).toBeOnTheScreen();
     expect(inRow.getByText("25 del plan + 1 de regalo · vence el vie 5 feb")).toBeOnTheScreen();
     expect(screen.queryByText(/esta semana/i)).toBeNull();
   });
@@ -167,18 +172,19 @@ describe("Client Inicio, option A", () => {
     });
 
     const inRow = within(screen.getByTestId("home-plan-card"));
-    expect(inRow.getByText("Trimestral · 1 restante")).toBeOnTheScreen();
+    expect(inRow.getByText("1")).toBeOnTheScreen();
+    expect(inRow.getByText("restante")).toBeOnTheScreen();
     expect(inRow.getByText("Esta semana te queda 1 · vence el vie 5 feb")).toBeOnTheScreen();
-    // FIX-089: the exception is the one Rubor pill.
+    // FIX-089: the exception is the one pill.
     expect(within(inRow.getByTestId("exception-pill")).getByText("Por vencer")).toBeOnTheScreen();
   });
 
-  it("keeps the other shortcuts quiet, without a tinted disc", async () => {
+  it("draws the other shortcuts as white tiles with the icon on a 50 disc", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
       expect(screen.getByRole("button", { name: label })).toHaveStyle({
-        backgroundColor: "#F9F4F2",
+        backgroundColor: "#FFFBFB",
       });
     }
     expect(screen.getByTestId("glyph-health", hidden)).toHaveProp("stroke", "#93615D");

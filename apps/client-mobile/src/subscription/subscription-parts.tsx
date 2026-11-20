@@ -1,7 +1,6 @@
 import type { ClientSubscriptionSummaryDto } from "@pilates/api-contracts";
 import {
   colors,
-  ExceptionPill,
   fontFamilies,
   SectionTitle,
   spacing,
@@ -14,8 +13,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { formatCivilDate } from "../home/home-format";
 import { planClasses } from "../home/plan-classes";
 
-// FIX-089: a normal state in words; «Por vencer» is the exception, on the
-// pill. FIX-090: an ended plan reads «Plan vencido».
+// FIX-089: the state in words, «Por vencer» included (Rosa Emma C12n: bold
+// white on the hero). FIX-090: an ended plan reads «Plan vencido».
 const statusLabels = {
   active: "Activo",
   expiring_soon: "Por vencer",
@@ -32,10 +31,10 @@ function extraOrigin(line: string | null | undefined): string | null {
 }
 
 /**
- * C12's plan card. FIX-082 (design audit 2026-11-18, Mi plan option A): a
- * light card like Inicio's plan row: the name and its state in words (the
- * Rubor pill only for «Por vencer», FIX-089), the classes left in Lora, and
- * one line with where they come from and the end.
+ * C12's plan card (Rosa Emma C12, C12n, C12b): the screen's 600 hero with the
+ * name and its state in bold words, the classes left in Lora 56, and one line
+ * with where they come from and the end. An ended plan is a white card, since
+ * «Comprar un plan» is then the screen's solid block.
  */
 export function SubscriptionHero({
   status,
@@ -53,21 +52,18 @@ export function SubscriptionHero({
     breakdown === null
       ? end.charAt(0).toUpperCase() + end.slice(1)
       : `${breakdown}${origin === null ? "" : ` (${origin})`} · ${end}`;
+  const ink = expired ? styles.onCard : styles.onHero;
   return (
-    <View style={styles.hero} testID="subscription-hero">
+    <View style={expired ? styles.ended : styles.hero} testID="subscription-hero">
       <View style={styles.between}>
-        <Text style={styles.name}>
+        <Text style={[styles.name, ink]}>
           {expired ? `Último plan · ${subscription.planName}` : subscription.planName}
         </Text>
-        {status === "expiring_soon" ? (
-          <ExceptionPill>{statusLabels[status]}</ExceptionPill>
-        ) : (
-          <Text style={styles.statusLabel}>{statusLabels[status]}</Text>
-        )}
+        <Text style={[styles.statusLabel, ink]}>{statusLabels[status]}</Text>
       </View>
       <View style={styles.count}>
-        <Text style={styles.number}>{String(left)}</Text>
-        <Text style={styles.countLabel}>
+        <Text style={[styles.number, ink]}>{String(left)}</Text>
+        <Text style={[styles.countLabel, ink]}>
           {expired
             ? "clases disponibles"
             : breakdown === null
@@ -75,12 +71,12 @@ export function SubscriptionHero({
               : "clases restantes"}
         </Text>
       </View>
-      <Text style={styles.note}>{detail}</Text>
+      <Text style={[styles.note, ink]}>{detail}</Text>
     </View>
   );
 }
 
-/** A Lino group of label and value rows, such as C12's «Detalles». */
+/** A white card of label and value rows, such as C12's «Detalles». */
 export function DetailRows({
   rows,
   title,
@@ -108,39 +104,55 @@ export function DetailRows({
 
 const styles = StyleSheet.create({
   between: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.sm,
     justifyContent: "space-between",
   },
-  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
-  countLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
-  hero: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lgXl },
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  name: {
-    color: colors.text,
+  count: { alignItems: "baseline", flexDirection: "row", gap: spacing.smLg },
+  countLabel: {
     flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  number: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.display },
+  ended: { ...surfaces.card, gap: spacing.sm, padding: spacing.xlSm },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  hero: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
+  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  name: {
+    flexShrink: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+    lineHeight: 22,
+  },
+  note: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  number: { fontFamily: fontFamilies.display, fontSize: 56, lineHeight: 62 },
+  onCard: { color: colors.text },
+  onHero: { color: colors.onEmphasis },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
-    minHeight: 52,
+    minHeight: 44,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  statusLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  statusLabel: {
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
+    lineHeight: 22,
+  },
   value: {
     color: colors.text,
     flexShrink: 1,
-    fontFamily: fontFamilies.bodyMedium,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
+    fontWeight: "700",
     textAlign: "right",
   },
 });

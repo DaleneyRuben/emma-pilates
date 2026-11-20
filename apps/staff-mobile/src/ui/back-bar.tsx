@@ -1,6 +1,5 @@
-import { ScreenHeader, spacing } from "@pilates/mobile-core";
+import { ScreenHeader } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet } from "react-native";
 
 /**
  * A pushed screen's top: the shared EncabezadoA (FIX-089), the back arrow on
@@ -29,12 +28,3 @@ export function BackBar({
     />
   );
 }
-
-/**
- * For a BackBar inside a ScrollView on a screen padded by `xlSm`: the scroller
- * reaches the screen edge and pads its content instead (iPad walk).
- */
-export const backBarScroll = StyleSheet.create({
-  content: { paddingHorizontal: spacing.xlSm },
-  scroll: { marginHorizontal: -spacing.xlSm },
-});

@@ -14,13 +14,14 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
+  BandScrollView,
   boliviaCivilDate,
-  Heading,
   LoadingState,
   OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
+  ScreenHeader,
   spacing,
   useIsOnline,
   usePullToRefresh,
@@ -29,7 +30,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { approvedFreeze } from "../booking/frozen-day";
 import { useClientFetcher } from "../client-fetcher";
 import { usePaymentStanding } from "../payments/payment-standing";
@@ -117,7 +118,7 @@ export function HomeScreen() {
   if (profile.isPending || subscription.isPending || paymentPending) {
     return (
       <Screen>
-        <Heading accessibilityLabel="Inicio">Inicio</Heading>
+        <ScreenHeader title="Inicio" />
         <View style={styles.centered}>
           <LoadingState label="Cargando inicio" />
         </View>
@@ -128,7 +129,7 @@ export function HomeScreen() {
   if (loadedProfile === undefined || loadedSubscription === undefined) {
     return (
       <Screen>
-        <Heading accessibilityLabel="Inicio">Inicio</Heading>
+        <ScreenHeader title="Inicio" />
         <QueryFailure label="No pudimos cargar tu inicio." onRetry={refetchHome} />
       </Screen>
     );
@@ -165,7 +166,7 @@ export function HomeScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView
+      <BandScrollView
         contentContainerStyle={styles.content}
         refreshControl={refreshControl}
         testID="home-scroll"
@@ -199,7 +200,17 @@ export function HomeScreen() {
         {nextClass === undefined ? null : (
           // C7 A (owner 2026-11-19): the next class leads Inicio.
           <View style={styles.underPromotion}>
-            <NextClassCard booking={nextClass} onPress={() => navigation.navigate("Bookings")} />
+            <NextClassCard
+              booking={nextClass}
+              onPress={() => navigation.navigate("Bookings")}
+              // Rosa Emma C02c2, C02f: a notice or the Guest Pass card is the
+              // screen's one hero.
+              quiet={
+                standing.kind !== "none" ||
+                freezeNotice !== null ||
+                view.subscription?.guestPass !== undefined
+              }
+            />
           </View>
         )}
         <PromotionsCarousel
@@ -271,7 +282,7 @@ export function HomeScreen() {
             </>
           )}
         </ShortcutSection>
-      </ScrollView>
+      </BandScrollView>
       <PhonePrompt client={loadedProfile.data} />
     </Screen>
   );
@@ -281,6 +292,6 @@ const styles = StyleSheet.create({
   // On a tablet the blocks line up with the carousel, which starts at the left edge.
   underPromotion: { alignSelf: "flex-start", maxWidth: promotionCardMaxWidth, width: "100%" },
   centered: { alignItems: "center", flex: 1, justifyContent: "center" },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  content: { gap: spacing.md, paddingBottom: spacing.xxl },
   screen: { paddingBottom: 0 },
 });

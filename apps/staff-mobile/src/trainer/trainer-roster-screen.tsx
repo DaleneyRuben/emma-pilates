@@ -8,23 +8,24 @@ import {
   colors,
   EmptyState,
   fontFamilies,
-  IconRowGroup,
   LoadingState,
   NoticeRow,
   PrimaryButton,
   QueryFailure,
   Screen,
   spacing,
-  SectionTitle,
   TextButton,
+  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
 
+import { bodyScroll, RowCard } from "../ui/card-pieces";
+import { TabFooter } from "../ui/tab-footer";
 import { useStaffFetcher } from "../staff-fetcher";
 import { createTrainerApi } from "../trainer-api";
-import { BackBar, backBarScroll } from "../ui/back-bar";
+import { BackBar } from "../ui/back-bar";
 import { useHasStarted } from "../ui/use-has-started";
 import { useMinuteClock } from "../ui/use-minute-clock";
 import { useIsTablet } from "../ui/use-is-tablet";
@@ -52,7 +53,9 @@ function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, Atte
  * S03, E6 B + A (board E6C): before the class, who is coming and «Tomar
  * asistencia»; once the class starts, or on that tap, the same screen takes
  * attendance with «Vino» / «No vino». Saving waits for the start (owner,
- * 2026-11-03), which the backend enforces too.
+ * 2026-11-03), which the backend enforces too. Boards I05–I09: the band stays
+ * fixed, the list is one white card under its label, and the actions sit in
+ * the white footer above the tab bar.
  */
 export function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
@@ -133,11 +136,11 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
   return (
     <Screen style={styles.screen}>
+      <BackBar back="Mi agenda" onBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content, tablet && styles.tablet]}
-        style={backBarScroll.scroll}
+        contentContainerStyle={[bodyScroll.content, tablet && styles.tablet]}
+        style={bodyScroll.scroll}
       >
-        <BackBar back="Mi agenda" onBack={() => navigation.goBack()} />
         <RosterBlock
           booked={session.bookings.length}
           branchName={session.branchName}
@@ -154,37 +157,35 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
             icon="calendar"
             message="No hay reservas para esta clase."
             title="Sin reservas"
-            variant="plain"
           />
         ) : (
-          <View>
-            <SectionTitle>
-              {attendance
+          <RowCard
+            label={
+              attendance
                 ? "Asistencia"
-                : `Quién viene · ${countLabel(session.bookings.length, "clienta", "clientas")}`}
-            </SectionTitle>
-            <IconRowGroup>
-              {session.bookings.map((booking) =>
-                attendance ? (
-                  <AttendanceRow
-                    booking={booking}
-                    fetcher={fetcher}
-                    key={booking.bookingId}
-                    onChoose={(outcome) =>
-                      setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
-                    }
-                    outcome={outcomes[booking.bookingId]}
-                  />
-                ) : (
-                  <ComingRow booking={booking} fetcher={fetcher} key={booking.bookingId} />
-                ),
-              )}
-            </IconRowGroup>
-          </View>
+                : `Quién viene · ${countLabel(session.bookings.length, "clienta", "clientas")}`
+            }
+          >
+            {session.bookings.map((booking) =>
+              attendance ? (
+                <AttendanceRow
+                  booking={booking}
+                  fetcher={fetcher}
+                  key={booking.bookingId}
+                  onChoose={(outcome) =>
+                    setEdits((current) => ({ ...current, [booking.bookingId]: outcome }))
+                  }
+                  outcome={outcomes[booking.bookingId]}
+                />
+              ) : (
+                <ComingRow booking={booking} fetcher={fetcher} key={booking.bookingId} />
+              ),
+            )}
+          </RowCard>
         )}
         {saveError ? <NoticeRow message="No pudimos guardar la asistencia." /> : null}
       </ScrollView>
-      <View style={[styles.footer, tablet && styles.tablet]} testID="roster-footer">
+      <TabFooter style={tablet && styles.tabletFooter} testID="roster-footer">
         {attendance ? (
           <>
             {missing > 0 && !empty ? (
@@ -213,7 +214,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
           />
         ) : null}
         {reportFault}
-      </View>
+      </TabFooter>
       {saved ? <BrandToast onClose={() => setSaved(false)} title="Asistencia guardada" /> : null}
     </Screen>
   );
@@ -221,16 +222,16 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
 const styles = StyleSheet.create({
   centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  footer: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
   missing: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
-    fontSize: 13,
+    fontSize: typography.note,
     textAlign: "center",
   },
+  // Board I05: the link sits at the footer's start, underlined.
   reportFault: { alignSelf: "flex-start", paddingHorizontal: 0 },
   screen: { paddingHorizontal: spacing.xlSm },
   // On a tablet the roster keeps a phone's column, so the block never stretches.
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
+  tabletFooter: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

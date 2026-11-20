@@ -8,7 +8,6 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
-  ClassList,
   formatTimeRange,
   hasStarted,
   LoadingState,
@@ -16,15 +15,16 @@ import {
   placesLabel,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
+  surfaces,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { BranchField } from "../ui/branch-field";
@@ -134,37 +134,40 @@ export function CancelClassScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <BranchField
-        allLabel="Todas las sucursales"
-        onSelect={setSelectedBranchId}
-        options={branchList}
-        selectedId={allBranches ? everyBranch : branch.id}
-        selectedName={allBranches ? "Todas las sucursales" : branch.name}
-      />
-      <DayStrip
-        dates={strip}
-        onSelect={setSelectedDate}
-        selected={selectedDate}
-        testIDPrefix="cancel-class-day"
-        today={today}
-        trailing={
-          <DayStripAction
-            accessibilityLabel="Elegir otra fecha, hasta 30 días"
-            label={pickedLater ? (dayHeading(selectedDate).split(" ")[1] ?? "Otra") : "Otra"}
-            onPress={() => setChoosingDate(true)}
-            selected={pickedLater}
-            testID="cancel-class-other"
-          />
-        }
-      />
-      <FilterChips
-        onSelect={setClassTypeId}
-        options={[
-          { id: allClassTypes, label: "Todas" },
-          ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
-        ]}
-        selected={classTypeId}
-      />
+      {/* E-D12: the Branch, the days and the class types share one white card. */}
+      <View style={styles.filters}>
+        <BranchField
+          allLabel="Todas las sucursales"
+          onSelect={setSelectedBranchId}
+          options={branchList}
+          selectedId={allBranches ? everyBranch : branch.id}
+          selectedName={allBranches ? "Todas las sucursales" : branch.name}
+        />
+        <DayStrip
+          dates={strip}
+          onSelect={setSelectedDate}
+          selected={selectedDate}
+          testIDPrefix="cancel-class-day"
+          today={today}
+          trailing={
+            <DayStripAction
+              accessibilityLabel="Elegir otra fecha, hasta 30 días"
+              label={pickedLater ? (dayHeading(selectedDate).split(" ")[1] ?? "Otra") : "Otra"}
+              onPress={() => setChoosingDate(true)}
+              selected={pickedLater}
+              testID="cancel-class-other"
+            />
+          }
+        />
+        <FilterChips
+          onSelect={setClassTypeId}
+          options={[
+            { id: allClassTypes, label: "Todas" },
+            ...classTypeList.map((classType) => ({ id: classType.id, label: classType.name })),
+          ]}
+          selected={classTypeId}
+        />
+      </View>
       {sessions.isPending ? (
         <LoadingState label="Cargando clases" />
       ) : sessions.isError ? (
@@ -200,10 +203,7 @@ export function CancelClassScreen() {
           />
         )
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
-          <SectionTitle>
-            {`${dayHeading(selectedDate)} · ${countLabel(visible.length, "clase", "clases")}`}
-          </SectionTitle>
+        <ScrollView contentContainerStyle={styles.list} style={bodyScroll.scroll}>
           {next === undefined ? null : (
             <TodayHero
               accessibilityLabel={`${next.classTypeName} ${formatTimeRange(next.startsAt, next.endsAt)}${allBranches ? ` · ${branchNameOf(next)}` : ""}`}
@@ -216,27 +216,28 @@ export function CancelClassScreen() {
               title={`${startTime(next.startsAt, next.endsAt)} · ${next.classTypeName}`}
             />
           )}
-          {rest.length === 0 ? null : (
-            <ClassList>
-              {rest.map((session) => {
-                const branchName = allBranches ? session.branchName : branch.name;
-                return (
-                  <SessionRow
-                    accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${branchName}` : ""}`}
-                    key={session.id}
-                    onPress={() => openSession(session)}
-                    places={placesLabel(session.bookedCount, session.capacity)}
-                    subtitle={
-                      allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
-                    }
-                    testID={`cancel-class-card-${session.id}`}
-                    time={startTime(session.startsAt, session.endsAt)}
-                    title={session.classTypeName}
-                  />
-                );
-              })}
-            </ClassList>
-          )}
+          <RowCard
+            label={`${dayHeading(selectedDate)} · ${countLabel(visible.length, "clase", "clases")}`}
+            testID="class-list"
+          >
+            {rest.map((session) => {
+              const branchName = allBranches ? session.branchName : branch.name;
+              return (
+                <SessionRow
+                  accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${branchName}` : ""}`}
+                  key={session.id}
+                  onPress={() => openSession(session)}
+                  places={placesLabel(session.bookedCount, session.capacity)}
+                  subtitle={
+                    allBranches ? `${session.trainerName} · ${branchName}` : session.trainerName
+                  }
+                  testID={`cancel-class-card-${session.id}`}
+                  time={startTime(session.startsAt, session.endsAt)}
+                  title={session.classTypeName}
+                />
+              );
+            })}
+          </RowCard>
         </ScrollView>
       )}
       <OtherDateSheet
@@ -255,6 +256,12 @@ export function CancelClassScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
-  screen: { gap: spacing.lg, paddingHorizontal: spacing.xlSm },
+  filters: {
+    ...surfaces.card,
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.mdLg,
+  },
+  list: { ...bodyScroll.content, paddingTop: 0 },
+  screen: { gap: spacing.smLg, paddingHorizontal: spacing.xlSm },
 });

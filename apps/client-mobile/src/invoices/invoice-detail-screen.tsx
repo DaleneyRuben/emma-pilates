@@ -19,6 +19,7 @@ import {
   QueryFailure,
   Screen,
   ScreenTopBar,
+  shadows,
   spacing,
   surfaces,
   typography,
@@ -178,7 +179,9 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
         }
       >
         {header}
-        <Preview footer={downloadButton} invoice={invoice} />
+        <View style={styles.previewCard}>
+          <Preview footer={downloadButton} invoice={invoice} />
+        </View>
         <Details invoice={invoice} />
       </FormScrollView>
       {saved === null ? null : (
@@ -189,10 +192,18 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card },
-  content: { gap: spacing.lg, paddingBottom: spacing.xl },
+  card: { ...surfaces.card, overflow: "hidden" },
+  content: { gap: spacing.md, paddingBottom: spacing.xl },
   divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
-  footer: { gap: spacing.xs, paddingTop: spacing.md },
+  // C17c: «Descargar» on a white panel over the tab bar, the shadow cast up.
+  footer: {
+    ...shadows.footer,
+    backgroundColor: colors.card,
+    gap: spacing.sm,
+    marginHorizontal: -spacing.lg,
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.mdLg,
+  },
   kv: {
     flexDirection: "row",
     gap: spacing.md,
@@ -200,16 +211,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  kvLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
+  kvLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   kvValue: {
     color: colors.text,
     flexShrink: 1,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
+    fontWeight: "700",
     fontVariant: ["tabular-nums"],
     textAlign: "right",
   },
-  photo: { alignSelf: "center", borderRadius: 8, maxHeight: 320, width: "100%" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  photo: { alignSelf: "center", borderRadius: 10, maxHeight: 320, width: "100%" },
+  previewCard: { ...surfaces.card, padding: spacing.md },
+  screen: { gap: spacing.md },
   toast: { bottom: spacing.xl * 4, left: 0, position: "absolute", right: 0 },
 });

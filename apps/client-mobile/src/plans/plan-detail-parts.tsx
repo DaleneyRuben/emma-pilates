@@ -19,7 +19,7 @@ import { formatBolivianos } from "./plan-format";
 import { planValidity } from "./plans-screen";
 
 /**
- * C09's hero: its validity, the price in Lora 32, and the struck list price.
+ * C09's hero: its validity, the price in Lora 34, and the struck list price.
  * The header above names the Plan, so the hero does not repeat it (FIX-089).
  */
 export function PlanHero({ plan }: { plan: PlanDto }) {
@@ -86,7 +86,7 @@ function BreakdownRow({ label, tone, value }: { label: string; tone?: "discount"
   );
 }
 
-/** C09's «Desglose»: the list price, the discount in Rosa enlace, and the total in Lora 22. */
+/** C09's «Desglose»: a white card with the list price, the discount, and the total in Lora 22. */
 export function PlanBreakdown({ plan }: { plan: PlanDto }) {
   const percent = discountPercent(plan);
   const list = plan.listPriceCentavos ?? plan.priceCentavos;
@@ -116,41 +116,45 @@ export function PlanBreakdown({ plan }: { plan: PlanDto }) {
 }
 
 const styles = StyleSheet.create({
-  discount: { color: colors.primaryOnTint },
-  group: { ...surfaces.card },
-  hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: spacing.lg },
+  discount: { color: colors.text },
+  group: { ...surfaces.card, overflow: "hidden" },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
   listPrice: {
     color: colors.onEmphasis,
     fontFamily: fontFamilies.body,
-    fontSize: typography.body,
+    fontSize: typography.note,
     textDecorationLine: "line-through",
   },
   price: {
-    color: colors.white,
+    color: colors.onEmphasis,
     fontFamily: fontFamilies.display,
-    fontSize: 32,
+    fontSize: 34,
     fontVariant: ["tabular-nums"],
   },
-  prices: { alignItems: "baseline", flexDirection: "row", gap: spacing.sm },
+  prices: { alignItems: "baseline", flexDirection: "row", gap: spacing.smLg },
   row: {
     alignItems: "center",
     flexDirection: "row",
+    gap: spacing.md,
     justifyContent: "space-between",
-    minHeight: 52,
+    minHeight: 46,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  rowLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
+  rowLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
   rowValue: {
     color: colors.text,
-    fontFamily: fontFamilies.body,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: typography.body,
     fontVariant: ["tabular-nums"],
+    fontWeight: "700",
   },
   total: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
   totalLabel: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
+    flex: 1,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.bodyMedium,
+    fontWeight: "700",
   },
 });

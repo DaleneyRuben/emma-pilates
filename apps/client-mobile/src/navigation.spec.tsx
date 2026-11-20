@@ -55,8 +55,8 @@ describe("ClientNavigation", () => {
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
   });
 
-  // FIX-089: every tab is Rosa profundo; the open one is told by weight.
-  it("draws 02's line icons in Rosa profundo, the focused tab's label in bold", async () => {
+  // Rosa Emma: the open tab is a 600 pill with white icon and bold label.
+  it("draws the open tab white on its pill and the others in rosa profundo", async () => {
     const screen = await render(<ClientNavigation {...defaultProps} role="client" />);
     // React Navigation cross-fades an active and an idle copy of each icon.
     const icon = (name: string) =>
@@ -64,14 +64,15 @@ describe("ClientNavigation", () => {
         .getAllByTestId(`client-tab-icon-${name}`, { includeHiddenElements: true })
         .find((copy) => StyleSheet.flatten(copy.parent?.props.style)?.opacity === 1);
 
-    for (const name of ["home", "booking", "bookings", "profile"]) {
+    expect(icon("home")).toHaveProp("stroke", colors.onPrimary);
+    for (const name of ["booking", "bookings", "profile"]) {
       expect(icon(name)).toHaveProp("stroke", colors.text);
     }
     const tabLabel = (name: string) =>
       within(screen.getByRole("button", { name: new RegExp(`^${name}, tab`) })).getByText(name);
     expect(tabLabel("Inicio")).toHaveStyle({
-      color: colors.text,
-      fontFamily: "WorkSans_600SemiBold",
+      color: colors.onPrimary,
+      fontFamily: "WorkSans_700Bold",
     });
     expect(tabLabel("Reservar")).toHaveStyle({
       color: colors.text,

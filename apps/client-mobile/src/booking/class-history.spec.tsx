@@ -129,27 +129,27 @@ describe("Client Class History", () => {
     expect(screen.getAllByText("EV")).toHaveLength(2);
   });
 
-  // MOB-040: the 07 frame draws rows between rules on Superficie, not cards.
-  it("draws each class as a ruled row with its day, under a summary and month counts", async () => {
+  // Rosa Emma (C05d): the summary is the 600 hero and each month a white card.
+  it("draws each class as a row with its day, under the summary hero and month cards", async () => {
     const screen = await openHistory(history);
 
     await waitFor(() => {
       expect(screen.getByText("Has asistido a")).toBeOnTheScreen();
     });
-    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 26 });
+    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 28 });
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
-    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
+    expect(screen.getByText("05")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
     expect(screen.getByText("sáb")).toBeOnTheScreen();
 
     const rows = screen.getAllByTestId("class-history-row");
     expect(rows).toHaveLength(3);
     expect(StyleSheet.flatten(rows[0].props.style)).not.toHaveProperty("backgroundColor");
     expect(StyleSheet.flatten(rows[1].props.style)).toMatchObject({
-      borderBottomColor: "#E7CCBF",
+      borderBottomColor: "#F9E7DF",
       borderBottomWidth: 1,
     });
     expect(screen.getByText("Septiembre 2026").parent).toHaveStyle({
-      borderBottomColor: "#CDA697",
+      backgroundColor: "#FEF6F2",
     });
   });
 

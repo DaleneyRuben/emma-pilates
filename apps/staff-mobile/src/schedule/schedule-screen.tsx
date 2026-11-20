@@ -5,16 +5,15 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
-  ClassList,
   colors,
   fontFamilies,
   LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
+  surfaces,
   upcomingCivilDates,
   usePullToRefresh,
   typography,
@@ -24,6 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll } from "../ui/card-pieces";
 import { useOwnRoleLabel } from "../profile/staff-labels";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
@@ -33,8 +33,11 @@ import { DayStrip } from "../ui/day-strip";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { allCancelledTitle, countLabel, dayHeading } from "../ui/session-time";
+import { cancelledReason } from "../trainer/agenda-cancellations";
 import { splitNextClass } from "../trainer/next-class";
-import { ScheduleCancelledFold, ScheduleClassRow, ScheduleNextClass } from "./schedule-class-card";
+import { ClassDayCards } from "../ui/class-day-cards";
+import { scheduleCancelledRows, ScheduleClassRow, ScheduleNextClass } from "./schedule-class-card";
+import { TabFooter } from "../ui/tab-footer";
 
 type ScheduleNavigation = {
   navigate: {
@@ -53,7 +56,10 @@ function dayCount(date: string, today: string, count: number, cancelled: number)
 /**
  * The read-only week of classes (HOR boards). The Assistant books from a
  * Client's file, so «Reservar para una clienta» opens Clientas; the
- * Coordinator and the Administrator cancel a class from here instead.
+ * Coordinator and the Administrator cancel a class from here instead. Boards
+ * H01–H05: the band stays fixed; the Branch and the week share a white card,
+ * the day's classes sit in cards under their count, and «Reservar para una
+ * clienta» in the white footer above the tabs.
  */
 export function ScheduleScreen() {
   const navigation = useNavigation<ScheduleNavigation>();
@@ -103,8 +109,12 @@ export function ScheduleScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        {header}
+      {header}
+      <ScrollView
+        contentContainerStyle={bodyScroll.content}
+        refreshControl={refreshControl}
+        style={bodyScroll.scroll}
+      >
         {selling ? null : (
           <PlainRowGroup>
             <PlainRow
@@ -114,21 +124,25 @@ export function ScheduleScreen() {
             />
           </PlainRowGroup>
         )}
-        {several ? (
-          <BranchField
-            onSelect={branches.select}
-            options={branches.options}
-            selectedId={branch.id}
-            selectedName={branch.name}
+        <View style={styles.week}>
+          {several ? (
+            <View style={styles.branch}>
+              <BranchField
+                onSelect={branches.select}
+                options={branches.options}
+                selectedId={branch.id}
+                selectedName={branch.name}
+              />
+            </View>
+          ) : null}
+          <DayStrip
+            dates={dates}
+            onSelect={setSelectedDate}
+            selected={selectedDate}
+            testIDPrefix="schedule-day"
+            today={today}
           />
-        ) : null}
-        <DayStrip
-          dates={dates}
-          onSelect={setSelectedDate}
-          selected={selectedDate}
-          testIDPrefix="schedule-day"
-          today={today}
-        />
+        </View>
         {sessions.isPending ? (
           <LoadingState label="Cargando clases" />
         ) : sessions.isError || sessions.data.status !== 200 ? (
@@ -144,49 +158,54 @@ export function ScheduleScreen() {
             title="Este día no hay clases"
           />
         ) : (
-          <View style={styles.list}>
-            <SectionTitle>
-              {dayCount(selectedDate, today, standing.length, cancelled.length)}
-            </SectionTitle>
+          <>
             {next === undefined ? null : <ScheduleNextClass now={now} session={next} />}
-            {rest.length === 0 ? null : (
-              <ClassList>
-                {rest.map((session) => (
-                  <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
-                ))}
-              </ClassList>
-            )}
-            <ScheduleCancelledFold key={selectedDate} sessions={cancelled} />
-          </View>
+            <ClassDayCards
+              cancelledListTestID="schedule-cancelled-list"
+              cancelledRows={scheduleCancelledRows(cancelled)}
+              foldTestID="schedule-cancelled-fold"
+              key={selectedDate}
+              label={dayCount(selectedDate, today, standing.length, cancelled.length)}
+              reason={cancelledReason(cancelled)}
+              rows={rest.map((session) => (
+                <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
+              ))}
+            />
+          </>
         )}
         {selling ? null : (
-          <Text style={styles.note}>
-            Solo lectura. Para reservar, abre la ficha de una clienta.
-          </Text>
+          <View style={styles.noteCard}>
+            <Text style={styles.note}>
+              Solo lectura. Para reservar, abre la ficha de una clienta.
+            </Text>
+          </View>
         )}
       </ScrollView>
       {selling ? (
-        <View style={styles.footer}>
+        <TabFooter>
           <PrimaryButton
             label="Reservar para una clienta"
             onPress={() => navigation.navigate("ClientsTab", { screen: "ClientSearch" })}
             testID="schedule-book-for-client"
           />
-        </View>
+        </TabFooter>
       ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  footer: { paddingBottom: spacing.lg, paddingTop: spacing.sm },
-  list: { gap: spacing.md },
+  branch: { paddingHorizontal: spacing.xs },
   note: {
-    color: colors.textMuted,
+    color: colors.text,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
+    lineHeight: 18,
     textAlign: "center",
   },
+  // Board H02: the read-only line rides its own white card.
+  noteCard: { ...surfaces.card, paddingHorizontal: spacing.mdLg, paddingVertical: spacing.smLg },
   screen: { paddingHorizontal: spacing.xlSm },
+  // Boards H01–H02: the week (and the Branch) in one white card.
+  week: { ...surfaces.card, gap: spacing.smLg, padding: spacing.md },
 });

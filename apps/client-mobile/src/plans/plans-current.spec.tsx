@@ -88,7 +88,7 @@ describe("Client Plans with a current Plan", () => {
     await openPlansFromMyPlan(screen);
 
     const hero = await screen.findByTestId("plan-renewal-plan-24");
-    expect(hero).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(hero).toHaveStyle({ backgroundColor: "#93615D" });
     expect(within(hero).getByText("Renueva tu plan")).toBeOnTheScreen();
     expect(within(hero).getByText("Trimestral 24 clases")).toBeOnTheScreen();
     expect(within(hero).getByText("90 días · hasta 3 por semana")).toBeOnTheScreen();
@@ -120,7 +120,7 @@ describe("Client Plans with a current Plan", () => {
     expect(within(hero).getByText("Bs 1.530")).toBeOnTheScreen();
     expect(within(hero).getByText("Bs 1.800")).toHaveStyle({ textDecorationLine: "line-through" });
     // The offer banner stays, quiet under the list: the block is the one hero.
-    expect(screen.getByTestId("plans-launch-banner")).toHaveStyle({ backgroundColor: "#F9F4F2" });
+    expect(screen.getByTestId("plans-launch-banner")).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 
   it("offers to renew the Plan of an expired Subscription", async () => {

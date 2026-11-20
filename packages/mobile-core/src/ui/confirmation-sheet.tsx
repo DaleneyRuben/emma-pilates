@@ -6,7 +6,7 @@ import { fontFamilies } from "./fonts";
 import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
 import { TextButton } from "./text-button";
-import { colors, radii, spacing, typography } from "./tokens";
+import { colors, radii, shadows, spacing, typography } from "./tokens";
 
 type ConfirmationSheetProps = PropsWithChildren<{
   visible: boolean;
@@ -64,6 +64,7 @@ export function ConfirmationSheet({
     >
       <View style={styles.backdrop}>
         <View style={styles.sheet} testID={testID}>
+          <View style={styles.grabber} />
           <Text style={styles.title}>{title}</Text>
           {children}
           {note === undefined ? null : <BodyText>{note}</BodyText>}
@@ -72,7 +73,6 @@ export function ConfirmationSheet({
             disabled={locked && !busy}
             label={confirmLabel}
             onPress={onConfirm}
-            size="compact"
             testID={confirmTestID}
             tone={tone === "primary" ? "primary" : "error"}
           />
@@ -97,17 +97,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
   },
+  grabber: {
+    alignSelf: "center",
+    backgroundColor: colors.band,
+    borderRadius: 3,
+    height: 5,
+    width: 40,
+  },
   sheet: {
+    ...shadows.sheet,
     backgroundColor: colors.card,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
+    borderTopLeftRadius: radii.band,
+    borderTopRightRadius: radii.band,
+    gap: spacing.mdLg,
+    paddingBottom: spacing.xxl + spacing.xxs,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.md,
   },
   title: {
     color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSecondary,
-    fontWeight: "500",
+    fontFamily: fontFamilies.display,
+    fontSize: typography.section,
+    lineHeight: 29,
   },
 });

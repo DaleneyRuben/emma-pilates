@@ -23,10 +23,8 @@ describe("SegmentedTabs", () => {
     );
 
     expect(screen.getByTestId("tabs")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 14,
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 16,
       flexDirection: "row",
       gap: 4,
       padding: 4,
@@ -43,7 +41,7 @@ describe("SegmentedTabs", () => {
     expect(selected).toHaveProp("accessibilityState", { selected: true });
     expect(selected).toHaveStyle({
       backgroundColor: "#93615D",
-      borderRadius: 10,
+      borderRadius: 12,
       flex: 1,
       height: 44,
     });
@@ -51,8 +49,8 @@ describe("SegmentedTabs", () => {
     expect(other).toHaveProp("accessibilityState", { selected: false });
     expect(StyleSheet.flatten(other.props.style)).not.toHaveProperty("backgroundColor");
     expect(screen.getByText("Próximas")).toHaveStyle({
-      color: "#F9F4F2",
-      fontFamily: "WorkSans_600SemiBold",
+      color: "#FFFBFB",
+      fontFamily: "WorkSans_700Bold",
       fontSize: 15,
     });
     expect(screen.getByText("Historial")).toHaveStyle({

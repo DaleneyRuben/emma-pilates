@@ -10,8 +10,8 @@ import {
   NoticeRow,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -20,7 +20,8 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { staffRoleLabel } from "@pilates/api-contracts";
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar, backBarScroll } from "../ui/back-bar";
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
+import { BackBar } from "../ui/back-bar";
 import { PersonRow } from "../ui/person-row";
 import { createImpersonationApi } from "./impersonation-api";
 import { useImpersonation } from "./impersonation-context";
@@ -52,12 +53,7 @@ export function ViewAsScreen() {
     ]),
   );
   const header = (
-    <BackBar
-      back="Perfil"
-      onBack={() => navigation.goBack()}
-      subtitle="Verás sus clases y su agenda durante 30 minutos. Sales cuando quieras desde la franja de arriba."
-      title="Ver la app como…"
-    />
+    <BackBar back="Perfil" onBack={() => navigation.goBack()} title="Ver la app como…" />
   );
 
   if (members.isPending) {
@@ -109,11 +105,16 @@ export function ViewAsScreen() {
 
   return (
     <Screen style={styles.screen}>
+      {header}
       <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
-        style={backBarScroll.scroll}
+        contentContainerStyle={[bodyScroll.content, styles.content]}
+        style={bodyScroll.scroll}
       >
-        {header}
+        {/* E-D23: what seeing the app as someone means, as a soft aside. */}
+        <SoftNote
+          icon="eye"
+          message="Verás sus clases y su agenda durante 30 minutos. Sales cuando quieras desde la franja de arriba."
+        />
         {failure === null ? null : (
           <View accessibilityLabel={failure} accessibilityRole="alert">
             <NoticeRow message={failure} />
@@ -126,9 +127,8 @@ export function ViewAsScreen() {
             variant="plain"
           />
         ) : (
-          <View>
-            <SectionTitle>El equipo</SectionTitle>
-            <IconRowGroup>
+          <>
+            <RowCard label="El equipo">
               {people.map((member) => (
                 <PersonRow
                   accessibilityLabel={member.name}
@@ -139,9 +139,11 @@ export function ViewAsScreen() {
                   testID={`view-as-${member.id}`}
                 />
               ))}
-            </IconRowGroup>
-            <Text style={styles.footnote}>Nunca aparece otra persona de administración.</Text>
-          </View>
+            </RowCard>
+            <View style={styles.footnoteCard}>
+              <Text style={styles.footnote}>Nunca aparece otra persona de administración.</Text>
+            </View>
+          </>
         )}
       </ScrollView>
       {/* S24's sheet (UX-002): the solid action, since starting is not destructive. */}
@@ -171,18 +173,20 @@ const styles = StyleSheet.create({
   // S24: a 560 pt column on the tablet, the full width on a phone.
   content: {
     alignSelf: "center",
-    gap: spacing.xl,
     // 560 pt of text inside the scroller's own padding.
     maxWidth: 600,
-    paddingBottom: spacing.xxl,
     width: "100%",
   },
   footnote: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
-    marginTop: spacing.md,
     textAlign: "center",
+  },
+  footnoteCard: {
+    ...surfaces.card,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.smLg,
   },
   screen: { paddingHorizontal: spacing.xlSm },
 });

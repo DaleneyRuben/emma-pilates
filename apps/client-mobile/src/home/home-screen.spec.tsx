@@ -76,8 +76,9 @@ describe("Client Home", () => {
     });
     // FIX-082 (Inicio option A): a light Plan row, no Rosa profundo hero, no
     // «Activo» pill and no «Mi plan» pill; the whole row opens Mi plan.
-    expect(screen.getByTestId("home-plan-card")).toHaveStyle({ backgroundColor: "#F9F4F2" });
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByTestId("home-plan-summary")).toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(screen.getByTestId("home-plan-count")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     // Follow-up 177: the end is an expiry, «vence el».
     expect(screen.getByText("Vence el dom 11 oct")).toBeOnTheScreen();
     expect(screen.queryByText("Activo")).toBeNull();
@@ -149,12 +150,12 @@ describe("Client Home", () => {
     });
     const screen = await render(<App runtime={createRuntime(fetcher)} />);
 
-    // FIX-089 (ClaseE): the next class is the Palo de rosa hero.
+    // FIX-089 (ClaseE): the next class is the 600 hero.
     await waitFor(() => {
       expect(screen.getByText(/^TU PRÓXIMA CLASE · /)).toBeOnTheScreen();
     });
-    expect(screen.getByTestId("home-next-class")).toHaveStyle({ backgroundColor: "#B78380" });
-    expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getByTestId("home-next-class")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({ color: "#FFFBFB" });
     expect(screen.getByText("Achumani · Daniela Ortiz")).toBeOnTheScreen();
     expect(screen.queryByText(/Reformer/)).toBeNull();
 
@@ -180,9 +181,9 @@ describe("Client Home", () => {
     expect(screen.getByText("Desde Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Mat y Reformer · paga por QR o en el estudio")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
-      backgroundColor: "#F9F4F2",
+      backgroundColor: "#FFFBFB",
     });
-    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({ backgroundColor: "#B78380" });
+    expect(screen.getByTestId("home-purchase-card")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("Necesitas un plan activo")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Activo")).not.toBeOnTheScreen();
@@ -209,7 +210,7 @@ describe("Client Home", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+      expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     });
   });
 
@@ -228,7 +229,7 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     // FIX-090: the app's one banner, not a second copy of Inicio's own.
     expect(
       screen.getAllByText("Sin conexión. Mostrando la última información guardada."),
@@ -250,7 +251,7 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.getByText("Sin conexión. Mostrando la última información guardada."),
     ).toBeOnTheScreen();
@@ -302,7 +303,7 @@ describe("Client Home", () => {
       onlineManager.setOnline(true);
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    expect(screen.getByText("Paquete de 8 clases · 5 restantes")).toBeOnTheScreen();
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.queryByText("Sin conexión. Mostrando la última información guardada."),
     ).not.toBeOnTheScreen();

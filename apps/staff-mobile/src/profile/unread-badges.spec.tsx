@@ -41,7 +41,7 @@ describe("Staff unread language", () => {
     });
     expect(screen.getByTestId("notification-bell-count")).toHaveStyle({
       backgroundColor: "#93615D",
-      color: "#F9F4F2",
+      color: "#FFFBFB",
       fontFamily: "WorkSans_600SemiBold",
       fontSize: 12,
     });
@@ -59,7 +59,7 @@ describe("Staff unread language", () => {
     expect(screen.getByTestId("notifications-row-badge")).toHaveStyle({
       backgroundColor: "#93615D",
     });
-    expect(screen.getAllByText("9+").at(-1)).toHaveStyle({ color: "#F9F4F2" });
+    expect(screen.getAllByText("9+").at(-1)).toHaveStyle({ color: "#FFFBFB" });
     expect(screen.getAllByText("9+").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("button", {

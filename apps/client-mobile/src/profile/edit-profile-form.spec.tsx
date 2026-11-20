@@ -37,7 +37,7 @@ describe("Editar perfil, FormB", () => {
     const summary = await screen.findByTestId("form-error-summary");
     expect(within(summary).getByText("Faltan 2 datos para guardar")).toBeOnTheScreen();
     expect(within(summary).getByText("Nombre · Correo electrónico")).toBeOnTheScreen();
-    expect(summary).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(summary).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(screen.getByText("Escribe tu nombre.")).toBeOnTheScreen();
     expect(screen.getByLabelText("Nombre")).toHaveStyle({ borderWidth: 2 });
     expect(saved).not.toHaveBeenCalled();

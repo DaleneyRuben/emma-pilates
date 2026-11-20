@@ -3,25 +3,25 @@ import { render } from "@testing-library/react-native";
 import { ChannelGrid } from "../assistant/channel-grid";
 import { DateTile, Pill } from "../nutritionist/availability-block-form-parts";
 import { UnitTiles } from "../trainer/report-fault-pieces";
-import { BranchChips } from "./branch-chips";
+import { BranchCard } from "./branch-chips";
 import { DayStrip, DayStripAction } from "./day-strip";
 import { FilterChips } from "./filter-chips";
 import { PersonRow } from "./person-row";
 
 const rosaProfundo = "#93615D";
-const crema = "#F9F4F2";
-const arcilla = "#CDA697";
+const crema = "#FFFBFB";
 const noop = () => undefined;
 
 type Element = ReturnType<Awaited<ReturnType<typeof render>>["getByText"]>;
 
 function expectSelected(box: Element, label: Element) {
   expect(box).toHaveStyle({ backgroundColor: rosaProfundo });
-  expect(label).toHaveStyle({ color: crema, fontFamily: "WorkSans_600SemiBold" });
+  expect(label).toHaveStyle({ color: crema, fontFamily: "WorkSans_700Bold" });
 }
 
 function expectUnselected(box: Element) {
-  expect(box).toHaveStyle({ backgroundColor: crema, borderColor: arcilla, borderWidth: 1 });
+  // Rosa Emma: a chip keeps its 1.5 pt 400 outline; a day tile, the card shadow.
+  expect(box).toHaveStyle({ backgroundColor: crema });
 }
 
 // A box under 44 pt reaches 44 with its hit slop.
@@ -59,7 +59,7 @@ describe("Staff selected states", () => {
 
   it("draws the Branch chips the same way", async () => {
     const screen = await render(
-      <BranchChips
+      <BranchCard
         label="Sucursal"
         onSelect={noop}
         options={[
@@ -74,7 +74,7 @@ describe("Staff selected states", () => {
     expectSelected(screen.getByTestId("branch-a"), screen.getByText("Achumani"));
     expectUnselected(screen.getByTestId("branch-c"));
     expectTouchTarget(screen.getByTestId("branch-c"));
-    expect(screen.getByText("Sucursal")).toHaveStyle({ fontFamily: "WorkSans_600SemiBold" });
+    expect(screen.getByText("Sucursal")).toHaveStyle({ fontFamily: "WorkSans_700Bold" });
   });
 
   it("draws the chosen day and the «Otra» chip the same way", async () => {
@@ -122,7 +122,7 @@ describe("Staff selected states", () => {
     expectSelected(screen.getByRole("button", { name: "Lun" }), screen.getByText("Lun"));
     expectUnselected(screen.getByRole("button", { name: "Mar" }));
     expectUnselected(screen.getByRole("button", { name: "Viernes 9" }));
-    expect(screen.getByText("Mar")).toHaveStyle({ fontFamily: "WorkSans_400Regular" });
+    expect(screen.getByText("Mar")).toHaveStyle({ fontFamily: "WorkSans_500Medium" });
   });
 
   it("draws the chosen unit tile the same way", async () => {

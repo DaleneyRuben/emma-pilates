@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { spacing, surfaces } from "../ui/tokens";
 import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { SecondaryButton, WaitNotice } from "./auth-parts";
+import { CheckEmailSheet, type CheckEmailSheetKind } from "./check-email-sheet";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useMountedAt } from "../time/mounted-at";
 import { formatCountdown, useCountdown } from "./countdown";
@@ -42,13 +42,21 @@ function RegistrationLapsed({
   onRegisterAgain: () => void;
 }) {
   return (
-    <AuthenticationScreen brand={false} title="El registro venció">
+    <AuthenticationScreen
+      actions={
+        <>
+          <PrimaryButton label="Registrarme de nuevo" onPress={onRegisterAgain} />
+          <TextButton label="Volver a iniciar sesión" onPress={onBack} style={authStyles.pill} />
+        </>
+      }
+      badge={{ icon: "clock", tone: "primary" }}
+      brand={false}
+      title="El registro venció"
+    >
       <BodyText>
         Pasaron 7 días sin verificar el correo, así que eliminamos el registro pendiente. Puedes
         registrarte de nuevo.
       </BodyText>
-      <PrimaryButton label="Registrarme de nuevo" onPress={onRegisterAgain} />
-      <TextButton label="Volver a iniciar sesión" onPress={onBack} />
     </AuthenticationScreen>
   );
 }
@@ -57,7 +65,7 @@ function RegistrationLapsed({
 // address, one line of what to do, and two buttons; correcting, cancelling
 // and the deadlines live in the options sheet. The screen reads the same
 // whether or not the address could register (ADR-0029).
-type Sheet = "cancel" | "options" | null;
+type Sheet = CheckEmailSheetKind;
 
 export function CheckEmailScreen({
   api,
@@ -133,12 +141,29 @@ export function CheckEmailScreen({
 
   return (
     <AuthenticationScreen
+      actions={
+        <>
+          <PrimaryButton disabled={submitting} label="Iniciar sesión" onPress={onBack} />
+          <SecondaryButton
+            busy={submitting && sheet === null}
+            disabled={submitting || waiting}
+            label={waiting ? `Reenviar en ${formatCountdown(waitSeconds)}` : "Reenviar correo"}
+            onPress={resend}
+          />
+          <TextButton
+            disabled={submitting}
+            label="¿Correo equivocado? Ver opciones"
+            onPress={() => setSheet("options")}
+            style={authStyles.pill}
+          />
+        </>
+      }
       badge={{ icon: "mail", tone: "primary" }}
       brand={false}
       title="Revisa tu correo"
     >
       <View style={styles.lines}>
-        <BodyText style={[authStyles.muted, authStyles.centered]}>Te enviamos un enlace a</BodyText>
+        <BodyText style={authStyles.centered}>Te enviamos un enlace a</BodyText>
         <BodyText style={[authStyles.emphasized, authStyles.centered]}>{pending.email}</BodyText>
       </View>
       <BodyText style={authStyles.centered}>
@@ -149,11 +174,7 @@ export function CheckEmailScreen({
           <BodyText>Te enviamos otro correo. Usa el enlace más reciente.</BodyText>
         </View>
       ) : null}
-      {failure === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      )}
+      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
       {waiting ? (
         <WaitNotice
           message="Ya te enviamos uno hace poco. El enlace que tienes sigue sirviendo."
@@ -161,95 +182,15 @@ export function CheckEmailScreen({
           waitLabel="Podrás reenviarlo en"
         />
       ) : null}
-      <PrimaryButton disabled={submitting} label="Iniciar sesión" onPress={onBack} />
-      <SecondaryButton
-        busy={submitting && sheet === null}
-        disabled={submitting || waiting}
-        label={waiting ? `Reenviar en ${formatCountdown(waitSeconds)}` : "Reenviar correo"}
-        onPress={resend}
+      <CheckEmailSheet
+        kind={sheet}
+        onAskCancel={() => setSheet("cancel")}
+        onCancel={cancel}
+        onClose={() => setSheet(null)}
+        onCorrect={correct}
+        submitting={submitting}
       />
-      <TextButton
-        disabled={submitting}
-        label="¿Correo equivocado? Ver opciones"
-        onPress={() => setSheet("options")}
-        style={styles.centeredButton}
-      />
-      <Modal
-        animationType="slide"
-        onRequestClose={() => {
-          if (!submitting) setSheet(null);
-        }}
-        transparent
-        visible={sheet !== null}
-      >
-        <View style={styles.sheetBackdrop}>
-          {sheet === "cancel" ? (
-            <View style={styles.sheet}>
-              <Text style={styles.sheetTitle}>¿Cancelar tu registro?</Text>
-              <BodyText style={authStyles.muted}>
-                El enlace deja de funcionar y el correo queda libre para registrarte de nuevo.
-              </BodyText>
-              <SecondaryButton
-                busy={submitting}
-                label="Sí, cancelar registro"
-                onPress={cancel}
-                tone="error"
-              />
-              <TextButton
-                disabled={submitting}
-                label="Volver"
-                onPress={() => setSheet(null)}
-                style={styles.centeredButton}
-              />
-            </View>
-          ) : (
-            <View style={styles.sheet}>
-              <Text style={styles.sheetTitle}>Opciones</Text>
-              <OptionRow hint="Si lo escribiste mal" label="Cambiar correo" onPress={correct} />
-              <OptionRow
-                hint="Libera el correo para empezar de nuevo"
-                label="Cancelar registro"
-                onPress={() => setSheet("cancel")}
-                tone="error"
-              />
-              <BodyText style={[authStyles.muted, authStyles.centered, styles.small]}>
-                El enlace vence en 24 horas. Si no lo abres en 7 días, borramos el registro.
-              </BodyText>
-              <TextButton
-                label="Cerrar"
-                onPress={() => setSheet(null)}
-                style={styles.centeredButton}
-              />
-            </View>
-          )}
-        </View>
-      </Modal>
     </AuthenticationScreen>
-  );
-}
-
-function OptionRow({
-  hint,
-  label,
-  onPress,
-  tone = "default",
-}: {
-  hint: string;
-  label: string;
-  onPress: () => void;
-  tone?: "default" | "error";
-}) {
-  return (
-    <Pressable
-      accessibilityHint={hint}
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.option}
-    >
-      <Text style={[styles.optionLabel, tone === "error" && styles.failure]}>{label}</Text>
-      <Text style={styles.optionHint}>{hint}</Text>
-    </Pressable>
   );
 }
 
@@ -310,11 +251,7 @@ export function CorrectEmailScreen({
         onChangeText={setEmail}
         value={email}
       />
-      {failure === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
-          {failure}
-        </BodyText>
-      )}
+      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
       {waitSeconds > 0 ? (
         <WaitNotice
           message={limitKeepsCurrentLink}
@@ -328,62 +265,14 @@ export function CorrectEmailScreen({
         label="Enviar enlace"
         onPress={submit}
       />
-      <TextButton label="Volver" onPress={onBack} />
+      <TextButton label="Volver" onPress={onBack} style={styles.centered} />
     </AuthenticationScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  centeredButton: {
-    alignSelf: "center",
-  },
-  failure: {
-    color: colors.errorText,
-  },
-  lines: {
-    gap: spacing.xs,
-  },
-  option: {
-    borderBottomColor: colors.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: spacing.xs,
-    minHeight: 56,
-    paddingVertical: spacing.sm,
-  },
-  optionHint: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
-  optionLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.bodyMedium,
-  },
-  resent: {
-    backgroundColor: colors.card,
-    borderRadius: radii.card,
-    padding: spacing.md,
-  },
-  sheet: {
-    backgroundColor: colors.card,
-    borderTopLeftRadius: radii.frame,
-    borderTopRightRadius: radii.frame,
-    gap: spacing.md,
-    padding: spacing.xl,
-  },
-  sheetBackdrop: {
-    backgroundColor: colors.scrim,
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheetTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-  },
-  small: {
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
+  centered: { alignSelf: "center" },
+  lines: { gap: spacing.xs },
+  // C01c: the resend's confirmation on the soft inset inside the card.
+  resent: { ...surfaces.soft, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
 });

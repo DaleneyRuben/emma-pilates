@@ -3,8 +3,8 @@ import {
   colors,
   fontFamilies,
   Glyph,
-  radii,
   spacing,
+  surfaces,
   weeklyClassesLeftLine,
 } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
@@ -38,8 +38,8 @@ export function weekNoticeLine(
 
 /**
  * Reservar option A (FIX-082, design audit 2026-11-18): the weekly cap said
- * once above the days instead of under every class, on Lino with a plain
- * muted icon.
+ * once above the days instead of under every class, on a white card inside
+ * the band (C03, C03f).
  */
 export function WeekNotice({
   classesLeft,
@@ -61,11 +61,17 @@ export function WeekNotice({
 }
 
 const styles = StyleSheet.create({
-  line: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  line: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 20,
+  },
   notice: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: radii.inset,
     flexDirection: "row",
     gap: spacing.smLg,
     paddingHorizontal: spacing.mdLg,

@@ -5,11 +5,9 @@ import {
   fontFamilies,
   formatTimeRange,
   IconRow,
-  IconRowGroup,
   NoticeRow,
   PrimaryButton,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
   surfaces,
@@ -22,8 +20,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
-import { BackBar, backBarScroll } from "../ui/back-bar";
+import { BackBar } from "../ui/back-bar";
 import { dayHeading } from "../ui/session-time";
 import { ValueRow } from "../ui/value-row";
 import { AdministratorApiError, createAdministratorApi } from "./administrator-api";
@@ -86,40 +85,41 @@ export function CancelSessionScreen({
   const time = formatTimeRange(session.startsAt, session.endsAt);
   const header = <BackBar onBack={() => navigation.goBack()} title="Cancelar clase" />;
 
+  // E-D15: the state card, what was cancelled, and the way back on the footer.
   if (affected !== null) {
     return (
-      <Screen style={styles.screen}>
-        <StateScreen
-          icon="check"
-          note={
-            affected === 0
-              ? "La clase no tenía reservas."
-              : affected === 1
-                ? "Avisamos a la clienta y recuperó su clase."
-                : `Avisamos a las ${affected} clientas y cada una recuperó su clase.`
-          }
-          primaryAction={{ label: "Volver a las clases", onPress: () => navigation.goBack() }}
-          title="Clase cancelada"
-        >
-          <View style={styles.summary}>
-            <IconRowGroup>
-              <ValueRow label="Clase" value={session.classTypeName} />
-              <ValueRow label="Fecha" value={`${day} · ${time.split(" – ")[0]}`} />
-            </IconRowGroup>
-          </View>
-        </StateScreen>
+      <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
+        <BackBar onBack={() => navigation.goBack()} />
+        <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+          <StateScreen
+            icon="check"
+            layout="card"
+            note={
+              affected === 0
+                ? "La clase no tenía reservas."
+                : affected === 1
+                  ? "Avisamos a la clienta y recuperó su clase."
+                  : `Avisamos a las ${affected} clientas y cada una recuperó su clase.`
+            }
+            title="Clase cancelada"
+          />
+          <RowCard>
+            <ValueRow label="Clase" value={session.classTypeName} />
+            <ValueRow label="Fecha" value={`${day} · ${time.split(" – ")[0]}`} />
+          </RowCard>
+        </ScrollView>
+        <FooterPanel>
+          <PrimaryButton label="Volver a las clases" onPress={() => navigation.goBack()} />
+        </FooterPanel>
       </Screen>
     );
   }
 
   const empty = session.bookedCount === 0;
   return (
-    <Screen style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
-        style={backBarScroll.scroll}
-      >
-        {header}
+    <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
+      {header}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         <View style={styles.card}>
           <Text style={styles.title}>{session.classTypeName}</Text>
           <Text style={styles.muted}>{`${day} · ${time}`}</Text>
@@ -127,28 +127,25 @@ export function CancelSessionScreen({
           <Text style={styles.muted}>{capacityLabel(session.bookedCount, session.capacity)}</Text>
         </View>
         {empty ? null : (
-          <View>
-            <SectionTitle>Qué va a pasar</SectionTitle>
-            <IconRowGroup>
-              <IconRow
-                icon="cross"
-                label={
-                  session.bookedCount === 1
-                    ? "Se cancela la reserva"
-                    : `Se cancelan las ${session.bookedCount} reservas`
-                }
-              />
-              <IconRow
-                icon="check"
-                label={
-                  rules === undefined
-                    ? "Cada clienta recupera su clase, aun dentro del plazo de cancelación"
-                    : `Cada clienta recupera su clase, aun fuera del plazo de ${windowLabel(rules.cancellationWindowMinutes)}`
-                }
-              />
-              <IconRow icon="bell" label="Avisamos a cada clienta por notificación" />
-            </IconRowGroup>
-          </View>
+          <RowCard label="Qué va a pasar">
+            <IconRow
+              icon="cross"
+              label={
+                session.bookedCount === 1
+                  ? "Se cancela la reserva"
+                  : `Se cancelan las ${session.bookedCount} reservas`
+              }
+            />
+            <IconRow
+              icon="check"
+              label={
+                rules === undefined
+                  ? "Cada clienta recupera su clase, aun dentro del plazo de cancelación"
+                  : `Cada clienta recupera su clase, aun fuera del plazo de ${windowLabel(rules.cancellationWindowMinutes)}`
+              }
+            />
+            <IconRow icon="bell" label="Avisamos a cada clienta por notificación" />
+          </RowCard>
         )}
         <NoticeRow
           message={
@@ -157,13 +154,13 @@ export function CancelSessionScreen({
               : "Esto no se puede deshacer."
           }
         />
+      </ScrollView>
+      <FooterPanel>
         {failure === null ? null : (
           <View accessibilityLabel={failure} accessibilityRole="alert">
             <Text style={styles.failure}>{failure}</Text>
           </View>
         )}
-      </ScrollView>
-      <View style={styles.actions}>
         <PrimaryButton
           busy={submitting}
           label="Sí, cancelar clase"
@@ -172,18 +169,20 @@ export function CancelSessionScreen({
           tone="error"
         />
         <TextButton label="Volver" onPress={() => navigation.goBack()} />
-      </View>
+      </FooterPanel>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.xs, paddingBottom: spacing.lg, paddingTop: spacing.md },
-  card: { ...surfaces.card, gap: spacing.xs, padding: spacing.lg },
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
-  failure: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.body },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  card: { ...surfaces.card, gap: spacing.smd, padding: spacing.lg },
+  failure: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.body,
+    textAlign: "center",
+  },
+  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.body },
   screen: { paddingHorizontal: spacing.xlSm },
-  summary: { alignSelf: "stretch", marginTop: spacing.sm },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
+  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.section },
 });

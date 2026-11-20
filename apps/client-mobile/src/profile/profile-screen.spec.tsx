@@ -146,8 +146,12 @@ describe("Client Profile", () => {
     }
     // Finding 70: one evaluation row; «Mis evaluaciones» lives inside it.
     expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
-    // FIX-082 (design audit 2026-11-18): the icons stand alone, no tinted disc.
-    expect(screen.queryByTestId("icon-row-disc")).toBeNull();
+    // Rosa Emma (C18): every row's icon sits on a 36 pt 50 disc.
+    const discs = screen.getAllByTestId("profile-row-disc");
+    expect(discs).toHaveLength(8);
+    expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", height: 36, width: 36 });
+    // The identity is the 600 hero under the «Perfil» band.
+    expect(screen.getByRole("header", { name: "Perfil" })).toBeOnTheScreen();
     // Follow-up 256 § 2 (verification n.º 43, 44): «Cerrar sesión» is the Error
     // last row, as in the Staff app, and «Cerrar mi cuenta» a muted link after
     // the version, far from it.

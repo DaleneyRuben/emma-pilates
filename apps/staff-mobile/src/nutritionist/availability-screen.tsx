@@ -8,7 +8,6 @@ import {
   Chevron,
   colors,
   fontFamilies,
-  IconRowGroup,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -18,11 +17,12 @@ import {
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
-  SectionTitle,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { bodyScroll, RowCard, SoftNote } from "../ui/card-pieces";
+import { TabFooter } from "../ui/tab-footer";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import {
@@ -70,26 +70,27 @@ export function AvailabilityScreen() {
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
 
-  const header = (
-    <RootHeader
-      note="Las clientas eligen turnos de 45 min dentro de estos rangos."
-      title="Mi disponibilidad"
-    />
+  // Boards N05–N06: the band holds the title alone; the note rides a soft
+  // aside on the body, and «Nuevo horario» the white footer above the tabs.
+  const header = <RootHeader title="Mi disponibilidad" />;
+  const note = (
+    <SoftNote icon="clock" message="Las clientas eligen turnos de 45 min dentro de estos rangos." />
   );
   const newBlock = (
-    <View style={styles.footer}>
+    <TabFooter>
       <PrimaryButton
         label="Nuevo horario"
         onPress={() => navigation.navigate("AvailabilityBlockForm")}
         testID="availability-new-block"
       />
-    </View>
+    </TabFooter>
   );
 
   if (blocks.isPending) {
     return (
       <Screen style={styles.screen}>
         {header}
+        <View style={styles.state}>{note}</View>
         <LoadingState label="Cargando horarios" />
       </Screen>
     );
@@ -119,9 +120,11 @@ export function AvailabilityScreen() {
   if (sorted.length === 0) {
     return (
       <Screen style={styles.screen}>
-        <RootHeader title="Mi disponibilidad" />
+        {header}
+        <View style={styles.balance} />
         <StateScreen
           icon="calendar"
+          layout="card"
           note="Publica un rango y las clientas podrán reservar su evaluación."
           primaryAction={{
             label: "Nuevo horario",
@@ -130,48 +133,51 @@ export function AvailabilityScreen() {
           }}
           title="Aún no publicaste horarios"
         />
+        <View style={styles.balance} />
       </Screen>
     );
   }
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
-        {header}
-        <View>
-          <SectionTitle>{`Horarios semanales · ${countLabel(sorted.length, "horario", "horarios")}`}</SectionTitle>
-          <IconRowGroup>
-            {sorted.map((block) => {
-              const dates = dateLine(block, today);
-              return (
-                <Pressable
-                  accessibilityLabel={`Editar horario ${blockRange(block)}`}
-                  accessibilityRole="button"
-                  key={block.id}
-                  onPress={() => navigation.navigate("AvailabilityBlockForm", { block })}
-                  style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-                >
-                  <View style={styles.tag}>
-                    <Text style={styles.tagText}>{weekdayTag(block.weekday)}</Text>
-                  </View>
-                  <View style={styles.body}>
-                    <Text style={styles.range}>
-                      {`${displayTime(block.startsAtLocal)} – ${displayTime(block.endsAtLocal)}`}
-                    </Text>
-                    <Text style={styles.muted}>
-                      {[
-                        `${block.slotsPerWeek} turnos · ${bookedLabel(block.upcomingBookedCount)}`,
-                        ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
-                      ].join(" · ")}
-                    </Text>
-                    {dates === null ? null : <Text style={styles.dates}>{dates}</Text>}
-                  </View>
-                  <Chevron size={16} strokeWidth={1.5} tone="muted" />
-                </Pressable>
-              );
-            })}
-          </IconRowGroup>
-        </View>
+      {header}
+      <ScrollView
+        contentContainerStyle={bodyScroll.content}
+        refreshControl={refreshControl}
+        style={bodyScroll.scroll}
+      >
+        {note}
+        <RowCard label={`Horarios semanales · ${countLabel(sorted.length, "horario", "horarios")}`}>
+          {sorted.map((block) => {
+            const dates = dateLine(block, today);
+            return (
+              <Pressable
+                accessibilityLabel={`Editar horario ${blockRange(block)}`}
+                accessibilityRole="button"
+                key={block.id}
+                onPress={() => navigation.navigate("AvailabilityBlockForm", { block })}
+                style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+              >
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>{weekdayTag(block.weekday)}</Text>
+                </View>
+                <View style={styles.body}>
+                  <Text style={styles.range}>
+                    {`${displayTime(block.startsAtLocal)} – ${displayTime(block.endsAtLocal)}`}
+                  </Text>
+                  <Text style={styles.muted}>
+                    {[
+                      `${block.slotsPerWeek} turnos · ${bookedLabel(block.upcomingBookedCount)}`,
+                      ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
+                    ].join(" · ")}
+                  </Text>
+                  {dates === null ? null : <Text style={styles.dates}>{dates}</Text>}
+                </View>
+                <Chevron size={16} strokeWidth={1.5} tone="muted" />
+              </Pressable>
+            );
+          })}
+        </RowCard>
       </ScrollView>
       {newBlock}
     </Screen>
@@ -179,28 +185,34 @@ export function AvailabilityScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Board N06: the empty card sits in the middle of the space under the band.
+  balance: { flex: 1 },
   body: { flex: 1, gap: spacing.xxs },
   dates: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  footer: { paddingBottom: spacing.lg, paddingTop: spacing.md },
-  list: { gap: spacing.xl, paddingBottom: spacing.xl },
-  muted: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
+  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.7 },
-  range: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 16 },
+  range: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
+  },
   row: {
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 64,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
   },
   screen: { paddingHorizontal: spacing.xlSm },
+  state: { paddingTop: spacing.md },
   // FIX-089: the weekday is a word in weight, with no tinted disc behind it.
   tag: { justifyContent: "center", width: 40 },
   tagText: {
     color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
+    fontFamily: fontFamilies.bodyBold,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

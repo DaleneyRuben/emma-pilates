@@ -18,7 +18,7 @@ import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { SectionTitle } from "../ui/section-title";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing } from "../ui/tokens";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { NotificationGroup, type NotificationActionFor } from "./notification-row";
 import { usePushNotifications } from "./push-notifications";
 import { LoadingState } from "../ui/loading-state";
@@ -56,18 +56,18 @@ function DeniedNotice() {
 
   return (
     <View style={styles.notice}>
-      <BodyText>
+      <BodyText style={styles.noticeText}>
         Las notificaciones están desactivadas en este dispositivo. Actívalas para enterarte a tiempo
         de cambios y recordatorios.
       </BodyText>
-      <TextButton label="Abrir Ajustes" onPress={openSettings} />
+      <TextButton label="Abrir Ajustes" onPress={openSettings} style={styles.noticeLink} />
     </View>
   );
 }
 
 /**
- * The Client inbox (C2 C, owner 2026-11-19): «Nuevas · N» and «Anteriores»
- * on Crema cards, each notice with its topic icon and, where the app gives
+ * The Client inbox (C19, Rosa Emma): «Nuevas · N» and «Anteriores» in Lora
+ * over white cards, each notice with its topic icon and, where the app gives
  * one, a direct action.
  */
 export function NotificationsScreen({
@@ -186,6 +186,7 @@ export function NotificationsScreen({
             disabled={markAllRead.isPending}
             label="Marcar leídas"
             onPress={() => markAllRead.mutate()}
+            style={styles.markRead}
           />
         ) : undefined,
       )}
@@ -203,15 +204,23 @@ export function NotificationsScreen({
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
-  notice: {
-    alignItems: "flex-start",
+  content: { gap: spacing.md, paddingBottom: spacing.xxl },
+  // C19: «Marcar leídas» on a white pill at the end of the band's back row.
+  markRead: {
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radii.inset,
-    gap: spacing.sm,
-    padding: spacing.lg,
+    borderRadius: radii.pill,
+    minHeight: 36,
+    paddingHorizontal: spacing.mdLg,
   },
-  screen: { gap: spacing.lg },
+  // C19b: the soft 50 inset with its 1 pt 200 rule.
+  notice: {
+    ...surfaces.soft,
+    alignItems: "flex-start",
+    gap: spacing.smd,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  noticeLink: { minHeight: 32, paddingHorizontal: 0 },
+  noticeText: { fontSize: 14, lineHeight: 20 },
+  screen: { gap: spacing.md },
 });

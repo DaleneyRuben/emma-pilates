@@ -16,14 +16,15 @@ import {
   PrimaryButton,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
   StateScreen,
+  surfaces,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { FilterChips } from "../ui/filter-chips";
@@ -47,7 +48,9 @@ const isConflict = (response: { status: number; data: unknown }) =>
   (response.data as { code?: unknown } | null)?.code === "equipment_damage_exceeds_usable";
 
 // S26 (BKO-004): a Trainer tells the studio a machine of her Session's Branch
-// is broken; the Administrator resolves it on the admin web (AW37).
+// is broken; the Administrator resolves it on the admin web (AW37). Boards
+// I10–I13: the band stays fixed, each step is a white card with its label
+// inside, and «Enviar reporte» sits in the white footer with what it still needs.
 export function ReportFaultScreen({ route }: { route: { params: { sessionId: string } } }) {
   const { sessionId } = route.params;
   const navigation = useNavigation<{ goBack: () => void }>();
@@ -85,12 +88,16 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   if (sent !== null)
     return (
       <Screen style={column}>
+        <BackBar onBack={() => navigation.goBack()} />
+        <View style={styles.balance} />
         <StateScreen
           icon="check"
+          layout="card"
           note={`Administración ya puede ver ${sent} y lo marcará cuando esté resuelto.`}
           primaryAction={{ label: "Volver a la lista", onPress: () => navigation.goBack() }}
           title="Gracias por avisar"
         />
+        <View style={styles.balance} />
       </Screen>
     );
   if (equipment.isPending)
@@ -120,11 +127,13 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
     return (
       <Screen style={column}>
         {header}
-        <EmptyState
-          message="Administración todavía no cargó los equipos de esta sucursal."
-          title="Sin equipos registrados"
-          variant="plain"
-        />
+        <View style={styles.emptyGap}>
+          <EmptyState
+            icon="alert"
+            message="Administración todavía no cargó los equipos de esta sucursal."
+            title="Sin equipos registrados"
+          />
+        </View>
       </Screen>
     );
 
@@ -179,37 +188,39 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   };
 
   return (
-    <Screen style={column}>
-      <FormScrollView
-        contentContainerStyle={styles.form}
-        footer={
-          <View style={styles.footer}>
-            {problem === "failed" ? (
-              <NoticeRow message="No pudimos enviar el reporte. Inténtalo de nuevo." />
-            ) : null}
-            {problem === "conflict" ? (
-              <NoticeRow message={`Solo hay ${shown.usable} que se pueden usar.`} />
-            ) : null}
-            {busy ? null : <MissingStep message={missing} />}
-            <PrimaryButton
-              busy={busy}
-              disabled={!ready}
-              label="Enviar reporte"
-              onPress={() => void send()}
-              testID="report-fault-send"
+    <Screen edges={taskEdges} style={[column, bodyScroll.taskScreen]}>
+      {header}
+      <View style={bodyScroll.clip}>
+        <FormScrollView
+          contentContainerStyle={bodyScroll.content}
+          footer={
+            <FooterPanel bleed={0}>
+              {problem === "failed" ? (
+                <NoticeRow message="No pudimos enviar el reporte. Inténtalo de nuevo." />
+              ) : null}
+              {problem === "conflict" ? (
+                <NoticeRow message={`Solo hay ${shown.usable} que se pueden usar.`} />
+              ) : null}
+              {busy ? null : <MissingStep message={missing} />}
+              <PrimaryButton
+                busy={busy}
+                disabled={!ready}
+                label="Enviar reporte"
+                onPress={() => void send()}
+                testID="report-fault-send"
+              />
+            </FooterPanel>
+          }
+        >
+          <View style={styles.card}>
+            <CardLabel>¿Qué equipo?</CardLabel>
+            <FilterChips
+              onSelect={choose}
+              options={types.map((type) => ({ id: type.id, label: type.name }))}
+              selected={shown.id}
+              testID="report-fault-types"
             />
           </View>
-        }
-      >
-        {header}
-        <View style={styles.group}>
-          <SectionTitle>¿Qué equipo?</SectionTitle>
-          <FilterChips
-            onSelect={choose}
-            options={types.map((type) => ({ id: type.id, label: type.name }))}
-            selected={shown.id}
-            testID="report-fault-types"
-          />
           {byQuantity ? (
             <DamageCounter count={damaged} onChange={setCount} usable={shown.usable} />
           ) : (
@@ -220,28 +231,33 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
               units={shown.units}
             />
           )}
-        </View>
-        <FormField
-          label="¿Qué pasó?"
-          maxLength={500}
-          multiline
-          onChangeText={setDescription}
-          hint={byQuantity ? "Ej.: uno se pinchó" : "Ej.: el resorte rojo se soltó"}
-          style={styles.textArea}
-          testID="report-fault-description"
-          value={description}
-        />
-        {byQuantity ? null : <OutOfServiceSwitch onChange={setOutOfService} value={outOfService} />}
-      </FormScrollView>
+          <View style={styles.card}>
+            <FormField
+              label="¿Qué pasó?"
+              maxLength={500}
+              multiline
+              onChangeText={setDescription}
+              hint={byQuantity ? "Ej.: uno se pinchó" : "Ej.: el resorte rojo se soltó"}
+              style={styles.textArea}
+              testID="report-fault-description"
+              value={description}
+            />
+          </View>
+          {byQuantity ? null : (
+            <OutOfServiceSwitch onChange={setOutOfService} value={outOfService} />
+          )}
+        </FormScrollView>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  // Board I13: the thanks card sits in the middle of the space under the band.
+  balance: { flex: 1 },
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   centered: { alignItems: "center", justifyContent: "center" },
-  footer: { gap: spacing.sm, paddingTop: spacing.sm },
-  form: { gap: spacing.xl, paddingBottom: spacing.lg },
-  group: { gap: spacing.md },
+  emptyGap: { paddingTop: spacing.md },
   screen: { paddingHorizontal: spacing.xlSm },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   textArea: { minHeight: 104, textAlignVertical: "top" },

@@ -10,15 +10,15 @@ import {
   fontFamilies,
   NoticeRow,
   PrimaryButton,
-  radii,
   spacing,
+  surfaces,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Linking, StyleSheet, Text, View } from "react-native";
 
+import { CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { OutlineButton } from "../ui/outline-button";
 import { contactWhatsAppHref } from "./contact-list-copy";
@@ -89,7 +89,10 @@ export function ClientContactPanel({
   return (
     <>
       {whatsApp === null ? (
-        <Text style={styles.note}>{unreachableNote(phone)}</Text>
+        // Small text never sits on the 100 screen: the note rides a white card.
+        <View style={styles.card}>
+          <Text style={styles.note}>{unreachableNote(phone)}</Text>
+        </View>
       ) : (
         <View style={styles.pair} testID="client-overview-actions">
           <View style={styles.wide}>
@@ -108,7 +111,7 @@ export function ClientContactPanel({
       )}
       {contact === undefined ? null : (
         <View style={styles.card} testID="client-last-contact">
-          <Text style={styles.title}>Último contacto</Text>
+          <CardLabel>Último contacto</CardLabel>
           <Text style={styles.line}>{lastContactLine(contact)}</Text>
           {failed ? (
             <View accessibilityRole="alert">
@@ -131,25 +134,10 @@ export function ClientContactPanel({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.button,
-    borderWidth: 1,
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
+  card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
   line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   link: { alignSelf: "flex-start", paddingHorizontal: 0 },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   pair: { flexDirection: "row", gap: spacing.md },
-  title: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
   wide: { flex: 1 },
 });

@@ -14,7 +14,7 @@ describe("IconRow", () => {
     const label = screen.getByText("30 días desde la fecha de inicio");
     expect(label).toHaveStyle({
       color: "#93615D",
-      fontFamily: "WorkSans_400Regular",
+      fontFamily: "WorkSans_600SemiBold",
       fontSize: 16,
     });
     expect(label.parent).toHaveStyle({
@@ -39,7 +39,7 @@ describe("IconRow", () => {
       <IconRow chevron icon="bell" label="Notificaciones" onPress={onPress} value="Activadas" />,
     );
 
-    expect(screen.getByText("Activadas")).toHaveStyle({ color: "#93615D", fontSize: 15 });
+    expect(screen.getByText("Activadas")).toHaveStyle({ color: "#93615D", fontSize: 14 });
     const chevron = screen.getByTestId("chevron", hidden);
     expect(chevron).toHaveProp("stroke", "#93615D");
     expect(chevron).toHaveProp("width", 16);
@@ -90,14 +90,12 @@ describe("IconRowGroup", () => {
 
     const group = screen.getByTestId("group");
     expect(group).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 16,
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
     const hairlines = screen.getAllByTestId("icon-row-hairline");
     expect(hairlines).toHaveLength(2);
-    expect(hairlines[0]).toHaveStyle({ backgroundColor: "#E7CCBF", height: 1, marginLeft: 46 });
+    expect(hairlines[0]).toHaveStyle({ backgroundColor: "#F9E7DF", height: 1, marginLeft: 46 });
   });
 
   // Verification n.º 44 (follow-up 256 § 2): «Cerrar sesión» is the Error last

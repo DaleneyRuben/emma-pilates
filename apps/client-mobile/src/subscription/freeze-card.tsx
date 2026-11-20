@@ -5,6 +5,8 @@ import {
   colors,
   ConfirmationSheet,
   fontFamilies,
+  Glyph,
+  radii,
   spacing,
   surfaces,
   typography,
@@ -37,8 +39,8 @@ export function freezeCardState(freeze: ClientFreezeDto, today: string): CardSta
 }
 
 /**
- * Walkthrough findings 51 and 53 (follow-up 259 A): the Freeze as a neutral
- * card with its state, dates, days and plan end, instead of a loose line.
+ * Walkthrough findings 51 and 53 (follow-up 259 A, Rosa Emma C12c–f): the
+ * Freeze as a white card with its icon on a 50 disc, with its state, dates, days and plan end, instead of a loose line.
  * A request in review can be withdrawn (owner, 2026-11-08).
  */
 export function FreezeCard({
@@ -143,26 +145,29 @@ export function FreezeCard({
           onPress={() => setOpen((shown) => !shown)}
           style={({ pressed }) => [styles.summary, pressed && styles.pressed]}
         >
+          <View style={styles.disc}>
+            <Glyph color={colors.text} name="sun" size={18} strokeWidth={1.7} />
+          </View>
           <View style={styles.summaryBody}>
             <Text style={styles.summaryTitle}>{content.title}</Text>
             <Text style={styles.note}>{`${pill.label} · ${content.line}`}</Text>
           </View>
-          <Chevron direction={open ? "up" : "right"} size={16} strokeWidth={1.5} tone="muted" />
+          <Chevron direction={open ? "up" : "right"} size={18} strokeWidth={1.7} tone="muted" />
         </Pressable>
         {open ? (
           <View style={styles.detail}>
             {content.rows.map(([label, value]) => (
-              <View key={label} style={styles.row}>
+              <View key={label} style={[styles.row, styles.rowRule]}>
                 <Text style={styles.rowLabel}>{label}</Text>
                 <Text style={styles.rowValue}>{value}</Text>
               </View>
             ))}
-            <Text style={styles.note}>{content.note}</Text>
+            <Text style={[styles.note, styles.detailNote]}>{content.note}</Text>
           </View>
         ) : null}
       </View>
-      {/* Owner 2026-11-08: a discreet link under the card, like «Cerrar mi
-          cuenta» on Perfil, not a button. */}
+      {/* Owner 2026-11-08: a discreet link under the card, not a button;
+          Rosa Emma C12c sets it on a white capsule. */}
       {state === "requested" ? (
         <Pressable
           accessibilityRole="button"
@@ -193,24 +198,42 @@ export function FreezeCard({
 }
 
 const styles = StyleSheet.create({
-  block: { gap: spacing.sm },
-  card: { ...surfaces.card },
-  detail: {
-    borderTopColor: colors.hairline,
-    borderTopWidth: 1,
-    gap: spacing.md,
-    padding: spacing.lg,
+  block: { gap: spacing.md },
+  card: { ...surfaces.card, overflow: "hidden" },
+  detail: { borderTopColor: colors.hairline, borderTopWidth: 1 },
+  detailNote: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
   },
   error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13, lineHeight: 18 },
+  note: {
+    color: colors.text,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 18,
+  },
   pressed: { opacity: 0.7 },
-  row: { flexDirection: "row", gap: spacing.md, justifyContent: "space-between" },
-  rowLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  rowLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  rowRule: { borderBottomColor: colors.hairline, borderBottomWidth: 1 },
   rowValue: {
     color: colors.text,
     flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
     textAlign: "right",
   },
   summary: {
@@ -221,12 +244,26 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   summaryBody: { flex: 1, gap: spacing.xxs },
-  summaryTitle: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
-  withdraw: { alignSelf: "center", paddingVertical: spacing.xs },
+  summaryTitle: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyStrong,
+    fontSize: typography.body,
+    fontWeight: "600",
+  },
+  withdraw: {
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    justifyContent: "center",
+    minHeight: 36,
+    paddingHorizontal: spacing.lg,
+  },
   withdrawLabel: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.label,
+    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: 14,
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
 });

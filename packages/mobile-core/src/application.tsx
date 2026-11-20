@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
+import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import { type ComponentType, useCallback, useMemo } from "react";
 
 import { createAuthenticationApi, type AuthenticationApi } from "./auth/authentication-api";
@@ -70,6 +71,13 @@ export type MobileNavigationProps = {
   role?: AppRole;
   /** The login screen's one-time notice, such as after closing the Account. */
   signOutNotice?: string | null;
+};
+
+// Sign-in stands outside the navigators' own safe area: the app provides one
+// so its header band clears the status bar. Jest has no native metrics.
+const windowMetrics = initialWindowMetrics ?? {
+  frame: { x: 0, y: 0, width: 0, height: 0 },
+  insets: { top: 0, right: 0, bottom: 0, left: 0 },
 };
 
 export function createDefaultMobileRuntime({
@@ -206,7 +214,7 @@ export function MobileApplication({
   // navigators' own chrome; each navigator wraps its screens on its own
   // (recoveryScreenLayout) so a failed screen keeps the navigator (MOB-053).
   return (
-    <>
+    <SafeAreaProvider initialMetrics={windowMetrics}>
       <RenderErrorBoundary>
         <MobileQueryProvider>
           <VerifiedLinkProvider
@@ -230,6 +238,6 @@ export function MobileApplication({
         </MobileQueryProvider>
       </RenderErrorBoundary>
       <StatusBar style="auto" />
-    </>
+    </SafeAreaProvider>
   );
 }

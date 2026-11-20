@@ -24,8 +24,8 @@ describe("SessionCard", () => {
 
     const card = screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" });
     expect(card).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderRadius: 16,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
       gap: 12,
       padding: 18,
     });

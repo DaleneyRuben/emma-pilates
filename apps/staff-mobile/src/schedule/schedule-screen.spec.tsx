@@ -44,7 +44,7 @@ describe("Horario (v2 HOR boards)", () => {
     expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
     const hero = within(screen.getByTestId("next-class-hero"));
     expect(hero.getByText(/^PRÓXIMA/)).toBeOnTheScreen();
-    expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#F9F4F2" });
+    expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#FFFBFB" });
     expect(hero.getByText("6 de 12")).toBeOnTheScreen();
     expect(hero.getByTestId("schedule-session-session-1")).toBeOnTheScreen();
     expect(screen.queryByText("6 lugares libres")).toBeNull();

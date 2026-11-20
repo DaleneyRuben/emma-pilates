@@ -5,14 +5,14 @@ import {
   FormField,
   OutlinedButton,
   PrimaryButton,
-  radii,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useState, type ReactNode } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { backBarScroll } from "../ui/back-bar";
+import { bodyScroll, CardLabel, FooterPanel } from "../ui/card-pieces";
 import {
   refusalDisabledReason,
   refusalMessageLimit,
@@ -23,8 +23,9 @@ import {
 } from "./freeze-refusal";
 
 /**
- * E9 B (owner 2026-11-19): the refusal's reason as chips, an optional message,
- * the «Esto no se puede deshacer» notice in Crema with an Arcilla border, then
+ * E9 B (owner 2026-11-19, E-D11): the refusal's reason as chips in a white
+ * card under «Motivo», an optional message, the «Esto no se puede deshacer»
+ * card, then, on the white footer panel,
  * «Rechazar y avisar a <clienta>» and «Volver». This step is the destructive
  * decision's confirmation (FIX-089).
  */
@@ -48,39 +49,44 @@ export function RefuseFreezeStep({
   const text = refusalReasonText(reason, message);
   return (
     <>
+      {header}
       <ScrollView
-        contentContainerStyle={[styles.content, backBarScroll.content]}
+        contentContainerStyle={bodyScroll.content}
         keyboardShouldPersistTaps="handled"
-        style={backBarScroll.scroll}
+        style={bodyScroll.scroll}
       >
-        {header}
-        <View accessibilityRole="radiogroup" style={styles.chips}>
-          {refusalReasons.map((option) => (
-            <Chip
-              key={option}
-              label={option}
-              onPress={() => setReason(option)}
-              role="radio"
-              selected={reason === option}
-            />
-          ))}
+        <View style={styles.card}>
+          <CardLabel>Motivo</CardLabel>
+          <View accessibilityRole="radiogroup" style={styles.chips}>
+            {refusalReasons.map((option) => (
+              <Chip
+                key={option}
+                label={option}
+                onPress={() => setReason(option)}
+                role="radio"
+                selected={reason === option}
+              />
+            ))}
+          </View>
         </View>
-        <FormField
-          hint="Ej.: Necesitamos 48 h de aviso para congelar."
-          label={`Mensaje para ${firstName}`}
-          maxLength={refusalMessageLimit(reason)}
-          multiline
-          onChangeText={setMessage}
-          optional={!refusalNeedsMessage(reason)}
-          value={message}
-        />
+        <View style={styles.card}>
+          <FormField
+            hint="Ej.: Necesitamos 48 h de aviso para congelar."
+            label={`Mensaje para ${firstName}`}
+            maxLength={refusalMessageLimit(reason)}
+            multiline
+            onChangeText={setMessage}
+            optional={!refusalNeedsMessage(reason)}
+            value={message}
+          />
+        </View>
         <View style={styles.notice} testID="refuse-freeze-notice">
           <Text style={styles.noticeTitle}>Esto no se puede deshacer</Text>
           <Text style={styles.noticeBody}>{`${firstName} podrá pedir otro congelamiento.`}</Text>
         </View>
         {error}
       </ScrollView>
-      <View style={styles.actions}>
+      <FooterPanel>
         <PrimaryButton
           busy={busy}
           disabled={text === undefined}
@@ -96,28 +102,25 @@ export function RefuseFreezeStep({
           onPress={onBack}
           testID="refuse-freeze-back"
         />
-      </View>
+      </FooterPanel>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  actions: { gap: spacing.sm, paddingBottom: spacing.lg, paddingTop: spacing.md },
+  card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  content: { gap: spacing.xl, paddingBottom: spacing.xl },
   notice: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 1,
+    ...surfaces.card,
     gap: spacing.xs,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
-  noticeBody: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  noticeBody: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
   noticeTitle: {
     color: colors.text,
     fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "700",
+    fontSize: typography.bodyMedium,
+    fontWeight: "600",
   },
 });

@@ -38,12 +38,10 @@ describe("NotificationGroup", () => {
     );
 
     expect(screen.getByTestId("notification-group")).toHaveStyle({
-      backgroundColor: "#F9F4F2",
-      borderColor: "#CDA697",
-      borderRadius: 16,
-      borderWidth: 1,
+      backgroundColor: "#FFFBFB",
+      borderRadius: 20,
     });
-    expect(screen.getByTestId("notification-divider")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(screen.getByTestId("notification-divider")).toHaveStyle({ backgroundColor: "#F9E7DF" });
   });
 
   it("shows the title and the message of each notice", async () => {
@@ -62,12 +60,12 @@ describe("NotificationGroup", () => {
     );
 
     expect(screen.getByTestId("notification-icon-n1")).toHaveStyle({
-      backgroundColor: "#B78380",
+      backgroundColor: "#93615D",
       borderRadius: 20,
       height: 40,
       width: 40,
     });
-    expect(screen.getByTestId("notification-glyph-card", hidden)).toHaveProp("stroke", "#F9F4F2");
+    expect(screen.getByTestId("notification-glyph-card", hidden)).toHaveProp("stroke", "#FFFBFB");
     expect(screen.getByTestId("notification-new-dot")).toHaveStyle({ backgroundColor: "#93615D" });
   });
 
@@ -76,7 +74,7 @@ describe("NotificationGroup", () => {
       <NotificationGroup items={[invoice]} now={now} onOpen={jest.fn()} />,
     );
 
-    expect(screen.getByTestId("notification-icon-n2")).toHaveStyle({ backgroundColor: "#E7CCBF" });
+    expect(screen.getByTestId("notification-icon-n2")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(screen.getByTestId("notification-glyph-document", hidden)).toHaveProp(
       "stroke",
       "#93615D",

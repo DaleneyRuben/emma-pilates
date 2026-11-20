@@ -17,7 +17,7 @@ describe("front-desk receipt", () => {
     // FIX-089: the sources are secondary buttons, Crema with a Rosa profundo outline.
     for (const name of ["Fotografiar comprobante", "Elegir de la galería"]) {
       expect(screen.getByRole("button", { name })).toHaveStyle({
-        backgroundColor: "#F9F4F2",
+        backgroundColor: "#FFFBFB",
         borderColor: "#93615D",
         borderWidth: 1.5,
       });

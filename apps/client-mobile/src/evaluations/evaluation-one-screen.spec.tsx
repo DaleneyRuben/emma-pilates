@@ -102,8 +102,8 @@ describe("One Evaluación nutricional screen", () => {
     const card = await screen.findByTestId("next-evaluation");
     // FIX-089: a normal state is a Crema line on the hero, not a chip.
     const state = within(card).getByText("Gratis · primera del trimestre · llega 10 min antes");
-    expect(state).toHaveStyle({ color: "#F9F4F2" });
-    expect(ancestorBackgrounds(state)[0]).toBe("#B78380");
+    expect(state).toHaveStyle({ color: "#FFFBFB" });
+    expect(ancestorBackgrounds(state)[0]).toBe("#93615D");
     expect(within(card).getByText(/ · 09:00$/)).toBeOnTheScreen();
     expect(screen.getByText("Puedes cancelarla hasta 3 horas antes.")).toBeOnTheScreen();
     expect(screen.getByText("¿Otra evaluación?")).toBeOnTheScreen();

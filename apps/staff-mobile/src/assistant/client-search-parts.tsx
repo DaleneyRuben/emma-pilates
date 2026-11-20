@@ -3,6 +3,7 @@ import {
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
+  Chevron,
   ClientFace,
   colors,
   ExceptionPill,
@@ -12,9 +13,10 @@ import {
   LineIcon,
   QueryFailure,
   radii,
+  shadows,
   spacing,
   StateScreen,
-  TextButton,
+  surfaces,
   typography,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -58,23 +60,35 @@ export function useClientSearch() {
 
 export type ClientSearch = ReturnType<typeof useClientSearch>;
 
-// FIX-083 (Ronda 2 pick A): «Nueva clienta» is a quiet link under the results.
+const newClientLabel = "¿No está? Crear clienta nueva";
+
+// FIX-083 (Ronda 2 pick A): «Nueva clienta» is a quiet row under the results,
+// on its own white card with a plus and a chevron (E-S02, E-C01).
 export function NewClientLink({ onPress }: { onPress: () => void }) {
   return (
-    <TextButton
-      label="¿No está? Crear clienta nueva"
+    <Pressable
+      accessibilityLabel={newClientLabel}
+      accessibilityRole="button"
       onPress={onPress}
-      style={styles.newClient}
+      style={({ pressed }) => [styles.newClient, pressed && styles.pressed]}
       testID="client-search-new-client"
-    />
+    >
+      <LineIcon color={colors.text} size={18} strokeWidth={1.7}>
+        <Path d="M12 5v14M5 12h14" />
+      </LineIcon>
+      <Text style={styles.newClientLabel}>{newClientLabel}</Text>
+      <Chevron size={16} strokeWidth={1.5} tone="muted" />
+    </Pressable>
   );
 }
 
 export function ClientSearchField({ search }: { search: ClientSearch }) {
   const { setText, text } = search;
+  const [focused, setFocused] = useState(false);
+  // The white field with the card shadow; typing or focus rings it in 600 (E-S03).
   return (
-    <View style={styles.field}>
-      <LineIcon color={colors.textMuted} size={18} strokeWidth={1.5}>
+    <View style={[styles.field, (focused || text !== "") && styles.fieldActive]}>
+      <LineIcon color={colors.text} size={20} strokeWidth={1.7}>
         <Circle cx={11} cy={11} r={6.5} />
         <Path d="M16 16l4 4" />
       </LineIcon>
@@ -82,7 +96,9 @@ export function ClientSearchField({ search }: { search: ClientSearch }) {
         accessibilityLabel={placeholder}
         autoCapitalize="none"
         autoCorrect={false}
+        onBlur={() => setFocused(false)}
         onChangeText={setText}
+        onFocus={() => setFocused(true)}
         placeholder="Nombre, teléfono o correo"
         placeholderTextColor={colors.textMuted}
         style={styles.input}
@@ -122,9 +138,11 @@ export function ClientSearchResults({
   const { refreshControl, results } = search;
   if (results.isPending) {
     return (
-      <Text accessibilityLabel="Buscando clientas" style={styles.hint}>
-        Buscando…
-      </Text>
+      <View style={styles.hintCard}>
+        <Text accessibilityLabel="Buscando clientas" style={styles.hint}>
+          Buscando…
+        </Text>
+      </View>
     );
   }
   if (results.isError || results.data.status !== 200) {
@@ -156,6 +174,7 @@ export function ClientSearchResults({
       contentContainerStyle={styles.list}
       keyboardShouldPersistTaps="handled"
       refreshControl={refreshControl}
+      style={styles.scroll}
     >
       <IconRowGroup>
         {clients.map((client) => (
@@ -183,29 +202,40 @@ export function ClientSearchResults({
   );
 }
 
+// A quiet line never sits on the 100 screen: it reads in Lora on a white card.
 export const searchStyles = StyleSheet.create({
   hint: {
-    fontFamily: fontFamilies.body,
-    color: colors.textMuted,
-    fontSize: typography.note,
+    color: colors.text,
+    fontFamily: fontFamilies.display,
+    fontSize: typography.titleSecondary,
+    lineHeight: 29,
     textAlign: "center",
+  },
+  hintCard: {
+    ...surfaces.card,
+    alignItems: "center",
+    paddingHorizontal: spacing.xlSm,
+    paddingVertical: spacing.xlSm,
   },
 });
 
 const styles = StyleSheet.create({
   clear: { alignItems: "center", height: 32, justifyContent: "center", width: 32 },
   field: {
+    ...shadows.card,
     alignItems: "center",
     backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
+    borderColor: colors.card,
     borderRadius: radii.button,
+    borderWidth: 2,
     flexDirection: "row",
-    gap: spacing.sm,
+    gap: spacing.smLg,
     minHeight: 52,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
+  fieldActive: { borderColor: colors.primary },
   hint: searchStyles.hint,
+  hintCard: searchStyles.hintCard,
   input: {
     color: colors.text,
     flex: 1,
@@ -213,6 +243,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 52,
   },
-  list: { gap: spacing.lg, paddingBottom: spacing.xxl },
-  newClient: { alignSelf: "flex-start" },
+  list: {
+    gap: spacing.md,
+    paddingBottom: spacing.xxl,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.xs,
+  },
+  newClient: {
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    minHeight: 52,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  newClientLabel: {
+    color: colors.text,
+    flex: 1,
+    fontFamily: fontFamilies.bodyBold,
+    fontSize: typography.body,
+    fontWeight: "700",
+  },
+  pressed: { opacity: 0.7 },
+  // The list reaches the screen's sides so the cards' shadows show.
+  scroll: { marginHorizontal: -spacing.xlSm },
 });

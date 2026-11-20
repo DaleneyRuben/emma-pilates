@@ -15,12 +15,14 @@ const notice = (surface?: "card") =>
   );
 
 describe("WaitNotice inside a pending card (S06 «Reenvío limitado», «Verificación limitada»)", () => {
-  it("keeps the tinted box on a screen", async () => {
+  it("draws the soft 50 inset with its 200 rule by default (C01t, C20l)", async () => {
     const screen = await notice();
 
     expect(screen.getByTestId("wait-notice")).toHaveStyle({
       backgroundColor: colors.secondaryTint,
-      gap: 12,
+      borderColor: "#E7CCBF",
+      borderRadius: 16,
+      gap: 10,
       paddingHorizontal: 16,
       paddingVertical: 14,
     });

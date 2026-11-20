@@ -36,9 +36,11 @@ describe("Staff text styles", () => {
     expect(missing).toEqual([]);
   });
 
-  it("pair 600 and 700 with a SemiBold family and 500 with a Medium one", () => {
+  it("pair 600 and 700 with a SemiBold or Bold family and 500 with a Medium one", () => {
     const faux = textStyles().filter(({ block }) => {
-      if (/fontWeight: "(600|700)"/.test(block)) return !/(bodyStrong|headingStrong)/.test(block);
+      if (/fontWeight: "(600|700)"/.test(block)) {
+        return !/(bodyStrong|bodyBold|headingStrong)/.test(block);
+      }
       if (/fontWeight: "500"/.test(block)) return !/(bodyMedium|heading\b)/.test(block);
       return false;
     });

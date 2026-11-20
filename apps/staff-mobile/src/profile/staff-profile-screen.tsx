@@ -9,13 +9,12 @@ import {
   colors,
   fontFamilies,
   IconRow,
-  IconRowGroup,
   LoadingState,
   LogoutConfirmationSheet,
   QueryFailure,
   Screen,
-  SectionTitle,
   spacing,
+  surfaces,
   typography,
   useMobileIdentity,
   useStickyNotice,
@@ -28,6 +27,7 @@ import appConfig from "../../app.json";
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
+import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { payPlacement } from "./pay-placement";
 import { PayoutQrRow } from "./payout-qr/payout-qr-row";
 import { ProfileRow } from "./profile-row";
@@ -109,8 +109,8 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {header}
+      {header}
+      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         <StaffPhotoSummary
           editable={viewingAs === null}
           member={member}
@@ -122,83 +122,80 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                 : "Tu nombre y tu correo los actualiza administración."
           }
         />
-        <View>
-          <SectionTitle>Tu cuenta</SectionTitle>
-          <IconRowGroup>
-            <IconRow icon="person" label="Rol" value={staffRoleLabel(member.role, member.gender)} />
-            <IconRow
-              icon="pin"
-              label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
-              value={branchesLabel(member)}
-            />
-          </IconRowGroup>
-        </View>
-        <View>
-          <SectionTitle>Ajustes</SectionTitle>
-          <IconRowGroup>
-            {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
+        {/* E-F01: each section's label sits inside its white card. */}
+        <RowCard label="Tu cuenta">
+          <IconRow icon="person" label="Rol" value={staffRoleLabel(member.role, member.gender)} />
+          <IconRow
+            icon="pin"
+            label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
+            value={branchesLabel(member)}
+          />
+        </RowCard>
+        <RowCard label="Ajustes">
+          {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
                 here: her tab, or for the Assistant the screen itself. */}
-            {pay === "none" ? null : (
-              <ProfileRow
-                icon="credit"
-                label="Mis pagos"
-                onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
-                testID="profile-my-pay"
-                value={lastPayment}
-              />
-            )}
-            {/* FIX-072: every role keeps the QR she is paid by. */}
-            <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
-            {administrator ? (
-              <ProfileRow
-                icon="eye"
-                label="Ver la app como…"
-                onPress={() => navigation.navigate("ViewAs")}
-              />
-            ) : null}
-            {trainer && referralCode !== null ? (
-              <ProfileRow
-                icon="tag"
-                label="Tu código de referido"
-                onPress={() => navigation.navigate("ReferralCode")}
-                value={referralCode}
-              />
-            ) : null}
+          {pay === "none" ? null : (
             <ProfileRow
-              badge={unreadCount}
-              icon="bell"
-              label="Notificaciones"
-              onPress={() => navigation.navigate("Notifications")}
+              icon="credit"
+              label="Mis pagos"
+              onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
+              testID="profile-my-pay"
+              value={lastPayment}
             />
-            {viewingAs === null ? (
-              <>
-                <ProfileRow
-                  icon="lock"
-                  label="Cambiar contraseña"
-                  onPress={() => navigation.navigate("ChangePassword")}
-                />
-                <ProfileRow
-                  icon="message"
-                  label="Enviar comentarios"
-                  onPress={() => navigation.navigate("Feedback")}
-                />
-                <ProfileRow
-                  icon="logout"
-                  label="Cerrar sesión"
-                  onPress={() => setConfirmingLogout(true)}
-                  testID="profile-logout"
-                  tone="error"
-                />
-              </>
-            ) : (
+          )}
+          {/* FIX-072: every role keeps the QR she is paid by. */}
+          <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
+          {administrator ? (
+            <ProfileRow
+              icon="eye"
+              label="Ver la app como…"
+              onPress={() => navigation.navigate("ViewAs")}
+            />
+          ) : null}
+          {trainer && referralCode !== null ? (
+            <ProfileRow
+              icon="tag"
+              label="Tu código de referido"
+              onPress={() => navigation.navigate("ReferralCode")}
+              value={referralCode}
+            />
+          ) : null}
+          <ProfileRow
+            badge={unreadCount}
+            icon="bell"
+            label="Notificaciones"
+            onPress={() => navigation.navigate("Notifications")}
+          />
+          {viewingAs === null ? (
+            <>
+              <ProfileRow
+                icon="lock"
+                label="Cambiar contraseña"
+                onPress={() => navigation.navigate("ChangePassword")}
+              />
+              <ProfileRow
+                icon="message"
+                label="Enviar comentarios"
+                onPress={() => navigation.navigate("Feedback")}
+              />
               <ProfileRow
                 icon="logout"
-                label={`Dejar de ver como ${viewingAs}`}
-                onPress={exit}
-                testID="profile-stop-viewing"
+                label="Cerrar sesión"
+                onPress={() => setConfirmingLogout(true)}
+                testID="profile-logout"
+                tone="error"
               />
-            )}
-          </IconRowGroup>
+            </>
+          ) : (
+            <ProfileRow
+              icon="logout"
+              label={`Dejar de ver como ${viewingAs}`}
+              onPress={exit}
+              testID="profile-stop-viewing"
+            />
+          )}
+        </RowCard>
+        <View style={styles.footerCard}>
           <Text style={styles.footer}>
             {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
           </Text>
@@ -217,13 +214,13 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   footer: {
     color: colors.textMuted,
     fontFamily: fontFamilies.body,
     fontSize: typography.label,
-    marginTop: spacing.md,
     textAlign: "center",
   },
+  // A quiet line goes in a white card, never on the 100 screen.
+  footerCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.smLg },
   screen: { paddingHorizontal: spacing.xlSm },
 });

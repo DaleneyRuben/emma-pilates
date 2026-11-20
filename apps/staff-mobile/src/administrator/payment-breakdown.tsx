@@ -1,7 +1,7 @@
 import { formatMoney } from "@pilates/api-contracts";
-import { discountPercent, IconRowGroup, SectionTitle } from "@pilates/mobile-core";
-import { View } from "react-native";
+import { discountPercent } from "@pilates/mobile-core";
 
+import { RowCard } from "../ui/card-pieces";
 import { ValueRow } from "../ui/value-row";
 
 // Walkthrough n.º 73: a discounted Plan shows what she saw paying, in C09's
@@ -18,17 +18,14 @@ export function PaymentBreakdown({
     priceCentavos: payment.planPriceCentavos - discount,
   });
   return (
-    <View>
-      <SectionTitle>Desglose</SectionTitle>
-      <IconRowGroup>
-        <ValueRow label="Precio del plan" value={formatMoney(payment.planPriceCentavos)} />
-        <ValueRow
-          label={percent === null ? "Descuento" : `Descuento ${percent} %`}
-          tone="emphasis"
-          value={`−${formatMoney(discount)}`}
-        />
-        <ValueRow label="Total" strong value={formatMoney(payment.amountDueCentavos)} />
-      </IconRowGroup>
-    </View>
+    <RowCard label="Desglose">
+      <ValueRow label="Precio del plan" value={formatMoney(payment.planPriceCentavos)} />
+      <ValueRow
+        label={percent === null ? "Descuento" : `Descuento ${percent} %`}
+        tone="emphasis"
+        value={`−${formatMoney(discount)}`}
+      />
+      <ValueRow label="Total" strong value={formatMoney(payment.amountDueCentavos)} />
+    </RowCard>
   );
 }

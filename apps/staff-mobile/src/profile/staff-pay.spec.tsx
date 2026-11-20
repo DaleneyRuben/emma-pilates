@@ -171,6 +171,30 @@ describe("Staff Mis pagos", () => {
     await waitFor(() => expect(screen.getByTestId("pay-summary")).toBeOnTheScreen());
   });
 
+  // Verification E2: 54 identical undated rows read as one row with the count.
+  it("lists identical undated lines of a concept once, with their count and sum", async () => {
+    const oldMinimums = {
+      ...approvedOctober,
+      totalCentavos: 135_000,
+      lines: Array.from({ length: 54 }, () => ({
+        kind: "minimum_not_met",
+        detail: "Mínimo no alcanzado",
+        amountCentavos: 2_500,
+      })),
+    };
+    const screen = await openStatement("Liquidación de octubre 2026", {
+      statements: () => jsonResponse([oldMinimums]),
+      payments: paidOctober,
+    });
+
+    const detail = within(screen.getByTestId("pay-statement"));
+    await fireEvent.press(detail.getByRole("button", { name: /^Canceladas por mínimo,/ }));
+    const cancelled = within(await waitFor(() => screen.getByTestId("pay-group")));
+    expect(cancelled.getAllByText("Mínimo no alcanzado")).toHaveLength(1);
+    expect(cancelled.getByText("54 × Bs 25")).toBeOnTheScreen();
+    expect(cancelled.getByText("Bs 1.350")).toBeOnTheScreen();
+  });
+
   it("says an approved statement still waits for its payment, and an open one may change", async () => {
     const screen = await openStatement("Liquidación de octubre 2026", {
       statements: () =>

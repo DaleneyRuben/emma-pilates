@@ -26,18 +26,17 @@ describe("StartDateChooser", () => {
 
     expect(screen.getAllByText("Fecha de inicio")).toHaveLength(1);
     expect(screen.getByRole("header", { name: "Fecha de inicio" })).toHaveStyle({
-      textTransform: "uppercase",
+      fontFamily: "Lora_400Regular",
+      fontSize: 24,
     });
   });
 
-  it("draws the days as Crema tiles with an Arcilla border (FIX-089)", async () => {
+  it("draws the days as white tiles with the card shadow (Rosa Emma)", async () => {
     const screen = await renderChooser();
 
     expect(screen.getByTestId("start-date-2026-11-03")).toHaveStyle({
       backgroundColor: colors.card,
-      borderColor: colors.border,
-      borderRadius: 12,
-      borderWidth: 1,
+      borderRadius: 14,
       height: 72,
       minWidth: 52,
     });
