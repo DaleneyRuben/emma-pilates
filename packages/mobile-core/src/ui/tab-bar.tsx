@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pressable, type PressableProps, StyleSheet, View } from "react-native";
+import { Platform, Pressable, type PressableProps, StyleSheet, View } from "react-native";
 
 import { colors, shadows, spacing } from "./tokens";
 
@@ -38,7 +38,9 @@ export const tabBarStyle = {
   ...shadows.tabBar,
   backgroundColor: colors.card,
   borderTopWidth: 0,
-  paddingTop: spacing.sm,
+  // Android's bar leaves its items about 49 pt above the gesture area: the
+  // pill needs all of it there.
+  paddingTop: Platform.OS === "android" ? 0 : spacing.sm,
 } as const;
 
 export const tabBarTints = {
@@ -50,11 +52,12 @@ const styles = StyleSheet.create({
   pill: {
     alignItems: "center",
     borderRadius: 16,
-    gap: 3,
+    gap: Platform.OS === "android" ? 1 : 3,
     maxWidth: "100%",
     minWidth: 56,
     paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.sm,
+    // Android's bar is shorter than iOS's: a slimmer pill keeps inside it.
+    paddingVertical: Platform.OS === "android" ? spacing.xxs : spacing.sm,
   },
   selected: { backgroundColor: colors.primary },
 });
