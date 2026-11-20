@@ -7,6 +7,7 @@ import {
   ContactAlertReason as PrismaContactAlertReason,
 } from '../../generated/prisma/enums';
 import { clientPhotoOf } from '../client/client-photo-of';
+import type { LastContact } from './client-contact';
 import type { ContactAlertReason } from './first-90-days-alerts';
 import type { OpenContactAlert } from './list-contact-alerts';
 import type { MarkContactedStore } from './mark-contacted';
@@ -21,13 +22,32 @@ const reasonNames: Record<PrismaContactAlertReason, ContactAlertReason> = {
 export const createPrismaContactAlerts = (
   prisma: PrismaClient,
 ): {
-  findOpen: () => Promise<OpenContactAlert[]>;
+  /** Every open alert, or one Client's (staff pick E4 A). */
+  findOpen: (clientId?: string) => Promise<OpenContactAlert[]>;
+  findLastContact: (clientId: string) => Promise<LastContact | null>;
   mark: MarkContactedStore['mark'];
 } => ({
-  findOpen: () =>
+  findLastContact: (clientId) =>
+    prisma.contactAlert
+      .findFirst({
+        where: { clientId, contactedAt: { not: null }, deletedAt: null },
+        orderBy: [{ contactedAt: 'desc' }, { id: 'asc' }],
+        select: { contactedAt: true, contactedByAccountId: true },
+      })
+      .then((row) =>
+        row?.contactedAt == null
+          ? null
+          : {
+              contactedAt: row.contactedAt,
+              contactedByAccountId: row.contactedByAccountId,
+            },
+      ),
+
+  findOpen: (clientId) =>
     prisma.contactAlert
       .findMany({
         where: {
+          ...(clientId === undefined ? {} : { clientId }),
           contactedAt: null,
           deletedAt: null,
           client: { deletedAt: null },
