@@ -38,6 +38,42 @@ const signedInRoutes = [
   "/ajustes/qr-del-estudio",
 ];
 
+// Panels, sheets and dialogs that open over a page: most of the forms,
+// errors and summaries live there.
+const openStates: {
+  name: string;
+  path: string;
+  open: (page: Page) => Promise<void>;
+}[] = [
+  {
+    name: "a Client's panel",
+    path: "/clientas",
+    open: (page) =>
+      page.getByRole("button", { name: "Isabel Arce" }).first().click(),
+  },
+  {
+    name: "a Staff Member's panel",
+    path: "/estudio/personal",
+    open: (page) =>
+      page.getByRole("button", { name: "Paola Mendoza" }).first().click(),
+  },
+  {
+    name: "the new class panel",
+    path: "/horario",
+    open: (page) =>
+      page.getByRole("button", { name: "Nueva clase" }).first().click(),
+  },
+  {
+    name: "the Branch selector",
+    path: "/horario",
+    open: (page) =>
+      page
+        .getByRole("button", { name: /^Sucursal / })
+        .first()
+        .click(),
+  },
+];
+
 const publicRoutes = [
   "/iniciar-sesion",
   "/recuperar-contrasena",
@@ -101,6 +137,17 @@ for (const width of [1440, 420]) {
       test(path, async () => {
         await settle(page, path);
         expect(await audit(page, narrow)).toEqual([]);
+      });
+    }
+
+    for (const state of openStates) {
+      test(`${state.path} with ${state.name}`, async () => {
+        await settle(page, state.path);
+        await state.open(page);
+        await expect(page.getByRole("dialog").first()).toBeVisible();
+        await page.waitForTimeout(400);
+        expect(await audit(page, narrow)).toEqual([]);
+        await page.keyboard.press("Escape");
       });
     }
 
