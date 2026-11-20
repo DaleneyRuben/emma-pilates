@@ -62,13 +62,15 @@ numbered tests.
 | Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
 | Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 186) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
 | Staff app redesign picks | The Trainer's week with classes per day and the next class with who is coming (E1), the roster before and during the class with «Vino» / «No vino» (E6), the statement as a «TOTAL» block whose concepts open by day (E2), «Mis pagos» for every paid role (E8), the Palo de rosa Plan, the role's actions and the Coordinator's WhatsApp, Llamar and Anotar contacto on the client file (E4), Registrar pago with large options, a day strip and the invoice switch (E3), the Nutritionist's next appointment with WhatsApp (E5), the Assistant's «Hoy» (E7), and the freeze review with a refusal reason (E9) (Test 187) | The client file's Pagos and Evaluaciones rows need staff endpoints not built yet; transfer receipts are not on the Assistant's Hoy because only the Administrator confirms them |
+| Rosa Emma in the apps        | Both apps on the approved Rosa Emma system: the 200 header band behind the status bar, the 600 hero, 500 blocks, white cards with the rosa shadow, the 600 tab pill, class-type bars, and the joined undated lines of an old Liquidación (Test 188) | The boards in `design/v3/cliente` and `design/v3/equipo` are the reference; a screen the boards never drew keeps the shared pieces' look |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 
 ## Where each designed screen is tested
 
 The design index ([`docs/design/prompts/README.md`](./design/prompts/README.md))
 names every screen; this table says which tests walk each one, so a screen
-can be found by its design name.
+can be found by its design name. Since Rosa Emma every Client and Staff
+screen's look is also walked by Test 188 against its board in `design/v3/`.
 
 | Client app | Tests |
 | --- | --- |
@@ -11634,3 +11636,53 @@ I. **E9 · The freeze review and a refusal reason.** The Test 5A fixtures
    aviso. <mensaje>»), and the refused Freeze's review
    under **Decididas** shows «Pidió congelar …» and «Motivo del rechazo».
    An approved one shows a «Vence» row instead of «Vencería».
+
+## Test 188: Rosa Emma in the Client and Staff apps
+
+The owner's approved redesign (2026-11-20, design follow-up 284; boards in
+`design/v3/cliente` and `design/v3/equipo`, system in `design/v3/sistema/`).
+JavaScript only: no migration, no API change, no native build. Use the Test 5A
+fixtures (password `emma-local-2026`), run the API, the worker and both Metro
+servers on your own ports, and walk the iPhone 16 Pro, the iPad Pro 11 and the
+Android emulator. Open each screen next to its board (open the `.dc.html`
+file in a browser, or the canvases linked from follow-up 284).
+
+A. **Colours.** Every screen uses only the Rosa Emma scale (50 `#FEF6F2`, 100
+   `#F9E7DF`, 200 `#E7CCBF`, 300 `#DAB9AB`, 400 `#CDA697`, 500 `#B78380`, 600
+   `#93615D`) plus white `#FFFBFB`. The screen is 100, cards are white with a
+   soft rosa shadow and no border, and no text smaller than 19 pt bold or 24 pt
+   regular sits directly on 100, 200 or 500.
+B. **Header band.** Every screen opens with a 200 band that reaches behind the
+   status bar and both side edges, with rounded lower corners and the screen's
+   Lora title. A pushed screen's back button is a white disc on the band; an
+   eyebrow («Instructora · Viernes 20 de noviembre») and a subtitle sit on
+   white capsules. On Inicio the band scrolls away with the content; on staff
+   screens it stays fixed. On Reservar the branch pill, the weekly line and the
+   days are inside the band; on Mis reservas, «Próximas · Historial». Sign out
+   and check that Login's band also clears the status bar on the iPhone.
+C. **Heroes and blocks.** The screen's one strong block is solid 600 with
+   white text: Inicio's next class, Mi plan's count, Mis reservas' next
+   booking, the class detail, Pagos pendientes' total, the Liquidación total,
+   the client file's plan. Inicio's plan count is a 500 block («5 restantes»,
+   on one line on every device).
+D. **Rows.** Class rows start with a 5 pt bar in the class type's colour
+   (Reformer 600, Mat 300, Cadillac 500) and the time in Lora. Lists are white
+   cards with 100 hairlines; staff section labels («PENDIENTES», «TU CUENTA»)
+   sit inside their cards.
+E. **Buttons, chips and tabs.** The primary button is 600, 52 pt, radius 16,
+   with a bold white label; secondary buttons are white with a 600 outline.
+   The chosen chip, day or segment is 600 with a white label. The tab bar is
+   white and the open tab is a 600 pill with a white icon and label, whole on
+   Android too; with five staff tabs, «Para contactar» and «Disponibilidad»
+   stay on one line.
+F. **States, sheets and footers.** Empty, error and success states are white
+   cards with the glyph on a 50 disc and a Lora 24 title; a load failure has
+   «Reintentar» inside the card. Confirmation sheets are white with a grabber
+   and radius 28. A screen's fixed button sits in a white footer with an
+   upward shadow, its hint inside the footer.
+G. **Liquidación (verification E2).** As a Trainer whose statement was drafted
+   before its lines carried the class (Test 95), open Mis pagos › the
+   statement › «Canceladas por mínimo». Identical undated lines now show as
+   one row, «Mínimo no alcanzado · 54 × Bs 25» with «Bs 1.350», instead of 54
+   rows. A newer statement still lists its classes by day with time, type and
+   Branch.
