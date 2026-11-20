@@ -11,6 +11,8 @@ export type AdministratorSessionRoster = {
     clientName: string;
     clientPhoto: ClientPhotoRef;
     attendanceOutcome: 'attended' | 'no_show' | null;
+    classNumber: number;
+    founder: boolean;
   }[];
   waitlist: {
     waitlistEntryId: string;
@@ -26,8 +28,8 @@ export type FindAdministratorSessionRoster = (
 ) => Promise<AdministratorSessionRoster | null>;
 
 // WEB-039 / ADR-0108: Horario's class panel shows who booked a Session and
-// who waits for it to the people who run the schedule. Names only: no plan,
-// no amount.
+// who waits for it to the people who run the schedule. Names, her class
+// number and the founder mark (W1): no plan, no amount.
 export const loadAdministratorSessionRoster = async (
   sessionId: string,
   principal: AuthenticatedPrincipal,
