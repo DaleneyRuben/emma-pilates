@@ -1,4 +1,9 @@
 import type { KeyboardEvent, ReactNode } from "react";
+import {
+  segmentClass,
+  segmentCurrentClass,
+  segmentedBarClass,
+} from "../components/ui/segmented";
 import { cn } from "../lib/cn";
 
 export type SessionTab = "reservas" | "editar" | "serie";
@@ -36,7 +41,9 @@ export function SessionTabs({
     <div
       role="tablist"
       aria-label="Clase"
-      className="mx-7 flex gap-4 overflow-x-auto border-b border-borde"
+      // Rosa Emma (RW-horario-clase): the panel's tabs as the white
+      // segmented bar, the chosen one solid Rosa profundo.
+      className={cn(segmentedBarClass, "mx-7 flex-nowrap overflow-x-auto")}
     >
       {tabs.map((tab, index) => {
         const selected = tab.value === value;
@@ -52,8 +59,9 @@ export function SessionTabs({
             onClick={() => onChange(tab.value)}
             onKeyDown={(event) => move(event, index)}
             className={cn(
-              "-mb-px inline-flex h-11 shrink-0 items-center border-b-[3px] border-transparent px-0.5 text-cuerpo text-texto focus-visible:shadow-foco",
-              selected && "border-rosa-600 font-bold",
+              segmentClass,
+              "h-9 shrink-0 px-3.5 text-celda",
+              selected && segmentCurrentClass,
             )}
           >
             {tab.label}

@@ -36,7 +36,9 @@ const rowClass =
   "flex min-h-[56px] items-center gap-3 px-4 py-2.5 text-celda text-texto";
 
 /** W1: «Primera clase», «12.ª clase», with « · Fundadora» for a founder. */
-function bookingNote(booking: AdministratorRosterBookingDto): string {
+function bookingNote(booking: AdministratorRosterBookingDto): string | null {
+  // An API from before W1 answers without the class number.
+  if (typeof booking.classNumber !== "number") return null;
   const count =
     booking.classNumber === 1
       ? "Primera clase"
@@ -55,6 +57,7 @@ function BookedRow({
     booking.attendanceOutcome === null
       ? undefined
       : attendance[booking.attendanceOutcome];
+  const note = bookingNote(booking);
   return (
     <li className={rowClass}>
       <ClientPhoto
@@ -63,8 +66,8 @@ function BookedRow({
         size={40}
       />
       <span className="flex flex-1 flex-col">
-        <span className="font-medium">{booking.clientName}</span>
-        <span className="text-ayuda">{bookingNote(booking)}</span>
+        <span className="font-bold">{booking.clientName}</span>
+        {note === null ? null : <span className="text-ayuda">{note}</span>}
       </span>
       {outcome === undefined ? null : (
         <span className="text-ayuda">{outcome}</span>

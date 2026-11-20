@@ -1,3 +1,4 @@
+import { StatusPill } from "../components/ui/status-pill";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -68,23 +69,29 @@ function Finding({
   pending: boolean;
 }) {
   return (
-    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-borde px-4 py-3.5 first:border-t-0 md:px-5">
-      <div className="flex min-w-0 flex-1 basis-[260px] flex-col gap-0.5">
+    // Rosa Emma (RW-informes): each finding is its own white card, its
+    // state a pill (a new one solid) and «Descartar» a link.
+    <li className="flex flex-col gap-2 rounded-tarjeta bg-superficie px-[18px] py-4 shadow-tarjeta">
+      <div className="flex min-w-0 flex-col gap-1.5">
         <Subject item={item} />
-        <p className="text-cuerpo text-texto">{item.detail}</p>
-        <p className="text-nota text-texto">{stateLabel[item.state]}</p>
+        <p className="text-celda text-texto">{item.detail}</p>
       </div>
-      {/* A resolved finding that holds again comes back unless discarded. */}
-      {readOnly || item.state === "dismissed" ? null : (
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => onDismiss(item.id)}
-          className="rounded-control text-celda font-medium text-rosa-600 underline underline-offset-2 focus-visible:shadow-foco disabled:no-underline"
-        >
-          Descartar
-        </button>
-      )}
+      <div className="mt-auto flex items-center justify-between gap-3">
+        <StatusPill tone={item.state === "new" ? "accion" : "neutral"}>
+          {stateLabel[item.state]}
+        </StatusPill>
+        {/* A resolved finding that holds again comes back unless discarded. */}
+        {readOnly || item.state === "dismissed" ? null : (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => onDismiss(item.id)}
+            className="rounded-control text-nota font-bold text-texto underline underline-offset-[3px] focus-visible:shadow-foco disabled:no-underline"
+          >
+            Descartar
+          </button>
+        )}
+      </div>
     </li>
   );
 }
@@ -139,7 +146,7 @@ function FindingsByKind({
           Nada pendiente en este grupo.
         </p>
       ) : (
-        <ul className="flex flex-col rounded-tarjeta bg-superficie shadow-tarjeta">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {shown.map((item) => (
             <Finding
               key={item.id}
@@ -197,10 +204,10 @@ export function RecommendationsSection({
       aria-labelledby="recomendaciones-del-mes"
       className="flex flex-col gap-3"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-tarjeta bg-superficie py-2 pr-2 pl-[18px] shadow-tarjeta">
         <h2
           id="recomendaciones-del-mes"
-          className="font-sans text-pie font-medium tracking-[0.12em] text-texto uppercase"
+          className="font-sans text-etiqueta font-bold tracking-[0.14em] text-texto uppercase"
         >
           Recomendaciones del mes
         </h2>
