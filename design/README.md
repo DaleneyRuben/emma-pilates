@@ -2,7 +2,8 @@
 
 > **Current source of truth: `design/v3/` (Rosa Emma, approved by the owner on 2026-11-20).**
 > `v3/cliente` (142 boards), `v3/equipo` (139) and `v3/admin` (275, with 420 px variants) redraw every screen and state of main at 62d8465fe in the Rosa Emma system. Each folder has a `canvas.json` and opens like the `v2/` folders.
-> The system is in `v3/sistema/` (`Sistema Rosa Emma.html` and `tokens.json`), and follow-up [284](../docs/design/prompts/followups/284-rosa-emma-redesign.md) explains it.
+> The system is in `v3/sistema/` (`Sistema Rosa Emma.html` and `tokens.json`), and follow-up [284](../docs/design/prompts/followups/284-rosa-emma-redesign.md) explains its colour and surfaces.
+> **Typography follows follow-up [285](../docs/design/prompts/followups/285-rosa-emma-type-scale.md)**: 13 text styles shared by web and apps. `v3/sistema/revisor/` holds the checkers that enforce it.
 > Structure, copy and behaviour still follow the rules below. **Colour, type and surfaces follow v3, not the palette tables further down**: the root `01`–`25`, `S01`–`S29`, `AW01`–`AW40` files and `v2/` show the older palette and stay only as history.
 
 ## Overview
