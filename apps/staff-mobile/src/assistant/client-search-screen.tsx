@@ -55,7 +55,6 @@ export function ClientSearchScreen() {
   const newClient = () => navigation.navigate("NewClient");
   const content = (
     <>
-      {/* The field rides in the band (option A), so the screen holds one card. */}
       <RootHeader bell eyebrow={eyebrow} label="Buscar clienta" title="Buscar clienta">
         <ClientSearchField search={search} />
       </RootHeader>
