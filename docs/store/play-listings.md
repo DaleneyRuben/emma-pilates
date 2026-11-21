@@ -96,17 +96,21 @@ Si eres cliente del estudio, descarga la app Emma Pilates.
 
 ## Graphics
 
-Made 2026-11-03 in style A «Editorial», chosen by the owner on a Claude
-Design canvas: a Lino ground, a small uppercase label, a Lora title on the
-left, and the real v2 screen in a dark frame that runs off the bottom. **No
-image shows a price or the launch discount**, because the offer is temporary
-(owner, 2026-11-03).
+Remade 2026-11-21 in «Rosa Emma», approved by the owner from a sample: a
+rosa 100 ground, the label on a white pill, a Lora title in rosa 600, and the
+real Rosa Emma screen in a rosa 600 frame under the title (on the phone and
+the iPad 13 it runs off the bottom).
+Screenshots carry no subtitle line, because small text may not sit on rosa
+100; the feature graphics put theirs on a white card. **No image shows a
+price or the launch discount**, because the offer is temporary (owner,
+2026-11-03). The layout keeps the editorial idea the owner chose on
+2026-11-03.
 
 | Play field | Emma Pilates | Emma Pilates Staff |
 | --- | --- | --- |
 | Feature graphic (1024 × 500) | `graphics/play/client/feature-graphic.png` | `graphics/play/staff/feature-graphic.png` |
 | Phone screenshots (1080 × 1920) | `graphics/play/phone/client/1-reservar.png` … `5-invita.png` | `graphics/play/phone/staff/1-agenda.png` … `5-codigo.png` |
-| 7- and 10-inch tablet screenshots (1440 × 2560) | `graphics/play/tablet/client/` | `graphics/play/tablet/staff/` |
+| 7- and 10-inch tablet screenshots (1440 × 2560, the same set for both) | `graphics/play/tablet/client/` | `graphics/play/tablet/staff/` |
 
 The App Store sizes come from the same captures: `graphics/apple/iphone-6.9/`
 (1320 × 2868) and `graphics/apple/ipad-13/` (2064 × 2752), one folder per app
@@ -114,12 +118,24 @@ The App Store sizes come from the same captures: `graphics/apple/iphone-6.9/`
 
 **To make them again** after a screen changes:
 
-1. Capture the raw screens from Release builds of both apps on the iPhone
-   16 Pro and the iPad Pro 11 Simulators, with the fixtures data and the
-   status bar at 9:41 (`xcrun simctl status_bar <udid> override --time 9:41`;
-   the iPad ignores it, so the render crops its status bar). They go to
-   `graphics/raw/<app>/<phone|tablet>/`, with the file names
+1. Load the fixtures into a fresh database and run
+   `scripts/store-graphics/seed.mjs` against its API and worker. It turns
+   «Centro» into the studio's branch, Achumani, archives the other branches
+   and Pilates Prenatal, books Lucía's classes, registers two friends with her
+   code, fills the first Tuesday or Thursday two to six days ahead with six classes
+   for «Reservar» (it prints the date), and
+   starts a class of Daniela's a few minutes later so its roster can be
+   photographed while attendance is open.
+2. Capture the raw screens of both apps on the iPhone 16 Pro and the iPad Pro
+   11 Simulators, with the status bar at 9:41 and a full battery
+   (`xcrun simctl status_bar <udid> override --time 9:41 --batteryState charged --batteryLevel 100`;
+   the iPad keeps its own clock, so the render crops its status bar). On a
+   development build, switch the dev menu's «Tools button» off (tap the
+   switch, not its label) so the gear is not in the shot, and open the app
+   from the home screen so the status bar shows no «◀ app» link. Lucía
+   (Client), Daniela (Trainer) and Camila (Assistant) take the shots. They go
+   to `graphics/raw/<app>/<phone|tablet>/`, with the file names
    `scripts/store-graphics/copy.mjs` lists.
-2. Run `node scripts/store-graphics/render.mjs` (or `… client`, `… staff`).
+3. Run `node scripts/store-graphics/render.mjs` (or `… client`, `… staff`).
    It writes every Play and App Store size. The copy for each image is in
    `copy.mjs`; the layout is in `templates.mjs`.
