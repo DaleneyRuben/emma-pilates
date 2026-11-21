@@ -80,6 +80,15 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
   };
 
   const expiry = expiryLine(invitation.data?.activationExpiresAt);
+  // A 4xx means there is no invitation to follow up (a self-registered
+  // Client, or one already activated); anything else can be read again.
+  const unreadable =
+    invitation.isError &&
+    !(
+      isApiError(invitation.error) &&
+      invitation.error.status < 500 &&
+      invitation.error.status > 0
+    );
 
   return (
     <>
@@ -112,6 +121,22 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
               Reenviar enlace
             </Button>
           )}
+          {unreadable ? (
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <p className="tipo-secundario text-texto">
+                No pudimos comprobar su enlace de activación.
+              </p>
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto px-0"
+                busy={invitation.isFetching}
+                onClick={() => void invitation.refetch()}
+              >
+                Reintentar
+              </Button>
+            </div>
+          ) : null}
           {result === null ? null : result.ok ? (
             <p role="status" className="tipo-secundario text-texto">
               {result.message}
