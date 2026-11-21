@@ -1,4 +1,5 @@
 import { screen, waitFor, within } from "@testing-library/react";
+import { getGetClientInvitationQueryKey } from "@pilates/api-contracts";
 import { http } from "msw";
 import {
   apiUrl,
@@ -212,6 +213,35 @@ describe("AW22 Pendiente de activación with «Reenviar enlace»", () => {
     expect(await resendButton(notice)).toBeEnabled();
   });
 
+  it("offers a retry when her invitation cannot be read", async () => {
+    let attempts = 0;
+    server.use(
+      ...pendingHandlers(
+        () => jsonResponse(invitation(null)),
+        () => {
+          attempts += 1;
+          return attempts <= 2
+            ? problemResponse(500, "internal")
+            : jsonResponse(invitation("2099-03-05T15:00:00.000Z"));
+        },
+      ),
+    );
+    const { notice, user } = await openLucia();
+
+    expect(
+      await within(notice).findByText(
+        "No pudimos comprobar su enlace de activación.",
+        {},
+        { timeout: 5000 },
+      ),
+    ).toBeVisible();
+    await user.click(
+      within(notice).getByRole("button", { name: "Reintentar" }),
+    );
+
+    expect(await resendButton(notice)).toBeEnabled();
+  });
+
   it("offers no resend when there is no invitation to follow up", async () => {
     server.use(
       ...pendingHandlers(
@@ -219,14 +249,21 @@ describe("AW22 Pendiente de activación with «Reenviar enlace»", () => {
         () => problemResponse(404, "client_verification_pending"),
       ),
     );
-    const { notice } = await openLucia();
+    const { notice, queryClient } = await openLucia();
 
     expect(
       within(notice).getByText(
         "Todavía no abrió el enlace del correo para crear su contraseña.",
       ),
     ).toBeVisible();
-    await waitFor(() => expect(reads).toBe(1));
+    await waitFor(() =>
+      expect(
+        queryClient.getQueryState(getGetClientInvitationQueryKey(lucia.id))
+          ?.status,
+      ).toBe("error"),
+    );
+    expect(reads).toBe(1);
+    expect(within(notice).queryByText(/No pudimos comprobar/)).toBeNull();
     expect(
       within(notice).queryByRole("button", { name: "Reenviar enlace" }),
     ).not.toBeInTheDocument();
