@@ -1,7 +1,7 @@
-// Store graphics for Google Play and the App Store, option A «Editorial»
-// (owner, 2026-11-03): Lino ground, a small uppercase label, a Lora title
-// on the left, the real screen in a dark frame that runs off the bottom.
-// No price or launch discount on any image: the offer is temporary.
+// Store graphics for Google Play and the App Store in «Rosa Emma» (owner,
+// 2026-11-21): rosa 100 ground, the label on a white pill, a Lora title in
+// rosa 600, and the real screen in a rosa 600 frame under it. No price or
+// launch discount on any image: the offer is temporary.
 //
 //   node scripts/store-graphics/render.mjs [client|staff]
 //
