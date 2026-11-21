@@ -33,6 +33,10 @@ describe("the first-load state in index.html", () => {
     expect(indexHtml).toMatch(/role="status"/);
     expect(indexHtml).toMatch(/aria-label="Cargando la administración"/);
     expect(indexHtml).toMatch(/<img[^>]*src="\/emma-logo\.png"[^>]*alt=""/);
+    // Follow-up 286: on its soft halo, which breathes with it.
+    expect(indexHtml).toMatch(
+      /<span class="carga-halo">\s*<img\s+class="carga-logo"/,
+    );
     expect(indexHtml.indexOf(`id="${startupStateId}"`)).toBeLessThan(
       indexHtml.indexOf('id="root"'),
     );

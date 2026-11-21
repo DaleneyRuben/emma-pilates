@@ -8,8 +8,9 @@ type Queries = BoundFunctions<typeof queries>;
 
 // Follow-ups 94 and 107 (WEB-045): a loading area is one status named with
 // the page's Spanish label, holding only the studio's logo and no text.
+// Follow-up 286 (Rosa Emma): the logo sits on its soft halo.
 function expectLogoOnly(status: HTMLElement) {
-  expect(status.querySelector("img.carga-logo")).toHaveAttribute(
+  expect(status.querySelector(".carga-halo > img.carga-logo")).toHaveAttribute(
     "src",
     "/emma-logo.png",
   );
