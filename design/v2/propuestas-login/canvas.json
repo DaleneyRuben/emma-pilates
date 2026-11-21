@@ -1,0 +1,34 @@
+{
+ "v": 3,
+ "createdOnFiles": {"v": 1, "at": "2026-11-21T19:30:00Z"},
+ "title": "Iniciar sesión · propuestas de diseño",
+ "launch": {"view": "canvas"},
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "Antes · Clientas (hoy)"},
+  "Antes-Equipo.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "Antes · Equipo (hoy)"},
+  "A-Clientas.dc.html": {"x": 0, "y": 1224, "w": 390, "h": 844, "title": "A · Clientas", "is_interactive": true},
+  "A-Equipo.dc.html": {"x": 470, "y": 1224, "w": 390, "h": 844, "title": "A · Equipo", "is_interactive": true},
+  "A-iPad.dc.html": {"x": 940, "y": 1224, "w": 834, "h": 1194, "title": "A · Equipo en iPad", "is_interactive": true},
+  "B-Clientas.dc.html": {"x": 0, "y": 2798, "w": 390, "h": 844, "title": "B · Clientas", "is_interactive": true},
+  "B-Equipo.dc.html": {"x": 470, "y": 2798, "w": 390, "h": 844, "title": "B · Equipo", "is_interactive": true},
+  "B-iPad.dc.html": {"x": 940, "y": 2798, "w": 834, "h": 1194, "title": "B · Equipo en iPad", "is_interactive": true},
+  "C-Clientas.dc.html": {"x": 0, "y": 4372, "w": 390, "h": 844, "title": "C · Clientas", "is_interactive": true},
+  "C-Equipo.dc.html": {"x": 470, "y": 4372, "w": 390, "h": 844, "title": "C · Equipo", "is_interactive": true},
+  "C-iPad.dc.html": {"x": 940, "y": 4372, "w": 834, "h": 1194, "title": "C · Equipo en iPad", "is_interactive": true}
+ },
+ "order": [
+  "Main.dc.html", "Antes-Equipo.dc.html",
+  "A-Clientas.dc.html", "A-Equipo.dc.html", "A-iPad.dc.html",
+  "B-Clientas.dc.html", "B-Equipo.dc.html", "B-iPad.dc.html",
+  "C-Clientas.dc.html", "C-Equipo.dc.html", "C-iPad.dc.html"
+ ],
+ "notes": {
+  "r0": {"x": 0, "y": -260, "text": "Antes · hoy", "kind": "title1", "maxW": 1774},
+  "r1": {"x": 0, "y": 964, "text": "A · Hoja abajo con el logo (recomendada)", "kind": "title1", "maxW": 1774},
+  "r2": {"x": 0, "y": 2538, "text": "B · Hoja abajo con el título", "kind": "title1", "maxW": 1774},
+  "r3": {"x": 0, "y": 4112, "text": "C · Logo y tarjeta al centro", "kind": "title1", "maxW": 1774},
+  "tip": {"x": 940, "y": 0, "w": 420, "text": "Toca un campo para ver la pantalla con el teclado; «Listo» lo cierra. Se puede escribir en los campos.", "size": "l", "fill": "pink"}
+ },
+ "designSystems": []
+}

@@ -66,6 +66,7 @@ numbered tests.
 | Type scale in the apps       | Every text in both apps is one of the follow-up 285 styles: Lora 500 only for titles and figures, Work Sans for everything else, no text under 12 pt, small text only on white, 50 or 600, italic field examples, the same weight for a chosen chip or tab, text that grows with the phone up to 1.3 times (Test 191) | Text at the phone's largest accessibility sizes stops growing at 1.3 times by design |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 | Resend a Client activation link from the admin web | Clientas › a pending Client's Resumen: the «Pendiente de activación» aviso with her link's expiry and «Reenviar enlace», the success line, and the server's wait after a second click (Test 26, step 3) | A self-registered Client still verifying her email shows the aviso without the link |
+| Login with the logo | Both apps open Login on the rosa band with the studio's logo and the form in a white sheet anchored to the bottom, no «Ej.:» under the email, the sheet above the keyboard, a 560 pt column on iPad (Test 193) | — |
 
 ## Where each designed screen is tested
 
@@ -184,9 +185,8 @@ build can take a few minutes.
 
 You should see:
 
-- a light warm-beige background;
-- the **Emma** wordmark in Lora;
-- email and password fields;
+- the rosa band with the studio's logo filling the top (Test 193);
+- a white sheet at the bottom with the email and password fields;
 - the **Iniciar sesión** button; and
 - **¿Olvidaste tu contraseña?** and, at the bottom, "¿No tienes una cuenta?
   **Regístrate**".
@@ -11208,9 +11208,10 @@ F. **Class card (Clase E).** As daniela@, **Mi agenda** opens on the next class
    Ver», which opens them. Horario, Cancelar una clase and Reservar para una
    clienta use the same rows. As carla@, Reservar uses the same rows with the
    trainer line on one line.
-G. **Forms (Form B).** On Login the email example reads «Ej.: tu@correo.com»
-   under the field (the staff app «Ej.: tu@emmapilates.bo») and no password
-   field shows dots. On **Editar perfil**, clear Nombre and tap **Guardar
+G. **Forms (Form B).** On recovery the email example reads «Ej.:
+   tu@correo.com» under the field (the staff app «Ej.: tu@emmapilates.bo»);
+   Login shows no example since follow-up 288 (Test 193). No password field
+   shows dots. On **Editar perfil**, clear Nombre and tap **Guardar
    cambios**: a Rubor box reads «Falta 1 dato para guardar · Nombre», the field
    has a 2 pt Rosa profundo border and «Escribe tu nombre.» in bold. On
    Registro, **Crear cuenta** with nothing filled lists all six fields
@@ -11902,3 +11903,33 @@ C. **Results.** Type «luc»: the card goes away, the results show in one white
 D. **Hoy.** The Assistant's **Hoy** shows the same outlined **Crear clienta
    nueva** button above the next class.
 E. Check on the iPhone 16 Pro and the Android emulator.
+
+## Test 193: Login with the logo and the form in a sheet (follow-up 288)
+
+The owner's Login (2026-11-21, design follow-up 288 option A) in both apps.
+JavaScript only: no migration, no API change, no native build. Run the API and
+both Metro servers on your own ports, sign out, and walk the iPhone 16 Pro,
+the iPad Pro 11 and the Android emulator next to
+`design/v2/propuestas-login/A-*.dc.html`.
+
+A. **No empty half.** Login opens with the Rosa 200 band from the top edge
+   down to the form, the studio's logo centred in it (the Staff app with
+   «Acceso del equipo» under it). The form is a white sheet with rounded
+   upper corners that reaches the bottom edge; the home indicator sits inside
+   the sheet. No Rosa 100 shows under it.
+B. **Everything is still there.** «Correo electrónico», «Contraseña» with its
+   eye, «Iniciar sesión», «¿Olvidaste tu contraseña?», and on the Client app
+   «¿No tienes una cuenta? Regístrate» at the foot of the sheet under a thin
+   line. There is no «Ej.: …» under the email field on Login. «Recuperar
+   contraseña» still shows its example.
+C. **Keyboard.** Tap «Correo electrónico»: the sheet rises above the keyboard
+   with both fields and «Iniciar sesión» in view, the logo moved up above it.
+   Drag the form up: white, never the band, shows under the sheet. Close the keyboard: the sheet
+   settles back at the bottom.
+D. **iPad.** On the iPad Pro 11 (portrait and landscape), the sheet is a
+   centred column at most 560 pt wide anchored to the bottom, with the logo
+   centred above it.
+E. **States.** A wrong password shows «El correo o la contraseña no son
+   correctos.» at the top of the sheet; Cerrar mi cuenta returns to Login
+   with its notice at the top of the sheet.
+F. **VoiceOver / TalkBack.** The logo reads «Emma Pilates Studio, imagen».

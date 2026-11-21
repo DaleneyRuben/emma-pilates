@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Iniciar sesión · propuesta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}input:focus{outline:none}</style></helmet>
+<div style="width: {{w}}px; height: {{h}}px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: {{bg}}; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <sc-if value="{{sheet}}" hint-placeholder-val="{{true}}">
+    <div style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: {{heroPad}}; box-sizing: border-box; overflow: hidden">
+      <sc-if value="{{logo}}" hint-placeholder-val="{{true}}"><img src="./emma-logo.png" alt="Emma Pilates Studio" style="width: {{logoW}}px; height: auto; display: block"></sc-if>
+      <sc-if value="{{title}}" hint-placeholder-val="{{false}}"><h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: {{titleSize}}px; line-height: 1.1; text-align: center">Emma Pilates Studio</h1></sc-if>
+      <sc-if value="{{staff}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; min-height: 26px; padding: 3px 12px; border-radius: 999px; background: #FFFBFB; font-size: 12px; font-weight: 700; line-height: 1.2; letter-spacing: .12em; text-transform: uppercase">Acceso del equipo</span></sc-if>
+    </div>
+    <div style="flex: none; align-self: center; width: 100%; max-width: {{sheetMax}}px; box-sizing: border-box; background: #FFFBFB; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 32px rgba(147,97,93,.25); padding: 28px {{sheetPadX}}px {{sheetPadB}}px; display: flex; flex-direction: column; gap: 14px">
+      <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600; line-height: 1.45">Correo electrónico</span><input type="email" autocomplete="email" value="{{email}}" onChange="{{typeEmail}}" onFocus="{{openKb}}" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 14px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-family: 'Work Sans', sans-serif; font-size: 16px; color: #93615D"></label>
+      <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600; line-height: 1.45">Contraseña</span><span style="display: flex; align-items: center; height: 52px; box-sizing: border-box; padding: 0 4px 0 14px; border-radius: 14px; box-shadow: inset 0 0 0 1.5px #CDA697"><input type="{{pwType}}" autocomplete="current-password" value="{{password}}" onChange="{{typePassword}}" onFocus="{{openKb}}" style="flex: 1; min-width: 0; height: 48px; border: 0; background: transparent; font-family: 'Work Sans', sans-serif; font-size: 16px; color: #93615D"><button type="button" aria-label="{{eyeLabel}}" onClick="{{toggleEye}}" style="width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: #93615D; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></span></label>
+      <button type="button" style="height: 52px; margin-top: 4px; border: 0; border-radius: 16px; background: #93615D; color: #FFFBFB; font-family: 'Work Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer">Iniciar sesión</button>
+      <button type="button" style="align-self: center; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">¿Olvidaste tu contraseña?</button>
+      <sc-if value="{{client}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 6px; padding-top: 12px; border-top: 1px solid #F3DDD3"><span style="font-size: 15px; line-height: 1.5">¿No tienes una cuenta?</span><button type="button" style="min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">Regístrate</button></div>
+      </sc-if>
+    </div>
+  </sc-if>
+  <sc-if value="{{centered}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: {{cJustify}}; gap: 20px; padding: {{cPad}}; box-sizing: border-box; overflow: hidden">
+      <sc-if value="{{cLogo}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-direction: column; align-items: center; gap: 14px"><img src="./emma-logo.png" alt="Emma Pilates Studio" style="width: {{logoW}}px; height: auto; display: block"><sc-if value="{{staff}}" hint-placeholder-val="{{false}}"><span style="display: inline-flex; align-items: center; min-height: 26px; padding: 3px 12px; border-radius: 999px; background: #FFFBFB; font-size: 12px; font-weight: 700; line-height: 1.2; letter-spacing: .12em; text-transform: uppercase">Acceso del equipo</span></sc-if></div></sc-if>
+      <div style="width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px">
+        <div style="background: #FFFBFB; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+          <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600; line-height: 1.45">Correo electrónico</span><input type="email" autocomplete="email" value="{{email}}" onChange="{{typeEmail}}" onFocus="{{openKb}}" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 14px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-family: 'Work Sans', sans-serif; font-size: 16px; color: #93615D"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600; line-height: 1.45">Contraseña</span><span style="display: flex; align-items: center; height: 52px; box-sizing: border-box; padding: 0 4px 0 14px; border-radius: 14px; box-shadow: inset 0 0 0 1.5px #CDA697"><input type="{{pwType}}" autocomplete="current-password" value="{{password}}" onChange="{{typePassword}}" onFocus="{{openKb}}" style="flex: 1; min-width: 0; height: 48px; border: 0; background: transparent; font-family: 'Work Sans', sans-serif; font-size: 16px; color: #93615D"><button type="button" aria-label="{{eyeLabel}}" onClick="{{toggleEye}}" style="width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: #93615D; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></span></label>
+          <button type="button" style="height: 52px; margin-top: 4px; border: 0; border-radius: 16px; background: #93615D; color: #FFFBFB; font-family: 'Work Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer">Iniciar sesión</button>
+          <button type="button" style="align-self: center; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">¿Olvidaste tu contraseña?</button>
+        </div>
+        <sc-if value="{{client}}" hint-placeholder-val="{{true}}">
+          <div style="background: #FFFBFB; border-radius: 20px; padding: 6px 14px; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)"><span style="font-size: 15px; line-height: 1.5">¿No tienes una cuenta?</span><button type="button" style="min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">Regístrate</button></div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{kb}}" hint-placeholder-val="{{false}}">
+    <div style="flex: none; height: {{kbH}}px; display: flex; flex-direction: column; background: #D1D4DA">
+      <div style="display: flex; justify-content: flex-end; padding: 4px 8px; background: #F1F1F3"><button type="button" onClick="{{closeKb}}" style="min-height: 44px; padding: 0 14px; border: 0; background: transparent; color: #0A63D6; font-family: -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">Listo</button></div>
+      <div style="flex: 1; display: grid; place-items: center; color: #6B6E75; font-family: -apple-system, system-ui, sans-serif; font-size: 14px">Teclado</div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var V = 'A';
+var APP = 'equipo';
+var IPAD = false;
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var kb = !!st.kb;
+    var sheet = V !== 'C';
+    var staff = APP === 'equipo';
+    var logoW = sheet ? (kb ? (IPAD ? 220 : 150) : (IPAD ? 380 : 270)) : (kb ? (IPAD ? 200 : 130) : (IPAD ? 300 : 230));
+    return {
+      w: IPAD ? 834 : 390, h: IPAD ? 1194 : 844,
+      bg: sheet ? '#E7CCBF' : '#F9E7DF',
+      sheet: sheet, centered: !sheet, logo: V === 'A', title: V === 'B',
+      staff: staff, client: !staff,
+      logoW: logoW, titleSize: IPAD ? 40 : (kb ? 26 : 30),
+      heroPad: IPAD ? '64px 40px 32px' : (kb ? '50px 24px 12px' : '58px 24px 24px'),
+      sheetMax: IPAD ? 560 : 1000, sheetPadX: IPAD ? 40 : 24, sheetPadB: kb ? 16 : (IPAD ? 40 : 42),
+      cLogo: !(kb && !IPAD), cJustify: kb ? 'flex-end' : 'center',
+      cPad: kb ? '50px 16px 12px' : (IPAD ? '64px 40px 40px' : '58px 16px 42px'),
+      kb: kb, kbH: IPAD ? 398 : 336,
+      email: st.email || '', password: st.password || '',
+      pwType: st.show ? 'text' : 'password', eyeLabel: st.show ? 'Ocultar contraseña' : 'Mostrar contraseña',
+      typeEmail: function (e) { self.setState({ email: e.target.value }); },
+      typePassword: function (e) { self.setState({ password: e.target.value }); },
+      toggleEye: function () { self.setState({ show: !st.show }); },
+      openKb: function () { self.setState({ kb: true }); },
+      closeKb: function () { self.setState({ kb: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

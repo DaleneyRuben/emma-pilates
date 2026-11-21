@@ -1,11 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
-import { useState } from "react";
+import { Image, StyleSheet, useWindowDimensions, View } from "react-native";
+import { SafeAreaInsetsContext } from "react-native-safe-area-context";
+import { useContext, useState } from "react";
 import { z } from "zod";
 
-import { BrandHeader } from "./auth-layout";
-import { emailHint, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import logo from "../../assets/emma-logo.png";
+import { TeamAccessBadge } from "./auth-layout";
+import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
@@ -13,15 +15,18 @@ import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
-import { ScreenHeader } from "../ui/screen-header";
 import { TextButton } from "../ui/text-button";
 import { Text } from "../ui/text";
-import { colors, radii, spacing, surfaces } from "../ui/tokens";
+import { colors, radii, shadows, spacing } from "../ui/tokens";
 
 const loginSchema = z.object({
   email: z.email("Escribe un correo electrónico válido."),
   password: z.string().min(1, "Escribe tu contraseña."),
 });
+
+// The logo is 1312 × 565 (the owner's file, background removed), as in LoadingState.
+const logoAspect = 565 / 1312;
+const logoMaxWidth = 380;
 
 export type LoginValues = z.infer<typeof loginSchema>;
 
@@ -50,6 +55,10 @@ export function LoginScreen({
   teamAccess = false,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
+  const { width } = useWindowDimensions();
+  // The sheet reaches the bottom edge and keeps the home indicator clear itself.
+  const bottomInset = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
+  const logoWidth = Math.min(Math.round(width * 0.7), logoMaxWidth);
   const [retryAfterSeconds, startRetryWait] = useCountdown();
   const {
     control,
@@ -73,16 +82,30 @@ export function LoginScreen({
   });
 
   return (
-    <Screen style={styles.screen}>
-      <FormScrollView band contentContainerStyle={styles.content}>
-        {/* Rosa Emma C01/E-A01: the wordmark on the band, the form in a white
-            card, and «Regístrate» in its own card under it. */}
-        <View style={styles.main} testID="login-main">
-          <ScreenHeader>
-            <View style={styles.band}>
-              <BrandHeader teamAccess={teamAccess} />
-            </View>
-          </ScreenHeader>
+    <Screen edges={sheetEdges} style={styles.screen}>
+      {/* White under the sheet, so dragging the form up never shows the band
+          beneath it; the opaque hero covers it at rest. */}
+      <View pointerEvents="none" style={styles.underlay}>
+        <View style={styles.underlaySheet} />
+      </View>
+      <FormScrollView contentContainerStyle={styles.content}>
+        {/* Follow-up 288 A: the logo on the 200 band fills the top, and the form
+            sits in a white sheet anchored to the bottom edge. */}
+        <View style={styles.hero} testID="login-hero">
+          <Image
+            accessibilityLabel="Emma Pilates Studio"
+            accessibilityRole="image"
+            accessible
+            resizeMode="contain"
+            source={logo}
+            style={{ height: Math.round(logoWidth * logoAspect), width: logoWidth }}
+          />
+          {teamAccess ? <TeamAccessBadge /> : null}
+        </View>
+        <View
+          style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+          testID="login-sheet"
+        >
           {notice === null ? null : (
             <View accessibilityRole="summary" style={styles.notice}>
               <Glyph color={colors.onEmphasis} name="check" size={20} strokeWidth={1.8} />
@@ -91,84 +114,93 @@ export function LoginScreen({
               </Text>
             </View>
           )}
-          <View style={styles.form}>
-            {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
-            {retryAfterSeconds > 0 ? (
-              <WaitNotice
-                message="Demasiados intentos. Intenta de nuevo en un momento."
-                remainingSeconds={retryAfterSeconds}
-                waitLabel="Podrás intentarlo en"
-              />
-            ) : null}
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onBlur, onChange, value } }) => (
-                <FormField
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  error={errors.email?.message}
-                  keyboardType="email-address"
-                  label="Correo electrónico"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  hint={emailHint(teamAccess)}
-                  testID="login-email"
-                  value={value}
-                />
-              )}
+          {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
+          {retryAfterSeconds > 0 ? (
+            <WaitNotice
+              message="Demasiados intentos. Intenta de nuevo en un momento."
+              remainingSeconds={retryAfterSeconds}
+              waitLabel="Podrás intentarlo en"
             />
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onBlur, onChange, value } }) => (
-                <FormField
-                  autoComplete="current-password"
-                  error={errors.password?.message}
-                  label="Contraseña"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  secureTextEntry
-                  testID="login-password"
-                  value={value}
-                />
-              )}
-            />
-            <PrimaryButton
-              busy={isSubmitting}
-              disabled={retryAfterSeconds > 0}
-              label="Iniciar sesión"
-              onPress={submitLogin}
-              testID="login-submit"
-            />
-            {onBiometricUnlock === undefined ? null : (
-              <BiometricLoginButton onPress={onBiometricUnlock} />
-            )}
-            {onForgotPassword === undefined ? null : (
-              <TextButton
-                label="¿Olvidaste tu contraseña?"
-                onPress={onForgotPassword}
-                testID="login-forgot-password"
+          ) : null}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onBlur, onChange, value } }) => (
+              <FormField
+                autoCapitalize="none"
+                autoComplete="email"
+                error={errors.email?.message}
+                keyboardType="email-address"
+                label="Correo electrónico"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                testID="login-email"
+                value={value}
               />
             )}
-          </View>
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onBlur, onChange, value } }) => (
+              <FormField
+                autoComplete="current-password"
+                error={errors.password?.message}
+                label="Contraseña"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                secureTextEntry
+                testID="login-password"
+                value={value}
+              />
+            )}
+          />
+          <PrimaryButton
+            busy={isSubmitting}
+            disabled={retryAfterSeconds > 0}
+            label="Iniciar sesión"
+            onPress={submitLogin}
+            testID="login-submit"
+          />
+          {onBiometricUnlock === undefined ? null : (
+            <BiometricLoginButton onPress={onBiometricUnlock} />
+          )}
+          {onForgotPassword === undefined ? null : (
+            <TextButton
+              label="¿Olvidaste tu contraseña?"
+              onPress={onForgotPassword}
+              testID="login-forgot-password"
+            />
+          )}
+          {onRegister === undefined ? null : (
+            <View style={styles.register}>
+              <FooterPrompt
+                action="Regístrate"
+                onPress={onRegister}
+                prompt="¿No tienes una cuenta?"
+              />
+            </View>
+          )}
         </View>
-        {onRegister === undefined ? null : (
-          <View style={styles.register}>
-            <FooterPrompt
-              action="Regístrate"
-              onPress={onRegister}
-              prompt="¿No tienes una cuenta?"
-            />
-          </View>
-        )}
       </FormScrollView>
     </Screen>
   );
 }
 
+/** The sheet owns the bottom edge, so the Screen keeps only the others. */
+const sheetEdges = ["top", "left", "right"] as const;
+
 const styles = StyleSheet.create({
-  band: { paddingBottom: spacing.xs, paddingTop: spacing.xl },
+  content: { flexGrow: 1 },
+  hero: {
+    alignItems: "center",
+    backgroundColor: colors.band,
+    flexGrow: 1,
+    gap: spacing.md,
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
   // C01n: the closing message is the screen's one 600 block, said in white.
   notice: {
     alignItems: "center",
@@ -180,23 +212,25 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   noticeText: { flex: 1 },
-  // A phone-width column, centred on a tablet instead of stretched.
-  content: {
+  register: {
+    borderTopColor: colors.divider,
+    borderTopWidth: 1,
+    paddingTop: spacing.md,
+  },
+  screen: { backgroundColor: colors.band, padding: 0 },
+  // A phone-width sheet, centred on a tablet instead of stretched.
+  sheet: {
+    ...shadows.sheet,
     alignSelf: "center",
-    flexGrow: 1,
-    gap: spacing.md,
-    maxWidth: 480,
-    paddingBottom: spacing.xxl,
+    backgroundColor: colors.card,
+    borderTopLeftRadius: radii.band,
+    borderTopRightRadius: radii.band,
+    gap: spacing.mdLg,
+    maxWidth: 560,
+    paddingHorizontal: spacing.xlSm,
+    paddingTop: spacing.xl,
     width: "100%",
   },
-  form: {
-    ...surfaces.card,
-    gap: spacing.mdLg,
-    padding: spacing.xlSm,
-  },
-  main: { gap: spacing.md },
-  register: { ...surfaces.card, padding: spacing.mdLg },
-  screen: {
-    backgroundColor: colors.surface,
-  },
+  underlay: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "flex-end" },
+  underlaySheet: { backgroundColor: colors.card, height: "50%", maxWidth: 560, width: "100%" },
 });
