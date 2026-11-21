@@ -116,17 +116,18 @@ describe("Client Class History", () => {
     expect(screen.queryByRole("button", { name: "Cancelar reserva" })).not.toBeOnTheScreen();
   });
 
-  // FIX-041 (follow-up 242, C05d): her 20 px face comes before her name.
-  it("leads each row's trainer with her photo, or her initials without one", async () => {
+  // The owner's pick C: each row names its trainer without a face.
+  it("names each row's trainer without her photo or initials", async () => {
     const screen = await openHistory(history);
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ height: 20 });
+      expect(screen.getByText("Daniela Ortiz · Urubó")).toBeOnTheScreen();
     });
-    expect(screen.fetcher).toHaveBeenCalledWith(
+    expect(screen.queryByLabelText("Foto de Daniela Ortiz")).toBeNull();
+    expect(screen.queryByText("EV")).toBeNull();
+    expect(screen.fetcher).not.toHaveBeenCalledWith(
       "/api/v1/staff-photos/asset-daniela?variant=thumbnail",
     );
-    expect(screen.getAllByText("EV")).toHaveLength(2);
   });
 
   // Rosa Emma (C05d): the summary is the 600 hero and each month a white card.
