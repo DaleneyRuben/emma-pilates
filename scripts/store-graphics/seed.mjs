@@ -87,13 +87,21 @@ if (prenatal) {
 console.log("branch Centro is now Achumani");
 
 const lucia = await login("lucia@example.com");
+// The «Reservar» shots show the first Tuesday or Thursday two to six days
+// ahead (La Paz), inside the screen's seven-day strip. The fixtures give
+// those days a 09:00 Mat and an 18:30 Reformer only, so the extra classes
+// below never overlap one.
+const laPazNow = new Date(Date.now() - 4 * 60 * minute);
+const ahead = [2, 3, 4, 5, 6].find((offset) => [2, 4].includes((laPazNow.getUTCDay() + offset) % 7));
+const showcase = new Date(laPazNow.getTime() + ahead * 24 * 60 * minute).toISOString().slice(0, 10);
+const onShowcase = (session) => new Date(new Date(session.startsAt).getTime() - 4 * 60 * minute).toISOString().slice(0, 10) === showcase;
 const day = (offset) => new Date(Date.now() + offset * 24 * 60 * minute).toISOString();
 const sessions = await must(
   "GET",
   `/sessions?branchId=${centro.id}&from=${day(1)}&until=${day(6)}&limit=50`,
   lucia,
 );
-for (const session of sessions.slice(0, 2)) {
+for (const session of sessions.filter((session) => !onShowcase(session)).slice(0, 2)) {
   await must("POST", `/sessions/${session.id}/bookings`, lucia, {});
 }
 console.log("Lucía booked 2 classes");
@@ -138,13 +146,12 @@ for (const email of ["lucia@example.com", "valeria@example.com"]) {
 }
 console.log(`Daniela's class starts at ${session.startsAt}`);
 
-// The fixtures' schedule has two classes a day. The «Reservar» shots show
-// the day three days from now (La Paz), filled out like a real studio day:
+// The fixtures' schedule has two classes a day. The showcase day is
+// filled out like a real studio day:
 // morning and evening Reformer and Mat classes. Lucía books none of them, so
 // her Plan still shows classes left on «Inicio».
 const emma = staff.find((member) => member.name === "Emma Vargas");
 const mat = classTypes.find((type) => type.name === "Mat Pilates");
-const showcase = new Date(Date.now() - 4 * 60 * minute + 3 * 24 * 60 * minute).toISOString().slice(0, 10);
 const laPaz = (time) => new Date(`${showcase}T${time}:00-04:00`).toISOString();
 const valeria = await login("valeria@example.com");
 for (const extra of [
@@ -163,6 +170,9 @@ for (const extra of [
   });
   console.log(`${showcase} ${extra.time} ${extra.type.name}: ${created.status}`);
   if (created.status >= 300) continue;
-  for (const token of extra.book) await must("POST", `/sessions/${created.data.id}/bookings`, token, {});
+  for (const token of extra.book) {
+    const booked = await request("POST", `/sessions/${created.data.id}/bookings`, token, {});
+    if (booked.status >= 300) console.log(`  booking refused: ${booked.status} ${booked.data?.code}`);
+  }
 }
 console.log(`the Reservar shots show ${showcase}`);
