@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { Platform, Pressable, type PressableProps, StyleSheet, View } from "react-native";
+import type { EdgeInsets } from "react-native-safe-area-context";
 
 import { colors, shadows, spacing } from "./tokens";
+import { maxTextScale, textVariants } from "./type-scale";
 
 type TabBarButtonProps = Omit<PressableProps, "children"> & {
   "aria-selected"?: boolean;
@@ -22,7 +24,11 @@ export function TabBarButton({
   ...props
 }: TabBarButtonProps) {
   return (
-    <Pressable {...props} aria-selected={selected} style={style}>
+    <Pressable
+      {...props}
+      aria-selected={selected}
+      style={(state) => [typeof style === "function" ? style(state) : style, styles.button]}
+    >
       <View
         style={[styles.pill, selected && styles.selected]}
         testID={selected ? "open-tab-pill" : undefined}
@@ -33,15 +39,38 @@ export function TabBarButton({
   );
 }
 
-/** The white bar under the tabs, a 1 pt 200 rule on top. */
-export const tabBarStyle = {
-  ...shadows.tabBar,
-  backgroundColor: colors.card,
-  borderTopWidth: 0,
-  // Android's bar leaves its items about 49 pt above the gesture area: the
-  // pill needs all of it there.
-  paddingTop: Platform.OS === "android" ? 0 : spacing.sm,
-} as const;
+// React Navigation boxes each tab icon in 28 pt (UIKit), whatever its size.
+const iconBoxHeight = 28;
+const android = () => Platform.OS === "android";
+// Android's bar is shorter than iOS's: a slimmer pill and a tighter bar.
+const pillPadding = () => (android() ? spacing.xxs : spacing.sm);
+const pillGap = () => (android() ? 1 : 3);
+const barPadding = () => (android() ? spacing.xs : spacing.sm);
+
+/** The pill's height: its padding, the icon box, the gap and the label, at this text size. */
+export function tabBarPillHeight(fontScale = 1) {
+  const scale = Math.min(Math.max(fontScale, 1), maxTextScale);
+  const label = Math.ceil(textVariants.pastilla.lineHeight * scale);
+  return pillPadding() * 2 + iconBoxHeight + pillGap() + label;
+}
+
+/**
+ * The white bar under the tabs: the pill with even room above and below it
+ * (8 pt, 4 on Android), then the bottom inset left clear for the home
+ * indicator. React Navigation sizes a bar without a height at 49 pt, which
+ * pushed the pill down against the indicator.
+ */
+export function tabBarStyleFor(insets: Pick<EdgeInsets, "bottom">, fontScale = 1) {
+  const padding = barPadding();
+  return {
+    ...shadows.tabBar,
+    backgroundColor: colors.card,
+    borderTopWidth: 0,
+    height: padding * 2 + tabBarPillHeight(fontScale) + insets.bottom,
+    paddingBottom: padding + insets.bottom,
+    paddingTop: padding,
+  } as const;
+}
 
 /**
  * Each tab as wide as its icon and label, plus an even share of the rest of
@@ -58,15 +87,16 @@ export const tabBarTints = {
 } as const;
 
 const styles = StyleSheet.create({
+  // The bar pads the pill: the tab adds no room of its own above or below it.
+  button: { paddingVertical: 0 },
   pill: {
     alignItems: "center",
     borderRadius: 16,
-    gap: Platform.OS === "android" ? 1 : 3,
+    gap: pillGap(),
     maxWidth: "100%",
     minWidth: 56,
     paddingHorizontal: spacing.xs,
-    // Android's bar is shorter than iOS's: a slimmer pill keeps inside it.
-    paddingVertical: Platform.OS === "android" ? spacing.xxs : spacing.sm,
+    paddingVertical: pillPadding(),
   },
   selected: { backgroundColor: colors.primary },
 });
