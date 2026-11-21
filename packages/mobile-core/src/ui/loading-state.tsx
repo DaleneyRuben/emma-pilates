@@ -68,7 +68,14 @@ export function LoadingState({ label }: { label: string }) {
   const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
   const halo = Math.round(logoWidth * haloToLogo);
   return (
-    <View accessibilityLabel={label} accessibilityRole="progressbar" accessible style={styles.area}>
+    // The area never collapses below the halo, so a parent that does not grow
+    // (the Trainer's Agenda under its week card) cannot push it onto content.
+    <View
+      accessibilityLabel={label}
+      accessibilityRole="progressbar"
+      accessible
+      style={[styles.area, { minHeight: halo }]}
+    >
       {visible && reduceMotion !== undefined ? (
         // The accessible area above is the one element screen readers reach.
         <Animated.View
