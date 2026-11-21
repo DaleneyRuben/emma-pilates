@@ -46,16 +46,20 @@ describe("LoadingState", () => {
     expect(screen.getByTestId("loading-state-logo")).toBeOnTheScreen();
   });
 
-  // E-A12 (Rosa Emma): the logo on a white disc, 120 pt on a phone, 150 on a tablet.
-  it("draws the logo on a white disc, larger on a tablet", async () => {
+  // Follow-ups 286 and 287 (Rosa Emma, option A): the logo on a white halo
+  // with a soft edge over the screen's Rosa 100, 240 pt wide on a phone and 300 on a tablet, the halo
+  // 1.25 times the logo's width.
+  it("draws the logo on a soft halo, larger on a tablet", async () => {
     const phone = await render(<LoadingState label="Cargando clases" />);
     await advance(400);
-    expect(phone.getByTestId("loading-state-disc")).toHaveStyle({
-      backgroundColor: "#FFFBFB",
-      borderRadius: 60,
-      width: 120,
+    const halo = phone.getByTestId("loading-state-halo");
+    expect(halo).toHaveStyle({ borderRadius: 150, height: 300, width: 300 });
+    expect(halo).toHaveStyle({
+      experimental_backgroundImage:
+        "radial-gradient(circle, #FFFBFB 0%, #FFFBFB 52%, rgba(255, 251, 251, 0.6) 60%, rgba(255, 251, 251, 0) 70%)",
     });
-    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 100, height: 43 });
+    expect(halo).not.toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
     await phone.unmount();
 
     const phoneWindow = Dimensions.get("window");
@@ -64,11 +68,22 @@ describe("LoadingState", () => {
     try {
       const tablet = await render(<LoadingState label="Cargando clases" />);
       await advance(400);
-      expect(tablet.getByTestId("loading-state-disc")).toHaveStyle({ width: 150 });
-      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 126, height: 54 });
+      expect(tablet.getByTestId("loading-state-halo")).toHaveStyle({ width: 375 });
+      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 300, height: 129 });
     } finally {
       Dimensions.set({ window: phoneWindow, screen: phoneWindow });
     }
+  });
+
+  // A screen that stacks the state under other content without letting it
+  // grow (the Trainer's Agenda under its week card) must not squeeze the halo
+  // onto that content: the area is never shorter than the halo.
+  it("keeps room for the whole halo where its parent does not grow", async () => {
+    const screen = await render(<LoadingState label="Cargando agenda" />);
+
+    expect(screen.getByRole("progressbar", { name: "Cargando agenda" })).toHaveStyle({
+      minHeight: 300,
+    });
   });
 
   it("fades in and then breathes in an endless loop", async () => {
@@ -82,13 +97,27 @@ describe("LoadingState", () => {
     expect(breath.start).toHaveBeenCalled();
   });
 
+  // Follow-up 287: at rest the logo stays at 0.8 and 0.96, never a washed-out grey.
+  it("fades in to a rest of 0.8 and breathes up to full opacity", async () => {
+    const timing = jest.spyOn(Animated, "timing");
+    await render(<LoadingState label="Cargando clases" />);
+
+    await advance(400);
+
+    const targets = timing.mock.calls.map(([, config]) => config.toValue);
+    expect(targets[0]).toBe(0.8);
+    expect(targets).toEqual(expect.arrayContaining([1, 0.96]));
+    expect(targets).not.toContain(0.55);
+  });
+
   it("appears still at full opacity under Reduce Motion", async () => {
     jest.mocked(AccessibilityInfo.isReduceMotionEnabled).mockResolvedValue(true);
     const screen = await render(<LoadingState label="Cargando clases" />);
 
     await advance(400);
 
-    expect(screen.getByTestId("loading-state-disc")).toHaveStyle({
+    // The halo and the logo breathe as one piece, so both stand still together.
+    expect(screen.getByTestId("loading-state-halo")).toHaveStyle({
       opacity: 1,
       transform: [{ scale: 1 }],
     });

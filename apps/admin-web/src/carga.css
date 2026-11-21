@@ -1,7 +1,7 @@
 /*
  * WEB-035, design follow-up 107: the loading states. index.html links this
  * file so the first-load state is styled before the bundle runs; the
- * router's pending state reuses `.carga-logo`. Only the logo, breathing as
+ * router's pending state reuses `.carga-halo` and `.carga-logo`. Only the logo, breathing as
  * the mobile apps' loading state does (follow-up 94), still under Reduce
  * Motion. The Content-Security-Policy (WEB-030) allows no inline styles, so
  * everything the static markup needs is here.
@@ -11,13 +11,13 @@
     opacity: 0;
   }
   to {
-    opacity: 0.55;
+    opacity: 0.8;
   }
 }
 
 @keyframes carga-respira {
   from {
-    opacity: 0.55;
+    opacity: 0.8;
     transform: scale(0.96);
   }
   to {
@@ -38,15 +38,35 @@
   background-color: #f9e7df;
 }
 
-.carga-logo {
-  display: block;
-  width: 240px;
-  height: auto;
-  opacity: 0.55;
+/* Follow-ups 286 and 287 (Rosa Emma, option A): the logo sits on a white
+   halo, 1.25 times its width, solid to 52 % of the radius with a soft edge
+   gone by 70 %, so it reads clearly on Rosa 100. The halo breathes and
+   carries the logo with it, as one piece; at rest it stays at 0.8. */
+.carga-halo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-image: radial-gradient(
+    circle,
+    #fffbfb 0%,
+    #fffbfb 52%,
+    rgb(255 251 251 / 60%) 60%,
+    rgb(255 251 251 / 0%) 70%
+  );
+  opacity: 0.8;
   transform: scale(0.96);
   animation:
     carga-aparece 300ms ease-out both,
     carga-respira 1.4s ease-in-out 300ms infinite alternate;
+}
+
+.carga-logo {
+  display: block;
+  width: 240px;
+  height: auto;
 }
 
 /* WEB-045: a loading area is centred in the space it replaces. It grows
@@ -60,7 +80,7 @@
 
 /* WEB-045, follow-up 94: an in-page read draws nothing for its first
    400 ms, so a fast answer never flashes the logo. */
-.carga-logo-demora {
+.carga-halo-demora {
   animation:
     carga-aparece 300ms ease-out 400ms both,
     carga-respira 1.4s ease-in-out 700ms infinite alternate;
@@ -76,20 +96,24 @@
 }
 
 @media (min-width: 1024px) {
+  .carga-halo {
+    width: 375px;
+  }
+
   .carga-logo {
     width: 300px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .carga-logo {
+  .carga-halo {
     animation: none;
     opacity: 1;
     transform: none;
   }
 
   /* Still, but after the same 400 ms: one step from hidden to shown. */
-  .carga-logo-demora {
+  .carga-halo-demora {
     animation: carga-quieto 0s step-end 400ms both;
   }
 }

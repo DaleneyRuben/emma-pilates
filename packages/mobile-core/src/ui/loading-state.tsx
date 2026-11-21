@@ -10,19 +10,21 @@ import {
 } from "react-native";
 
 import logo from "../../assets/emma-logo.png";
-import { colors, shadows } from "./tokens";
+import { colors } from "./tokens";
 
 // Design follow-up 94: nothing for 400 ms, a 300 ms fade, then one breath every
 // 2.8 s between the rest and the top; still under Reduce Motion.
 const appearDelayMilliseconds = 400;
 const fadeInMilliseconds = 300;
 const halfBreathMilliseconds = 1400;
-const rest = { opacity: 0.55, scale: 0.96 };
+// Follow-up 287: the rest keeps the logo at 0.8, never a washed-out grey.
+const rest = { opacity: 0.8, scale: 0.96 };
 const top = { opacity: 1, scale: 1 };
 
 // The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed); tablets start at the Staff app's 768 pt split width.
 const logoAspect = 565 / 1312;
 const tabletMinimumWidth = 768;
+const haloToLogo = 1.25;
 
 /**
  * A screen's first load (MOB-061): only the studio's logo, centred in the
@@ -62,21 +64,28 @@ export function LoadingState({ label }: { label: string }) {
     return () => animation.stop();
   }, [opacity, reduceMotion, scale, visible]);
 
-  // E-A12 (Rosa Emma): the logo on a white disc with the card shadow.
-  const tablet = windowWidth >= tabletMinimumWidth;
-  const disc = tablet ? 150 : 120;
-  const logoWidth = tablet ? 126 : 100;
+  // Follow-ups 286 and 287 (E-A12, Rosa Emma option A): the logo on a white
+  // halo over the screen's own Rosa 100; the halo breathes with the logo as one piece.
+  const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
+  const halo = Math.round(logoWidth * haloToLogo);
   return (
-    <View accessibilityLabel={label} accessibilityRole="progressbar" accessible style={styles.area}>
+    // The area never collapses below the halo, so a parent that does not grow
+    // (the Trainer's Agenda under its week card) cannot push it onto content.
+    <View
+      accessibilityLabel={label}
+      accessibilityRole="progressbar"
+      accessible
+      style={[styles.area, { minHeight: halo }]}
+    >
       {visible && reduceMotion !== undefined ? (
         // The accessible area above is the one element screen readers reach.
         <Animated.View
           style={[
-            styles.disc,
-            { borderRadius: disc / 2, height: disc, width: disc },
+            styles.halo,
+            { borderRadius: halo / 2, height: halo, width: halo },
             { opacity, transform: [{ scale }] },
           ]}
-          testID="loading-state-disc"
+          testID="loading-state-halo"
         >
           <Image
             resizeMode="contain"
@@ -124,10 +133,11 @@ function useReduceMotion(): boolean | undefined {
 
 const styles = StyleSheet.create({
   area: { flex: 1, alignItems: "center", justifyContent: "center" },
-  disc: {
-    ...shadows.card,
+  halo: {
     alignItems: "center",
-    backgroundColor: colors.card,
+    // Follow-up 287: white, solid to 52 % of the radius, a soft edge by 70 %,
+    // so it reads clearly on the screen's Rosa 100.
+    experimental_backgroundImage: `radial-gradient(circle, ${colors.card} 0%, ${colors.card} 52%, rgba(255, 251, 251, 0.6) 60%, rgba(255, 251, 251, 0) 70%)`,
     justifyContent: "center",
   },
 });
