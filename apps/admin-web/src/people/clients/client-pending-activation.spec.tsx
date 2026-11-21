@@ -194,6 +194,24 @@ describe("AW22 Pendiente de activación with «Reenviar enlace»", () => {
     ).toHaveAttribute("role", "alert");
   });
 
+  it("still offers the resend after a passing failure to read her invitation", async () => {
+    let attempts = 0;
+    server.use(
+      ...pendingHandlers(
+        () => jsonResponse(invitation(null)),
+        () => {
+          attempts += 1;
+          return attempts === 1
+            ? problemResponse(500, "internal")
+            : jsonResponse(invitation("2099-03-05T15:00:00.000Z"));
+        },
+      ),
+    );
+    const { notice } = await openLucia();
+
+    expect(await resendButton(notice)).toBeEnabled();
+  });
+
   it("offers no resend when there is no invitation to follow up", async () => {
     server.use(
       ...pendingHandlers(
