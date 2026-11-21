@@ -106,10 +106,10 @@ describe("Hoy, the Assistant's first tab (E7 pick A)", () => {
     await waitFor(() => expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen());
   });
 
-  it("keeps «¿No está? Crear clienta nueva»", async () => {
+  it("keeps «Crear clienta nueva»", async () => {
     const screen = await openToday();
 
-    await fireEvent.press(screen.getByRole("button", { name: "¿No está? Crear clienta nueva" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Crear clienta nueva" }));
     await waitFor(() => expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen());
   });
 
