@@ -384,34 +384,42 @@ primera pestaña de cada rol, arriba a la derecha, está la campana de
 | Rol | Barra de abajo |
 | --- | --- |
 | Entrenadora | **Agenda** · **Mis pagos** · **Perfil** |
-| Asistente | **Clientes** · **Horario** · **Caja** · **Perfil** |
-| Nutricionista | **Agenda** · **Disponibilidad** · **Perfil** |
-| Administración | **Pagos** · **Clientes** · **Horario** · **Perfil** |
-| Coordinación | **Clientes** · **Para contactar** · **Horario** · **Perfil** |
+| Asistente | **Hoy** · **Clientas** · **Horario** · **Caja** · **Perfil** |
+| Nutricionista | **Agenda** · **Disponibilidad** · **Mis pagos** · **Perfil** |
+| Administración | **Pagos** · **Clientas** · **Horario** · **Perfil** |
+| Coordinación | **Clientas** · **Para contactar** · **Horario** · **Mis pagos** · **Perfil** |
 
 1. Daniela entra con su correo y la contraseña que acaba de crear. Llega a
    **Agenda**: arriba «Entrenadora · » y la fecha, `Hola, Daniela`, y la tira
-   **Esta semana** con **Hoy** y los seis días siguientes. Si todavía no
+   **Esta semana · clases por día** con hoy y los seis días siguientes, más
+   el botón **Hoy** para volver al día de hoy. Si todavía no
    publicaste clases, el día está vacío; si la semana ya tiene clases, las
    ves aquí.
 2. Abre **Perfil**. Muestra su nombre, su correo y su celular, con la nota
    «Tu nombre y tu correo los actualiza administración.». Debajo, **Tu
-   cuenta** con **Rol** y **Sucursal**, y **Ajustes** con **Mis pagos**, **Tu
-   código de referido**, **Notificaciones**, **Cambiar contraseña**,
-   **Enviar comentarios** y **Cerrar sesión**. Su círculo tiene sus iniciales y **Cambiar foto**: elige una
-   foto de la galería y queda puesta («Subiendo foto…» mientras sube); con
+   cuenta** con **Rol** y **Sucursal**, y **Ajustes** con **Mis pagos**, **Mi
+   QR de cobro**, **Tu código de referido**, **Notificaciones**, **Cambiar
+   contraseña**, **Enviar comentarios** y **Cerrar sesión**. Su círculo
+   tiene sus iniciales y **Cambiar foto**: elige una foto de la galería y queda puesta («Subiendo foto…» mientras sube); con
    foto aparece también **Quitar foto**.
-3. Cierra sesión. Camila entra y llega a **Clientes**, con **Nuevo
-   cliente**: la búsqueda pide al menos dos letras o números. **Cerrar caja**
-   vive en la pestaña **Caja**. Gabriela entra y llega a su **Agenda** de
+3. Cierra sesión. Camila entra y llega a **Hoy**: arriba «Asistente · » y
+   la fecha, el título **Hoy en Centro** y el campo «Nombre, teléfono o
+   correo». Debajo, **¿No está? Crear clienta nueva**, la próxima clase de
+   hoy en la sede (o «Hoy no quedan clases en esta sucursal.» si todavía no
+   publicaste nada) y la tarjeta **Pendientes**, con **Facturas por subir**
+   («Nada pendiente») y **Cerrar caja** («Al final del día»). Si hay más
+   clases después, van en **Más tarde**. La búsqueda completa y la ficha
+   de la clienta están en **Clientas**; el cierre de caja, en **Caja**.
+   Gabriela entra y llega a su **Agenda** de
    nutrición; vacía dice «No tienes evaluaciones», con **Ver mi
    disponibilidad**.
 4. Ana también puede entrar a la app del equipo. Llega a **Pagos**: **Pagos
-   pendientes** vacío dice «Todo al día», con **Ver el horario**, y debajo
-   **Accesos**: **Cancelar una clase**, **Congelamientos** y **Cerrar caja**.
-   Su perfil dice «Tus datos se editan en la web de administración.»,
-   **Sucursales** «Todas las sucursales» y, en **Ajustes**, además **Ver la
-   app como…**.
+   pendientes** vacío dice «Todo al día» y «No hay pagos por confirmar», y
+   debajo **Accesos**: **Facturas por subir**, **Cancelar una clase**,
+   **Congelamientos** y **Cerrar caja**. Su perfil dice «Tus datos se
+   editan en la web de administración.», **Sucursales** «Todas las
+   sucursales» y, en **Ajustes**, además **Ver la app como…** (sin **Mis
+   pagos**: la dueña paga, no cobra aquí).
    Déjalo para el paso 16.
 
 Si alguien olvida la contraseña, en el acceso del equipo está **¿Olvidaste
@@ -461,18 +469,21 @@ cancelada**, solo para leer: el motivo, cuándo pasó y cuántas reservas tenía
 Una clase que se quitó porque cambiaste o terminaste la serie no se muestra:
 la clase nueva ocupa su lugar.
 
-En la app del equipo, Daniela abre **Agenda**. La tira **Esta semana**
-muestra **Hoy** y los días siguientes (`lun 9`, `mié 11`, y así), y el botón
-**Hoy** vuelve al día de hoy. Al tocar el lunes aparece la clase de las 09:00,
-con `0 de 12 reservados` si dejaste la capacidad en 12, o `0 de 10` si
-guardaste el cambio del paso 2. Toca la clase: la lista de asistencia está
-vacía, dice «Podrás marcar asistencia cuando empiece la clase.» y
-**Guardar asistencia** está apagado. Arriba está **Reportar una falla**, para
-avisar de un equipo que no funciona. Si una de sus clases del día se canceló, sigue en la lista, apagada,
-con «Cancelada · mínimo no alcanzado» o «Cancelada por el estudio» y sin
-flecha: no se abre. El título lo cuenta («Hoy · 2 clases · 1 cancelada»), y
-un día con todas canceladas dice «Hoy · 5 canceladas» en vez de «Hoy no
-tienes clases».
+En la app del equipo, Daniela abre **Agenda**. La tarjeta **Esta semana ·
+clases por día** muestra hoy y los días siguientes, cada uno con cuántas
+clases tiene («—» si ninguna), y el botón **Hoy** vuelve al día de hoy. En el
+día de hoy, la próxima clase va arriba en un bloque rosa grande, «Próxima»,
+con la hora, el tipo, los lugares y las iniciales de quienes vienen. Al tocar
+el lunes aparece la clase de las 09:00, con `0 de 12` si dejaste la capacidad
+en 12, o `0 de 10` si guardaste el cambio del paso 2. Toca la clase: arriba,
+un bloque rosa con «Empieza a las 09:00» (o «Empieza en N min»), la hora y el
+tipo; debajo, «Sin reservas». Abajo está **Reportar una falla de equipo**,
+para avisar de un equipo que no funciona. Si una de sus clases del día se
+canceló, queda al final en una tarjeta aparte, «1 cancelada por mínimo» (o
+«por el estudio»), con **Ver**: al abrirla, cada clase dice «Cancelada ·
+mínimo no alcanzado» o «Cancelada por el estudio» y no se abre. El título lo
+cuenta («Hoy · 2 clases · 1 cancelada»), y un día con todas canceladas dice
+«Hoy · 5 canceladas» en vez de «Hoy no tienes clases».
 
 ## Paso 6. Lo que la clienta ve antes de comprar
 
@@ -480,10 +491,11 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
 
 1. Pulsa **Regístrate**. El formulario pide nombre, correo, contraseña y
    confirmar contraseña, y el **Celular**, que es obligatorio: con **🇧🇴
-   +591** ya elegido, escribe `70712345`. Si lo dejas vacío, **Crear cuenta**
-   muestra «Escribe tu celular. Lo necesitamos para escribirte por
-   WhatsApp.» y no crea nada. Abre **¿Cómo nos
-   conociste?** y elige **Una instructora**. En el código de referido escribe
+   +591** ya elegido, escribe `70712345`. Todo está en una sola pantalla,
+   con ejemplos «Ej.: …» debajo de los campos. Si dejas algo vacío,
+   **Crear cuenta** no crea nada: arriba aparece «Revisa N datos antes de
+   seguir» y cada campo dice su error corto («! Escribe tu número» para el
+   celular). En **¿Cómo nos conociste?** toca la opción **Una instructora**. En el código de referido escribe
    el código de Daniela. **Crear cuenta**.
 2. La pantalla pasa a **Revisa tu correo**: el ícono del sobre, «Te
    enviamos un enlace a» con tu correo, «Ábrelo para activar tu cuenta y
@@ -505,11 +517,10 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    «Necesitas un plan activo»; al lado, **Evaluación nutricional** e
    **Invita a una amiga**. El carrusel de promociones está vacío hasta el
    paso 14.
-5. **Reservar** muestra la semana, pero al abrir una clase **Reservar** está
-   apagado y el aviso dice «Necesitas un plan para reservar.», con **Comprar
-   un plan** debajo. La fila del plazo dice el día, en hora de La Paz:
-   «Cancela sin costo hasta hoy a las 05:30», «hasta mañana a las 05:30» o
-   «hasta el sáb 7 a las 05:30». (A quien le quedan 0 clases de su plan le dice, en
+5. **Reservar** muestra la semana, pero al abrir una clase **Reservar esta
+   clase** está apagado y el aviso dice «Necesitas un plan para reservar.»,
+   con **Comprar un plan** debajo. La última fila del detalle es el plazo,
+   en hora de La Paz: **Cancelas gratis hasta** «sáb 7 nov · 05:30». (A quien le quedan 0 clases de su plan le dice, en
    cambio, «No te quedan clases en tu plan.».)
 6. **Mis Reservas** tiene dos pestañas, **Próximas** e **Historial**.
    **Próximas** dice «Aún no tienes reservas», con **Reservar una clase**;
@@ -519,7 +530,7 @@ Abre la app de clientas. La primera pantalla es el acceso, con **Regístrate**.
    evaluaciones**, **Invita a una amiga**), **Preferencias**
    (**Notificaciones**) y **Cuenta** (**Cambiar
    contraseña**, **Enviar comentarios** y **Cerrar sesión**, la última fila,
-   en rojo y sin flecha, igual que en la app del equipo). Al final, en letra
+   sin flecha, igual que en la app del equipo). Al final, en letra
    chica y subrayada después de la versión, «Emma Pilates Studio · versión … ·
    **Cerrar mi cuenta**».
 
@@ -548,10 +559,10 @@ Quédate en la app de clientas, como Lucía.
 4. La pantalla de pago muestra el monto y el QR del estudio. No muestra
    número de cuenta ni banco. Transfiere el monto de mentira, o usa cualquier
    imagen como comprobante, y súbela. La pantalla pasa a «Tu pago está en revisión».
-5. **Volver al inicio**. **Inicio** ya no ofrece **Comprar un plan**: la
-   tarjeta grande dice «En revisión · Tu pago está en revisión», con
-   el plan y el monto («8 clases · Bs 502») y **Ver estado del pago**, que
-   abre de nuevo la pantalla del pago en revisión. El atajo **Reservar una clase** sigue con candado y
+5. **Volver al inicio**. **Inicio** ya no ofrece **Comprar un plan**: arriba
+   va un bloque «Tu pago está en revisión», con el plan («8 clases»), el
+   monto (`Bs 502`), «Te avisamos apenas el estudio lo confirme.» y **Ver
+   estado del pago**, que abre de nuevo la pantalla del pago en revisión. El atajo **Reservar una clase** sigue con candado y
    dice «Tu pago está en revisión».
 6. Mientras está en revisión, **Reservar** no deja tomar un lugar: el detalle
    de la clase dice «Tu pago está en revisión. Podrás reservar cuando el
@@ -572,9 +583,9 @@ En la app del equipo, Ana (o la dueña desde la web) recibe la novedad.
 2. Lo mismo se puede hacer en la web, en **Dinero › Pagos**, o desde la fila
    del pago en **Inicio**: abre la fila, mira el
    comprobante y confirma. Si el comprobante no sirve, rechaza y escribe el
-   motivo. Lucía lo ve en la app: **Inicio** dice «Pago rechazado · No
-   pudimos confirmar tu pago», con el motivo, el plan y el monto, y **Subir
-   otro comprobante**, que abre de nuevo el pago del mismo plan (no deja
+   motivo. Lucía lo ve en la app: arriba de **Inicio**, un bloque «No
+   pudimos confirmar tu pago», con el plan, el monto, el motivo y «Sube uno
+   nuevo para activar tu plan.», y **Subir otro comprobante**, que abre de nuevo el pago del mismo plan (no deja
    elegir otro plan). El atajo dice «Tu pago no se confirmó», el detalle de
    una clase dice «No pudimos confirmar tu pago.» con **Subir otro
    comprobante**, y **Elegir plan** lleva a ese pago rechazado. La tarjeta
@@ -599,10 +610,11 @@ Emite la factura en el sistema de facturación de siempre y súbela:
   confirmación; nada se borra). El filtro **Factura por subir** muestra las
   que faltan.
 - **En la app del equipo**: la dueña entra desde **Pagos › Facturas por
-  subir**; Camila (recepción) y la coordinadora desde **Clientes ›
-  Facturas por subir**. Abre el pago, **Subir factura**, **Tomar foto** o
-  **Elegir de la galería**. Desde el teléfono se sube una foto; el PDF se
-  sube desde la web. Una factura en PDF ya subida se ve en el teléfono como
+  subir**; Camila (recepción) y la coordinadora desde **Clientas ›
+  Facturas por subir** (Camila también desde **Pendientes**, en **Hoy**).
+  Abre el pago, **Subir factura**, y elige **Tomar foto**, **Elegir de la
+  galería** o **Elegir un PDF**: desde el teléfono se sube una foto o el
+  PDF. Una factura en PDF ya subida se ve en el teléfono como
   una miniatura de su primera página junto al nombre del archivo; al tocarla
   se abre el visor a pantalla completa.
 - Lucía recibe el aviso **Tu factura está lista** y la ve en **Perfil › Mis
@@ -628,15 +640,17 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 
 1. **Reservar**. Elige la sede si hay más de una. La tira de días y la tira
    de tipos se desplazan de lado. Elige el día del mat de las 09:00.
-2. Abre la clase. Ves el tipo, la hora, la sede, **Daniela Ortiz** con
-   **Entrenadora** (con su foto si ya puso una; si no, sus
-   iniciales), los cupos y la descripción que escribiste. En la lista de
+2. Abre la clase. Arriba, un bloque rosa con el tipo y la hora; debajo, una
+   tabla con **Entrenadora** · **Daniela Ortiz** (con su foto si ya puso
+   una; si no, sus iniciales), **Sucursal**, **Lugares** y **Cancelas gratis
+   hasta**, y la descripción que escribiste. En la lista de
    **Reservar**, en **Mis Reservas** y en el historial su foto chica va antes
    de su nombre.
    Si Lucía pone su foto en **Editar perfil**, el equipo la ve en lugar de
    sus iniciales: en la lista de la clase, al buscarla, en su ficha, en
    Pagos pendientes y en la web (Clientas, Dinero › Pagos, «Reservaron»).
-3. **Reservar**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
+3. Encima del botón dice «Usarás 1 de tus 8 clases.». **Reservar esta
+   clase**. La clase pasa a **Mis Reservas**, con la fecha, la hora y la
    sede, y el aviso «Reserva confirmada · Te quedan N clases en tu plan».
    **Mi plan** baja una clase. Toca la pestaña **Reservar**: vuelve a la
    tira de días, no al detalle de la clase. Cada pestaña abre siempre su
@@ -652,8 +666,8 @@ En la app de clientas, como Lucía, con el plan ya vigente.
 6. Si la clase está llena, el botón es **Unirme a la lista de espera**.
    Dentro de las 2 h 30 esa lista ya cerró y el botón no aparece.
 
-En la app del equipo, Camila puede hacer lo mismo por una clienta: **Clientes**,
-el nombre de Lucía, toca su fila y **Reservar clase** (el paso 9 lo recorre).
+En la app del equipo, Camila puede hacer lo mismo por una clienta: **Clientas**
+(o la búsqueda de **Hoy**), el nombre de Lucía, toca su fila y **Reservar clase** (el paso 9 lo recorre).
 Si Lucía ya tiene esa clase, la fila dice **Ya reservada** y el detalle dice
 «La clienta ya tiene esta clase reservada.» en lugar de **Reservar para
 Lucía**. Si Camila cancela una reserva de Lucía, aparece «Reserva
@@ -661,32 +675,39 @@ cancelada · La clase volvió a su plan». Como en la app de clientas, cada
 pestaña de la app del equipo vuelve a su primera pantalla.
 
 Daniela, en **Agenda**, abre la clase de mañana. Ahora hay una reserva.
-Antes de que empiece, la lista se lee y dice «Podrás marcar asistencia
-cuando empiece la clase.». Desde que la clase empieza, marca asistió o no
-asistió y pulsa **Guardar asistencia**.
+Antes de que empiece, el bloque dice «Empieza en N min» y **Quién viene ·
+1 clienta** lista a cada una con su número de clase («Primera clase:
+explícale el método» y la marca **Primera clase** si es la primera). **Tomar
+asistencia** muestra **Vino** y **No vino** por clienta, y el bloque cuenta
+«Marcadas N de M»; **Guardar asistencia** sigue apagado, con «Podrás guardar
+la asistencia cuando empiece la clase.». Desde que la clase empieza («En
+curso · termina HH:MM»), marca a cada una y pulsa **Guardar asistencia**.
 
 ## Paso 9. Lo que hace la recepcionista
 
 Cierra la sesión de Ana en la app del equipo (**Perfil** › **Cerrar sesión**)
-y entra como Camila. Su barra de abajo es **Clientes** · **Horario** ·
-**Caja** · **Perfil**, y llega a **Clientes**: arriba «Asistente · Centro» y
-el título **Buscar cliente**, el campo «Nombre, teléfono o correo» y, debajo,
-el botón **Nuevo cliente**. En un iPad la búsqueda queda a la izquierda y la
+y entra como Camila. Su barra de abajo es **Hoy** · **Clientas** ·
+**Horario** · **Caja** · **Perfil**, y llega a **Hoy** (el paso 4 lo
+describe). La búsqueda de arriba sirve igual que la de **Clientas**, que
+tiene arriba «Asistente · Centro» y el título **Buscar clienta**, el campo
+«Nombre, teléfono o correo» y, debajo, **¿No está? Crear clienta nueva**.
+En un iPad la búsqueda queda a la izquierda y la
 ficha se abre a la derecha, sin perder la lista.
 
 1. Con el campo vacío ya dice «Escribe al menos dos letras o números para
    buscar.», y lo sigue diciendo con una sola letra. Escribe `Lucía`. Cada resultado muestra la foto (o las
    iniciales), el nombre, el teléfono y el correo; una cuenta sin activar
    lleva la marca **Pendiente**. Si nadie coincide, dice «No encontramos a
-   nadie», con **Nuevo cliente**. Toca la fila de Lucía (el lector de
-   pantalla la anuncia como «Ver cliente Lucía Fernández»).
-2. La ficha muestra su foto, su nombre y su contacto; la tarjeta rosa del
-   plan, con el nombre del plan, **Activo**, «N clases restantes de 8» y
-   «Vence el …»; los botones **Reservar clase** y **Registrar pago** (que
-   cobra en efectivo o por QR); y el grupo **Reservas**, con **Próximas reservas** (al lado, el
-   día y la hora de la próxima, por ejemplo «Lun 9 · 09:00») e **Historial de
-   clases**. **Clientes**, arriba a la izquierda, vuelve a la búsqueda.
-3. Vuelve a la búsqueda y pulsa **Nuevo cliente**. Crea a una clienta que
+   nadie», con **Nueva clienta**. Toca la fila de Lucía (el lector de
+   pantalla la anuncia como «Ver clienta Lucía Fernández»).
+2. La ficha muestra su foto, su nombre y su contacto; el bloque rosa del
+   plan, con el nombre del plan, **Activa**, el número grande de «clases
+   disponibles» y «N de 8 del plan · vence el …»; los botones **Reservar
+   clase** y **Registrar pago** (que cobra en efectivo o por QR), lado a
+   lado; y las filas **Reservas** (al lado, la próxima, por ejemplo
+   «Próxima: lun 9 nov · 09:00») e **Historial de clases**. La flecha de
+   arriba vuelve a la búsqueda.
+3. Vuelve a la búsqueda y pulsa **¿No está? Crear clienta nueva**. Crea a una clienta que
    llega al estudio sin la app: **Nombre**, **Correo electrónico**,
    **Celular** (obligatorio, con su país, como en el paso 3) y **¿Cómo nos
    conoció?**. Si eliges una amiga o una instructora aparece el campo del
@@ -699,47 +720,50 @@ ficha se abre a la derecha, sin perder la lista.
 4. Si escribes el correo de una clienta que ya se registró sola y no
    confirmó el correo, no se crea nada nuevo: la pantalla dice «Este correo
    ya se registró desde la app y espera verificación.», con **Enviar enlace
-   de verificación** (el mismo correo de 24 horas) y **Ver cliente**.
+   de verificación** (el mismo correo de 24 horas) y **Ver clienta**.
 5. Con una clienta sin plan, la ficha dice **Sin plan activo** y
    **Registrar pago** abre **Elige un plan**, con la franja
    «Registrando pago para …». Elige **4 clases**. La pantalla **Registrar
-   pago** pregunta **¿Cómo paga?**: **Efectivo** o **QR**. Con **Efectivo**
-   ves **A cobrar** (el precio, el **Descuento** si es fundadora y **Total en
-   efectivo**), la fecha de inicio, la **Sucursal donde recibes el
-   efectivo** y **¿Necesita factura?** («Por defecto, sin factura»; si la
-   abres, el NIT o CI y el nombre, y si ya compró antes trae los datos de su
-   última compra). **Confirmar pago en efectivo** muestra **¡Pago
+   pago** muestra arriba un bloque rosa con **A cobrar** (el precio de lista
+   y el **Descuento** si es fundadora). Debajo, **Cómo paga**: **Efectivo**
+   («Entra a la caja de hoy») o **QR** («Subes el comprobante»). Con
+   **Efectivo** ves **Empieza** (la fecha de inicio), **Pide factura** («Sin
+   factura si no la pide»; si lo enciendes, el NIT o CI y el nombre, y si ya
+   compró antes trae los datos de su última compra) y la **Sucursal donde
+   recibes el efectivo**. **Confirmar Bs N en efectivo** muestra **¡Pago
    registrado!**: el plan queda activo en el acto, sin pasar por la dueña, y
-   el efectivo entra en la caja de hoy de esa sede. **Volver a Clientes**.
+   el efectivo entra en la caja de hoy de esa sede. **Volver a Clientas**
+   vuelve a la búsqueda, o a **Hoy** si la venta empezó ahí.
 6. Si la clienta paga por QR en el mostrador, elige **QR**. La pantalla
    muestra el QR del estudio con el monto exacto, para que ella transfiera.
    La tarjeta **Comprobante** tiene **Fotografiar comprobante**, que abre la
    cámara, y **Elegir de la galería**, para un comprobante que la clienta
    mandó por WhatsApp. Elegido, queda «Comprobante listo · Todavía no se
-   envió», con **Cambiar**. **Enviar comprobante** muestra **Comprobante
+   envió», con **Cambiar**. **Confirmar Bs N por QR** (apagado con «Primero
+   fotografía el comprobante» hasta que hay una foto) muestra **Comprobante
    enviado** («Administración lo revisa y activa el plan de …»), con el
    estado **En revisión**: ese pago queda en **Pagos pendientes** hasta que
    Ana lo confirma, y no entra en la caja. Mientras un pago está en
    revisión, el otro camino queda apagado.
 7. Con un plan vigente que todavía tiene clases o una reserva futura,
-   **Registrar pago** vende el plan siguiente, y también elige su **Fecha de
-   inicio**: la franja va desde el día siguiente al vencimiento hasta 4
+   **Registrar pago** vende el plan siguiente, y también elige cuándo
+   **Empieza**: la franja va desde el día siguiente al vencimiento hasta 4
    semanas después, con el día siguiente marcado. Cada día dice el día de la
-   semana, el número y el mes («dic», «ene»), y debajo dice «El plan
-   actual de Rocío vence el 5 de diciembre. El nuevo empieza el …; se puede
-   elegir hasta el 2 de enero.». Al confirmar en efectivo el plan queda
+   semana, el número y el mes («dic», «ene»). Al lado dice «el actual vence
+   el jue 5 dic», y debajo «El nuevo empieza el …; se puede elegir hasta el
+   sáb 2 ene.». Al confirmar en efectivo el plan queda
    programado; por QR, **Comprobante enviado** dice «Administración lo revisa
    y programa el plan siguiente de Rocío, que empieza el …» y muestra
    **Empieza**. Una fundadora que compra así por adelantado conserva su
    lugar aunque el nuevo plan empiece más de 7 días después. Si ya tiene un
-   plan siguiente, el botón no está y la ficha dice «Su próximo plan ya está
-   pagado (…, desde el …). Podrás registrar otro pago cuando empiece.».
+   plan siguiente, el botón no está y el bloque del plan dice «Próximo plan
+   ya pagado: …, desde el …. Podrás registrar otro pago cuando empiece.».
 8. **Reservar clase** abre **Reservar una clase**, con la franja
    «Reservando para Lucía», la sede, los días (y **Otra** para una fecha más
    adelante) y los tipos de clase. Una clase que ya tiene dice **Ya
    reservada**. En el detalle, el botón es **Reservar para Lucía**; con la
    clase llena, **Anotarla en la lista de espera**.
-9. **Próximas reservas** e **Historial de clases** abren la misma pantalla,
+9. **Reservas** e **Historial de clases** abren la misma pantalla,
    **Reservas de Lucía**, con las pestañas **Próximas** · **Historial**.
    Después de **Reservar para Lucía**, la app llega ahí con el aviso
    «Reserva confirmada». Cada reserva próxima tiene un solo botón:
@@ -751,8 +775,9 @@ ficha se abre a la derecha, sin perder la lista.
    clase del mismo día. **Historial** lista lo ya pasado, en filas, sin
    tarjetas.
 
-Arriba de **Clientes** y de **Horario** dice lo mismo: «Asistente ·
-Centro» (el rol y la sede, sin la palabra «Sucursal»).
+Arriba de **Clientas** y de **Horario** dice lo mismo: «Asistente ·
+Centro» (el rol y la sede, sin la palabra «Sucursal»). Arriba de **Hoy**
+dice el rol y la fecha.
 
 Si una clienta se registró antes de que el celular fuera obligatorio y no
 tiene uno válido (por ejemplo, ninguno, o `7000004`), al abrir su app ve,
@@ -763,22 +788,27 @@ no** la cierra hasta la próxima vez que abra la app; nunca le impide
 reservar.
 
 En la pestaña **Horario**, Camila ve la semana de la sede, solo para leer:
-cada clase con su hora, la entrenadora (con su foto), las reservas y los
-cupos libres, o **Completa**. **Reservar para una clienta** la lleva a
-**Clientes**: se reserva desde la ficha.
+cada clase con su hora, la entrenadora (con su foto) y «N de M» (reservas
+de la capacidad), o **Completa**. La próxima clase de hoy va arriba en un
+bloque grande, y las canceladas quedan juntas al final. **Reservar para una
+clienta**, abajo, la lleva a **Clientas**: se reserva desde la ficha.
 
 **Cerrar caja**, al final del turno:
 
 1. Abre la pestaña **Caja**. El título es **Cerrar caja**, con el día y la
-   sede arriba. La tarjeta **Efectivo esperado** suma los pagos en efectivo
-   confirmados hoy en esta sede («1 venta en efectivo hoy en Centro»). Con
-   más de una sede, elige la sede arriba.
-2. Cuenta el cajón y escribe el **Efectivo contado**. Debajo aparece la
-   diferencia: **Cuadra**, **Falta efectivo** o **Sobra efectivo**. Si no
-   coincide, escribe la **Nota (opcional)**. La pantalla avisa «Hay un solo
-   cierre por día y no se corrige después.». Pulsa **Cerrar caja**.
+   sede arriba. Con más de una sede, elige la sede arriba. Pregunta
+   primero «¿Cuánto efectivo hay en la caja?», con un campo grande en Bs y
+   «Cuenta los billetes antes de mirar el total esperado.». Una tarjeta
+   cuenta las ventas («1 venta en efectivo hoy en Centro»). Un día sin
+   pagos en efectivo dice «Hoy no hubo pagos en efectivo», con **Cerrar
+   caja sin efectivo** y **Sí hay efectivo en la caja**.
+2. Cuenta el cajón y escribe cuánto hay. Recién entonces aparecen
+   **Esperado según los pagos** y la **Diferencia**: **Cuadra**, «Falta
+   Bs …» o «Sobra Bs …». Si no cuadra, escribe la **Nota**. Pulsa **Cerrar
+   caja**: la hoja «¿Cerrar la caja de hoy?» recuerda que un cierre no se
+   puede deshacer. Confírmala.
 3. La pantalla queda en **Caja cerrada**, con quién la cerró y a qué hora,
-   lo esperado, lo contado y la diferencia, y el botón **Ir a Clientes**.
+   lo esperado, lo contado y la diferencia, y el botón **Ir a Clientas**.
    Volver a **Caja** el mismo día, en la misma sede, muestra ese cierre: no
    se crea un segundo.
 4. Ana ve el historial en la web, en **Dinero › Caja**, y puede cambiar de
@@ -787,13 +817,15 @@ cupos libres, o **Completa**. **Reservar para una clienta** la lleva a
 
 ## Paso 10. La dueña mueve la operación desde el teléfono
 
-Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientes** ·
+Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientas** ·
 **Horario** · **Perfil**.
 
 1. **Pagos** abre **Pagos pendientes**. Con nada en revisión dice «Todo al
-   día», con **Ver el horario**. Debajo, en **Accesos**, están **Cancelar una
-   clase**, **Congelamientos** y **Cerrar caja** (la misma caja de Camila,
-   con **Volver** en lugar de **Ir a Clientes**).
+   día · No hay pagos por confirmar»; con pagos, un bloque rosa «Por
+   confirmar · N» con el total. Debajo, en **Accesos**, están **Facturas por
+   subir**, **Cancelar una clase**, **Congelamientos** (con «N por revisar»
+   si hay) y **Cerrar caja** (la misma caja de Camila, con **Volver** en
+   lugar de **Ir a Clientas**).
    El comprobante por QR del plan siguiente de Rocío (paso 9) está ahí.
    **Revisar pago** muestra Transferencia, «Enviado el …», la fila **Plan
    siguiente** · «Empieza el 2 de enero» (o el día que eligió Camila) y la
@@ -803,18 +835,20 @@ Entra a la app del equipo como Ana. Su barra es **Pagos** · **Clientes** ·
 2. **Cancelar una clase** (desde **Accesos** o desde arriba de la pestaña
    **Horario**). Elige la sede (o **Todas las sucursales**), el día (**Otra**
    abre una fecha de los próximos 30 días) y el tipo, y toca la clase de
-   prenatal que creaste para una sola vez. Cada fila dice **Sin reservas** o
-   cuántas tiene. **Cancelar sesión** explica **Qué va a pasar**: sin
+   prenatal que creaste para una sola vez. Cada fila dice «N de M»
+   (reservas de la capacidad). **Cancelar clase** explica **Qué va a pasar**: sin
    reservas, solo «Esto no se puede deshacer. La clase no tiene reservas.»;
    con Lucía anotada, «Se cancela la reserva», «Cada clienta recupera su
    clase, aun fuera del plazo de 2 h 30» y «Avisamos a cada clienta por
-   notificación». **Sí, cancelar sesión** muestra **Sesión cancelada**;
-   **Volver** la deja como estaba. Confirma solo si quieres perder esa clase.
-3. **Clientes** es la misma búsqueda y la misma ficha de Camila, con el
+   notificación». **Sí, cancelar clase** muestra **Clase cancelada** (con
+   Lucía anotada, «Avisamos a la clienta y recuperó su clase.») y **Volver a
+   las clases**; **Volver** la deja como estaba. Confirma solo si quieres perder esa clase.
+3. **Clientas** es la misma búsqueda y la misma ficha de Camila, con el
    cobro en efectivo. **Horario** es la semana para leer, con **Cancelar una
-   clase** arriba. La prenatal que cancelaste sigue en su lugar ese día,
-   apagada, con borde punteado y «Cancelada por el estudio»; el título dice
-   «5 clases · 1 cancelada». No se abre, no ofrece cupos y **Cancelar una
+   clase** arriba. La prenatal que cancelaste queda al final de ese día, en
+   la tarjeta «1 cancelada por el estudio» con **Ver**; al abrirla dice
+   «Cancelada por el estudio». El título cuenta solo las clases que siguen
+   («4 clases hoy», u otro día «Martes 3 de noviembre · 4 clases»). No se abre, no ofrece cupos y **Cancelar una
    clase** ya no la muestra.
 4. **Ver la app como…** está en el **Perfil** de Ana, en el grupo
    **Ajustes**. El paso 16 lo recorre cuando los otros roles ya tienen algo
@@ -869,8 +903,9 @@ Solo un plan de 90 días se puede congelar, una vez, hasta 15 días. Lucía
 tiene un plan de 30 días, así que este paso necesita un trimestral.
 
 1. En la app de Lucía, compra **Trimestral 24 clases** como renovación
-   anticipada. **Mi plan** › **Renovar mi plan** › **Trimestral 24 clases**
-   ofrece la fecha de inicio en una franja con el mes en cada día: desde el
+   anticipada. **Mi plan** › **Renovar mi plan** muestra arriba su plan actual con
+   **Renovar este plan**; debajo, en **Otros planes**, **Trimestral 24
+   clases** ofrece la fecha de inicio en una franja con el mes en cada día: desde el
    día siguiente al fin del plan actual hasta 4 semanas después. Deja el día
    siguiente. Sube el comprobante y Ana lo confirma.
    **Congelar plan** solo aparece cuando el trimestral ya está en curso:
@@ -896,10 +931,12 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
    como el congelamiento del plan, y en el historial del equipo y de la web
    queda como **Retirada**.
 4. Ana lo ve en la app del equipo, en **Pagos** › **Accesos** ›
-   **Congelamientos** («9 al 15 nov · 7 días»), y en la web en **Clientas ›
-   Congelamientos** y en **Inicio**. **Revisar congelamiento** dice las
-   fechas, los días y «Vence el 5 de febrero → 12 de febrero». Lo aprueba
-   (la coordinadora también puede, desde la web). El fin del plan se corre
+   **Congelamientos** («lun 9 al dom 15 nov · 7 días»), y en la web en
+   **Clientas › Congelamientos** y en **Inicio**. **Revisar congelamiento**
+   dice «Pide congelar del lun 9 al dom 15 nov (7 días)» y, en la tabla,
+   **Vencería** «vie 12 feb (antes vie 5 feb)». Pulsa **Aprobar** (o
+   **Rechazar con un motivo**, que pide el motivo y avisa a la clienta).
+   La coordinadora también puede, desde la web. El fin del plan se corre
    exactamente esos días. Lo decidido queda en **Decididas** (equipo) y en
    **Vista › Decididas** (web), con quién y cuándo. El aviso de la
    solicitud, en la campana de Ana y de la coordinadora, queda leído al
@@ -907,9 +944,12 @@ tiene un plan de 30 días, así que este paso necesita un trimestral.
 5. Lucía recibe «Aprobamos tu congelamiento del 9 al 15 de noviembre. Tu
    plan ahora vence el 12 de febrero.». En **Mi plan**, la tarjeta dice
    **Aprobado** («Congelado del … al …») hasta que empieza y **Congelado**
-   («Congelado hasta el …») mientras dura. Esos días no puede reservar: el
-   detalle de una clase dentro del congelamiento dice «Tu plan está congelado
-   ese día» con **Reservar** apagado. Si Ana lo rechaza, la tarjeta dice
+   («Congelado hasta el …») mientras dura. Desde 7 días antes de que empiece,
+   **Inicio** muestra arriba el bloque «Plan congelado», con las fechas, «No
+   puedes reservar esos días. Vuelves el …» y **Ver mi congelamiento**. Esos
+   días no puede reservar: en **Reservar** llevan un candado y, al tocar uno,
+   en lugar de clases dice «Viernes 20: plan congelado», con **Ver clases
+   del …** (el primer día de vuelta) y **Ver mi congelamiento**. Si Ana lo rechaza, la tarjeta dice
    **No aprobado** y aparece **Pedir otro congelamiento**.
 
 ### Invita a una amiga
@@ -942,8 +982,8 @@ Entra a la app del equipo como Gabriela.
    turno que la clienta ve dura 45 minutos, recortados de ese bloque.
    **Guardar**.
 3. El bloque aparece en **Horarios semanales** con el día abreviado,
-   `9:00 – 13:00` (o la hora que hayas puesto) y «N cupos · sin reservas» o
-   cuántas evaluaciones tiene reservadas.
+   `9:00 – 13:00` (o la hora que hayas puesto) y «N turnos · sin reservas» o
+   cuántos turnos tienen reserva («1 con reserva»).
    Tócalo: se abre **Editar horario**. **Eliminar horario** abre «¿Quitar
    este horario?», que dice desde qué fecha deja de existir, con **Quitar
    horario**. Si el bloque ya tiene una evaluación reservada, **Guardar**
@@ -969,13 +1009,17 @@ En la app de Lucía:
    paga. El encabezado de **Evaluación nutricional** lo dice: «Cuesta Bs
    70 con tu plan.», «Tu primera evaluación del trimestre es gratis.» o «Ya
    usaste la gratis de este trimestre · Bs 70.».
-3. Reserva un turno. Queda arriba, en **Tu próxima evaluación**: la tarjeta
-   rosa con la fecha, la hora grande y una etiqueta con su estado. Una
-   consulta gratis dice «Gratis con tu plan» y tiene **Cancelar
-   evaluación**. Una pagada dice «Pago en revisión» mientras Ana no confirma
-   la transferencia, y tiene **Reprogramar** y **Cancelar evaluación**. Ya
-   confirmada dice «Pagada» y solo tiene **Reprogramar**: el pago se
-   mantiene. **Reprogramar** se hace en la misma pantalla: los turnos pasan a
+3. Reserva un turno. Queda arriba, en un bloque rosa: «Tu cita · en N
+   días» (o «hoy», «mañana»), la fecha con la hora, las iniciales y el
+   nombre de Gabriela con la sede y la duración, y lo que paga con «llega 10
+   min antes». Una consulta gratis dice «Gratis · primera del trimestre» y
+   tiene **Cancelar**. Una pagada dice «Bs 70 · Pago en revisión» mientras
+   Ana no confirma la transferencia, y tiene **Cambiar fecha** y
+   **Cancelar**. Ya confirmada dice «Bs 70 · Pagada» y solo tiene **Cambiar
+   fecha**: el pago se mantiene. Debajo del bloque, una línea explica hasta
+   cuándo puede cambiarla. Con la cita reservada, los turnos siguientes
+   quedan en **¿Otra evaluación?**, con **Ver más días**. **Cambiar fecha**
+   se hace en la misma pantalla: los turnos pasan a
    **Elige el nuevo horario**, con «Cambias tu cita del …» y **Volver**; al
    elegir uno, «¿Mover tu evaluación?» lo confirma. Cancelar abre la hoja de
    confirmación. Desde 3 horas antes ya no se puede cancelar ni
@@ -1012,14 +1056,15 @@ Con Lucía todavía en la app, recorre lo que no es comprar ni reservar.
    las iniciales. El equipo ve esa foto en la app del equipo y en la web.
 3. **Cambiar contraseña** pide la actual y la nueva. Al guardar, la sesión
    sigue abierta.
-4. **Notificaciones** separa **Sin leer** y **Anteriores**. Al tocar una, se
-   marca leída; **Marcar leídas** las marca todas. En **Perfil**, la fila
+4. **Notificaciones** separa **Nuevas · N** y **Anteriores**; cada aviso
+   tiene el ícono de su tema en un círculo, un punto si es nuevo y un enlace
+   directo a lo que nombra. Al tocar una, se marca leída; **Marcar leídas** las marca todas. En **Perfil**, la fila
    dice «N sin leer», y la campana de **Inicio** muestra el número. La
    pestaña **Perfil** no lleva número.
 5. **Enviar comentarios** manda un texto a la dueña. Puedes mandar hasta 10
    en 24 horas. El undécimo se niega.
 6. Vuelve a **Inicio** y arrastra hacia abajo. La lista se refresca y el
-   indicador es color palo de rosa. Sal de **Mis Reservas**, reserva algo
+   indicador es color rosa profundo. Sal de **Mis Reservas**, reserva algo
    desde la web o desde Camila, y vuelve a entrar: la reserva nueva aparece
    sin cerrar la app.
 7. **Cerrar mi cuenta** explica que se borran el nombre, el correo, el
@@ -1108,7 +1153,8 @@ Equipos** también los usa la coordinadora, sin montos.
 1. **Estudio › Equipos**, con la sede **Centro**. **Nuevo equipo**. Crea 8
    reformers y 8 cadillacs, numerados, y los mats que uses. El número se
    repite dentro de la sede y el sistema lo rechaza.
-2. Daniela, en la app, abre una clase de reformer y **Reportar una falla**.
+2. Daniela, en la app, abre una clase de reformer y, abajo, **Reportar una
+   falla de equipo**.
    Elige el equipo y describe la falla. En la web, la falla aparece en el
    equipo. Márcala resuelta cuando corresponda.
 3. Si una clase de reformer tiene más cupos que equipos en servicio, el
@@ -1166,15 +1212,19 @@ lista en **Por resolver**.
    opcional: sube la foto de la transferencia (JPG, PNG o WebP, hasta 10 MB).
    Para agregarla a un pago ya anotado, ábrelo, sube la foto y **Guardar**.
    La columna **Comprobante** muestra **Ver** cuando el pago tiene foto.
-6. En la app del equipo, Daniela abre la pestaña **Mis pagos**.
-   Ve una tarjeta por liquidación, la más nueva arriba, con **Borrador** o
-   **Aprobado**, el total y la suma por concepto: clases dictadas,
-   canceladas por mínimo y comisiones. **Ver cada clase** abre una línea por
-   clase con sus alumnas y extras. Un borrador avisa que puede cambiar hasta
-   que administración lo apruebe. Abajo, **Pagos recibidos** lista lo
-   que **Dinero › Sueldos › Pagados** registró para ella, con fecha y monto. Un pago con foto
-   muestra **Ver** y la abre a pantalla completa. Solo ve lo suyo. La
-   coordinadora, la recepcionista y la nutricionista no tienen esa fila.
+6. En la app del equipo, Daniela abre la pestaña **Mis pagos**. Arriba, lo
+   que tiene **Por cobrar** (o el **Periodo en curso**); debajo,
+   **Historial**, con una fila por liquidación, la más nueva arriba: «En
+   curso · puede cambiar», «Aprobada · por pagar» o «Pagado el …». Al abrir
+   una ve el total en un bloque rosa y la suma por concepto: **Clases
+   dictadas**, **Canceladas por mínimo** y **Comisiones de primer plan**;
+   cada grupo abre sus clases por día. Una abierta avisa que puede cambiar
+   hasta que administración la apruebe. Un pago con foto muestra **Ver
+   comprobante** y la abre a pantalla completa. Los pagos que **Dinero ›
+   Sueldos › Pagados** registró sin liquidación van en **Otros pagos**, y
+   al final está **Mi QR de cobro**. Solo ve lo suyo. La coordinadora y la
+   nutricionista tienen la misma pestaña **Mis pagos**; la recepcionista lo
+   abre desde **Perfil › Ajustes**.
 
 ### El mes
 
@@ -1218,7 +1268,7 @@ app cambia a la barra de Camila y una franja arriba dice «Viendo como Camila
 Rojas · Asistente · Quedan N min», con **Salir**. Las pantallas empiezan
 justo debajo de la franja, sin un espacio en blanco en medio.
 
-Recorre **Clientes** y la ficha de Lucía, **Horario** y **Caja**. No
+Recorre **Hoy**, **Clientas** y la ficha de Lucía, **Horario** y **Caja**. No
 confirmes un pago desde ahí: un pago en efectivo quedaría registrado a tu
 nombre. Su **Perfil** no ofrece **Cambiar foto**, **Cambiar contraseña**,
 **Enviar comentarios** ni **Cerrar sesión**: dice «Mientras ves la app como
@@ -1247,13 +1297,15 @@ Entra a la web con ella. Es el contacto con clientas y equipo, sin dinero:
 - Una dirección de **Dinero**, escrita a mano, la devuelve con el aviso de
   que no tiene permiso.
 
-En la app del equipo, su barra es **Clientes** · **Para contactar** ·
-**Horario** · **Perfil**. **Clientes** tiene **Nuevo cliente**, el mismo
-formulario de la recepcionista: crea una clienta con un correo nuevo, y su
+En la app del equipo, su barra es **Clientas** · **Para contactar** ·
+**Horario** · **Mis pagos** · **Perfil**. **Clientas** tiene **¿No está?
+Crear clienta nueva**, el mismo formulario de la recepcionista: crea una clienta con un correo nuevo, y su
 ficha muestra la tarjeta **Cuenta pendiente de activación** con **Reenviar
 enlace** (y, en **⋯**, **Cambiar correo** y **Cancelar invitación**). No tiene
 **Registrar pago**: el cobro sigue en recepción, y sin plan la
-ficha dice «La clienta necesita un plan activo para reservar.». **Horario**
+ficha dice «La clienta necesita un plan activo para reservar.». Arriba de
+la ficha tiene **Escribir por WhatsApp** y **Llamar**, el último contacto y,
+si la clienta está en **Para contactar**, **Anotar contacto**. **Horario**
 es la semana para leer, con **Cancelar una clase** arriba. **Para
 contactar** lista a las clientas en sus primeros 90 días (contados desde el
 inicio de su primer plan) que cumplen una de tres reglas, y cada fila dice
@@ -1283,7 +1335,8 @@ verlos, deja la semana creada y espera, o acepta leerlos al día siguiente.
   («del miércoles 4 de noviembre, 18:00»), para elegir otro horario: «Ese día
   hay lugar en …» o «Ese día ya no quedan otras clases con lugar.». En **Horario › Clases** de la web
   queda como **Cancelada · mínimo**, y en la **Agenda** de la entrenadora
-  como «Cancelada · mínimo no alcanzado». La instructora suma Bs 25 en la liquidación de ese
+  al final del día, en «1 cancelada por mínimo» con **Ver**, como
+  «Cancelada · mínimo no alcanzado». La instructora suma Bs 25 en la liquidación de ese
   mes. Si tiene 2 o más, la clase se dicta y el sistema guarda cuántas
   reservas había al cierre. Ese número es el que cobra la instructora.
 - La lista de espera corre cuando se libera un cupo, hasta que cierra la
@@ -1376,12 +1429,12 @@ paso de arriba todavía no creó lo que esa pantalla necesita.
 
 | Rol | Barra de abajo | Qué hace ahí | Paso |
 | --- | --- | --- | --- |
-| Administración | Pagos · Clientes · Horario · Perfil | Pagos pendientes; en Accesos, cancelar una clase, congelamientos y cerrar caja; la ficha de la clienta con efectivo; la semana; ver como otra persona | 4, 7, 10, 11, 16 |
-| Asistente | Clientes · Horario · Caja · Perfil | Buscar, alta, efectivo, QR de mostrador, reservas; la semana para leer; el cierre de caja | 9 |
+| Administración | Pagos · Clientas · Horario · Perfil | Pagos pendientes; en Accesos, facturas por subir, cancelar una clase, congelamientos y cerrar caja; la ficha de la clienta con efectivo; la semana; ver como otra persona | 4, 7, 10, 11, 16 |
+| Asistente | Hoy · Clientas · Horario · Caja · Perfil | El día de la sede y lo pendiente; buscar, alta, efectivo, QR de mostrador, reservas; la semana para leer; el cierre de caja; sus pagos desde Perfil | 4, 9 |
 | Entrenadora | Agenda · Mis pagos · Perfil | Pasar lista, reportar una falla, sus liquidaciones y pagos recibidos, su código de referido | 5, 8, 15 |
-| Nutricionista | Agenda · Disponibilidad · Perfil | Sus evaluaciones y cancelarlas; sus horarios semanales | 12 |
-| Coordinación | Clientes · Para contactar · Horario · Perfil | Buscar, alta sin cobro, reservas; los primeros 90 días; cancelar una clase | 16 |
-| Todas | Perfil | Foto de perfil, **Tu cuenta** (rol y sucursal), **Ajustes** (avisos, contraseña, comentarios, cerrar sesión) | 4 |
+| Nutricionista | Agenda · Disponibilidad · Mis pagos · Perfil | Sus evaluaciones y cancelarlas; sus horarios semanales; sus pagos | 12 |
+| Coordinación | Clientas · Para contactar · Horario · Mis pagos · Perfil | Buscar, alta sin cobro, reservas; WhatsApp y llamar desde la ficha; los primeros 90 días; cancelar una clase; sus pagos | 16 |
+| Todas | Perfil | Foto de perfil, **Tu cuenta** (rol y sucursal), **Ajustes** (Mis pagos si cobra, Mi QR de cobro, avisos, contraseña, comentarios, cerrar sesión) | 4 |
 
 ## Cuando algo no aparece
 
