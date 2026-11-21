@@ -6419,8 +6419,9 @@ touching production.
    retention»](./architecture/infrastructure.md#logs-and-retention)).
 5. **Secrets rotation** ([runbook](./runbooks/secrets-rotation.md)). Read
    the inventory (which secret lives in which store, who issues it) and
-   the calendar: the deploy tokens on 2027-09-14 and 2027-09-17, every
-   never-expiring credential in the same September sitting, the restore
+   the calendar: every never-expiring credential, the Northflank deploy
+   tokens included since their 2026-10-31 rotation, in one September
+   sitting (2027-09-14), the restore
    drill every quarter from January 2027, and the free-plan usage check
    every month. A rotation ends with a row in the rotation log and the
    calendar line moved a year forward in the runbook **and** in the

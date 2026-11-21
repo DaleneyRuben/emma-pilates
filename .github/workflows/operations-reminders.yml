@@ -52,9 +52,7 @@ jobs:
               remind "[ops] $title (due $due)" "$body"
             fi
           done <<'TABLE'
-          2027-09-14|Rotate NORTHFLANK_API_TOKEN|The production deploy token (Northflank team emma-pilates, github-actions-release) expires 2027-10-14. Create a new 1-year token with the same role, set the repository secret, verify with the next promotion, delete the old token.
-          2027-09-17|Rotate NORTHFLANK_STAGING_API_TOKEN|The staging deploy token (team emma-pilates-staging, github-actions-staging-release) expires 2027-10-17. Same steps as production with the staging workflow as the check.
-          2027-09-14|Yearly rotation of the never-expiring credentials|Vercel tokens (check their expiry first), the R2 tokens, Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token; also check the domain renewal (2027-10-15) and the Aiven CA date.
+          2027-09-14|Yearly rotation of the never-expiring credentials|The Northflank deploy tokens (github-actions-release-v2 and github-actions-staging-release-v2, never expiring since 2026-10-31), the Vercel tokens (check their expiry first), the R2 tokens, Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token; also check the domain renewal (2027-10-15) and the Aiven CA date.
           TABLE
 
           # Quarterly restore drill (BE-007 G9): January, April, July, October.
