@@ -31,6 +31,7 @@ import { ClientEvaluationsTab } from "./client-evaluations-tab";
 import { ClientFileTabs, type ClientFileTab } from "./client-file-tabs";
 import { ClientPaymentsTab } from "./client-payments-tab";
 import { ClientPhone } from "./client-phone";
+import { ClientPendingActivation } from "./client-pending-activation";
 import { ClientPlanBlock } from "./client-plan-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
@@ -104,12 +105,7 @@ function ClientSummary({
         </p>
       </div>
       {client.accountStatus === "pending" ? (
-        <div className="flex flex-col gap-1 rounded-control border border-borde-fuerte bg-aviso px-3 py-2">
-          <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
-          <p className="tipo-secundario text-texto">
-            Todavía no abrió el enlace del correo para crear su contraseña.
-          </p>
-        </div>
+        <ClientPendingActivation clientId={client.id} />
       ) : null}
       {client.accountStatus === "disabled" ? (
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>

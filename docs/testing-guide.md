@@ -65,6 +65,7 @@ numbered tests.
 | Rosa Emma in the apps        | Both apps on the approved Rosa Emma system: the 200 header band behind the status bar, the 600 hero, 500 blocks, white cards with the rosa shadow, the 600 tab pill, class-type bars, and the joined undated lines of an old Liquidación (Test 189) | The boards in `design/v3/cliente` and `design/v3/equipo` are the reference; a screen the boards never drew keeps the shared pieces' look |
 | Type scale in the apps       | Every text in both apps is one of the follow-up 285 styles: Lora 500 only for titles and figures, Work Sans for everything else, no text under 12 pt, small text only on white, 50 or 600, italic field examples, the same weight for a chosen chip or tab, text that grows with the phone up to 1.3 times (Test 191) | Text at the phone's largest accessibility sizes stops growing at 1.3 times by design |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
+| Resend a Client activation link from the admin web | Clientas › a pending Client's Resumen: the «Pendiente de activación» aviso with her link's expiry and «Reenviar enlace», the success line, and the server's wait after a second click (Test 26, step 3) | A self-registered Client still verifying her email shows the aviso without the link |
 
 ## Where each designed screen is tested
 
@@ -3114,7 +3115,28 @@ the admin web, exactly as Test 24 describes, and log in as
    her referral code; there is no Crédito block (PAY-005). Without an active Plan the
    block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
    she had one. A Client invited from the Staff app who has not created her
-   password yet shows **Pendiente de activación**. Nothing here is editable;
+   password yet shows **Pendiente de activación** as a pink aviso with a
+   clock: «Todavía no abrió el enlace del correo para crear su contraseña.»,
+   «El enlace vence el jue 5 mar.» («venció» once it lapsed), and the link
+   **Reenviar enlace**, the same resend as the Staff app (Test 11 E). Click
+   it: «Enviamos un nuevo enlace de activación.» appears in the aviso, the
+   date becomes 7 days from now, and a new email lands in
+   `apps/backend/.data/email-capture/`. Click again at once: a clock notice
+   «Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue
+   sirviendo.» with «Podrás reenviarlo en m:ss.» replaces the result and the
+   link stays disabled until the wait ends (too many emails from your own
+   Account show «Enviaste muchos correos…» with «Podrás enviarlo en…»). If
+   she activated in the meantime the aviso says «Ya activó su cuenta o la
+   invitación ya no existe; vuelve a abrir la ficha.». If her invitation
+   cannot be read (the API is down), the aviso says «No pudimos comprobar su
+   enlace de activación.» with **Reintentar**. A Client who registered
+   herself and has not verified her email shows the aviso without the link
+   (its password sentence does not fit her yet; the Staff app's
+   verification offer is not on the web). The reads are `GET
+   /api/v1/assistant/client-invitations/{clientId}` and `POST
+   …/{clientId}/resends` (`429 email_throttled` or `staff_email_throttled`
+   with `Retry-After`, `404 client_invitation_not_found`). Nothing else
+   here is editable;
    the only action is «Cerrar cuenta» in the footer (Test 35), which a
    deactivated account does not offer. The list is
    `GET /api/v1/administrator/clients?q=…&page=…&pageSize=…` and the panel
@@ -11018,10 +11040,9 @@ E. **Pagos (Ronda 2 pick A, one line a day).** As Ana with nothing to
    icon discs: **Facturas por subir** (count), **Cancelar una clase**,
    **Congelamientos**, **Cerrar caja**, each with ›.
 F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
-   Coordinator), **Clientes**: the search field first, **Facturas por subir**
-   as a plain row before searching, and no big «Nuevo cliente» button. Under
-   the hint (or under the results once she searches) a quiet link «¿No está?
-   Crear cliente nuevo» opens **Nuevo cliente** (it stays under «No pudimos
+   Coordinator), **Clientes**: no big «Nuevo cliente» button. Since Test 192
+   the field sits in the band, there is no hint, and under the results the
+   outlined **Crear clienta nueva** button opens **Nueva clienta** (it stays under «No pudimos
    buscar clientes.» when the search fails). No match still reads «No
    encontramos a nadie» with **Nuevo cliente** as the next step.
 G. Check on the iPhone 16 Pro and the Android emulator.
@@ -11189,7 +11210,7 @@ F. **Class card (Clase E).** As daniela@, **Mi agenda** opens on the next class
    trainer line on one line.
 G. **Forms (Form B).** On recovery the email example reads «Ej.:
    tu@correo.com» under the field (the staff app «Ej.: tu@emmapilates.bo»);
-   Login shows no example since follow-up 288 (Test 192). No password field
+   Login shows no example since follow-up 288 (Test 193). No password field
    shows dots. On **Editar perfil**, clear Nombre and tap **Guardar
    cambios**: a Rubor box reads «Falta 1 dato para guardar · Nombre», the field
    has a 2 pt Rosa profundo border and «Escribe tu nombre.» in bold. On
@@ -11623,7 +11644,8 @@ G. **E5 · The Nutritionist's next appointment.** As Lucía book an
 H. **E7 · The Assistant's «Hoy».** As Camila the tabs are **Hoy · Clientas
    · Horario · Caja · Perfil** and she opens on **Hoy**: «Hoy en Centro»
    under the eyebrow «Asistente · Jueves 19 de noviembre», the bell, the
-   search («Nombre, teléfono o correo») and «¿No está? Crear clienta nueva».
+   search («Nombre, teléfono o correo») and the outlined **Crear clienta nueva**
+   button (Test 192).
    Today's next class at the Branch is a Palo de rosa block with «N de M»
    («Completa» when full), «Trainer · 50 min» and the booked Clients'
    initials (five, then «+N»). Under it, Crema rows with an Arcilla border:
@@ -11828,8 +11850,7 @@ A. **Two families, one ink.** Titles and figures are Lora at one weight: the
    spaced capitals and pills 12 bold. Text is rosa profundo, or white on 600;
    nothing is faded.
 B. **No sentence in Lora.** A load failure («No pudimos cargar tus
-   reservas.»), an empty state's note, the Clientas search hint («Escribe al
-   menos dos letras…») and «Hoy no quedan clases…» read in Work Sans. An
+   reservas.»), an empty state's note, and «Hoy no quedan clases…» read in Work Sans. An
    empty or error state's title is Work Sans 16 semibold.
 C. **Small text on white.** On the 100 screen, the 200 band and a 500 block you
    only see titles, figures and 19 pt bold text. Check the sheets that used to
@@ -11859,7 +11880,31 @@ H. **Larger text.** In Settings › Accessibility › Display & Text Size › La
    class times stay whole. At the accessibility sizes text stops growing at
    1.3 times by design.
 
-## Test 192: Login with the logo and the form in a sheet (follow-up 288)
+## Test 192: Buscar clienta redesign (option A)
+
+Start the Staff app (Test 1B) with the backend running and log in as
+`camila.rojas@example.com` (Assistant); repeat with
+`carolina.rivas@example.com` (Coordinator). Open **Clientas**.
+
+A. **Field in the band.** The search field («Nombre, teléfono o correo») is
+   the last thing in the 200 band, under «Buscar clienta» and the bell. No
+   card asks to type «al menos dos letras»: with one letter nothing happens,
+   from the second the results appear.
+B. **One card before searching.** Under the band a single white card holds
+   two rows, each behind a 50 disc: **Nueva clienta** «Crea su ficha si aún
+   no está» (plus) and **Facturas por subir** (document) with the count in a
+   600 pill when invoices wait. Each row ends in ›. **Nueva clienta** opens
+   the new-client form; **Facturas por subir** opens Facturas.
+C. **Results.** Type «luc»: the card goes away, the results show in one white
+   card, and under them an outlined button **+ Crear clienta nueva** opens the
+   form. It also shows under «No pudimos buscar clientas.» when the search
+   fails. No match still reads «No encontramos a nadie» with **Nueva
+   clienta**.
+D. **Hoy.** The Assistant's **Hoy** shows the same outlined **Crear clienta
+   nueva** button above the next class.
+E. Check on the iPhone 16 Pro and the Android emulator.
+
+## Test 193: Login with the logo and the form in a sheet (follow-up 288)
 
 The owner's Login (2026-11-21, design follow-up 288 option A) in both apps.
 JavaScript only: no migration, no API change, no native build. Run the API and

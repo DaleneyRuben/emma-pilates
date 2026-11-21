@@ -404,7 +404,7 @@ primera pestaña de cada rol, arriba a la derecha, está la campana de
    foto aparece también **Quitar foto**.
 3. Cierra sesión. Camila entra y llega a **Hoy**: arriba «Asistente · » y
    la fecha, el título **Hoy en Centro** y el campo «Nombre, teléfono o
-   correo». Debajo, **¿No está? Crear clienta nueva**, la próxima clase de
+   correo». Debajo, el botón **Crear clienta nueva**, la próxima clase de
    hoy en la sede (o «Hoy no quedan clases en esta sucursal.» si todavía no
    publicaste nada) y la tarjeta **Pendientes**, con **Facturas por subir**
    («Nada pendiente») y **Cerrar caja** («Al final del día»). Si hay más
@@ -690,12 +690,14 @@ y entra como Camila. Su barra de abajo es **Hoy** · **Clientas** ·
 **Horario** · **Caja** · **Perfil**, y llega a **Hoy** (el paso 4 lo
 describe). La búsqueda de arriba sirve igual que la de **Clientas**, que
 tiene arriba «Asistente · Centro» y el título **Buscar clienta**, el campo
-«Nombre, teléfono o correo» y, debajo, **¿No está? Crear clienta nueva**.
+«Nombre, teléfono o correo» dentro de la franja rosa y, debajo, una sola
+tarjeta con **Nueva clienta** («Crea su ficha si aún no está») y **Facturas
+por subir**.
 En un iPad la búsqueda queda a la izquierda y la
 ficha se abre a la derecha, sin perder la lista.
 
-1. Con el campo vacío ya dice «Escribe al menos dos letras o números para
-   buscar.», y lo sigue diciendo con una sola letra. Escribe `Lucía`. Cada resultado muestra la foto (o las
+1. Con una sola letra todavía no busca; desde la segunda aparecen los
+   resultados y, debajo, el botón **Crear clienta nueva**. Escribe `Lucía`. Cada resultado muestra la foto (o las
    iniciales), el nombre, el teléfono y el correo; una cuenta sin activar
    lleva la marca **Pendiente**. Si nadie coincide, dice «No encontramos a
    nadie», con **Nueva clienta**. Toca la fila de Lucía (el lector de
@@ -707,7 +709,8 @@ ficha se abre a la derecha, sin perder la lista.
    lado; y las filas **Reservas** (al lado, la próxima, por ejemplo
    «Próxima: lun 9 nov · 09:00») e **Historial de clases**. La flecha de
    arriba vuelve a la búsqueda.
-3. Vuelve a la búsqueda y pulsa **¿No está? Crear clienta nueva**. Crea a una clienta que
+3. Vuelve a la búsqueda y pulsa **Crear clienta nueva** (o, con el campo
+   vacío, **Nueva clienta**). Crea a una clienta que
    llega al estudio sin la app: **Nombre**, **Correo electrónico**,
    **Celular** (obligatorio, con su país, como en el paso 3) y **¿Cómo nos
    conoció?**. Si eliges una amiga o una instructora aparece el campo del
@@ -1298,8 +1301,8 @@ Entra a la web con ella. Es el contacto con clientas y equipo, sin dinero:
   que no tiene permiso.
 
 En la app del equipo, su barra es **Clientas** · **Para contactar** ·
-**Horario** · **Mis pagos** · **Perfil**. **Clientas** tiene **¿No está?
-Crear clienta nueva**, el mismo formulario de la recepcionista: crea una clienta con un correo nuevo, y su
+**Horario** · **Mis pagos** · **Perfil**. **Clientas** tiene **Nueva
+clienta**, el mismo formulario de la recepcionista: crea una clienta con un correo nuevo, y su
 ficha muestra la tarjeta **Cuenta pendiente de activación** con **Reenviar
 enlace** (y, en **⋯**, **Cambiar correo** y **Cancelar invitación**). No tiene
 **Registrar pago**: el cobro sigue en recepción, y sin plan la
