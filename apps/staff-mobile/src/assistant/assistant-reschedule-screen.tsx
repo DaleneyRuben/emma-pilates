@@ -18,7 +18,6 @@ import {
   radii,
   Screen,
   spacing,
-  StaffFace,
   surfaces,
   Text,
 } from "@pilates/mobile-core";
@@ -154,7 +153,6 @@ export function AssistantRescheduleScreen({
         ) : (
           options.map((session) => (
             <RescheduleOption
-              fetcher={fetcher}
               key={session.id}
               onPress={() => setSelectedId(session.id)}
               selected={session.id === selectedId}
@@ -189,12 +187,10 @@ export function AssistantRescheduleScreen({
  * Lora time, the free seats as a pill, ringed in 600 once chosen.
  */
 function RescheduleOption({
-  fetcher,
   onPress,
   selected,
   session,
 }: {
-  fetcher: typeof globalThis.fetch;
   onPress: () => void;
   selected: boolean;
   session: SessionAvailabilityDto;
@@ -209,14 +205,6 @@ function RescheduleOption({
     >
       <ClassRow
         detail={session.trainerName}
-        detailLead={
-          <StaffFace
-            fetcher={fetcher}
-            name={session.trainerName}
-            photo={session.trainerPhoto}
-            size={20}
-          />
-        }
         end={
           <ExceptionPill>
             {session.availableSeats === 1

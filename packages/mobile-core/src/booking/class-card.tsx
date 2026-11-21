@@ -123,7 +123,6 @@ export function ClassList({
 export function ClassRow({
   accessibilityLabel,
   detail,
-  detailLead,
   detailLines,
   end,
   onPress,
@@ -136,8 +135,6 @@ export function ClassRow({
 }: {
   accessibilityLabel?: string;
   detail?: string;
-  /** Something before the quiet line, such as the Trainer's small face. */
-  detailLead?: ReactNode;
   /** Keeps the quiet line to this many lines. */
   detailLines?: number;
   /** Replaces the places, such as an exception pill. */
@@ -161,12 +158,9 @@ export function ClassRow({
       <View style={styles.body}>
         <Text variant="titulo-fila">{title}</Text>
         {detail === undefined ? null : (
-          <View style={styles.detailLine}>
-            {detailLead}
-            <Text numberOfLines={detailLines} style={styles.detail} variant="secundario">
-              {detail}
-            </Text>
-          </View>
+          <Text numberOfLines={detailLines} variant="secundario">
+            {detail}
+          </Text>
         )}
       </View>
       {end ?? (places === undefined ? null : <Text variant="pastilla">{places}</Text>)}
@@ -231,8 +225,6 @@ export function CancelledFold({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs, minWidth: 0 },
-  detail: { flexShrink: 1 },
-  detailLine: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   divider: { backgroundColor: colors.hairline, height: 1 },
   fold: { gap: spacing.sm },
   foldLine: {

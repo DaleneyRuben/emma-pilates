@@ -96,15 +96,15 @@ describe("Horario (v2 HOR boards)", () => {
     expect(screen.getByText("Elige otro día de la semana.")).toBeOnTheScreen();
   });
 
-  // FIX-041 (follow-up 242): each line leads the Trainer's name with her face.
-  it("leads each class line with the Trainer's 20 px photo, or her initials", async () => {
+  // The owner's pick C: each line names the Trainer without a face.
+  it("names the Trainer on each class line without her photo or initials", async () => {
     const screen = await render(
       <App
         runtime={createStaffRuntime(
           routeFetcher({
             ...routes(coordinator),
             [daySessions]: () =>
-              // Today's next class is the hero; the face leads the other rows.
+              // Today's next class is the hero; the other rows follow it.
               jsonResponse([
                 { ...session, trainerName: "Andrea Suárez", trainerPhoto: null },
                 { ...session, id: "session-2", trainerPhoto: { imageAssetId: "asset-emma" } },
@@ -129,16 +129,11 @@ describe("Horario (v2 HOR boards)", () => {
     await fireEvent.press(screen.getByTestId("tab-schedule"));
 
     const emma = await screen.findByTestId("schedule-session-session-2");
-    await waitFor(() =>
-      expect(within(emma).getByLabelText("Foto de Emma Vargas")).toHaveStyle({
-        width: 20,
-        height: 20,
-      }),
-    );
     expect(within(emma).getByText("Emma Vargas · 50 min")).toBeOnTheScreen();
-    expect(
-      within(screen.getByTestId("schedule-session-session-3")).getByText("AS"),
-    ).toBeOnTheScreen();
+    expect(within(emma).queryByLabelText("Foto de Emma Vargas")).toBeNull();
+    const andrea = screen.getByTestId("schedule-session-session-3");
+    expect(within(andrea).getByText("Andrea Suárez · 50 min")).toBeOnTheScreen();
+    expect(within(andrea).queryByText("AS")).toBeNull();
   });
 
   // FIX-052 (walkthrough n.º 48): a cancelled class keeps its place, muted,

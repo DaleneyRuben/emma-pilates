@@ -57,8 +57,8 @@ describe("Assistant reschedule option card", () => {
     expect(card.getByTestId("class-row-time")).toHaveTextContent(/^\d\d:\d\d$/);
     expect(card.getByTestId("class-row-time")).toHaveStyle(textVariants.cifra);
     expect(card.getByText("Reformer Pilates")).toHaveStyle({ color: "#93615D" });
-    // FIX-041: her face (here her initials) leads her name.
-    expect(card.getByText("EV")).toBeOnTheScreen();
+    // The owner's pick C: her name only, without her face or initials.
+    expect(card.queryByText("EV")).toBeNull();
     expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#93615D" });
     expect(card.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(card.getByText("6 lugares libres")).toBeOnTheScreen();
