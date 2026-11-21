@@ -66,6 +66,7 @@ numbered tests.
 | Type scale in the apps       | Every text in both apps is one of the follow-up 285 styles: Lora 500 only for titles and figures, Work Sans for everything else, no text under 12 pt, small text only on white, 50 or 600, italic field examples, the same weight for a chosen chip or tab, text that grows with the phone up to 1.3 times (Test 191) | Text at the phone's largest accessibility sizes stops growing at 1.3 times by design |
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 | Resend a Client activation link from the admin web | Clientas › a pending Client's Resumen: the «Pendiente de activación» aviso with her link's expiry and «Reenviar enlace», the success line, and the server's wait after a second click (Test 26, step 3) | A self-registered Client still verifying her email shows the aviso without the link |
+| Login with the logo | Both apps open Login on the rosa band with the studio's logo and the form in a white sheet anchored to the bottom, no «Ej.:» under the email, the sheet above the keyboard, a 560 pt column on iPad (Test 193) | — |
 
 ## Where each designed screen is tested
 
@@ -184,9 +185,8 @@ build can take a few minutes.
 
 You should see:
 
-- a light warm-beige background;
-- the **Emma** wordmark in Lora;
-- email and password fields;
+- the rosa band with the studio's logo filling the top (Test 193);
+- a white sheet at the bottom with the email and password fields;
 - the **Iniciar sesión** button; and
 - **¿Olvidaste tu contraseña?** and, at the bottom, "¿No tienes una cuenta?
   **Regístrate**".
@@ -11923,8 +11923,8 @@ B. **Everything is still there.** «Correo electrónico», «Contraseña» with 
    line. There is no «Ej.: …» under the email field on Login. «Recuperar
    contraseña» still shows its example.
 C. **Keyboard.** Tap «Correo electrónico»: the sheet rises above the keyboard
-   with both fields and «Iniciar sesión» in view, and the logo scrolls up out
-   of the way. Scroll back up to see the logo. Close the keyboard: the sheet
+   with both fields and «Iniciar sesión» in view, the logo moved up above it.
+   Drag the form up: white, never the band, shows under the sheet. Close the keyboard: the sheet
    settles back at the bottom.
 D. **iPad.** On the iPad Pro 11 (portrait and landscape), the sheet is a
    centred column at most 560 pt wide anchored to the bottom, with the logo
