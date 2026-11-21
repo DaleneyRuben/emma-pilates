@@ -1,5 +1,8 @@
 // Seeds a fresh fixtures database, through the API, with what the store
-// screenshots show (docs/store/play-listings.md#graphics): Lucía's next two
+// screenshots show (docs/store/play-listings.md#graphics). The fixtures'
+// «Centro» becomes the studio's real branch, Achumani, and the other
+// branches and Pilates Prenatal are archived, so every picker and filter
+// reads like the studio: Reformer Pilates and Mat Pilates. Then Lucía's next two
 // classes, two friends registered with her code, and a class of Daniela's
 // that starts a few minutes from now with two Clients booked, so its roster
 // can be photographed while attendance is open.
@@ -9,7 +12,7 @@
 // Needs the API and the worker on that database: the friends confirm their
 // email with the token the worker writes to the local email capture.
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 const api = process.env.API_URL ?? "http://127.0.0.1:3130/api/v1";
@@ -45,7 +48,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // The newest captured message to `email` that carries a link token.
 async function captureToken(email) {
   for (let attempt = 0; attempt < 30; attempt += 1) {
-    const files = readdirSync(capture, { recursive: true })
+    const files = (existsSync(capture) ? readdirSync(capture, { recursive: true }) : [])
       .map((file) => path.join(capture, String(file)))
       .filter((file) => statSync(file).isFile())
       .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
@@ -59,9 +62,31 @@ async function captureToken(email) {
   throw new Error(`no captured email for ${email}`);
 }
 
+const paola = await login("paola.mendoza@example.com");
+const adminBranches = await must("GET", "/branches", paola);
+const centro = adminBranches.find((branch) => branch.name === "Centro" || branch.name === "Achumani");
+await must("PUT", `/administrator/branches/${centro.id}`, paola, { name: "Achumani", address: "Calle 21 de Achumani 450" });
+// A branch or class type with a running schedule cannot be archived: end
+// those schedules today (La Paz date) first.
+const classTypes = await must("GET", "/class-types", paola);
+const prenatal = classTypes.find((type) => type.name === "Pilates Prenatal");
+const laPazToday = new Date(Date.now() - 4 * 60 * minute).toISOString().slice(0, 10);
+for (const schedule of await must("GET", "/administrator/session-schedules", paola)) {
+  if (schedule.branchId === centro.id && schedule.classTypeId !== prenatal?.id) continue;
+  if (schedule.effectiveUntil !== null && schedule.effectiveUntil <= laPazToday) continue;
+  await must("POST", `/administrator/session-schedules/${schedule.id}/end`, paola, { effectiveFrom: laPazToday });
+}
+for (const branch of adminBranches.filter((other) => other.id !== centro.id && other.archivedAt == null)) {
+  const archived = await request("POST", `/administrator/branches/${branch.id}/archive`, paola, {});
+  console.log(`archive ${branch.name}: ${archived.status}`);
+}
+if (prenatal) {
+  const archived = await request("POST", `/administrator/class-types/${prenatal.id}/archive`, paola, {});
+  console.log(`archive Pilates Prenatal: ${archived.status}`);
+}
+console.log("branch Centro is now Achumani");
+
 const lucia = await login("lucia@example.com");
-const branches = await must("GET", "/branches", lucia);
-const centro = branches.find((branch) => branch.name === "Centro");
 const day = (offset) => new Date(Date.now() + offset * 24 * 60 * minute).toISOString();
 const sessions = await must(
   "GET",
@@ -88,8 +113,6 @@ for (const friend of [
   console.log(`${friend.name} registered with LUCIA`);
 }
 
-const paola = await login("paola.mendoza@example.com");
-const classTypes = await must("GET", "/class-types", paola);
 const staff = (await must("GET", "/administrator/staff-members", paola)).items;
 const daniela = staff.find((member) => member.name === "Daniela Ortiz");
 const reformer = classTypes.find((type) => type.name === "Reformer Pilates");
@@ -114,3 +137,32 @@ for (const email of ["lucia@example.com", "valeria@example.com"]) {
   console.log(`${email} booked Daniela's class`);
 }
 console.log(`Daniela's class starts at ${session.startsAt}`);
+
+// The fixtures' schedule has two classes a day. The «Reservar» shots show
+// the day three days from now (La Paz), filled out like a real studio day:
+// morning and evening Reformer and Mat classes. Lucía books none of them, so
+// her Plan still shows classes left on «Inicio».
+const emma = staff.find((member) => member.name === "Emma Vargas");
+const mat = classTypes.find((type) => type.name === "Mat Pilates");
+const showcase = new Date(Date.now() - 4 * 60 * minute + 3 * 24 * 60 * minute).toISOString().slice(0, 10);
+const laPaz = (time) => new Date(`${showcase}T${time}:00-04:00`).toISOString();
+const valeria = await login("valeria@example.com");
+for (const extra of [
+  { time: "07:00", type: reformer, trainer: emma, book: [valeria] },
+  { time: "08:00", type: reformer, trainer: daniela, book: [] },
+  { time: "10:15", type: mat, trainer: emma, book: [] },
+  { time: "19:45", type: mat, trainer: daniela, book: [] },
+]) {
+  const created = await request("POST", "/administrator/sessions", paola, {
+    branchId: centro.id,
+    classTypeId: extra.type.id,
+    trainerStaffMemberId: extra.trainer.id,
+    startsAt: laPaz(extra.time),
+    durationMinutes: 50,
+    capacity: extra.type.name === "Mat Pilates" ? 14 : 12,
+  });
+  console.log(`${showcase} ${extra.time} ${extra.type.name}: ${created.status}`);
+  if (created.status >= 300) continue;
+  for (const token of extra.book) await must("POST", `/sessions/${created.data.id}/bookings`, token, {});
+}
+console.log(`the Reservar shots show ${showcase}`);
