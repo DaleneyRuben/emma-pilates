@@ -1,5 +1,10 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
-import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
+import {
+  boliviaCivilDate,
+  civilDateRange,
+  clearMobileQueryCache,
+  textVariants,
+} from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher, staffPhotoRoute } from "../test-support";
@@ -88,7 +93,7 @@ describe("Client class list rows", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
     await waitFor(() => {
-      expect(screen.getByText("Centro")).toBeOnTheScreen();
+      expect(screen.getByText("Sucursal: Centro")).toBeOnTheScreen();
     });
     await waitFor(() => {
       expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })).toHaveLength(2);
@@ -112,20 +117,14 @@ describe("Client class list rows", () => {
       backgroundColor: "#FFFBFB",
       borderRadius: 20,
     });
-    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
-      fontFamily: "WorkSans_600SemiBold",
-      fontSize: 16,
-    });
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle(textVariants["titulo-fila"]);
     expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveStyle({
       color: "#93615D",
-      fontSize: 13,
+      ...textVariants.secundario,
     });
     // FIX-041 (follow-up 242): the trainer line stays on one line.
     expect(cards[0].getByText("Emma Vargas · 50 min")).toHaveProp("numberOfLines", 1);
-    expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 22,
-    });
+    expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveStyle(textVariants.cifra);
     for (const card of cards) {
       expect(card.getByTestId("chevron", hidden)).toBeOnTheScreen();
     }
@@ -145,13 +144,14 @@ describe("Client class list rows", () => {
   });
 
   // MOB-074 walk: a fixed 56 pt width broke «09:00» in Lora 20 into «09:0» and
-  // «0» on the iPhone 16 Pro.
+  // «0» on the iPhone 16 Pro. Follow-up 285: the time never shrinks and is never
+  // cut to «08:…», so it grows with the text size instead.
   it("keeps the start time on one line", async () => {
     const { cards } = await openClassList();
-    expect(cards[0].getByText(/^\d\d:\d\d$/)).toHaveProp("numberOfLines", 1);
     const box = cards[0].getByTestId("class-row-time");
+    expect(box).not.toHaveProp("numberOfLines");
     expect(box).not.toHaveStyle({ width: 62 });
-    expect(box).toHaveStyle({ minWidth: 62 });
+    expect(box).toHaveStyle({ flexShrink: 0, minWidth: 62 });
   });
 
   // ClaseE draws the places short in the row («9 de 12») so the trainer line
@@ -160,7 +160,9 @@ describe("Client class list rows", () => {
     const { cards } = await openClassList();
 
     expect(cards[0].queryByTestId("seat-pill")).toBeNull();
-    expect(cards[0].getByText("9 de 12")).toHaveStyle({ color: "#93615D", fontSize: 14 });
-    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#93615D", fontSize: 14 });
+    // Follow-up 285: the seats are `pastilla` in ink.
+    const seats = { color: "#93615D", ...textVariants.pastilla };
+    expect(cards[0].getByText("9 de 12")).toHaveStyle(seats);
+    expect(cards[1].getByText("Lleno")).toHaveStyle(seats);
   });
 });

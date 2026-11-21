@@ -7,7 +7,6 @@ import {
 import {
   boliviaCivilDate,
   colors,
-  fontFamilies,
   LoadingState,
   OutlinedButton,
   QueryFailure,
@@ -16,13 +15,14 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  Text,
   upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -88,7 +88,7 @@ export function TrainerAgendaScreen() {
           style={styles.todayButton}
           testID="agenda-today"
         >
-          <Text style={styles.todayLabel}>Hoy</Text>
+          <Text variant="compacto">Hoy</Text>
         </Pressable>
       </View>
       <DayStrip
@@ -191,12 +191,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: "center",
     paddingHorizontal: spacing.lg,
-  },
-  todayLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
   },
   // The week sits in its own white card, its label inside (board I01).
   week: {

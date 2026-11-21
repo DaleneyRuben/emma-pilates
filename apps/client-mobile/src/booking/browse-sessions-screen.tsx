@@ -10,8 +10,6 @@ import {
   boliviaCivilDate,
   civilDateRange,
   ClassList,
-  colors,
-  fontFamilies,
   formatSessionDate,
   formatTimeRange,
   hasStarted,
@@ -23,7 +21,7 @@ import {
   spacing,
   StaffFace,
   surfaces,
-  typography,
+  Text,
   upcomingCivilDates,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -31,7 +29,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BrowseEmptyState } from "./browse-empty-state";
@@ -217,10 +215,10 @@ export function BrowseSessionsScreen() {
           testID="browse-sessions-scroll"
         >
           <View style={styles.dayHeader} testID="browse-day-header">
-            <Text style={styles.dayTitle}>
+            <Text style={styles.dayTitle} variant="etiqueta">
               {capitalized(formatSessionDate(civilDateRange(selectedDate).from))}
             </Text>
-            <Text style={styles.dayCount}>
+            <Text variant="pastilla">
               {visibleSessions.length === 1 ? "1 clase" : `${visibleSessions.length} clases`}
             </Text>
           </View>
@@ -261,12 +259,6 @@ export function BrowseSessionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  dayCount: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
   // C03: the day's date is a white strip card above its classes.
   dayHeader: {
     ...surfaces.card,
@@ -276,15 +268,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  dayTitle: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
+  dayTitle: { flexShrink: 1 },
   empty: { flexGrow: 1, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
   list: { gap: spacing.md, paddingBottom: spacing.xxl, paddingTop: spacing.xxs },
   screen: { gap: spacing.md },

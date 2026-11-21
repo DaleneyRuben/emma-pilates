@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Text } from "react-native";
+import { Text } from "../ui/text";
 
 import {
   bookingStrip,
@@ -21,7 +21,7 @@ const rules = {
 function Probe({ fetcher }: { fetcher: typeof globalThis.fetch }) {
   const studioRules = useStudioRules(fetcher);
   return (
-    <Text>
+    <Text variant="cuerpo">
       {studioRules === undefined
         ? "loading"
         : `${studioRules.cancellationWindowMinutes} ${studioRules.plansFromPriceCentavos}`}

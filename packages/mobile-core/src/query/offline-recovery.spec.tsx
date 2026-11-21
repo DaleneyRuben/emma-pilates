@@ -1,8 +1,9 @@
 import { act, render } from "@testing-library/react-native";
 import { onlineManager } from "@tanstack/react-query";
-import { AppState, type AppStateStatus, Text } from "react-native";
+import { AppState, type AppStateStatus } from "react-native";
 
 import { MobileQueryProvider } from "./provider";
+import { Text } from "../ui/text";
 
 type NetState = { isConnected: boolean | null };
 const mockNetListeners: ((state: NetState) => void)[] = [];
@@ -43,7 +44,7 @@ describe("leaving offline mode", () => {
   const goOffline = async () => {
     const screen = await render(
       <MobileQueryProvider>
-        <Text>Inicio</Text>
+        <Text variant="cuerpo">Inicio</Text>
       </MobileQueryProvider>,
     );
     await act(async () => mockNetListeners.forEach((listener) => listener({ isConnected: false })));

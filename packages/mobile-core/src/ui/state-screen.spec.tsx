@@ -1,14 +1,17 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { StateScreen } from "./state-screen";
+import { textVariants } from "./type-scale";
+import { Text } from "./text";
 
 const hidden = { includeHiddenElements: true };
 
 // Rosa Emma (C05b, E-A13): every empty, pending, success, or error state is a
-// white card with its glyph on a 50 disc, a Lora 24 title and a note.
+// white card with its glyph on a 50 disc, a titulo-fila title and a cuerpo
+// note (follow-up 285: never Lora for a state).
 describe("StateScreen", () => {
-  it("draws the glyph on a disc, a Lora 24 title, and a note in a white card", async () => {
+  it("draws the glyph on a disc, a titulo-fila title, and a cuerpo note in a white card", async () => {
     const screen = await render(
       <StateScreen
         icon="calendar"
@@ -35,14 +38,13 @@ describe("StateScreen", () => {
     expect(glyph).toHaveProp("stroke", "#93615D");
     expect(glyph).toHaveProp("width", 28);
     expect(screen.getByText("Aún no tienes reservas")).toHaveStyle({
+      ...textVariants["titulo-fila"],
       color: "#93615D",
-      fontFamily: "Lora_400Regular",
-      fontSize: 24,
       textAlign: "center",
     });
     expect(screen.getByText("Cuando reserves una clase, aparecerá aquí.")).toHaveStyle({
+      ...textVariants.cuerpo,
       color: "#93615D",
-      fontSize: 15,
       textAlign: "center",
     });
     expect(screen.getByText("Aún no tienes reservas")).toHaveProp("accessibilityRole", "header");
@@ -68,7 +70,7 @@ describe("StateScreen", () => {
         textAction={{ label: "Ver mis pagos", onPress: book }}
         title="Tu pago está en revisión"
       >
-        <Text>Detalles</Text>
+        <Text variant="cuerpo">Detalles</Text>
       </StateScreen>,
     );
 

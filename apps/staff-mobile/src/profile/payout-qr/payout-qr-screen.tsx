@@ -1,9 +1,7 @@
 import { getGetOwnPayoutQrQueryKey, useGetOwnPayoutQr } from "@pilates/api-contracts";
 import {
-  BodyText,
   BrandToast,
   colors,
-  fontFamilies,
   Glyph,
   LoadingState,
   OutlinedButton,
@@ -13,13 +11,13 @@ import {
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
   useRefetchOnFocus,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../../staff-fetcher";
 import { BackBar } from "../../ui/back-bar";
@@ -74,36 +72,34 @@ export function PayoutQrScreen() {
       <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
         {/* E-M08: the explanation sits in a white card, the warning on a soft 50 aside. */}
         <View style={styles.intro}>
-          <BodyText style={styles.introText}>
+          <Text variant="cuerpo">
             Administración lo usa para pagarte tu sueldo. Los QR del banco vencen: cuando subas uno
             nuevo, dinos hasta cuándo vale y te avisamos antes de que venza.
-          </BodyText>
+          </Text>
         </View>
         {banner === null ? null : (
           <View style={[styles.banner, banner.tone === "error" ? styles.bad : styles.warn]}>
             <Glyph
-              color={banner.tone === "error" ? colors.error : colors.warningText}
+              color={colors.text}
               name={banner.tone === "error" ? "alert" : "clock"}
               size={20}
               strokeWidth={1.6}
             />
-            <Text
-              style={[
-                styles.bannerText,
-                banner.tone === "error" ? styles.badText : styles.warnText,
-              ]}
-            >
+            <Text style={styles.bannerText} variant="cuerpo">
               {banner.text}
             </Text>
           </View>
         )}
         {qr === null ? (
+          // Board E-M10: the white dashed box, its line in `titulo-fila`, its note in `cuerpo`.
           <View style={styles.empty}>
             <Glyph color={colors.primary} name="image" size={40} strokeWidth={1.4} />
-            <Text style={styles.emptyTitle}>Todavía no subiste tu QR de cobro</Text>
-            <BodyText style={styles.center}>
+            <Text style={styles.center} variant="titulo-fila">
+              Todavía no subiste tu QR de cobro
+            </Text>
+            <Text style={styles.center} variant="cuerpo">
               Una foto o captura del QR de tu banco para recibir pagos.
-            </BodyText>
+            </Text>
           </View>
         ) : (
           <PayoutQrCard qr={qr} />
@@ -138,7 +134,6 @@ export function PayoutQrScreen() {
 
 const styles = StyleSheet.create({
   bad: { backgroundColor: colors.errorSurface },
-  badText: { color: colors.error },
   banner: {
     alignItems: "flex-start",
     borderColor: colors.borderSoft,
@@ -149,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  bannerText: { flex: 1, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  bannerText: { flex: 1 },
   center: { textAlign: "center" },
   // E-M10: a white box with the 400 dashed outline.
   empty: {
@@ -163,16 +158,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingVertical: 28,
   },
-  emptyTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    lineHeight: 27,
-    textAlign: "center",
-  },
   intro: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  introText: { fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   screen: { paddingHorizontal: spacing.xlSm },
   warn: { backgroundColor: colors.warningTint },
-  warnText: { color: colors.warningText },
 });

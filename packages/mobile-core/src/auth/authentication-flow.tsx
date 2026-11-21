@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { BackHandler } from "react-native";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
-import { BodyText } from "../ui/body-text";
+import { Text } from "../ui/text";
 import { PrimaryButton } from "../ui/primary-button";
 import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
@@ -116,13 +116,13 @@ function VerifyEmailScreen({
             : "Enlace no válido"
       }
     >
-      <BodyText>
+      <Text variant="cuerpo">
         {status === "loading"
           ? "Estamos verificando tu enlace."
           : status === "verified"
             ? "Tu cuenta está lista. Ahora puedes iniciar sesión."
             : "Este enlace venció o ya fue utilizado."}
-      </BodyText>
+      </Text>
     </AuthenticationScreen>
   );
 }

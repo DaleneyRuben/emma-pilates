@@ -10,8 +10,8 @@ export type PayGroupKey = LineKind | "other";
 export type PayGroup = {
   key: PayGroupKey;
   label: string;
-  /** Its share of the proportions bar and the dot on its row. */
-  color: string;
+  /** The ground of its share of the proportions bar and of the dot on its row. */
+  fill: string;
   lines: PayStatementLineDto[];
   centavos: number;
   /** The row's quiet line: «54 × Bs 25», «2 clientas nuevas». */
@@ -20,13 +20,13 @@ export type PayGroup = {
 
 // S29: the statement sums by concept in this order. E2 B names the Trainer's
 // commission by what it pays for.
-const concepts: { kind: LineKind; label: string; color: string }[] = [
-  { kind: "class", label: "Clases dictadas", color: colors.medio },
-  { kind: "minimum_not_met", label: "Canceladas por mínimo", color: colors.border },
-  { kind: "commission", label: "Comisiones de primer plan", color: colors.primary },
-  { kind: "base", label: "Base", color: colors.primaryTint },
-  { kind: "new_client", label: "Clientas nuevas", color: colors.primary },
-  { kind: "bonus", label: "Bono", color: colors.emphasis },
+const concepts: { kind: LineKind; label: string; fill: string }[] = [
+  { kind: "class", label: "Clases dictadas", fill: colors.medio },
+  { kind: "minimum_not_met", label: "Canceladas por mínimo", fill: colors.border },
+  { kind: "commission", label: "Comisiones de primer plan", fill: colors.primary },
+  { kind: "base", label: "Base", fill: colors.primaryTint },
+  { kind: "new_client", label: "Clientas nuevas", fill: colors.primary },
+  { kind: "bonus", label: "Bono", fill: colors.emphasis },
 ];
 
 const known = new Set<string>(concepts.map((concept) => concept.kind));
@@ -60,24 +60,24 @@ function noteOf(key: PayGroupKey, label: string, lines: PayStatementLineDto[]): 
 /** E2 B: the statement's lines by concept, only the concepts it has. */
 export function payGroups(lines: PayStatementLineDto[]): PayGroup[] {
   const groups = [
-    ...concepts.map(({ kind, label, color }) => ({
+    ...concepts.map(({ kind, label, fill }) => ({
       key: kind as PayGroupKey,
       label,
-      color,
+      fill,
       lines: lines.filter((line) => line.kind === kind),
     })),
     // A kind a newer API adds still counts, so the rows add up to the total.
     {
       key: "other" as const,
       label: "Otros",
-      color: colors.iconQuiet,
+      fill: colors.iconQuiet,
       lines: lines.filter((line) => !known.has(line.kind)),
     },
   ];
-  return groups.flatMap(({ key, label, color, lines: matching }) => {
+  return groups.flatMap(({ key, label, fill, lines: matching }) => {
     if (matching.length === 0) return [];
     const centavos = matching.reduce((total, line) => total + line.amountCentavos, 0);
-    return [{ key, label, color, lines: matching, centavos, note: noteOf(key, label, matching) }];
+    return [{ key, label, fill, lines: matching, centavos, note: noteOf(key, label, matching) }];
   });
 }
 

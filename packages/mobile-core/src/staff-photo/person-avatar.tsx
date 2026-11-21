@@ -1,8 +1,11 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 import { initials } from "../account/initials";
-import { fontFamilies } from "../ui/fonts";
+import { Text } from "../ui/text";
 import { colors } from "../ui/tokens";
+
+/** From this diameter the initials are `destacado`; below it `pastilla`. */
+const largeDisc = 44;
 
 /**
  * FIX-041 (follow-ups 240–242): a person's circle, her photo centre-cropped
@@ -33,9 +36,11 @@ export function PersonAvatar({
   }
   return (
     <View style={[styles.initials, frame]}>
+      {/* A fixed disc: the initials never scale out of it (follow-up 285). */}
       <Text
         allowFontScaling={false}
-        style={[styles.initialsText, { fontSize: Math.max(9, Math.round(size * 0.36)) }]}
+        tone="onDark"
+        variant={size >= largeDisc ? "destacado" : "pastilla"}
       >
         {initials(name)}
       </Text>
@@ -48,11 +53,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.emphasis,
     justifyContent: "center",
-  },
-  initialsText: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "700",
   },
   photo: { backgroundColor: colors.emphasis },
 });

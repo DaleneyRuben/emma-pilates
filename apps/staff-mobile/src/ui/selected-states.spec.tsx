@@ -14,9 +14,14 @@ const noop = () => undefined;
 
 type Element = ReturnType<Awaited<ReturnType<typeof render>>["getByText"]>;
 
+// Follow-up 285 rule 4: the chosen one changes ground and tone, never weight.
 function expectSelected(box: Element, label: Element) {
   expect(box).toHaveStyle({ backgroundColor: rosaProfundo });
-  expect(label).toHaveStyle({ color: crema, fontFamily: "WorkSans_700Bold" });
+  expect(label).toHaveStyle({ color: crema });
+}
+
+function fontFamilyOf(label: Element): unknown {
+  return Object.assign({}, ...[label.props.style].flat(Infinity).filter(Boolean)).fontFamily;
 }
 
 function expectUnselected(box: Element) {
@@ -97,11 +102,12 @@ describe("Staff selected states", () => {
     );
 
     expectSelected(screen.getByTestId("day-2026-10-08"), screen.getByText("Hoy"));
-    expect(screen.getByText("8")).toHaveStyle({ color: crema });
+    expect(screen.getByText("8")).toHaveStyle({ color: crema, fontFamily: "Lora_500Medium" });
     expectUnselected(screen.getByTestId("day-2026-10-09"));
     expectUnselected(screen.getByTestId("other"));
     // No 11 pt hint text.
     expect(screen.getByText("vie")).toHaveStyle({ fontSize: 12 });
+    expect(fontFamilyOf(screen.getByText("vie"))).toBe(fontFamilyOf(screen.getByText("Hoy")));
   });
 
   it("draws the availability pills and date tiles the same way", async () => {
@@ -122,7 +128,7 @@ describe("Staff selected states", () => {
     expectSelected(screen.getByRole("button", { name: "Lun" }), screen.getByText("Lun"));
     expectUnselected(screen.getByRole("button", { name: "Mar" }));
     expectUnselected(screen.getByRole("button", { name: "Viernes 9" }));
-    expect(screen.getByText("Mar")).toHaveStyle({ fontFamily: "WorkSans_500Medium" });
+    expect(fontFamilyOf(screen.getByText("Mar"))).toBe(fontFamilyOf(screen.getByText("Lun")));
   });
 
   it("draws the chosen unit tile the same way", async () => {

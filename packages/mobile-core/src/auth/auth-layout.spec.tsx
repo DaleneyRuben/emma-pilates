@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react-native";
-import { Text } from "react-native";
+import { Text } from "../ui/text";
 
 import { AuthenticationScreen } from "./auth-layout";
 
@@ -10,12 +10,13 @@ describe("AuthenticationScreen", () => {
   it("draws a client outcome on the band and its text in a white card", async () => {
     const screen = await render(
       <AuthenticationScreen
-        actions={<Text>Iniciar sesión</Text>}
+        // A client's actions stand on 100: a large variant for this stand-in.
+        actions={<Text variant="destacado">Iniciar sesión</Text>}
         badge={{ icon: "mail", tone: "primary" }}
         brand={false}
         title="Revisa tu correo"
       >
-        <Text>Te enviamos un enlace</Text>
+        <Text variant="cuerpo">Te enviamos un enlace</Text>
       </AuthenticationScreen>,
     );
 
@@ -31,12 +32,12 @@ describe("AuthenticationScreen", () => {
   it("draws a staff outcome and its actions inside the card", async () => {
     const screen = await render(
       <AuthenticationScreen
-        actions={<Text>Ir a iniciar sesión</Text>}
+        actions={<Text variant="enlace">Ir a iniciar sesión</Text>}
         badge={{ icon: "check", tone: "success" }}
         staff
         title="Tu cuenta está activa"
       >
-        <Text>Tu correo quedó verificado.</Text>
+        <Text variant="cuerpo">Tu correo quedó verificado.</Text>
       </AuthenticationScreen>,
     );
 
@@ -49,13 +50,16 @@ describe("AuthenticationScreen", () => {
   it("keeps a form screen's title in its card", async () => {
     const screen = await render(
       <AuthenticationScreen title="Crea tu contraseña">
-        <Text>Elige una contraseña</Text>
+        <Text variant="cuerpo">Elige una contraseña</Text>
       </AuthenticationScreen>,
     );
 
     expect(screen.getByTestId("authentication-panel")).toContainElement(
       screen.getByText("Crea tu contraseña"),
     );
-    expect(screen.getByText("Crea tu contraseña")).toHaveStyle({ fontSize: 26 });
+    expect(screen.getByText("Crea tu contraseña")).toHaveStyle({
+      fontFamily: "Lora_500Medium",
+      fontSize: 30,
+    });
   });
 });

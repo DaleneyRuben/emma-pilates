@@ -2,7 +2,6 @@ import { useGetAssistantClientOverview, formatDateTime } from "@pilates/api-cont
 import {
   ClientFace,
   colors,
-  fontFamilies,
   isCompletePhone,
   LoadingState,
   PrimaryButton,
@@ -11,17 +10,17 @@ import {
   Screen,
   ScreenHeader,
   spacing,
-  typography,
+  Text,
+  OutlinedButton,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { ClientContactPanel } from "../coordinator/client-contact-panel";
 import { useStaffFetcher } from "../staff-fetcher";
 import { bodyScroll } from "../ui/card-pieces";
 import { useStaffRole } from "../staff-role";
 import { BackBar } from "../ui/back-bar";
-import { OutlineButton } from "../ui/outline-button";
 import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { useInClientPanel } from "./assistant-workspace";
 import { canBookFor } from "./bookable-classes";
@@ -127,17 +126,21 @@ export function ClientOverviewScreen({
         <View style={styles.identity}>
           <ClientFace fetcher={fetcher} name={client.name} photo={client.photo} size={56} />
           <View style={styles.identityBody}>
-            <Text accessibilityLabel={client.name} accessibilityRole="header" style={styles.name}>
+            <Text
+              accessibilityLabel={client.name}
+              accessibilityRole="header"
+              variant="titulo-pagina"
+            >
               {client.name}
             </Text>
             <View style={styles.contactBox}>
-              <Text style={styles.contact}>
+              <Text variant="compacto">
                 {isCompletePhone(client.phone) ? (
                   describeContact(client.phone, client.email)
                 ) : (
                   // Walkthrough finding 95: as the admin web's file (finding 74).
                   <>
-                    <Text style={styles.incompletePhone}>Celular incompleto</Text>
+                    <Text variant="compacto">Celular incompleto</Text>
                     {` · ${client.email}`}
                   </>
                 )}
@@ -193,7 +196,7 @@ export function ClientOverviewScreen({
               ) : null}
               {canBuy && canBook ? (
                 <View style={styles.wide}>
-                  <OutlineButton {...cash} />
+                  <OutlinedButton {...cash} />
                 </View>
               ) : null}
               {canBuy && !canBook ? (
@@ -210,7 +213,7 @@ export function ClientOverviewScreen({
               contact={data.contact}
               phone={client.phone ?? null}
             />
-            {canBook ? <OutlineButton {...book} /> : null}
+            {canBook ? <OutlinedButton {...book} /> : null}
           </>
         )}
         <PlainRowGroup testID="client-overview-rows">
@@ -234,7 +237,6 @@ export function ClientOverviewScreen({
 }
 
 const styles = StyleSheet.create({
-  contact: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 19 },
   // Small text never sits on the 200 band: the contact rides on a white
   // capsule, as the band's subtitle does. It is no card, so it casts no
   // shadow; its outline is the capsule's own white.
@@ -250,13 +252,6 @@ const styles = StyleSheet.create({
   gapped: { gap: spacing.md },
   identity: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
   identityBody: { flex: 1, gap: spacing.smd },
-  incompletePhone: { color: colors.text },
-  name: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.price,
-    lineHeight: 29,
-  },
   pair: { flexDirection: "row", gap: spacing.smLg },
   wide: { flex: 1 },
   screen: { paddingHorizontal: spacing.xlSm },

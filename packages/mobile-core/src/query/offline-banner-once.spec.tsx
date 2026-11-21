@@ -1,8 +1,8 @@
 import { act, render } from "@testing-library/react-native";
 import { onlineManager } from "@tanstack/react-query";
-import { Text } from "react-native";
 
 import { MobileQueryProvider } from "./provider";
+import { Text } from "../ui/text";
 
 const banner = "Sin conexión. Mostrando la última información guardada.";
 
@@ -18,7 +18,7 @@ describe("the offline banner", () => {
     const screen = await render(
       <MobileQueryProvider>
         <MobileQueryProvider>
-          <Text>Inicio</Text>
+          <Text variant="cuerpo">Inicio</Text>
         </MobileQueryProvider>
       </MobileQueryProvider>,
     );

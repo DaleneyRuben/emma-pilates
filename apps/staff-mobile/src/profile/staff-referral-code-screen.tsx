@@ -1,22 +1,20 @@
 import { getGetOwnReferralCodeQueryKey, useGetOwnReferralCode } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
   EditReferralCode,
-  fontFamilies,
   LoadingState,
   QueryFailure,
   ReferralCodeCard,
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
   useRefetchOnFocus,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
@@ -72,13 +70,17 @@ export function StaffReferralCodeScreen() {
         <RowCard label="Cómo funciona">
           {steps.map((step, index) => (
             <View key={step} style={styles.row}>
-              <Text style={styles.number}>{String(index + 1)}</Text>
-              <Text style={styles.label}>{step}</Text>
+              <Text style={styles.number} variant="cifra">
+                {String(index + 1)}
+              </Text>
+              <Text style={styles.label} variant="cuerpo">
+                {step}
+              </Text>
             </View>
           ))}
         </RowCard>
         <View style={styles.noteCard}>
-          <Text style={styles.note}>
+          <Text variant="secundario">
             Puedes cambiar tu código una vez cada 30 días. Si lo cambias, el anterior deja de
             funcionar; las clientas que ya se registraron siguen contigo.
           </Text>
@@ -91,12 +93,11 @@ export function StaffReferralCodeScreen() {
 
 const styles = StyleSheet.create({
   edit: { ...surfaces.card, alignItems: "flex-start", paddingHorizontal: spacing.xs },
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: typography.body },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
+  label: { flex: 1 },
   // A quiet line goes in a white card, never on the 100 screen.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  // FIX-089: the step number stands alone in Lora, with no disc behind it.
-  number: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22, width: 24 },
+  // FIX-089: the step number stands alone in `cifra`, with no disc behind it.
+  number: { width: 24 },
   row: {
     alignItems: "center",
     flexDirection: "row",

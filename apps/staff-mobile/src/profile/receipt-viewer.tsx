@@ -2,14 +2,15 @@ import { formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   FullScreenImage,
+  InlineError,
   loadPrivateImageWithRatio,
-  typography,
+  spacing,
+  surfaces,
 } from "@pilates/mobile-core";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -57,9 +58,10 @@ export function useReceiptViewer() {
     setOpen(payment);
   };
   const error = failed ? (
-    <Text accessibilityRole="alert" style={styles.error}>
-      No pudimos mostrar el comprobante.
-    </Text>
+    // It stands between cards on the 100 screen, so it goes in a white card (rule 3).
+    <View style={styles.error}>
+      <InlineError>No pudimos mostrar el comprobante.</InlineError>
+    </View>
   ) : null;
   const viewer = (
     <FullScreenImage
@@ -75,7 +77,7 @@ export function useReceiptViewer() {
 }
 
 const styles = StyleSheet.create({
-  error: { color: colors.errorText, fontFamily: fontFamilies.body, fontSize: typography.note },
+  error: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   image: { borderColor: colors.hairline, borderWidth: 1 },
   pending: { backgroundColor: colors.neutralTint },
 });

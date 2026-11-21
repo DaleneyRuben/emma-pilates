@@ -1,4 +1,4 @@
-import { brand, colors, radii, rosa, shadows, surfaces, typography } from "./tokens";
+import { brand, colors, radii, rosa, shadows, surfaces } from "./tokens";
 
 // Rosa Emma (follow-up 284, owner 2026-11-20): one scale of seven tones plus
 // crema and white. Rosa profundo (600) is the darkest tone: no greys, no inks.
@@ -95,10 +95,5 @@ describe("Rosa Emma surfaces", () => {
       borderRadius: 24,
       boxShadow: "0 10px 28px rgba(147,97,93,0.30)",
     });
-  });
-
-  it("names the Lora section size", () => {
-    expect(typography.section).toBe(24);
-    expect(typography.titleSmall).toBe(19);
   });
 });

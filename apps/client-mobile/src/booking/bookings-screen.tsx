@@ -10,13 +10,12 @@ import {
   type UpcomingBookingDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   BrandToast,
   colors,
   ConfirmationSheet,
-  fontFamilies,
   Glyph,
+  InlineError,
   LoadingState,
   QueryFailure,
   Screen,
@@ -194,9 +193,7 @@ export function BookingsScreen({
         // C05i: the refusal on a soft notice with the alert glyph.
         <View style={styles.failureBox} testID="bookings-failure">
           <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.5} />
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {failure}
-          </BodyText>
+          <InlineError style={styles.failure}>{failure}</InlineError>
         </View>
       ) : null}
       {tab === "history" ? (
@@ -305,13 +302,7 @@ export function BookingsScreen({
 
 const styles = StyleSheet.create({
   empty: { flexGrow: 1, paddingBottom: spacing.xxl },
-  failure: {
-    color: colors.errorText,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  failure: { flex: 1 },
   failureBox: {
     ...surfaces.soft,
     alignItems: "flex-start",

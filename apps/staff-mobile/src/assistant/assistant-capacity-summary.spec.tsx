@@ -35,12 +35,12 @@ describe("Assistant Session detail capacity summary", () => {
   }
 
   // E-R03: the class is the screen's 600 hero, radius 24, the free seats in
-  // Lora 40 over a bar.
+  // `cifra-grande` (follow-up 285) over a bar.
   it("puts the free seats on the 600 hero with its progress bar", async () => {
     const { box, screen, summary } = await openDetail(sessionDetail);
 
     expect(box).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 24 });
-    expect(summary.getByText("6")).toHaveStyle({ fontSize: 40 });
+    expect(summary.getByText("6")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 34 });
     expect(summary.getByText("lugares libres de 12")).toBeOnTheScreen();
     expect(summary.getByTestId("capacity-bar")).toBeOnTheScreen();
     expect(

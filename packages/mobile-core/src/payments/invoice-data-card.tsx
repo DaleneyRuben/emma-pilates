@@ -1,9 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 
 /** The tax identity on a sale's invoice (booking glossary «Invoice Data»). */
 export type InvoiceData = { taxId: string; name: string };
@@ -68,7 +67,9 @@ function ChoicePill({
       onPress={onPress}
       style={[styles.pill, selected && styles.pillSelected]}
     >
-      <Text style={[styles.pillLabel, selected && styles.pillLabelSelected]}>{label}</Text>
+      <Text tone={selected ? "onDark" : "ink"} variant="compacto">
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -94,7 +95,7 @@ export function InvoiceDataCard({
 }) {
   return (
     <View style={[raised ? styles.raised : styles.card]} testID="invoice-data-card">
-      <Text style={styles.title}>Datos para la factura</Text>
+      <Text variant="titulo-fila">Datos para la factura</Text>
       <View style={styles.pills}>
         <ChoicePill
           label="Con factura"
@@ -110,7 +111,7 @@ export function InvoiceDataCard({
       {value.wantsInvoice ? (
         <InvoiceDataFields onChange={onChange} prefilledNote={prefilledNote} value={value} />
       ) : (
-        <BodyText style={styles.note}>{noInvoiceNote}</BodyText>
+        <Text variant="secundario">{noInvoiceNote}</Text>
       )}
     </View>
   );
@@ -151,7 +152,7 @@ export function InvoiceDataFields({
         testID="invoice-name"
         value={value.name}
       />
-      {value.prefilled ? <BodyText style={styles.note}>{prefilledNote}</BodyText> : null}
+      {value.prefilled ? <Text variant="secundario">{prefilledNote}</Text> : null}
     </View>
   );
 }
@@ -159,7 +160,6 @@ export function InvoiceDataFields({
 const styles = StyleSheet.create({
   card: { ...surfaces.flatCard, gap: spacing.mdLg, padding: spacing.xlSm },
   fields: { gap: spacing.md },
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pill: {
     alignItems: "center",
     borderColor: colors.borderStrong,
@@ -169,14 +169,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.lg,
   },
-  pillLabel: { color: colors.textSecondary, fontFamily: fontFamilies.body, fontSize: 14 },
-  pillLabelSelected: { color: colors.white },
   pillSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   pills: { flexDirection: "row", gap: spacing.sm },
   raised: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 16,
-  },
 });

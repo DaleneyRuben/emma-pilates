@@ -8,13 +8,14 @@ let mockFlowFails = false;
 
 jest.mock("./trainer/trainer-agenda-screen", () => {
   const { createElement } = require("react");
-  const { Text } = require("react-native");
+  const { Text } =
+    jest.requireActual<typeof import("@pilates/mobile-core")>("@pilates/mobile-core");
   return {
     TrainerAgendaScreen: () => {
       if (mockAgendaFails) {
         throw new Error("mob-053 probe");
       }
-      return createElement(Text, null, "Agenda recuperada");
+      return createElement(Text, { variant: "cuerpo" }, "Agenda recuperada");
     },
   };
 });

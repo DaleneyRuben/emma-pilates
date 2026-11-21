@@ -4,15 +4,7 @@ import {
   setCurrentClientPhoto,
   type ClientProfileDto,
 } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  spacing,
-  surfaces,
-  TextButton,
-  typography,
-} from "@pilates/mobile-core";
+import { InlineError, spacing, surfaces, Text, TextButton } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -84,9 +76,9 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
     <View style={styles.section}>
       <ClientAvatar name={client.name} photoUri={shownUri} size={96} />
       {state.status === "uploading" ? (
-        <BodyText accessibilityLabel="Subiendo foto" style={styles.note}>
+        <Text accessibilityLabel="Subiendo foto" style={styles.centered} variant="secundario">
           Subiendo foto…
-        </BodyText>
+        </Text>
       ) : (
         <View style={styles.actions}>
           <TextButton
@@ -106,9 +98,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
         </View>
       )}
       {state.status === "failed" ? (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          {state.message}
-        </BodyText>
+        <InlineError style={styles.centered}>{state.message}</InlineError>
       ) : null}
     </View>
   );
@@ -116,13 +106,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
 
 const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: spacing.xlSm },
-  error: { color: colors.errorText, textAlign: "center" },
-  note: {
-    color: colors.textMuted,
-    fontSize: typography.note,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
+  centered: { textAlign: "center" },
   link: { paddingHorizontal: 0 },
   // C22: the photo and its links on their own white card.
   section: { ...surfaces.card, alignItems: "center", gap: spacing.smLg, padding: spacing.lgXl },

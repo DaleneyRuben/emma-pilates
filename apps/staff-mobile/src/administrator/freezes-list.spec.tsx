@@ -62,7 +62,7 @@ describe("freezes list", () => {
     ).toMatchObject({ fontSize: 30 });
     // Walkthrough finding 94: BackBar's quiet line, as on the headed screens.
     expect(StyleSheet.flatten(screen.getByText(explanation).props.style)).toMatchObject({
-      fontSize: 14,
+      fontSize: 15,
     });
   });
 

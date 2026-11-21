@@ -7,7 +7,9 @@ import {
   TabBarButton,
   tabBarHidden,
   tabBarStyle,
+  tabBarItemStyle,
   tabBarTints,
+  TabLabel,
   type MobileNavigationProps,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
@@ -23,7 +25,6 @@ import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
 import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
-import { ClientTabLabel } from "./client-tab-label";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { InvoiceDetailScreen } from "./invoices/invoice-detail-screen";
@@ -154,10 +155,9 @@ const tabOptions =
       tabBarAccessibilityLabel: `${title}, tab, ${position} of ${tabCount}`,
       tabBarButtonTestID: `tab-${icon}`,
       tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
-      tabBarLabel: ({ color, focused }: { color: string; focused: boolean }) => (
-        <ClientTabLabel color={color} focused={focused}>
-          {title}
-        </ClientTabLabel>
+      // The open tab's label is white on its 600 pill, in the same weight.
+      tabBarLabel: ({ focused }: { focused: boolean }) => (
+        <TabLabel focused={focused}>{title}</TabLabel>
       ),
       tabBarStyle: hidden ? { display: "none" as const } : tabBarStyle,
       title,
@@ -182,6 +182,7 @@ const ClientTabs = createBottomTabNavigator({
     // Rosa Emma: the open tab is a 600 pill with white icon and label.
     ...tabBarTints,
     tabBarButton: TabBarButton,
+    tabBarItemStyle,
     tabBarLabelPosition: "below-icon",
   },
   screens: {

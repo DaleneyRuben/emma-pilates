@@ -1,13 +1,6 @@
 import type { ClientSubscriptionDto, PlanDto } from "@pilates/api-contracts";
-import {
-  colors,
-  EmphasisCard,
-  fontFamilies,
-  radii,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, EmphasisCard, radii, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { formatBolivianos } from "./plan-format";
 
@@ -50,9 +43,13 @@ export function PlanRenewalHero({ plan, onRenew }: { plan: PlanDto; onRenew: () 
       title={plan.name}
     >
       <View style={styles.prices}>
-        <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
+        <Text tone="onDark" variant="cifra-grande">
+          {formatBolivianos(plan.priceCentavos)}
+        </Text>
         {plan.listPriceCentavos === undefined ? null : (
-          <Text style={styles.listPrice}>{formatBolivianos(plan.listPriceCentavos)}</Text>
+          <Text strike tone="onDark" variant="secundario">
+            {formatBolivianos(plan.listPriceCentavos)}
+          </Text>
         )}
       </View>
       <Pressable
@@ -62,7 +59,7 @@ export function PlanRenewalHero({ plan, onRenew }: { plan: PlanDto; onRenew: () 
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
         testID={`plan-renew-${plan.id}`}
       >
-        <Text style={styles.buttonLabel}>Renovar este plan</Text>
+        <Text variant="boton">Renovar este plan</Text>
       </Pressable>
     </EmphasisCard>
   );
@@ -76,24 +73,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 48,
   },
-  buttonLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
-  listPrice: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    textDecorationLine: "line-through",
-  },
   pressed: { opacity: 0.85 },
-  price: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 32,
-    fontVariant: ["tabular-nums"],
-  },
   prices: { alignItems: "baseline", flexDirection: "row", gap: spacing.smLg },
 });

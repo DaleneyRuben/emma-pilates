@@ -1,8 +1,9 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { useQuery } from "@tanstack/react-query";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 
 import { clearMobileQueryCache, MobileQueryProvider } from "./provider";
+import { Text } from "../ui/text";
 
 const banner = "Sin conexión. Mostrando la última información guardada.";
 
@@ -16,7 +17,7 @@ function Screen({
   const query = useQuery({ queryFn: load, queryKey: [name] });
   return (
     <Pressable accessibilityRole="button" onPress={() => void query.refetch()}>
-      <Text>{query.data ?? "Cargando"}</Text>
+      <Text variant="cuerpo">{query.data ?? "Cargando"}</Text>
     </Pressable>
   );
 }

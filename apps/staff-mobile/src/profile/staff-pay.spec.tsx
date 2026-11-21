@@ -32,7 +32,7 @@ describe("Staff Mis pagos", () => {
 
     const summary = within(await waitFor(() => screen.getByTestId("pay-summary")));
     expect(summary.getByText("En curso · Noviembre 2026")).toBeOnTheScreen();
-    expect(summary.getByText("Bs 65")).toHaveStyle({ fontSize: 36 });
+    expect(summary.getByText("Bs 65")).toHaveStyle({ fontSize: 34 });
     expect(
       summary.getByText(
         "1 clase dictada hasta hoy · puede cambiar hasta que administración lo apruebe.",
@@ -133,7 +133,7 @@ describe("Staff Mis pagos", () => {
     expect(detail.getByText("Octubre 2026")).toBeOnTheScreen();
     // E2 B: the state is a line in the Palo de rosa block, never a pill.
     const total = within(detail.getByTestId("pay-statement-total"));
-    expect(total.getByText("Bs 322")).toHaveStyle({ fontSize: 36 });
+    expect(total.getByText("Bs 322")).toHaveStyle({ fontSize: 34 });
     expect(total.getByText("Aprobada · pagada el dom 1 nov").parent).not.toHaveStyle({
       borderRadius: 999,
     });

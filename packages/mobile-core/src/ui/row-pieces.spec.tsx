@@ -1,48 +1,17 @@
 import { render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { AvatarCircle } from "./avatar-circle";
 import { CardFooter } from "./card-footer";
-import { DetailLine } from "./detail-line";
-
-const hidden = { includeHiddenElements: true };
+import { textVariants } from "./type-scale";
+import { Text } from "./text";
 
 // MOB-042: the pieces the frames' tappable cards share.
-describe("DetailLine", () => {
-  it("puts a glyph before a short line of text, 8 pt apart", async () => {
-    const screen = await render(
-      <DetailLine icon="person" iconSize={17} style={{ color: "#93615D", fontSize: 14 }}>
-        Emma Vargas
-      </DetailLine>,
-    );
-
-    const text = screen.getByText("Emma Vargas");
-    expect(text).toHaveStyle({ color: "#93615D", fontSize: 14 });
-    expect(text.parent).toHaveStyle({ alignItems: "center", flexDirection: "row", gap: 8 });
-    const icon = screen.getByTestId("glyph-person", hidden);
-    expect(icon).toHaveProp("width", 17);
-    expect(icon).toHaveProp("stroke", "#93615D");
-  });
-
-  it("takes another icon colour for S11's amber clock", async () => {
-    const screen = await render(
-      <DetailLine icon="clock" iconColor="#93615D" iconSize={15}>
-        Hace 20 minutos
-      </DetailLine>,
-    );
-
-    const icon = screen.getByTestId("glyph-clock", hidden);
-    expect(icon).toHaveProp("stroke", "#93615D");
-    expect(icon).toHaveProp("width", 15);
-  });
-});
-
 describe("CardFooter", () => {
   it("draws a row under a Regla rule, 12 pt below it by default", async () => {
     const screen = await render(
       <CardFooter>
-        <Text>left</Text>
-        <Text>right</Text>
+        <Text variant="cuerpo">left</Text>
+        <Text variant="cuerpo">right</Text>
       </CardFooter>,
     );
 
@@ -60,7 +29,7 @@ describe("CardFooter", () => {
   it("takes the 13 pt the S02, S11, and S13 frames draw", async () => {
     const screen = await render(
       <CardFooter paddingTop={13}>
-        <Text>left</Text>
+        <Text variant="cuerpo">left</Text>
       </CardFooter>,
     );
 
@@ -69,16 +38,26 @@ describe("CardFooter", () => {
 });
 
 describe("AvatarCircle", () => {
-  it("draws the first letter on the Rubor wash", async () => {
-    const screen = await render(<AvatarCircle fontSize={16} name="valeria áñez" size={42} />);
+  it("draws the first letter on the 50 wash, pastilla under 44 pt", async () => {
+    const screen = await render(<AvatarCircle name="valeria áñez" size={42} />);
 
     const letter = screen.getByText("V");
-    expect(letter).toHaveStyle({ color: "#93615D", fontFamily: "Lora_400Regular", fontSize: 16 });
+    expect(letter).toHaveStyle({ ...textVariants.pastilla, color: "#93615D" });
+    // The disc is fixed, so its letter never grows with the phone's text size.
+    expect(letter).toHaveProp("allowFontScaling", false);
     expect(screen.getByTestId("avatar-circle")).toHaveStyle({
       backgroundColor: "#FEF6F2",
       borderRadius: 21,
       height: 42,
       width: 42,
     });
+  });
+});
+
+describe("AvatarCircle at 44 pt and over", () => {
+  it("draws the letter in destacado", async () => {
+    const screen = await render(<AvatarCircle name="Lucía" size={56} />);
+
+    expect(screen.getByText("L")).toHaveStyle(textVariants.destacado);
   });
 });

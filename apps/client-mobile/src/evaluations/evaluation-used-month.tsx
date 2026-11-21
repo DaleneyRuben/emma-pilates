@@ -1,13 +1,6 @@
 import type { EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { spacing, surfaces, Text } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 import { evaluationDayAndTime, followingMonth, monthName, monthPhrase } from "./evaluation-format";
 
@@ -29,20 +22,18 @@ export function UsedMonth({ availability }: { availability: EvaluationAvailabili
 
   return (
     <View style={usedMonthStyles.used}>
-      <Text style={usedMonthStyles.usedTitle}>
+      <Text variant="titulo-fila">
         {`Ya usaste tu evaluación de ${usedMonth === undefined ? "este mes" : monthPhrase(usedMonth.month)}.`}
       </Text>
       {next !== null ? (
-        <BodyText style={usedMonthStyles.note}>
+        <Text variant="cuerpo">
           {`Podrás agendar la de ${monthName(next)} desde el 1 de ${monthName(next)}.`}
-        </BodyText>
+        </Text>
       ) : null}
       {last ? (
         <View style={usedMonthStyles.lastCard}>
-          <Text style={usedMonthStyles.label}>Tu última evaluación</Text>
-          <BodyText style={usedMonthStyles.lastWhen}>
-            {evaluationDayAndTime(last.startsAt)}
-          </BodyText>
+          <Text variant="etiqueta">Tu última evaluación</Text>
+          <Text variant="titulo-fila">{evaluationDayAndTime(last.startsAt)}</Text>
         </View>
       ) : null}
     </View>
@@ -50,15 +41,6 @@ export function UsedMonth({ availability }: { availability: EvaluationAvailabili
 }
 
 export const usedMonthStyles = StyleSheet.create({
-  // An 11 pt uppercase label inside a white card or a soft inset.
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
   // C13u: the last Evaluation on a soft 50 inset inside the white card.
   lastCard: {
     ...surfaces.soft,
@@ -66,19 +48,6 @@ export const usedMonthStyles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  lastWhen: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  // Rosa Emma (C13n, C13u): a white card with a Lora title.
+  // Rosa Emma (C13n, C13u): a white card whose first line is a row title.
   used: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lgXl },
-  usedTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 27,
-  },
 });

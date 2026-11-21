@@ -1,26 +1,28 @@
-import { colors, fontFamilies, spacing } from "@pilates/mobile-core";
+import { spacing, Text } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-/** A label and its value on one Lino row (v2 S10, S14, S25 summaries). */
+/**
+ * A label and its value on one Lino row (v2 S10, S14, S25 summaries): the key
+ * in `cuerpo`, the value in `titulo-fila`. `strong` is the total: its key in
+ * `titulo-fila`, its amount in `cifra`.
+ */
 export function ValueRow({
   label,
   strong = false,
-  tone,
   value,
 }: {
   label: string;
   strong?: boolean;
-  tone?: "emphasis";
   value: ReactNode;
 }) {
   return (
     <View style={styles.row}>
-      <Text style={[styles.label, strong && styles.strongLabel]}>{label}</Text>
+      <Text style={styles.label} variant={strong ? "titulo-fila" : "cuerpo"}>
+        {label}
+      </Text>
       {typeof value === "string" ? (
-        <Text
-          style={[styles.value, strong && styles.strongValue, tone === "emphasis" && styles.tint]}
-        >
+        <Text style={styles.value} variant={strong ? "cifra" : "titulo-fila"}>
           {value}
         </Text>
       ) : (
@@ -31,7 +33,7 @@ export function ValueRow({
 }
 
 const styles = StyleSheet.create({
-  label: { color: colors.textMuted, flexShrink: 1, fontFamily: fontFamilies.body, fontSize: 15 },
+  label: { flexShrink: 1 },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -41,15 +43,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  strongLabel: { color: colors.text, fontFamily: fontFamilies.bodyMedium },
-  strongValue: { fontFamily: fontFamilies.display, fontSize: 22 },
-  tint: { color: colors.primaryOnTint },
-  value: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 15,
-    fontWeight: "700",
-    fontVariant: ["tabular-nums"],
-    textAlign: "right",
-  },
+  value: { textAlign: "right" },
 });

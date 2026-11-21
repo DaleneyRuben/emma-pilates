@@ -1,15 +1,7 @@
 import type { ReferredClientDto } from "@pilates/api-contracts";
-import {
-  colors,
-  fontFamilies,
-  PersonAvatar,
-  SectionTitle,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, PersonAvatar, SectionTitle, spacing, surfaces, Text } from "@pilates/mobile-core";
 import { Fragment } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // BKM-014's invitation statuses. The API says the class was booked, not taken.
 const invitationStatus = {
@@ -35,12 +27,12 @@ export function HowItWorks() {
       <View style={styles.card} testID="referral-how-it-works">
         <View style={styles.steps}>
           {steps.map((step) => (
-            <Text key={step} style={styles.step}>
+            <Text key={step} variant="cuerpo">
               {step}
             </Text>
           ))}
         </View>
-        <Text style={styles.limits}>
+        <Text variant="secundario">
           Una amiga por mes. La clase gratis es una sola vez para ella.
         </Text>
       </View>
@@ -57,8 +49,10 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
           {index === 0 ? null : <View style={styles.hairline} />}
           <View style={styles.row}>
             <PersonAvatar name={entry.referredName} photoUri={null} size={36} />
-            <Text style={styles.label}>{entry.referredName}</Text>
-            <Text style={styles.value}>{invitationStatus[entry.invitationStatus]}</Text>
+            <Text style={styles.label} variant="titulo-fila">
+              {entry.referredName}
+            </Text>
+            <Text variant="cuerpo">{invitationStatus[entry.invitationStatus]}</Text>
           </View>
         </Fragment>
       ))}
@@ -70,26 +64,7 @@ const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  limits: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
-  step: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.body,
-    fontWeight: "500",
-    lineHeight: 21,
-  },
+  label: { flex: 1 },
   steps: { gap: spacing.sm },
   row: {
     alignItems: "center",
@@ -99,5 +74,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.smLg,
   },
-  value: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
 });

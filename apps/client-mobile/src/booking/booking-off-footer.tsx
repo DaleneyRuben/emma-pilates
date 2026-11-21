@@ -1,11 +1,4 @@
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  PrimaryButton,
-  TextButton,
-  typography,
-} from "@pilates/mobile-core";
+import { InlineError, PrimaryButton, TextButton } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import type { PaymentStanding } from "../payments/payment-standing";
@@ -50,21 +43,11 @@ export function BookingOffFooter({
           if (!busy) onAction();
         }}
       />
-      {error === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          {error}
-        </BodyText>
-      )}
+      {error === null ? null : <InlineError style={styles.error}>{error}</InlineError>}
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  error: { color: colors.errorText, textAlign: "center" },
-  note: {
-    color: colors.textMuted,
-    fontSize: typography.note,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
+  error: { textAlign: "center" },
 });

@@ -5,21 +5,19 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
   EmptyState,
-  fontFamilies,
   LoadingState,
   NoticeRow,
   PrimaryButton,
   QueryFailure,
   Screen,
   spacing,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { TabFooter } from "../ui/tab-footer";
@@ -189,7 +187,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
         {attendance ? (
           <>
             {missing > 0 && !empty ? (
-              <Text style={styles.missing}>
+              <Text style={styles.missing} variant="secundario">
                 {`Falta marcar a ${countLabel(missing, "clienta", "clientas")}.`}
               </Text>
             ) : null}
@@ -222,12 +220,7 @@ export function TrainerRosterScreen({ route }: { route: { params: { sessionId: s
 
 const styles = StyleSheet.create({
   centered: { alignItems: "center", flex: 1, gap: spacing.lg, justifyContent: "center" },
-  missing: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  missing: { textAlign: "center" },
   // Board I05: the link sits at the footer's start, underlined.
   reportFault: { alignSelf: "flex-start", paddingHorizontal: 0 },
   screen: { paddingHorizontal: spacing.xlSm },

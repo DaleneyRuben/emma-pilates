@@ -1,10 +1,10 @@
 import { onlineManager, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing } from "./tokens";
 
 export function useIsOnline(): boolean {
   const [online, setOnline] = useState(() => onlineManager.isOnline());
@@ -50,7 +50,7 @@ function useApiUnreachable(): boolean {
   return unreachable;
 }
 
-/** The one «Sin conexión» banner, above every screen of both apps. */
+/** The one «Sin conexión» banner, above every screen of both apps: white `cuerpo` on 600. */
 export function OfflineBanner() {
   const online = useIsOnline();
   const unreachable = useApiUnreachable();
@@ -63,7 +63,9 @@ export function OfflineBanner() {
   return (
     <SafeAreaView edges={["top"]} style={styles.area}>
       <View accessibilityRole="alert" style={styles.banner}>
-        <Text style={styles.text}>Sin conexión. Mostrando la última información guardada.</Text>
+        <Text style={styles.text} tone="onDark" variant="cuerpo">
+          Sin conexión. Mostrando la última información guardada.
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -76,10 +78,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  text: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-    fontWeight: "500",
-  },
+  text: { textAlign: "center" },
 });

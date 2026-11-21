@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
 import { PrimaryButton } from "./primary-button";
-import { colors, spacing, surfaces, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing, surfaces } from "./tokens";
 
 type QueryFailureProps = {
   label: string;
@@ -12,8 +12,8 @@ type QueryFailureProps = {
 
 /**
  * A screen's load failure (Rosa Emma E-A13, C02i): a white card at the top of
- * the space under the header, the alert on a 50 disc, the sentence in Lora
- * and «Reintentar».
+ * the space under the header, the alert on a 50 disc, the sentence in
+ * `cuerpo`, centred (never Lora: follow-up 285), and «Reintentar».
  */
 export function QueryFailure({ label, onRetry }: QueryFailureProps) {
   return (
@@ -22,7 +22,7 @@ export function QueryFailure({ label, onRetry }: QueryFailureProps) {
         <View style={styles.disc}>
           <Glyph color={colors.text} name="alert" size={28} strokeWidth={1.6} />
         </View>
-        <Text accessibilityRole="alert" style={styles.label}>
+        <Text accessibilityRole="alert" style={styles.label} variant="cuerpo">
           {label}
         </Text>
         <View style={styles.action}>
@@ -53,11 +53,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 64,
   },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 29,
-    textAlign: "center",
-  },
+  label: { textAlign: "center" },
 });

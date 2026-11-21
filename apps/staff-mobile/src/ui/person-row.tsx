@@ -1,19 +1,11 @@
-import {
-  Chevron,
-  chipStyles,
-  colors,
-  fontFamilies,
-  PersonAvatar,
-  radii,
-  spacing,
-} from "@pilates/mobile-core";
+import { Chevron, chipStyles, PersonAvatar, radii, spacing, Text } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * A person in a Lino list group: initials on Palo de rosa (or the `face` given, such as a
  * Client's `ClientFace`, finding n.º 30), the name over one quiet line, an
- * optional trailing value (an amount in Lora 18, a pill) and a chevron when it
+ * optional trailing value (an amount in `cifra`, a pill) and a chevron when it
  * opens something. Put rows in `IconRowGroup` for the hairline inset 64.
  */
 export function PersonRow({
@@ -37,23 +29,27 @@ export function PersonRow({
   testID?: string;
   trailing?: ReactNode;
 }) {
+  // The open row is 600: its words turn white.
+  const tone = selected ? "onDark" : "ink";
   const content = (
     <>
       {face ?? <PersonAvatar name={name} photoUri={null} size={36} />}
       <View style={styles.body}>
-        <Text style={[styles.name, selected && chipStyles.labelSelected]}>{name}</Text>
+        <Text tone={tone} variant="titulo-fila">
+          {name}
+        </Text>
         {detail === undefined ? null : (
-          <Text
-            ellipsizeMode="tail"
-            numberOfLines={1}
-            style={[styles.detail, selected && styles.onSelected]}
-          >
+          <Text ellipsizeMode="tail" numberOfLines={1} tone={tone} variant="secundario">
             {detail}
           </Text>
         )}
       </View>
       {trailing}
-      {amount === undefined ? null : <Text style={styles.amount}>{amount}</Text>}
+      {amount === undefined ? null : (
+        <Text tone={tone} variant="cifra">
+          {amount}
+        </Text>
+      )}
       {/* The open row needs no way in: its panel already shows it. */}
       {onPress === undefined || selected ? null : (
         <Chevron size={16} strokeWidth={1.5} tone="muted" />
@@ -86,20 +82,7 @@ export function PersonRow({
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 18,
-    fontVariant: ["tabular-nums"],
-  },
   body: { flex: 1 },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  name: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 16,
-    fontWeight: "600",
-  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",
@@ -109,6 +92,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  onSelected: { color: colors.onPrimary },
   selected: { borderRadius: radii.card },
 });

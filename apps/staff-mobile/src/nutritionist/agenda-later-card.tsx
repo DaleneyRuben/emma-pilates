@@ -1,12 +1,12 @@
 import type { NutritionistAgendaEntryDto } from "@pilates/api-contracts";
-import { colors, fontFamilies, spacing, surfaces, TextButton } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { colors, spacing, surfaces, Text, TextButton } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 import { isCancellable, laterAppointmentMeta } from "./agenda-copy";
 import { clockTime } from "./nutritionist-format";
 
 /**
- * A «Después» appointment (E5 B, board N01): the Lora time over its length,
+ * A «Después» appointment (E5 B, board N01): the `cifra` time over its length,
  * the Client over her day, kind and payment, and «Cancelar evaluación» on
  * its own row under a hairline while it can be.
  */
@@ -28,14 +28,14 @@ export function LaterAppointmentCard({
         style={styles.cardBody}
       >
         <View style={styles.timeColumn}>
-          <Text numberOfLines={1} style={styles.time}>
+          <Text numberOfLines={1} variant="cifra">
             {clockTime(entry.startsAt)}
           </Text>
-          <Text style={styles.quiet}>{`${entry.durationMinutes} min`}</Text>
+          <Text variant="secundario">{`${entry.durationMinutes} min`}</Text>
         </View>
         <View style={styles.who}>
-          <Text style={styles.client}>{entry.clientName}</Text>
-          <Text style={styles.quiet}>{laterAppointmentMeta(entry, today)}</Text>
+          <Text variant="titulo-fila">{entry.clientName}</Text>
+          <Text variant="secundario">{laterAppointmentMeta(entry, today)}</Text>
         </View>
       </View>
       {cancellable ? (
@@ -45,7 +45,6 @@ export function LaterAppointmentCard({
             onPress={onCancel}
             style={styles.actionButton}
             testID={`cancel-evaluation-${entry.evaluationId}`}
-            tone="error"
           />
         </View>
       ) : null}
@@ -70,22 +69,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   cardBody: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
-  client: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13 },
-  time: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 22,
-    fontVariant: ["tabular-nums"],
-  },
-  // «07:00» in Lora runs wider than 56 pt on both platforms (more so on
-  // Android): a fixed width wrapped it, so 56 is only the floor.
-  timeColumn: { alignItems: "center", flexShrink: 0, minWidth: 56 },
+  // «07:00» in Lora 24 (`cifra`) runs wider than 56 pt on both platforms:
+  // the boards give the column 64 pt, and that is only the floor.
+  timeColumn: { alignItems: "center", flexShrink: 0, minWidth: 64 },
   who: { flex: 1, gap: spacing.xxs },
   withAction: { paddingBottom: 0 },
 });

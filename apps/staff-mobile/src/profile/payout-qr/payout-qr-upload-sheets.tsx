@@ -1,15 +1,15 @@
 import {
-  BodyText,
   Calendar,
   ConfirmationSheet,
+  InlineError,
   OutlinedButton,
   boliviaCivilDate,
   colors,
   spacing,
-  fontFamilies,
+  Text,
 } from "@pilates/mobile-core";
 import { useMemo, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 import { qrDate, validUntilSpan } from "./payout-qr-dates";
 
@@ -83,7 +83,9 @@ export function PayoutQrDateSheet({
         {photoUri === null ? null : (
           <Image accessibilityIgnoresInvertColors source={{ uri: photoUri }} style={styles.thumb} />
         )}
-        <BodyText>Lo dice tu banco al generar el QR.</BodyText>
+        <Text style={styles.leadText} variant="cuerpo">
+          Lo dice tu banco al generar el QR.
+        </Text>
       </View>
       <Calendar
         firstMonth={span.firstMonth}
@@ -99,20 +101,16 @@ export function PayoutQrDateSheet({
         today={today}
       />
       {picked === null ? null : (
-        <BodyText>{`Vale hasta el ${qrDate(picked)}. Te avisaremos 7 días antes y cuando venza.`}</BodyText>
+        <Text variant="cuerpo">{`Vale hasta el ${qrDate(picked)}. Te avisaremos 7 días antes y cuando venza.`}</Text>
       )}
-      {message === null ? null : (
-        <Text accessibilityRole="alert" style={styles.failure}>
-          {message}
-        </Text>
-      )}
+      {message === null ? null : <InlineError>{message}</InlineError>}
     </ConfirmationSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  failure: { fontFamily: fontFamilies.body, color: colors.errorText, fontSize: 14 },
   lead: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  leadText: { flex: 1 },
   thumb: {
     backgroundColor: colors.white,
     borderColor: colors.borderSoft,

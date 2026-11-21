@@ -65,7 +65,7 @@ describe("Trainer roster before and during the class (E6 B + A)", () => {
     const { screen, startsAt } = await openRoster(20);
 
     const block = within(screen.getByTestId("roster-block"));
-    expect(block.getByText("EMPIEZA EN 20 MIN")).toBeOnTheScreen();
+    expect(block.getByText("Empieza en 20 min")).toBeOnTheScreen();
     expect(block.getByText(`${formatStartTime(startsAt)} · Mat Pilates`)).toBeOnTheScreen();
     expect(
       block.getByText(`${formatListDate(startsAt)} · Achumani · 3 de 8 lugares · 1 clienta nueva`),
@@ -107,7 +107,7 @@ describe("Trainer roster before and during the class (E6 B + A)", () => {
     ]);
 
     const block = within(screen.getByTestId("roster-block"));
-    expect(block.getByText(`EN CURSO · TERMINA ${formatStartTime(endsAt)}`)).toBeOnTheScreen();
+    expect(block.getByText(`En curso · termina ${formatStartTime(endsAt)}`)).toBeOnTheScreen();
     expect(block.getByText("Marcadas 1 de 3")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Tomar asistencia" })).toBeNull();
     expect(screen.getByRole("button", { name: "Lucía Fernández: Vino" })).toHaveProp(
@@ -153,7 +153,7 @@ describe("Trainer roster before and during the class (E6 B + A)", () => {
 
     expect(
       within(screen.getByTestId("roster-block")).getByText(
-        `TERMINÓ A LAS ${formatStartTime(endsAt)}`,
+        `Terminó a las ${formatStartTime(endsAt)}`,
       ),
     ).toBeOnTheScreen();
   });

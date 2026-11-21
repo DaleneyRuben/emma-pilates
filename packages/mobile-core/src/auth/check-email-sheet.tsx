@@ -1,12 +1,11 @@
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
 import { Chevron } from "../ui/chevron";
-import { fontFamilies } from "../ui/fonts";
 import { Glyph, type GlyphName } from "../ui/glyph";
+import { SheetTitle } from "../ui/sheet-title";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, rosa, shadows, spacing, typography } from "../ui/tokens";
-import { authStyles } from "./auth-layout";
+import { colors, radii, rosa, shadows, spacing } from "../ui/tokens";
 import { SecondaryButton } from "./auth-parts";
 
 export type CheckEmailSheetKind = "cancel" | "options" | null;
@@ -34,8 +33,8 @@ function OptionRow({
         <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       </View>
       <View style={styles.optionText}>
-        <Text style={styles.optionLabel}>{label}</Text>
-        <Text style={styles.optionHint}>{hint}</Text>
+        <Text variant="titulo-fila">{label}</Text>
+        <Text variant="secundario">{hint}</Text>
       </View>
       <Chevron size={16} strokeWidth={1.5} />
     </Pressable>
@@ -75,10 +74,10 @@ export function CheckEmailSheet({
           <View style={styles.grabber} />
           {kind === "cancel" ? (
             <>
-              <Text style={styles.title}>¿Cancelar tu registro?</Text>
-              <BodyText>
+              <SheetTitle>¿Cancelar tu registro?</SheetTitle>
+              <Text variant="cuerpo">
                 El enlace deja de funcionar y el correo queda libre para registrarte de nuevo.
-              </BodyText>
+              </Text>
               <SecondaryButton
                 busy={submitting}
                 label="Sí, cancelar registro"
@@ -94,7 +93,7 @@ export function CheckEmailSheet({
             </>
           ) : (
             <>
-              <Text style={styles.title}>Opciones</Text>
+              <SheetTitle>Opciones</SheetTitle>
               <View style={styles.options}>
                 <OptionRow
                   hint="Si lo escribiste mal"
@@ -110,9 +109,9 @@ export function CheckEmailSheet({
                   onPress={onAskCancel}
                 />
               </View>
-              <BodyText style={authStyles.small}>
+              <Text variant="secundario">
                 El enlace vence en 24 horas. Si no lo abres en 7 días, borramos el registro.
-              </BodyText>
+              </Text>
               <TextButton label="Cerrar" onPress={onClose} style={styles.centered} />
             </>
           )}
@@ -153,17 +152,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 36,
   },
-  optionHint: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
-  optionLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   optionText: { flex: 1, gap: spacing.xxs },
   // The choices sit on white with a 1 pt 200 rule.
   options: {
@@ -183,11 +171,5 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.md,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 26,
-    lineHeight: 32,
   },
 });

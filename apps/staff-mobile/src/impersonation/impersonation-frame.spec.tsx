@@ -1,5 +1,5 @@
+import { Text } from "@pilates/mobile-core";
 import { render } from "@testing-library/react-native";
-import { Text } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { impersonationBannerHeight } from "./impersonation-banner";
@@ -14,7 +14,9 @@ const metrics = {
 
 function InsetsProbe() {
   const insets = useSafeAreaInsets();
-  return <Text testID="probe">{`top ${insets.top} · bottom ${insets.bottom}`}</Text>;
+  return (
+    <Text testID="probe" variant="cuerpo">{`top ${insets.top} · bottom ${insets.bottom}`}</Text>
+  );
 }
 
 // Walkthrough finding 115 (FIX-080): the banner already covers the status
@@ -24,7 +26,13 @@ describe("ImpersonationFrame", () => {
   it("pushes the screens under the banner once and leaves them no top inset", async () => {
     const screen = await render(
       <SafeAreaProvider initialMetrics={metrics}>
-        <ImpersonationFrame banner={<Text testID="banner">Viendo como Camila Rojas</Text>}>
+        <ImpersonationFrame
+          banner={
+            <Text testID="banner" variant="cuerpo">
+              Viendo como Camila Rojas
+            </Text>
+          }
+        >
           <InsetsProbe />
         </ImpersonationFrame>
       </SafeAreaProvider>,

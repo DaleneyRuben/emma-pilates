@@ -22,7 +22,6 @@ export function PaymentBreakdown({
       <ValueRow label="Precio del plan" value={formatMoney(payment.planPriceCentavos)} />
       <ValueRow
         label={percent === null ? "Descuento" : `Descuento ${percent} %`}
-        tone="emphasis"
         value={`−${formatMoney(discount)}`}
       />
       <ValueRow label="Total" strong value={formatMoney(payment.amountDueCentavos)} />

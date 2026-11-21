@@ -6,21 +6,20 @@ import {
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
-  colors,
-  fontFamilies,
   NoticeRow,
+  OutlinedButton,
   PrimaryButton,
   spacing,
   surfaces,
+  Text,
   TextButton,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { Linking, StyleSheet, View } from "react-native";
 
 import { CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
-import { OutlineButton } from "../ui/outline-button";
 import { contactWhatsAppHref } from "./contact-list-copy";
 
 /** «tel:+59170011001», the WhatsApp link's digits (FIX-037 keeps her own code). */
@@ -91,7 +90,7 @@ export function ClientContactPanel({
       {whatsApp === null ? (
         // Small text never sits on the 100 screen: the note rides a white card.
         <View style={styles.card}>
-          <Text style={styles.note}>{unreachableNote(phone)}</Text>
+          <Text variant="cuerpo">{unreachableNote(phone)}</Text>
         </View>
       ) : (
         <View style={styles.pair} testID="client-overview-actions">
@@ -102,7 +101,7 @@ export function ClientContactPanel({
               testID="client-overview-whatsapp"
             />
           </View>
-          <OutlineButton
+          <OutlinedButton
             label="Llamar"
             onPress={() => open(callHref(whatsApp))}
             testID="client-overview-call"
@@ -112,7 +111,7 @@ export function ClientContactPanel({
       {contact === undefined ? null : (
         <View style={styles.card} testID="client-last-contact">
           <CardLabel>Último contacto</CardLabel>
-          <Text style={styles.line}>{lastContactLine(contact)}</Text>
+          <Text variant="cuerpo">{lastContactLine(contact)}</Text>
           {failed ? (
             <View accessibilityRole="alert">
               <NoticeRow message="No pudimos anotar el contacto. Inténtalo de nuevo." />
@@ -135,9 +134,7 @@ export function ClientContactPanel({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   link: { alignSelf: "flex-start", paddingHorizontal: 0 },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   pair: { flexDirection: "row", gap: spacing.md },
   wide: { flex: 1 },
 });

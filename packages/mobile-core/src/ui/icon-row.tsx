@@ -1,10 +1,10 @@
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { Chevron } from "./chevron";
-import { fontFamilies } from "./fonts";
 import { Glyph, type GlyphName } from "./glyph";
-import { colors, spacing, surfaces, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing, surfaces } from "./tokens";
 
 export type IconRowProps = {
   /** A quiet chevron at the end, for a row that opens something. */
@@ -14,16 +14,17 @@ export type IconRowProps = {
   /** Makes the whole row one button. */
   onPress?: () => void;
   testID?: string;
-  /** «error» for «Cerrar sesión», the Error last row (follow-up 256 § 2). */
+  /** «error» for «Cerrar sesión», the Error last row (follow-up 256 § 2): the
+   * same ink and weight, without a chevron; its words say what it does. */
   tone?: "default" | "error";
-  /** A Texto tenue value on the right, such as «Activadas». */
+  /** A `compacto` value on the right, such as «Activadas». */
   value?: string;
 };
 
 /**
  * A fact as a row instead of a paragraph (follow-up 225 §3): an 18 pt line
- * glyph alone, never in a disc (FIX-089), the label in Work Sans 16, an
- * optional value and chevron; «error» says it in weight. Put rows in an
+ * glyph alone, never in a disc (FIX-089), the label in `titulo-fila`, an
+ * optional `compacto` value and chevron (follow-up 285). Put rows in an
  * `IconRowGroup`.
  */
 export function IconRow({
@@ -39,12 +40,14 @@ export function IconRow({
   const content = (
     <>
       <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.5} />
-      <Text
-        style={[styles.label, value === undefined && styles.labelAlone, error && styles.errorLabel]}
-      >
+      <Text style={[styles.label, value === undefined && styles.labelAlone]} variant="titulo-fila">
         {label}
       </Text>
-      {value === undefined ? null : <Text style={styles.value}>{value}</Text>}
+      {value === undefined ? null : (
+        <Text style={styles.value} variant="compacto">
+          {value}
+        </Text>
+      )}
       {chevron && !error ? <Chevron size={16} strokeWidth={1.5} tone="muted" /> : null}
     </>
   );
@@ -94,19 +97,11 @@ export function IconRowGroup({
 }
 
 const styles = StyleSheet.create({
-  errorLabel: { color: colors.error, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
   group: { ...surfaces.card, overflow: "hidden" },
   // 16 side padding + 18 glyph + 12 gap.
   hairline: { backgroundColor: colors.hairline, height: 1, marginLeft: 46 },
   // The label keeps its width; a long value wraps under itself instead.
-  label: {
-    color: colors.text,
-    flexGrow: 1,
-    flexShrink: 0,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
+  label: { flexGrow: 1, flexShrink: 0 },
   // Without a value the label is the row's note: it wraps instead of running off.
   labelAlone: { flexShrink: 1 },
   pressed: { opacity: 0.7 },
@@ -118,12 +113,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  value: {
-    color: colors.textMuted,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "right",
-  },
+  value: { flexShrink: 1, textAlign: "right" },
 });

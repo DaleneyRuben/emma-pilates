@@ -1,8 +1,9 @@
-import { Keyboard, StyleSheet, Text, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 
 import { Chip } from "../ui/chip";
-import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, typography } from "../ui/tokens";
+import { InlineError } from "../ui/inline-error";
+import { Text } from "../ui/text";
+import { spacing } from "../ui/tokens";
 
 /** BKM-011: the eight answers to «¿Cómo nos conociste?», in the owner's order. */
 export const acquisitionChannelOptions = [
@@ -38,7 +39,7 @@ export function AcquisitionChannelField({
 }) {
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text variant="compacto-600">{label}</Text>
       <View accessibilityLabel={label} accessibilityRole="radiogroup" style={styles.options}>
         {acquisitionChannelOptions.map((option) => (
           <Chip
@@ -56,29 +57,12 @@ export function AcquisitionChannelField({
           />
         ))}
       </View>
-      {error === undefined ? null : (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {error}
-        </Text>
-      )}
+      {error === undefined ? null : <InlineError field>{error}</InlineError>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  error: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "700",
-    lineHeight: 20,
-  },
   field: { gap: spacing.sm },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-  },
   options: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
 });

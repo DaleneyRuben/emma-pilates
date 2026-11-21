@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { BodyText } from "../ui/body-text";
+import { Text } from "../ui/text";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
@@ -75,12 +75,12 @@ export function RecoveryRequestScreen({
         title="Revisa tu correo"
         topBar={topBar}
       >
-        <BodyText style={teamAccess ? authStyles.centered : undefined}>
+        <Text variant="cuerpo" style={teamAccess ? authStyles.centered : undefined}>
           {`Si hay una cuenta con ${sentTo}, te enviamos un enlace para restablecer tu contraseña.`}
-        </BodyText>
-        <BodyText style={[authStyles.small, teamAccess ? authStyles.centered : undefined]}>
+        </Text>
+        <Text style={teamAccess ? authStyles.centered : undefined} variant="secundario">
           El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam.
-        </BodyText>
+        </Text>
       </AuthenticationScreen>
     );
   }
@@ -88,7 +88,7 @@ export function RecoveryRequestScreen({
   return (
     // FIX-090: the bar names the screen; no wordmark repeats a title under it.
     <AuthenticationScreen brand={false} teamAccess={teamAccess} topBar={topBar}>
-      <BodyText>Te enviaremos un enlace para restablecer tu contraseña.</BodyText>
+      <Text variant="cuerpo">Te enviaremos un enlace para restablecer tu contraseña.</Text>
       {limited ? (
         <WaitNotice
           message={limitKeepsAnyLink}
@@ -107,7 +107,11 @@ export function RecoveryRequestScreen({
         testID="recovery-email"
         value={email}
       />
-      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
+      {failure === null ? null : (
+        <Text variant="cuerpo" accessibilityRole="alert">
+          {failure}
+        </Text>
+      )}
       <PrimaryButton
         busy={submitting}
         disabled={limited}

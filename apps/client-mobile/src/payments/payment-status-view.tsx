@@ -1,18 +1,18 @@
 import {
   colors,
-  fontFamilies,
   FooterPanel,
   Glyph,
+  InlineError,
   PrimaryButton,
   ScreenHeader,
   spacing,
   surfaces,
+  Text,
   TextButton,
   type GlyphName,
-  typography,
 } from "@pilates/mobile-core";
 import { Fragment, type ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
@@ -33,8 +33,12 @@ function Facts({ rows }: { rows: readonly [string, string][] }) {
         <Fragment key={label}>
           {index === 0 ? null : <View style={styles.hairline} />}
           <View style={styles.row}>
-            <Text style={styles.label}>{label}</Text>
-            <Text style={styles.value}>{value}</Text>
+            <Text style={styles.label} variant="cuerpo">
+              {label}
+            </Text>
+            <Text style={styles.value} variant="titulo-fila">
+              {value}
+            </Text>
           </View>
         </Fragment>
       ))}
@@ -53,7 +57,7 @@ type Action = { label: string; onPress: () => void; testID?: string };
 
 /**
  * 11's three states (walkthrough n.º 15, Rosa Emma C11, C11b, C11c): the band
- * holds the line icon on a white disc and the Lora title; the owner's copy and
+ * holds the line icon on a white disc and the `titulo-pagina` title; the owner's copy and
  * the Plan's facts are white cards; the buttons sit on the white footer.
  */
 function StatusLayout({
@@ -85,21 +89,19 @@ function StatusLayout({
             testID={`payment-status-icon-${icon}`}
           />
         </View>
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text accessibilityRole="header" variant="titulo-pagina">
           {title}
         </Text>
       </ScreenHeader>
       <ScrollView contentContainerStyle={styles.content} style={styles.scroll}>
         <View style={styles.noteCard}>
-          <Text style={styles.note}>{note}</Text>
+          <Text variant="cuerpo">{note}</Text>
         </View>
         {children}
         {error === undefined || error === null ? null : (
           <View style={styles.errorBox}>
             <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
-            <Text accessibilityRole="alert" style={styles.error}>
-              {error}
-            </Text>
+            <InlineError style={styles.error}>{error}</InlineError>
           </View>
         )}
       </ScrollView>
@@ -213,13 +215,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 64,
   },
-  error: {
-    color: colors.errorText,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  error: { flex: 1 },
   errorBox: {
     alignItems: "flex-start",
     backgroundColor: colors.errorSurface,
@@ -233,13 +229,7 @@ const styles = StyleSheet.create({
   },
   facts: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 21,
-  },
+  label: { flex: 1 },
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
   row: {
     alignItems: "center",
@@ -251,18 +241,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   scroll: { flex: 1 },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.title,
-    lineHeight: 33,
-  },
-  value: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textAlign: "right",
-  },
+  value: { flexShrink: 1, textAlign: "right" },
 });

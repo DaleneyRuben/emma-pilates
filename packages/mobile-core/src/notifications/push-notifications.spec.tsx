@@ -1,10 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 
 import { clearMobileQueryCache, MobileQueryProvider } from "../query/provider";
 import { PushNotificationsProvider, usePushNotifications } from "./push-notifications";
 import type { PushPermissionStatus, PushPlatform } from "./push-platform";
+import { Text } from "../ui/text";
 
 const notificationId = "11111111-1111-4111-8111-111111111111";
 const payload = {
@@ -75,7 +76,7 @@ function OfferButton() {
   const { offerPermission } = usePushNotifications();
   return (
     <Pressable accessibilityRole="button" onPress={offerPermission}>
-      <Text>Reservar</Text>
+      <Text variant="boton">Reservar</Text>
     </Pressable>
   );
 }

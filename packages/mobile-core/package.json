@@ -4,7 +4,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./launch-tap-plugin": "./src/notifications/launch-tap-plugin.js",
-    "./app-variant": "./src/config/app-variant.js"
+    "./app-variant": "./src/config/app-variant.js",
+    "./testing": "./src/testing.ts"
   },
   "dependencies": {
     "@expo-google-fonts/lora": "^0.4.2",

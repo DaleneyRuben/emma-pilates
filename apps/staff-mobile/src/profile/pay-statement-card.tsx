@@ -1,15 +1,7 @@
 import { formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
-import {
-  Chevron,
-  colors,
-  fontFamilies,
-  Glyph,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { statusTone } from "./pay-history";
 import type { StatementStatus } from "./pay-ledger";
@@ -18,8 +10,8 @@ import { ReceiptThumbnail } from "./receipt-viewer";
 function StripText({ title, note, link }: { title: string; note: string; link?: boolean }) {
   return (
     <View style={styles.stripBody}>
-      <Text style={styles.stripTitle}>{title}</Text>
-      <Text style={link === true ? styles.stripLink : styles.detail}>{note}</Text>
+      <Text variant="titulo-fila">{title}</Text>
+      <Text variant={link === true ? "enlace-secundario" : "secundario"}>{note}</Text>
     </View>
   );
 }
@@ -41,7 +33,7 @@ export function PaymentStrip({
   const tone = statusTone[status.kind];
   const icon = (
     <View style={[styles.stripIcon, { backgroundColor: iconTint[status.kind] }]}>
-      <Glyph color={tone.color} name={tone.glyph} size={20} strokeWidth={1.6} />
+      <Glyph color={colors.text} name={tone.glyph} size={20} strokeWidth={1.6} />
     </View>
   );
   if (status.kind === "open") {
@@ -89,7 +81,6 @@ export function PaymentStrip({
 }
 
 const styles = StyleSheet.create({
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.8 },
   // E-M06: a white card; its icon on a 50 tile with the 200 rule.
   strip: {
@@ -110,17 +101,5 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     width: 40,
-  },
-  stripLink: {
-    color: colors.primaryOnTint,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-  stripTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
   },
 });

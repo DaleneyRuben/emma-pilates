@@ -8,14 +8,13 @@ import {
   type ClientProfileDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
-  colors,
   footerEdges,
   FooterPanel,
   footerScreen,
   FormErrorSummary,
   FormField,
   FormScrollView,
+  InlineError,
   LoadingState,
   parseStoredPhone,
   PhoneField,
@@ -193,9 +192,7 @@ function EditProfileForm({
           )}
         />
         {failed ? (
-          <BodyText accessibilityRole="alert" style={styles.error}>
-            No pudimos guardar los cambios. Inténtalo de nuevo.
-          </BodyText>
+          <InlineError>No pudimos guardar los cambios. Inténtalo de nuevo.</InlineError>
         ) : null}
       </View>
     </FormScrollView>
@@ -248,7 +245,6 @@ export function EditProfileScreen() {
 const styles = StyleSheet.create({
   // C22: the fields on one white card under the photo's card.
   card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lg },
-  error: { color: colors.errorText },
   form: { gap: spacing.md, paddingBottom: spacing.lg },
   screen: { gap: spacing.md },
 });

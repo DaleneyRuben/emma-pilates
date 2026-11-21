@@ -1,17 +1,11 @@
-import {
-  addCivilDays,
-  colors,
-  fontFamilies,
-  PrimaryButton,
-  TextButton,
-} from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { addCivilDays, PrimaryButton, Text, TextButton } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 import { dayMonth, freezeRange } from "../subscription/freeze-window";
 
 /**
  * Class detail on a frozen day (FIX-082, design audit 2026-11-18, option B):
- * the frozen days in bold, the first day she can book, the off button that
+ * the frozen days as a row title (C04j), the first day she can book, the off button that
  * says why, and a way back to another day.
  */
 export function FrozenBookingFooter({
@@ -27,7 +21,7 @@ export function FrozenBookingFooter({
   return (
     <>
       <View>
-        <Text style={[styles.note, styles.strong]}>
+        <Text style={styles.note} variant="titulo-fila">
           {`Tu plan está congelado ${range.charAt(0).toLowerCase()}${range.slice(1)}.`}
         </Text>
       </View>
@@ -43,12 +37,5 @@ export function FrozenBookingFooter({
 }
 
 const styles = StyleSheet.create({
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: "center",
-  },
-  strong: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
+  note: { textAlign: "center" },
 });

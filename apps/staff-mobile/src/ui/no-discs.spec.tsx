@@ -73,8 +73,7 @@ describe("Staff rows without discs", () => {
 
     expect(screen.getByText("CM")).toHaveStyle({
       color: "#FFFBFB",
-      fontFamily: "WorkSans_600SemiBold",
-      fontWeight: "700",
+      fontFamily: "WorkSans_700Bold",
     });
     expect(screen.getByText("CM").parent).toHaveStyle({ backgroundColor: "#93615D" });
   });

@@ -7,7 +7,6 @@ import {
   Chevron,
   colors,
   EmptyState,
-  fontFamilies,
   formatBolivianos,
   Glyph,
   LoadingState,
@@ -17,11 +16,11 @@ import {
   ScreenTopBar,
   spacing,
   surfaces,
-  typography,
+  Text,
   usePullToRefresh,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { ProfileRowCard } from "../profile/profile-rows";
@@ -49,8 +48,8 @@ function InvoiceRow({ invoice, onPress }: { invoice: ClientInvoiceDto; onPress: 
         </View>
       </View>
       <View style={styles.text}>
-        <Text style={styles.title}>{invoice.purchaseLabel}</Text>
-        <Text style={styles.muted}>{`${date} · ${amount}`}</Text>
+        <Text variant="titulo-fila">{invoice.purchaseLabel}</Text>
+        <Text variant="secundario">{`${date} · ${amount}`}</Text>
       </View>
       <InvoiceState invoice={invoice} />
       <Chevron size={16} strokeWidth={1.5} />
@@ -108,7 +107,7 @@ export function MyInvoicesScreen() {
             ))}
           </ProfileRowCard>
           <View style={styles.noteCard}>
-            <Text style={styles.muted}>
+            <Text variant="secundario">
               Las facturas salen a nombre del NIT o CI que diste al pagar. Si un dato está mal,
               avísale al estudio.
             </Text>
@@ -130,12 +129,6 @@ const styles = StyleSheet.create({
     width: 36,
   },
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
-  muted: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 19,
-  },
   pressed: { backgroundColor: colors.rowHover },
   row: {
     alignItems: "center",
@@ -147,10 +140,4 @@ const styles = StyleSheet.create({
   },
   screen: { gap: spacing.md },
   text: { flex: 1, gap: 2 },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
 });

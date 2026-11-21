@@ -8,7 +8,6 @@ import {
   BrandToast,
   colors,
   EmptyState,
-  fontFamilies,
   formatBolivianos,
   FormScrollView,
   LoadingState,
@@ -22,12 +21,12 @@ import {
   shadows,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { downloadInvoice } from "./invoice-download";
@@ -45,8 +44,10 @@ function Details({ invoice }: { invoice: ClientInvoiceDto }) {
     <View style={styles.card}>
       {rows.map(([label, value], index) => (
         <View key={label} style={[styles.kv, index > 0 && styles.divided]}>
-          <Text style={styles.kvLabel}>{label}</Text>
-          <Text style={styles.kvValue}>{value}</Text>
+          <Text variant="cuerpo">{label}</Text>
+          <Text style={styles.kvValue} variant="titulo-fila">
+            {value}
+          </Text>
         </View>
       ))}
     </View>
@@ -211,16 +212,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  kvLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  kvValue: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    fontVariant: ["tabular-nums"],
-    textAlign: "right",
-  },
+  kvValue: { flexShrink: 1, textAlign: "right" },
   photo: { alignSelf: "center", borderRadius: 10, maxHeight: 320, width: "100%" },
   previewCard: { ...surfaces.card, padding: spacing.md },
   screen: { gap: spacing.md },

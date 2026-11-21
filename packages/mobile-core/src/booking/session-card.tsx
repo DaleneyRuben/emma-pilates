@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { CardFooter } from "../ui/card-footer";
 import { Chevron } from "../ui/chevron";
-import { DetailLine } from "../ui/detail-line";
-import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, surfaces, typography } from "../ui/tokens";
+import { Glyph } from "../ui/glyph";
+import { Text } from "../ui/text";
+import { colors, spacing, surfaces } from "../ui/tokens";
 
 /**
  * The Session card of 03 and S07 (MOB-042): a spaced 12 pt time over a Lora
@@ -49,22 +49,18 @@ export function SessionCard({
     >
       <View style={styles.header}>
         <View style={styles.titles}>
-          <Text style={styles.time}>{time}</Text>
-          <Text style={styles.title}>{title}</Text>
+          <Text variant="cifra">{time}</Text>
+          <Text variant="titulo-fila">{title}</Text>
         </View>
         {tag}
       </View>
       <CardFooter>
-        {trainerFace === undefined ? (
-          <DetailLine icon="person" style={styles.trainer}>
+        <View style={styles.faceLine}>
+          {trainerFace ?? <Glyph name="person" size={17} />}
+          <Text style={styles.trainer} variant="secundario">
             {trainerName}
-          </DetailLine>
-        ) : (
-          <View style={styles.faceLine}>
-            {trainerFace}
-            <Text style={styles.trainer}>{trainerName}</Text>
-          </View>
-        )}
+          </Text>
+        </View>
         {footerEnd}
       </CardFooter>
     </Pressable>
@@ -80,25 +76,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     justifyContent: "space-between",
   },
-  time: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "500",
-    letterSpacing: 1.2,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSmall,
-  },
   titles: { flexShrink: 1, gap: spacing.xs },
   faceLine: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: spacing.sm },
-  trainer: {
-    color: colors.textSecondary,
-    flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-  },
+  trainer: { flexShrink: 1 },
 });

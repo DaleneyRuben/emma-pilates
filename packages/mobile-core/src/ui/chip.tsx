@@ -1,12 +1,14 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
-import { fontFamilies } from "./fonts";
+import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
 /**
  * Selected and unselected in palette B (BotonAPiezas, FIX-089): the chosen
- * chip is Rosa profundo with a Crema label, the others Crema with an Arcilla
- * outline. Screens with their own shape (a day box, a tile) spread these.
+ * chip is Rosa profundo, the others white with a 400 outline. Screens with
+ * their own shape (a day box, a tile) spread these and draw their label with
+ * `<Text tone={selected ? "onDark" : "ink"}>`: the choice changes the ground
+ * and the tone, never the weight (follow-up 285, rule 4).
  */
 export const chipStyles = StyleSheet.create({
   box: {
@@ -18,20 +20,12 @@ export const chipStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  labelSelected: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontWeight: "700",
-  },
 });
 
-/** A 38 pt chip whose touch target reaches 44 pt; «radio» for one answer of a group. */
+/**
+ * A 38 pt chip whose touch target reaches 44 pt; «radio» for one answer of a
+ * group. Its label is `compacto`, the same selected or not.
+ */
 export function Chip({
   accessibilityLabel,
   label,
@@ -46,7 +40,7 @@ export function Chip({
   onPress: () => void;
   role?: "button" | "radio";
   selected: boolean;
-  /** «compact»: 36 high with a 13 pt bold label, as Reservar's type filter. */
+  /** «compact»: 36 high, as Reservar's type filter; the same label. */
   size?: "compact" | "regular";
   testID?: string;
 }) {
@@ -65,13 +59,7 @@ export function Chip({
       ]}
       testID={testID}
     >
-      <Text
-        style={[
-          chipStyles.label,
-          size === "compact" && styles.compactLabel,
-          selected && chipStyles.labelSelected,
-        ]}
-      >
+      <Text tone={selected ? "onDark" : "ink"} variant="compacto">
         {label}
       </Text>
     </Pressable>
@@ -80,7 +68,6 @@ export function Chip({
 
 const styles = StyleSheet.create({
   compact: { minHeight: 36 },
-  compactLabel: { fontFamily: fontFamilies.bodyBold, fontSize: 13, fontWeight: "700" },
   chip: {
     alignItems: "center",
     borderRadius: radii.pill,

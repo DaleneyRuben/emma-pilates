@@ -1,30 +1,18 @@
-import { Lora_400Regular, Lora_500Medium, Lora_600SemiBold } from "@expo-google-fonts/lora";
+import { Lora_500Medium } from "@expo-google-fonts/lora";
 import {
-  WorkSans_300Light,
   WorkSans_400Regular,
-  WorkSans_500Medium,
+  WorkSans_400Regular_Italic,
   WorkSans_600SemiBold,
   WorkSans_700Bold,
 } from "@expo-google-fonts/work-sans";
 
-export const fontFamilies = {
-  display: "Lora_400Regular",
-  heading: "Lora_500Medium",
-  headingStrong: "Lora_600SemiBold",
-  bodyLight: "WorkSans_300Light",
-  body: "WorkSans_400Regular",
-  bodyMedium: "WorkSans_500Medium",
-  bodyStrong: "WorkSans_600SemiBold",
-  bodyBold: "WorkSans_700Bold",
-} as const;
+import { typeFaces } from "./type-scale";
 
+/** The faces the type scale draws with (follow-up 285), loaded at launch. */
 export const fontAssets = {
-  [fontFamilies.display]: Lora_400Regular,
-  [fontFamilies.heading]: Lora_500Medium,
-  [fontFamilies.headingStrong]: Lora_600SemiBold,
-  [fontFamilies.bodyLight]: WorkSans_300Light,
-  [fontFamilies.body]: WorkSans_400Regular,
-  [fontFamilies.bodyMedium]: WorkSans_500Medium,
-  [fontFamilies.bodyStrong]: WorkSans_600SemiBold,
-  [fontFamilies.bodyBold]: WorkSans_700Bold,
+  [typeFaces.serif]: Lora_500Medium,
+  [typeFaces.regular]: WorkSans_400Regular,
+  [typeFaces.italic]: WorkSans_400Regular_Italic,
+  [typeFaces.semibold]: WorkSans_600SemiBold,
+  [typeFaces.bold]: WorkSans_700Bold,
 };

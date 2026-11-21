@@ -1,11 +1,15 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 import { Chevron } from "./chevron";
-import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
+import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
-/** The «Sucursal:» picker of 03, S07, and S13 (MOB-042): a 44 pt pill with a pin and the muted chevron. */
+/**
+ * The «Sucursal:» picker of 03, S07, and S13 (MOB-042): a 44 pt white pill
+ * with a pin, «Sucursal: Centro» in `compacto` as board C03 draws it, and the
+ * muted chevron (follow-up 285).
+ */
 export function BranchPickerPill({
   name,
   onPress,
@@ -24,8 +28,7 @@ export function BranchPickerPill({
       style={styles.pill}
     >
       <Glyph name="pin" size={17} />
-      <Text style={styles.label}>Sucursal:</Text>
-      <Text style={[styles.label, styles.name]}>{name}</Text>
+      <Text variant="compacto">{`Sucursal: ${name}`}</Text>
       <Chevron
         direction={open ? "up" : "down"}
         size={16}
@@ -37,8 +40,6 @@ export function BranchPickerPill({
 }
 
 const styles = StyleSheet.create({
-  label: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  name: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   pill: {
     alignItems: "center",
     alignSelf: "flex-start",

@@ -1,8 +1,6 @@
 import {
   acquisitionChannelRequired,
   type AcquisitionChannelChoice,
-  colors,
-  fontFamilies,
   formatCountdown,
   FormErrorSummary,
   FormField,
@@ -17,13 +15,13 @@ import {
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
   useCountdown,
   WaitNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -164,7 +162,7 @@ export function NewClientScreen() {
       <FooterPanel bleed={0}>
         {failure !== null ? (
           failure === limitedEmailMessage ? (
-            <Text accessibilityRole="alert" style={styles.note}>
+            <Text accessibilityRole="alert" style={styles.note} variant="secundario">
               {failure}
             </Text>
           ) : (
@@ -174,9 +172,12 @@ export function NewClientScreen() {
           )
         ) : null}
         {waitSeconds > 0 && !accountLimited ? (
-          <Text style={styles.note}>{`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}</Text>
+          <Text
+            style={styles.note}
+            variant="secundario"
+          >{`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}</Text>
         ) : (
-          <Text style={styles.note}>
+          <Text style={styles.note} variant="secundario">
             Le enviaremos un enlace de activación al correo. Vence en 7 días.
           </Text>
         )}
@@ -287,12 +288,6 @@ const styles = StyleSheet.create({
   // E-C05: each group of fields on a white card under its uppercase label.
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   column: { gap: 0 },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   screen: { paddingHorizontal: spacing.xlSm },
 });

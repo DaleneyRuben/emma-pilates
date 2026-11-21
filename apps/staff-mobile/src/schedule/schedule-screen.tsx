@@ -5,8 +5,6 @@ import {
 import {
   boliviaCivilDate,
   civilDateRange,
-  colors,
-  fontFamilies,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -14,14 +12,14 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  Text,
   upcomingCivilDates,
   usePullToRefresh,
-  typography,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll } from "../ui/card-pieces";
 import { useOwnRoleLabel } from "../profile/staff-labels";
@@ -175,7 +173,7 @@ export function ScheduleScreen() {
         )}
         {selling ? null : (
           <View style={styles.noteCard}>
-            <Text style={styles.note}>
+            <Text style={styles.note} variant="secundario">
               Solo lectura. Para reservar, abre la ficha de una clienta.
             </Text>
           </View>
@@ -196,13 +194,7 @@ export function ScheduleScreen() {
 
 const styles = StyleSheet.create({
   branch: { paddingHorizontal: spacing.xs },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   // Board H02: the read-only line rides its own white card.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.mdLg, paddingVertical: spacing.smLg },
   screen: { paddingHorizontal: spacing.xlSm },

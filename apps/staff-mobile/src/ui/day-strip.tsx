@@ -1,13 +1,6 @@
-import {
-  agendaDayChipLabel,
-  chipStyles,
-  colors,
-  fontFamilies,
-  shadows,
-  spacing,
-} from "@pilates/mobile-core";
+import { agendaDayChipLabel, chipStyles, shadows, spacing, Text } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * The v2 week strip (S02, S07, S13, Horario): seven days share the width, so a
@@ -15,6 +8,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
  * profundo with Crema words, the others Crema with an Arcilla outline (FIX-089).
  * `trailing` is an extra chip such as S13's «Otra». `counts` (E1 B) adds how
  * many classes each day holds under its number, «—» for none, blank while loading.
+ * The weekday and the count are `pastilla`, the day number `cifra` (follow-up 285).
  */
 export function DayStrip({
   counts,
@@ -40,6 +34,7 @@ export function DayStrip({
         const isSelected = date === selected;
         const label = date === today ? "Hoy" : weekday.toLowerCase();
         const count = counts?.[date];
+        const tone = isSelected ? "onDark" : "ink";
         return (
           <Pressable
             accessibilityLabel={`${date === today ? "Hoy" : weekday} ${day}${countTail(count)}`}
@@ -56,13 +51,14 @@ export function DayStrip({
             ]}
             testID={`${testIDPrefix}-${date}`}
           >
-            <Text style={[styles.weekday, isSelected && chipStyles.labelSelected]}>{label}</Text>
-            <Text style={[styles.day, isSelected && styles.onSelected]}>{day}</Text>
+            <Text tone={tone} variant="pastilla">
+              {label}
+            </Text>
+            <Text tone={tone} variant="cifra">
+              {day}
+            </Text>
             {counts === undefined ? null : (
-              <Text
-                style={[styles.count, isSelected && styles.onSelected]}
-                testID={`${testIDPrefix}-${date}-count`}
-              >
+              <Text testID={`${testIDPrefix}-${date}-count`} tone={tone} variant="pastilla">
                 {count === undefined ? " " : count === 0 ? "—" : String(count)}
               </Text>
             )}
@@ -103,43 +99,25 @@ export function DayStripAction({
       style={[styles.chip, chipStyles.box, selected && chipStyles.boxSelected]}
       testID={testID}
     >
-      <Text style={[styles.actionLabel, selected && chipStyles.labelSelected]}>{label}</Text>
+      <Text tone={selected ? "onDark" : "ink"} variant="pastilla">
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  actionLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "600",
-  },
   chip: {
     alignItems: "center",
     borderRadius: 14,
     flex: 1,
     gap: spacing.xxs,
-    height: 60,
     justifyContent: "center",
+    minHeight: 60,
     minWidth: 0,
   },
-  count: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  countedChip: { gap: 0, height: 70 },
-  day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  onSelected: { color: colors.onPrimary },
+  countedChip: { gap: 0, minHeight: 70 },
   strip: { flexDirection: "row", flexGrow: 0, flexShrink: 0, gap: spacing.smd },
   // Rosa Emma: the days are white tiles lifted by the card shadow, no outline.
   tile: { ...shadows.card, borderWidth: 0 },
-  weekday: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 12,
-    fontWeight: "500",
-  },
 });

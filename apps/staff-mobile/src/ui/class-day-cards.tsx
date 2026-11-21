@@ -1,6 +1,6 @@
-import { colors, fontFamilies, spacing, typography } from "@pilates/mobile-core";
+import { spacing, Text } from "@pilates/mobile-core";
 import { useState, type ReactElement } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 import { RowCard } from "./card-pieces";
 
@@ -58,8 +58,10 @@ export function ClassDayCards({
             onPress={() => setOpen((current) => !current)}
             style={({ pressed }) => [styles.fold, pressed && styles.pressed]}
           >
-            <Text style={styles.summary}>{summary}</Text>
-            <Text style={styles.toggle}>{open ? "Ocultar" : "Ver"}</Text>
+            <Text style={styles.summary} variant="titulo-fila">
+              {summary}
+            </Text>
+            <Text variant="enlace">{open ? "Ocultar" : "Ver"}</Text>
           </Pressable>
         </RowCard>
       )}
@@ -77,18 +79,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   pressed: { opacity: 0.7 },
-  summary: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-  },
-  toggle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
+  summary: { flex: 1 },
 });

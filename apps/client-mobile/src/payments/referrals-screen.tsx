@@ -3,10 +3,7 @@ import {
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   BrandToast,
-  colors,
-  fontFamilies,
   LoadingState,
   QueryFailure,
   Screen,
@@ -14,6 +11,7 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
   useTransientNotice,
@@ -91,9 +89,9 @@ export function ReferralsScreen() {
           {referred.length === 0 ? (
             // Rosa Emma C16b: the quiet line in a white card; sharing is above.
             <View style={styles.emptyCard} testID="referrals-empty">
-              <BodyText style={styles.empty}>
+              <Text variant="cuerpo">
                 Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
-              </BodyText>
+              </Text>
             </View>
           ) : (
             <ReferredList referred={referred} />
@@ -107,7 +105,6 @@ export function ReferralsScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
-  empty: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
   emptyCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
   screen: { gap: spacing.lg },
 });

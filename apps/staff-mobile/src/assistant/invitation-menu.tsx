@@ -1,14 +1,14 @@
 import {
   colors,
-  fontFamilies,
   Glyph,
   radii,
   shadows,
+  SheetTitle,
   spacing,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 
 type Option = {
   detail: string;
@@ -18,6 +18,8 @@ type Option = {
   tone?: "error";
 };
 
+// An option that is off stays in full ink (follow-up 285, rule 5): its detail
+// line says why, in words, and it sits on the 50 inset instead of fading.
 function MenuRow({ detail, disabled = false, label, onPress, tone }: Option) {
   const error = tone === "error";
   return (
@@ -27,14 +29,14 @@ function MenuRow({ detail, disabled = false, label, onPress, tone }: Option) {
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed, disabled && styles.disabled]}
+      style={({ pressed }) => [styles.row, disabled && styles.disabled, pressed && styles.pressed]}
     >
       <View style={styles.disc}>
         <Glyph color={colors.text} name={error ? "cross" : "message"} size={18} strokeWidth={1.5} />
       </View>
       <View style={styles.body}>
-        <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
-        <Text style={styles.detail}>{detail}</Text>
+        <Text variant="titulo-fila">{label}</Text>
+        <Text variant="secundario">{detail}</Text>
       </View>
     </Pressable>
   );
@@ -42,7 +44,7 @@ function MenuRow({ detail, disabled = false, label, onPress, tone }: Option) {
 
 /**
  * S06's «Más opciones de la invitación» sheet (E-C13): the white sheet with
- * its grabber, the Lora title, and the two ways on split by hairlines.
+ * its grabber, the sheet title, and the two ways on split by hairlines.
  */
 export function InvitationMenu({
   cancellable,
@@ -64,7 +66,7 @@ export function InvitationMenu({
       <View style={styles.backdrop}>
         <View accessibilityRole="none" style={styles.sheet} testID="invitation-menu">
           <View style={styles.grabber} />
-          <Text style={styles.title}>{`Invitación de ${firstName}`}</Text>
+          <SheetTitle style={styles.title}>{`Invitación de ${firstName}`}</SheetTitle>
           <View>
             <MenuRow
               detail="Anula los enlaces al correo anterior"
@@ -93,11 +95,13 @@ export function InvitationMenu({
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
   body: { flex: 1, gap: spacing.xxs },
-  detail: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
-  disabled: { opacity: 0.5 },
+  disabled: {
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: radii.inset,
+    paddingHorizontal: spacing.md,
+  },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", justifyContent: "center", width: 24 },
-  errorLabel: { color: colors.text },
   // The 200 grabber, drawn as its outline so no 200 fill sits on the sheet.
   grabber: {
     alignSelf: "center",
@@ -107,12 +111,6 @@ const styles = StyleSheet.create({
     height: 5,
     marginBottom: spacing.sm,
     width: 40,
-  },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
   },
   pressed: { opacity: 0.7 },
   row: {
@@ -134,11 +132,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.md,
   },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 30,
-    marginBottom: spacing.sm,
-  },
+  title: { marginBottom: spacing.sm },
 });

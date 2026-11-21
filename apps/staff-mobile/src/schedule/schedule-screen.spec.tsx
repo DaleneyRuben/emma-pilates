@@ -43,7 +43,7 @@ describe("Horario (v2 HOR boards)", () => {
     // with the places «N de M».
     expect(screen.getByText("1 clase hoy")).toBeOnTheScreen();
     const hero = within(screen.getByTestId("next-class-hero"));
-    expect(hero.getByText(/^PRÓXIMA/)).toBeOnTheScreen();
+    expect(hero.getByText(/^Próxima/)).toBeOnTheScreen();
     expect(hero.getByText(/ · Reformer Pilates$/)).toHaveStyle({ color: "#FFFBFB" });
     expect(hero.getByText("6 de 12")).toBeOnTheScreen();
     expect(hero.getByTestId("schedule-session-session-1")).toBeOnTheScreen();

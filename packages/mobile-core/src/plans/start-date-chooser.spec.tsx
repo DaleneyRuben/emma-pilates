@@ -26,7 +26,7 @@ describe("StartDateChooser", () => {
 
     expect(screen.getAllByText("Fecha de inicio")).toHaveLength(1);
     expect(screen.getByRole("header", { name: "Fecha de inicio" })).toHaveStyle({
-      fontFamily: "Lora_400Regular",
+      fontFamily: "Lora_500Medium",
       fontSize: 24,
     });
   });
@@ -37,13 +37,13 @@ describe("StartDateChooser", () => {
     expect(screen.getByTestId("start-date-2026-11-03")).toHaveStyle({
       backgroundColor: colors.card,
       borderRadius: 14,
-      height: 72,
+      minHeight: 72,
       minWidth: 52,
     });
     expect(screen.getByTestId("start-date-2026-11-02")).toHaveStyle({
       backgroundColor: colors.primary,
     });
-    expect(screen.getByText("3")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 18 });
+    expect(screen.getByText("3")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 24 });
   });
 
   // Staff pick E3 C: Registrar pago titles the days «Empieza» and notes the

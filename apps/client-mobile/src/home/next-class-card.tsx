@@ -2,16 +2,14 @@ import type { UpcomingBookingDto } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
   Chevron,
-  colors,
-  fontFamilies,
   formatStartTime,
   spacing,
   surfaces,
-  typography,
+  Text,
   TypeBar,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { classDayWord, ClientNextClassHero } from "../booking/next-class-hero";
 
@@ -20,8 +18,8 @@ export { nextBookedClass } from "../booking/next-class-hero";
 /**
  * 02's «Tu próxima clase» as the shared next class hero (ClaseE, FIX-089).
  * When a notice already leads Inicio as its one hero (Rosa Emma C02c2), the
- * class turns `quiet`: a white card with the type bar, the eyebrow, the Lora
- * time and a chevron.
+ * class turns `quiet`: a white card with the type bar, the `etiqueta` eyebrow,
+ * the time and class as its `titulo-bloque` and a chevron.
  */
 export function NextClassCard({
   booking,
@@ -58,11 +56,11 @@ export function NextClassCard({
     >
       <TypeBar name={booking.classTypeName} />
       <View style={styles.body}>
-        <Text style={styles.eyebrow}>{eyebrow.toUpperCase()}</Text>
-        <Text style={styles.title}>
+        <Text variant="etiqueta">{eyebrow}</Text>
+        <Text variant="titulo-bloque">
           {`${formatStartTime(booking.startsAt)} · ${booking.classTypeName}`}
         </Text>
-        <Text style={styles.detail}>{`${booking.branchName} · ${booking.trainerName}`}</Text>
+        <Text variant="secundario">{`${booking.branchName} · ${booking.trainerName}`}</Text>
       </View>
       <Chevron size={18} strokeWidth={1.7} />
     </Pressable>
@@ -79,24 +77,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  detail: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
-  eyebrow: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-  },
   pressed: { opacity: 0.7 },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 27,
-  },
 });

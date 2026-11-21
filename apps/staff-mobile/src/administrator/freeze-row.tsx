@@ -1,6 +1,6 @@
 import type { FreezeReviewDto } from "@pilates/api-contracts";
-import { Chevron, ClientFace, colors, fontFamilies, spacing } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, ClientFace, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { freezeDays, freezeRange } from "./freeze-format";
@@ -34,9 +34,9 @@ export function FreezeRow({
     >
       <ClientFace fetcher={fetcher} name={freeze.clientName} photo={freeze.clientPhoto} size={36} />
       <View style={styles.body}>
-        <Text style={styles.name}>{freeze.clientName}</Text>
-        <Text style={styles.detail}>{period}</Text>
-        <Text ellipsizeMode="tail" numberOfLines={2} style={styles.detail}>
+        <Text variant="titulo-fila">{freeze.clientName}</Text>
+        <Text variant="secundario">{period}</Text>
+        <Text ellipsizeMode="tail" numberOfLines={2} variant="secundario">
           {note}
         </Text>
       </View>
@@ -47,13 +47,6 @@ export function FreezeRow({
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  detail: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 13 },
-  name: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 16,
-    fontWeight: "600",
-  },
   pressed: { opacity: 0.7 },
   row: {
     alignItems: "center",

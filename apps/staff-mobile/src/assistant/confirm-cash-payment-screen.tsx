@@ -8,8 +8,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   boliviaCivilDate,
-  colors,
-  fontFamilies,
   FormScrollView,
   invoiceChoiceFrom,
   invoiceDataPayload,
@@ -19,12 +17,12 @@ import {
   PrimaryButton,
   Screen,
   spacing,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { BranchCard, useCashBranches } from "../ui/branch-chips";
@@ -209,7 +207,7 @@ export function ConfirmCashPaymentScreen({
           <NoticeRow message={failure} />
         </View>
       ) : null}
-      <Text style={styles.note}>
+      <Text style={styles.note} variant="secundario">
         {cash
           ? `Confirma con el efectivo en mano: ${
               renewalStartsOn === undefined
@@ -290,12 +288,6 @@ export function ConfirmCashPaymentScreen({
 
 const styles = StyleSheet.create({
   column: { gap: 0 },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   screen: { paddingHorizontal: spacing.xlSm },
 });

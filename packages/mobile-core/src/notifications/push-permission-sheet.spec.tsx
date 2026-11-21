@@ -32,6 +32,7 @@ describe("PushPermissionSheet", () => {
     );
 
     expect(screen.getByRole("header", { name: "No te pierdas ninguna clase" })).toHaveStyle({
+      fontFamily: "Lora_500Medium",
       fontSize: 24,
       textAlign: "center",
     });

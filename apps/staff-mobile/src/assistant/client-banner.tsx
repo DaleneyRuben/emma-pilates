@@ -1,5 +1,5 @@
-import { ClientFace, colors, fontFamilies, spacing, surfaces } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { ClientFace, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -26,9 +26,9 @@ export function ClientBanner({
   return (
     <View style={styles.banner} testID="client-banner">
       <ClientFace fetcher={fetcher} name={clientName} photo={clientPhoto} size={32} />
-      <Text style={styles.text}>
+      <Text style={styles.text} variant="cuerpo">
         {`${action} `}
-        <Text style={styles.name}>{clientName}</Text>
+        <Text variant="titulo-fila">{clientName}</Text>
         {detail === undefined ? null : ` · ${detail}`}
       </Text>
     </View>
@@ -44,6 +44,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.smLg,
   },
-  name: { color: colors.text, fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
-  text: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  text: { flex: 1 },
 });

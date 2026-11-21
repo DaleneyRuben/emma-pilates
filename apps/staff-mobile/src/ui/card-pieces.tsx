@@ -1,15 +1,14 @@
 import {
   colors,
-  fontFamilies,
   Glyph,
   type GlyphName,
   shadows,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { Children, Fragment, isValidElement, type ReactNode, useContext } from "react";
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 /**
@@ -18,14 +17,14 @@ import { SafeAreaInsetsContext } from "react-native-safe-area-context";
  * screen; a fixed footer is a white panel with rounded top corners.
  */
 
-/** The 12 pt uppercase label at the top of a white card («TU CUENTA», «ACCESOS»). */
+/** The `etiqueta` at the top of a white card («TU CUENTA», «ACCESOS»), a count at its end. */
 export function CardLabel({ children, end }: { children: string; end?: string }) {
   return (
     <View style={styles.labelRow}>
-      <Text accessibilityRole="header" style={styles.label}>
+      <Text accessibilityRole="header" style={styles.label} variant="etiqueta">
         {children}
       </Text>
-      {end === undefined ? null : <Text style={styles.labelEnd}>{end}</Text>}
+      {end === undefined ? null : <Text variant="pastilla">{end}</Text>}
     </View>
   );
 }
@@ -78,7 +77,9 @@ export function SoftNote({
   return (
     <View style={styles.note} testID={testID}>
       <Glyph color={colors.text} name={icon} size={20} strokeWidth={1.6} />
-      <Text style={styles.noteText}>{message}</Text>
+      <Text style={styles.noteText} variant="cuerpo">
+        {message}
+      </Text>
     </View>
   );
 }
@@ -141,25 +142,11 @@ const styles = StyleSheet.create({
     paddingTop: spacing.mdLg,
   },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
+  label: { flex: 1 },
   labelBox: {
     paddingBottom: spacing.smLg,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.mdLg,
-  },
-  labelEnd: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
   },
   labelRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   note: {
@@ -170,11 +157,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  noteText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  noteText: { flex: 1 },
 });

@@ -10,7 +10,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
 import { EmptyState } from "../ui/empty-state";
 import { PrimaryButton } from "../ui/primary-button";
 import { QueryFailure } from "../ui/query-failure";
@@ -18,6 +17,7 @@ import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { SectionTitle } from "../ui/section-title";
 import { TextButton } from "../ui/text-button";
+import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { NotificationGroup, type NotificationActionFor } from "./notification-row";
 import { usePushNotifications } from "./push-notifications";
@@ -56,10 +56,10 @@ function DeniedNotice() {
 
   return (
     <View style={styles.notice}>
-      <BodyText style={styles.noticeText}>
+      <Text variant="cuerpo">
         Las notificaciones están desactivadas en este dispositivo. Actívalas para enterarte a tiempo
         de cambios y recordatorios.
-      </BodyText>
+      </Text>
       <TextButton label="Abrir Ajustes" onPress={openSettings} style={styles.noticeLink} />
     </View>
   );
@@ -221,6 +221,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   noticeLink: { minHeight: 32, paddingHorizontal: 0 },
-  noticeText: { fontSize: 14, lineHeight: 20 },
   screen: { gap: spacing.md },
 });

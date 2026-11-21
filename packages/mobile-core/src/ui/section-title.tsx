@@ -1,15 +1,15 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { spacing } from "./tokens";
 
 /**
- * A list group's heading on the 100 screen (Rosa Emma): Lora 24, the only
- * size the screen's background allows, 12 above the group.
+ * A list group's heading on the 100 screen (Rosa Emma): `titulo-seccion`, a
+ * size the screen's background allows, 12 above the group (follow-up 285).
  */
 export function SectionTitle({ children }: { children: string }) {
   return (
-    <Text accessibilityRole="header" style={styles.title}>
+    <Text accessibilityRole="header" style={styles.title} variant="titulo-seccion">
       {children}
     </Text>
   );
@@ -17,10 +17,6 @@ export function SectionTitle({ children }: { children: string }) {
 
 const styles = StyleSheet.create({
   title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.section,
-    lineHeight: 28,
     marginBottom: spacing.md,
     paddingHorizontal: spacing.xs,
     paddingTop: spacing.sm,

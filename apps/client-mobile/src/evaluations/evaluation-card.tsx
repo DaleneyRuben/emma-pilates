@@ -1,7 +1,7 @@
 import type { ClientEvaluationDto } from "@pilates/api-contracts";
-import { colors, fontFamilies, spacing, surfaces, typography } from "@pilates/mobile-core";
+import { colors, spacing, surfaces, Text } from "@pilates/mobile-core";
 import { Fragment } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { evaluationDayAndTime } from "./evaluation-format";
 
@@ -19,10 +19,10 @@ export function PastEvaluations({
         <Fragment key={evaluation.id}>
           {index === 0 ? null : <View style={styles.hairline} />}
           <View style={styles.row}>
-            <Text style={styles.rowLabel}>
+            <Text style={styles.rowLabel} variant="cuerpo">
               {`${evaluationDayAndTime(evaluation.startsAt)} · ${evaluation.nutritionistName}`}
             </Text>
-            <Text style={styles.rowValue}>{label(evaluation)}</Text>
+            <Text variant="pastilla">{label(evaluation)}</Text>
           </View>
         </Fragment>
       ))}
@@ -41,17 +41,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  rowLabel: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  rowValue: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
+  rowLabel: { flex: 1 },
 });

@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import {
   AcquisitionChannelField,
   type AcquisitionChannelChoice,
 } from "../acquisition/acquisition-channel-field";
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
-import { fontFamilies } from "../ui/fonts";
 import { FormErrorSummary } from "../ui/form-error-summary";
 import { FormField } from "../ui/form-field";
 import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
-import { colors, spacing, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { spacing } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
@@ -210,7 +210,7 @@ export function RegistrationScreen({
             onChangeText={setReferralCode}
             value={referralCode}
           />
-          <Text style={styles.referralHelp}>De una amiga o de tu instructora.</Text>
+          <Text variant="secundario">De una amiga o de tu instructora.</Text>
         </View>
       ) : (
         <Pressable
@@ -219,8 +219,8 @@ export function RegistrationScreen({
           onPress={() => setReferralOpen(true)}
           style={styles.referralToggle}
         >
-          <Text style={styles.referralLabel}>¿Tienes un código de referido?</Text>
-          <Text style={styles.referralLabel}>⌄</Text>
+          <Text variant="compacto-600">¿Tienes un código de referido?</Text>
+          <Text variant="compacto-600">⌄</Text>
         </Pressable>
       )}
     </AuthenticationScreen>
@@ -229,17 +229,6 @@ export function RegistrationScreen({
 
 const styles = StyleSheet.create({
   referral: { gap: spacing.xs },
-  referralHelp: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
-  referralLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
-  },
   referralToggle: {
     alignItems: "center",
     flexDirection: "row",

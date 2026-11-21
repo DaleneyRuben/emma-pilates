@@ -1,19 +1,21 @@
 import type { ReactNode } from "react";
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Line } from "react-native-svg";
 
-import { BodyText } from "./body-text";
-import { fontFamilies } from "./fonts";
 import { LineIcon } from "./line-icon";
-import { colors, spacing, surfaces, typography } from "./tokens";
+import { SheetTitle } from "./sheet-title";
+import { Text } from "./text";
+import { colors, spacing, surfaces } from "./tokens";
 
 /**
  * An image over the whole screen, drawn whole and pinch-zoomable, closed by
  * «Cerrar» or the back gesture. «dark» is the photo viewer of a receipt
  * (S12); «light» is the studio QR on Superficie (follow-up 95), which scans
  * best dark on light and sits on a card with an optional note and action;
- * `banner` sits under the top row for an action's outcome (MOB-063).
+ * `banner` sits under the top row for an action's outcome (MOB-063). The
+ * title is a `SheetTitle`, white on the dark viewer; the light viewer's note
+ * is `cuerpo` inside the white card, never on the 100 screen (follow-up 285).
  */
 export function FullScreenImage({
   aspectRatio = 1,
@@ -59,7 +61,15 @@ export function FullScreenImage({
       <SafeAreaProvider>
         <SafeAreaView style={[styles.viewer, light ? styles.lightViewer : styles.darkViewer]}>
           <View style={styles.topRow}>
-            {title === undefined ? <View /> : <Text style={styles.title}>{title}</Text>}
+            {title === undefined ? (
+              <View />
+            ) : light ? (
+              <SheetTitle>{title}</SheetTitle>
+            ) : (
+              <Text accessibilityRole="header" tone="onDark" variant="titulo-seccion">
+                {title}
+              </Text>
+            )}
             <Pressable
               accessibilityLabel="Cerrar"
               accessibilityRole="button"
@@ -82,11 +92,22 @@ export function FullScreenImage({
             {light ? (
               <View style={styles.card} testID="full-screen-image-card">
                 {image}
+                {note === undefined ? null : (
+                  <Text style={styles.note} variant="cuerpo">
+                    {note}
+                  </Text>
+                )}
               </View>
             ) : (
-              image
+              <>
+                {image}
+                {note === undefined ? null : (
+                  <Text style={styles.note} tone="onDark" variant="cuerpo">
+                    {note}
+                  </Text>
+                )}
+              </>
             )}
-            {note === undefined ? null : <BodyText style={styles.note}>{note}</BodyText>}
           </ScrollView>
           {footer === undefined ? null : <View style={styles.footer}>{footer}</View>}
         </SafeAreaView>
@@ -98,7 +119,14 @@ export function FullScreenImage({
 const styles = StyleSheet.create({
   banner: { paddingHorizontal: spacing.xlSm, paddingTop: spacing.sm },
   // A phone column on a tablet: the QR stays scannable without leaving the screen.
-  card: { ...surfaces.flatCard, maxWidth: 480, padding: spacing.xlSm, width: "100%" },
+  card: {
+    ...surfaces.flatCard,
+    alignItems: "center",
+    gap: spacing.lgXl,
+    maxWidth: 480,
+    padding: spacing.xlSm,
+    width: "100%",
+  },
   close: {
     alignItems: "center",
     height: 44,
@@ -117,19 +145,7 @@ const styles = StyleSheet.create({
   },
   lightImage: { width: "100%" },
   lightViewer: { backgroundColor: colors.surface },
-  note: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 22,
-    maxWidth: 300,
-    textAlign: "center",
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSmall,
-  },
+  note: { alignSelf: "center", maxWidth: 300, textAlign: "center" },
   topRow: {
     alignItems: "center",
     flexDirection: "row",

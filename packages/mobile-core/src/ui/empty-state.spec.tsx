@@ -2,6 +2,7 @@ import { render } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { EmptyState } from "./empty-state";
+import { textVariants } from "./type-scale";
 import { PrimaryButton } from "./primary-button";
 
 const hidden = { includeHiddenElements: true };
@@ -29,7 +30,7 @@ describe("EmptyState", () => {
     );
 
     const title = screen.getByText("Sin plan activo");
-    expect(title).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 24, textAlign: "center" });
+    expect(title).toHaveStyle({ ...textVariants["titulo-fila"], textAlign: "center" });
     const block = title.parent;
     expect(block).toHaveStyle({
       backgroundColor: "#FFFBFB",
@@ -42,8 +43,8 @@ describe("EmptyState", () => {
     expect(icon).toHaveProp("stroke", "#93615D");
     expect(icon).toHaveProp("width", 28);
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
+      ...textVariants.cuerpo,
       color: "#93615D",
-      fontSize: 15,
       textAlign: "center",
     });
   });
@@ -79,7 +80,7 @@ describe("EmptyState plain variant", () => {
     );
 
     const title = screen.getByText("Aún no tienes clases en tu historial.");
-    expect(title).toHaveStyle({ fontSize: 24 });
+    expect(title).toHaveStyle(textVariants["titulo-fila"]);
     expect(title.parent).toHaveStyle({ alignItems: "center", backgroundColor: "#FFFBFB" });
     expect(title.parent?.parent).toHaveStyle({ flex: 1 });
     const icon = screen.getByTestId("empty-state-icon-clock", hidden);
@@ -92,9 +93,9 @@ describe("EmptyState plain variant", () => {
       <EmptyState title="Esta clienta aún no tiene clases en su historial." variant="plain" />,
     );
 
-    expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle({
-      fontSize: 24,
-    });
+    expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle(
+      textVariants["titulo-fila"],
+    );
     expect(screen.queryByTestId("empty-state-disc")).toBeNull();
   });
 

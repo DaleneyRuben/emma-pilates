@@ -6,20 +6,18 @@ import {
 } from "@pilates/api-contracts";
 import {
   Chevron,
-  colors,
   describePlanCardLabel,
   describePlanTerms,
-  fontFamilies,
   SectionTitle,
   LoadingState,
   QueryFailure,
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -110,14 +108,16 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
       testID={`select-plan-${plan.id}`}
     >
       <View style={styles.rowBody}>
-        <Text style={styles.planName}>{plan.name}</Text>
-        <Text style={styles.terms}>{describePlanTerms(plan)}</Text>
+        <Text variant="titulo-fila">{plan.name}</Text>
+        <Text variant="secundario">{describePlanTerms(plan)}</Text>
       </View>
       <View style={styles.prices}>
         {plan.listPriceCentavos === undefined ? null : (
-          <Text style={styles.originalPrice}>{formatMoney(plan.listPriceCentavos)}</Text>
+          <Text strike variant="secundario">
+            {formatMoney(plan.listPriceCentavos)}
+          </Text>
         )}
-        <Text style={styles.price}>{formatMoney(plan.priceCentavos)}</Text>
+        <Text variant="cifra">{formatMoney(plan.priceCentavos)}</Text>
       </View>
       <Chevron size={16} strokeWidth={1.5} tone="muted" />
     </Pressable>
@@ -148,20 +148,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
 const styles = StyleSheet.create({
   card: surfaces.card,
   gapped: { gap: spacing.md },
-  originalPrice: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textDecorationLine: "line-through",
-  },
-  planName: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
   pressed: { opacity: 0.7 },
-  price: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.price },
   prices: { alignItems: "flex-end" },
   row: {
     alignItems: "center",
@@ -173,5 +160,4 @@ const styles = StyleSheet.create({
   },
   rowBody: { flex: 1, gap: spacing.xxs },
   screen: { paddingHorizontal: spacing.xlSm },
-  terms: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
 });

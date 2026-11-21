@@ -62,3 +62,30 @@ describe("FormField password control", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 });
+
+// Follow-up 285 rule 7: the example text is italic, what is typed is not.
+describe("FormField example text", () => {
+  it("leaves italic once something is typed, even when the field keeps its own value", async () => {
+    const screen = await render(<FormField label="Nombre" placeholder="Tu nombre" />);
+    const field = screen.getByLabelText("Nombre");
+
+    expect(field).toHaveStyle({ fontFamily: "WorkSans_400Regular_Italic" });
+
+    await fireEvent.changeText(field, "Lucía");
+
+    expect(screen.getByLabelText("Nombre")).toHaveStyle({ fontFamily: "WorkSans_400Regular" });
+  });
+});
+
+describe("FormField text", () => {
+  it("keeps the field's face and size over a caller's style", async () => {
+    const loose = { fontSize: 20, marginTop: 4 };
+    const screen = await render(<FormField label="Nombre" style={loose} value="Lucía" />);
+
+    expect(screen.getByLabelText("Nombre")).toHaveStyle({
+      fontFamily: "WorkSans_400Regular",
+      fontSize: 15,
+      marginTop: 4,
+    });
+  });
+});

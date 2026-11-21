@@ -147,7 +147,7 @@ describe("Client Inicio with a payment in review or rejected (C8 A + C)", () => 
 
     const notice = await screen.findByTestId("home-payment-card");
     expect(notice).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(within(notice).getByText("TU PAGO ESTÁ EN REVISIÓN")).toBeOnTheScreen();
+    expect(within(notice).getByText("Tu pago está en revisión")).toBeOnTheScreen();
     expect(within(notice).getByText("Trimestral 24")).toBeOnTheScreen();
     expect(
       within(notice).getByText(
@@ -175,7 +175,7 @@ describe("Client Inicio with a payment in review or rejected (C8 A + C)", () => 
     });
 
     const notice = await screen.findByTestId("home-payment-card");
-    expect(within(notice).getByText("NO PUDIMOS CONFIRMAR TU PAGO")).toBeOnTheScreen();
+    expect(within(notice).getByText("No pudimos confirmar tu pago")).toBeOnTheScreen();
     expect(within(notice).getByText("El comprobante no corresponde al monto.")).toBeOnTheScreen();
     // A renewal: she keeps her current plan meanwhile (review of C8).
     expect(
@@ -215,7 +215,7 @@ describe("Client Inicio with a frozen plan (C1 C)", () => {
 
     const notice = await screen.findByTestId("home-freeze-notice");
     expect(notice).toHaveStyle({ backgroundColor: "#93615D" });
-    expect(within(notice).getByText("PLAN CONGELADO")).toBeOnTheScreen();
+    expect(within(notice).getByText("Plan congelado")).toBeOnTheScreen();
     expect(within(notice).getByText(/^Del /)).toBeOnTheScreen();
     const backDay = formatTitleDate(back).split(" de ")[0]!.toLowerCase();
     expect(

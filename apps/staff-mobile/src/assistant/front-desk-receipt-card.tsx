@@ -1,18 +1,17 @@
 import { getGetTransferQrImageUrl } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   Glyph,
   loadPrivateImageWithRatio,
   radii,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
@@ -41,9 +40,9 @@ export function StudioQrCard({ amount }: { amount: string }) {
         ) : null}
       </View>
       <View style={styles.amountColumn}>
-        <Text style={styles.amountLabel}>Monto exacto a transferir</Text>
-        <Text style={styles.amount}>{amount}</Text>
-        <Text style={styles.muted}>QR del estudio · muéstraselo a la clienta</Text>
+        <Text variant="secundario">Monto exacto a transferir</Text>
+        <Text variant="cifra-grande">{amount}</Text>
+        <Text variant="secundario">QR del estudio · muéstraselo a la clienta</Text>
       </View>
     </View>
   );
@@ -76,8 +75,8 @@ export function FrontDeskReceiptCard({
             <Glyph color={colors.text} name="camera" size={22} strokeWidth={1.6} />
           </View>
           <View style={styles.body}>
-            <Text style={styles.title}>Comprobante</Text>
-            <Text style={styles.muted}>
+            <Text variant="titulo-fila">Comprobante</Text>
+            <Text variant="secundario">
               Fotografíalo o elígelo de la galería si llegó por WhatsApp
             </Text>
           </View>
@@ -103,8 +102,8 @@ export function FrontDeskReceiptCard({
         <Glyph color={colors.text} name="check" size={22} strokeWidth={1.6} />
       </View>
       <View style={styles.body}>
-        <Text style={styles.title}>Comprobante listo</Text>
-        <Text style={styles.muted}>Todavía no se envió</Text>
+        <Text variant="titulo-fila">Comprobante listo</Text>
+        <Text variant="secundario">Todavía no se envió</Text>
       </View>
       <TextButton label="Cambiar" onPress={() => setChanging(true)} testID="front-desk-change" />
     </View>
@@ -129,15 +128,15 @@ function SourceButton({
       style={({ pressed }) => [styles.source, pressed && styles.pressed]}
       testID={testID}
     >
-      <Text style={styles.sourceLabel}>{label}</Text>
+      <Text style={styles.sourceLabel} variant="boton-chico">
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  amount: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 32, lineHeight: 38 },
   amountColumn: { flex: 1, gap: spacing.xxs },
-  amountLabel: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   body: { flex: 1, gap: spacing.xxs },
   card: {
     ...surfaces.card,
@@ -150,7 +149,6 @@ const styles = StyleSheet.create({
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", paddingTop: 1, width: 24 },
   head: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
-  muted: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   qr: { height: undefined, width: "100%" },
   qrBox: {
     alignItems: "center",
@@ -185,18 +183,6 @@ const styles = StyleSheet.create({
     minHeight: 48,
     paddingHorizontal: spacing.sm,
   },
-  sourceLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textAlign: "center",
-  },
+  sourceLabel: { textAlign: "center" },
   sources: { flexDirection: "row", gap: spacing.smLg },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
 });

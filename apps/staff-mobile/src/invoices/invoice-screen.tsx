@@ -16,12 +16,13 @@ import {
   PrimaryButton,
   QueryFailure,
   Screen,
+  Text,
   TextButton,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -205,14 +206,14 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
       ) : current.file === null ? (
         <>
           <PrimaryButton busy={busy} label="Subir factura" onPress={() => setChoosing(true)} />
-          <Text style={styles.note}>
+          <Text style={styles.note} variant="secundario">
             {`Al subirla, el pago queda como factura emitida y ${firstName} la ve en su app.`}
           </Text>
         </>
       ) : (
         <View style={styles.row}>
           <TextButton label="Reemplazar" onPress={() => setChoosing(true)} />
-          <TextButton label="Quitar factura" onPress={() => setAsking(true)} tone="error" />
+          <TextButton label="Quitar factura" onPress={() => setAsking(true)} />
         </View>
       )}
     </FooterPanel>
@@ -228,8 +229,10 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
         <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
           <EmphasisCard>
             <View style={styles.heroTop}>
-              <Text style={styles.heroLabel}>Monto</Text>
-              <Text style={styles.state}>
+              <Text style={styles.heroLabel} tone="onDark" variant="etiqueta">
+                Monto
+              </Text>
+              <Text tone="onDark" variant="pastilla">
                 {current.voided
                   ? "Anulado"
                   : current.file === null
@@ -237,9 +240,12 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
                     : "Factura emitida"}
               </Text>
             </View>
-            <Text style={styles.amount}>{formatMoney(current.amountDueCentavos)}</Text>
+            <Text tone="onDark" variant="cifra-grande">
+              {formatMoney(current.amountDueCentavos)}
+            </Text>
             <Text
-              style={styles.heroNote}
+              tone="onDark"
+              variant="cuerpo"
             >{`${current.clientName} · ${current.purchaseLabel}`}</Text>
           </EmphasisCard>
           <RowCard label="Datos de la factura">

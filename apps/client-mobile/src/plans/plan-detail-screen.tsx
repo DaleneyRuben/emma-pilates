@@ -9,10 +9,8 @@ import {
 } from "@pilates/api-contracts";
 import {
   addCivilDays,
-  BodyText,
   boliviaCivilDate,
   colors,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   Glyph,
@@ -26,7 +24,7 @@ import {
   spacing,
   StartDateChooser,
   surfaces,
-  typography,
+  Text,
   useStudioRules,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -203,7 +201,9 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
       </ScrollView>
       {/* Rosa Emma C09: the button and its line on a white panel cast upward. */}
       <FooterPanel testID="plan-detail-footer">
-        <BodyText style={styles.note}>Pagas por QR y subes tu comprobante</BodyText>
+        <Text style={styles.note} variant="secundario">
+          Pagas por QR y subes tu comprobante
+        </Text>
         <PrimaryButton
           busy={busy}
           label={`Pagar ${price}`}
@@ -223,9 +223,13 @@ function Aside({ alert = false, text }: { alert?: boolean; text: string }) {
   return (
     <View style={[styles.aside, alert && styles.asideAlert]}>
       {alert ? <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} /> : null}
-      <BodyText accessibilityRole={alert ? "alert" : undefined} style={styles.asideText}>
+      <Text
+        accessibilityRole={alert ? "alert" : undefined}
+        style={styles.asideText}
+        variant="cuerpo"
+      >
         {text}
-      </BodyText>
+      </Text>
     </View>
   );
 }
@@ -246,19 +250,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     boxShadow: "none",
   },
-  asideText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  asideText: { flex: 1 },
   content: { gap: spacing.md, paddingBottom: spacing.lg },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   screen: { gap: spacing.lg, paddingBottom: 0 },
 });

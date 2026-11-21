@@ -5,7 +5,6 @@ import {
   cardWithActionRow,
   colors,
   dayChipLabel,
-  fontFamilies,
   formatCancellationWindow,
   formatTimeRange,
   IconRow,
@@ -15,10 +14,10 @@ import {
   spacing,
   StaffFace,
   surfaces,
-  typography,
+  Text,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 
@@ -30,12 +29,12 @@ function TrainerDetails({ item, time }: { item: UpcomingBookingDto; time: string
   const fetcher = useClientFetcher();
   return (
     <View style={styles.detailsLine}>
-      <Text style={styles.details}>{`${time} ·`}</Text>
+      <Text variant="secundario">{`${time} ·`}</Text>
       <View style={styles.trainer}>
         <StaffFace fetcher={fetcher} name={item.trainerName} photo={item.trainerPhoto} size={20} />
-        <Text style={styles.details}>{item.trainerName}</Text>
+        <Text variant="secundario">{item.trainerName}</Text>
       </View>
-      <Text style={styles.details}>{`· ${item.branchName}`}</Text>
+      <Text variant="secundario">{`· ${item.branchName}`}</Text>
     </View>
   );
 }
@@ -45,8 +44,8 @@ export function DayTile({ startsAt, today }: { startsAt: string; today: string }
   const day = dayChipLabel(civil);
   return (
     <View style={styles.day} testID="booking-day-tile">
-      <Text style={styles.weekday}>{civil === today ? "Hoy" : day.weekday}</Text>
-      <Text style={styles.dayNumber}>{day.day}</Text>
+      <Text variant="etiqueta">{civil === today ? "Hoy" : day.weekday}</Text>
+      <Text variant="cifra">{day.day}</Text>
     </View>
   );
 }
@@ -106,7 +105,7 @@ export function useBookingAction({
 
 /**
  * A booking card (follow-ups 225 §9 and 226, Rosa Emma C05): a white card
- * with the soft day tile, the class in Lora 22 over one line of details, then the action as a text
+ * with the soft day tile, the class as a row title over one line of details, then the action as a text
  * button. Cancelling is the secondary look and asks first (FIX-089); a
  * waitlist place is said in words, not a pill.
  */
@@ -139,12 +138,10 @@ export function BookingCard({
       <View style={styles.header}>
         <DayTile startsAt={item.startsAt} today={today} />
         <View style={styles.body}>
-          <Text style={styles.title}>{item.classTypeName}</Text>
-          {item.kind === "waitlist" ? (
-            <Text style={styles.waitlist}>En lista de espera</Text>
-          ) : null}
+          <Text variant="titulo-fila">{item.classTypeName}</Text>
+          {item.kind === "waitlist" ? <Text variant="pastilla">En lista de espera</Text> : null}
           {insideWindow && cancellationWindowMinutes !== undefined ? (
-            <Text style={styles.details}>
+            <Text variant="secundario">
               {`${time} · faltan menos de ${formatCancellationWindow(cancellationWindowMinutes)}`}
             </Text>
           ) : (
@@ -166,7 +163,10 @@ export function CancelBookingFacts({ booking }: { booking: UpcomingBookingDto })
           icon="calendar"
           label={`${booking.classTypeName} · ${formatDateTime(booking.startsAt)}`}
         />
-        <Text style={styles.factNote}>{`${booking.trainerName} · ${booking.branchName}`}</Text>
+        <Text
+          style={styles.factNote}
+          variant="secundario"
+        >{`${booking.trainerName} · ${booking.branchName}`}</Text>
       </View>
       <IconRow icon="undo" label="La clase vuelve a tu plan" />
     </IconRowGroup>
@@ -188,42 +188,17 @@ const styles = StyleSheet.create({
     borderRadius: radii.inset,
     borderWidth: 1,
     flexShrink: 0,
-    height: 52,
+    height: 56,
     justifyContent: "center",
     width: 52,
   },
-  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20, lineHeight: 22 },
-  details: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   detailsLine: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   factNote: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
     marginLeft: 64,
     marginTop: -spacing.sm,
     paddingBottom: spacing.sm,
   },
   factRow: {},
   header: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    lineHeight: 25,
-  },
   trainer: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  waitlist: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
-  weekday: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.08,
-    textTransform: "uppercase",
-  },
 });

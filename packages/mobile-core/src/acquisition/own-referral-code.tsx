@@ -7,13 +7,13 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
 import { useMountedAt } from "../time/mounted-at";
 import { Glyph } from "../ui/glyph";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { type CodeStatus, ReferralCodeSheet } from "./referral-code-sheet";
 
 // The API's refusals of a save (BKM-017), shown on the sheet's status line.
@@ -35,15 +35,11 @@ export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.codeColumn}>
-        <Text style={styles.eyebrow}>Tu código</Text>
-        {/* Up to 20 characters: one line, the type shrinks to fit. */}
-        <Text
-          adjustsFontSizeToFit
-          minimumFontScale={0.5}
-          numberOfLines={1}
-          selectable
-          style={styles.code}
-        >
+        <Text tone="onDark" variant="etiqueta">
+          Tu código
+        </Text>
+        {/* Up to 20 characters: a long code wraps, it never shrinks below cifra-grande. */}
+        <Text selectable tone="onDark" variant="cifra-grande">
           {code}
         </Text>
       </View>
@@ -54,7 +50,7 @@ export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
         style={({ pressed }) => [styles.copy, pressed && styles.pressed]}
       >
         <Glyph color={colors.text} name="copy" size={16} strokeWidth={1.6} />
-        <Text style={styles.copyLabel}>Copiar</Text>
+        <Text variant="boton-chico">Copiar</Text>
       </Pressable>
     </View>
   );
@@ -86,7 +82,7 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
   if (current === null) return null;
   if (editableFrom !== null && new Date(editableFrom).getTime() > mountedAt) {
     return (
-      <Text style={styles.waitLine}>
+      <Text style={styles.waitLine} variant="secundario">
         Podrás cambiarlo de nuevo el {formatListDate(editableFrom)}
       </Text>
     );
@@ -158,13 +154,6 @@ const styles = StyleSheet.create({
     paddingRight: spacing.lg,
     paddingTop: spacing.lg,
   },
-  code: {
-    color: colors.white,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    letterSpacing: 34 * 0.12,
-    lineHeight: 40,
-  },
   codeColumn: { flex: 1, gap: spacing.xs },
   copy: {
     alignItems: "center",
@@ -175,26 +164,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingHorizontal: spacing.mdLg,
   },
-  copyLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-  },
   edit: { alignSelf: "flex-start", minHeight: 40, paddingHorizontal: 0 },
-  eyebrow: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
   pressed: { opacity: 0.85 },
-  waitLine: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    paddingVertical: spacing.sm,
-  },
+  waitLine: { paddingVertical: spacing.sm },
 });

@@ -26,3 +26,17 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 jest.mock("@react-native-community/netinfo", () => ({
   addEventListener: () => () => undefined,
 }));
+
+// Follow-up 285: RNTL's cleanup checks every text a spec left on screen
+// against the type scale before it unmounts, whether the spec calls cleanup
+// itself or leaves it to the hook below, which runs after the hooks above.
+process.env.RNTL_SKIP_AUTO_CLEANUP = "true";
+jest.mock("@testing-library/react-native", () =>
+  require("./src/testing").withTypeScaleAudit(jest.requireActual("@testing-library/react-native")),
+);
+afterEach(async () => {
+  const {
+    cleanup,
+  }: typeof import("@testing-library/react-native") = require("@testing-library/react-native");
+  await cleanup();
+});

@@ -1,5 +1,5 @@
-import { colors, fontFamilies, Glyph, spacing, surfaces } from "@pilates/mobile-core";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 
 export type InvoiceSource = "camera" | "library" | "document";
 
@@ -14,7 +14,8 @@ const choices: readonly {
   { source: "document", label: "Elegir un PDF", icon: "document" },
 ];
 
-// E5 «Elegir archivo»: where the invoice comes from, a photo or a PDF.
+// E5 «Elegir archivo» (E-D20): where the invoice comes from, a photo or a PDF.
+// Each choice is a `titulo-fila` row; «Cancelar» is a button, `boton`.
 export function InvoiceSourceSheet({
   onChoose,
   onDismiss,
@@ -47,7 +48,7 @@ export function InvoiceSourceSheet({
               ]}
             >
               <Glyph color={colors.primaryOnTint} name={choice.icon} size={20} strokeWidth={1.6} />
-              <Text style={styles.label}>{choice.label}</Text>
+              <Text variant="titulo-fila">{choice.label}</Text>
             </Pressable>
           ))}
         </View>
@@ -57,7 +58,7 @@ export function InvoiceSourceSheet({
             onPress={onDismiss}
             style={({ pressed }) => [styles.choice, pressed && styles.pressed]}
           >
-            <Text style={[styles.label, styles.cancel]}>Cancelar</Text>
+            <Text variant="boton">Cancelar</Text>
           </Pressable>
         </View>
       </View>
@@ -67,7 +68,6 @@ export function InvoiceSourceSheet({
 
 const styles = StyleSheet.create({
   backdrop: { ...StyleSheet.absoluteFill, backgroundColor: colors.scrim },
-  cancel: { fontFamily: fontFamilies.bodyBold, fontWeight: "700" },
   choice: {
     alignItems: "center",
     flexDirection: "row",
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
   },
   divided: { borderTopColor: colors.hairline, borderTopWidth: 1 },
   group: { ...surfaces.card, overflow: "hidden" },
-  label: { color: colors.primaryOnTint, fontFamily: fontFamilies.body, fontSize: 18 },
   pressed: { backgroundColor: colors.primaryTint },
   sheet: {
     bottom: spacing.xl,

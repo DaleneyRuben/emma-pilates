@@ -1,14 +1,14 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { dayChipLabel } from "../time/session-format";
-import { fontFamilies } from "../ui/fonts";
 import { SectionTitle } from "../ui/section-title";
+import { Text } from "../ui/text";
 import { colors, radii, shadows, spacing } from "../ui/tokens";
 import { startDateOptions, type StartDateOption } from "./start-date-options";
 
 /**
  * C09 and S10 on v2: «Fecha de inicio» as the section title, then Lino tiles
- * with the day in Lora 18 between the weekday and the month (72 high, follow-up
+ * with the day in cifra between the weekday and the month (72 high, follow-up
  * 256 § 1) and the chosen one in Palo de rosa.
  */
 export function StartDateChooser({
@@ -54,7 +54,12 @@ export function StartDateStrip({
       ) : (
         <View style={styles.titleRow}>
           <SectionTitle>{title}</SectionTitle>
-          <Text style={styles.aside}>{aside}</Text>
+          {/* Small text on a white capsule, never straight on 100 (audit d7). */}
+          <View style={styles.aside}>
+            <Text style={styles.asideText} variant="secundario">
+              {aside}
+            </Text>
+          </View>
         </View>
       )}
       <ScrollView
@@ -108,6 +113,8 @@ function StartDateChip({
   const weekday = option.weekday === "" ? chip.weekday : option.weekday;
   const day = option.weekday === "Día de apertura" ? "" : chip.day;
   const [shortMonth, month] = monthOf(option.date);
+  // The chosen tile changes ground and tone, never weight.
+  const tone = selected ? "onDark" : "ink";
 
   return (
     <Pressable
@@ -118,13 +125,15 @@ function StartDateChip({
       style={[styles.chip, selected && styles.chipSelected]}
       testID={`start-date-${option.date}`}
     >
-      <Text style={[styles.weekday, selected && [styles.selectedText, styles.selectedWeekday]]}>
+      <Text tone={tone} variant="pastilla">
         {weekday}
       </Text>
       {day === "" ? null : (
         <>
-          <Text style={[styles.day, selected && styles.selectedText]}>{day}</Text>
-          <Text style={[styles.weekday, selected && [styles.selectedText, styles.selectedWeekday]]}>
+          <Text tone={tone} variant="cifra">
+            {day}
+          </Text>
+          <Text tone={tone} variant="pastilla">
             {shortMonth}
           </Text>
         </>
@@ -135,35 +144,32 @@ function StartDateChip({
 
 const styles = StyleSheet.create({
   aside: {
-    color: colors.textMuted,
+    backgroundColor: colors.card,
+    borderRadius: radii.inset,
     flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 13,
     marginBottom: spacing.md,
-    textAlign: "right",
+    paddingHorizontal: spacing.smLg,
+    paddingVertical: spacing.xs,
   },
+  asideText: { textAlign: "right" },
   chip: {
     ...shadows.card,
     alignItems: "center",
     backgroundColor: colors.card,
     borderRadius: radii.inset,
     gap: spacing.xxs,
-    height: 72,
+    minHeight: 72,
     justifyContent: "center",
     // «Día de apertura» is wider than a day.
     minWidth: 52,
     paddingHorizontal: spacing.sm,
   },
   chipSelected: { backgroundColor: colors.primary },
-  day: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
   row: { gap: spacing.sm },
-  selectedText: { color: colors.onPrimary },
   titleRow: {
     alignItems: "baseline",
     flexDirection: "row",
     gap: spacing.md,
     justifyContent: "space-between",
   },
-  selectedWeekday: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
-  weekday: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 12 },
 });

@@ -1,16 +1,14 @@
 import type { EvaluationSlotDto } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   colors,
-  fontFamilies,
   formatBolivianos,
   radii,
   spacing,
-  typography,
+  Text,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { firstName, slotDayLabel } from "./evaluation-appointment-format";
 import { clockTime } from "./evaluation-format";
@@ -53,7 +51,7 @@ export function NextSlots({
 
   return (
     <>
-      <BodyText style={styles.line}>{nextSlotsLine(slots)}</BodyText>
+      <Text variant="secundario">{nextSlotsLine(slots)}</Text>
       <View style={styles.row}>
         {slots.map((slot) => {
           const dayLabel = slotDayLabel(slot.startsAt, today);
@@ -67,10 +65,10 @@ export function NextSlots({
               onPress={() => onPick(slot)}
               style={({ pressed }) => [styles.box, pressed && styles.pressed]}
             >
-              <Text style={styles.day}>{dayLabel}</Text>
-              <Text style={styles.time}>{time}</Text>
+              <Text variant="pastilla">{dayLabel}</Text>
+              <Text variant="cifra">{time}</Text>
               {extra.map((caption) => (
-                <Text key={caption} style={styles.day}>
+                <Text key={caption} variant="pastilla">
                   {caption}
                 </Text>
               ))}
@@ -95,19 +93,6 @@ const styles = StyleSheet.create({
     minHeight: 62,
     paddingVertical: spacing.sm,
   },
-  day: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "600",
-  },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   pressed: { opacity: 0.85 },
   row: { flexDirection: "row", gap: spacing.sm },
-  time: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 20,
-    fontVariant: ["tabular-nums"],
-  },
 });

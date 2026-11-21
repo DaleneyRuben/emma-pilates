@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
+import { Text } from "./text";
 import { colors, radii } from "./tokens";
 
 // Follow-up 73: «9+» above nine.
@@ -8,7 +8,7 @@ export function unreadCountLabel(count: number): string {
   return count > 9 ? "9+" : String(count);
 }
 
-/** The unread count in rosa profundo, never Error red (follow-up 73). */
+/** The unread count in rosa profundo, never Error red (follow-up 73), in `pastilla`. */
 export function UnreadCountPill({
   count,
   inverted = false,
@@ -31,7 +31,7 @@ export function UnreadCountPill({
       style={[styles.pill, ring && styles.ring, inverted && styles.inverted]}
       testID={testID}
     >
-      <Text style={[styles.label, inverted && styles.invertedLabel]}>
+      <Text tone={inverted ? "ink" : "onDark"} variant="pastilla">
         {unreadCountLabel(count)}
       </Text>
     </View>
@@ -40,13 +40,6 @@ export function UnreadCountPill({
 
 const styles = StyleSheet.create({
   inverted: { backgroundColor: colors.card },
-  invertedLabel: { color: colors.primary },
-  label: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-  },
   pill: {
     alignItems: "center",
     backgroundColor: colors.primary,

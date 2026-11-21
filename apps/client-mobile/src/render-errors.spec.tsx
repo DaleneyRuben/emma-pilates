@@ -8,13 +8,14 @@ let mockFlowFails = false;
 
 jest.mock("./home/home-screen", () => {
   const { createElement } = require("react");
-  const { Text } = require("react-native");
+  const { Text } =
+    jest.requireActual<typeof import("@pilates/mobile-core")>("@pilates/mobile-core");
   return {
     HomeScreen: () => {
       if (mockHomeFails) {
         throw new Error("mob-053 probe");
       }
-      return createElement(Text, null, "Inicio recuperado");
+      return createElement(Text, { variant: "cuerpo" }, "Inicio recuperado");
     },
   };
 });

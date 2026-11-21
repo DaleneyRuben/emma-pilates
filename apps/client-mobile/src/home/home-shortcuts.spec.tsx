@@ -60,7 +60,7 @@ describe("Client Home shortcut tiles", () => {
 
     expect(screen.getByText("Accesos rápidos")).toHaveStyle({
       color: "#93615D",
-      fontFamily: "Lora_400Regular",
+      fontFamily: "Lora_500Medium",
       fontSize: 24,
     });
     for (const label of ["Evaluación nutricional", "Invita a una amiga"]) {
@@ -68,7 +68,10 @@ describe("Client Home shortcut tiles", () => {
         backgroundColor: "#FFFBFB",
         borderRadius: 20,
       });
-      expect(screen.getByText(label)).toHaveStyle({ fontSize: 15, fontWeight: "700" });
+      expect(screen.getByText(label)).toHaveStyle({
+        fontFamily: "WorkSans_600SemiBold",
+        fontSize: 16,
+      });
     }
     expect(screen.getAllByTestId("shortcut-disc")[0]).toHaveStyle({
       backgroundColor: "#FEF6F2",

@@ -6,15 +6,14 @@ import {
   useGetCurrentPurchaseIntent,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   colors,
   EmphasisCard,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   FormScrollView,
   Glyph,
+  InlineError,
   invoiceChoiceFrom,
   invoiceDataPayload,
   invoiceIncompleteNote,
@@ -27,14 +26,14 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  Text,
   type InvoiceChoice,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
@@ -169,7 +168,9 @@ export function PaymentScreen() {
           note={`Plan ${current.planName}${startsLine}`}
           testID="payment-hero"
         >
-          <Text style={styles.amount}>{formatBolivianos(current.amountDueCentavos)}</Text>
+          <Text tone="onDark" variant="cifra-grande">
+            {formatBolivianos(current.amountDueCentavos)}
+          </Text>
         </EmphasisCard>
         <View>
           <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
@@ -191,16 +192,16 @@ export function PaymentScreen() {
         {error === null ? null : (
           <View style={styles.errorBox}>
             <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
-            <BodyText accessibilityRole="alert" style={styles.error}>
-              {error}
-            </BodyText>
+            <InlineError style={styles.error}>{error}</InlineError>
           </View>
         )}
       </FormScrollView>
       {/* Rosa Emma C10: the button and its line on a white panel cast upward. */}
       <FooterPanel testID="payment-footer">
         {offReason === undefined ? (
-          <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
+          <Text style={styles.note} variant="secundario">
+            El estudio revisa tu pago y te avisa por la app
+          </Text>
         ) : null}
         <PrimaryButton
           busy={submitting}
@@ -217,20 +218,8 @@ export function PaymentScreen() {
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    fontVariant: ["tabular-nums"],
-  },
   content: { gap: spacing.md, paddingBottom: spacing.lg },
-  error: {
-    color: colors.errorText,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  error: { flex: 1 },
   // Rosa Emma C10e: a failure on 50 with its outline and glyph.
   errorBox: {
     alignItems: "flex-start",
@@ -245,11 +234,6 @@ const styles = StyleSheet.create({
   },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  note: { textAlign: "center" },
   screen: { gap: spacing.lg, paddingBottom: 0 },
 });

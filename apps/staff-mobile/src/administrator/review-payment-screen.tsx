@@ -6,9 +6,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   ClientFace,
-  colors,
   EmphasisCard,
-  fontFamilies,
   FormField,
   FormScrollView,
   FullScreenImage,
@@ -23,13 +21,13 @@ import {
   Screen,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { BackBar } from "../ui/back-bar";
@@ -144,7 +142,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           onRetry={() => void receipt.refetch()}
         />
       ) : (
-        <Text style={styles.helper}>
+        <Text variant="secundario">
           {payment.receipt ? "Cargando el comprobante…" : "Todavía no hay comprobante."}
         </Text>
       )
@@ -222,7 +220,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                 testID="review-reject-reason"
                 value={reason}
               />
-              <Text style={styles.helper}>
+              <Text variant="secundario">
                 La clienta verá este mensaje para corregir y volver a enviar.
               </Text>
             </View>
@@ -248,7 +246,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               <FooterPanel bleed={0}>
                 {failureRow}
                 {invoiceData === null ? null : (
-                  <Text style={styles.invoiceNote}>
+                  <Text style={styles.invoiceNote} variant="secundario">
                     Podrás subir la factura cuando confirmes el pago.
                   </Text>
                 )}
@@ -263,7 +261,6 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                   label="Rechazar"
                   onPress={() => setRejecting(true)}
                   testID="review-reject"
-                  tone="error"
                 />
               </FooterPanel>
             )
@@ -272,12 +269,19 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           {/* E-D04: the amount is the screen's one 600 hero, its state at the eyebrow's end. */}
           <EmphasisCard>
             <View style={styles.heroTop}>
-              <Text style={styles.heroLabel}>Monto a verificar</Text>
-              <Text style={styles.state}>{stateLabels[payment.state]}</Text>
+              <Text style={styles.heroLabel} tone="onDark" variant="etiqueta">
+                Monto a verificar
+              </Text>
+              <Text tone="onDark" variant="pastilla">
+                {stateLabels[payment.state]}
+              </Text>
             </View>
-            <Text style={styles.amount}>{formatMoney(payment.amountDueCentavos)}</Text>
+            <Text tone="onDark" variant="cifra-grande">
+              {formatMoney(payment.amountDueCentavos)}
+            </Text>
             <Text
-              style={styles.heroNote}
+              tone="onDark"
+              variant="cuerpo"
             >{`${payment.clientName} · ${describeSale(payment)}`}</Text>
           </EmphasisCard>
           <PaymentBreakdown payment={payment} />
@@ -311,7 +315,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                   hitSlop={spacing.md}
                   onPress={() => setEnlarged(true)}
                 >
-                  <Text style={styles.enlarge}>Ampliar</Text>
+                  <Text variant="enlace">Ampliar</Text>
                 </Pressable>
               )}
             </View>
@@ -330,53 +334,15 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   );
 }
 
-const heroText = { color: colors.onEmphasis } as const;
-
 const styles = StyleSheet.create({
-  amount: {
-    ...heroText,
-    fontFamily: fontFamilies.display,
-    fontSize: 36,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 42,
-  },
-  enlarge: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
   formCard: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
-  helper: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
-  heroLabel: {
-    ...heroText,
-    flex: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
-  heroNote: { ...heroText, fontFamily: fontFamilies.body, fontSize: typography.body },
+  heroLabel: { flex: 1 },
   heroTop: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  invoiceNote: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  invoiceNote: { textAlign: "center" },
   reasonInput: { minHeight: 96, textAlignVertical: "top" },
   receipt: { borderRadius: radii.inset, width: "100%" },
   receiptCard: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   receiptLabel: { flex: 1 },
   receiptTop: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   screen: { paddingHorizontal: spacing.xlSm },
-  // FIX-089: the state is a word in weight on the hero, not a pill.
-  state: {
-    ...heroText,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
 });

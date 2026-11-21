@@ -1,5 +1,5 @@
 import { formatListDate } from "@pilates/api-contracts";
-import { BodyText, ConfirmationSheet } from "@pilates/mobile-core";
+import { ConfirmationSheet, Text } from "@pilates/mobile-core";
 
 import { keptLine } from "./availability-block-form-parts";
 
@@ -37,7 +37,7 @@ export function BlockChangeSheet({
       tone={ending ? "destructive" : "primary"}
       visible={confirming !== null}
     >
-      {booked > 0 ? <BodyText>{keptLine(booked)}</BodyText> : null}
+      {booked > 0 ? <Text variant="cuerpo">{keptLine(booked)}</Text> : null}
     </ConfirmationSheet>
   );
 }

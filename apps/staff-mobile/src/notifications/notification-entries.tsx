@@ -1,9 +1,9 @@
 import type { NotificationDto } from "@pilates/api-contracts";
 import {
-  BodyText,
   formatNotificationTime,
   spacing,
   surfaces,
+  Text,
   TextButton,
   usePushNotifications,
 } from "@pilates/mobile-core";
@@ -20,10 +20,10 @@ export function DeniedNotice() {
   if (permissionStatus !== "denied") return null;
   return (
     <View style={styles.notice}>
-      <BodyText>
+      <Text variant="cuerpo">
         Las notificaciones están desactivadas en este dispositivo. Actívalas para enterarte a tiempo
         de cambios y recordatorios.
-      </BodyText>
+      </Text>
       <TextButton label="Abrir Ajustes" onPress={openSettings} />
     </View>
   );
@@ -49,7 +49,7 @@ function NoticeRow({
       indent={indent}
       label={notification.message}
       onPress={() => onOpen(notification)}
-      strong={unread}
+
       testID={`notification-row-${notification.id}`}
     />
   );
@@ -105,7 +105,6 @@ export function NotificationEntries({
             key={entry.key}
             label={entry.label}
             onPress={() => toggle(entry.key)}
-            strong={entry.unreadCount > 0}
             testID={`notification-group-${entry.key}`}
           />,
           ...(open

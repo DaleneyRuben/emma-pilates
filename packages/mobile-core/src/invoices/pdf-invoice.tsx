@@ -7,7 +7,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
@@ -15,10 +14,10 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Line } from "react-native-svg";
 
-import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
 import { LineIcon } from "../ui/line-icon";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing } from "../ui/tokens";
 import { loadPdfPage, type PdfPage } from "./load-pdf-page";
 
 const pagesLabel = (count: number) => (count === 1 ? "1 página" : `${count} páginas`);
@@ -61,7 +60,7 @@ export function PdfInvoice({
       >
         <Glyph name="document" size={compact ? 22 : 40} strokeWidth={1.2} />
         {compact ? null : (
-          <Text numberOfLines={2} style={styles.fileName}>
+          <Text numberOfLines={2} style={styles.fileName} variant="secundario">
             {fileName}
           </Text>
         )}
@@ -96,7 +95,9 @@ export function PdfInvoice({
         />
         {compact ? null : (
           <View style={styles.pill}>
-            <Text style={styles.pillLabel}>{`Ver · ${pagesLabel(count)}`}</Text>
+            <Text tone="onDark" variant="pastilla">
+              {`Ver · ${pagesLabel(count)}`}
+            </Text>
           </View>
         )}
       </Pressable>
@@ -172,7 +173,9 @@ function PdfInvoiceViewer({
                 <Line x1="18" x2="6" y1="6" y2="18" />
               </LineIcon>
             </Pressable>
-            <Text style={styles.title}>{`Factura · ${current} de ${count}`}</Text>
+            <Text style={styles.title} tone="onDark" variant="titulo-fila">
+              {`Factura · ${current} de ${count}`}
+            </Text>
             <View style={styles.close} />
           </View>
           <ScrollView
@@ -220,12 +223,7 @@ function PdfInvoiceViewer({
 const styles = StyleSheet.create({
   close: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
   compactPage: { alignSelf: "auto", width: 56 },
-  fileName: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "center",
-  },
+  fileName: { textAlign: "center" },
   footer: { paddingBottom: spacing.lg, paddingHorizontal: spacing.xlSm, paddingTop: spacing.md },
   page: { backgroundColor: colors.white, width: "100%" },
   pageFrame: { alignSelf: "center", maxWidth: 720, width: "100%" },
@@ -237,20 +235,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
   },
+  // Solid 600 under the white label: never a see-through ground.
   pill: {
-    backgroundColor: colors.scrim,
+    backgroundColor: colors.emphasis,
     borderRadius: radii.pill,
     bottom: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     position: "absolute",
     right: spacing.sm,
-  },
-  pillLabel: {
-    color: colors.white,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
   },
   placeholder: {
     alignItems: "center",
@@ -272,14 +265,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     width: 220,
   },
-  title: {
-    color: colors.white,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    textAlign: "center",
-  },
+  title: { flex: 1, textAlign: "center" },
   topRow: { alignItems: "center", flexDirection: "row", paddingHorizontal: spacing.sm },
   viewer: { backgroundColor: colors.text, flex: 1 },
 });

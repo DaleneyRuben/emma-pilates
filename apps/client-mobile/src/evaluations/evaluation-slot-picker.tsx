@@ -1,22 +1,19 @@
 import type { EvaluationAvailabilityDto, EvaluationSlotDto } from "@pilates/api-contracts";
 import {
-  BodyText,
   chipStyles,
   colors,
   dayChipLabel,
   formatBolivianos,
-  fontFamilies,
   PersonAvatar,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useState, type ReactNode } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
-import { usedMonthStyles } from "./evaluation-used-month";
 
 export type OpenDay = { date: string; slots: EvaluationSlotDto[] };
 
@@ -50,8 +47,8 @@ function NutritionistCard({ branchName, name }: { branchName: string; name: stri
     <View style={styles.nutritionist}>
       <PersonAvatar name={name} photoUri={null} size={44} />
       <View style={styles.nutritionistText}>
-        <Text style={styles.nutritionistName}>{name}</Text>
-        <BodyText style={styles.muted}>{`Nutricionista · 45 min · ${branchName}`}</BodyText>
+        <Text variant="titulo-fila">{name}</Text>
+        <Text variant="secundario">{`Nutricionista · 45 min · ${branchName}`}</Text>
       </View>
     </View>
   );
@@ -94,7 +91,7 @@ export function EvaluationSlotPicker({
 
   return (
     <View style={plain ? styles.plain : styles.card} testID="evaluation-slot-card">
-      <Text style={usedMonthStyles.label}>Días disponibles</Text>
+      <Text variant="etiqueta">Días disponibles</Text>
       <ScrollView
         contentContainerStyle={styles.days}
         horizontal
@@ -113,10 +110,10 @@ export function EvaluationSlotPicker({
               onPress={() => setSelectedDate(day.date)}
               style={[styles.day, chipStyles.box, isSelected && chipStyles.boxSelected]}
             >
-              <Text style={[styles.dayWeekday, isSelected && chipStyles.labelSelected]}>
+              <Text tone={isSelected ? "onDark" : "ink"} variant="pastilla">
                 {chip.weekday}
               </Text>
-              <Text style={[styles.dayNumber, isSelected && styles.daySelectedText]}>
+              <Text tone={isSelected ? "onDark" : "ink"} variant="cifra">
                 {chip.day}
               </Text>
             </Pressable>
@@ -126,10 +123,12 @@ export function EvaluationSlotPicker({
       {selected !== undefined ? (
         <>
           <View style={styles.dayHeader}>
-            <Text style={styles.dayTitle}>{evaluationDate(selected.slots[0]?.startsAt ?? "")}</Text>
-            <BodyText style={styles.count}>
+            <Text style={styles.dayTitle} variant="etiqueta">
+              {evaluationDate(selected.slots[0]?.startsAt ?? "")}
+            </Text>
+            <Text variant="pastilla">
               {selected.slots.length === 1 ? "1 horario" : `${selected.slots.length} horarios`}
-            </BodyText>
+            </Text>
           </View>
           <View style={styles.grid}>
             {selected.slots.map((slot) => (
@@ -140,14 +139,12 @@ export function EvaluationSlotPicker({
                 onPress={() => onPick(slot)}
                 style={styles.slot}
               >
-                <Text style={styles.slotTime}>{clockTime(slot.startsAt)}</Text>
-                {branches.size > 1 ? (
-                  <Text style={styles.slotCaption}>{slot.branchName}</Text>
-                ) : null}
+                <Text variant="cifra">{clockTime(slot.startsAt)}</Text>
+                {branches.size > 1 ? <Text variant="pastilla">{slot.branchName}</Text> : null}
                 {nutritionists.size > 1 ? (
-                  <Text style={styles.slotCaption}>{slot.nutritionistName}</Text>
+                  <Text variant="pastilla">{slot.nutritionistName}</Text>
                 ) : null}
-                {mixedPrices ? <Text style={styles.slotCaption}>{priceLabel(slot)}</Text> : null}
+                {mixedPrices ? <Text variant="pastilla">{priceLabel(slot)}</Text> : null}
               </Pressable>
             ))}
           </View>
@@ -161,12 +158,6 @@ export function EvaluationSlotPicker({
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   plain: { gap: spacing.smLg },
-  count: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
   // C13's day chips: 48 × 60, white with a 400 outline, the chosen one 600.
   day: {
     alignItems: "center",
@@ -182,27 +173,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: spacing.xs,
   },
-  dayNumber: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 20 },
-  daySelectedText: { color: colors.onPrimary },
   dayStrip: { flexGrow: 0, flexShrink: 0 },
-  dayTitle: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 11 * 0.14,
-    textTransform: "uppercase",
-  },
-  dayWeekday: {
-    color: colors.text,
-    fontSize: typography.label,
-    fontFamily: fontFamilies.bodyBold,
-    fontWeight: "700",
-  },
+  dayTitle: { flexShrink: 1 },
   days: { gap: spacing.sm },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  muted: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
   nutritionist: {
     ...surfaces.card,
     alignItems: "center",
@@ -211,14 +185,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  nutritionistName: {
-    color: colors.text,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-    fontFamily: fontFamilies.bodyStrong,
-  },
   nutritionistText: { flex: 1, gap: spacing.xxs },
-  // C13's slots: 56 high, soft 50 with a 1.5 400 outline, the time in Lora 22.
+  // C13's slots: 56 high, soft 50 with a 1.5 400 outline, the time in `cifra`.
   slot: {
     alignItems: "center",
     backgroundColor: colors.primaryTint,
@@ -229,16 +197,5 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingVertical: spacing.xs,
     width: "31%",
-  },
-  slotCaption: {
-    color: colors.text,
-    fontSize: typography.label,
-    fontFamily: fontFamilies.body,
-  },
-  slotTime: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.titleSecondary,
-    fontVariant: ["tabular-nums"],
   },
 });

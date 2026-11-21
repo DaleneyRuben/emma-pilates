@@ -50,12 +50,12 @@ describe("Client Inicio, option A", () => {
     clearMobileQueryCache();
   });
 
-  // Rosa Emma: a root screen's title is the band's 30 pt Lora 400.
+  // Follow-up 285: a root screen's title is the band's `titulo-pagina`, Lora 30.
   it("titles Inicio like every root screen, with a Rosa profundo bell", async () => {
     const screen = await openHome({ status: "active", subscription: trimestral });
 
     expect(screen.getByRole("header", { name: "Inicio" })).toHaveStyle({
-      fontFamily: "Lora_400Regular",
+      fontFamily: "Lora_500Medium",
       fontSize: 30,
     });
     expect(screen.getByTestId("glyph-bell", hidden)).toHaveProp("stroke", "#93615D");

@@ -1,9 +1,10 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { dayChipLabel, formatSessionDate } from "../time/session-format";
-import { fontFamilies } from "../ui/fonts";
+import { SheetTitle } from "../ui/sheet-title";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { colors, radii, spacing } from "../ui/tokens";
 
 /**
  * S13 «Otra»: the days after a day strip, as a sheet of date chips. S13
@@ -30,7 +31,7 @@ export function OtherDateSheet({
     <Modal animationType="slide" onRequestClose={onClose} transparent visible={visible}>
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
-          <Text style={styles.title}>Elige otra fecha</Text>
+          <SheetTitle>Elige otra fecha</SheetTitle>
           <ScrollView contentContainerStyle={styles.grid}>
             {dates.map((date) => {
               const { weekday, day } = dayChipLabel(date);
@@ -45,8 +46,12 @@ export function OtherDateSheet({
                   style={[styles.day, isSelected && styles.selected]}
                   testID={`${testIDPrefix}-${date}`}
                 >
-                  <Text style={[styles.weekday, isSelected && styles.onSelected]}>{weekday}</Text>
-                  <Text style={[styles.number, isSelected && styles.onSelected]}>{day}</Text>
+                  <Text tone={isSelected ? "onDark" : "ink"} variant="pastilla">
+                    {weekday}
+                  </Text>
+                  <Text tone={isSelected ? "onDark" : "ink"} variant="cifra">
+                    {day}
+                  </Text>
                 </Pressable>
               );
             })}
@@ -60,31 +65,27 @@ export function OtherDateSheet({
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.scrim, flex: 1, justifyContent: "flex-end" },
+  // White chips with a 400 outline on the white sheet; the chosen one 600.
   day: {
     alignItems: "center",
     backgroundColor: colors.card,
+    borderColor: colors.borderStrong,
     borderRadius: 14,
+    borderWidth: 1.5,
     height: 60,
     justifyContent: "center",
     width: "13%",
   },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.smd },
-  number: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 18 },
-  onSelected: { color: colors.white },
-  selected: { backgroundColor: colors.primary },
+  selected: { backgroundColor: colors.primary, borderColor: colors.primary },
   sheet: {
-    backgroundColor: colors.surface,
+    // White, never 100: «Cerrar» is small text (follow-up 285, audit d2).
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame + 4,
     borderTopRightRadius: radii.frame + 4,
     gap: spacing.lg,
     maxHeight: "70%",
     padding: spacing.xlSm,
     paddingBottom: spacing.xxl,
-  },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
-  weekday: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
   },
 });

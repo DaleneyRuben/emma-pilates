@@ -9,7 +9,6 @@ import {
 import {
   colors,
   EmptyState,
-  fontFamilies,
   LoadingState,
   OutlinedButton,
   QueryFailure,
@@ -17,6 +16,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  Text,
   useMobileIdentity,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -24,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
+import { Pressable, ScrollView, StyleSheet } from "react-native";
 
 import {
   staffNotificationDestination,
@@ -147,7 +147,7 @@ export function StaffNotificationsScreen() {
             onPress={() => markAllRead.mutate()}
             style={({ pressed }) => [styles.markAll, pressed && styles.pressed]}
           >
-            <Text style={styles.markAllLabel}>Marcar todo leído</Text>
+            <Text variant="boton-chico">Marcar todo leído</Text>
           </Pressable>
         ) : undefined,
       )}
@@ -171,12 +171,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 36,
     paddingHorizontal: spacing.mdLg,
-  },
-  markAllLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
   },
   pressed: { opacity: 0.7 },
   screen: { paddingHorizontal: spacing.xlSm },

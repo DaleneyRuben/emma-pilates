@@ -2,6 +2,7 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { SegmentedTabs } from "./segmented-tabs";
+import { textVariants } from "./type-scale";
 
 const options = [
   { key: "upcoming", label: "Próximas" },
@@ -48,15 +49,14 @@ describe("SegmentedTabs", () => {
     const other = screen.getByRole("tab", { name: "Historial" });
     expect(other).toHaveProp("accessibilityState", { selected: false });
     expect(StyleSheet.flatten(other.props.style)).not.toHaveProperty("backgroundColor");
+    // Follow-up 285, rule 4: boton-chico in the same weight, chosen or not.
     expect(screen.getByText("Próximas")).toHaveStyle({
+      ...textVariants["boton-chico"],
       color: "#FFFBFB",
-      fontFamily: "WorkSans_700Bold",
-      fontSize: 15,
     });
     expect(screen.getByText("Historial")).toHaveStyle({
+      ...textVariants["boton-chico"],
       color: "#93615D",
-      fontFamily: "WorkSans_500Medium",
-      fontSize: 15,
     });
   });
 

@@ -1,11 +1,13 @@
-import { KeyboardAvoidingView, Modal, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Modal, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
 import { Glyph } from "../ui/glyph";
 import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
+import { InlineError } from "../ui/inline-error";
+import { SheetTitle } from "../ui/sheet-title";
+import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, typography } from "../ui/tokens";
+import { colors, radii, spacing } from "../ui/tokens";
 
 const reason = "El estudio te escribe por WhatsApp si cambia una clase o hay un aviso de tu plan.";
 
@@ -48,10 +50,8 @@ export function PhonePromptSheet({
           <View style={styles.disc}>
             <Glyph color={colors.primary} name="phone" size={24} strokeWidth={1.5} />
           </View>
-          <Text accessibilityRole="header" style={styles.title}>
-            {missing ? "Agrega tu celular" : "Revisa tu celular"}
-          </Text>
-          <Text style={styles.reason}>
+          <SheetTitle>{missing ? "Agrega tu celular" : "Revisa tu celular"}</SheetTitle>
+          <Text variant="cuerpo">
             {missing ? reason : `El número que tenemos no es un celular válido. ${reason}`}
           </Text>
           <PhoneField
@@ -61,9 +61,7 @@ export function PhonePromptSheet({
             value={value}
           />
           {failed ? (
-            <Text accessibilityRole="alert" style={styles.failure}>
-              No pudimos guardar tu celular. Inténtalo de nuevo.
-            </Text>
+            <InlineError>No pudimos guardar tu celular. Inténtalo de nuevo.</InlineError>
           ) : null}
           <PrimaryButton busy={busy} label="Guardar" onPress={onSave} testID="phone-prompt-save" />
           <TextButton label="Ahora no" onPress={onLater} testID="phone-prompt-later" />
@@ -82,7 +80,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 52,
   },
-  failure: { color: colors.error, fontFamily: fontFamilies.body, fontSize: typography.note },
   handle: {
     alignSelf: "center",
     backgroundColor: colors.hairline,
@@ -90,15 +87,10 @@ const styles = StyleSheet.create({
     height: 5,
     width: 36,
   },
-  reason: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
-  },
   sheet: {
     alignSelf: "center",
-    backgroundColor: colors.surface,
+    // White, never 100: small text sits on it (follow-up 285, audit d1).
+    backgroundColor: colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     gap: spacing.lg,
@@ -108,5 +100,4 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     width: "100%",
   },
-  title: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 24 },
 });

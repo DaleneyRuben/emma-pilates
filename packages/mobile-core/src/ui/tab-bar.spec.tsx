@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
-import { TabBarButton, tabBarStyle, tabBarTints } from "./tab-bar";
+import { TabBarButton, tabBarItemStyle, tabBarStyle, tabBarTints } from "./tab-bar";
+import { Text } from "./text";
 
 // Rosa Emma (C02, E-D01): the open tab is a 600 pill on the white bar.
 describe("TabBarButton", () => {
@@ -9,7 +9,9 @@ describe("TabBarButton", () => {
     const onPress = jest.fn();
     const screen = await render(
       <TabBarButton aria-selected onPress={onPress} testID="tab-home">
-        <Text>Inicio</Text>
+        <Text tone="onDark" variant="pastilla">
+          Inicio
+        </Text>
       </TabBarButton>,
     );
 
@@ -24,7 +26,7 @@ describe("TabBarButton", () => {
   it("leaves the other tabs bare", async () => {
     const screen = await render(
       <TabBarButton aria-selected={false}>
-        <Text>Perfil</Text>
+        <Text variant="pastilla">Perfil</Text>
       </TabBarButton>,
     );
 
@@ -37,5 +39,12 @@ describe("TabBarButton", () => {
       tabBarActiveTintColor: "#FFFBFB",
       tabBarInactiveTintColor: "#93615D",
     });
+  });
+
+  // Boards E-C04, E-F05: each tab is as wide as its label, so «Para
+  // contactar» and «Disponibilidad» fit whole at 12 pt; the rest of the bar is
+  // shared out evenly.
+  it("sizes each tab from its label and shares out the rest", () => {
+    expect(tabBarItemStyle).toEqual({ flex: 0, flexBasis: "auto", flexGrow: 1, flexShrink: 1 });
   });
 });

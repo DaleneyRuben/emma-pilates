@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, spacing } from "./tokens";
 
 /** «Faltan N datos para guardar» (FormB, FIX-089); `action` names another verb. */
 export function missingFieldsTitle(count: number, action = "guardar"): string {
@@ -10,7 +10,8 @@ export function missingFieldsTitle(count: number, action = "guardar"): string {
 
 /**
  * The Rubor box at the top of a form after a save with fields missing or
- * wrong (FormB): how many, then their labels. The fields themselves are marked.
+ * wrong (FormB): how many in `titulo-fila`, then their labels in `cuerpo`
+ * (follow-up 285). The fields themselves are marked.
  */
 export function FormErrorSummary({
   action,
@@ -26,10 +27,10 @@ export function FormErrorSummary({
   if (fields.length === 0) return null;
   return (
     <View accessibilityRole="alert" style={styles.box} testID="form-error-summary">
-      <Text style={styles.title}>
+      <Text variant="titulo-fila">
         {title === undefined ? missingFieldsTitle(fields.length, action) : title(fields.length)}
       </Text>
-      <Text style={styles.fields}>{fields.join(" · ")}</Text>
+      <Text variant="cuerpo">{fields.join(" · ")}</Text>
     </View>
   );
 }
@@ -42,12 +43,5 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     gap: spacing.sm,
     padding: spacing.lg,
-  },
-  fields: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "700",
   },
 });

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
 import type { PhoneCountry } from "../account/phone-number";
 import { Chevron } from "./chevron";
 import { CountryPicker } from "./country-picker";
-import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { fieldTextProps } from "./field-text";
+import { InlineError } from "./inline-error";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 export type PhoneValue = { country: PhoneCountry; digits: string };
 
@@ -22,6 +24,8 @@ type PhoneFieldProps = {
  * FIX-037 (DES-006, follow-up 236, proposal A): one field whose left end is
  * a tappable «🇧🇴 +591 ⌄» prefix; the digits follow. The prefix opens the
  * country list; the value goes out through `storedPhone` as «+<code> <digits>».
+ * Label `compacto-600`, digits and code `cuerpo`, helper and error
+ * `secundario` (follow-up 285).
  */
 export function PhoneField({
   error,
@@ -33,10 +37,11 @@ export function PhoneField({
 }: PhoneFieldProps) {
   const [picking, setPicking] = useState(false);
   const { country, digits } = value;
+  const fieldText = fieldTextProps(digits);
 
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text variant="compacto-600">{label}</Text>
       <View
         style={[styles.box, error === undefined ? null : styles.boxError]}
         testID="phone-field-box"
@@ -48,18 +53,19 @@ export function PhoneField({
           style={styles.prefix}
           testID={testID === undefined ? undefined : `${testID}-country`}
         >
-          <Text style={styles.flag}>{country.flag}</Text>
-          <Text style={styles.code}>+{country.dial}</Text>
+          <Text variant="destacado">{country.flag}</Text>
+          <Text variant="cuerpo">+{country.dial}</Text>
           <Chevron direction="down" size={16} strokeWidth={1.8} testID="phone-country-chevron" />
         </Pressable>
         <TextInput
           accessibilityLabel={label}
           autoComplete="tel"
           keyboardType="phone-pad"
+          maxFontSizeMultiplier={fieldText.maxFontSizeMultiplier}
           onChangeText={(typed) => onChange({ country, digits: typed })}
           placeholder={`${country.lengths[0]} dígitos`}
-          placeholderTextColor={colors.iconQuiet}
-          style={styles.input}
+          placeholderTextColor={fieldText.placeholderTextColor}
+          style={[fieldText.style, styles.input]}
           testID={testID}
           textContentType="telephoneNumber"
           value={digits}
@@ -67,12 +73,10 @@ export function PhoneField({
       </View>
       {error === undefined ? (
         helper === undefined ? null : (
-          <Text style={styles.helper}>{helper}</Text>
+          <Text variant="secundario">{helper}</Text>
         )
       ) : (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {error}
-        </Text>
+        <InlineError field>{error}</InlineError>
       )}
       <CountryPicker
         onClose={() => setPicking(false)}
@@ -98,35 +102,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   boxError: { borderColor: colors.error, borderWidth: 2 },
-  code: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 16 },
-  error: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "700",
-    fontSize: typography.note,
-    lineHeight: 20,
-  },
   field: { gap: spacing.smd },
-  flag: { fontSize: 20 },
-  helper: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 20,
-  },
   input: {
-    color: colors.text,
     flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 16,
     minWidth: 0,
     paddingHorizontal: spacing.mdLg,
-  },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 14,
-    fontWeight: "600",
   },
   prefix: {
     alignItems: "center",

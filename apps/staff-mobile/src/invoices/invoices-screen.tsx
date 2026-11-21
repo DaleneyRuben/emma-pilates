@@ -1,18 +1,17 @@
 import { useListStaffInvoices, type StaffInvoiceDto, formatMoney } from "@pilates/api-contracts";
 import {
-  colors,
   EmptyState,
-  fontFamilies,
   LoadingState,
   QueryFailure,
   Screen,
   SegmentedTabs,
   spacing,
   surfaces,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, RowCard } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -98,7 +97,7 @@ export function InvoicesScreen() {
         </RowCard>
         {filter === "pending" ? (
           <View style={styles.noteCard}>
-            <Text style={styles.note}>Pagos confirmados de clientas que pidieron factura.</Text>
+            <Text variant="cuerpo">Pagos confirmados de clientas que pidieron factura.</Text>
           </View>
         ) : null}
       </>
@@ -117,7 +116,6 @@ export function InvoicesScreen() {
 }
 
 const styles = StyleSheet.create({
-  note: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
   // Rosa Emma: a quiet line sits in a white card, never on the 100 screen.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   screen: { paddingHorizontal: spacing.xlSm },

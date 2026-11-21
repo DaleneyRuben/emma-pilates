@@ -1,10 +1,10 @@
 import { NavigationContext } from "@react-navigation/native";
 import { useContext, useEffect, useEffectEvent } from "react";
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 
-import { fontFamilies } from "./fonts";
 import { Glyph } from "./glyph";
-import { colors, shadows, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, shadows, spacing } from "./tokens";
 
 export type BrandToastProps = {
   /** One line under the title, such as «Te quedan 9 clases en tu plan». */
@@ -17,8 +17,8 @@ export type BrandToastProps = {
 };
 
 /**
- * The confirmation toast (follow-up 225 §7): Rosa profundo, radius 14, white
- * text and a check, a 44 pt × to close it. Render it as the last child of the
+ * The confirmation toast (follow-up 225 §7): Rosa profundo, radius 14, a
+ * white `titulo-fila` title and `cuerpo` note (follow-up 285), a check, a 44 pt × to close it. Render it as the last child of the
  * `Screen`: it floats 16 above the screen's bottom edge, which on a tab screen
  * is the tab bar. It never closes on its own; pair it with `useStickyNotice`.
  */
@@ -32,8 +32,14 @@ export function BrandToast({ note, onClose, style, testID, title }: BrandToastPr
     >
       <Glyph color={colors.white} name="check" size={20} strokeWidth={1.8} />
       <View style={styles.text}>
-        <Text style={styles.title}>{title}</Text>
-        {note === undefined ? null : <Text style={styles.note}>{note}</Text>}
+        <Text tone="onDark" variant="titulo-fila">
+          {title}
+        </Text>
+        {note === undefined ? null : (
+          <Text tone="onDark" variant="cuerpo">
+            {note}
+          </Text>
+        )}
       </View>
       <Pressable
         accessibilityLabel="Cerrar aviso"
@@ -69,18 +75,7 @@ export function useStickyNotice<T>(notice: T | undefined, dismiss: () => void): 
 
 const styles = StyleSheet.create({
   close: { alignItems: "center", height: 44, justifyContent: "center", width: 44 },
-  note: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-  },
   text: { flex: 1, gap: spacing.xxs },
-  title: {
-    color: colors.onPrimary,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
   toast: {
     ...shadows.toast,
     alignItems: "center",

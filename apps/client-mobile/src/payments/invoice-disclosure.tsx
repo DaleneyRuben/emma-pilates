@@ -1,15 +1,13 @@
 import {
-  BodyText,
   Chevron,
   colors,
-  fontFamilies,
   FormField,
   Glyph,
   type InvoiceChoice,
   spacing,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 const taxIdCharacters = /^[0-9A-Za-z\s-]*$/;
 
@@ -38,7 +36,9 @@ export function InvoiceDisclosure({
         <View style={styles.icon}>
           <Glyph color={colors.text} name="receipt" size={18} strokeWidth={1.7} />
         </View>
-        <Text style={styles.label}>¿Necesitas factura?</Text>
+        <Text style={styles.label} variant="titulo-fila">
+          ¿Necesitas factura?
+        </Text>
         <Chevron direction={open ? "up" : "down"} size={18} strokeWidth={1.7} tone="muted" />
       </Pressable>
       {open ? (
@@ -65,9 +65,9 @@ export function InvoiceDisclosure({
             value={value.name}
           />
           {value.prefilled ? (
-            <BodyText style={styles.note}>
+            <Text variant="secundario">
               Usamos los datos de tu última compra. Puedes cambiarlos.
-            </BodyText>
+            </Text>
           ) : null}
         </View>
       ) : null}
@@ -86,14 +86,7 @@ const styles = StyleSheet.create({
     width: 36,
   },
   fields: { gap: spacing.md, paddingBottom: spacing.lg, paddingHorizontal: spacing.lg },
-  label: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
+  label: { flex: 1 },
   row: {
     alignItems: "center",
     flexDirection: "row",

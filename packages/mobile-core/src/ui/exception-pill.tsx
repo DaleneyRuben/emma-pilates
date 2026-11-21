@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 /**
  * The one pill palette B allows (FIX-089): an exception such as «Por vencer»
- * or «Primera clase», bold Rosa profundo on Rubor. Normal states are words.
+ * or «Primera clase», `pastilla` in ink on 50 (follow-up 285). Normal states
+ * are words.
  */
 export function ExceptionPill({
   children,
@@ -16,18 +17,12 @@ export function ExceptionPill({
 }) {
   return (
     <View style={styles.pill} testID={testID}>
-      <Text style={styles.label}>{children}</Text>
+      <Text variant="pastilla">{children}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
   pill: {
     alignItems: "center",
     alignSelf: "flex-start",

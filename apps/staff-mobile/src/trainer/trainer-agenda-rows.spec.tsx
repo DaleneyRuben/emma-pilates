@@ -70,7 +70,7 @@ describe("Trainer agenda rows", () => {
 
     await waitFor(() => expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen());
     const hero = within(screen.getByTestId("next-class-hero"));
-    expect(hero.getByText("PRÓXIMA · EN 40 MIN")).toBeOnTheScreen();
+    expect(hero.getByText("Próxima · en 40 min")).toBeOnTheScreen();
     expect(hero.getByText("10:40 · Reformer Pilates")).toBeOnTheScreen();
     expect(hero.getByText("2 de 8")).toBeOnTheScreen();
     // E1 B: the branch and the length, «Sopocachi · 50 min».
@@ -100,7 +100,7 @@ describe("Trainer agenda rows", () => {
     ]);
 
     await waitFor(() => expect(screen.getByTestId("next-class-hero")).toBeOnTheScreen());
-    expect(within(screen.getByTestId("next-class-hero")).getByText("PRÓXIMA")).toBeOnTheScreen();
+    expect(within(screen.getByTestId("next-class-hero")).getByText("Próxima")).toBeOnTheScreen();
     expect(within(screen.getByTestId("class-list")).getByText("14:00")).toBeOnTheScreen();
   });
 

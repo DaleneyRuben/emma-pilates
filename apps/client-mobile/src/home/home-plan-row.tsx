@@ -1,14 +1,6 @@
 import type { ClientSubscriptionDto } from "@pilates/api-contracts";
-import {
-  Chevron,
-  colors,
-  ExceptionPill,
-  fontFamilies,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, ExceptionPill, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { formatCivilDate } from "./home-format";
 import { planClasses } from "./plan-classes";
@@ -56,7 +48,8 @@ export function planRowLines(subscription: ActiveSubscription): {
 
 /**
  * Inicio's Plan (Rosa Emma C02): a 500 «medio» block with the count left in
- * large white type beside a white card with the plan's name, its detail and
+ * white `cifra-grande` over a `destacado` unit (it wraps, never shrinks below
+ * 19: audit d9) beside a white card with the plan's name, its detail and
  * a chevron, tappable as a whole. «Por vencer» is the one pill, as the
  * exception it is.
  */
@@ -79,15 +72,17 @@ export function PlanRow({
       testID="home-plan-card"
     >
       <View style={styles.medio} testID="home-plan-count">
-        <Text style={styles.count}>{count}</Text>
-        <Text adjustsFontSizeToFit minimumFontScale={0.85} numberOfLines={1} style={styles.unit}>
+        <Text tone="onDark" variant="cifra-grande">
+          {count}
+        </Text>
+        <Text tone="onDark" variant="destacado">
           {unit}
         </Text>
       </View>
       <View style={styles.card} testID="home-plan-summary">
         <View style={styles.body}>
-          <Text style={styles.title}>{subscription.planName}</Text>
-          <Text style={styles.detail}>{detail}</Text>
+          <Text variant="titulo-fila">{subscription.planName}</Text>
+          <Text variant="secundario">{detail}</Text>
           {expiringSoon ? <ExceptionPill>Por vencer</ExceptionPill> : null}
         </View>
         <Chevron size={18} strokeWidth={1.7} tone="muted" />
@@ -106,18 +101,6 @@ const styles = StyleSheet.create({
     gap: spacing.smLg,
     padding: spacing.mdLg,
   },
-  count: {
-    color: colors.onMedio,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    lineHeight: 37,
-  },
-  detail: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
   medio: {
     ...surfaces.medio,
     gap: spacing.xxs,
@@ -134,18 +117,5 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     maxWidth: promotionCardMaxWidth,
     width: "100%",
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
-  unit: {
-    color: colors.onMedio,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.titleSmall,
-    fontWeight: "700",
-    lineHeight: 22,
   },
 });

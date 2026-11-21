@@ -152,7 +152,7 @@ describe("Client Home", () => {
 
     // FIX-089 (ClaseE): the next class is the 600 hero.
     await waitFor(() => {
-      expect(screen.getByText(/^TU PRÓXIMA CLASE · /)).toBeOnTheScreen();
+      expect(screen.getByText(/^Tu próxima clase · /)).toBeOnTheScreen();
     });
     expect(screen.getByTestId("home-next-class")).toHaveStyle({ backgroundColor: "#93615D" });
     expect(screen.getByText("08:00 · Mat Pilates")).toHaveStyle({ color: "#FFFBFB" });

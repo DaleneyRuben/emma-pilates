@@ -8,29 +8,28 @@ import {
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   colors,
   EmphasisCard,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   formatBolivianos,
   IconRow,
   IconRowGroup,
+  InlineError,
   PrimaryButton,
   Screen,
   ScreenTopBar,
   SectionTitle,
   spacing,
   surfaces,
-  typography,
+  Text,
   usePushNotifications,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { ReceiptRow } from "../payments/receipt-row";
@@ -155,7 +154,9 @@ export function BookEvaluationScreen({
           note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
           testID="evaluation-hero"
         >
-          <Text style={styles.time}>{clockTime(slot.startsAt)}</Text>
+          <Text tone="onDark" variant="cifra-grande">
+            {clockTime(slot.startsAt)}
+          </Text>
         </EmphasisCard>
         <IconRowGroup>
           <IconRow
@@ -192,16 +193,16 @@ export function BookEvaluationScreen({
         )}
         {message !== null ? (
           <View style={styles.failureBox}>
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              {message}
-            </BodyText>
+            <InlineError>{message}</InlineError>
           </View>
         ) : null}
       </ScrollView>
       {/* C14: the button and its line sit on the white footer. */}
       <FooterPanel testID="evaluation-footer">
         {slot.included || receipt === null ? null : (
-          <BodyText style={styles.note}>El estudio revisa tu pago y te avisa por la app</BodyText>
+          <Text style={styles.note} variant="secundario">
+            El estudio revisa tu pago y te avisa por la app
+          </Text>
         )}
         <PrimaryButton
           busy={submitting}
@@ -224,12 +225,6 @@ function capitalized(text: string): string {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
-  failure: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   failureBox: {
     ...surfaces.soft,
     borderColor: colors.borderStrong,
@@ -238,17 +233,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   group: { ...surfaces.card },
-  note: {
-    color: colors.text,
-    fontSize: typography.note,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
+  note: { textAlign: "center" },
   screen: { gap: spacing.md, paddingBottom: 0 },
-  time: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    fontVariant: ["tabular-nums"],
-  },
 });

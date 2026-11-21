@@ -99,7 +99,8 @@ describe("Client Mis reservas, palette B", () => {
       color: "#FFFBFB",
     });
     expect(within(hero).getByText("Urubó · Daniela Ortiz")).toBeOnTheScreen();
-    expect(within(hero).getByText(/^PRÓXIMA · /)).toBeOnTheScreen();
+    // `etiqueta` writes the eyebrow in capitals by its style, not by its text.
+    expect(within(hero).getByText(/^Próxima · /)).toHaveStyle({ textTransform: "uppercase" });
     // A screen reader hears the eyebrow in sentence case, not spelled out.
     expect(within(hero).getByLabelText(/^Próxima · /)).toBeOnTheScreen();
     expect(screen.getAllByRole("button", { name: "Cancelar reserva" })).toHaveLength(2);

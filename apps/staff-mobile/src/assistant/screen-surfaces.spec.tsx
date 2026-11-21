@@ -1,5 +1,5 @@
 import { cleanup, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 import { Dimensions, StyleSheet } from "react-native";
 
 import App from "../../App";
@@ -65,7 +65,7 @@ describe("Assistant surfaces on Superficie", () => {
 const hidden = { includeHiddenElements: true };
 
 // MOB-039: the cards take the frames' border and radius, and the two empty
-// states their icon, Lora title, and copy.
+// states their icon, titulo-fila title, and copy.
 describe("Assistant cards and empty states (MOB-039)", () => {
   afterEach(async () => {
     await cleanup();
@@ -93,7 +93,7 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     expect(screen.queryByRole("button", { name: "Reservar clase" })).toBeNull();
   });
 
-  it("draws the tablet's empty panel with the person icon on its disc, a Lora 24 title, and its helper", async () => {
+  it("draws the tablet's empty panel with the person icon on its disc, a titulo-fila title, and its helper", async () => {
     jest
       .spyOn(Dimensions, "get")
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
@@ -102,10 +102,9 @@ describe("Assistant cards and empty states (MOB-039)", () => {
     // Rosa Emma: the glyph sits on the 64 pt 50 disc.
     expect(screen.getByTestId("empty-state-disc")).toBeOnTheScreen();
     expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
-    expect(screen.getByText("Selecciona una clienta para ver sus detalles")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 24,
-    });
+    expect(screen.getByText("Selecciona una clienta para ver sus detalles")).toHaveStyle(
+      textVariants["titulo-fila"],
+    );
     expect(
       screen.getByText(
         "Busca por nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin perder la lista.",

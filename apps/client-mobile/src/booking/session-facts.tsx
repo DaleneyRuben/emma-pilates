@@ -1,15 +1,7 @@
-import {
-  colors,
-  fontFamilies,
-  spacing,
-  StaffFace,
-  surfaces,
-  typography,
-  useMountedAt,
-} from "@pilates/mobile-core";
+import { colors, spacing, StaffFace, surfaces, Text, useMountedAt } from "@pilates/mobile-core";
 import { formatDateTime, staffRoleLabel, type StaffGenderCode } from "@pilates/api-contracts";
 import { Fragment, type ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { freePlacesLabel } from "./free-places";
@@ -38,8 +30,17 @@ function FactRow({ fact }: { fact: Fact }) {
       style={[styles.row, fact.key === "trainer" && styles.trainerRow]}
       testID={`session-fact-${fact.key}`}
     >
-      <Text style={[styles.label, fact.value === undefined && styles.wide]}>{fact.label}</Text>
-      {typeof fact.value === "string" ? <Text style={styles.value}>{fact.value}</Text> : fact.value}
+      {/* «Te avisamos si se libera un lugar» says itself across the row. */}
+      <Text style={styles.label} variant={fact.value === undefined ? "titulo-fila" : "cuerpo"}>
+        {fact.label}
+      </Text>
+      {typeof fact.value === "string" ? (
+        <Text style={styles.value} variant="titulo-fila">
+          {fact.value}
+        </Text>
+      ) : (
+        fact.value
+      )}
     </View>
   );
 }
@@ -50,7 +51,9 @@ function Trainer({ name, photo }: { name: string; photo: Detail["trainerPhoto"] 
   return (
     <View style={styles.trainer}>
       <StaffFace fetcher={fetcher} name={name} photo={photo} size={36} />
-      <Text style={styles.value}>{name}</Text>
+      <Text style={styles.value} variant="titulo-fila">
+        {name}
+      </Text>
     </View>
   );
 }
@@ -107,7 +110,7 @@ export function SessionFacts({
 
 const styles = StyleSheet.create({
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  label: { flex: 1 },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -120,14 +123,5 @@ const styles = StyleSheet.create({
   table: { ...surfaces.card, overflow: "hidden" },
   trainer: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: spacing.sm },
   trainerRow: { paddingVertical: spacing.smLg },
-  value: {
-    color: colors.text,
-    flexShrink: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-    textAlign: "right",
-  },
-  // «Te avisamos si se libera un lugar» says itself across the row.
-  wide: { fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
+  value: { flexShrink: 1, textAlign: "right" },
 });

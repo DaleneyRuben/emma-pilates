@@ -2,6 +2,7 @@ import { NavigationContext } from "@react-navigation/native";
 import { act, fireEvent, render } from "@testing-library/react-native";
 
 import { BrandToast, useStickyNotice } from "./brand-toast";
+import { textVariants } from "./type-scale";
 
 const hidden = { includeHiddenElements: true };
 
@@ -47,14 +48,14 @@ describe("BrandToast", () => {
       position: "absolute",
       right: 16,
     });
+    // Follow-up 285: a toast is a white titulo-fila over a white cuerpo.
     expect(screen.getByText("Reserva confirmada")).toHaveStyle({
+      ...textVariants["titulo-fila"],
       color: "#FFFBFB",
-      fontFamily: "WorkSans_700Bold",
-      fontSize: 16,
     });
     expect(screen.getByText("Te quedan 9 clases en tu plan")).toHaveStyle({
+      ...textVariants.cuerpo,
       color: "#FFFBFB",
-      fontSize: 13,
     });
     const check = screen.getByTestId("glyph-check", hidden);
     expect(check).toHaveProp("stroke", "#FFFBFB");

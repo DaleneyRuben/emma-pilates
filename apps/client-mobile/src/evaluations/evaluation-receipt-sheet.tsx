@@ -1,17 +1,16 @@
 import type { ClientEvaluationDto } from "@pilates/api-contracts";
 import {
   colors,
-  fontFamilies,
   formatBolivianos,
   radii,
   shadows,
   SectionTitle,
+  SheetTitle,
   spacing,
   surfaces,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ReceiptRow } from "../payments/receipt-row";
 import { TransferQrCard } from "../payments/transfer-qr-card";
@@ -46,9 +45,7 @@ export function EvaluationReceiptSheet({
         <View style={styles.sheet} testID="evaluation-receipt-sheet">
           <ScrollView contentContainerStyle={styles.content}>
             <View style={styles.grab} />
-            <Text accessibilityRole="header" style={styles.title}>
-              Sube tu comprobante
-            </Text>
+            <SheetTitle>Sube tu comprobante</SheetTitle>
             <View>
               <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
               <TransferQrCard amount={amount} fetcher={fetcher} />
@@ -94,11 +91,5 @@ const styles = StyleSheet.create({
     maxHeight: "92%",
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.smLg,
-  },
-  title: {
-    color: colors.text,
-    fontSize: typography.section,
-    fontFamily: fontFamilies.display,
-    lineHeight: 28,
   },
 });

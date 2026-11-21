@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { EmailChangeCompletionResultDto } from "@pilates/api-contracts";
 
 import { AuthenticationScreen, authStyles } from "../auth/auth-layout";
-import { BodyText } from "../ui/body-text";
+import { Text } from "../ui/text";
 import type { OutcomeBadgeProps } from "../ui/outcome-badge";
 import { PrimaryButton } from "../ui/primary-button";
 
@@ -104,7 +104,9 @@ export function EmailChangeLinkScreen({
       staff={staff}
       title={shown.title}
     >
-      <BodyText style={staff ? authStyles.centered : undefined}>{shown.body}</BodyText>
+      <Text variant="cuerpo" style={staff ? authStyles.centered : undefined}>
+        {shown.body}
+      </Text>
     </AuthenticationScreen>
   );
 }

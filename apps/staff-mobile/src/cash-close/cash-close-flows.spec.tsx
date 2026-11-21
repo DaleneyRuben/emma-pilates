@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { assistantRoutes, openClientSearch } from "../assistant/assistant-fixtures";
@@ -59,7 +59,12 @@ describe("Cerrar caja (S25)", () => {
 
     // FIX-083 (Cerrar caja pick A), FIX-090: count first; the expected cash
     // and the difference only read once she has typed her count.
-    expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({ fontSize: 40 });
+    // Follow-up 285 (board E-S05): the count is typed as the figure it is,
+    // in cifra-grande; Lora has no italic, so its empty «0» stays upright.
+    expect(screen.getByLabelText("¿Cuánto efectivo hay en la caja?")).toHaveStyle({
+      fontFamily: textVariants["cifra-grande"].fontFamily,
+      fontSize: textVariants["cifra-grande"].fontSize,
+    });
     expect(
       screen.getByText("Cuenta los billetes antes de mirar el total esperado."),
     ).toBeOnTheScreen();

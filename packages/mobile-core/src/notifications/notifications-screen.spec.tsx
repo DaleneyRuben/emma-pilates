@@ -254,10 +254,10 @@ describe("NotificationsScreen", () => {
     await waitFor(() => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();
     });
-    // Follow-up 225 §6: the v2 state block, a Rosa profundo bell over Lora 24.
+    // Follow-up 285: the state block's title in titulo-fila under the bell.
     expect(screen.getByText("No tienes notificaciones.")).toHaveStyle({
-      fontFamily: "Lora_400Regular",
-      fontSize: 24,
+      fontFamily: "WorkSans_600SemiBold",
+      fontSize: 16,
     });
     const bell = screen.getByTestId("empty-state-icon-bell", {
       includeHiddenElements: true,

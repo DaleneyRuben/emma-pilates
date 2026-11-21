@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
 import { jsonResponse } from "../test-support";
@@ -35,8 +35,9 @@ describe("Assistant Client history (S22)", () => {
       expect(screen.getByText("Asistió a")).toBeOnTheScreen();
     });
     // Rosa Emma C05d: the summary is the 600 hero, each month a white card
-    // under its 50 header strip.
-    expect(screen.getByText("3 clases desde agosto")).toHaveStyle({ fontSize: 28 });
+    // under its 50 header strip. Follow-up 285 (board E-R10): the count is a
+    // titulo-bloque, Lora 22.
+    expect(screen.getByText("3 clases desde agosto")).toHaveStyle(textVariants["titulo-bloque"]);
     expect(screen.getByTestId("class-history-summary")).toHaveStyle({
       backgroundColor: "#93615D",
     });
@@ -45,7 +46,7 @@ describe("Assistant Client history (S22)", () => {
     });
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
-    expect(screen.getByText("15")).toHaveStyle({ fontFamily: "Lora_400Regular", fontSize: 22 });
+    expect(screen.getByText("15")).toHaveStyle(textVariants.cifra);
     // 15 and 8 September are both Tuesdays.
     expect(screen.getAllByText("mar")).toHaveLength(2);
 
@@ -59,7 +60,7 @@ describe("Assistant Client history (S22)", () => {
     expect(StyleSheet.flatten(rows[2].props.style)).not.toHaveProperty("borderBottomWidth");
   });
 
-  it("centres the empty state as the v2 Lora 24 title with the Rosa profundo clock", async () => {
+  it("centres the empty state's titulo-fila title with the Rosa profundo clock", async () => {
     const screen = await openHistory({
       ...assistantRoutes(),
       "/api/v1/assistant/clients/client-lucia/class-history": () => jsonResponse([]),
@@ -67,8 +68,7 @@ describe("Assistant Client history (S22)", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Todavía no tomó clases")).toHaveStyle({
-        fontFamily: "Lora_400Regular",
-        fontSize: 24,
+        ...textVariants["titulo-fila"],
         textAlign: "center",
       });
     });

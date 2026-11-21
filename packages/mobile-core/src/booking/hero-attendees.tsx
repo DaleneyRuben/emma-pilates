@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "../ui/fonts";
-import { colors, spacing, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, spacing } from "../ui/tokens";
 
 const shown = 5;
 
@@ -22,7 +22,10 @@ export function HeroAttendees({ initials }: { initials: readonly string[] }) {
     <View style={styles.row} testID="hero-attendees">
       {circles.map((text, index) => (
         <View key={`${text}-${index}`} style={styles.circle} testID="hero-attendee">
-          <Text style={styles.initials}>{text}</Text>
+          {/* Initials in a fixed 32 pt disc: pastilla, never scaled out of it. */}
+          <Text allowFontScaling={false} variant="pastilla">
+            {text}
+          </Text>
         </View>
       ))}
     </View>
@@ -37,12 +40,6 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: "center",
     width: 32,
-  },
-  initials: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "700",
   },
   row: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
 });

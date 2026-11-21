@@ -1,14 +1,13 @@
 import {
   colors,
-  fontFamilies,
   InvoiceDataFields,
   type InvoiceChoice,
   radii,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * Staff pick E3 C (E-P02, E-P03): «Pide factura» as a switch on a white
@@ -34,8 +33,8 @@ export function InvoiceSwitch({
         testID="invoice-switch"
       >
         <View style={styles.body}>
-          <Text style={styles.title}>Pide factura</Text>
-          {on ? null : <Text style={styles.note}>Sin factura si no la pide</Text>}
+          <Text variant="titulo-fila">Pide factura</Text>
+          {on ? null : <Text variant="secundario">Sin factura si no la pide</Text>}
         </View>
         <View style={[styles.track, on && styles.trackOn]}>
           <View style={[styles.thumb, on && styles.thumbOn]} />
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: { alignItems: "center", flexDirection: "row", gap: spacing.md, minHeight: 44 },
   // Off: a 400 thumb on a 50 track ringed in 400 (no 200 fill, FIX-089);
   // on: a white thumb on 600.
@@ -71,12 +69,6 @@ const styles = StyleSheet.create({
     width: 23,
   },
   thumbOn: { alignSelf: "flex-end", backgroundColor: colors.onPrimary },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
   track: {
     backgroundColor: colors.surfaceSubtle,
     borderColor: colors.borderStrong,

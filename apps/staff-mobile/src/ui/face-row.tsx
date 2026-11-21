@@ -1,6 +1,6 @@
-import { colors, fontFamilies, spacing, typography } from "@pilates/mobile-core";
+import { spacing, Text } from "@pilates/mobile-core";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 /**
  * An `IconRow` whose icon disc is a person's 36 px face (FIX-041, follow-up
@@ -21,20 +21,18 @@ export function FaceRow({
   return (
     <View style={styles.row} testID={testID}>
       {face}
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+      <Text style={styles.label} variant="titulo-fila">
+        {label}
+      </Text>
+      <Text style={styles.value} variant="compacto">
+        {value}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-    color: colors.text,
-    flexGrow: 1,
-    flexShrink: 0,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.bodyMedium,
-  },
+  label: { flexGrow: 1, flexShrink: 0 },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -43,11 +41,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  value: {
-    color: colors.textMuted,
-    flexShrink: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    textAlign: "right",
-  },
+  value: { flexShrink: 1, textAlign: "right" },
 });

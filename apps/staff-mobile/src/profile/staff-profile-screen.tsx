@@ -6,8 +6,6 @@ import {
 } from "@pilates/api-contracts";
 import {
   BrandToast,
-  colors,
-  fontFamilies,
   IconRow,
   LoadingState,
   LogoutConfirmationSheet,
@@ -15,13 +13,13 @@ import {
   Screen,
   spacing,
   surfaces,
-  typography,
+  Text,
   useMobileIdentity,
   useStickyNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import appConfig from "../../app.json";
 import { useImpersonation } from "../impersonation/impersonation-context";
@@ -196,7 +194,7 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
           )}
         </RowCard>
         <View style={styles.footerCard}>
-          <Text style={styles.footer}>
+          <Text style={styles.footer} variant="secundario">
             {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
           </Text>
         </View>
@@ -214,12 +212,7 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
 }
 
 const styles = StyleSheet.create({
-  footer: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.label,
-    textAlign: "center",
-  },
+  footer: { textAlign: "center" },
   // A quiet line goes in a white card, never on the 100 screen.
   footerCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.smLg },
   screen: { paddingHorizontal: spacing.xlSm },

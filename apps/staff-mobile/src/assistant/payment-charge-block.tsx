@@ -1,15 +1,6 @@
 import { formatMoney, type PlanQuoteDto } from "@pilates/api-contracts";
-import {
-  ClientFace,
-  colors,
-  fontFamilies,
-  initials,
-  radii,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { ClientFace, colors, initials, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { describeClasses } from "./assistant-format";
@@ -42,26 +33,36 @@ export function PaymentChargeBlock({
       <View style={styles.who}>
         {clientPhoto === null ? (
           <View style={styles.circle}>
-            <Text style={styles.initials}>{initials(clientName)}</Text>
+            <Text allowFontScaling={false} variant="pastilla">
+              {initials(clientName)}
+            </Text>
           </View>
         ) : (
           <ClientFace fetcher={fetcher} name={clientName} photo={clientPhoto} size={32} />
         )}
-        <Text style={styles.name}>{`${clientName} · ${quote.name}`}</Text>
+        <Text style={styles.name} tone="onDark" variant="titulo-fila">
+          {`${clientName} · ${quote.name}`}
+        </Text>
       </View>
       <View style={styles.bottom}>
         <View>
-          <Text style={styles.label}>A cobrar</Text>
-          <Text style={styles.amount}>{formatMoney(quote.priceCentavos)}</Text>
+          <Text tone="onDark" variant="etiqueta">
+            A cobrar
+          </Text>
+          <Text tone="onDark" variant="cifra-grande">
+            {formatMoney(quote.priceCentavos)}
+          </Text>
         </View>
         <View style={styles.detail}>
-          <Text style={styles.detailLine}>
+          <Text style={styles.detailLine} tone="onDark" variant="cuerpo">
             {`${describeClasses(quote.classAllowance)} · ${formatMoney(
               quote.listPriceCentavos ?? quote.priceCentavos,
             )}`}
           </Text>
           {discount > 0 ? (
-            <Text style={styles.detailLine}>{`Descuento · −${formatMoney(discount)}`}</Text>
+            <Text style={styles.detailLine} tone="onDark" variant="cuerpo">
+              {`Descuento · −${formatMoney(discount)}`}
+            </Text>
           ) : null}
         </View>
       </View>
@@ -70,13 +71,6 @@ export function PaymentChargeBlock({
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 40,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 46,
-  },
   block: {
     ...surfaces.emphasis,
     gap: spacing.md,
@@ -99,32 +93,7 @@ const styles = StyleSheet.create({
     width: 32,
   },
   detail: { alignItems: "flex-end", flexShrink: 1, gap: spacing.xs, paddingBottom: spacing.sm },
-  detailLine: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    textAlign: "right",
-  },
-  initials: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.label,
-    fontWeight: "700",
-  },
-  label: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
-  name: {
-    color: colors.onEmphasis,
-    flex: 1,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
+  detailLine: { textAlign: "right" },
+  name: { flex: 1 },
   who: { alignItems: "center", flexDirection: "row", gap: spacing.md },
 });

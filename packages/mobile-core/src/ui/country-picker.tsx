@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
 import {
@@ -17,10 +8,12 @@ import {
   searchPhoneCountries,
   type PhoneCountry,
 } from "../account/phone-number";
-import { fontFamilies } from "./fonts";
+import { fieldTextProps } from "./field-text";
 import { LineIcon } from "./line-icon";
 import { PickerCheck } from "./picker-check";
-import { colors, radii, spacing, typography } from "./tokens";
+import { SheetTitle } from "./sheet-title";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 type CountryPickerProps = {
   visible: boolean;
@@ -32,7 +25,8 @@ type CountryPickerProps = {
 /**
  * FIX-037 (design A1–A3): the country list behind the phone prefix. An iPhone
  * draws it as a sheet with a grabber and «Cancelar»; Android as a full-screen
- * list with a back arrow and the search in the top bar.
+ * list with a back arrow and the search in the top bar. Both are white, so
+ * the rows' small text never stands on 100 (follow-up 285).
  */
 export function CountryPicker({ onClose, onPick, selected, visible }: CountryPickerProps) {
   const [query, setQuery] = useState("");
@@ -46,14 +40,15 @@ export function CountryPicker({ onClose, onPick, selected, visible }: CountryPic
     onPick(country);
   };
 
+  const fieldText = fieldTextProps(query);
   const search = (
     <TextInput
+      {...fieldText}
       accessibilityLabel="Buscar país o código"
       autoCorrect={false}
       onChangeText={setQuery}
       placeholder="Buscar país o código"
-      placeholderTextColor={colors.textSubtle}
-      style={android ? styles.barSearch : styles.sheetSearch}
+      style={[fieldText.style, android ? styles.barSearch : styles.sheetSearch]}
       value={query}
     />
   );
@@ -87,20 +82,18 @@ export function CountryPicker({ onClose, onPick, selected, visible }: CountryPic
             <>
               <View style={styles.grabber} />
               <View style={styles.header}>
-                <Text accessibilityRole="header" style={styles.title}>
-                  Elige el país
-                </Text>
+                <SheetTitle style={styles.title}>Elige el país</SheetTitle>
                 <Pressable accessibilityRole="button" onPress={close} style={styles.cancel}>
-                  <Text style={styles.cancelLabel}>Cancelar</Text>
+                  <Text variant="enlace">Cancelar</Text>
                 </Pressable>
               </View>
               {search}
             </>
           )}
           {android ? (
-            <Text accessibilityRole="header" style={styles.hiddenTitle}>
-              Elige el país
-            </Text>
+            <View style={styles.hiddenTitle}>
+              <SheetTitle>Elige el país</SheetTitle>
+            </View>
           ) : null}
           <ScrollView keyboardShouldPersistTaps="handled">
             <CountryRows onPick={pick} query={query} selected={selected} />
@@ -135,11 +128,15 @@ function CountryRows({
   return (
     <>
       <CountryRow country={selected} onPick={onPick} selected />
-      <Text style={styles.section}>Frecuentes</Text>
+      <Text style={styles.section} variant="etiqueta">
+        Frecuentes
+      </Text>
       {others(frequentPhoneCountries).map((country) => (
         <CountryRow country={country} key={country.iso} onPick={onPick} selected={false} />
       ))}
-      <Text style={styles.section}>Todos los países</Text>
+      <Text style={styles.section} variant="etiqueta">
+        Todos los países
+      </Text>
       {others(phoneCountries).map((country) => (
         <CountryRow country={country} key={country.iso} onPick={onPick} selected={false} />
       ))}
@@ -164,9 +161,11 @@ function CountryRow({
       onPress={() => onPick(country)}
       style={[styles.row, selected ? styles.rowSelected : null]}
     >
-      <Text style={styles.flag}>{country.flag}</Text>
-      <Text style={styles.name}>{country.name}</Text>
-      <Text style={styles.code}>+{country.dial}</Text>
+      <Text variant="destacado">{country.flag}</Text>
+      <Text style={styles.name} variant="cuerpo">
+        {country.name}
+      </Text>
+      <Text variant="cuerpo">+{country.dial}</Text>
       <PickerCheck selected={selected} />
     </Pressable>
   );
@@ -182,23 +181,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     paddingTop: 48,
   },
-  barSearch: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 18,
-    minHeight: 56,
-  },
+  barSearch: { flex: 1, minHeight: 56 },
   cancel: { justifyContent: "center", minHeight: 44, paddingHorizontal: spacing.md },
-  cancelLabel: { color: colors.primaryOnTint, fontFamily: fontFamilies.bodyStrong, fontSize: 15 },
-  code: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.body,
-    fontSize: 15,
-    fontVariant: ["tabular-nums"],
-  },
-  flag: { fontSize: 22 },
-  fullScreen: { backgroundColor: colors.surface, flex: 1 },
+  fullScreen: { backgroundColor: colors.card, flex: 1 },
   grabber: {
     alignSelf: "center",
     backgroundColor: colors.borderStrong,
@@ -214,8 +199,8 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.xl,
     paddingRight: spacing.sm,
   },
-  hiddenTitle: { height: 0, opacity: 0, position: "absolute" },
-  name: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 16 },
+  hiddenTitle: { height: 0, opacity: 0, overflow: "hidden", position: "absolute" },
+  name: { flex: 1 },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -226,38 +211,28 @@ const styles = StyleSheet.create({
   rowSelected: { backgroundColor: colors.primaryTint },
   scrim: { backgroundColor: colors.scrim, flex: 1, paddingTop: 84 },
   section: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: 12,
-    letterSpacing: 1.44,
     paddingBottom: spacing.smd,
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
-    textTransform: "uppercase",
   },
   sheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.card,
     borderTopLeftRadius: radii.frame,
     borderTopRightRadius: radii.frame,
     flex: 1,
     paddingBottom: spacing.xl,
   },
+  // The search on the white sheet: a 50 box with a 400 outline.
   sheetSearch: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderStrong,
     borderRadius: radii.control,
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: 16,
+    borderWidth: 1,
     marginBottom: spacing.xs,
     marginHorizontal: spacing.xl,
     marginTop: spacing.sm,
     minHeight: 44,
     paddingHorizontal: spacing.mdLg,
   },
-  title: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleSecondary,
-  },
+  title: { flex: 1 },
 });

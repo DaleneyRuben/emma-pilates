@@ -1,5 +1,5 @@
-import { colors, fontFamilies, radii, spacing, surfaces, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { CardLabel } from "../ui/card-pieces";
 
@@ -45,8 +45,12 @@ export function PaymentMethodOptions({
               style={[styles.option, filled && styles.chosen]}
               testID={`payment-method-${option.key}`}
             >
-              <Text style={[styles.label, filled && styles.chosenText]}>{option.label}</Text>
-              <Text style={[styles.next, filled && styles.chosenText]}>{next}</Text>
+              <Text tone={filled ? "onDark" : "ink"} variant="titulo-fila">
+                {option.label}
+              </Text>
+              <Text tone={filled ? "onDark" : "ink"} variant="secundario">
+                {next}
+              </Text>
             </Pressable>
           );
         })}
@@ -58,14 +62,6 @@ export function PaymentMethodOptions({
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   chosen: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chosenText: { color: colors.onPrimary },
-  label: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyLarge,
-    fontWeight: "700",
-  },
-  next: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   option: {
     backgroundColor: colors.card,
     borderColor: colors.borderStrong,

@@ -11,6 +11,7 @@ import {
   ExceptionPill,
   formatTimeRange,
   hasStarted,
+  InlineError,
   LoadingState,
   PrimaryButton,
   QueryFailure,
@@ -19,13 +20,12 @@ import {
   spacing,
   StaffFace,
   surfaces,
-  typography,
-  fontFamilies,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -130,13 +130,15 @@ export function AssistantRescheduleScreen({
         />
         <View style={styles.current}>
           <CardLabel>Reserva actual</CardLabel>
-          <Text style={styles.currentTitle}>{booking.classTypeName}</Text>
-          <Text style={styles.currentLine}>
+          <Text variant="titulo-fila">{booking.classTypeName}</Text>
+          <Text variant="secundario">
             {`${booking.trainerName} · ${formatTimeRange(booking.startsAt, booking.endsAt)}`}
           </Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.lead}>Puedes cambiarla por otra clase disponible el mismo día.</Text>
+          <Text variant="titulo-fila">
+            Puedes cambiarla por otra clase disponible el mismo día.
+          </Text>
         </View>
         {alternatives.isPending ? (
           <LoadingState label="Cargando alternativas" />
@@ -147,7 +149,7 @@ export function AssistantRescheduleScreen({
           />
         ) : options.length === 0 ? (
           <View style={styles.card}>
-            <Text style={styles.quiet}>No hay otras clases disponibles ese día.</Text>
+            <Text variant="cuerpo">No hay otras clases disponibles ese día.</Text>
           </View>
         ) : (
           options.map((session) => (
@@ -160,19 +162,16 @@ export function AssistantRescheduleScreen({
             />
           ))
         )}
+        {/* The error never sits on the 100 screen: it reads inside a white card. */}
         {failure !== null && !offered ? (
-          <Text accessibilityRole="alert" style={styles.failure}>
-            {failure}
-          </Text>
+          <View style={styles.card}>
+            <InlineError>{failure}</InlineError>
+          </View>
         ) : null}
       </ScrollView>
       {offered ? (
         <FooterPanel>
-          {failure !== null ? (
-            <Text accessibilityRole="alert" style={styles.failure}>
-              {failure}
-            </Text>
-          ) : null}
+          {failure !== null ? <InlineError style={styles.failure}>{failure}</InlineError> : null}
           <PrimaryButton
             busy={submitting}
             disabled={selectedId === null}
@@ -242,29 +241,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
-  currentLine: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  currentTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.bodyMedium,
-    fontWeight: "700",
-  },
-  failure: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.note,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  lead: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 21,
-  },
+  failure: { textAlign: "center" },
   option: { borderColor: "transparent", borderRadius: radii.card + 2, borderWidth: 2 },
   optionSelected: { borderColor: colors.primary },
-  quiet: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.body },
   screen: { paddingHorizontal: spacing.xlSm },
 });

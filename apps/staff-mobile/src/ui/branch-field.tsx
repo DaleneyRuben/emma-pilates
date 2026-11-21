@@ -1,6 +1,6 @@
-import { Chevron, colors, fontFamilies, Glyph, spacing } from "@pilates/mobile-core";
+import { Chevron, colors, Glyph, spacing, Text } from "@pilates/mobile-core";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { FilterChips } from "./filter-chips";
 
@@ -10,6 +10,8 @@ type Branch = { id: string; name: string };
  * «Sucursal Achumani» under a screen title (S07, S13, Horario). With one
  * Branch it is fixed: no chevron, nothing to tap (walkthrough 7). From the
  * second Branch it opens the Branch chips, plus «Todas» when `allLabel` is set.
+ * Boards E-D12, E-H02, E-R01: «Sucursal» in `cuerpo` with the name in
+ * `titulo-fila`. It is small text, so it always sits inside a white card.
  */
 export function BranchField({
   allLabel,
@@ -28,8 +30,8 @@ export function BranchField({
   const line = (
     <>
       <Glyph color={colors.primary} name="pin" size={16} strokeWidth={1.5} />
-      <Text style={styles.label}>
-        Sucursal <Text style={styles.name}>{selectedName}</Text>
+      <Text style={styles.label} variant="cuerpo">
+        Sucursal <Text variant="titulo-fila">{selectedName}</Text>
       </Text>
     </>
   );
@@ -73,7 +75,6 @@ export function BranchField({
 
 const styles = StyleSheet.create({
   field: { gap: spacing.sm },
-  label: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: 14 },
+  label: { flexShrink: 1 },
   line: { alignItems: "center", alignSelf: "flex-start", flexDirection: "row", gap: spacing.sm },
-  name: { color: colors.text, fontFamily: fontFamilies.bodyStrong, fontWeight: "600" },
 });

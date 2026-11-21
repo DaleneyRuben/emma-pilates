@@ -1,16 +1,14 @@
 import {
   Chip,
-  colors,
-  fontFamilies,
   FormField,
   OutlinedButton,
   PrimaryButton,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useState, type ReactNode } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll, CardLabel, FooterPanel } from "../ui/card-pieces";
 import {
@@ -81,8 +79,8 @@ export function RefuseFreezeStep({
           />
         </View>
         <View style={styles.notice} testID="refuse-freeze-notice">
-          <Text style={styles.noticeTitle}>Esto no se puede deshacer</Text>
-          <Text style={styles.noticeBody}>{`${firstName} podrá pedir otro congelamiento.`}</Text>
+          <Text variant="titulo-fila">Esto no se puede deshacer</Text>
+          <Text variant="cuerpo">{`${firstName} podrá pedir otro congelamiento.`}</Text>
         </View>
         {error}
       </ScrollView>
@@ -115,12 +113,5 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
-  },
-  noticeBody: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14 },
-  noticeTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
   },
 });

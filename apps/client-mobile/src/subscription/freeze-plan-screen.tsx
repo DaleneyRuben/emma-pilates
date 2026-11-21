@@ -4,11 +4,9 @@ import {
   useGetCurrentClientSubscription,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   Calendar,
   colors,
-  fontFamilies,
   footerEdges,
   FooterPanel,
   FormErrorSummary,
@@ -22,12 +20,12 @@ import {
   ScreenTopBar,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { AccessibilityInfo, ScrollView, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { freezeRequestFailure } from "./freeze-refusal-copy";
@@ -188,12 +186,14 @@ export function FreezePlanScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {attempted && open ? <FormErrorSummary fields={missing} /> : null}
         <View style={styles.leadCard}>
-          <BodyText style={styles.lead}>
+          <Text variant="cuerpo">
             Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
-          </BodyText>
+          </Text>
         </View>
         {open ? (
-          <>
+          // Audit d4, d5: the calendar and its prompt on a white card, never
+          // straight on the 100 screen (follow-up 285, rule 3).
+          <View style={styles.calendarCard} testID="freeze-calendar-card">
             <Calendar
               firstMonth={window.firstDay.slice(0, 7)}
               isOff={(day) => window.whyOff(day, choosingEnd ? start : null) !== null}
@@ -204,20 +204,22 @@ export function FreezePlanScreen() {
               today={today}
             />
             {why === null ? null : <Reason live text={why} />}
-            {prompt === null ? null : <BodyText style={styles.prompt}>{prompt}</BodyText>}
-          </>
+            {prompt === null ? null : <Text variant="cuerpo">{prompt}</Text>}
+          </View>
         ) : (
           message === null && <Reason text={blocked ?? genericRefusal} />
         )}
         {summary === null ? null : (
           <View style={styles.summary} testID="freeze-summary">
-            <Text style={styles.range}>{summary.range}</Text>
+            <Text variant="titulo-bloque">{summary.range}</Text>
             <View style={styles.summaryRows}>
               <SummaryRow label="Días congelados" value={summary.days} />
               <View style={styles.hairline} />
               <SummaryRow label="Tu plan vencerá el" value={summary.newEnd} />
             </View>
-            <Text style={styles.was}>{summary.was}</Text>
+            <Text style={styles.was} variant="secundario">
+              {summary.was}
+            </Text>
           </View>
         )}
         <View style={styles.reasonCard}>
@@ -231,7 +233,7 @@ export function FreezePlanScreen() {
           />
           <View style={styles.info}>
             <Glyph color={colors.primary} name="alert" size={18} strokeWidth={1.7} />
-            <Text style={styles.infoText}>
+            <Text style={styles.infoText} variant="secundario">
               Si tienes reservas esos días, se cancelan al aprobarse y las clases vuelven a tu plan.
             </Text>
           </View>
@@ -260,8 +262,10 @@ function addDays(civil: string, days: number): string {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.summaryRow}>
-      <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={styles.summaryValue}>{value}</Text>
+      <Text style={styles.summaryLabel} variant="cuerpo">
+        {label}
+      </Text>
+      <Text variant="titulo-fila">{value}</Text>
     </View>
   );
 }
@@ -283,26 +287,20 @@ function Reason({
       style={styles.reason}
     >
       <Glyph color={colors.errorText} name="alert" size={16} strokeWidth={1.5} />
-      <Text style={styles.reasonText}>{text}</Text>
+      <Text style={styles.reasonText} variant="cuerpo">
+        {text}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  calendarCard: { ...surfaces.card, gap: spacing.md, padding: spacing.md },
   content: { gap: spacing.md, paddingBottom: spacing.lg },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   info: { alignItems: "flex-start", flexDirection: "row", gap: spacing.smLg },
-  infoText: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 19,
-  },
-  lead: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
+  infoText: { flex: 1 },
   leadCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
-  prompt: { color: colors.text, fontSize: typography.note, fontFamily: fontFamilies.body },
-  range: { color: colors.text, fontFamily: fontFamilies.display, fontSize: typography.section },
   reason: {
     alignItems: "flex-start",
     backgroundColor: colors.errorSurface,
@@ -314,16 +312,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   reasonCard: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
-  reasonText: {
-    color: colors.errorText,
-    flex: 1,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
+  reasonText: { flex: 1 },
   screen: { gap: spacing.lg, paddingBottom: 0 },
   summary: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
-  summaryLabel: { color: colors.text, flex: 1, fontFamily: fontFamilies.body, fontSize: 14 },
+  summaryLabel: { flex: 1 },
   summaryRow: {
     alignItems: "center",
     flexDirection: "row",
@@ -333,16 +325,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   summaryRows: { backgroundColor: colors.card, borderRadius: radii.card, overflow: "hidden" },
-  summaryValue: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
-  was: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    textAlign: "right",
-  },
+  was: { textAlign: "right" },
 });

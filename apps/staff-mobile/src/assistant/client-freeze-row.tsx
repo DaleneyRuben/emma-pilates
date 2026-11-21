@@ -1,14 +1,6 @@
 import { formatListDate, type ClientOverviewDto } from "@pilates/api-contracts";
-import {
-  boliviaCivilDate,
-  colors,
-  fontFamilies,
-  Glyph,
-  spacing,
-  surfaces,
-  typography,
-} from "@pilates/mobile-core";
-import { StyleSheet, Text, View } from "react-native";
+import { boliviaCivilDate, colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
+import { StyleSheet, View } from "react-native";
 
 type Freeze = NonNullable<ClientOverviewDto["subscription"]["freeze"]>;
 
@@ -43,8 +35,8 @@ export function ClientFreezeRow({ freeze }: { freeze: Freeze | null | undefined 
     >
       <Glyph color={colors.text} name="snowflake" size={22} strokeWidth={1.6} />
       <View style={styles.body}>
-        <Text style={styles.title}>{lines.title}</Text>
-        <Text style={styles.note}>{lines.note}</Text>
+        <Text variant="titulo-fila">{lines.title}</Text>
+        <Text variant="secundario">{lines.note}</Text>
       </View>
     </View>
   );
@@ -52,7 +44,6 @@ export function ClientFreezeRow({ freeze }: { freeze: Freeze | null | undefined 
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  note: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.note },
   row: {
     ...surfaces.card,
     alignItems: "center",
@@ -60,11 +51,5 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
   },
 });

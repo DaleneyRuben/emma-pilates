@@ -9,7 +9,12 @@ import tseslint from "typescript-eslint";
 // one another, and packages never import applications.
 const restrictedImportPatterns = [
   {
-    group: ["@pilates/api-contracts/*", "@pilates/mobile-core/*"],
+    group: [
+      "@pilates/api-contracts/*",
+      "@pilates/mobile-core/*",
+      // Test-only entry for Jest setup files.
+      "!@pilates/mobile-core/testing",
+    ],
     message:
       "Import a workspace package by its name and public exports, never a deep path.",
   },
@@ -32,6 +37,80 @@ const restrictedImportPatterns = [
     message:
       "A relative path must not leave the package; import the workspace package by name.",
   },
+];
+
+// Follow-up 285: every text in both apps is a `Text` variant from mobile-core,
+// which owns the face, size, line height, spacing and the two tones. Only the
+// scale's own files may name a font or a text colour.
+const restrictedTypographyImports = [
+  {
+    name: "react-native",
+    importNames: ["Text"],
+    message: "Use <Text variant=…> from @pilates/mobile-core (follow-up 285).",
+  },
+  {
+    name: "@pilates/mobile-core",
+    importNames: [
+      "typography",
+      "fontFamilies",
+      "textVariants",
+      "typeFaces",
+      "textTones",
+    ],
+    message:
+      "Sizes, faces and text colours live inside <Text variant=…> (follow-up 285); pick a variant.",
+  },
+];
+
+const typographyKeys = [
+  "fontFamily",
+  "fontSize",
+  "fontStyle",
+  "fontVariant",
+  "fontWeight",
+  "letterSpacing",
+  "lineHeight",
+  "textDecorationLine",
+  "textTransform",
+];
+
+const typographyKeyPattern = `/^(${typographyKeys.join("|")})$/`;
+
+const restrictedTypographySyntax = [
+  {
+    selector: `ObjectExpression > Property[key.name=${typographyKeyPattern}]`,
+    message:
+      "Text styles come from <Text variant=…> in @pilates/mobile-core (follow-up 285); never declare one locally.",
+  },
+  {
+    // A quoted key is the same key: { "fontSize": 9 }.
+    selector: `ObjectExpression > Property[key.value=${typographyKeyPattern}]`,
+    message:
+      "Text styles come from <Text variant=…> in @pilates/mobile-core (follow-up 285); never declare one locally.",
+  },
+  {
+    selector: "ObjectExpression > Property[key.name='color']",
+    message:
+      "A text's colour is the tone prop of <Text> (ink or onDark); an icon takes its colour as a prop.",
+  },
+  {
+    selector: "ObjectExpression > Property[key.value='color']",
+    message:
+      "A text's colour is the tone prop of <Text> (ink or onDark); an icon takes its colour as a prop.",
+  },
+  {
+    selector: "MemberExpression[object.name='Animated'][property.name='Text']",
+    message: "Use <Text variant=…> from @pilates/mobile-core (follow-up 285).",
+  },
+];
+
+const typeScaleFiles = [
+  "src/ui/type-scale.ts",
+  "src/ui/text.tsx",
+  "src/ui/field-text.ts",
+  "src/ui/type-scale-audit.ts",
+  "src/ui/fonts.ts",
+  "src/ui/tokens.ts",
 ];
 
 // React Native code runs in Hermes with the browser-like globals Expo
@@ -72,13 +151,29 @@ export default tseslint.config(
       ],
       "no-restricted-imports": [
         "error",
-        { patterns: restrictedImportPatterns },
+        {
+          paths: restrictedTypographyImports,
+          patterns: restrictedImportPatterns,
+        },
       ],
+      "no-restricted-syntax": ["error", ...restrictedTypographySyntax],
       // Coding standards «File size and reuse»: 400 lines of code per file.
       "max-lines": [
         "error",
         { max: 400, skipBlankLines: true, skipComments: true },
       ],
+    },
+  },
+  {
+    // The scale itself, and specs that build off-scale samples or assert a
+    // rendered style.
+    files: [...typeScaleFiles, "**/*.spec.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: restrictedImportPatterns },
+      ],
+      "no-restricted-syntax": "off",
     },
   },
   {

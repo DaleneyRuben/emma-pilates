@@ -1,7 +1,7 @@
 import { formatMoney, formatListDate } from "@pilates/api-contracts";
 import type { OwnSalaryPaymentDto } from "@pilates/api-contracts";
-import { Chevron, colors, fontFamilies, Glyph, spacing, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Chevron, colors, Glyph, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { RowCard } from "../ui/card-pieces";
 import { ReceiptThumbnail, useReceiptViewer } from "./receipt-viewer";
@@ -10,8 +10,8 @@ function PaymentText({ payment }: { payment: OwnSalaryPaymentDto }) {
   const receipt = (payment.receiptUrl ?? null) === null ? "sin comprobante" : "ver comprobante";
   return (
     <View style={styles.body}>
-      <Text style={styles.amount}>{formatMoney(payment.amountCentavos)}</Text>
-      <Text style={styles.date}>{`${formatListDate(payment.paidOn)} · ${receipt}`}</Text>
+      <Text variant="titulo-fila">{formatMoney(payment.amountCentavos)}</Text>
+      <Text variant="secundario">{`${formatListDate(payment.paidOn)} · ${receipt}`}</Text>
     </View>
   );
 }
@@ -65,15 +65,7 @@ export function OtherPayments({
 }
 
 const styles = StyleSheet.create({
-  amount: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 16,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "600",
-  },
   body: { flex: 1, gap: 2 },
-  date: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   // FIX-089: the icon stands alone, with no tinted box behind it.
   icon: { alignItems: "center", height: 40, justifyContent: "center", width: 40 },
   pressed: { backgroundColor: colors.surfaceSubtle },

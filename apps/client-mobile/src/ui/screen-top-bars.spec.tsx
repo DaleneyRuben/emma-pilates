@@ -1,10 +1,5 @@
 import { cleanup, render, within } from "@testing-library/react-native";
-import {
-  clearMobileQueryCache,
-  fontFamilies,
-  MobileQueryProvider,
-  typography,
-} from "@pilates/mobile-core";
+import { clearMobileQueryCache, MobileQueryProvider, textVariants } from "@pilates/mobile-core";
 import type { ComponentType } from "react";
 
 import { RescheduleScreen } from "../booking/reschedule-screen";
@@ -92,7 +87,10 @@ describe("The Client screens' top bar", () => {
 
     const bar = screen.getByTestId("screen-top-bar");
     const label = within(bar).getByLabelText(title);
-    expect(label).toHaveStyle({ fontFamily: fontFamilies.display, fontSize: typography.title });
+    expect(label).toHaveStyle({
+      fontFamily: textVariants["titulo-pagina"].fontFamily,
+      fontSize: textVariants["titulo-pagina"].fontSize,
+    });
     expect(screen.getAllByLabelText(title)).toHaveLength(1);
   });
 
@@ -110,7 +108,9 @@ describe("The Client screens' top bar", () => {
     );
 
     const bar = await screen.findByTestId("screen-top-bar");
-    expect(within(bar).getByLabelText("Tu pago")).toHaveStyle({ fontSize: typography.title });
+    expect(within(bar).getByLabelText("Tu pago")).toHaveStyle({
+      fontSize: textVariants["titulo-pagina"].fontSize,
+    });
     expect(within(bar).getByLabelText("Volver")).toBeOnTheScreen();
   });
 });

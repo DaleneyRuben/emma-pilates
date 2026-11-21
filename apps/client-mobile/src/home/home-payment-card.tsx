@@ -1,5 +1,5 @@
 import { formatMoney, type PaymentDto } from "@pilates/api-contracts";
-import { BodyText, colors, spacing } from "@pilates/mobile-core";
+import { InlineError, spacing, surfaces } from "@pilates/mobile-core";
 import { StyleSheet, View } from "react-native";
 
 import { HomeNotice } from "./home-notice";
@@ -71,15 +71,16 @@ export function PaymentRejectedCard({
         title={payment.planName}
       />
       {error === null ? null : (
-        <BodyText accessibilityRole="alert" style={styles.error}>
-          {error}
-        </BodyText>
+        // On white, never straight on the 100 screen (follow-up 285, rule 3).
+        <View style={styles.errorCard}>
+          <InlineError>{error}</InlineError>
+        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  error: { color: colors.errorText },
+  errorCard: { ...surfaces.card, padding: spacing.md },
   stack: { gap: spacing.sm },
 });

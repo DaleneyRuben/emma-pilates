@@ -1,20 +1,20 @@
 import type { PropsWithChildren, ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
 import { FormScrollView } from "../ui/form-scroll-view";
-import { fontFamilies } from "../ui/fonts";
 import type { OutcomeBadgeProps } from "../ui/outcome-badge";
 import { Screen } from "../ui/screen";
 import { ScreenHeader } from "../ui/screen-header";
-import { colors, radii, spacing, surfaces, typography } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { OutcomeDisc } from "./outcome-disc";
 
 /** The white capsule under the Staff wordmark (E-A01, E-A04): the team's entrance. */
 export function TeamAccessBadge({ start = false }: { start?: boolean }) {
   return (
     <View style={[styles.teamBadge, start && styles.teamBadgeStart]}>
-      <Text style={styles.teamBadgeLabel}>Acceso del equipo</Text>
+      <Text variant="etiqueta">Acceso del equipo</Text>
     </View>
   );
 }
@@ -23,7 +23,9 @@ export function TeamAccessBadge({ start = false }: { start?: boolean }) {
 export function BrandHeader({ teamAccess = false }: { teamAccess?: boolean }) {
   return (
     <View style={styles.brand}>
-      <Text style={[styles.wordmark, teamAccess && styles.wordmarkTeam]}>Emma Pilates Studio</Text>
+      <Text style={authStyles.centered} variant="titulo-pagina">
+        Emma Pilates Studio
+      </Text>
       {teamAccess ? <TeamAccessBadge /> : null}
     </View>
   );
@@ -68,9 +70,7 @@ export function AuthenticationScreen({
   const outcomeInCard = badge !== undefined && staff;
   const outcomeOnScreen = badge !== undefined && !staff && topBar !== undefined;
   const outcomeTitle = (
-    <Text
-      style={[styles.outcomeTitle, outcomeInCard && styles.outcomeTitleCard, authStyles.centered]}
-    >
+    <Text style={authStyles.centered} variant="titulo-pagina">
       {title}
     </Text>
   );
@@ -115,9 +115,9 @@ export function AuthenticationScreen({
         >
           {outcomeInCard ? <OutcomeDisc {...badge} surface="card" /> : null}
           {outcomeInCard ? outcomeTitle : null}
-          {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
+          {eyebrow === undefined ? null : <Text variant="etiqueta">{eyebrow}</Text>}
           {badge === undefined && title !== undefined ? (
-            <Text style={[styles.title, staff && styles.titleStaff]}>{title}</Text>
+            <Text variant="titulo-pagina">{title}</Text>
           ) : null}
           {children}
           {staff && actions !== undefined ? (
@@ -134,15 +134,11 @@ export const authStyles = StyleSheet.create({
   centered: {
     textAlign: "center",
   },
-  emphasized: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyLarge,
-    fontWeight: "600",
-  },
-  muted: {
-    color: colors.textMuted,
-  },
+  /**
+   * Deprecated (follow-up 285): the type is the variant's now. Kept empty for
+   * the screens that still pass it to `BodyText`; use `<Text variant>` instead.
+   */
+  emphasized: {},
   /** A text button on the 100 screen rides on a white pill (C01c, C20b, C21e). */
   pill: {
     alignSelf: "center",
@@ -150,11 +146,8 @@ export const authStyles = StyleSheet.create({
     borderRadius: radii.pill,
     paddingHorizontal: spacing.xlSm,
   },
-  /** A short note in a card, such as the link's lifetime. */
-  small: {
-    fontSize: typography.note,
-    lineHeight: 19,
-  },
+  /** Deprecated (follow-up 285): a short note is `<Text variant="secundario">`. */
+  small: {},
 });
 
 const styles = StyleSheet.create({
@@ -174,22 +167,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     width: "100%",
   },
-  eyebrow: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
   outcome: { alignItems: "center", gap: spacing.mdLg },
-  outcomeTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.title,
-    lineHeight: 36,
-  },
-  outcomeTitleCard: { fontSize: typography.hero, lineHeight: 34 },
   panel: {
     ...surfaces.card,
     gap: spacing.mdLg,
@@ -215,27 +193,4 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   teamBadgeStart: { alignSelf: "flex-start" },
-  teamBadgeLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 26,
-    lineHeight: 32,
-  },
-  titleStaff: { fontSize: typography.hero, lineHeight: 34 },
-  wordmark: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 34,
-    lineHeight: 38,
-    textAlign: "center",
-  },
-  wordmarkTeam: { fontSize: 36, lineHeight: 40 },
 });

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import { fontFamilies } from "./fonts";
-import { colors, radii, spacing, surfaces, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, radii, spacing, surfaces } from "./tokens";
 
 type Action = { label: string; onPress: () => void; testID?: string };
 
@@ -11,14 +11,14 @@ export type EmphasisCardProps = {
   action?: Action;
   /** Custom content between the note and the action: a big number, a progress bar. */
   children?: ReactNode;
-  /** The uppercase label on top, in white at 75 %. */
+  /** The uppercase `etiqueta` on top, in white. */
   eyebrow?: string;
-  /** One line of white 85 % text. */
+  /** One line of white `cuerpo`. */
   note?: string;
-  /** A short fact such as «15 % de descuento», bold Crema text (no pill, FIX-089). */
+  /** A short fact such as «15 % de descuento», white `pastilla` (no pill, FIX-089). */
   pill?: string;
   testID?: string;
-  /** A Lora 24 white title. */
+  /** A white `titulo-bloque` title. */
   title?: string;
 };
 
@@ -34,21 +34,35 @@ export function EmphasisCard({
 }: EmphasisCardProps) {
   return (
     <View style={styles.card} testID={testID}>
-      {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
+      {eyebrow === undefined ? null : (
+        <Text tone="onDark" variant="etiqueta">
+          {eyebrow}
+        </Text>
+      )}
       {pill === undefined ? null : (
         <View>
-          <Text style={styles.pillLabel}>{pill}</Text>
+          <Text tone="onDark" variant="pastilla">
+            {pill}
+          </Text>
         </View>
       )}
-      {title === undefined ? null : <Text style={styles.title}>{title}</Text>}
-      {note === undefined ? null : <Text style={styles.note}>{note}</Text>}
+      {title === undefined ? null : (
+        <Text tone="onDark" variant="titulo-bloque">
+          {title}
+        </Text>
+      )}
+      {note === undefined ? null : (
+        <Text tone="onDark" variant="cuerpo">
+          {note}
+        </Text>
+      )}
       {children}
       {action === undefined ? null : <OnEmphasisButton {...action} />}
     </View>
   );
 }
 
-/** The Crema pill action on the hero block, 44 high (follow-up 225 §4). */
+/** The white pill action on the hero block, 44 high (follow-up 225 §4), in ink `boton`. */
 export function OnEmphasisButton({ label, onPress, testID }: Action) {
   return (
     <Pressable
@@ -58,7 +72,7 @@ export function OnEmphasisButton({ label, onPress, testID }: Action) {
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
       testID={testID}
     >
-      <Text style={styles.buttonLabel}>{label}</Text>
+      <Text variant="boton">{label}</Text>
     </Pressable>
   );
 }
@@ -73,38 +87,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.xlSm,
   },
-  buttonLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
   card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
-  eyebrow: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.14,
-    textTransform: "uppercase",
-  },
-  note: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 21,
-  },
-  pillLabel: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "700",
-  },
   pressed: { opacity: 0.85 },
-  title: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.hero,
-    lineHeight: 31,
-  },
 });

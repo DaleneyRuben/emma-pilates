@@ -40,8 +40,7 @@ describe("Client Home with a payment in review or rejected", () => {
     });
 
     // C8 A: the block's eyebrow, and the locked booking row's note.
-    expect(screen.getByText("TU PAGO ESTÁ EN REVISIÓN")).toBeOnTheScreen();
-    expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
+    expect(screen.getAllByText("Tu pago está en revisión")).toHaveLength(2);
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Bs 502")).toBeOnTheScreen();
     expect(screen.getByText("Te avisamos apenas el estudio lo confirme.")).toBeOnTheScreen();
@@ -64,7 +63,7 @@ describe("Client Home with a payment in review or rejected", () => {
     });
 
     // C8 C: one Palo de rosa block with the reason and what to do.
-    expect(screen.getByText("NO PUDIMOS CONFIRMAR TU PAGO")).toBeOnTheScreen();
+    expect(screen.getByText("No pudimos confirmar tu pago")).toBeOnTheScreen();
     expect(screen.getByText("El monto del comprobante no coincide con el plan.")).toBeOnTheScreen();
     expect(screen.getByText("Sube uno nuevo para activar tu plan.")).toBeOnTheScreen();
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();

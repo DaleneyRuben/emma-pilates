@@ -4,12 +4,9 @@ import {
 } from "@pilates/api-contracts";
 import {
   addCivilDays,
-  BodyText,
   boliviaCivilDate,
   BrandToast,
-  colors,
   EmphasisCard,
-  fontFamilies,
   formatBolivianos,
   LoadingState,
   nextPlanStartWindowDays,
@@ -21,7 +18,7 @@ import {
   surfaces,
   SectionTitle,
   spacing,
-  typography,
+  Text,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
@@ -160,7 +157,9 @@ export function SubscriptionScreen() {
           // Rosa Emma C12: the button and its hint together in a white card.
           <View style={styles.renew} testID="subscription-renew">
             <PrimaryButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
-            <BodyText style={styles.renewNote}>{renewNote}</BodyText>
+            <Text style={styles.renewNote} variant="secundario">
+              {renewNote}
+            </Text>
           </View>
         ) : null}
         {notices.length === 0 ? null : <NoticeList notices={notices} />}
@@ -180,9 +179,7 @@ export function SubscriptionScreen() {
           <View>
             <SectionTitle>Elige tu próximo plan</SectionTitle>
             <View style={styles.purchase} testID="subscription-purchase">
-              <BodyText style={styles.note}>
-                {purchaseNote(studioRules?.plansFromPriceCentavos)}
-              </BodyText>
+              <Text variant="cuerpo">{purchaseNote(studioRules?.plansFromPriceCentavos)}</Text>
               <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
             </View>
           </View>
@@ -220,20 +217,8 @@ function purchaseNote(fromCentavos: number | null | undefined): string {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   purchase: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   renew: { ...surfaces.card, gap: spacing.smLg, padding: spacing.mdLg },
-  renewNote: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-  },
+  renewNote: { textAlign: "center" },
   screen: { gap: spacing.lg },
 });

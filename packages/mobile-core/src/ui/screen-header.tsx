@@ -1,11 +1,11 @@
 import { type ReactNode, useContext, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
-import { fontFamilies } from "./fonts";
 import { LineIcon } from "./line-icon";
 import { ScreenFrameContext } from "./screen";
-import { colors, radii, spacing, typography } from "./tokens";
+import { Text } from "./text";
+import { colors, radii, spacing } from "./tokens";
 
 type Bleed = { left: number; top: number };
 
@@ -53,7 +53,8 @@ function useBandBleed() {
  * white circle on its own row, then the screen's own large Lora title — never
  * the name of the screen it was opened from. A tab's root screen omits
  * `onBack`. Small text never sits on 200: the eyebrow and the subtitle ride on
- * white capsules.
+ * white capsules. Title `titulo-pagina`, eyebrow `etiqueta`, subtitle
+ * `compacto` (follow-up 285).
  */
 export function ScreenHeader({
   action,
@@ -125,7 +126,7 @@ export function ScreenHeader({
       {eyebrow === undefined ? null : (
         <View style={styles.eyebrowRow}>
           <View style={styles.capsule}>
-            <Text style={styles.eyebrow}>{eyebrow}</Text>
+            <Text variant="etiqueta">{eyebrow}</Text>
           </View>
           {action !== undefined && !showRow ? <View style={styles.action}>{action}</View> : null}
         </View>
@@ -137,6 +138,7 @@ export function ScreenHeader({
               accessibilityLabel={titleLabel ?? title}
               accessibilityRole="header"
               style={styles.title}
+              variant="titulo-pagina"
             >
               {title}
             </Text>
@@ -146,7 +148,7 @@ export function ScreenHeader({
       )}
       {subtitle === undefined ? null : (
         <View style={styles.subtitleBox}>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text variant="compacto">{subtitle}</Text>
         </View>
       )}
       {children}
@@ -182,23 +184,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 3,
   },
-  eyebrow: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.label,
-    fontWeight: "700",
-    letterSpacing: typography.label * 0.12,
-    textTransform: "uppercase",
-  },
   eyebrowRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   pressed: { opacity: 0.6 },
   row: { alignItems: "center", flexDirection: "row", minHeight: 44 },
-  subtitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 19,
-  },
   subtitleBox: {
     alignSelf: "flex-start",
     backgroundColor: colors.card,
@@ -206,12 +194,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 5,
   },
-  title: {
-    color: colors.text,
-    flex: 1,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.title,
-    lineHeight: 36,
-  },
+  title: { flex: 1 },
   titleRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
 });

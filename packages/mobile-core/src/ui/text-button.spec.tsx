@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { StyleSheet } from "react-native";
 
 import { TextButton } from "./text-button";
+import { textVariants } from "./type-scale";
 
 // MOB-066: Maestro and RNTL reach the link by a stable id, not its Spanish label.
 describe("TextButton testID", () => {
@@ -18,35 +18,27 @@ describe("TextButton testID", () => {
   });
 });
 
-// Rosa Emma: a Text button is rosa profundo Work Sans 700 15 with a 44 pt tap
-// height, underlined only where the board draws a link; the Error tone is
-// 226's «Cancelar reserva».
+// Follow-up 285: a standalone link or action is `enlace`, Work Sans 14 · 700,
+// always underlined, in ink, with a 44 pt tap height; the Error tone and a
+// disabled link stay ink (an error is said in words, never in colour).
 describe("TextButton", () => {
-  it("draws rosa profundo Work Sans 700 15 without an underline, 44 pt tall", async () => {
+  it("draws enlace in ink, underlined, 44 pt tall", async () => {
     const screen = await render(<TextButton label="Ahora no" onPress={jest.fn()} />);
 
-    const label = screen.getByText("Ahora no");
-    expect(label).toHaveStyle({
-      color: "#93615D",
-      fontFamily: "WorkSans_700Bold",
-      fontSize: 15,
-      fontWeight: "700",
-    });
-    expect(StyleSheet.flatten(label.props.style)).not.toHaveProperty("textDecorationLine");
+    expect(screen.getByText("Ahora no")).toHaveStyle({ ...textVariants.enlace, color: "#93615D" });
     expect(screen.getByRole("button", { name: "Ahora no" })).toHaveStyle({ minHeight: 44 });
   });
 
-  it("underlines a link when asked", async () => {
-    const screen = await render(<TextButton label="Volver" onPress={jest.fn()} underline />);
-
-    expect(screen.getByText("Volver")).toHaveStyle({ textDecorationLine: "underline" });
-  });
-
-  it("draws the Error tone in #93615D", async () => {
+  it("draws every link, disabled or not, in the same ink", async () => {
     const screen = await render(
-      <TextButton label="Cancelar reserva" onPress={jest.fn()} tone="error" />,
+      <>
+        <TextButton label="Cancelar reserva" onPress={jest.fn()} />
+        <TextButton disabled label="Volver" onPress={jest.fn()} />
+      </>,
     );
 
     expect(screen.getByText("Cancelar reserva")).toHaveStyle({ color: "#93615D" });
+    expect(screen.getByText("Volver")).toHaveStyle({ color: "#93615D" });
+    expect(screen.getByRole("button", { name: "Volver" })).toBeDisabled();
   });
 });

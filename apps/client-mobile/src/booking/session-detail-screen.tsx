@@ -6,10 +6,9 @@ import {
   useGetSession,
 } from "@pilates/api-contracts";
 import {
-  BodyText,
   boliviaCivilDate,
   colors,
-  fontFamilies,
+  InlineError,
   isInsideCancellationWindow,
   LoadingState,
   PrimaryButton,
@@ -20,7 +19,7 @@ import {
   shadows,
   spacing,
   surfaces,
-  typography,
+  Text,
   usePushNotifications,
   useStudioRules,
   weeklyClassesLeftLine,
@@ -248,15 +247,17 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
         />
         {classesLeftLine === null ? null : (
           <View style={styles.weekNotice} testID="session-week-notice">
-            <BodyText style={styles.weekLine}>{classesLeftLine}</BodyText>
+            <Text style={styles.centered} variant="titulo-fila">
+              {classesLeftLine}
+            </Text>
           </View>
         )}
         {detail.classType.description.length === 0 ? null : (
           <View style={styles.aboutCard}>
-            <BodyText accessibilityRole="header" style={styles.aboutTitle}>
+            <Text accessibilityRole="header" variant="titulo-fila">
               Sobre la clase
-            </BodyText>
-            <BodyText style={styles.about}>{detail.classType.description}</BodyText>
+            </Text>
+            <Text variant="cuerpo">{detail.classType.description}</Text>
           </View>
         )}
       </ScrollView>
@@ -264,9 +265,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
       <View style={styles.actions} testID="session-footer">
         {message !== null ? (
           <View style={styles.messageBox}>
-            <BodyText accessibilityRole="alert" style={styles.message}>
-              {message}
-            </BodyText>
+            <InlineError>{message}</InlineError>
           </View>
         ) : null}
         {frozenOnClassDay && view?.freeze != null ? (
@@ -277,16 +276,18 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           />
         ) : full ? (
           waitlisted ? (
-            <BodyText style={[styles.status, styles.statusTall]}>
+            <Text style={[styles.status, styles.statusTall]} variant="titulo-fila">
               Ya estás en la lista de espera.
-            </BodyText>
+            </Text>
           ) : !waitlistOpen ? (
-            <BodyText style={styles.status}>
+            <Text style={styles.status} variant="titulo-fila">
               Falta poco para la clase, así que la lista de espera ya cerró.
-            </BodyText>
+            </Text>
           ) : (
             <>
-              <BodyText style={styles.note}>La lista de espera no usa clases de tu plan</BodyText>
+              <Text style={styles.centered} variant="secundario">
+                La lista de espera no usa clases de tu plan
+              </Text>
               <PrimaryButton
                 busy={submitting}
                 label="Unirme a la lista de espera"
@@ -303,11 +304,11 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               onPress={() => void book()}
               testID="session-book"
             />
-            <BodyText style={styles.note}>
+            <Text style={styles.centered} variant="secundario">
               {view?.subscription?.guestPass?.usedClassStartsAt === null
                 ? "Es tu clase gratis de invitada"
                 : usesLine(nextCovers ? next : (view?.subscription ?? null))}
-            </BodyText>
+            </Text>
           </>
         ) : paymentPending ? (
           // The reason waits for the Payment, so «Necesitas un plan» never
@@ -332,19 +333,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 }
 
 const styles = StyleSheet.create({
-  about: {
-    color: colors.text,
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: fontFamilies.body,
-  },
   aboutCard: { ...surfaces.card, gap: spacing.smd, padding: spacing.lg },
-  aboutTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   // A white panel from edge to edge with the card shadow cast upward.
   actions: {
     ...shadows.footer,
@@ -354,13 +343,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingVertical: spacing.mdLg,
   },
+  centered: { textAlign: "center" },
   content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
-  message: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   messageBox: {
     backgroundColor: colors.primaryTint,
     borderColor: colors.borderStrong,
@@ -369,30 +353,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  note: {
-    color: colors.textMuted,
-    fontSize: typography.note,
-    lineHeight: 18,
-    textAlign: "center",
-    fontFamily: fontFamilies.body,
-  },
   screen: { gap: spacing.md, paddingBottom: 0 },
-  status: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 21,
-    paddingVertical: spacing.sm,
-    textAlign: "center",
-  },
+  status: { paddingVertical: spacing.sm, textAlign: "center" },
   statusTall: { paddingVertical: spacing.md },
-  weekLine: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.note,
-    fontWeight: "600",
-    textAlign: "center",
-  },
   weekNotice: { ...surfaces.soft, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
 });

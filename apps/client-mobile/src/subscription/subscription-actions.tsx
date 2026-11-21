@@ -1,15 +1,14 @@
 import {
   Chevron,
   colors,
-  fontFamilies,
   Glyph,
   type GlyphName,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import { Children, Fragment, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export type PlanNotice = { icon: GlyphName; text: string; note?: string };
 
@@ -24,10 +23,8 @@ export function NoticeList({ notices }: { notices: readonly PlanNotice[] }) {
         <View key={notice.text} style={[styles.notice, index > 0 && styles.noticeRule]}>
           <IconDisc icon={notice.icon} />
           <View style={styles.noticeBody}>
-            <Text style={styles.noticeText}>{notice.text}</Text>
-            {notice.note === undefined ? null : (
-              <Text style={styles.noticeNote}>{notice.note}</Text>
-            )}
+            <Text variant="titulo-fila">{notice.text}</Text>
+            {notice.note === undefined ? null : <Text variant="secundario">{notice.note}</Text>}
           </View>
         </View>
       ))}
@@ -74,8 +71,8 @@ export function ActionRow({
     <>
       <IconDisc icon={icon} />
       <View style={styles.rowBody}>
-        <Text style={[styles.rowLabel, onPress === undefined && styles.rowLabelOff]}>{label}</Text>
-        <Text style={styles.rowNote}>{note}</Text>
+        <Text variant="titulo-fila">{label}</Text>
+        <Text variant="secundario">{note}</Text>
       </View>
       {onPress === undefined ? null : <Chevron size={18} strokeWidth={1.7} tone="muted" />}
     </>
@@ -119,20 +116,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   noticeBody: { flex: 1, gap: spacing.xxs },
-  noticeNote: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
   noticeRule: { borderTopColor: colors.hairline, borderTopWidth: 1 },
-  noticeText: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.body,
-    fontWeight: "600",
-    lineHeight: 20,
-  },
   notices: { ...surfaces.card },
   pressed: { opacity: 0.7 },
   row: {
@@ -144,17 +128,4 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
-  rowLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
-  rowLabelOff: { color: colors.text },
-  rowNote: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
 });

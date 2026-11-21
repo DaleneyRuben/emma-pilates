@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { BodyText } from "../ui/body-text";
+import { Text } from "../ui/text";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
@@ -53,10 +53,10 @@ function RegistrationLapsed({
       brand={false}
       title="El registro venció"
     >
-      <BodyText>
+      <Text variant="cuerpo">
         Pasaron 7 días sin verificar el correo, así que eliminamos el registro pendiente. Puedes
         registrarte de nuevo.
-      </BodyText>
+      </Text>
     </AuthenticationScreen>
   );
 }
@@ -163,18 +163,26 @@ export function CheckEmailScreen({
       title="Revisa tu correo"
     >
       <View style={styles.lines}>
-        <BodyText style={authStyles.centered}>Te enviamos un enlace a</BodyText>
-        <BodyText style={[authStyles.emphasized, authStyles.centered]}>{pending.email}</BodyText>
+        <Text style={authStyles.centered} variant="cuerpo">
+          Te enviamos un enlace a
+        </Text>
+        <Text style={authStyles.centered} variant="titulo-fila">
+          {pending.email}
+        </Text>
       </View>
-      <BodyText style={authStyles.centered}>
+      <Text variant="cuerpo" style={authStyles.centered}>
         Ábrelo para activar tu cuenta y después inicia sesión.
-      </BodyText>
+      </Text>
       {resent && !waiting ? (
         <View accessibilityLiveRegion="polite" style={styles.resent} testID="resent-notice">
-          <BodyText>Te enviamos otro correo. Usa el enlace más reciente.</BodyText>
+          <Text variant="cuerpo">Te enviamos otro correo. Usa el enlace más reciente.</Text>
         </View>
       ) : null}
-      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
+      {failure === null ? null : (
+        <Text variant="cuerpo" accessibilityRole="alert">
+          {failure}
+        </Text>
+      )}
       {waiting ? (
         <WaitNotice
           message="Ya te enviamos uno hace poco. El enlace que tienes sigue sirviendo."
@@ -242,7 +250,7 @@ export function CorrectEmailScreen({
 
   return (
     <AuthenticationScreen brand={false} topBar={{ onBack, title: "Cambiar correo" }}>
-      <BodyText>Escribe el correo correcto y te enviamos un enlace nuevo.</BodyText>
+      <Text variant="cuerpo">Escribe el correo correcto y te enviamos un enlace nuevo.</Text>
       <FormField
         autoCapitalize="none"
         error={error}
@@ -251,7 +259,11 @@ export function CorrectEmailScreen({
         onChangeText={setEmail}
         value={email}
       />
-      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
+      {failure === null ? null : (
+        <Text variant="cuerpo" accessibilityRole="alert">
+          {failure}
+        </Text>
+      )}
       {waitSeconds > 0 ? (
         <WaitNotice
           message={limitKeepsCurrentLink}

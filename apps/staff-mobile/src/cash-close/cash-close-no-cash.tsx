@@ -1,17 +1,15 @@
 import type { CashCloseDto } from "@pilates/api-contracts";
 import {
-  colors,
   ConfirmationSheet,
-  fontFamilies,
   NoticeRow,
   PrimaryButton,
   spacing,
   surfaces,
+  Text,
   TextButton,
-  typography,
 } from "@pilates/mobile-core";
 import { useState, type ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useRecordCashClose } from "./cash-close-form";
 import { CashCloseFrame } from "./cash-close-frame";
@@ -19,7 +17,8 @@ import { CashCloseFrame } from "./cash-close-frame";
 /**
  * FIX-083 (Cerrar caja pick C): a day with no cash Payments is not a problem
  * to solve. It closes in zero, unless there is cash in the drawer after all.
- * E-S04: the news on a white card, both ways on in the white footer.
+ * E-S04: the news on a white card (`titulo-fila` over a `cuerpo` note, never a
+ * Lora sentence), both ways on in the white footer.
  */
 export function CashCloseNoCash({
   branch,
@@ -58,10 +57,12 @@ export function CashCloseNoCash({
     <CashCloseFrame footer={footer} root={root}>
       {lead}
       <View style={styles.card} testID="cash-close-no-cash">
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text accessibilityRole="header" style={styles.centered} variant="titulo-fila">
           Hoy no hubo pagos en efectivo
         </Text>
-        <Text style={styles.note}>Puedes cerrar la caja en cero.</Text>
+        <Text style={styles.centered} variant="cuerpo">
+          Puedes cerrar la caja en cero.
+        </Text>
       </View>
       {failure === null ? null : (
         <View accessibilityLabel={failure} accessibilityRole="alert">
@@ -95,19 +96,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingVertical: spacing.xl,
   },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.body,
-    lineHeight: 22,
-    textAlign: "center",
-  },
+  centered: { textAlign: "center" },
   secondary: { alignSelf: "center" },
-  title: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: typography.hero,
-    lineHeight: 34,
-    textAlign: "center",
-  },
 });

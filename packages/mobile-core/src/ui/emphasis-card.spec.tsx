@@ -1,7 +1,8 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { EmphasisCard, OnEmphasisButton } from "./emphasis-card";
+import { Text } from "./text";
+import { textVariants } from "./type-scale";
 
 // Follow-up 225 §5 and the boards' Inicio and Detalle del Plan hero cards.
 describe("EmphasisCard", () => {
@@ -24,24 +25,23 @@ describe("EmphasisCard", () => {
       gap: 8,
       padding: 20,
     });
+    // Follow-up 285: etiqueta, pastilla, titulo-bloque and cuerpo, all white.
     expect(screen.getByText("Tu plan · 12 clases")).toHaveStyle({
+      ...textVariants.etiqueta,
       color: "#FFFBFB",
-      fontSize: 12,
-      textTransform: "uppercase",
     });
-    // FIX-089: a normal fact on the hero is bold Crema text, not a pill.
+    // FIX-089: a normal fact on the hero is white text, not a pill.
     expect(screen.getByText("Desde Bs 80")).toHaveStyle({
+      ...textVariants.pastilla,
       color: "#FFFBFB",
-      fontSize: 13,
-      fontWeight: "700",
     });
     expect(screen.getByText("Desde Bs 80").parent).not.toHaveStyle({ borderRadius: 999 });
     expect(screen.getByText("Elige tu plan y empieza a moverte")).toHaveStyle({
+      ...textVariants["titulo-bloque"],
       color: "#FFFBFB",
-      fontFamily: "Lora_400Regular",
-      fontSize: 28,
     });
     expect(screen.getByText("Mat y Reformer · paga por QR o en el estudio")).toHaveStyle({
+      ...textVariants.cuerpo,
       color: "#FFFBFB",
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
@@ -51,7 +51,9 @@ describe("EmphasisCard", () => {
   it("holds custom content and leaves out what it is not given", async () => {
     const screen = await render(
       <EmphasisCard testID="hero">
-        <Text>9 clases restantes</Text>
+        <Text tone="onDark" variant="cuerpo">
+          9 clases restantes
+        </Text>
       </EmphasisCard>,
     );
 
@@ -61,7 +63,7 @@ describe("EmphasisCard", () => {
 });
 
 describe("OnEmphasisButton", () => {
-  it("is a 44 pt Crema pill with a Rosa profundo Work Sans 600 label", async () => {
+  it("is a 44 pt white pill with an ink boton label", async () => {
     const screen = await render(<OnEmphasisButton label="Comprar un plan" onPress={jest.fn()} />);
 
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
@@ -72,9 +74,8 @@ describe("OnEmphasisButton", () => {
       paddingHorizontal: 20,
     });
     expect(screen.getByText("Comprar un plan")).toHaveStyle({
+      ...textVariants.boton,
       color: "#93615D",
-      fontFamily: "WorkSans_700Bold",
-      fontSize: 15,
     });
   });
 });

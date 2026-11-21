@@ -1,7 +1,8 @@
 import { fireEvent, render, within } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { ConfirmationSheet } from "./confirmation-sheet";
+import { textVariants } from "./type-scale";
+import { Text } from "./text";
 
 // UX-002: the bottom confirmation sheet 05, 15, S14, S15, S17, S23 and S24 draw,
 // in place of the native Alert.alert dialogs.
@@ -23,11 +24,13 @@ describe("ConfirmationSheet", () => {
     );
 
   // FIX-089: the destructive confirmation takes the secondary look, never red.
-  it("draws the Lora title, the note, the outlined destructive action and the quiet dismiss link", async () => {
+  it("draws the sheet title, the note, the outlined destructive action and the quiet dismiss link", async () => {
     const screen = await renderSheet();
 
     const sheet = within(screen.getByTestId("logout-sheet"));
-    expect(sheet.getByText("¿Cerrar sesión?")).toHaveStyle({ fontFamily: "Lora_400Regular" });
+    expect(sheet.getByRole("header", { name: "¿Cerrar sesión?" })).toHaveStyle(
+      textVariants["titulo-seccion"],
+    );
     expect(
       sheet.getByText(
         "Vuelves al inicio de sesión y tendrás que entrar de nuevo con tu correo y contraseña.",
@@ -82,13 +85,15 @@ describe("ConfirmationSheet", () => {
     const hidden = await renderSheet({ visible: false });
     expect(hidden.queryByText("¿Cerrar sesión?")).toBeNull();
 
-    const screen = await renderSheet({ children: <Text>Reformer · jueves 20</Text> });
+    const screen = await renderSheet({
+      children: <Text variant="cuerpo">Reformer · jueves 20</Text>,
+    });
     expect(screen.getByText("Reformer · jueves 20")).toBeOnTheScreen();
   });
 
   it("leaves the note out when the facts are rows (C05c)", async () => {
     const screen = await renderSheet({
-      children: <Text>La clase vuelve a tu plan</Text>,
+      children: <Text variant="cuerpo">La clase vuelve a tu plan</Text>,
       note: undefined,
     });
 

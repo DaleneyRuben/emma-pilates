@@ -1,10 +1,11 @@
 import { fireEvent, render } from "@testing-library/react-native";
-import { Text } from "react-native";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Screen, ScreenHeader, ScreenTopBar } from "../index";
 import { spacing } from "./tokens";
+import { textVariants } from "./type-scale";
+import { Text } from "./text";
 
 // Rosa Emma (follow-up 284): one header for both apps — a 200 band with the
 // back button on its own row, then the screen's large Lora title under it.
@@ -13,14 +14,13 @@ const metrics = {
   insets: { bottom: 34, left: 0, right: 0, top: 47 },
 };
 describe("ScreenHeader", () => {
-  it("puts the back arrow on its own row above a large Lora title", async () => {
+  it("puts the back arrow on its own row above a titulo-pagina title", async () => {
     const onBack = jest.fn();
     const screen = await render(<ScreenHeader onBack={onBack} title="Mi plan" />);
 
     expect(screen.getByRole("header", { name: "Mi plan" })).toHaveStyle({
+      ...textVariants["titulo-pagina"],
       color: "#93615D",
-      fontFamily: "Lora_400Regular",
-      fontSize: 30,
     });
     const back = screen.getByRole("button", { name: "Volver" });
     expect(back).toHaveStyle({ height: 44, width: 44 });
@@ -50,7 +50,7 @@ describe("ScreenHeader", () => {
   it("puts an action at the end of the arrow's row and a quiet line under the title", async () => {
     const screen = await render(
       <ScreenHeader
-        action={<Text>Marcar leídas</Text>}
+        action={<Text variant="destacado">Marcar leídas</Text>}
         onBack={jest.fn()}
         subtitle="3 sin leer"
         title="Notificaciones"
@@ -58,7 +58,10 @@ describe("ScreenHeader", () => {
     );
 
     expect(screen.getByText("Marcar leídas")).toBeOnTheScreen();
-    expect(screen.getByText("3 sin leer")).toHaveStyle({ color: "#93615D", fontSize: 14 });
+    expect(screen.getByText("3 sin leer")).toHaveStyle({
+      ...textVariants.compacto,
+      color: "#93615D",
+    });
     expect(screen.getByText("3 sin leer").parent).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 
@@ -114,15 +117,11 @@ describe("ScreenHeader", () => {
       <ScreenHeader
         eyebrow="Instructora · Jueves 19"
         title="Hola, Daniela"
-        titleAccessory={<Text>Campana</Text>}
+        titleAccessory={<Text variant="destacado">Campana</Text>}
       />,
     );
 
-    expect(screen.getByText("Instructora · Jueves 19")).toHaveStyle({
-      fontSize: 12,
-      fontWeight: "700",
-      textTransform: "uppercase",
-    });
+    expect(screen.getByText("Instructora · Jueves 19")).toHaveStyle(textVariants.etiqueta);
     expect(screen.getByText("Instructora · Jueves 19").parent).toHaveStyle({
       backgroundColor: "#FFFBFB",
     });
@@ -139,6 +138,8 @@ describe("ScreenTopBar", () => {
   it("is the shared header", async () => {
     const screen = await render(<ScreenTopBar onBack={jest.fn()} title="Mi crédito" />);
 
-    expect(screen.getByRole("header", { name: "Mi crédito" })).toHaveStyle({ fontSize: 30 });
+    expect(screen.getByRole("header", { name: "Mi crédito" })).toHaveStyle(
+      textVariants["titulo-pagina"],
+    );
   });
 });

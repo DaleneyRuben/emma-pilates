@@ -1,6 +1,6 @@
 import type { ClientEvaluationDto, EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import { BodyText, colors, fontFamilies, spacing, surfaces } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { spacing, surfaces, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
 import { UsedMonth, usedMonthStyles } from "./evaluation-used-month";
@@ -13,7 +13,7 @@ const turno = (instant: string) => {
 
 /**
  * The note over the turnos while she moves an Evaluation (follow-up 264): a
- * white card with «Volver» as a bold underlined link under the line (C13v).
+ * white card with «Volver» as a standalone `enlace` under the line (C13v).
  */
 export function MovingBand({
   evaluation,
@@ -24,7 +24,7 @@ export function MovingBand({
 }) {
   return (
     <View style={styles.band}>
-      <Text style={styles.bandText}>
+      <Text variant="cuerpo">
         {`Cambias tu cita del ${turno(evaluation.startsAt)}. Elige el nuevo horario.`}
       </Text>
       <Pressable
@@ -33,7 +33,7 @@ export function MovingBand({
         onPress={onBack}
         style={styles.bandButton}
       >
-        <Text style={styles.bandButtonLabel}>Volver</Text>
+        <Text variant="enlace">Volver</Text>
       </Pressable>
     </View>
   );
@@ -49,8 +49,8 @@ export function NoSlots({
   if (showUsed) return <UsedMonth availability={availability} />;
   return (
     <View style={usedMonthStyles.used}>
-      <Text style={usedMonthStyles.usedTitle}>No hay horarios disponibles por ahora.</Text>
-      <BodyText style={usedMonthStyles.note}>Vuelve a revisar en unos días.</BodyText>
+      <Text variant="titulo-fila">No hay horarios disponibles por ahora.</Text>
+      <Text variant="cuerpo">Vuelve a revisar en unos días.</Text>
     </View>
   );
 }
@@ -65,12 +65,4 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xs,
   },
   bandButton: { justifyContent: "center", minHeight: 44 },
-  bandButtonLabel: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 14,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
-  bandText: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 14, lineHeight: 20 },
 });

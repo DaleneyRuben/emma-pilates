@@ -1,9 +1,11 @@
-import { colors, fontFamilies, initials, radii } from "@pilates/mobile-core";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { colors, initials, radii, Text } from "@pilates/mobile-core";
+import { Image, StyleSheet, View } from "react-native";
 
 // The Perfil avatar (18, 22): the photo centre-cropped by the circle, or the
-// initials when the Client has none (prompt 22, follow-up 60 §1): bold white
-// on 600, or 600 on a white disc over the Perfil hero (C18, Rosa Emma).
+// initials when the Client has none (prompt 22, follow-up 60 §1): white on
+// 600, or 600 on a white disc over the Perfil hero (C18, Rosa Emma). The
+// initials are `destacado` from 44 pt and `pastilla` below, and never grow
+// with the phone's text size, which would overflow the disc (follow-up 285).
 export function ClientAvatar({
   name,
   onEmphasis = false,
@@ -30,11 +32,9 @@ export function ClientAvatar({
   return (
     <View style={[styles.avatar, onEmphasis && styles.avatarLight, frame]}>
       <Text
-        style={[
-          styles.avatarText,
-          onEmphasis && styles.avatarTextLight,
-          { fontSize: Math.round(size * 0.32) },
-        ]}
+        allowFontScaling={false}
+        tone={onEmphasis ? "ink" : "onDark"}
+        variant={size >= 44 ? "destacado" : "pastilla"}
       >
         {initials(name)}
       </Text>
@@ -50,11 +50,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarLight: { backgroundColor: colors.card },
-  avatarText: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyStrong,
-    fontWeight: "600",
-  },
-  avatarTextLight: { color: colors.text },
   photo: { backgroundColor: colors.emphasis },
 });

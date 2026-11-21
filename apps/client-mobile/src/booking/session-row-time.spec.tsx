@@ -22,6 +22,8 @@ const session = {
 
 // Lora's digits run wider on Android: a fixed 56-wide column broke «09:00»
 // into «09:0» over «0» on the emulator (MOB-074). The start keeps one line.
+// Follow-up 285: the class row's time never shrinks and is never cut to «08:…»;
+// it grows with the text size instead of carrying `numberOfLines`.
 describe("the start time of a class row", () => {
   it("stays on one line in the class list", async () => {
     const screen = await render(
@@ -29,9 +31,9 @@ describe("the start time of a class row", () => {
     );
 
     const time = screen.getByText("09:00", { includeHiddenElements: true });
-    expect(time.props.numberOfLines).toBe(1);
+    expect(time.props.numberOfLines).toBeUndefined();
     const box = screen.getByTestId("class-row-time", { includeHiddenElements: true });
-    expect(box).toHaveStyle({ minWidth: 62 });
+    expect(box).toHaveStyle({ flexShrink: 0, minWidth: 62 });
     expect(box).not.toHaveStyle({ width: 62 });
   });
 
@@ -43,7 +45,7 @@ describe("the start time of a class row", () => {
     const time = screen.getByText("09:00", { includeHiddenElements: true });
     expect(time.props.numberOfLines).toBe(1);
     const box = screen.getByTestId("reschedule-time", { includeHiddenElements: true });
-    expect(box).toHaveStyle({ minWidth: 62 });
-    expect(box).not.toHaveStyle({ width: 62 });
+    expect(box).toHaveStyle({ minWidth: 68 });
+    expect(box).not.toHaveStyle({ width: 68 });
   });
 });

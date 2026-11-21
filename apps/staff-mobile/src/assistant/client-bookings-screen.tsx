@@ -9,11 +9,9 @@ import {
   BrandToast,
   CardActionRow,
   cardWithActionRow,
-  colors,
   ConfirmationSheet,
   dayChipLabel,
   EmptyState,
-  fontFamilies,
   formatSessionDate,
   formatTimeRange,
   IconRow,
@@ -26,6 +24,7 @@ import {
   Screen,
   spacing,
   surfaces,
+  Text,
   useStickyNotice,
   useStudioRules,
   ExceptionPill,
@@ -33,7 +32,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { bodyScroll } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -65,10 +64,10 @@ function DateDisc({ startsAt }: { startsAt: string }) {
   const today = civil === boliviaCivilDate(new Date());
   return (
     <View style={styles.disc}>
-      <Text style={styles.discWeekday}>
+      <Text variant="pastilla">
         {today ? "Hoy" : weekday.charAt(0).toUpperCase() + weekday.slice(1)}
       </Text>
-      <Text style={styles.discDay}>{day}</Text>
+      <Text variant="cifra">{day}</Text>
     </View>
   );
 }
@@ -104,10 +103,10 @@ function BookingCard({
       <View style={styles.cardBody}>
         <DateDisc startsAt={item.startsAt} />
         <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>{item.classTypeName}</Text>
-          <Text style={styles.line}>{line}</Text>
+          <Text variant="titulo-fila">{item.classTypeName}</Text>
+          <Text variant="secundario">{line}</Text>
           {item.kind === "waitlist" ? <ExceptionPill>En lista de espera</ExceptionPill> : null}
-          {locked ? <Text style={styles.line}>Solo en tus sucursales</Text> : null}
+          {locked ? <Text variant="secundario">Solo en tus sucursales</Text> : null}
         </View>
       </View>
       {item.kind === "waitlist" ? (
@@ -115,7 +114,7 @@ function BookingCard({
       ) : !windowKnown ? null : insideWindow ? (
         <CardActionRow disabled={locked} label="Reprogramar" onPress={onReschedule} />
       ) : (
-        <CardActionRow disabled={locked} label="Cancelar reserva" onPress={onCancel} tone="error" />
+        <CardActionRow disabled={locked} label="Cancelar reserva" onPress={onCancel} />
       )}
     </View>
   );
@@ -281,17 +280,8 @@ const styles = StyleSheet.create({
   },
   cardBody: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
   cardText: { alignItems: "flex-start", flex: 1, gap: spacing.xs },
-  cardTitle: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 21 },
   // FIX-089: the date stands alone, with no tinted box behind it.
   disc: { alignItems: "center", width: 44 },
-  discDay: { color: colors.text, fontFamily: fontFamilies.display, fontSize: 22 },
-  discWeekday: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  line: { color: colors.text, fontFamily: fontFamilies.body, fontSize: 13, lineHeight: 18 },
   list: {
     gap: spacing.smLg,
     paddingBottom: spacing.xxl,

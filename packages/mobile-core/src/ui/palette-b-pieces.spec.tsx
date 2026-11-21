@@ -13,12 +13,13 @@ import {
   SeatPill,
 } from "../index";
 import { bolivia } from "../account/phone-number";
+import { textVariants } from "./type-scale";
 
 const hidden = { includeHiddenElements: true };
 
 // FIX-089 (BotonAPiezas, owner 2026-11-19): the shared pieces of palette B.
 describe("Chip", () => {
-  it("fills the selected chip in Rosa profundo with a Crema label", async () => {
+  it("fills the selected chip in 600 with a white compacto label", async () => {
     const screen = await render(<Chip label="Hoy" onPress={jest.fn()} selected />);
 
     expect(screen.getByRole("button", { name: "Hoy" })).toHaveStyle({
@@ -26,10 +27,7 @@ describe("Chip", () => {
       minHeight: 38,
     });
     expect(screen.getByRole("button", { name: "Hoy" })).toBeSelected();
-    expect(screen.getByText("Hoy")).toHaveStyle({
-      color: "#FFFBFB",
-      fontFamily: "WorkSans_700Bold",
-    });
+    expect(screen.getByText("Hoy")).toHaveStyle({ ...textVariants.compacto, color: "#FFFBFB" });
   });
 
   it("outlines the unselected chip in Arcilla on Crema and reaches 44 pt", async () => {
@@ -43,21 +41,21 @@ describe("Chip", () => {
       borderWidth: 1.5,
     });
     expect(chip).toHaveProp("hitSlop", { bottom: 3, left: 0, right: 0, top: 3 });
-    expect(screen.getByText("Mañana")).toHaveStyle({ color: "#93615D" });
+    // Follow-up 285, rule 4: the same weight selected or not.
+    expect(screen.getByText("Mañana")).toHaveStyle({ ...textVariants.compacto, color: "#93615D" });
     await fireEvent.press(chip);
     expect(onPress).toHaveBeenCalled();
   });
 });
 
 describe("ExceptionPill", () => {
-  it("says the exception in bold Rosa profundo on Rubor", async () => {
+  it("says the exception in ink pastilla on 50", async () => {
     const screen = await render(<ExceptionPill>Por vencer</ExceptionPill>);
 
     expect(screen.getByTestId("exception-pill")).toHaveStyle({ backgroundColor: "#FEF6F2" });
     expect(screen.getByText("Por vencer")).toHaveStyle({
+      ...textVariants.pastilla,
       color: "#93615D",
-      fontFamily: "WorkSans_600SemiBold",
-      fontSize: 12,
     });
   });
 });
@@ -76,8 +74,10 @@ describe("FormErrorSummary (FormB)", () => {
     const screen = await render(<FormErrorSummary fields={["Clases", "Precio"]} />);
 
     expect(screen.getByTestId("form-error-summary")).toHaveStyle({ backgroundColor: "#FEF6F2" });
-    expect(screen.getByText("Faltan 2 datos para guardar")).toHaveStyle({ fontWeight: "700" });
-    expect(screen.getByText("Clases · Precio")).toBeOnTheScreen();
+    expect(screen.getByText("Faltan 2 datos para guardar")).toHaveStyle(
+      textVariants["titulo-fila"],
+    );
+    expect(screen.getByText("Clases · Precio")).toHaveStyle(textVariants.cuerpo);
   });
 
   it("names another action than saving", async () => {
@@ -102,11 +102,11 @@ describe("FormErrorSummary (FormB)", () => {
 });
 
 describe("FormField (FormB)", () => {
-  it("labels the field in Work Sans 14 SemiBold and gives the example as a hint below", async () => {
+  it("labels the field in compacto-600 and gives the example as a secundario hint", async () => {
     const screen = await render(<FormField hint="Ej.: 77712345" label="Celular" />);
 
-    expect(screen.getByText("Celular")).toHaveStyle({ fontSize: 14, fontWeight: "600" });
-    expect(screen.getByText("Ej.: 77712345")).toHaveStyle({ fontSize: 13 });
+    expect(screen.getByText("Celular")).toHaveStyle(textVariants["compacto-600"]);
+    expect(screen.getByText("Ej.: 77712345")).toHaveStyle(textVariants.secundario);
     expect(screen.getByLabelText("Celular")).toHaveStyle({
       backgroundColor: "#FFFBFB",
       borderColor: "#CDA697",
@@ -116,11 +116,12 @@ describe("FormField (FormB)", () => {
     });
   });
 
-  it("marks an invalid field with a 2 pt Rosa profundo border and a bold message", async () => {
+  it("marks an invalid field with a 2 pt Rosa profundo border and a secundario alert", async () => {
     const screen = await render(<FormField error="Falta este dato" label="Clases" />);
 
     expect(screen.getByLabelText("Clases")).toHaveStyle({ borderColor: "#93615D", borderWidth: 2 });
-    expect(screen.getByText("Falta este dato")).toHaveStyle({ fontWeight: "700" });
+    expect(screen.getByRole("alert")).toHaveTextContent("Falta este dato");
+    expect(screen.getByText("Falta este dato")).toHaveStyle(textVariants.secundario);
   });
 
   it("never shows dots as a password placeholder", async () => {
@@ -133,16 +134,16 @@ describe("FormField (FormB)", () => {
 });
 
 describe("optional fields (FormB)", () => {
-  it("draws «(opcional)» at weight 400 after the label", async () => {
+  it("draws «(opcional)» in regular compacto after the label", async () => {
     const screen = await render(<FormField label="Nota" optional />);
 
-    expect(screen.getByText("(opcional)")).toHaveStyle({ fontWeight: "400" });
+    expect(screen.getByText("(opcional)")).toHaveStyle(textVariants.compacto);
     expect(screen.getByLabelText("Nota (opcional)")).toBeOnTheScreen();
   });
 });
 
 describe("PhoneField (FormB)", () => {
-  it("labels like every field and marks an error with 2 pt and a bold message", async () => {
+  it("labels like every field and marks an error with 2 pt and a secundario alert", async () => {
     const screen = await render(
       <PhoneField
         error="Escribe 8 dígitos."
@@ -151,8 +152,9 @@ describe("PhoneField (FormB)", () => {
       />,
     );
 
-    expect(screen.getByText("Celular")).toHaveStyle({ fontSize: 14, fontWeight: "600" });
-    expect(screen.getByText("Escribe 8 dígitos.")).toHaveStyle({ fontWeight: "700" });
+    expect(screen.getByText("Celular")).toHaveStyle(textVariants["compacto-600"]);
+    expect(screen.getByRole("alert")).toHaveTextContent("Escribe 8 dígitos.");
+    expect(screen.getByText("Escribe 8 dígitos.")).toHaveStyle(textVariants.secundario);
     expect(screen.getByTestId("phone-field-box")).toHaveStyle({
       borderColor: "#93615D",
       borderWidth: 2,
@@ -179,10 +181,10 @@ describe("no tinted discs behind icons", () => {
 });
 
 describe("PersonAvatar", () => {
-  it("draws Crema initials on a Palo de rosa circle", async () => {
+  it("draws white pastilla initials on a 600 circle", async () => {
     const screen = await render(<PersonAvatar name="Carla Prueba" photoUri={null} size={40} />);
 
-    expect(screen.getByText("CP")).toHaveStyle({ color: "#FFFBFB", fontWeight: "700" });
+    expect(screen.getByText("CP")).toHaveStyle({ ...textVariants.pastilla, color: "#FFFBFB" });
     expect(screen.toJSON()).toHaveStyle({ backgroundColor: "#93615D" });
   });
 });

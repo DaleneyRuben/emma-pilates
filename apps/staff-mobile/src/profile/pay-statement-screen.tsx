@@ -1,14 +1,7 @@
 import { formatMoney } from "@pilates/api-contracts";
-import {
-  colors,
-  EmphasisCard,
-  fontFamilies,
-  Screen,
-  ScreenHeader,
-  spacing,
-} from "@pilates/mobile-core";
+import { EmphasisCard, Screen, ScreenHeader, spacing, Text } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { BackBar } from "../ui/back-bar";
 import { bodyScroll } from "../ui/card-pieces";
@@ -57,8 +50,12 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
                 style={bodyScroll.scroll}
               >
                 <EmphasisCard eyebrow="Total" testID="pay-statement-total">
-                  <Text style={styles.total}>{formatMoney(statement.totalCentavos)}</Text>
-                  <Text style={styles.state}>{totalStateLine(statement, status)}</Text>
+                  <Text tone="onDark" variant="cifra-grande">
+                    {formatMoney(statement.totalCentavos)}
+                  </Text>
+                  <Text tone="onDark" variant="titulo-fila">
+                    {totalStateLine(statement, status)}
+                  </Text>
                 </EmphasisCard>
                 <PaymentStrip onReceipt={receipts.show} status={status} />
                 {receipts.error}
@@ -81,18 +78,5 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
 const styles = StyleSheet.create({
   body: { flex: 1 },
   screen: { paddingHorizontal: spacing.xlSm },
-  state: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: 15,
-    fontWeight: "700",
-  },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
-  total: {
-    color: colors.onEmphasis,
-    fontFamily: fontFamilies.display,
-    fontSize: 36,
-    fontVariant: ["tabular-nums"],
-    lineHeight: 42,
-  },
 });

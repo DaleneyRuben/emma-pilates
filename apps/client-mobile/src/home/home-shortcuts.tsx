@@ -1,18 +1,17 @@
 import {
   colors,
-  fontFamilies,
   Glyph,
   type GlyphName,
   SectionTitle,
   spacing,
   surfaces,
-  typography,
+  Text,
 } from "@pilates/mobile-core";
 import type { PropsWithChildren } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-// 02's «Accesos rápidos» (Rosa Emma C02s, C02b): a Lora 24 section title,
-// white tiles with the icon on a 40 pt 50 disc and a bold 15 label; without a
+// 02's «Accesos rápidos» (Rosa Emma C02s, C02b): a `titulo-seccion` title,
+// white tiles with the icon on a 40 pt 50 disc and a `titulo-fila` label; without a
 // Plan, the booking row is a locked soft inset with the icon on a white disc.
 export function ShortcutSection({ children }: PropsWithChildren) {
   return (
@@ -53,8 +52,8 @@ export function LockedShortcutRow({ label, note }: { label: string; note: string
     >
       <TileIcon icon="calendar" />
       <View style={styles.rowBody}>
-        <Text style={styles.rowTitle}>{label}</Text>
-        <Text style={styles.note}>{note}</Text>
+        <Text variant="titulo-fila">{label}</Text>
+        <Text variant="secundario">{note}</Text>
       </View>
       <Glyph color={colors.text} name="lock" size={20} strokeWidth={1.7} testID="shortcut-lock" />
     </Pressable>
@@ -88,8 +87,8 @@ export function ShortcutTile({
       style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
     >
       <TileIcon icon={icon} onWhite />
-      <Text style={styles.tileTitle}>{label}</Text>
-      {wide ? <Text style={styles.note}>{note}</Text> : null}
+      <Text variant="titulo-fila">{label}</Text>
+      {wide ? <Text variant="secundario">{note}</Text> : null}
     </Pressable>
   );
 }
@@ -111,12 +110,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 36,
   },
-  note: {
-    color: colors.text,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 18,
-  },
   pressed: { opacity: 0.7 },
   row: {
     ...surfaces.soft,
@@ -127,19 +120,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
-  rowTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyStrong,
-    fontSize: typography.bodyMedium,
-    fontWeight: "600",
-  },
   stack: { gap: spacing.md },
   tile: { ...surfaces.card, flex: 1, gap: spacing.sm, padding: spacing.mdLg },
-  tileTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.bodyBold,
-    fontSize: typography.body,
-    fontWeight: "700",
-  },
   tiles: { flexDirection: "row", gap: spacing.md },
 });

@@ -1,12 +1,5 @@
-import {
-  BodyText,
-  colors,
-  fontFamilies,
-  LineIcon,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors, LineIcon, spacing, Text } from "@pilates/mobile-core";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
 const label = "Quiero seguir recibiendo promociones de Emma Pilates Studio";
@@ -37,11 +30,11 @@ export function PromotionsConsent({
         ) : null}
       </View>
       <View style={styles.text}>
-        <Text style={styles.label}>{label}</Text>
-        <BodyText style={styles.helper}>
+        <Text variant="cuerpo">{label}</Text>
+        <Text variant="secundario">
           Guardamos solo tu nombre, correo y teléfono para enviarte promociones. Puedes pedir que
           paremos cuando quieras.
-        </BodyText>
+        </Text>
       </View>
     </Pressable>
   );
@@ -60,13 +53,6 @@ const styles = StyleSheet.create({
     width: 22,
   },
   boxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
-  helper: { color: colors.textMuted, fontSize: typography.note, fontFamily: fontFamilies.body },
-  label: {
-    color: colors.text,
-    fontSize: typography.body,
-    lineHeight: 21,
-    fontFamily: fontFamilies.body,
-  },
   row: {
     alignItems: "flex-start",
     flexDirection: "row",
