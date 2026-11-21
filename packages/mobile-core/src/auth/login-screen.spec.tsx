@@ -13,17 +13,19 @@ async function submitLogin(onSubmit: jest.Mock) {
 }
 
 describe("LoginScreen", () => {
-  // Follow-up 227: «Emma Pilates Studio» everywhere; the tagline is gone (owner, 2026-11-02).
-  it("names Emma Pilates Studio without the tagline", async () => {
+  // Follow-up 288 A (owner 2026-11-21): the studio's logo names the screen,
+  // «Emma Pilates Studio» to a screen reader, with no tagline.
+  it("names Emma Pilates Studio with the logo, without the tagline", async () => {
     const screen = await render(<LoginScreen onSubmit={jest.fn()} />);
 
-    expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 30 });
+    expect(screen.getByRole("image", { name: "Emma Pilates Studio" })).toBeOnTheScreen();
     expect(screen.queryByText("Movimiento · Equilibrio · Bienestar")).toBeNull();
   });
 
-  // Rosa Emma C01/E-A01: the wordmark on the band (the team's with its
-  // capsule), the form in a white card and «Regístrate» in its own card.
-  it("draws the wordmark on the band and the form in a white card (C01, E-A01)", async () => {
+  // Follow-up 288 A: the logo on the 200 band fills the top (the team's with
+  // its capsule) and the form sits in a white sheet anchored to the bottom,
+  // «Regístrate» inside it, so the lower half is never empty.
+  it("draws the logo on the band and the form in a sheet at the bottom", async () => {
     for (const teamAccess of [false, true]) {
       const screen = await render(
         <LoginScreen
@@ -32,21 +34,27 @@ describe("LoginScreen", () => {
           teamAccess={teamAccess}
         />,
       );
-      const main = screen.getByTestId("login-main");
-      const band = screen.getByTestId("screen-header");
-      expect(band).toHaveStyle({ backgroundColor: "#E7CCBF" });
-      expect(band).toContainElement(screen.getByText("Emma Pilates Studio"));
-      // Follow-up 285: the wordmark is titulo-pagina in both apps.
-      expect(screen.getByText("Emma Pilates Studio")).toHaveStyle({ fontSize: 30 });
-      expect(main).toContainElement(screen.getByTestId("login-submit"));
-      expect(band).not.toContainElement(screen.getByTestId("login-submit"));
+      const hero = screen.getByTestId("login-hero");
+      const sheet = screen.getByTestId("login-sheet");
+      expect(hero).toHaveStyle({ flexGrow: 1 });
+      expect(hero).toContainElement(screen.getByRole("image", { name: "Emma Pilates Studio" }));
+      expect(sheet).toHaveStyle({ backgroundColor: "#FFFBFB", borderTopLeftRadius: 28 });
+      expect(sheet).toContainElement(screen.getByTestId("login-submit"));
+      expect(hero).not.toContainElement(screen.getByTestId("login-submit"));
       if (teamAccess) {
-        expect(band).toContainElement(screen.getByText("Acceso del equipo"));
+        expect(hero).toContainElement(screen.getByText("Acceso del equipo"));
       } else {
-        expect(screen.getByText("¿No tienes una cuenta?")).toBeOnTheScreen();
+        expect(sheet).toContainElement(screen.getByText("¿No tienes una cuenta?"));
       }
       await screen.unmount();
     }
+  });
+
+  // Follow-up 288: the email example under the field is gone from Login.
+  it.each([false, true])("shows no email example on Login (team %s)", async (teamAccess) => {
+    const screen = await render(<LoginScreen onSubmit={jest.fn()} teamAccess={teamAccess} />);
+
+    expect(screen.queryByText(/^Ej\.:/)).toBeNull();
   });
 
   it("shows neutral feedback for rejected credentials", async () => {
