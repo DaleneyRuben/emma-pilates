@@ -42,6 +42,9 @@ describe("TabBarButton", () => {
     );
 
     expect(screen.queryByTestId("open-tab-pill")).toBeNull();
+    // On the bar's own white: Android drops the radius of a view whose
+    // background appears only once its tab opens.
+    expect(screen.getByTestId("tab-pill")).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 
   it("draws the bar white with white tints on the pill", () => {
@@ -98,10 +101,11 @@ describe("TabBarButton", () => {
     jest.replaceProperty(Platform, "OS", "android");
     // 2 above and below, the icon box, a 1 pt gap and the label.
     expect(tabBarPillHeight()).toBe(47);
+    // 8 over the pill, as on iOS; 4 under it, then the gesture bar kept whole.
     expect(tabBarStyleFor({ bottom: 24 })).toMatchObject({
-      height: 4 + 47 + 4 + 24,
+      height: 8 + 47 + 4 + 24,
       paddingBottom: 4 + 24,
-      paddingTop: 4,
+      paddingTop: 8,
     });
     jest.restoreAllMocks();
   });
