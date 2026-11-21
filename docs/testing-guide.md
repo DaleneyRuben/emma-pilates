@@ -11018,8 +11018,7 @@ E. **Pagos (Ronda 2 pick A, one line a day).** As Ana with nothing to
    icon discs: **Facturas por subir** (count), **Cancelar una clase**,
    **Congelamientos**, **Cerrar caja**, each with ›.
 F. **Buscar cliente (Ronda 2 pick A, new as a link).** As Camila (or the
-   Coordinator), **Clientes**: the search field first, **Facturas por subir**
-   as a plain row before searching, and no big «Nuevo cliente» button. Since Test 192
+   Coordinator), **Clientes**: no big «Nuevo cliente» button. Since Test 192
    the field sits in the band, there is no hint, and under the results the
    outlined **Crear clienta nueva** button opens **Nueva clienta** (it stays under «No pudimos
    buscar clientes.» when the search fails). No match still reads «No
