@@ -66,7 +66,7 @@ Details are in the sections below.
 | Provider | What we use | What it does for us | Not used (on purpose) |
 | --- | --- | --- | --- |
 | **GitHub** | Private repository `emma-pilates`; Actions (5 workflows: CI, the two releases, the production copy, and the monthly operations reminders); repository secrets; repository variables; commit status `release/staging`; issues as the operations reminders (EXT-020) | Holds the code; runs CI on every pull request and `main`; releases `main` to staging; promotes to production when started by hand; opens an issue a month before each secret rotation, each quarterly drill, and each monthly usage check | Branch protection (needs Pro), Packages, Pages |
-| **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
+| **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release-v2` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb), holding the databases `emma` (production) and `emma_staging` (staging, its own role); its CA certificate | The **production and staging databases** | The $50 trial credit, point-in-time restore, any paid plan |
 | **Vercel** | Projects `emma-pilates-admin` and `emma-pilates-admin-staging` (Hobby), each deployed only by its release workflow with the Vercel CLI (Git deployments off in `vercel.json`); `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables; one project-scoped token per project | Hosts the **admin web** and forwards its `/api/v1` calls to the matching API with that environment's proxy proof | Vercel Pro, Git deployments and pull-request previews (off since ADR-0091 and ADR-0092), custom domain (gate 7) |
 | **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off; Resend's records added through Domain Connect on 2026-10-19 (`resend._domainkey` TXT, `send` and `rsend` CNAMEs, all DNS only) and `links` and `links-staging` CNAMEs to Northflank (DNS only) with their `verify-….links` and `verify-….links-staging` TXT ownership records (LNK-001, 2026-10-19); `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:soporte@emmapilatesstudio.com` by hand; the root keeps its one SPF and Email Routing's MX records; Pages: project `emma-pilates-public` (Git integration on `DaleneyRuben/emma-pilates`, root directory `apps/public-site`, no build command) with custom domain `app.emmapilatesstudio.com` and its proxied `app` CNAME (WEB-021, ADR-0096) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email**; serves the **public privacy, support, and account-deletion pages** | Other hostnames on the domain (the apex and `www` are kept for the studio's future website; a custom API or admin host), Email Sending (Resend sends instead, ADR-0094), public buckets and custom bucket domains, Workers, every other product |
@@ -180,10 +180,10 @@ Every account belongs to the project owner and is shared with no one else.
   `BACKUP_HEARTBEAT_URL`; `DATABASE_URL` and the CA come from `production`.
   Each run takes under 30 s and one database connection
   ([backups runbook](../runbooks/backups-and-restore-drills.md)).
-- **API token `github-actions-release`:** team-level, role
+- **API token `github-actions-release-v2`:** team-level, role
   `github-production-release` (project `default` only; Services → General
-  Read and Update; Jobs → General Read, Update, Run Job), 1-year lifetime
-  from 2026-10-14. It is the GitHub secret `NORTHFLANK_API_TOKEN`; rotation
+  Read and Update; Jobs → General Read, Update, Run Job), created
+  2026-10-31 after the Northflank security incident, «Expires: Never». It is the GitHub secret `NORTHFLANK_API_TOKEN`; rotation
   is in the [runbook](../runbooks/production-release.md#the-deploy-tokens).
 - **Secret group `production`:** runtime scope, unrestricted (every service
   and job in the project receives it). Holds everything in the «Settings»
@@ -311,7 +311,7 @@ how to release, pause, and resume it is in the
 - **Secret group `staging`** (runtime, unrestricted): `DATABASE_URL`
   (`emma_staging` on the Aiven service, verify-full with the CA),
   `DATABASE_POOL_MAX=2`, fresh authentication keys with key ID
-  `northflank-staging-v1`, `ADMIN_WEB_TRUSTED_ORIGINS` (the staging admin
+  `northflank-staging-v2` (rotated 2026-10-31), `ADMIN_WEB_TRUSTED_ORIGINS` (the staging admin
   web), its own `ADMIN_WEB_PROXY_SECRET`, `ERROR_REPORTING_DSN` (the same
   `emma-pilates-api` application) with `ERROR_REPORTING_ENVIRONMENT=staging`,
   the `OBJECT_STORAGE_*` settings for `emma-pilates-staging-images`, and
@@ -322,9 +322,10 @@ how to release, pause, and resume it is in the
   staging's email is marked and shares Resend's 100-a-day limit with
   production. No `EXPO_ACCESS_TOKEN` yet: staging sends no push until a
   staging robot token is added.
-- **API token `github-actions-staging-release`:** role
+- **API token `github-actions-staging-release-v2`:** role
   `github-staging-release` (project `default`; Services → General Read and
-  Update; Jobs → General Read, Update, Run Job), 1 year from 2026-10-17;
+  Update; Jobs → General Read, Update, Run Job), created 2026-10-31,
+  «Expires: Never»;
   GitHub secret `NORTHFLANK_STAGING_API_TOKEN`.
 - **Aiven:** database `emma_staging` owned by the role `emma_staging`
   (connection limit 8), created on 2026-10-17; `CONNECT` on `emma`,
@@ -381,7 +382,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `DATABASE_POOL_MAX` | Northflank `production` (4) | default 10 | default 10 | Most connections per process (API or worker), split between its one Prisma and one pg-boss pool; Aiven allows 20 (BE-018) |
 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; how and when every secret is rotated is the [secrets rotation runbook](../runbooks/secrets-rotation.md) (EXT-020) |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | — | `.env` | 32 random bytes, base64 |
-| `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | — | `local-development-v1` | |
+| `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v2` since 2026-10-31) | — | `local-development-v1` | |
 | `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (`https://links.emmapilatesstudio.com`; staging `https://links-staging.emmapilatesstudio.com`) | default | default | The link host the API serves (ADR-0095) |
 | `ADMIN_WEB_TRUSTED_ORIGINS` | Northflank `production` (`https://emma-pilates-admin.vercel.app`) | — | `http://localhost:5173` | |
 | `ADMIN_WEB_PROXY_SECRET` | Northflank `production` **and** Vercel Production | — | unset | Same value on both sides |
@@ -410,8 +411,8 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `NODE_ENV` | `production` (image default) | — | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
-| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14, rotation planned 2027-09-14 ([calendar](../runbooks/secrets-rotation.md#calendar)) |
-| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17, rotation planned 2027-09-17 |
+| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; Northflank token `github-actions-release-v2`, never expires, rotated at the yearly sitting (next 2027-09-14, [calendar](../runbooks/secrets-rotation.md#calendar)) |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; Northflank token `github-actions-staging-release-v2`, never expires, rotated at the yearly sitting (next 2027-09-14) |
 | `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID`, `PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` | GitHub repository secrets | — | — | `Copy Production to Staging`; R2 token `github-staging-copy` (Object Read only on `emma-pilates-prod-backups`) |
 | `STAGING_DATABASE_PASSWORD` | GitHub repository secret (the same password is inside staging's `DATABASE_URL`) | — | — | `Copy Production to Staging` connects as `emma_staging`; reset in Aiven, then update both holders |
 | `AIVEN_CA_CERT` | GitHub repository **variable** | — | — | Aiven's public CA certificate for the copy workflow; the same file is `/etc/secrets/emma-ca.pem` on Northflank |

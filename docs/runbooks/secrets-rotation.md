@@ -54,8 +54,8 @@ the provider never expires it and only the calendar below does.
 
 | Secret | Where | Issued by | Used by | Expires |
 | --- | --- | --- | --- | --- |
-| `NORTHFLANK_API_TOKEN` | GitHub secret | Northflank team `emma-pilates` → API tokens (`github-actions-release`, role `github-production-release`) | `Release Production` | **2027-10-14** (1-year lifetime from 2026-10-14) |
-| `NORTHFLANK_STAGING_API_TOKEN` | GitHub secret | Northflank team `emma-pilates-staging` → API tokens (`github-actions-staging-release`, role `github-staging-release`) | `Release Staging` | **2027-10-17** (1 year from 2026-10-17) |
+| `NORTHFLANK_API_TOKEN` | GitHub secret | Northflank team `emma-pilates` → API tokens (`github-actions-release-v2`, role `github-production-release`) | `Release Production` | — («Expires: Never», created 2026-10-31 after the Northflank incident), so it joins the yearly September sitting |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub secret | Northflank team `emma-pilates-staging` → API tokens (`github-actions-staging-release-v2`, role `github-staging-release`) | `Release Staging` | — («Expires: Never», created 2026-10-31), so it joins the yearly September sitting |
 | `VERCEL_PRODUCTION_TOKEN` | GitHub secret | Vercel → Account Settings → Tokens (`github-actions-production-release`, scoped to `emma-pilates-admin`) | `Release Production` (admin web) | — (checked 2026-10-21: «Never expires»), so it joins the yearly September sitting |
 | `VERCEL_STAGING_TOKEN` | GitHub secret | Vercel → Tokens (`github-actions-staging-release`, scoped to `emma-pilates-admin-staging`) | `Release Staging` (admin web) | — («Never expires», checked 2026-10-21) |
 | `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_STAGING_PROJECT_ID` | GitHub secrets | Vercel project settings | both release workflows | — (identifiers, not credentials; they never rotate) |
@@ -65,14 +65,16 @@ the provider never expires it and only the calendar below does.
 
 **How to rotate a Northflank token** (no downtime: releases are started by
 hand or after a merge, so rotate between releases): Northflank → the team →
-**API tokens** → **Create token** with the same role and a 1-year lifetime;
-copy it with its copy icon; from the repository root run
+**API tokens** → **Create token** with the same role and the next version in
+its name (`github-actions-release-v3`, `github-actions-staging-release-v3`);
+the current tokens never expire, so pick «Never» again or a 1-year lifetime
+and put its date in the calendar; copy it with its copy icon; from the repository root run
 `gh secret set NORTHFLANK_API_TOKEN --repo DaleneyRuben/emma-pilates` (or
 `NORTHFLANK_STAGING_API_TOKEN`) and paste at the hidden prompt; **verify** by
 running the matching release workflow by hand (`gh workflow run
 release-staging.yml`, or the next promotion for production) and reading its
 log for `migrate` and `api build`; then delete the old token in Northflank and
-update the expiry date in the calendar below and in
+update the expiry or rotation date in the calendar below and in
 [infrastructure](../architecture/infrastructure.md). A token can only use a
 role its creator belongs to, so the owner stays a member of
 `github-production-release` and `github-staging-release`.
@@ -98,9 +100,9 @@ Read by `api`, `worker`, `migrate`, and `backup`. After any change here:
 | Secret | Issued by | Used by | How to rotate without downtime | Verify |
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` (the `avnadmin` password) | Aiven | all four pieces | «Database passwords» below | `/health/ready` answers 200 after the restart; the next `backup` run logs `database_backup_succeeded` |
-| `AUTHENTICATION_LINK_ENCRYPTION_KEY` + `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | generated: `openssl rand -base64 32`; the ID is a new label (`northflank-prod-v2`) | `api` and `worker` (same values on both) | Links queued but not yet sent are encrypted with the old key and cannot be sent after the switch. Rotate at a quiet hour: set both values, restart `api` **then** `worker`, then run the incident runbook's «unused links» statement so people ask for a fresh link | Request a recovery email for your own address: it arrives and opens |
+| `AUTHENTICATION_LINK_ENCRYPTION_KEY` + `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | generated: `openssl rand -base64 32`; the ID is a new label, one version up (`northflank-prod-v2` since 2026-10-31, so `northflank-prod-v3` next) | `api` and `worker` (same values on both) | Links queued but not yet sent are encrypted with the old key and cannot be sent after the switch. Rotate at a quiet hour: set both values, restart `api` **then** `worker`, then run the incident runbook's «unused links» statement so people ask for a fresh link | Request a recovery email for your own address: it arrives and opens |
 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | generated, 32 random bytes base64 | `api`, `worker` | Set, restart both. The recipient throttle history no longer matches and restarts empty (harmless) | A verification resend is accepted |
-| `ADMIN_WEB_PROXY_SECRET` | generated, `openssl rand -hex 32` | `api`; the same value is Vercel Production's variable | The two sides must match, so there is a short gap either way. Order that keeps it shortest: set the new value in Vercel Production, redeploy the admin web (`Release Production` with the current commit, or Vercel → Deployments → Redeploy), then set it in Northflank and restart `api`. Until both match the API logs forwarded addresses as untrusted (ADR-0087) but keeps serving | An admin-web login works and the API log shows hop count 2 |
+| `ADMIN_WEB_PROXY_SECRET` | generated, `openssl rand -hex 32` | `api`; the same value is Vercel Production's variable (project `emma-pilates-admin`, type Secret; it was missing there until 2026-10-31) | The two sides must match, so there is a short gap either way. Order that keeps it shortest: set the new value in Vercel Production, redeploy the admin web (`Release Production` with the current commit, or Vercel → Deployments → Redeploy), then set it in Northflank and restart `api`. Until both match the API logs forwarded addresses as untrusted (ADR-0087) but keeps serving | An admin-web login works and the API log shows hop count 2 |
 | `OBJECT_STORAGE_ACCESS_KEY_ID`, `OBJECT_STORAGE_SECRET_ACCESS_KEY` | Cloudflare R2 → Manage API tokens (`northflank-production-images`, Object Read & Write on the images bucket only) | `api`, `worker` | Create the new token, set both values, restart both, then delete the old token | Upload a profile photo: it reaches READY |
 | `RESEND_API_KEY` | Resend → API keys (`northflank-production`, sending only, domain-limited) | `worker` | Create the new key, set it, restart `worker`, delete the old key | A verification resend arrives |
 | `RESEND_WEBHOOK_SECRET` | Resend → Webhooks → the production endpoint → **Rotate secret** | `api` | Rotate in Resend (the old signature answers 401 until the restart; Resend retries), set the new `whsec_`, restart `api` | Resend → the webhook → send a test event → 2xx |
@@ -128,7 +130,7 @@ the job by hand (Jobs → `backup` → **Run**).
 ### Northflank `staging` group (team `emma-pilates-staging`)
 
 The same names as production with staging's own values: `DATABASE_URL` (the
-`emma_staging` role), the link keys (`northflank-staging-v1`), the digest key,
+`emma_staging` role), the link keys (`northflank-staging-v2` since 2026-10-31), the digest key,
 `ADMIN_WEB_PROXY_SECRET` (matched by Vercel project
 `emma-pilates-admin-staging`), `OBJECT_STORAGE_*` (R2 token
 `northflank-staging-images`), `RESEND_API_KEY` (`northflank-staging`),
@@ -191,9 +193,7 @@ stops the next release; nothing in production stops.
 
 | When | What | Why |
 | --- | --- | --- |
-| **2027-09-14** | Rotate `NORTHFLANK_API_TOKEN` (new token, 1-year lifetime) | Expires 2027-10-14 |
-| **2027-09-17** | Rotate `NORTHFLANK_STAGING_API_TOKEN` | Expires 2027-10-17 |
-| **2027-09-14** (same sitting) | Rotate `VERCEL_PRODUCTION_TOKEN` and `VERCEL_STAGING_TOKEN` (they never expire on their own), the R2 tokens (`northflank-production-images`, `northflank-production-backups`, `github-staging-copy`, `northflank-staging-images`, `mac-backup-restore`), the Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token | Yearly rotation of never-expiring credentials |
+| **2027-09-14** | Rotate `NORTHFLANK_API_TOKEN` and `NORTHFLANK_STAGING_API_TOKEN` (`github-actions-release-v2` and `github-actions-staging-release-v2`, both «Expires: Never» since 2026-10-31), `VERCEL_PRODUCTION_TOKEN` and `VERCEL_STAGING_TOKEN` (they never expire on their own), the R2 tokens (`northflank-production-images`, `northflank-production-backups`, `github-staging-copy`, `northflank-staging-images`, `mac-backup-restore`), the Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token | Yearly rotation of never-expiring credentials |
 | **2027-09-15** | Check the domain renewal (`emmapilatesstudio.com` expires 2027-10-15, auto-renew on, card on Cloudflare) and the Aiven CA's «Not after» date | Not secrets, but the same month |
 | every 3 months (first run January 2027) | Restore drill ([backups runbook](./backups-and-restore-drills.md#restore-drill)) | BE-007 G9 |
 | every month | Free-plan usage check ([infrastructure, «Free-plan limits that can be exceeded silently»](../architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently)) | Cost guard |
@@ -227,3 +227,14 @@ Two things to know:
 | 2026-10-14 | `NORTHFLANK_API_TOKEN` created | production | Owner | 2027-10-14 | First token (EXT-008) |
 | 2026-10-17 | `NORTHFLANK_STAGING_API_TOKEN` created | staging | Owner | 2027-10-17 | First token (EXT-017) |
 | 2026-10-21 | `VERCEL_PRODUCTION_TOKEN`, `VERCEL_STAGING_TOKEN` checked | both | Owner | never | Created without an expiry (EXT-017); next rotation at the 2027-09-14 sitting |
+| 2026-10-31 | `avnadmin` password and production `DATABASE_URL` | production | Owner | never | Northflank security incident of 2026-10-30 («assume all environment variables have been decrypted»): every secret Northflank held was rotated while production `api` and `worker` were paused (0/0), so nothing was restarted or verified that night; run each table's check on the next resume. The yearly sitting stays on 2027-09-14 for everything rotated that night, so one sitting still covers every never-expiring credential |
+| 2026-10-31 | `emma_staging` password, staging `DATABASE_URL`, GitHub `STAGING_DATABASE_PASSWORD` | staging | Owner | never | Northflank incident; staging paused |
+| 2026-10-31 | R2 tokens `northflank-production-images` and `northflank-production-backups` | production | Owner | never | Northflank incident |
+| 2026-10-31 | R2 token `northflank-staging-images` | staging | Owner | never | Northflank incident |
+| 2026-10-31 | Resend keys `northflank-production` and `northflank-staging`, both `RESEND_WEBHOOK_SECRET`s | both | Owner | never | Northflank incident |
+| 2026-10-31 | `EXPO_ACCESS_TOKEN` (robot `push-sender`) | production | Owner | never | Northflank incident |
+| 2026-10-31 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` and its ID | both | Owner | never | Northflank incident; key IDs now `northflank-prod-v2` and `northflank-staging-v2` |
+| 2026-10-31 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | both | Owner | never | Northflank incident |
+| 2026-10-31 | `ADMIN_WEB_PROXY_SECRET` (Northflank and Vercel) | both | Owner | never | Northflank incident. Vercel `emma-pilates-admin` Production had no `ADMIN_WEB_PROXY_SECRET` before this; it was created there as a Secret the same night |
+| 2026-10-31 | `NORTHFLANK_API_TOKEN`, `NORTHFLANK_STAGING_API_TOKEN` | both | Owner | never | Northflank incident; new tokens `github-actions-release-v2` and `github-actions-staging-release-v2` («Expires: Never»); their own 2027-09-14 and 2027-09-17 lines left the calendar and they join the 2027-09-14 sitting |
+| 2026-10-31 | Not rotated: Vercel tokens, R2 `github-staging-copy` and `mac-backup-restore`, the FCM and Play keys, EAS secrets | — | Owner | unchanged | Never held by Northflank, so the incident did not reach them; they stay on the 2027-09-14 sitting |

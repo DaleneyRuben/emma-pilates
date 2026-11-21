@@ -222,23 +222,25 @@ production's `VERCEL_PRODUCTION_TOKEN` (Vercel token
 `emma-pilates-admin`), with `VERCEL_ORG_ID` (the team) and
 `VERCEL_PRODUCTION_PROJECT_ID`. Rotate either in Vercel → Account Settings
 → Tokens, then `gh secret set` the same name. The Northflank staging token
-was created on 2026-10-17 with a 1-year lifetime (expires around
-2027-10-17).
+is `github-actions-staging-release-v2`, created on 2026-10-31 after the
+Northflank security incident, with no expiry («Expires: Never»).
 
 The production workflow authenticates with the repository secret `NORTHFLANK_API_TOKEN`:
-Northflank API token `github-actions-release` (team `emma-pilates`, created
-2026-10-14, lifetime 1 year, so it expires around **2027-10-14**). It carries
+Northflank API token `github-actions-release-v2` (team `emma-pilates`,
+created 2026-10-31 after the Northflank security incident, «Expires:
+Never»; the first token, `github-actions-release` of 2026-10-14, was
+replaced). It carries
 the access role `github-production-release`, limited to project `default`
 with Services → General Read and Update, and Jobs → General Read, Update,
 and Run Job; nothing on secrets, addons, or the team. A token can only use a
 role its creator belongs to, so the user is a member of that role.
 
 To rotate it: Northflank → Team → **API tokens** → create a token with the
-same role and lifetime; copy it with its copy icon; run
+same role and the next version in its name; copy it with its copy icon; run
 `gh secret set NORTHFLANK_API_TOKEN --repo DaleneyRuben/emma-pilates` and
 paste at the hidden prompt; then delete the old token. Never print it.
-The rotation is planned for 2027-09-14 (staging's for 2027-09-17), a month
-before each expiry; the `Operations reminders` workflow opens an issue then,
+Both tokens are rotated at the yearly sitting, next on 2027-09-14; the
+`Operations reminders` workflow opens an issue then,
 and every other secret's procedure and date is in the
 [secrets rotation runbook](./secrets-rotation.md).
 
