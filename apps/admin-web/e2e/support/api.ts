@@ -243,3 +243,13 @@ export async function createEmptySessionTomorrow(): Promise<{
   }
   throw new Error("No free Centro slot tomorrow evening");
 }
+
+/** The Assistant invites a new Client from the Staff app (S05). */
+export async function inviteClient(name: string, email: string): Promise<void> {
+  const token = await loginClient(fixtures.assistant.email);
+  await call("POST", "/assistant/client-invitations", {
+    token,
+    body: { name, email },
+    headers: idempotent(),
+  });
+}

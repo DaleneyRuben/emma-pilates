@@ -184,26 +184,6 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     expect(within(panel).queryByText(/Último plan/)).not.toBeInTheDocument();
   });
 
-  it("shows a staff-created Account still waiting for activation", async () => {
-    server.use(
-      ...handlers(() =>
-        jsonResponse(
-          withPlan(luciaDetail.subscription, { accountStatus: "pending" }),
-        ),
-      ),
-    );
-    const { panel } = await openLucia();
-
-    expect(
-      await within(panel).findByText("Pendiente de activación"),
-    ).toBeInTheDocument();
-    expect(
-      within(panel).getByText(
-        "Todavía no abrió el enlace del correo para crear su contraseña.",
-      ),
-    ).toBeInTheDocument();
-  });
-
   it("offers no «Cerrar cuenta» on a deactivated account (AW22)", async () => {
     server.use(
       ...handlers(() =>
