@@ -1,6 +1,13 @@
 import { fireEvent, render } from "@testing-library/react-native";
+import { Platform } from "react-native";
 
-import { TabBarButton, tabBarItemStyle, tabBarStyle, tabBarTints } from "./tab-bar";
+import {
+  TabBarButton,
+  tabBarItemStyle,
+  tabBarPillHeight,
+  tabBarStyleFor,
+  tabBarTints,
+} from "./tab-bar";
 import { Text } from "./text";
 
 // Rosa Emma (C02, E-D01): the open tab is a 600 pill on the white bar.
@@ -34,7 +41,7 @@ describe("TabBarButton", () => {
   });
 
   it("draws the bar white with white tints on the pill", () => {
-    expect(tabBarStyle.backgroundColor).toBe("#FFFBFB");
+    expect(tabBarStyleFor({ bottom: 34 }).backgroundColor).toBe("#FFFBFB");
     expect(tabBarTints).toEqual({
       tabBarActiveTintColor: "#FFFBFB",
       tabBarInactiveTintColor: "#93615D",
@@ -46,5 +53,47 @@ describe("TabBarButton", () => {
   // shared out evenly.
   it("sizes each tab from its label and shares out the rest", () => {
     expect(tabBarItemStyle).toEqual({ flex: 0, flexBasis: "auto", flexGrow: 1, flexShrink: 1 });
+  });
+
+  // The tab bar walk (2026-11-20): the pill sat low against the iPhone's home
+  // indicator with room above it, and touched the iPad's home bar.
+  it("gives the tab the pill's height, without the item's own padding", async () => {
+    const screen = await render(
+      <TabBarButton aria-selected style={{ padding: 5 }} testID="tab-home">
+        <Text tone="onDark" variant="pastilla">
+          Inicio
+        </Text>
+      </TabBarButton>,
+    );
+
+    expect(screen.getByTestId("tab-home")).toHaveStyle({ paddingVertical: 0 });
+    // 8 above and below, the 28 pt icon box, a 3 pt gap and the 14 pt label.
+    expect(tabBarPillHeight()).toBe(61);
+  });
+
+  it("pads the pill evenly above and below and keeps the home indicator clear", () => {
+    const iPhone = tabBarStyleFor({ bottom: 34 });
+    expect(iPhone).toMatchObject({ height: 8 + 61 + 8 + 34, paddingBottom: 8 + 34, paddingTop: 8 });
+
+    const iPad = tabBarStyleFor({ bottom: 20 });
+    expect(iPad).toMatchObject({ height: 8 + 61 + 8 + 20, paddingBottom: 8 + 20, paddingTop: 8 });
+  });
+
+  it("grows with the text size up to the scale's limit", () => {
+    expect(tabBarPillHeight(1.2)).toBe(64);
+    expect(tabBarPillHeight(2)).toBe(tabBarPillHeight(1.3));
+    expect(tabBarStyleFor({ bottom: 0 }, 1.2).height).toBe(8 + 64 + 8);
+  });
+
+  it("keeps Android's slimmer pill and tighter bar", () => {
+    jest.replaceProperty(Platform, "OS", "android");
+    // 2 above and below, the icon box, a 1 pt gap and the label.
+    expect(tabBarPillHeight()).toBe(47);
+    expect(tabBarStyleFor({ bottom: 24 })).toMatchObject({
+      height: 4 + 47 + 4 + 24,
+      paddingBottom: 4 + 24,
+      paddingTop: 4,
+    });
+    jest.restoreAllMocks();
   });
 });
