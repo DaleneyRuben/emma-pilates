@@ -65,20 +65,24 @@ describe("the branded loading state (WEB-045)", () => {
     expectBrandedLoading("Cargando el reporte…");
   });
 
-  // Follow-up 286 (Rosa Emma, option A): the halo is a Rosa 50 glow with no
-  // edge, and it breathes with the logo as one piece; the logo itself holds
+  // Follow-ups 286 and 287 (Rosa Emma, option A): the halo is a white glow
+  // with a soft edge, and it breathes with the logo as one piece; the logo itself holds
   // still inside it. The rules live in carga.css, which jsdom does not apply.
-  it("breathes the logo and its soft Rosa 50 halo together", () => {
+  it("breathes the logo and its white halo together", () => {
     const rule = (selector: string) =>
       cargaCss.match(
         new RegExp(`\\n${selector.replace(".", "\\.")} \\{([^}]*)\\}`),
       )?.[1] ?? "";
 
+    // Follow-up 287: white with a soft but visible edge on Rosa 100.
     expect(rule(".carga-halo")).toMatch(
-      /radial-gradient\(\s*circle,\s*#fef6f2 0%,\s*#fef6f2 45%,\s*rgb\(254 246 242 \/ 0%\) 70%\s*\)/,
+      /radial-gradient\(\s*circle,\s*#fffbfb 0%,\s*#fffbfb 52%,\s*rgb\(255 251 251 \/ 60%\) 60%,\s*rgb\(255 251 251 \/ 0%\) 70%\s*\)/,
     );
     expect(rule(".carga-halo")).toMatch(/border-radius: 50%/);
     expect(rule(".carga-halo")).toMatch(/carga-respira 1\.4s/);
     expect(rule(".carga-logo")).not.toMatch(/animation/);
+    // At rest the logo stays at 0.8, never a washed-out grey.
+    expect(rule(".carga-halo")).toMatch(/opacity: 0\.8;/);
+    expect(cargaCss).not.toMatch(/0\.55/);
   });
 });

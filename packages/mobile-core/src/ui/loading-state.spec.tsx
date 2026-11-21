@@ -46,8 +46,8 @@ describe("LoadingState", () => {
     expect(screen.getByTestId("loading-state-logo")).toBeOnTheScreen();
   });
 
-  // Follow-up 286 (Rosa Emma, option A): the logo on a soft Rosa 50 halo over
-  // the screen's Rosa 100, 240 pt wide on a phone and 300 on a tablet, the halo
+  // Follow-ups 286 and 287 (Rosa Emma, option A): the logo on a white halo
+  // with a soft edge over the screen's Rosa 100, 240 pt wide on a phone and 300 on a tablet, the halo
   // 1.25 times the logo's width.
   it("draws the logo on a soft halo, larger on a tablet", async () => {
     const phone = await render(<LoadingState label="Cargando clases" />);
@@ -56,7 +56,7 @@ describe("LoadingState", () => {
     expect(halo).toHaveStyle({ borderRadius: 150, height: 300, width: 300 });
     expect(halo).toHaveStyle({
       experimental_backgroundImage:
-        "radial-gradient(circle, #FEF6F2 0%, #FEF6F2 45%, rgba(254, 246, 242, 0) 70%)",
+        "radial-gradient(circle, #FFFBFB 0%, #FFFBFB 52%, rgba(255, 251, 251, 0.6) 60%, rgba(255, 251, 251, 0) 70%)",
     });
     expect(halo).not.toHaveStyle({ backgroundColor: "#FFFBFB" });
     expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
@@ -95,6 +95,19 @@ describe("LoadingState", () => {
     expect(Animated.loop).toHaveBeenCalledTimes(1);
     await advance(300);
     expect(breath.start).toHaveBeenCalled();
+  });
+
+  // Follow-up 287: at rest the logo stays at 0.8 and 0.96, never a washed-out grey.
+  it("fades in to a rest of 0.8 and breathes up to full opacity", async () => {
+    const timing = jest.spyOn(Animated, "timing");
+    await render(<LoadingState label="Cargando clases" />);
+
+    await advance(400);
+
+    const targets = timing.mock.calls.map(([, config]) => config.toValue);
+    expect(targets[0]).toBe(0.8);
+    expect(targets).toEqual(expect.arrayContaining([1, 0.96]));
+    expect(targets).not.toContain(0.55);
   });
 
   it("appears still at full opacity under Reduce Motion", async () => {
