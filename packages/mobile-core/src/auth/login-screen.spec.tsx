@@ -1,5 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 import { LoginScreen } from "./login-screen";
 
 async function submitLogin(onSubmit: jest.Mock) {
@@ -48,6 +50,26 @@ describe("LoginScreen", () => {
       }
       await screen.unmount();
     }
+  });
+
+  // Follow-up 288 A: the sheet reaches the bottom edge and keeps the home
+  // indicator clear itself; on a tablet it stays a 560 pt column.
+  it("pads the sheet past the bottom inset and keeps it a column", async () => {
+    const screen = await render(
+      <SafeAreaProvider
+        initialMetrics={{
+          frame: { height: 874, width: 402, x: 0, y: 0 },
+          insets: { bottom: 34, left: 0, right: 0, top: 62 },
+        }}
+      >
+        <LoginScreen onSubmit={jest.fn()} />
+      </SafeAreaProvider>,
+    );
+
+    expect(screen.getByTestId("login-sheet")).toHaveStyle({
+      maxWidth: 560,
+      paddingBottom: 24 + 34,
+    });
   });
 
   // Follow-up 288: the email example under the field is gone from Login.

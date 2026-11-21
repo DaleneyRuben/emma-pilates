@@ -83,6 +83,11 @@ export function LoginScreen({
 
   return (
     <Screen edges={sheetEdges} style={styles.screen}>
+      {/* White under the sheet, so dragging the form up never shows the band
+          beneath it; the opaque hero covers it at rest. */}
+      <View pointerEvents="none" style={styles.underlay}>
+        <View style={styles.underlaySheet} />
+      </View>
       <FormScrollView contentContainerStyle={styles.content}>
         {/* Follow-up 288 A: the logo on the 200 band fills the top, and the form
             sits in a white sheet anchored to the bottom edge. */}
@@ -189,6 +194,7 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1 },
   hero: {
     alignItems: "center",
+    backgroundColor: colors.band,
     flexGrow: 1,
     gap: spacing.md,
     justifyContent: "center",
@@ -208,7 +214,7 @@ const styles = StyleSheet.create({
   noticeText: { flex: 1 },
   register: {
     borderTopColor: colors.divider,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1,
     paddingTop: spacing.md,
   },
   screen: { backgroundColor: colors.band, padding: 0 },
@@ -225,4 +231,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     width: "100%",
   },
+  underlay: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "flex-end" },
+  underlaySheet: { backgroundColor: colors.card, height: "50%", maxWidth: 560, width: "100%" },
 });
