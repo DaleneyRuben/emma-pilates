@@ -31,7 +31,7 @@ export function TabBarButton({
     >
       <View
         style={[styles.pill, selected && styles.selected]}
-        testID={selected ? "open-tab-pill" : undefined}
+        testID={selected ? "open-tab-pill" : "tab-pill"}
       >
         {children}
       </View>
@@ -42,10 +42,11 @@ export function TabBarButton({
 // React Navigation boxes each tab icon in 28 pt (UIKit), whatever its size.
 const iconBoxHeight = 28;
 const android = () => Platform.OS === "android";
-// Android's bar is shorter than iOS's: a slimmer pill and a tighter bar.
+// Android's bar is shorter than iOS's: a slimmer pill, and only 4 pt under it
+// before the gesture bar, which keeps its whole inset.
 const pillPadding = () => (android() ? spacing.xxs : spacing.sm);
 const pillGap = () => (android() ? 1 : 3);
-const barPadding = () => (android() ? spacing.xs : spacing.sm);
+const barPadding = spacing.sm;
 
 /** The pill's height: its padding, the icon box, the gap and the label, at this text size. */
 export function tabBarPillHeight(fontScale = 1) {
@@ -60,19 +61,19 @@ const homeIndicatorSpare = 14;
 
 /** The room under the pill: iOS spares part of the home indicator's inset; Android's system bar is kept whole. */
 function bottomPadding(bottomInset: number) {
-  const padding = barPadding();
-  if (android()) return padding + bottomInset;
-  return Math.max(bottomInset - homeIndicatorSpare, padding);
+  if (android()) return spacing.xs + bottomInset;
+  return Math.max(bottomInset - homeIndicatorSpare, barPadding);
 }
 
 /**
- * The white bar under the tabs: 8 pt over the pill (4 on Android), and under
- * it the home indicator's room (never less than the 8 above). React
+ * The white bar under the tabs: 8 pt over the pill, and under it the home
+ * indicator's room (never less than the 8 above; 4 plus the gesture bar on
+ * Android). React
  * Navigation sizes a bar without a height at 49 pt, which pushed the pill
  * down against the indicator.
  */
 export function tabBarStyleFor(insets: Pick<EdgeInsets, "bottom">, fontScale = 1) {
-  const padding = barPadding();
+  const padding = barPadding;
   const paddingBottom = bottomPadding(insets.bottom);
   return {
     ...shadows.tabBar,
@@ -103,6 +104,9 @@ const styles = StyleSheet.create({
   button: { paddingVertical: 0 },
   pill: {
     alignItems: "center",
+    // The bar's own white: Android drops the radius of a view whose background
+    // appears only once its tab opens, which squared the open pill.
+    backgroundColor: colors.card,
     borderRadius: 16,
     gap: pillGap(),
     maxWidth: "100%",
