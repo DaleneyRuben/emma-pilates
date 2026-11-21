@@ -98,7 +98,8 @@ Si eres cliente del estudio, descarga la app Emma Pilates.
 
 Remade 2026-11-21 in «Rosa Emma», approved by the owner from a sample: a
 rosa 100 ground, the label on a white pill, a Lora title in rosa 600, and the
-real Rosa Emma screen in a rosa 600 frame that runs off the bottom.
+real Rosa Emma screen in a rosa 600 frame under the title (on the phone and
+the iPad 13 it runs off the bottom).
 Screenshots carry no subtitle line, because small text may not sit on rosa
 100; the feature graphics put theirs on a white card. **No image shows a
 price or the launch discount**, because the offer is temporary (owner,
@@ -121,7 +122,8 @@ The App Store sizes come from the same captures: `graphics/apple/iphone-6.9/`
    `scripts/store-graphics/seed.mjs` against its API and worker. It turns
    «Centro» into the studio's branch, Achumani, archives the other branches
    and Pilates Prenatal, books Lucía's classes, registers two friends with her
-   code, fills the day three days ahead with six classes for «Reservar», and
+   code, fills the first Tuesday or Thursday two to six days ahead with six classes
+   for «Reservar» (it prints the date), and
    starts a class of Daniela's a few minutes later so its roster can be
    photographed while attendance is open.
 2. Capture the raw screens of both apps on the iPhone 16 Pro and the iPad Pro
