@@ -22,9 +22,13 @@ describe("TabBarButton", () => {
       </TabBarButton>,
     );
 
+    // Owner, 2026-11-20: the open pill is clearly wider than its label.
     expect(screen.getByTestId("open-tab-pill")).toHaveStyle({
       backgroundColor: "#93615D",
       borderRadius: 16,
+      maxWidth: "100%",
+      minWidth: 72,
+      paddingHorizontal: 16,
     });
     await fireEvent.press(screen.getByTestId("tab-home"));
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -71,12 +75,17 @@ describe("TabBarButton", () => {
     expect(tabBarPillHeight()).toBe(61);
   });
 
-  it("pads the pill evenly above and below and keeps the home indicator clear", () => {
+  // Owner, 2026-11-20: the full 34 pt inset left too much room under the
+  // labels; 14 pt of it is spared, never leaving less than the 8 pt above.
+  it("pads the pill above and below with the home indicator's spare room", () => {
     const iPhone = tabBarStyleFor({ bottom: 34 });
-    expect(iPhone).toMatchObject({ height: 8 + 61 + 8 + 34, paddingBottom: 8 + 34, paddingTop: 8 });
+    expect(iPhone).toMatchObject({ height: 8 + 61 + 20, paddingBottom: 20, paddingTop: 8 });
 
     const iPad = tabBarStyleFor({ bottom: 20 });
-    expect(iPad).toMatchObject({ height: 8 + 61 + 8 + 20, paddingBottom: 8 + 20, paddingTop: 8 });
+    expect(iPad).toMatchObject({ height: 8 + 61 + 8, paddingBottom: 8, paddingTop: 8 });
+
+    const noIndicator = tabBarStyleFor({ bottom: 0 });
+    expect(noIndicator).toMatchObject({ height: 8 + 61 + 8, paddingBottom: 8, paddingTop: 8 });
   });
 
   it("grows with the text size up to the scale's limit", () => {
@@ -85,7 +94,7 @@ describe("TabBarButton", () => {
     expect(tabBarStyleFor({ bottom: 0 }, 1.2).height).toBe(8 + 64 + 8);
   });
 
-  it("keeps Android's slimmer pill and tighter bar", () => {
+  it("keeps Android's slimmer pill and tighter bar clear of its system bar", () => {
     jest.replaceProperty(Platform, "OS", "android");
     // 2 above and below, the icon box, a 1 pt gap and the label.
     expect(tabBarPillHeight()).toBe(47);
