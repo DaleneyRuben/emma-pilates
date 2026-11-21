@@ -46,16 +46,24 @@ describe("LoadingState", () => {
     expect(screen.getByTestId("loading-state-logo")).toBeOnTheScreen();
   });
 
-  // E-A12 (Rosa Emma): the logo on a white disc, 120 pt on a phone, 150 on a tablet.
-  it("draws the logo on a white disc, larger on a tablet", async () => {
+  // Follow-up 286 (Rosa Emma, option A): the logo on a soft Rosa 50 halo over
+  // the screen's Rosa 100, 240 pt wide on a phone and 300 on a tablet, the halo
+  // 1.25 times the logo's width.
+  it("draws the logo on a soft halo, larger on a tablet", async () => {
     const phone = await render(<LoadingState label="Cargando clases" />);
     await advance(400);
-    expect(phone.getByTestId("loading-state-disc")).toHaveStyle({
-      backgroundColor: "#FFFBFB",
-      borderRadius: 60,
-      width: 120,
-    });
-    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 100, height: 43 });
+    const halo = phone.getByTestId("loading-state-halo");
+    expect(halo).toHaveStyle({ borderRadius: 150, height: 300, width: 300 });
+    expect(halo.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          experimental_backgroundImage:
+            "radial-gradient(circle, #FEF6F2 0%, #FEF6F2 45%, rgba(254, 246, 242, 0) 70%)",
+        }),
+      ]),
+    );
+    expect(halo).not.toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
     await phone.unmount();
 
     const phoneWindow = Dimensions.get("window");
@@ -64,8 +72,8 @@ describe("LoadingState", () => {
     try {
       const tablet = await render(<LoadingState label="Cargando clases" />);
       await advance(400);
-      expect(tablet.getByTestId("loading-state-disc")).toHaveStyle({ width: 150 });
-      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 126, height: 54 });
+      expect(tablet.getByTestId("loading-state-halo")).toHaveStyle({ width: 375 });
+      expect(tablet.getByTestId("loading-state-logo")).toHaveStyle({ width: 300, height: 129 });
     } finally {
       Dimensions.set({ window: phoneWindow, screen: phoneWindow });
     }
@@ -88,7 +96,8 @@ describe("LoadingState", () => {
 
     await advance(400);
 
-    expect(screen.getByTestId("loading-state-disc")).toHaveStyle({
+    // The halo and the logo breathe as one piece, so both stand still together.
+    expect(screen.getByTestId("loading-state-halo")).toHaveStyle({
       opacity: 1,
       transform: [{ scale: 1 }],
     });
