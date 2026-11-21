@@ -75,6 +75,17 @@ describe("LoadingState", () => {
     }
   });
 
+  // A screen that stacks the state under other content without letting it
+  // grow (the Trainer's Agenda under its week card) must not squeeze the halo
+  // onto that content: the area is never shorter than the halo.
+  it("keeps room for the whole halo where its parent does not grow", async () => {
+    const screen = await render(<LoadingState label="Cargando agenda" />);
+
+    expect(screen.getByRole("progressbar", { name: "Cargando agenda" })).toHaveStyle({
+      minHeight: 300,
+    });
+  });
+
   it("fades in and then breathes in an endless loop", async () => {
     const screen = await render(<LoadingState label="Cargando clases" />);
 
