@@ -32,10 +32,6 @@ export function ClassHistoryTab() {
     return <EmptyState icon="clock" title="Todavía no tomaste clases" variant="plain" />;
   }
   return (
-    <ClassHistoryList
-      entries={entries}
-      lead="Has asistido a"
-      refreshControl={refreshControl}
-    />
+    <ClassHistoryList entries={entries} lead="Has asistido a" refreshControl={refreshControl} />
   );
 }

@@ -48,11 +48,7 @@ function HistoryRow({ entry, last }: { entry: ClassHistoryEntryDto; last: boolea
  * <mes>» summary as the 600 hero, then one white card per month with its
  * header strip and the classes divided by hairlines.
  */
-export function ClassHistoryList({
-  entries,
-  lead,
-  refreshControl,
-}: ClassHistoryListProps) {
+export function ClassHistoryList({ entries, lead, refreshControl }: ClassHistoryListProps) {
   return (
     <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
       <View style={styles.summary} testID="class-history-summary">
