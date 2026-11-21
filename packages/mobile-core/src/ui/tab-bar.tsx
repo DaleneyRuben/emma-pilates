@@ -54,20 +54,32 @@ export function tabBarPillHeight(fontScale = 1) {
   return pillPadding() * 2 + iconBoxHeight + pillGap() + label;
 }
 
+// The iOS home indicator needs about 20 of its 34 pt inset: the owner found
+// the full inset left too much room under the labels (2026-11-20).
+const homeIndicatorSpare = 14;
+
+/** The room under the pill: iOS spares part of the home indicator's inset; Android's system bar is kept whole. */
+function bottomPadding(bottomInset: number) {
+  const padding = barPadding();
+  if (android()) return padding + bottomInset;
+  return Math.max(bottomInset - homeIndicatorSpare, padding);
+}
+
 /**
- * The white bar under the tabs: the pill with even room above and below it
- * (8 pt, 4 on Android), then the bottom inset left clear for the home
- * indicator. React Navigation sizes a bar without a height at 49 pt, which
- * pushed the pill down against the indicator.
+ * The white bar under the tabs: 8 pt over the pill (4 on Android), and under
+ * it the home indicator's room (never less than the 8 above). React
+ * Navigation sizes a bar without a height at 49 pt, which pushed the pill
+ * down against the indicator.
  */
 export function tabBarStyleFor(insets: Pick<EdgeInsets, "bottom">, fontScale = 1) {
   const padding = barPadding();
+  const paddingBottom = bottomPadding(insets.bottom);
   return {
     ...shadows.tabBar,
     backgroundColor: colors.card,
     borderTopWidth: 0,
-    height: padding * 2 + tabBarPillHeight(fontScale) + insets.bottom,
-    paddingBottom: padding + insets.bottom,
+    height: padding + tabBarPillHeight(fontScale) + paddingBottom,
+    paddingBottom,
     paddingTop: padding,
   } as const;
 }
@@ -98,5 +110,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     paddingVertical: pillPadding(),
   },
-  selected: { backgroundColor: colors.primary },
+  // Owner, 2026-11-20: the open pill is clearly wider than its label; the
+  // 100% cap keeps «Para contactar» whole on a five-tab bar.
+  selected: { backgroundColor: colors.primary, minWidth: 72, paddingHorizontal: spacing.lg },
 });
