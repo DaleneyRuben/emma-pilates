@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import logo from "../../assets/emma-logo.png";
-import { colors, shadows } from "./tokens";
+import { rosa } from "./tokens";
 
 // Design follow-up 94: nothing for 400 ms, a 300 ms fade, then one breath every
 // 2.8 s between the rest and the top; still under Reduce Motion.
@@ -23,6 +23,7 @@ const top = { opacity: 1, scale: 1 };
 // The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed); tablets start at the Staff app's 768 pt split width.
 const logoAspect = 565 / 1312;
 const tabletMinimumWidth = 768;
+const haloToLogo = 1.25;
 
 /**
  * A screen's first load (MOB-061): only the studio's logo, centred in the
@@ -62,21 +63,21 @@ export function LoadingState({ label }: { label: string }) {
     return () => animation.stop();
   }, [opacity, reduceMotion, scale, visible]);
 
-  // E-A12 (Rosa Emma): the logo on a white disc with the card shadow.
-  const tablet = windowWidth >= tabletMinimumWidth;
-  const disc = tablet ? 150 : 120;
-  const logoWidth = tablet ? 126 : 100;
+  // Follow-up 286 (E-A12, Rosa Emma option A): the logo on a soft Rosa 50 halo
+  // over the screen's own Rosa 100; the halo breathes with the logo as one piece.
+  const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
+  const halo = Math.round(logoWidth * haloToLogo);
   return (
     <View accessibilityLabel={label} accessibilityRole="progressbar" accessible style={styles.area}>
       {visible && reduceMotion !== undefined ? (
         // The accessible area above is the one element screen readers reach.
         <Animated.View
           style={[
-            styles.disc,
-            { borderRadius: disc / 2, height: disc, width: disc },
+            styles.halo,
+            { borderRadius: halo / 2, height: halo, width: halo },
             { opacity, transform: [{ scale }] },
           ]}
-          testID="loading-state-disc"
+          testID="loading-state-halo"
         >
           <Image
             resizeMode="contain"
@@ -124,10 +125,10 @@ function useReduceMotion(): boolean | undefined {
 
 const styles = StyleSheet.create({
   area: { flex: 1, alignItems: "center", justifyContent: "center" },
-  disc: {
-    ...shadows.card,
+  halo: {
     alignItems: "center",
-    backgroundColor: colors.card,
+    // Rosa 50, solid to 45 % of the radius and gone by 70 %: a glow with no edge.
+    experimental_backgroundImage: `radial-gradient(circle, ${rosa[50]} 0%, ${rosa[50]} 45%, rgba(254, 246, 242, 0) 70%)`,
     justifyContent: "center",
   },
 });

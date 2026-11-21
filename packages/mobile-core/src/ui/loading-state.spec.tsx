@@ -54,14 +54,10 @@ describe("LoadingState", () => {
     await advance(400);
     const halo = phone.getByTestId("loading-state-halo");
     expect(halo).toHaveStyle({ borderRadius: 150, height: 300, width: 300 });
-    expect(halo.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          experimental_backgroundImage:
-            "radial-gradient(circle, #FEF6F2 0%, #FEF6F2 45%, rgba(254, 246, 242, 0) 70%)",
-        }),
-      ]),
-    );
+    expect(halo).toHaveStyle({
+      experimental_backgroundImage:
+        "radial-gradient(circle, #FEF6F2 0%, #FEF6F2 45%, rgba(254, 246, 242, 0) 70%)",
+    });
     expect(halo).not.toHaveStyle({ backgroundColor: "#FFFBFB" });
     expect(phone.getByTestId("loading-state-logo")).toHaveStyle({ width: 240, height: 103 });
     await phone.unmount();
