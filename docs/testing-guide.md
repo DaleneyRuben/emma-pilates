@@ -3127,9 +3127,12 @@ the admin web, exactly as Test 24 describes, and log in as
    link stays disabled until the wait ends (too many emails from your own
    Account show «Enviaste muchos correos…» with «Podrás enviarlo en…»). If
    she activated in the meantime the aviso says «Ya activó su cuenta o la
-   invitación ya no existe; vuelve a abrir la ficha.». A Client who
-   registered herself and has not verified her email shows the aviso
-   without the link. The reads are `GET
+   invitación ya no existe; vuelve a abrir la ficha.». If her invitation
+   cannot be read (the API is down), the aviso says «No pudimos comprobar su
+   enlace de activación.» with **Reintentar**. A Client who registered
+   herself and has not verified her email shows the aviso without the link
+   (its password sentence does not fit her yet; the Staff app's
+   verification offer is not on the web). The reads are `GET
    /api/v1/assistant/client-invitations/{clientId}` and `POST
    …/{clientId}/resends` (`429 email_throttled` or `staff_email_throttled`
    with `Retry-After`, `404 client_invitation_not_found`). Nothing else
