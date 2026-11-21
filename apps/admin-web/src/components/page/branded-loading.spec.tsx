@@ -40,6 +40,9 @@ describe("the branded loading state (WEB-045)", () => {
     expect(screen.getByRole("status")).toHaveClass(
       "carga-area",
       "flex-1",
+      // Follow-up 287: never shorter than the halo (300 px, 375 px from 1024 px).
+      "min-h-[300px]",
+      "lg:min-h-[375px]",
       "items-center",
       "justify-center",
     );
