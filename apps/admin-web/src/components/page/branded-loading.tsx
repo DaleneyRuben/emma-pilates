@@ -8,7 +8,8 @@ import { cn } from "../../lib/cn";
  * column on the way up grow too (`src/carga.css`): the shell's main area
  * for a page, the rest of a page under its header, a side panel's body.
  * The minimum band keeps it centred where no parent grows. The breath and its
- * Reduce Motion stillness come from `.carga-logo` in `src/carga.css`.
+ * Reduce Motion stillness come from `.carga-halo` in `src/carga.css`: the
+ * soft Rosa 50 halo of follow-up 286, which breathes with the logo on it.
  *
  * Only one logo is on screen at a time: when two areas of a page load at
  * once (Informes › Dinero reads the accrued revenue and the report), the
@@ -57,13 +58,15 @@ export function BrandedLoading({
       aria-label={label}
       className="carga-area flex min-h-[240px] flex-1 items-center justify-center"
     >
-      <img
-        className={cn("carga-logo", delayed && "carga-logo-demora")}
-        src="/emma-logo.png"
-        alt=""
-        width={1312}
-        height={565}
-      />
+      <span className={cn("carga-halo", delayed && "carga-halo-demora")}>
+        <img
+          className="carga-logo"
+          src="/emma-logo.png"
+          alt=""
+          width={1312}
+          height={565}
+        />
+      </span>
     </div>
   );
 }
