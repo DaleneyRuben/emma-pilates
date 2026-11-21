@@ -1,6 +1,6 @@
 # Critical journey (IDN-009, ADR-0102): the Coordinator finds a Client, sees
 # her overview with booking but no sale, and opens «Cancelar una clase» from
-# her Horario tab (v2). Since FIX-040 her search offers «Nuevo cliente».
+# her Horario tab (v2). Since FIX-040 her search offers «Nueva clienta».
 appId: ${APP_ID}
 env:
   EMAIL: carolina.rivas@example.com

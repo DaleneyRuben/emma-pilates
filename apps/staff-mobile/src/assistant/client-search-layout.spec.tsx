@@ -5,39 +5,53 @@ import { assistantRoutes, openClientSearch } from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
-const linkLabel = "¿No está? Crear clienta nueva";
+const shortcutLabel = "Nueva clienta, crea su ficha si aún no está";
+const buttonLabel = "Crear clienta nueva";
 
-describe("Buscar clienta, new as a link (FIX-083, Ronda 2 pick A)", () => {
+describe("Buscar clienta layout (redesign option A)", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
   });
 
-  it("drops the big «Nueva clienta» button for a quiet link", async () => {
+  it("puts the field in the band and drops the two-letters hint", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
-    expect(screen.queryByText("Nueva clienta")).toBeNull();
-    expect(screen.getByRole("button", { name: linkLabel })).toBeOnTheScreen();
-    expect(screen.queryByTestId("icon-row-disc")).toBeNull();
+    const band = screen.getByTestId("root-header");
+    expect(band).toContainElement(screen.getByTestId("client-search-input"));
+    expect(screen.queryByText(/al menos dos letras/)).toBeNull();
   });
 
-  it("puts the link below the results and opens Nueva clienta from it", async () => {
+  it("opens Nueva clienta from the shortcuts card before a search", async () => {
+    const screen = await openClientSearch(assistantRoutes());
+
+    expect(screen.getByRole("button", { name: shortcutLabel })).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: buttonLabel })).toBeNull();
+
+    await fireEvent.press(screen.getByRole("button", { name: shortcutLabel }));
+    await waitFor(() => expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen());
+  });
+
+  it("puts the outlined button below the results and opens Nueva clienta from it", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ver clienta Lucía Fernández" })).toBeOnTheScreen(),
     );
+    expect(screen.queryByRole("button", { name: shortcutLabel })).toBeNull();
     const order = screen
       .getAllByRole("button")
       .map((button) => button.props.accessibilityLabel as string | undefined);
-    expect(order.indexOf(linkLabel)).toBeGreaterThan(order.indexOf("Ver clienta Lucía Fernández"));
+    expect(order.indexOf(buttonLabel)).toBeGreaterThan(
+      order.indexOf("Ver clienta Lucía Fernández"),
+    );
 
     await fireEvent.press(screen.getByTestId("client-search-new-client"));
     await waitFor(() => expect(screen.getByLabelText("Nueva clienta")).toBeOnTheScreen());
   });
 
-  it("keeps the link when the search fails", async () => {
+  it("keeps the button when the search fails", async () => {
     const screen = await openClientSearch({
       ...assistantRoutes(),
       "/api/v1/assistant/clients?query=luc": () => {
@@ -47,6 +61,6 @@ describe("Buscar clienta, new as a link (FIX-083, Ronda 2 pick A)", () => {
 
     await fireEvent.changeText(screen.getByPlaceholderText("Nombre, teléfono o correo"), "luc");
     await waitFor(() => expect(screen.getByText("No pudimos buscar clientas.")).toBeOnTheScreen());
-    expect(screen.getByRole("button", { name: linkLabel })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: buttonLabel })).toBeOnTheScreen();
   });
 });
