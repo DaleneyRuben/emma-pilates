@@ -11,13 +11,13 @@
     opacity: 0;
   }
   to {
-    opacity: 0.55;
+    opacity: 0.8;
   }
 }
 
 @keyframes carga-respira {
   from {
-    opacity: 0.55;
+    opacity: 0.8;
     transform: scale(0.96);
   }
   to {
@@ -38,9 +38,10 @@
   background-color: #f9e7df;
 }
 
-/* Follow-up 286 (Rosa Emma, option A): the logo sits on a soft Rosa 50 halo,
-   1.25 times its width, solid to 45 % of the radius and gone by 70 %, so it
-   has no edge. The halo breathes and carries the logo with it, as one piece. */
+/* Follow-ups 286 and 287 (Rosa Emma, option A): the logo sits on a white
+   halo, 1.25 times its width, solid to 52 % of the radius with a soft edge
+   gone by 70 %, so it reads clearly on Rosa 100. The halo breathes and
+   carries the logo with it, as one piece; at rest it stays at 0.8. */
 .carga-halo {
   display: flex;
   align-items: center;
@@ -50,11 +51,12 @@
   border-radius: 50%;
   background-image: radial-gradient(
     circle,
-    #fef6f2 0%,
-    #fef6f2 45%,
-    rgb(254 246 242 / 0%) 70%
+    #fffbfb 0%,
+    #fffbfb 52%,
+    rgb(255 251 251 / 60%) 60%,
+    rgb(255 251 251 / 0%) 70%
   );
-  opacity: 0.55;
+  opacity: 0.8;
   transform: scale(0.96);
   animation:
     carga-aparece 300ms ease-out both,

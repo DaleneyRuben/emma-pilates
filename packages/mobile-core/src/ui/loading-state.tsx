@@ -10,14 +10,15 @@ import {
 } from "react-native";
 
 import logo from "../../assets/emma-logo.png";
-import { rosa } from "./tokens";
+import { colors } from "./tokens";
 
 // Design follow-up 94: nothing for 400 ms, a 300 ms fade, then one breath every
 // 2.8 s between the rest and the top; still under Reduce Motion.
 const appearDelayMilliseconds = 400;
 const fadeInMilliseconds = 300;
 const halfBreathMilliseconds = 1400;
-const rest = { opacity: 0.55, scale: 0.96 };
+// Follow-up 287: the rest keeps the logo at 0.8, never a washed-out grey.
+const rest = { opacity: 0.8, scale: 0.96 };
 const top = { opacity: 1, scale: 1 };
 
 // The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed); tablets start at the Staff app's 768 pt split width.
@@ -63,8 +64,8 @@ export function LoadingState({ label }: { label: string }) {
     return () => animation.stop();
   }, [opacity, reduceMotion, scale, visible]);
 
-  // Follow-up 286 (E-A12, Rosa Emma option A): the logo on a soft Rosa 50 halo
-  // over the screen's own Rosa 100; the halo breathes with the logo as one piece.
+  // Follow-ups 286 and 287 (E-A12, Rosa Emma option A): the logo on a white
+  // halo over the screen's own Rosa 100; the halo breathes with the logo as one piece.
   const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
   const halo = Math.round(logoWidth * haloToLogo);
   return (
@@ -134,8 +135,9 @@ const styles = StyleSheet.create({
   area: { flex: 1, alignItems: "center", justifyContent: "center" },
   halo: {
     alignItems: "center",
-    // Rosa 50, solid to 45 % of the radius and gone by 70 %: a glow with no edge.
-    experimental_backgroundImage: `radial-gradient(circle, ${rosa[50]} 0%, ${rosa[50]} 45%, rgba(254, 246, 242, 0) 70%)`,
+    // Follow-up 287: white, solid to 52 % of the radius, a soft edge by 70 %,
+    // so it reads clearly on the screen's Rosa 100.
+    experimental_backgroundImage: `radial-gradient(circle, ${colors.card} 0%, ${colors.card} 52%, rgba(255, 251, 251, 0.6) 60%, rgba(255, 251, 251, 0) 70%)`,
     justifyContent: "center",
   },
 });
