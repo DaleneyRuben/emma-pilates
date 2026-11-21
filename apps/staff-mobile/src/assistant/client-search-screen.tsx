@@ -6,15 +6,14 @@ import { Keyboard, StyleSheet, View } from "react-native";
 import { usePendingInvoiceCount } from "../invoices/invoices-screen";
 import { useStaffFetcher } from "../staff-fetcher";
 import { useStaffRole } from "../staff-role";
-import { PlainRow, PlainRowGroup } from "../ui/plain-rows";
 import { RootHeader } from "../ui/root-header";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { ClientDetailPanel } from "./client-panel";
 import {
   ClientSearchField,
   ClientSearchResults,
+  ClientSearchShortcuts,
   NewClientLink,
-  SearchHint,
   useClientSearch,
 } from "./client-search-parts";
 
@@ -54,34 +53,26 @@ export function ClientSearchScreen() {
     member?.branches.length === 1 ? `${roleLabel} · ${member.branches[0]?.name}` : roleLabel;
 
   const newClient = () => navigation.navigate("NewClient");
-  const newClientLink = <NewClientLink onPress={newClient} />;
   const content = (
     <>
-      <RootHeader bell eyebrow={eyebrow} label="Buscar clienta" title="Buscar clienta" />
-      <ClientSearchField search={search} />
-      {searching ? null : (
-        <PlainRowGroup>
-          <PlainRow
-            label="Facturas por subir"
-            onPress={() => navigation.navigate("Invoices")}
-            testID="client-search-invoices"
-            value={invoiceCount > 0 ? String(invoiceCount) : undefined}
-          />
-        </PlainRowGroup>
-      )}
+      {/* The field rides in the band (option A), so the screen holds one card. */}
+      <RootHeader bell eyebrow={eyebrow} label="Buscar clienta" title="Buscar clienta">
+        <ClientSearchField search={search} />
+      </RootHeader>
       {searching ? (
         <ClientSearchResults
-          newClientLink={newClientLink}
+          newClientLink={<NewClientLink onPress={newClient} />}
           onNewClient={newClient}
           onOpen={open}
           search={search}
           selectedId={selectedId}
         />
       ) : (
-        <>
-          <SearchHint>Escribe al menos dos letras o números para buscar.</SearchHint>
-          {newClientLink}
-        </>
+        <ClientSearchShortcuts
+          invoiceCount={invoiceCount}
+          onInvoices={() => navigation.navigate("Invoices")}
+          onNewClient={newClient}
+        />
       )}
     </>
   );

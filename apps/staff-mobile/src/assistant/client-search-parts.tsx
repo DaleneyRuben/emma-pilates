@@ -18,6 +18,7 @@ import {
   StateScreen,
   surfaces,
   Text,
+  UnreadCountPill,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -60,10 +61,10 @@ export function useClientSearch() {
 
 export type ClientSearch = ReturnType<typeof useClientSearch>;
 
-const newClientLabel = "¿No está? Crear clienta nueva";
+const newClientLabel = "Crear clienta nueva";
 
-// FIX-083 (Ronda 2 pick A): «Nueva clienta» is a quiet row under the results,
-// on its own white card with a plus and a chevron (E-S02, E-C01).
+// The Buscar clienta redesign (option A, 2026-11-21): under the results «Crear
+// clienta nueva» is an outlined button with a plus, not another white row.
 export function NewClientLink({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
@@ -73,14 +74,72 @@ export function NewClientLink({ onPress }: { onPress: () => void }) {
       style={({ pressed }) => [styles.newClient, pressed && styles.pressed]}
       testID="client-search-new-client"
     >
-      <LineIcon color={colors.text} size={18} strokeWidth={1.7}>
-        <Path d="M12 5v14M5 12h14" />
-      </LineIcon>
-      <Text style={styles.newClientLabel} variant="titulo-fila">
-        {newClientLabel}
-      </Text>
-      <Chevron size={16} strokeWidth={1.5} tone="muted" />
+      <PlusIcon />
+      <Text variant="boton">{newClientLabel}</Text>
     </Pressable>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <LineIcon color={colors.text} size={20} strokeWidth={1.7}>
+      <Path d="M12 5v14M5 12h14" />
+    </LineIcon>
+  );
+}
+
+/**
+ * Before a search (option A): one white card with «Nueva clienta» and
+ * «Facturas por subir», each behind a 50 disc. No hint asks for two letters;
+ * the results simply appear from the second one.
+ */
+export function ClientSearchShortcuts({
+  invoiceCount,
+  onInvoices,
+  onNewClient,
+}: {
+  invoiceCount: number;
+  onInvoices: () => void;
+  onNewClient: () => void;
+}) {
+  return (
+    <View style={styles.shortcuts}>
+      <Pressable
+        accessibilityLabel="Nueva clienta, crea su ficha si aún no está"
+        accessibilityRole="button"
+        onPress={onNewClient}
+        style={({ pressed }) => [styles.shortcut, pressed && styles.pressed]}
+        testID="client-search-new-client"
+      >
+        <View style={styles.disc}>
+          <PlusIcon />
+        </View>
+        <View style={styles.shortcutBody}>
+          <Text variant="titulo-fila">Nueva clienta</Text>
+          <Text variant="secundario">Crea su ficha si aún no está</Text>
+        </View>
+        <Chevron size={16} strokeWidth={1.5} tone="muted" />
+      </Pressable>
+      <View style={styles.hairline} />
+      <Pressable
+        accessibilityLabel={
+          invoiceCount > 0 ? `Facturas por subir, ${invoiceCount}` : "Facturas por subir"
+        }
+        accessibilityRole="button"
+        onPress={onInvoices}
+        style={({ pressed }) => [styles.shortcut, pressed && styles.pressed]}
+        testID="client-search-invoices"
+      >
+        <View style={styles.disc}>
+          <Glyph color={colors.text} name="document" size={20} strokeWidth={1.6} />
+        </View>
+        <Text style={styles.shortcutBody} variant="titulo-fila">
+          Facturas por subir
+        </Text>
+        <UnreadCountPill count={invoiceCount} />
+        <Chevron size={16} strokeWidth={1.5} tone="muted" />
+      </Pressable>
+    </View>
   );
 }
 
@@ -244,17 +303,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.xs,
   },
-  newClient: {
-    ...surfaces.card,
+  disc: {
     alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderColor: colors.borderSoft,
+    borderRadius: 20,
+    borderWidth: 1,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  hairline: { backgroundColor: colors.hairline, height: 1 },
+  newClient: {
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.primary,
+    borderRadius: radii.button,
+    borderWidth: 1.5,
     flexDirection: "row",
-    gap: spacing.smLg,
+    gap: spacing.sm,
+    justifyContent: "center",
     minHeight: 52,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.mdLg,
   },
-  newClientLabel: { flex: 1 },
   pressed: { opacity: 0.7 },
   // The list reaches the screen's sides so the cards' shadows show.
   scroll: { marginHorizontal: -spacing.xlSm },
+  shortcut: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    minHeight: 64,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.smLg,
+  },
+  shortcutBody: { flex: 1, gap: spacing.xxs },
+  shortcuts: { ...surfaces.card, overflow: "hidden" },
 });
