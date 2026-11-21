@@ -1,5 +1,5 @@
 import type { SessionAvailabilityDto } from "@pilates/api-contracts";
-import { ClassRow, formatTimeRange, placesLabel, StaffFace } from "@pilates/mobile-core";
+import { ClassRow, formatTimeRange, placesLabel } from "@pilates/mobile-core";
 
 import { causeLabel } from "../trainer/agenda-cancellations";
 import { minutesLabel, startTime } from "../ui/session-time";
@@ -36,13 +36,7 @@ export function ScheduleNextClass({
  * start, the class over its Trainer and length, the places «N de M»; a full
  * class is the one exception and takes the pill.
  */
-export function ScheduleClassRow({
-  fetcher,
-  session,
-}: {
-  fetcher: typeof globalThis.fetch;
-  session: SessionAvailabilityDto;
-}) {
+export function ScheduleClassRow({ session }: { session: SessionAvailabilityDto }) {
   const time = startTime(session.startsAt, session.endsAt);
   const full = session.availableSeats === 0;
   const places = placesLabel(full ? session.capacity : session.bookedCount, session.capacity);
@@ -54,14 +48,6 @@ export function ScheduleClassRow({
       exception={full ? "Completa" : undefined}
       places={places}
       subtitle={`${session.trainerName} · ${minutes}${waitlist}`}
-      subtitleLead={
-        <StaffFace
-          fetcher={fetcher}
-          name={session.trainerName}
-          photo={session.trainerPhoto}
-          size={20}
-        />
-      }
       testID={`schedule-session-${session.id}`}
       time={time}
       title={session.classTypeName}

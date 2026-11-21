@@ -17,7 +17,6 @@ import {
   Screen,
   SectionTitle,
   spacing,
-  StaffFace,
   StateScreen,
   surfaces,
   upcomingCivilDates,
@@ -157,14 +156,6 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
         places={places}
         standalone={tablet}
         subtitle={session.trainerName}
-        subtitleLead={
-          <StaffFace
-            fetcher={fetcher}
-            name={session.trainerName}
-            photo={session.trainerPhoto}
-            size={20}
-          />
-        }
         testID={`session-card-${session.id}`}
         time={startTime(session.startsAt, session.endsAt)}
         title={session.classTypeName}

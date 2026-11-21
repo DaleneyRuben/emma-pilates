@@ -1,6 +1,5 @@
 import { capacityLabel } from "@pilates/api-contracts";
 import { ClassRow, formatStartTime } from "@pilates/mobile-core";
-import type { ReactNode } from "react";
 
 type Seats = { availableSeats: number; bookedCount: number; capacity: number };
 
@@ -41,16 +40,15 @@ function durationMinutes(startsAt: string, endsAt: string): number {
 
 /**
  * A Session on Reservar as the shared class row (ClaseE, FIX-089): the start
- * in its Rubor box, the class over «Trainer · 50 min» led by her face
- * (FIX-041), the seats at the end and a chevron to the detail. Put the rows
- * in a `ClassList`.
+ * in its Rubor box, the class over «Trainer · 50 min» (her name only, the
+ * owner's pick C), the seats at the end and a chevron to the detail. Put the
+ * rows in a `ClassList`.
  */
 export function SessionRow({
   accessibilityLabel,
   onPress,
   session,
   testID,
-  trainerFace,
 }: {
   accessibilityLabel: string;
   onPress: () => void;
@@ -61,13 +59,11 @@ export function SessionRow({
     trainerName: string;
   };
   testID?: string;
-  trainerFace?: ReactNode;
 }) {
   return (
     <ClassRow
       accessibilityLabel={accessibilityLabel}
       detail={`${session.trainerName} · ${durationMinutes(session.startsAt, session.endsAt)} min`}
-      detailLead={trainerFace}
       detailLines={1}
       onPress={onPress}
       places={rowPlaces(session)}

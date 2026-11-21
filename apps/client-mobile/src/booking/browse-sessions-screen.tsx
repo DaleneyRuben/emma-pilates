@@ -19,7 +19,6 @@ import {
   Screen,
   ScreenHeader,
   spacing,
-  StaffFace,
   surfaces,
   Text,
   upcomingCivilDates,
@@ -230,14 +229,6 @@ export function BrowseSessionsScreen() {
                 onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
                 session={session}
                 testID={`session-card-${session.id}`}
-                trainerFace={
-                  <StaffFace
-                    fetcher={fetcher}
-                    name={session.trainerName}
-                    photo={session.trainerPhoto}
-                    size={20}
-                  />
-                }
               />
             ))}
           </ClassList>

@@ -166,7 +166,7 @@ export function ScheduleScreen() {
               label={dayCount(selectedDate, today, standing.length, cancelled.length)}
               reason={cancelledReason(cancelled)}
               rows={rest.map((session) => (
-                <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
+                <ScheduleClassRow key={session.id} session={session} />
               ))}
             />
           </>

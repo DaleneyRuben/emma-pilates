@@ -12,32 +12,11 @@ import {
   isInsideCancellationWindow,
   radii,
   spacing,
-  StaffFace,
   surfaces,
   Text,
   useMountedAt,
 } from "@pilates/mobile-core";
 import { StyleSheet, View } from "react-native";
-
-import { useClientFetcher } from "../client-fetcher";
-
-/**
- * «08:00 – 09:00 · Daniela Ortiz · Achumani» with her 20 px face right before
- * her name (FIX-041, follow-up 242); a wrapped line keeps the face with her name.
- */
-function TrainerDetails({ item, time }: { item: UpcomingBookingDto; time: string }) {
-  const fetcher = useClientFetcher();
-  return (
-    <View style={styles.detailsLine}>
-      <Text variant="secundario">{`${time} ·`}</Text>
-      <View style={styles.trainer}>
-        <StaffFace fetcher={fetcher} name={item.trainerName} photo={item.trainerPhoto} size={20} />
-        <Text variant="secundario">{item.trainerName}</Text>
-      </View>
-      <Text variant="secundario">{`· ${item.branchName}`}</Text>
-    </View>
-  );
-}
 
 export function DayTile({ startsAt, today }: { startsAt: string; today: string }) {
   const civil = boliviaCivilDate(new Date(startsAt));
@@ -145,7 +124,8 @@ export function BookingCard({
               {`${time} · faltan menos de ${formatCancellationWindow(cancellationWindowMinutes)}`}
             </Text>
           ) : (
-            <TrainerDetails item={item} time={time} />
+            // «08:00 – 09:00 · Daniela Ortiz · Achumani»: her name only (pick C).
+            <Text variant="secundario">{`${time} · ${item.trainerName} · ${item.branchName}`}</Text>
           )}
         </View>
       </View>
@@ -192,7 +172,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 52,
   },
-  detailsLine: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   factNote: {
     marginLeft: 64,
     marginTop: -spacing.sm,
@@ -200,5 +179,4 @@ const styles = StyleSheet.create({
   },
   factRow: {},
   header: { alignItems: "flex-start", flexDirection: "row", gap: spacing.md },
-  trainer: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
 });
