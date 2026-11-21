@@ -42,7 +42,6 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
       (await getClientInvitation(clientId, { signal }, adminFetch))
         .data as ClientInvitationDto,
     staleTime: 0,
-    retry: false,
   });
   const resend = useMutation({
     mutationFn: async () =>
