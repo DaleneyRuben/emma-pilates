@@ -4,7 +4,6 @@ import {
   EmptyState,
   LoadingState,
   QueryFailure,
-  StaffFace,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -33,18 +32,6 @@ export function ClassHistoryTab() {
     return <EmptyState icon="clock" title="Todavía no tomaste clases" variant="plain" />;
   }
   return (
-    <ClassHistoryList
-      entries={entries}
-      lead="Has asistido a"
-      refreshControl={refreshControl}
-      trainerFace={(entry) => (
-        <StaffFace
-          fetcher={fetcher}
-          name={entry.trainerName}
-          photo={entry.trainerPhoto}
-          size={20}
-        />
-      )}
-    />
+    <ClassHistoryList entries={entries} lead="Has asistido a" refreshControl={refreshControl} />
   );
 }

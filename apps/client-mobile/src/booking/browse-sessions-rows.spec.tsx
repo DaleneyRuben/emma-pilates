@@ -131,16 +131,16 @@ describe("Client class list rows", () => {
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
   });
 
-  // FIX-041 (follow-up 242): the trainer line leads with her 20 px face.
-  it("leads the trainer line with her photo, or her initials without one", async () => {
+  // The owner's pick C: the trainer line is her name only, without a face.
+  it("writes the trainer line without her photo or initials", async () => {
     const { cards, fetcher } = await openClassList();
 
-    await waitFor(() => {
-      expect(cards[0].getByLabelText("Foto de Emma Vargas")).toHaveStyle({ height: 20, width: 20 });
-    });
-    expect(fetcher).toHaveBeenCalledWith("/api/v1/staff-photos/asset-emma?variant=thumbnail");
-    expect(cards[1].getByText("EV")).toBeOnTheScreen();
-    expect(cards[1].queryByLabelText("Foto de Emma Vargas")).toBeNull();
+    for (const card of cards) {
+      expect(card.getByText("Emma Vargas · 50 min")).toBeOnTheScreen();
+      expect(card.queryByLabelText("Foto de Emma Vargas")).toBeNull();
+      expect(card.queryByText("EV")).toBeNull();
+    }
+    expect(fetcher).not.toHaveBeenCalledWith("/api/v1/staff-photos/asset-emma?variant=thumbnail");
   });
 
   // MOB-074 walk: a fixed 56 pt width broke «09:00» in Lora 20 into «09:0» and

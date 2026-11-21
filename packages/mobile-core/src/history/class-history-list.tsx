@@ -1,5 +1,5 @@
 import type { ClassHistoryEntryDto } from "@pilates/api-contracts";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement } from "react";
 import { type RefreshControlProps, ScrollView, StyleSheet, View } from "react-native";
 
 import { formatSessionDate } from "../time/session-format";
@@ -19,19 +19,9 @@ type ClassHistoryListProps = {
   lead: string;
   /** The pull-to-refresh control of the screen that owns the list (UX-004). */
   refreshControl?: ReactElement<RefreshControlProps>;
-  /** FIX-041: the Trainer's 20 px photo before her name (C05d), when the app draws one. */
-  trainerFace?: (entry: ClassHistoryEntryDto) => ReactNode;
 };
 
-function HistoryRow({
-  entry,
-  last,
-  trainerFace,
-}: {
-  entry: ClassHistoryEntryDto;
-  last: boolean;
-  trainerFace?: ClassHistoryListProps["trainerFace"];
-}) {
+function HistoryRow({ entry, last }: { entry: ClassHistoryEntryDto; last: boolean }) {
   const { day, weekday } = historyDayLabel(entry.startsAt);
   const detail = `${entry.trainerName} · ${entry.branchName}`;
   return (
@@ -47,16 +37,7 @@ function HistoryRow({
       </View>
       <View style={styles.body}>
         <Text variant="titulo-fila">{entry.classTypeName}</Text>
-        {trainerFace === undefined ? (
-          <Text variant="secundario">{detail}</Text>
-        ) : (
-          <View style={styles.faceLine}>
-            {trainerFace(entry)}
-            <Text style={styles.faceText} variant="secundario">
-              {detail}
-            </Text>
-          </View>
-        )}
+        <Text variant="secundario">{detail}</Text>
       </View>
     </View>
   );
@@ -67,12 +48,7 @@ function HistoryRow({
  * <mes>» summary as the 600 hero, then one white card per month with its
  * header strip and the classes divided by hairlines.
  */
-export function ClassHistoryList({
-  entries,
-  lead,
-  refreshControl,
-  trainerFace,
-}: ClassHistoryListProps) {
+export function ClassHistoryList({ entries, lead, refreshControl }: ClassHistoryListProps) {
   return (
     <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
       <View style={styles.summary} testID="class-history-summary">
@@ -94,7 +70,6 @@ export function ClassHistoryList({
               entry={entry}
               key={entry.bookingId}
               last={index === group.entries.length - 1}
-              trainerFace={trainerFace}
             />
           ))}
         </View>
@@ -107,8 +82,6 @@ export function ClassHistoryList({
 // row, 30 between the summary and the month groups.
 const styles = StyleSheet.create({
   body: { flex: 1, gap: 3 },
-  faceLine: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
-  faceText: { flexShrink: 1 },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   date: { alignItems: "center", gap: 1, width: 38 },
   group: { ...surfaces.card, overflow: "hidden" },

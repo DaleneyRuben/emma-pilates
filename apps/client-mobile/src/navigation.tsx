@@ -6,7 +6,7 @@ import {
   returnTabsToRoot,
   TabBarButton,
   tabBarHidden,
-  tabBarStyle,
+  tabBarStyleFor,
   tabBarItemStyle,
   tabBarTints,
   TabLabel,
@@ -18,6 +18,8 @@ import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStaticNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { PixelRatio } from "react-native";
+import { initialWindowMetrics } from "react-native-safe-area-context";
 
 import { BookingsScreen } from "./booking/bookings-screen";
 import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
@@ -145,6 +147,14 @@ const ProfileStack = createNativeStackNavigator({
 });
 
 const tabCount = 4;
+
+// The bar's height is its padded pill plus the device's bottom inset (the home
+// indicator), at the device's text size. Both apps are portrait only, so the
+// launch metrics hold, as they do for React Navigation's own bar height.
+const tabBarStyle = tabBarStyleFor(
+  initialWindowMetrics?.insets ?? { bottom: 0 },
+  PixelRatio.getFontScale(),
+);
 
 const tabOptions =
   (title: string, icon: ClientTabIconName, root: string, position: number) =>

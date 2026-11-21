@@ -90,7 +90,7 @@ export function TodayAgenda({ branchId, pending }: { branchId: string; pending: 
     later.length === 0 ? null : (
       <RowCard label="Más tarde" testID="today-later">
         {later.map((session) => (
-          <ScheduleClassRow fetcher={fetcher} key={session.id} session={session} />
+          <ScheduleClassRow key={session.id} session={session} />
         ))}
       </RowCard>
     ),

@@ -1,5 +1,4 @@
 import { ClassRow, ExceptionPill } from "@pilates/mobile-core";
-import type { ReactNode } from "react";
 
 /**
  * A class on a staff list (Rosa Emma): the shared class row, the type bar and
@@ -14,7 +13,6 @@ export function SessionRow({
   places,
   standalone = false,
   subtitle,
-  subtitleLead,
   testID,
   time,
   title,
@@ -25,8 +23,6 @@ export function SessionRow({
   places?: string;
   standalone?: boolean;
   subtitle: string;
-  /** The Trainer's 20 px face before the quiet line (FIX-041, follow-up 242). */
-  subtitleLead?: ReactNode;
   testID?: string;
   time: string;
   title: string;
@@ -35,7 +31,6 @@ export function SessionRow({
     <ClassRow
       accessibilityLabel={accessibilityLabel}
       detail={subtitle}
-      detailLead={subtitleLead}
       end={exception === undefined ? undefined : <ExceptionPill>{exception}</ExceptionPill>}
       onPress={onPress}
       places={places}

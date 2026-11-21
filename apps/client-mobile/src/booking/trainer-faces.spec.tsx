@@ -90,22 +90,20 @@ describe("the Trainer's face", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("puts her 20 px photo right before her name on a booking card", async () => {
+  // The owner's pick C: a booking card names her without a face.
+  it("names her on a booking card without her photo", async () => {
     const { fetcher, screen } = await renderWithFetcher(bookingCard(booking(daniela)));
 
-    await waitFor(() => {
-      expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ height: 20, width: 20 });
-    });
-    expect(fetcher).toHaveBeenCalledWith("/api/v1/staff-photos/asset-daniela?variant=thumbnail");
-    expect(screen.getByText("Daniela Ortiz")).toBeOnTheScreen();
-    expect(screen.getByText("· Achumani")).toBeOnTheScreen();
+    expect(screen.getByText(/· Daniela Ortiz · Achumani$/)).toBeOnTheScreen();
+    expect(screen.queryByLabelText("Foto de Daniela Ortiz")).toBeNull();
+    expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("shows her initials on a booking card when she has no photo", async () => {
+  it("shows no initials on a booking card when she has no photo", async () => {
     const { screen } = await renderWithFetcher(bookingCard(booking(null)));
 
-    expect(screen.getByText("DO")).toBeOnTheScreen();
-    expect(screen.getByText("Daniela Ortiz")).toBeOnTheScreen();
+    expect(screen.queryByText("DO")).toBeNull();
+    expect(screen.getByText(/· Daniela Ortiz · Achumani$/)).toBeOnTheScreen();
   });
 
   it("shows no face on a booking line that names no trainer", async () => {

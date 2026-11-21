@@ -30,9 +30,9 @@ describe("The Trainer's face on the Assistant's screens", () => {
     clearMobileQueryCache();
   });
 
-  // FIX-089 (ClaseE): today's next class leads as the hero; the face leads
-  // the rows after it.
-  it("leads today with the next class hero and each other class with her photo", async () => {
+  // FIX-089 (ClaseE): today's next class leads as the hero; the owner's pick C
+  // leaves the rows after it with her name only.
+  it("leads today with the next class hero and names her on the other rows without a face", async () => {
     const later = {
       ...session,
       id: "session-2",
@@ -52,11 +52,10 @@ describe("The Trainer's face on the Assistant's screens", () => {
         within(screen.getByTestId("next-class-hero")).getByTestId("session-card-session-1"),
       ).toBeOnTheScreen(),
     );
-    await waitFor(() =>
-      expect(
-        within(screen.getByTestId("session-card-session-2")).getByLabelText("Foto de Emma Vargas"),
-      ).toHaveStyle({ width: 20, height: 20 }),
-    );
+    const row = screen.getByTestId("session-card-session-2");
+    expect(within(row).getByText("Emma Vargas")).toBeOnTheScreen();
+    expect(within(row).queryByLabelText("Foto de Emma Vargas")).toBeNull();
+    expect(within(row).queryByText("EV")).toBeNull();
   });
 
   it("swaps the «Instructora» row's icon for her 36 px photo on S08", async () => {
@@ -111,7 +110,7 @@ describe("The Trainer's face on the Assistant's screens", () => {
     expect(within(row).getByText("Instructor")).toBeOnTheScreen();
   });
 
-  it("puts her face on the reschedule option card", async () => {
+  it("names her on the reschedule option card without a face", async () => {
     const alternativeStart = new Date(new Date(soonBooking.startsAt).getTime() + minute);
     const { from: dayFrom, until: dayUntil } = civilDateRange(boliviaCivilDate(alternativeStart));
     const screen = await openLucia({
@@ -136,8 +135,8 @@ describe("The Trainer's face on the Assistant's screens", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
 
     const card = await screen.findByRole("button", { name: /^Reformer Pilates \d/ });
-    await waitFor(() =>
-      expect(within(card).getByLabelText("Foto de Emma Vargas")).toHaveStyle({ width: 20 }),
-    );
+    expect(within(card).getByText("Emma Vargas")).toBeOnTheScreen();
+    expect(within(card).queryByLabelText("Foto de Emma Vargas")).toBeNull();
+    expect(within(card).queryByText("EV")).toBeNull();
   });
 });

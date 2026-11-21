@@ -4,7 +4,7 @@ import {
   TabBarButton,
   tabBarHidden,
   TabLabel,
-  tabBarStyle,
+  tabBarStyleFor,
   tabBarItemStyle,
   tabBarTints,
 } from "@pilates/mobile-core";
@@ -16,6 +16,8 @@ import {
   type RouteProp,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { PixelRatio } from "react-native";
+import { initialWindowMetrics } from "react-native-safe-area-context";
 
 import { CancelClassScreen } from "../administrator/cancel-class-screen";
 import { CancelSessionScreen } from "../administrator/cancel-session-screen";
@@ -149,6 +151,14 @@ const payScreens = {
   PayGroup: PayGroupScreen,
 };
 const cancelClassScreens = { CancelClass: CancelClassScreen, CancelSession: CancelSessionScreen };
+
+// The bar's height is its padded pill plus the device's bottom inset (the home
+// indicator), at the device's text size. Both apps are portrait only, so the
+// launch metrics hold, as they do for React Navigation's own bar height.
+const tabBarStyle = tabBarStyleFor(
+  initialWindowMetrics?.insets ?? { bottom: 0 },
+  PixelRatio.getFontScale(),
+);
 
 const tabOptions =
   (title: string, icon: StaffTabIconName, root: string) =>

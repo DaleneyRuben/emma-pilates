@@ -1,7 +1,6 @@
 import { render } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
-import { Text } from "../ui/text";
 import { ClassHistoryList } from "./class-history-list";
 
 const entry = (
@@ -105,16 +104,11 @@ describe("ClassHistoryList", () => {
     ).toBeOnTheScreen();
   });
 
-  it("puts the face the app draws before each Trainer's name (FIX-041)", async () => {
-    const screen = await render(
-      <ClassHistoryList
-        entries={history}
-        lead="Has asistido a"
-        trainerFace={(item) => <Text variant="secundario">{`cara de ${item.trainerName}`}</Text>}
-      />,
-    );
+  // The owner's pick C: the row names the Trainer without a face.
+  it("names each Trainer without a face", async () => {
+    const screen = await render(<ClassHistoryList entries={history} lead="Has asistido a" />);
 
-    expect(screen.getByText("cara de Daniela Ortiz")).toBeOnTheScreen();
-    expect(screen.getAllByText("cara de Emma Vargas")).toHaveLength(2);
+    expect(screen.getByText("Daniela Ortiz · Urubó")).toBeOnTheScreen();
+    expect(screen.queryByLabelText("Foto de Daniela Ortiz")).toBeNull();
   });
 });
