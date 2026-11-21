@@ -31,7 +31,7 @@ export function TabBarButton({
     >
       <View
         style={[styles.pill, selected && styles.selected]}
-        testID={selected ? "open-tab-pill" : "tab-pill"}
+        testID={selected ? "open-tab-pill" : undefined}
       >
         {children}
       </View>

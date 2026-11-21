@@ -44,7 +44,7 @@ describe("TabBarButton", () => {
     expect(screen.queryByTestId("open-tab-pill")).toBeNull();
     // On the bar's own white: Android drops the radius of a view whose
     // background appears only once its tab opens.
-    expect(screen.getByTestId("tab-pill")).toHaveStyle({ backgroundColor: "#FFFBFB" });
+    expect(screen.getByText("Perfil").parent).toHaveStyle({ backgroundColor: "#FFFBFB" });
   });
 
   it("draws the bar white with white tints on the pill", () => {
