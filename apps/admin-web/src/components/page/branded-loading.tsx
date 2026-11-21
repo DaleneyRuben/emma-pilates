@@ -56,7 +56,7 @@ export function BrandedLoading({
     <div
       role="status"
       aria-label={label}
-      className="carga-area flex min-h-[240px] flex-1 items-center justify-center"
+      className="carga-area flex min-h-[300px] flex-1 lg:min-h-[375px] items-center justify-center"
     >
       <span className={cn("carga-halo", delayed && "carga-halo-demora")}>
         <img

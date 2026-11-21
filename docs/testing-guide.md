@@ -6494,7 +6494,7 @@ device is free:
 3. **Reduce Motion.** The loading logo already stays still: mobile reads
    `AccessibilityInfo.isReduceMotionEnabled` and skips the breath
    (`packages/mobile-core`, asserted in `loading-state.spec.tsx`), and the
-   admin web's `.carga-logo` has a `prefers-reduced-motion` rule (Test 66).
+   admin web's `.carga-halo` has a `prefers-reduced-motion` rule (Test 66).
    The launch splash reads the same setting (UX-019): when Reduce Motion is
    on, `holdLaunchSplash` sets fade off and duration 0 before the first
    screen hides it. A development build that shows the native splash is the
