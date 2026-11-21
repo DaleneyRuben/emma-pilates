@@ -54,7 +54,7 @@ numbered tests.
 | Second walkthrough fixes | The rail's labels at 12 px, a missed Minimum Bookings check settled when the worker comes back, «Fecha de apertura» as dd/mm/aaaa, and phones without +591 (Test 130) | The phone normalization migration runs once on deploy |
 | The web's sign-in with the logo | Login, «¿Olvidaste tu contraseña?» and «Crea tu contraseña» with the studio's logo beside the form, their notices, errors and the throttled wait, at 1440 and 420 px (Test 131) | Busy buttons last only while a request is in flight |
 | Phones with a country code | «Celular» with a flag prefix and a country list in Regístrate (required), Editar perfil, Nuevo cliente, Invitar a alguien and the client's «Editar perfil» on the web; numbers with their flag in every list; WhatsApp in the number's own country (Test 132) | A store build older than FIX-037 registers without a phone |
-| Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and Horario, and next to the Trainer's name in the client's Reservar, class detail, Mis reservas and Historial (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
+| Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and the client's class detail; class rows name the Trainer without a photo (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
 | Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
@@ -660,7 +660,13 @@ The tab bar at the bottom is Lino with four line icons over **Inicio**,
 **Reservar**, **Mis Reservas**, and **Perfil**. The **Perfil** tab carries no
 unread pill any more (owner, 2026-11-02): the count is on the Inicio bell.
 Every screen with a back arrow hides the tab bar; it returns on the tab's
-first screen. On an iPad the labels stay under the icons.
+first screen. On an iPad the labels stay under the icons. The open tab's
+pill is clearly wider than its label (16 pt each side, at least 72 pt) and
+stays round on Android when you switch tabs. The bar keeps 8 pt over the
+pill; under it, iOS leaves the home indicator's room minus 14 pt (never less
+than 8 pt), so the labels neither sink onto the indicator nor float above a
+wide gap, and Android leaves 4 pt plus its gesture bar. The Staff app's
+five-tab bars keep «Para contactar» and «Disponibilidad» whole.
 
 **Comprar un plan** opens **Elige tu plan**; tapping a Plan shows its detail
 (Test 10 walks through the payment). The **Perfil** tab shows the Account
@@ -9318,12 +9324,13 @@ B. **Anyone's photo, admin web.** As Paola (Administrator) open **Estudio ›
 C. **The top bar.** Paola's own photo (set in step A from her Staff app
    Perfil) replaces «PM» in the account chip at the top right of every page.
 D. **Where the Trainer appears.** With Emma's photo set: the admin web's
-   **Horario** blocks show a 20 px photo before «Emma Vargas»; the Staff
-   app's **Horario** lines and an Assistant's class detail («Entrenadora»
-   row, 36 px) show it too; a client (Lucía) sees it before the Trainer's
-   name in **Reservar**, in the class detail's Instructora row, in **Mis
-   reservas** and in **Historial**. A Trainer without a photo shows her
-   initials in the same places.
+   **Horario** blocks show a 20 px photo before «Emma Vargas»; an
+   Assistant's class detail («Entrenadora» row, 36 px) and a client's
+   (Lucía) class detail Instructora row show it too, or her initials without
+   one. Class rows name her without any face (owner's pick C, 2026-11-20):
+   «Emma Vargas · 50 min» in the client's **Reservar**, her name in **Mis
+   reservas** cards and **Historial**, and in the Staff app's **Horario**,
+   **Hoy**, the Assistant's class list and the reschedule options.
 E. **The API.** `PUT /api/v1/staff-members/current/photo`, `PUT` and
    `DELETE /api/v1/administrator/staff-members/{id}/photo` (Administrator and
    Coordinator; anyone else `403 staff_access_denied`, a deactivated member
@@ -10998,7 +11005,7 @@ D. **Horario (pick A, cancellations at the end).** As Camila (and as Ana),
    **Horario** on today: «1 clase hoy» (another day reads «Jueves 19 de
    noviembre · 6 clases»), one plain Lino card per class for every role: the
    start in Lora, «N de M lugares» or «M de M · lleno» in grey, «class ·
-   Trainer» after her face, «50 min» (plus «· N en espera» when any). The
+   Trainer» (no face, pick C), «50 min» (plus «· N en espera» when any). The
    cancelled classes fold into one line at the end, «3 canceladas por
    mínimo» with **Ver ▾**; it opens the dashed cancelled rows with their
    cause. Mixed causes read «3 canceladas». A day where every class was
