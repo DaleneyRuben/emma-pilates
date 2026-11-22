@@ -114,8 +114,8 @@ price or the launch discount**, because the offer is temporary (owner,
 
 The App Store sizes come from the same captures: `graphics/apple/iphone-6.9/`
 (1320 × 2868) and `graphics/apple/ipad-13/` (2064 × 2752), one folder per app
-([app-store.md](./app-store.md)); only Staff uses its iPad set, since Emma
-Pilates is an iPhone app on iOS.
+([app-store.md](./app-store.md)); App Store Connect takes only the Emma Pilates
+iPhone set, since the client is an iPhone app and Staff goes out ad hoc.
 
 **To make them again** after a screen changes:
 

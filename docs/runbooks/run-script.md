@@ -80,7 +80,8 @@ both.
 
 Params: `{"clientEmail": "revision-play@emmapilatesstudio.com",
 "trainerEmail": "revision-staff@emmapilatesstudio.com"}`, and optionally
-`"endsOn": "2027-01-31"`.
+`"endsOn": "2027-01-31"`. After the production reset (REL-019) the Client
+Account is `revision-tiendas@emmapilatesstudio.com` for both stores.
 
 Each run gives both Accounts new passwords and logs them once, in
 `store_review_account_ready` lines; copy them into Play Console → App content

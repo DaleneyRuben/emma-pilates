@@ -87,7 +87,7 @@ pilates,clases,reservas,horario,estudio,bienestar,reformer,entrenamiento,salud
 | Privacy | `https://app.emmapilatesstudio.com/privacidad` |
 | Marketing | `https://app.emmapilatesstudio.com` |
 
-**Screenshots:** ready in `graphics/apple/iphone-6.9/<app>/` (1320 × 2868), five per app, made with the Play set ([play-listings.md](./play-listings.md#graphics)). Emma Pilates is an iPhone app (`supportsTablet: false`, 2026-11-22): on an iPad it runs in iPhone mode, upright, because its screens are drawn for a phone and turn to landscape on an iPad otherwise; App Store Connect then asks for no iPad screenshots, so `graphics/apple/ipad-13/client/` is not uploaded. Emma Staff keeps iPad support, since it goes out ad hoc (REL-017).
+**Screenshots:** ready in `graphics/apple/iphone-6.9/<app>/` (1320 × 2868), five per app (only Emma Pilates is uploaded; Staff goes out ad hoc), made with the Play set ([play-listings.md](./play-listings.md#graphics)). Emma Pilates is an iPhone app (`supportsTablet: false`, 2026-11-22): on an iPad it runs in iPhone mode, upright, because its screens are drawn for a phone and turn to landscape on an iPad otherwise; App Store Connect then asks for no iPad screenshots, so `graphics/apple/ipad-13/client/` is not uploaded. Emma Staff keeps iPad support, since it goes out ad hoc (REL-017).
 
 ### Review notes, to paste
 

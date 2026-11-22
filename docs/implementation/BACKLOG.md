@@ -1468,7 +1468,7 @@ Acceptance criteria: the iOS dev builds receive a real push through APNs, and
 #### REL-016 · Store-review Accounts
 
 - Two Accounts on our domain, never a real person's:
-  - `revision-tiendas@`: a Client with an active `store_review` Plan of 8 classes, renewed before each review.
+  - `revision-tiendas@`: a Client with an active `store_review` Plan of 16 classes, renewed before each review.
   - `revision-staff@`: a Trainer with no Sessions.
 - The review notes explain the 2.5 h rule and that a booking is for a real class: please cancel it after testing. An operational step cancels any booking the reviewer leaves behind.
 - REL-005 (Play) moves to these Accounts.
