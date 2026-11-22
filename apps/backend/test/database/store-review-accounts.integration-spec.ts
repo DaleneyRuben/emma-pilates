@@ -144,11 +144,25 @@ describe('the store-review Accounts script (REL-016)', () => {
 
   it('gives fresh passwords on a rerun without new Accounts or a second Plan', async () => {
     const before = await accountOf(clientEmail);
+    // Accounts made before the rename still carry the Play reviewer's name.
+    await world.prisma.client.update({
+      where: { id: before!.client!.id },
+      data: { name: 'Revisión Google Play' },
+    });
 
     const logged = await run({ clientEmail, trainerEmail });
 
     const after = await accountOf(clientEmail);
     expect(after!.client!.id).toBe(before!.client!.id);
+    expect(after!.client!.name).toBe('Revisión tienda');
+    expect(
+      (
+        await world.prisma.account.findFirstOrThrow({
+          where: { email: trainerEmail },
+          select: { staffMember: { select: { name: true } } },
+        })
+      ).staffMember!.name,
+    ).toBe('Revisión tienda');
     expect(after!.passwordHash).not.toBe(before!.passwordHash);
     expect(
       await verifyPassword(
