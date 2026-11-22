@@ -3,7 +3,7 @@ import { parseStudioParams } from './params';
 const ana = { email: ' Ana@Example.com ', name: ' Ana ', phone: '7123 4567' };
 
 describe('the Android closed-test studio params', () => {
-  it('needs nothing: the studio comes first, the testers later', () => {
+  it('needs nothing, and its staff names never say «prueba»', () => {
     const parsed = parseStudioParams({});
 
     expect(parsed.administratorName).toBe('Emma Pilates Studio');
@@ -12,29 +12,17 @@ describe('the Android closed-test studio params', () => {
     expect(
       parsed.staff.map((member) => [member.email, member.name, member.role]),
     ).toEqual([
-      [
-        'emmapilatesstudio+instructora1@gmail.com',
-        'Instructora 1 (prueba)',
-        'trainer',
-      ],
-      [
-        'emmapilatesstudio+instructora2@gmail.com',
-        'Instructora 2 (prueba)',
-        'trainer',
-      ],
-      [
-        'emmapilatesstudio+asistente@gmail.com',
-        'Asistente (prueba)',
-        'assistant',
-      ],
+      ['emmapilatesstudio+instructora1@gmail.com', 'Instructora 1', 'trainer'],
+      ['emmapilatesstudio+instructora2@gmail.com', 'Instructora 2', 'trainer'],
+      ['emmapilatesstudio+asistente@gmail.com', 'Asistente', 'assistant'],
       [
         'emmapilatesstudio+coordinadora@gmail.com',
-        'Coordinadora (prueba)',
+        'Coordinadora',
         'coordinator',
       ],
       [
         'emmapilatesstudio+nutricionista@gmail.com',
-        'Nutricionista (prueba)',
+        'Nutricionista',
         'nutritionist',
       ],
     ]);
