@@ -170,7 +170,7 @@ describe('the Android closed-test studio script', () => {
       ],
     ]);
     expect(staff.every((account) => account.activatedAt === null)).toBe(true);
-    expect(staff[2].staffMember!.name).toBe('Instructora 1 (prueba)');
+    expect(staff[2].staffMember!.name).toBe('Instructora 1');
     expect(staff[2].staffMember!.phone).toMatch(/^\+591 [67]\d{7}$/);
     expect(
       await prisma.auditRecord.count({

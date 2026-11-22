@@ -70,14 +70,18 @@ Makes the Accounts Apple's and Google's reviewers sign in with, both marked
 
 It refuses with `no_upcoming_sessions` (dry run too) while no scheduled
 class lies ahead, since a reviewer who cannot book rejects the app. A rerun
-renames Accounts made under the old «Revisión Google Play», but a courtesy
-Subscription still active keeps the Plan name it was granted with («Acceso
-de prueba» before 2026-11-22) until it ends; after the production reset
-(REL-019) every grant carries the new name.
+renames Accounts made under the old «Revisión Google Play», and renames the
+reviewer's own courtesy Subscription and the hidden Plan still called
+«Acceso de prueba» (granted before 2026-11-22) to «Plan de cortesía», with a
+`store_review_plan_renamed` line. Its Bs 0 Payment in «Mis pagos» keeps the
+old name, since the database never lets a Payment snapshot change, and so do
+the closed-test testers' Subscriptions; the production reset (REL-019) clears
+both.
 
 Params: `{"clientEmail": "revision-play@emmapilatesstudio.com",
 "trainerEmail": "revision-staff@emmapilatesstudio.com"}`, and optionally
-`"endsOn": "2027-01-31"`.
+`"endsOn": "2027-01-31"`. After the production reset (REL-019) the Client
+Account is `revision-tiendas@emmapilatesstudio.com` for both stores.
 
 Each run gives both Accounts new passwords and logs them once, in
 `store_review_account_ready` lines; copy them into Play Console → App content
@@ -113,7 +117,9 @@ What it makes, skipping whatever already exists:
    email: `emmapilatesstudio+instructora1@gmail.com` and `+instructora2`
    (Trainers), `+asistente` (Assistant), `+coordinadora` (Coordinator, every
    Branch), `+nutricionista` (Nutritionist), all at Achumani. Names are
-   «Instructora 1 (prueba)» and so on, phones the placeholders
+   «Instructora 1», «Instructora 2», «Asistente», «Coordinadora», and
+   «Nutricionista» (before 2026-11-22 they ended in «(prueba)»: rename those
+   on the admin web, see [After the test](#after-the-test)), phones the placeholders
    `+591 70000001` to `+591 70000005`, unless `staff` gives them. The
    Nutritionist publishes Monday to Saturday, 10:00 to 12:00. Pay rates and
    the evaluation price (Bs 70, Bs 50 to her) are the migrations' defaults;
@@ -206,6 +212,11 @@ anything is written.
 A link lasts 7 days; the pending Account 30.
 
 ### After the test
+
+Until the reset, rename the five staff Accounts of a run made before
+2026-11-22, because Trainer names show on every class a reviewer sees: admin
+web › **Equipo** › each «… (prueba)» member › edit the name (the real person's
+name, or the default without «(prueba)») › save.
 
 Restore the minimum of Bookings: admin web › **Reglas del estudio** ›
 **Mínimo de reservas por clase** › 2 › **Guardar cambios** (the `previous`

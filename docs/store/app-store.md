@@ -87,7 +87,7 @@ pilates,clases,reservas,horario,estudio,bienestar,reformer,entrenamiento,salud
 | Privacy | `https://app.emmapilatesstudio.com/privacidad` |
 | Marketing | `https://app.emmapilatesstudio.com` |
 
-**Screenshots:** ready in `graphics/apple/iphone-6.9/<app>/` (1320 × 2868) and `graphics/apple/ipad-13/<app>/` (2064 × 2752), five per app, made with the Play set ([play-listings.md](./play-listings.md#graphics)).
+**Screenshots:** ready in `graphics/apple/iphone-6.9/<app>/` (1320 × 2868), five per app (only Emma Pilates is uploaded; Staff goes out ad hoc), made with the Play set ([play-listings.md](./play-listings.md#graphics)). Emma Pilates is an iPhone app (`supportsTablet: false`, 2026-11-22): on an iPad it runs in iPhone mode, upright, because its screens are drawn for a phone and turn to landscape on an iPad otherwise; App Store Connect then asks for no iPad screenshots, so `graphics/apple/ipad-13/client/` is not uploaded. Emma Staff keeps iPad support, since it goes out ad hoc (REL-017).
 
 ### Review notes, to paste
 
@@ -126,7 +126,9 @@ No location, contacts, health data, browsing history, or usage analytics.
    instructors: no «(prueba)» staff names from the Android closed test. The
    reset also matters for the reviewer Account: a courtesy grant made before
    2026-11-22 keeps the name «Acceso de prueba» until it ends.
-2. Run `store-review-accounts`; it refuses (`no_upcoming_sessions`) while the
+2. Run `store-review-accounts` with `revision-tiendas@emmapilatesstudio.com`
+   as `clientEmail` (the review notes' address) and update Play Console's
+   App access to the same Account; it refuses (`no_upcoming_sessions`) while the
    schedule has no class ahead. Check by hand that the next two weeks have
    classes with free places, and name those days in the review notes.
 

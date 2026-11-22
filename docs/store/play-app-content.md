@@ -33,10 +33,10 @@ instructions» once per app:
 
 | Field | Client app | Staff app |
 | --- | --- | --- |
-| Name | `Revisión Google Play` | `Revisión Google Play` |
-| Username | `revision-play@emmapilatesstudio.com` | `revision-staff@emmapilatesstudio.com` |
+| Name | `Revisión tienda` | `Revisión tienda` |
+| Username | `revision-play@emmapilatesstudio.com` until the production reset, then `revision-tiendas@emmapilatesstudio.com` (the App Store's) | `revision-staff@emmapilatesstudio.com` |
 | Password | from the Run Script job log, typed only into this form, never stored in the repository | same |
-| Other information | «Inicia sesión con este correo y contraseña. La cuenta tiene un plan de prueba de 16 clases, otorgado por la administración, así que puedes reservar una clase, ver Mi plan y el perfil.» | «Inicia sesión con este correo y contraseña. La cuenta es de una instructora de prueba sin clases asignadas.» |
+| Other information | «Inicia sesión con este correo y contraseña. La cuenta tiene un plan de cortesía de 16 clases presenciales, otorgado por la administración, así que puedes reservar una clase en el horario, ver Mi plan, Mis reservas y Perfil (con Soporte, Política de privacidad y Cerrar mi cuenta). Por favor cancela la reserva después de probar: es una clase real del estudio.» | «Inicia sesión con este correo y contraseña. Es una app interna del equipo del estudio; las cuentas las crea la administración. La cuenta es de una instructora sin clases asignadas, así que la Agenda aparece vacía: puedes ver Agenda, Mis pagos, Notificaciones y Perfil (foto, código de referidos, Soporte y Política de privacidad).» |
 | Login needed every time | No (the session stays signed in) | No |
 
 The reviewer Accounts are made for Google, never a real person's, by the

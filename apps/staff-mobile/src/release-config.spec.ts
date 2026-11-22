@@ -123,19 +123,27 @@ describe("staff release configuration", () => {
     expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
   });
 
-  // FIX-011: Staff photographs transfer receipts (front-desk), so the plugin
-  // asks for the camera and the photo library in Spanish and never the mic.
+  // FIX-011: Staff photographs transfer receipts, invoices, the payout QR, and
+  // the profile photo; App Review 5.1.1 wants the texts to name every use.
   it("asks for the camera and photos in Spanish, never the microphone", () => {
     expect(appConfig.expo.plugins).toContainEqual([
       "expo-image-picker",
       {
         cameraPermission:
-          "Permite que Emma Pilates Staff tome fotos de los comprobantes de transferencia.",
+          "Permite que Emma Pilates Staff tome fotos de comprobantes de pago, facturas, tu QR de cobro y tu foto de perfil.",
         photosPermission:
-          "Permite que Emma Pilates Staff elija fotos de los comprobantes de transferencia.",
+          "Permite que Emma Pilates Staff elija fotos de comprobantes de pago, facturas, tu QR de cobro y tu foto de perfil.",
         microphonePermission: false,
       },
     ]);
+  });
+
+  // Expo's template asks to draw over other apps; neither app needs it, and
+  // Play lists it to reviewers as a special permission.
+  it("never asks to draw over other apps", () => {
+    expect(appConfig.expo.android.blockedPermissions).toContain(
+      "android.permission.SYSTEM_ALERT_WINDOW",
+    );
   });
 
   it("submits only the production profile", () => {

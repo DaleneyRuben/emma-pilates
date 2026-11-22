@@ -182,6 +182,50 @@ describe('the store-review Accounts script (REL-016)', () => {
     ).toBe(2);
   });
 
+  it('renames on a rerun the reviewer courtesy Plan still called «Acceso de prueba»', async () => {
+    const reviewer = await accountOf(clientEmail);
+    const clientId = reviewer!.client!.id;
+    const { planId } = await world.prisma.subscription.findFirstOrThrow({
+      where: { clientId },
+      select: { planId: true },
+    });
+    // A grant made before 2026-11-22 carries the old name. Payments keep
+    // their snapshot (the database refuses to change it).
+    await world.prisma.plan.update({
+      where: { id: planId },
+      data: { name: 'Acceso de prueba' },
+    });
+    await world.prisma.subscription.updateMany({
+      where: { clientId },
+      data: { planNameSnapshot: 'Acceso de prueba' },
+    });
+    const lucia = await accountOf('lucia@example.com');
+    const luciaSubscriptions = await world.prisma.subscription.findMany({
+      where: { clientId: lucia!.client!.id },
+      select: { id: true, planNameSnapshot: true },
+    });
+
+    await run({ clientEmail, trainerEmail });
+
+    expect(
+      await world.prisma.subscription.findMany({
+        where: { clientId },
+        select: { planNameSnapshot: true },
+      }),
+    ).toEqual([{ planNameSnapshot: 'Plan de cortesía' }]);
+    expect(
+      (await world.prisma.plan.findUniqueOrThrow({ where: { id: planId } }))
+        .name,
+    ).toBe('Plan de cortesía');
+    // Only the reviewer's own rows: a Client's history keeps its snapshot.
+    expect(
+      await world.prisma.subscription.findMany({
+        where: { clientId: lucia!.client!.id },
+        select: { id: true, planNameSnapshot: true },
+      }),
+    ).toEqual(luciaSubscriptions);
+  });
+
   it('never takes over an Account of the wrong kind', async () => {
     await expect(
       run({ clientEmail, trainerEmail: 'lucia@example.com' }),

@@ -47,7 +47,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "versionCode": 3
+      "versionCode": 3,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -84,8 +87,8 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Permite que Emma Pilates Staff tome fotos de los comprobantes de transferencia.",
-          "photosPermission": "Permite que Emma Pilates Staff elija fotos de los comprobantes de transferencia.",
+          "cameraPermission": "Permite que Emma Pilates Staff tome fotos de comprobantes de pago, facturas, tu QR de cobro y tu foto de perfil.",
+          "photosPermission": "Permite que Emma Pilates Staff elija fotos de comprobantes de pago, facturas, tu QR de cobro y tu foto de perfil.",
           "microphonePermission": false
         }
       ],
