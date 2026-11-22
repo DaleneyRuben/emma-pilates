@@ -107,8 +107,9 @@ developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
   `android.hardware.wifi` (from netinfo's `ACCESS_WIFI_STATE`) as
   `required="false"` in both apps, starting with 1.2.1. When a new
   permission makes Play warn that a feature limits compatible devices, add
-  that feature to the plugin's list. A new feature in the list is a native
-  change and needs a store build.
+  that feature to the plugin's list. Changing the list changes the
+  fingerprint on both platforms (the plugin is hashed for iOS too, though it
+  does nothing there), so it needs a store build of iOS and Android.
 
 ## Confirm a Client's email by hand (fallback)
 
