@@ -4,6 +4,12 @@ Answers for Play Console → each app → Policy and programs → App content. T
 answers are the same for both apps unless a row says otherwise. Data safety
 has its own page: [play-data-safety.md](./play-data-safety.md).
 
+Re-checked against `main` on 2026-11-22: every declaration below still holds.
+The Staff app's new camera, photo, and PDF uploads (receipts, invoices, profile
+photo, payout QR) go only to the studio, so «users interact» stays **No**; no
+ad, analytics, or advertising-ID SDK was added; Plans are still paid outside
+the app.
+
 ## Declarations
 
 | Section | Answer | Why |

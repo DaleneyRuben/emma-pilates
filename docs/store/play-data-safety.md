@@ -2,10 +2,15 @@
 
 Answers for Play Console → each app → Policy and programs → App content →
 Data safety. They come from an audit of the code on 2026-10-19 (both apps and
-`packages/mobile-core`), not from the proposals, and they match the privacy
-policy (`apps/public-site/privacidad/index.html`) and ADR-0081's telemetry
-rules. Re-check them whenever an app starts sending a new kind of data; PAY-007
-(2026-10-23) added Invoice Data, see [Deletion and retention](#deletion-and-retention).
+`packages/mobile-core`), not from the proposals, and they match ADR-0081's
+telemetry rules. Re-check them whenever an app starts sending a new kind of
+data; PAY-007 (2026-10-23) added Invoice Data, see [Deletion and retention](#deletion-and-retention).
+
+**Re-audited 2026-11-22 against `main` (`c5f726ed`).** The Staff app now
+uploads photos and PDF files and the Client app sends more free text and the
+registration channel; see [Changes since 2026-10-24](#changes-since-2026-10-24)
+for the evidence and the exact form edits. The privacy policy was updated the
+same day to match: see [Privacy policy gaps](#privacy-policy-gaps).
 
 Play counts data as **collected** when the app sends it off the device. Data
 the app only downloads and shows (a Staff Member viewing a receipt) is not
@@ -34,13 +39,13 @@ ephemerally: no**.
 | --- | --- | --- | --- |
 | Personal info → Name | Registration and profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → Email address | Login, verification, recovery; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
-| Personal info → User IDs | Referral code entered at registration | Optional | App functionality |
-| Personal info → Phone number | Profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
-| Personal info → Other info | Invoice Data on a purchase (PAY-007): the NIT or CI and the name or business name for the studio's invoice, prefilled from her last purchase; «Sin factura» sends none | Optional | App functionality |
+| Personal info → User IDs | Referral code entered at registration; her own referral code, which she can change in Mis referidos | Optional | App functionality |
+| Personal info → Phone number | Registration (required since FIX-037) and profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
+| Personal info → Other info | «¿Cómo nos conociste?» at registration (BKM-011, the app requires an answer); Invoice Data on a purchase (PAY-007): the NIT or CI and the name or business name for the studio's invoice, prefilled from her last purchase; «Sin factura» sends none | Required (the channel) | App functionality, Analytics |
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
-| Photos and videos → Photos | Profile photo and transfer receipt, picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
-| App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments | Required | App functionality |
-| App activity → Other user-generated content | The text of «Enviar comentarios» (REL-012), with its type (Problema, Sugerencia, Otro); no screenshots | Optional | App functionality (fixing and improving the apps) |
+| Photos and videos → Photos | Profile photo and transfer receipt (for a Plan or an Evaluation), picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
+| App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments, Plan freeze requests | Required | App functionality |
+| App activity → Other user-generated content | The text of «Enviar comentarios» (REL-012), with its type (Problema, Sugerencia, Otro), no screenshots; the «Motivo» of a Plan freeze request (up to 300 characters) | Optional | App functionality (fixing and improving the apps, reviewing a freeze) |
 | App info and performance → Crash logs | Sanitized exception type and stack (Better Stack) | Required | App functionality (diagnosing errors) |
 | App info and performance → Diagnostics | App release and build number on crash reports; the app version, build, platform, and OS version sent with «Enviar comentarios» | Required | App functionality |
 | Device or other IDs → Device or other IDs | Random installation ID and Expo push token | Required | App functionality (push notifications), Fraud prevention, security, and compliance (sign-in throttling) |
@@ -54,16 +59,21 @@ Members send:
 | --- | --- | --- | --- |
 | Personal info → Name | A Client's name when the Assistant creates the Account | Required for that feature | App functionality, Account management |
 | Personal info → Email address | Login; a Client's email when the Assistant invites them | Required | App functionality, Account management |
-| Personal info → Phone number | A Client's phone, entered by the Assistant | Optional | App functionality, Account management |
-| Personal info → Other info | A Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a cash sale (PAY-007) | Optional | App functionality |
-| Financial info → Purchase history | Cash Payments recorded by the Assistant, transfer approvals and rejection reasons by the Administrator | Required for those Roles | App functionality |
-| App activity → Other actions | Attendance, Bookings made for Clients, the Nutritionist's availability | Required | App functionality |
-| App activity → Other user-generated content | as in the Client app («Enviar comentarios») | Optional | App functionality |
+| Personal info → Phone number | A Client's phone, which the Assistant must enter when creating the Account (FIX-037) | Required for that feature | App functionality, Account management |
+| Personal info → User IDs | **New 2026-11-22.** The Staff Member's own referral code, which she can change (Perfil → código de referido); a Client's referral code the Assistant types when creating her Account | Optional | App functionality |
+| Personal info → Other info | A Client's «¿Cómo nos conoció?» when the Assistant creates the Account (required on that screen); a Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a sale (PAY-007) | Required for that feature | App functionality, Analytics |
+| Financial info → User payment info | **New 2026-11-22.** The Staff Member's bank payment QR (FIX-072, upload purpose `payout_qr`), so the studio can pay her salary; the image encodes her bank account | Optional | App functionality |
+| Financial info → Purchase history | Payments recorded by the Assistant (cash or a transfer receipt she photographs), transfer approvals and rejection reasons by the Administrator | Required for those Roles | App functionality |
+| Photos and videos → Photos | **New 2026-11-22.** Her profile photo (FIX-041, gallery); a transfer receipt at the front desk, the photo of an issued invoice (FIX-044), and her payout QR, each from the camera or the gallery | Optional | App functionality |
+| Files and docs → Files and docs | **New 2026-11-22.** An issued invoice as a PDF picked from the phone's files (FIX-049, `expo-document-picker`) | Optional | App functionality |
+| App activity → Other actions | Attendance, Bookings made for Clients, the Nutritionist's availability, cash closes, equipment fault reports, freeze approvals and refusals | Required | App functionality |
+| App activity → Other user-generated content | as in the Client app («Enviar comentarios»); the description of an equipment fault (up to 500 characters), the note on a cash close, and the message on a freeze refusal | Optional | App functionality |
 | App info and performance → Crash logs | as in the Client app | Required | App functionality |
 | App info and performance → Diagnostics | as in the Client app | Required | App functionality |
 | Device or other IDs → Device or other IDs | Installation ID and push token | Required | App functionality, Fraud prevention, security, and compliance |
 
-The Staff app uploads no photos.
+Until 2026-11 the Staff app uploaded no photos; it now uploads photos and
+PDFs (see [Changes since 2026-10-24](#changes-since-2026-10-24)).
 
 «Enviar comentarios» (REL-012) adds the **Other user-generated content**
 rows and widens **Diagnostics**: the OS version travels with a comment, never
@@ -77,9 +87,13 @@ Update the Play form for both apps with REL-004 before the next store build.
 
 Location, contacts, health and fitness data (Evaluations are appointments
 only: no measurements, results, or notes exist in the schema), messages, audio,
-files and documents, calendar, web browsing, installed apps, search history
-kept on the server, payment card or bank account numbers, advertising ID,
-analytics. Crash reports drop the message, user, device and OS contexts,
+video, calendar, web browsing, installed apps, search history kept on the
+server, payment card numbers, advertising ID, and no analytics or ads SDK.
+The Client app collects no files or documents and no bank account data; the
+Staff app does (invoice PDFs, the payout QR). A Client downloading her
+invoice in «Mis facturas», or a Staff Member viewing a salary receipt, only
+receives data. The clipboard (`expo-clipboard`) is only written to, to copy a
+referral code. Crash reports drop the message, user, device and OS contexts,
 breadcrumbs, and request (`packages/mobile-core/src/monitoring/error-reporting.ts`).
 
 ## Deletion and retention
@@ -133,30 +147,102 @@ The form's «delete» answers are **Yes** with the deletion URL above.
 
 ## Added since the 2026-10-19 draft
 
-Paste these when the forms are filled. None of them changes a declaration
-already made; each adds a data type the closed-test build collects.
+These three were folded into the tables above; this note keeps why each type
+was chosen. An earlier draft of this section named different types; the tables
+are the answer to enter.
 
-**Feedback text (REL-012, «Enviar comentarios»).** Both apps. Data type
-**Other user-generated content**, collected, not shared. Purposes: App
-functionality (the studio reads it to fix the app) and Account management
-(the Administrator triages it). Optional: a person can use the app without
-sending any. The text, the app version, and the device kind are kept while
-the Account is open and erased with it on closure. It is not used for
+**Feedback text (REL-012, «Enviar comentarios»).** Both apps: **App activity →
+Other user-generated content**, optional, App functionality. The text, the app
+version, and the device kind are kept while the Account is open; a Client's
+stays under the anonymised Account after closure (see above). Never used for
 advertising.
 
-**NIT or CI and business name (PAY-007, invoice data).** Client app, and the
-Staff app when the Assistant records a sale. Data type **Other financial
-info**, collected, not shared. Purpose: Account management and Fraud
-prevention, security, and compliance (the studio issues the invoice outside
-the app). Optional: «Sin factura» records the sale with none. Closing the
-Account erases the NIT or CI and the name and keeps the mark that an invoice
-was issued, which the accounting record needs.
+**NIT or CI and business name (PAY-007, Invoice Data).** Both apps: **Personal
+info → Other info**, optional, App functionality only (see [Deletion and
+retention](#deletion-and-retention)). Play's «Other financial info» was
+considered and not used: the NIT or CI identifies the buyer for the invoice
+and carries no account, balance, or credit data.
 
-**How she found the studio (BKM-011).** Client app, at registration. Data
-type **Other info**, collected, not shared. Purpose: App functionality and
-Analytics (the studio counts where new Clients come from; no third party
-receives it). Required on new registrations. It stays with the accounting
-record after closure, like the Payments.
+**How she found the studio (BKM-011, «¿Cómo nos conociste?»).** Client app at
+registration, and the Staff app when the Assistant creates a Client's Account:
+also **Personal info → Other info**, which makes that type **required** in the
+Client app (the registration screen will not submit without an answer,
+`packages/mobile-core/src/auth/registration-screen.tsx`) and adds the
+**Analytics** purpose in both (the Administrator counts where new Clients come
+from on the admin web; no third party receives it, and no analytics SDK is
+involved). It stays with the accounting record after closure, like the
+Payments.
+
+## Changes since 2026-10-24
+
+Audit of `main` at `c5f726ed` (2026-11-22) against the answers entered on
+2026-10-24. Libraries added since then: `expo-clipboard` (both apps, write
+only), `expo-constants` (Client), `expo-document-picker`, `expo-image-picker`
+with the camera, `expo-image-manipulator`, `expo-file-system`,
+`@react-navigation/bottom-tabs` and `react-native-svg` (Staff). Only the
+pickers lead to new data leaving the phone. No new
+third-party SDK that collects data on its own: Sentry (`@sentry/react-native`,
+sending to Better Stack) was already declared, and its settings are unchanged
+(`packages/mobile-core/src/monitoring/error-reporting.ts`: `sendDefaultPii:
+false`, no session tracking, no screenshots, `beforeSend` sanitizer). Upload
+purposes on the API are now `profile_photo`, `transfer_receipt`, `promotion`
+(admin web only), `invoice` (PDF, JPEG, PNG), and `payout_qr`
+(`apps/backend/src/uploads/image-purpose.ts`).
+
+### Client app
+
+| Change | Evidence | Form edit |
+| --- | --- | --- |
+| Phone became required at registration (FIX-037) | `phoneProblem` in `packages/mobile-core/src/account/phone-number.ts` returns «Escribe tu número» when empty; used by `registration-screen.tsx`; the API DTO says current builds require it | **Phone number**: change **Optional → Required** |
+| The registration channel was described below the tables but missing from the **Other info** row | `packages/mobile-core/src/acquisition/acquisition-channel-field.tsx`, required in `registration-screen.tsx` | **Other info**: make it **Required**, add **Analytics** (keep App functionality) |
+| Freeze request with a required free-text «Motivo» (300 characters) | `apps/client-mobile/src/subscription/freeze-plan-screen.tsx` | none: **Other user-generated content** is already ticked, optional, App functionality |
+| She can change her own referral code | `packages/mobile-core/src/acquisition/own-referral-code.tsx` (`EditReferralCode`), used by `apps/client-mobile/src/payments/referral-code-card.tsx` | none: **User IDs** is already ticked |
+| «Mis facturas»: downloads and shares the studio's invoice | `apps/client-mobile/src/invoices/` | none: only received |
+| Evaluation paid by transfer uploads a receipt | `apps/client-mobile/src/evaluations/use-evaluation-commands.ts` (`transfer_receipt`) | none: **Photos** is already ticked |
+
+### Staff app
+
+| Change | Evidence | Form edit |
+| --- | --- | --- |
+| Staff profile photo (FIX-041) | `apps/staff-mobile/src/profile/staff-photo-summary.tsx` (`profile_photo`) | tick **Photos and videos → Photos** |
+| Front-desk transfer receipt, camera or gallery | `apps/staff-mobile/src/assistant/front-desk-receipt-upload.ts` (`transfer_receipt`), camera permission in `apps/staff-mobile/app.json` | same **Photos** row |
+| «Facturas por subir»: the issued invoice as a photo (FIX-044) or a PDF (FIX-049) | `apps/staff-mobile/src/invoices/invoice-screen.tsx` (`invoice`), `apps/staff-mobile/src/uploads/document-upload.ts` | same **Photos** row, and tick **Files and docs → Files and docs** |
+| Payout QR (FIX-072) | `apps/staff-mobile/src/profile/payout-qr/use-save-payout-qr.ts` (`payout_qr`) | same **Photos** row, and tick **Financial info → User payment info** |
+| Her own referral code, changeable; a Client's code at Account creation | `apps/staff-mobile/src/profile/staff-referral-code-screen.tsx`, `apps/staff-mobile/src/assistant/new-client-screen.tsx` | tick **Personal info → User IDs** |
+| The Assistant must enter a Client's phone (FIX-037) | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`phoneProblem(..., "theirs")`) | **Phone number**: change **Optional → Required** |
+| A Client's registration channel at Account creation, required on that screen | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`ChannelGrid`, save blocked while empty) | **Other info**: add **Analytics**, and make it **Required** like Name and Phone |
+| Equipment fault description (500 characters), cash close note, freeze refusal message | `apps/staff-mobile/src/trainer/report-fault-screen.tsx`, `src/cash-close/cash-close-form.tsx`, `src/administrator/refuse-freeze-step.tsx` | none: **Other user-generated content** is already ticked |
+
+Every new row is **collected**, **not shared**, **not processed ephemerally**,
+**optional**, purpose **App functionality** only. The payout QR is an image the
+API stores without decoding it, but it carries the account the studio pays
+into, so «User payment info» is declared rather than left to «Photos» alone:
+over-declaring costs nothing, under-declaring is a rejection reason. The
+invoice files are the studio's own documents, yet the Staff app sends them
+off the device, so Play counts them as collected.
+
+## Privacy policy gaps
+
+Play compares the Data safety form with the privacy policy. The audit found
+that `apps/public-site/privacidad/index.html` did not cover the Staff
+additions: «Si eres parte del equipo» named no profile photo, invoice files,
+or payout QR, and «Permisos del teléfono» said the app «no usa la cámara»,
+false for the Staff app since FIX-044. It also omitted the freeze «Motivo»,
+fault reports and cash close notes, and the registration channel. Fixed on
+2026-11-22 (page dated 22/11/2026): the page now lists them and says the
+camera and file picker are Staff-only. The iOS camera and photos permission
+texts in `apps/staff-mobile/app.json` still mention only transfer receipts,
+not invoices or the payout QR; Android never shows them, so Play is
+unaffected, but they should be widened with the next store build (PR #366
+owns that file now).
+
+Retention, added the same day: invoice files stay with their Payment as
+accounting records; a Staff Member's data and photo stay while her Staff
+Account exists, and her payout QRs, past ones included, stay with the salary
+payments made to them. Deactivating a Staff Account erases nothing today
+(`apps/backend/src/booking/staff/` only sets `disabledAt`). That matches Play
+for accounts the studio creates, but whether deactivation should erase the
+photo and payout QR is an open decision for the owner.
 
 ## Related gaps found by the audit
 
