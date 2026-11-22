@@ -53,7 +53,7 @@ describe("Plan detail «Qué incluye» and the Branches", () => {
     const screen = await openPlanDetail([branch("b-1", "Achumani")]);
 
     await waitFor(() => {
-      expect(screen.getByText("24 clases")).toBeOnTheScreen();
+      expect(screen.getByText("24 clases presenciales")).toBeOnTheScreen();
     });
     expect(screen.queryByText(/cualquier sucursal/)).toBeNull();
   });
@@ -62,7 +62,7 @@ describe("Plan detail «Qué incluye» and the Branches", () => {
     const screen = await openPlanDetail([branch("b-1", "Achumani"), branch("b-2", "Sopocachi")]);
 
     await waitFor(() => {
-      expect(screen.getByText("24 clases en cualquier sucursal")).toBeOnTheScreen();
+      expect(screen.getByText("24 clases presenciales en cualquier sucursal")).toBeOnTheScreen();
     });
   });
 });
