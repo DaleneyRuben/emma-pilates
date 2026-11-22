@@ -14,6 +14,12 @@ describe("client release configuration", () => {
     expect(appConfig.expo.runtimeVersion).toEqual({ policy: "fingerprint" });
   });
 
+  // App Store Connect asks about export compliance on every build unless the
+  // binary says it uses only the system's standard HTTPS.
+  it("declares that it uses no non-exempt encryption", () => {
+    expect(appConfig.expo.ios.config).toEqual({ usesNonExemptEncryption: false });
+  });
+
   it("is linked to its own EAS project in the studio's Expo organization", () => {
     expect(appConfig.expo).toMatchObject({
       owner: "emma-pilates",
