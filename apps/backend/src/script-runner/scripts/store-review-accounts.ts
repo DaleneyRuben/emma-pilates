@@ -108,6 +108,8 @@ const prepareAccount = async (
   const password = randomBytes(18).toString('base64url');
   const passwordHash = await hashPassword(password);
   if (input.existing !== null) {
+    // A rerun also renames Accounts made under the old Play reviewer name.
+    const rename = { update: { name: reviewerName } };
     await prisma.account.update({
       where: { id: input.existing.id },
       data: {
@@ -115,6 +117,9 @@ const prepareAccount = async (
         passwordChangedAt: now,
         disabledAt: null,
         pendingExpiresAt: null,
+        ...(input.kind === 'client'
+          ? { client: rename }
+          : { staffMember: rename }),
       },
     });
   } else {
