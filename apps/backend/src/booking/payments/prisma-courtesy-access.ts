@@ -26,6 +26,7 @@ import {
   assertCourtesyTerm,
   courtesyAccessPlan,
   evaluateCourtesyGrant,
+  legacyCourtesyPlanName,
 } from './courtesy-access';
 import { PaymentRuleError } from './payment-errors';
 import type { PaymentView } from './prisma-payment-commands';
@@ -52,8 +53,10 @@ export type CourtesyAccessDependencies = {
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
 
-// The hidden «Acceso de prueba» Plan is made on the first grant rather than
-// seeded, so it survives the production reset (ADR-0104) without a step.
+// The hidden «Plan de cortesía» is made on the first grant rather than
+// seeded, so it survives the production reset (ADR-0104) without a step. One
+// still called «Acceso de prueba» is renamed on its next grant, so no
+// migration is needed; past Payments keep their name snapshot.
 // BKM-005 stores its catalog validity in days; the chosen end date still
 // decides the Subscription.
 const findOrCreateCourtesyPlan = async (
@@ -68,13 +71,20 @@ const findOrCreateCourtesyPlan = async (
   } as const;
   const existing = await transaction.plan.findFirst({
     where: {
-      name: courtesyAccessPlan.name,
+      name: { in: [courtesyAccessPlan.name, legacyCourtesyPlanName] },
       priceCentavos: 0,
       hiddenAt: { not: null },
     },
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     select,
   });
+  if (existing?.name === legacyCourtesyPlanName) {
+    return transaction.plan.update({
+      where: { id: existing.id },
+      data: { name: courtesyAccessPlan.name },
+      select,
+    });
+  }
   if (existing !== null) return existing;
   return transaction.plan.create({
     data: { ...courtesyAccessPlan, displayOrder: 0, hiddenAt: now },

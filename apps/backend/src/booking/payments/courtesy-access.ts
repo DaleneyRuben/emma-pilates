@@ -10,13 +10,17 @@ import {
 // Administrator grants so a closed-test tester or a store reviewer can book
 // without paying. Its catalog validity is 30 days, the day count that
 // replaced the one-month placeholder; the Subscription still ends on the
-// date the Administrator chooses.
+// date the Administrator chooses. Clients see its name on Inicio, so it never
+// says «prueba»: App Review rejects anything that reads as a trial or beta.
 export const courtesyAccessPlan = {
-  name: 'Acceso de prueba',
+  name: 'Plan de cortesía',
   classAllowance: 16,
   durationDays: 30,
   priceCentavos: 0,
 } as const;
+
+/** The name the hidden Plan had before 2026-11-22; a grant renames it. */
+export const legacyCourtesyPlanName = 'Acceso de prueba';
 
 const longestAccessDays = 365;
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
