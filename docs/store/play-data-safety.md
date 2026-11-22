@@ -40,7 +40,7 @@ ephemerally: no**.
 | Personal info → Name | Registration and profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → Email address | Login, verification, recovery; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → User IDs | Referral code entered at registration; her own referral code, which she can change in Mis referidos | Optional | App functionality |
-| Personal info → Phone number | Profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
+| Personal info → Phone number | Registration (required since FIX-037) and profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → Other info | «¿Cómo nos conociste?» at registration (BKM-011, the app requires an answer); Invoice Data on a purchase (PAY-007): the NIT or CI and the name or business name for the studio's invoice, prefilled from her last purchase; «Sin factura» sends none | Required (the channel) | App functionality, Analytics |
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
 | Photos and videos → Photos | Profile photo and transfer receipt (for a Plan or an Evaluation), picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
@@ -59,7 +59,7 @@ Members send:
 | --- | --- | --- | --- |
 | Personal info → Name | A Client's name when the Assistant creates the Account | Required for that feature | App functionality, Account management |
 | Personal info → Email address | Login; a Client's email when the Assistant invites them | Required | App functionality, Account management |
-| Personal info → Phone number | A Client's phone, entered by the Assistant | Optional | App functionality, Account management |
+| Personal info → Phone number | A Client's phone, which the Assistant must enter when creating the Account (FIX-037) | Required for that feature | App functionality, Account management |
 | Personal info → User IDs | **New 2026-11-22.** The Staff Member's own referral code, which she can change (Perfil → código de referido); a Client's referral code the Assistant types when creating her Account | Optional | App functionality |
 | Personal info → Other info | A Client's «¿Cómo nos conoció?» when the Assistant creates the Account (required on that screen); a Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a sale (PAY-007) | Optional | App functionality, Analytics |
 | Financial info → User payment info | **New 2026-11-22.** The Staff Member's bank payment QR (FIX-072, upload purpose `payout_qr`), so the studio can pay her salary; the image encodes her bank account | Optional | App functionality |
@@ -191,6 +191,7 @@ purposes on the API are now `profile_photo`, `transfer_receipt`, `promotion`
 
 | Change | Evidence | Form edit |
 | --- | --- | --- |
+| Phone became required at registration (FIX-037) | `phoneProblem` in `packages/mobile-core/src/account/phone-number.ts` returns «Escribe tu número» when empty; used by `registration-screen.tsx`; the API DTO says current builds require it | **Phone number**: change **Optional → Required** |
 | The registration channel was described below the tables but missing from the **Other info** row | `packages/mobile-core/src/acquisition/acquisition-channel-field.tsx`, required in `registration-screen.tsx` | **Other info**: make it **Required**, add **Analytics** (keep App functionality) |
 | Freeze request with a required free-text «Motivo» (300 characters) | `apps/client-mobile/src/subscription/freeze-plan-screen.tsx` | none: **Other user-generated content** is already ticked, optional, App functionality |
 | She can change her own referral code | `packages/mobile-core/src/acquisition/own-referral-code.tsx` (`EditReferralCode`), used by `apps/client-mobile/src/payments/referral-code-card.tsx` | none: **User IDs** is already ticked |
@@ -206,6 +207,7 @@ purposes on the API are now `profile_photo`, `transfer_receipt`, `promotion`
 | «Facturas por subir»: the issued invoice as a photo (FIX-044) or a PDF (FIX-049) | `apps/staff-mobile/src/invoices/invoice-screen.tsx` (`invoice`), `apps/staff-mobile/src/uploads/document-upload.ts` | same **Photos** row, and tick **Files and docs → Files and docs** |
 | Payout QR (FIX-072) | `apps/staff-mobile/src/profile/payout-qr/use-save-payout-qr.ts` (`payout_qr`) | same **Photos** row, and tick **Financial info → User payment info** |
 | Her own referral code, changeable; a Client's code at Account creation | `apps/staff-mobile/src/profile/staff-referral-code-screen.tsx`, `apps/staff-mobile/src/assistant/new-client-screen.tsx` | tick **Personal info → User IDs** |
+| The Assistant must enter a Client's phone (FIX-037) | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`phoneProblem(..., "theirs")`) | **Phone number**: change **Optional → Required** |
 | A Client's registration channel at Account creation | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`ChannelGrid`) | **Other info**: add **Analytics** |
 | Equipment fault description (500 characters), cash close note, freeze refusal message | `apps/staff-mobile/src/trainer/report-fault-screen.tsx`, `src/cash-close/cash-close-form.tsx`, `src/administrator/refuse-freeze-step.tsx` | none: **Other user-generated content** is already ticked |
 
