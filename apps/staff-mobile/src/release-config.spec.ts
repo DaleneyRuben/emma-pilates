@@ -138,6 +138,14 @@ describe("staff release configuration", () => {
     ]);
   });
 
+  // Expo's template asks to draw over other apps; neither app needs it, and
+  // Play lists it to reviewers as a special permission.
+  it("never asks to draw over other apps", () => {
+    expect(appConfig.expo.android.blockedPermissions).toContain(
+      "android.permission.SYSTEM_ALERT_WINDOW",
+    );
+  });
+
   it("submits only the production profile", () => {
     expect(Object.keys(easConfig.submit)).toEqual(["production"]);
   });

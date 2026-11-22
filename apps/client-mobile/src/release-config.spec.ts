@@ -148,6 +148,14 @@ describe("client release configuration", () => {
     expect(Object.keys(easConfig.submit)).toEqual(["production"]);
   });
 
+  // Expo's template asks to draw over other apps; neither app needs it, and
+  // Play lists it to reviewers as a special permission.
+  it("never asks to draw over other apps", () => {
+    expect(appConfig.expo.android.blockedPermissions).toContain(
+      "android.permission.SYSTEM_ALERT_WINDOW",
+    );
+  });
+
   // Its screens are drawn for a phone held upright. On an iPad it runs in
   // iPhone mode, upright, so App Review never sees a stretched or landscape
   // layout (Guideline 2.1, 4.0) and no iPad screenshots are needed.

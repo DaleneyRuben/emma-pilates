@@ -47,7 +47,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "versionCode": 3
+      "versionCode": 3,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
