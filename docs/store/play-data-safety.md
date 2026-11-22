@@ -9,8 +9,8 @@ data; PAY-007 (2026-10-23) added Invoice Data, see [Deletion and retention](#del
 **Re-audited 2026-11-22 against `main` (`c5f726ed`).** The Staff app now
 uploads photos and PDF files and the Client app sends more free text and the
 registration channel; see [Changes since 2026-10-24](#changes-since-2026-10-24)
-for the evidence and the exact form edits. The privacy policy has not caught
-up with the Staff app yet: see [Privacy policy gaps](#privacy-policy-gaps).
+for the evidence and the exact form edits. The privacy policy was updated the
+same day to match: see [Privacy policy gaps](#privacy-policy-gaps).
 
 Play counts data as **collected** when the app sends it off the device. Data
 the app only downloads and shows (a Staff Member viewing a receipt) is not
@@ -61,7 +61,7 @@ Members send:
 | Personal info → Email address | Login; a Client's email when the Assistant invites them | Required | App functionality, Account management |
 | Personal info → Phone number | A Client's phone, which the Assistant must enter when creating the Account (FIX-037) | Required for that feature | App functionality, Account management |
 | Personal info → User IDs | **New 2026-11-22.** The Staff Member's own referral code, which she can change (Perfil → código de referido); a Client's referral code the Assistant types when creating her Account | Optional | App functionality |
-| Personal info → Other info | A Client's «¿Cómo nos conoció?» when the Assistant creates the Account (required on that screen); a Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a sale (PAY-007) | Optional | App functionality, Analytics |
+| Personal info → Other info | A Client's «¿Cómo nos conoció?» when the Assistant creates the Account (required on that screen); a Client's Invoice Data (NIT or CI and name or business name) the Assistant types with a sale (PAY-007) | Required for that feature | App functionality, Analytics |
 | Financial info → User payment info | **New 2026-11-22.** The Staff Member's bank payment QR (FIX-072, upload purpose `payout_qr`), so the studio can pay her salary; the image encodes her bank account | Optional | App functionality |
 | Financial info → Purchase history | Payments recorded by the Assistant (cash or a transfer receipt she photographs), transfer approvals and rejection reasons by the Administrator | Required for those Roles | App functionality |
 | Photos and videos → Photos | **New 2026-11-22.** Her profile photo (FIX-041, gallery); a transfer receipt at the front desk, the photo of an issued invoice (FIX-044), and her payout QR, each from the camera or the gallery | Optional | App functionality |
@@ -177,8 +177,10 @@ Payments.
 
 Audit of `main` at `c5f726ed` (2026-11-22) against the answers entered on
 2026-10-24. Libraries added since then: `expo-clipboard` (both apps, write
-only), `expo-document-picker`, `expo-image-picker` with the camera,
-`@react-navigation/bottom-tabs` and `react-native-svg` (Staff). No new
+only), `expo-constants` (Client), `expo-document-picker`, `expo-image-picker`
+with the camera, `expo-image-manipulator`, `expo-file-system`,
+`@react-navigation/bottom-tabs` and `react-native-svg` (Staff). Only the
+pickers lead to new data leaving the phone. No new
 third-party SDK that collects data on its own: Sentry (`@sentry/react-native`,
 sending to Better Stack) was already declared, and its settings are unchanged
 (`packages/mobile-core/src/monitoring/error-reporting.ts`: `sendDefaultPii:
@@ -208,7 +210,7 @@ purposes on the API are now `profile_photo`, `transfer_receipt`, `promotion`
 | Payout QR (FIX-072) | `apps/staff-mobile/src/profile/payout-qr/use-save-payout-qr.ts` (`payout_qr`) | same **Photos** row, and tick **Financial info → User payment info** |
 | Her own referral code, changeable; a Client's code at Account creation | `apps/staff-mobile/src/profile/staff-referral-code-screen.tsx`, `apps/staff-mobile/src/assistant/new-client-screen.tsx` | tick **Personal info → User IDs** |
 | The Assistant must enter a Client's phone (FIX-037) | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`phoneProblem(..., "theirs")`) | **Phone number**: change **Optional → Required** |
-| A Client's registration channel at Account creation | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`ChannelGrid`) | **Other info**: add **Analytics** |
+| A Client's registration channel at Account creation, required on that screen | `apps/staff-mobile/src/assistant/new-client-screen.tsx` (`ChannelGrid`, save blocked while empty) | **Other info**: add **Analytics**, and make it **Required** like Name and Phone |
 | Equipment fault description (500 characters), cash close note, freeze refusal message | `apps/staff-mobile/src/trainer/report-fault-screen.tsx`, `src/cash-close/cash-close-form.tsx`, `src/administrator/refuse-freeze-step.tsx` | none: **Other user-generated content** is already ticked |
 
 Every new row is **collected**, **not shared**, **not processed ephemerally**,
@@ -229,9 +231,18 @@ false for the Staff app since FIX-044. It also omitted the freeze «Motivo»,
 fault reports and cash close notes, and the registration channel. Fixed on
 2026-11-22 (page dated 22/11/2026): the page now lists them and says the
 camera and file picker are Staff-only. The iOS camera and photos permission
-texts in `apps/staff-mobile/app.json` still mention only transfer receipts
-and the old name «Emma Pilates Staff»; Android never shows them, so Play is
-unaffected, but they should be widened with the next store build.
+texts in `apps/staff-mobile/app.json` still mention only transfer receipts,
+not invoices or the payout QR; Android never shows them, so Play is
+unaffected, but they should be widened with the next store build (PR #366
+owns that file now).
+
+Retention, added the same day: invoice files stay with their Payment as
+accounting records; a Staff Member's data and photo stay while her Staff
+Account exists, and her payout QRs, past ones included, stay with the salary
+payments made to them. Deactivating a Staff Account erases nothing today
+(`apps/backend/src/booking/staff/` only sets `disabledAt`). That matches Play
+for accounts the studio creates, but whether deactivation should erase the
+photo and payout QR is an open decision for the owner.
 
 ## Related gaps found by the audit
 
