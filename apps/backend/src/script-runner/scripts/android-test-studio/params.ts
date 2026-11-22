@@ -24,12 +24,14 @@ export type StudioParams = {
   courtesyAccessEndsOn: Date | null;
 };
 
+// Trainer names show on every class a Client sees, so a default never says
+// «prueba»: a store reviewer reads it as a trial or beta (App Review 2.2).
 const staffDefaults = {
-  instructora1: { name: 'Instructora 1 (prueba)', role: 'trainer' },
-  instructora2: { name: 'Instructora 2 (prueba)', role: 'trainer' },
-  asistente: { name: 'Asistente (prueba)', role: 'assistant' },
-  coordinadora: { name: 'Coordinadora (prueba)', role: 'coordinator' },
-  nutricionista: { name: 'Nutricionista (prueba)', role: 'nutritionist' },
+  instructora1: { name: 'Instructora 1', role: 'trainer' },
+  instructora2: { name: 'Instructora 2', role: 'trainer' },
+  asistente: { name: 'Asistente', role: 'assistant' },
+  coordinadora: { name: 'Coordinadora', role: 'coordinator' },
+  nutricionista: { name: 'Nutricionista', role: 'nutritionist' },
 } as const satisfies Record<string, { name: string; role: StaffRoleName }>;
 
 type StaffKey = keyof typeof staffDefaults;
