@@ -96,6 +96,7 @@
         }
       ],
       "@pilates/mobile-core/launch-tap-plugin",
+      "@pilates/mobile-core/optional-features-plugin",
       "@sentry/react-native/expo"
     ],
     "extra": {

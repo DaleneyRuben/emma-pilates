@@ -100,6 +100,16 @@ developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
   Play Store on the device must use that same account, or it answers «item
   not found». Until the store listing is reviewed, testers see the
   temporary name `com.emmapilates.<app> (unreviewed)`.
+- **Device compatibility:** Play treats some hardware features as required
+  because of manifest entries, and hides the app from devices without them.
+  `@pilates/mobile-core/optional-features-plugin` declares
+  `android.hardware.screen.portrait` (from the portrait lock) and
+  `android.hardware.wifi` (from netinfo's `ACCESS_WIFI_STATE`) as
+  `required="false"` in both apps, starting with 1.2.1. When a new
+  permission makes Play warn that a feature limits compatible devices, add
+  that feature to the plugin's list. Changing the list changes the
+  fingerprint on both platforms (the plugin is hashed for iOS too, though it
+  does nothing there), so it needs a store build of iOS and Android.
 
 ## Confirm a Client's email by hand (fallback)
 

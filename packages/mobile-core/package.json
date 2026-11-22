@@ -4,6 +4,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./launch-tap-plugin": "./src/notifications/launch-tap-plugin.js",
+    "./optional-features-plugin": "./src/config/optional-features-plugin.js",
     "./app-variant": "./src/config/app-variant.js",
     "./testing": "./src/testing.ts"
   },
