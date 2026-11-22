@@ -5,6 +5,10 @@ import {
   StaffRole,
   type PrismaClient,
 } from '../../generated/prisma/client';
+import {
+  courtesyAccessPlan,
+  legacyCourtesyPlanName,
+} from '../../booking/payments/courtesy-access';
 import { PaymentRuleError } from '../../booking/payments/payment-errors';
 import { createPrismaCourtesyAccess } from '../../booking/payments/prisma-courtesy-access';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
@@ -176,6 +180,41 @@ const prepareAccount = async (
   });
 };
 
+// A grant made before 2026-11-22 keeps «Acceso de prueba» on the reviewer's
+// Inicio and Mi plan until it ends, and App Review reads «prueba» as a
+// trial. Only this marked Account's Subscription changes, never a Client's;
+// its Payment keeps the snapshot, which the database never lets change.
+const renameLegacyCourtesy = async (
+  context: ScriptContext,
+  email: string,
+): Promise<void> => {
+  const { prisma } = context;
+  const { clientId } = await prisma.account.findFirstOrThrow({
+    where: { email, deletedAt: null },
+    select: { clientId: true },
+  });
+  const legacy = {
+    clientId: clientId!,
+    planNameSnapshot: legacyCourtesyPlanName,
+  };
+  const data = { planNameSnapshot: courtesyAccessPlan.name };
+  const [subscriptions] = await prisma.$transaction([
+    prisma.subscription.updateMany({ where: legacy, data }),
+    prisma.plan.updateMany({
+      where: {
+        name: legacyCourtesyPlanName,
+        priceCentavos: 0,
+        hiddenAt: { not: null },
+      },
+      data: { name: courtesyAccessPlan.name },
+    }),
+  ]);
+  context.log('store_review_plan_renamed', {
+    email,
+    subscriptions: subscriptions.count,
+  });
+};
+
 const grantTesterPlan = async (
   context: ScriptContext,
   email: string,
@@ -250,6 +289,7 @@ export const storeReviewAccounts: ScriptDefinition = {
       kind: 'trainer',
       existing: trainer,
     });
+    await renameLegacyCourtesy(context, clientEmail);
     await grantTesterPlan(context, clientEmail, endsOn);
   },
 };
