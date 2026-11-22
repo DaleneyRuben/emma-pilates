@@ -63,10 +63,17 @@ for 30 days.
 Makes the Accounts Apple's and Google's reviewers sign in with, both marked
 `store_review`:
 
-- a verified Client, «Revisión Google Play», holding the hidden tester Plan
-  of 16 classes (REL-011) until `endsOn` (default: 90 days), granted in the
-  name of the oldest active Administrator;
+- a verified Client, «Revisión tienda», holding the hidden tester Plan
+  «Plan de cortesía» of 16 classes (REL-011) until `endsOn` (default: 90
+  days), granted in the name of the oldest active Administrator;
 - a Trainer of the same name with no Branch and no classes.
+
+It refuses with `no_upcoming_sessions` (dry run too) while no scheduled
+class lies ahead, since a reviewer who cannot book rejects the app. A rerun
+renames Accounts made under the old «Revisión Google Play», but a courtesy
+Subscription still active keeps the Plan name it was granted with («Acceso
+de prueba» before 2026-11-22) until it ends; after the production reset
+(REL-019) every grant carries the new name.
 
 Params: `{"clientEmail": "revision-play@emmapilatesstudio.com",
 "trainerEmail": "revision-staff@emmapilatesstudio.com"}`, and optionally
@@ -122,7 +129,7 @@ What it makes, skipping whatever already exists:
 8. **Clients**: each one in `clients` is invited like the Staff app's «Crear
    clienta nueva» (Activation Link email, 7 days). With
    `courtesyAccessEndsOn`, each also gets Courtesy Access (REL-011: the
-   hidden Bs 0 «Acceso de prueba» Plan of 16 classes, until that date, at
+   hidden Bs 0 «Plan de cortesía» of 16 classes, until that date, at
    most a year away) so she can book. The product has no way to give a
    catalog Plan without a payment, so there is no `giftPlan`: a cash sale
    would count as income.

@@ -46,6 +46,8 @@ export function PlanHero({ plan }: { plan: PlanDto }) {
 /**
  * C09's «Qué incluye» as icon rows instead of paragraphs. «en cualquier
  * sucursal» only from the second active Branch (walkthrough finding 50).
+ * «presenciales» tells App Review the Plan is a service used at the studio,
+ * paid outside the App Store (3.1.3(e)), not digital content.
  */
 export function PlanIncludes({
   activeBranchCount,
@@ -58,8 +60,8 @@ export function PlanIncludes({
 }) {
   const classes =
     activeBranchCount !== undefined && activeBranchCount > 1
-      ? `${plan.classAllowance} clases en cualquier sucursal`
-      : `${plan.classAllowance} clases`;
+      ? `${plan.classAllowance} clases presenciales en cualquier sucursal`
+      : `${plan.classAllowance} clases presenciales`;
   return (
     <View>
       <SectionTitle>Qué incluye</SectionTitle>

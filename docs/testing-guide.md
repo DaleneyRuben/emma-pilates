@@ -1639,8 +1639,9 @@ FIX-057 no **Mis evaluaciones**, Test 151),
 «Preferencias» (**Notificaciones** with «N sin leer» on the right; since
 FIX-060 there is no **Recibir promociones** switch nor its note, Test 155),
 and «Cuenta»
-(**Cambiar contraseña**, **Enviar comentarios**, and **Cerrar sesión** as the
-last row, which opens the «¿Cerrar sesión?» sheet). Then the discreet
+(**Cambiar contraseña**, **Enviar comentarios**, **Soporte**, **Política de
+privacidad** (Test 194), and **Cerrar sesión** as the last row, which opens
+the «¿Cerrar sesión?» sheet). Then the discreet
 **Cerrar mi cuenta** text button in Error and "Emma Pilates Studio · versión
 1.0.1" (the installed app version, Test 76). The **Perfil** tab no longer
 carries the unread pill; the count is on the Inicio bell (VoiceOver reads
@@ -1728,8 +1729,9 @@ initials with **Cambiar foto** (Test 135 A), her name and email, and «Tu
 nombre y tu correo los actualiza administración.»; «Tu cuenta» with **Rol**
 (`Entrenadora`) and **Sucursales** (`Centro, Equipetrol, Urubó`); «Ajustes»
 with **Mis pagos**, **Mi QR de cobro** (Test 166), **Tu código de referido**, **Notificaciones** (with the
-unread count), **Cambiar contraseña**, **Enviar comentarios** and **Cerrar
-sesión** as the last row in Error; then the version footer «Emma Pilates
+unread count), **Soporte**, **Política de privacidad** (Test 194), **Cambiar
+contraseña**, **Enviar comentarios** and **Cerrar sesión** as the last row in
+Error; then the version footer «Emma Pilates
 Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
 Log in as `paola.mendoza@example.com` to see **Administración** with "Todas
 las sucursales", «Tus datos se editan en la web de administración.» and
@@ -7281,7 +7283,8 @@ changed field names.
 ## Test 78: tester access (Courtesy Access, REL-011)
 
 The closed-test testers and the stores' review Accounts book without paying
-through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes that only the
+through «Acceso de prueba»: a hidden Bs 0 Plan of 16 classes named «Plan de
+cortesía» (never «prueba», which App Review reads as a trial) that only the
 Administrator grants (booking ADR-0012). Run it against `pilates_dev_sim` (or
 a copy) with the API and the admin web, at 1440 px and 420 px.
 
@@ -7292,8 +7295,8 @@ a copy) with the API and the admin web, at 1440 px and 420 px.
    **Cerrar cuenta**. Click it: the dialog «¿Dar acceso de prueba a …?»
    explains the grant and proposes «Válido hasta» 30 days from today (the
    field accepts today up to one year ahead; an empty date greys out **Dar
-   acceso**). Confirm: the dialog closes, the Plan block reads «Acceso de
-   prueba · Activo», «Vigencia» from today to that date, «Clases
+   acceso**). Confirm: the dialog closes, the Plan block reads «Plan de
+   cortesía · Activo», «Vigencia» from today to that date, «Clases
    disponibles 16 de 16», and the footer says «Acceso de prueba activo hasta
    el dd/mm/aaaa.» without the button. In the database the Payment has
    method `courtesy`, Bs 0, `confirmed`; the audit log holds
@@ -9729,8 +9732,9 @@ A. **Founder deadline says why (n.º 49).** As Lucía (founder), **Mi plan**:
    the first notice reads «Renueva antes del 9 de diciembre para mantener tu
    15 % de descuento.», with no coloured box and no word «fundadora».
 B. **One branch (n.º 50).** With only Achumani active, **Comprar un plan ›
-   Trimestral 24 clases**: «Qué incluye» says «24 clases». Activate a second
-   branch in the admin web and reopen: «24 clases en cualquier sucursal».
+   Trimestral 24 clases**: «Qué incluye» says «24 clases presenciales»
+   (Test 194). Activate a second branch in the admin web and reopen: «24
+   clases presenciales en cualquier sucursal».
 C. **Mi plan, one focus (n.º 54).** As Carla, **Mi plan**: the light plan
    card, then **Renovar mi plan** with the founder discount line under it
    (Test 176 E); the next plan, when there is one, is a row with an icon and
@@ -11933,3 +11937,31 @@ E. **States.** A wrong password shows «El correo o la contraseña no son
    correctos.» at the top of the sheet; Cerrar mi cuenta returns to Login
    with its notice at the top of the sheet.
 F. **VoiceOver / TalkBack.** The logo reads «Emma Pilates Studio, imagen».
+
+## Test 194: App Store review fixes
+
+What App Review checks first, fixed before the iOS submission. Run the API on
+a copy of `pilates_dev_sim`, the Client and Staff apps on the iPhone 16 Pro,
+the iPad, and the Android emulator.
+
+A. **Privacy and support from the app (5.1.1(i)).** As Lucía, **Perfil**:
+   «Cuenta» shows **Soporte** and **Política de privacidad** before **Cerrar
+   sesión**. Each opens the browser on
+   `https://app.emmapilatesstudio.com/soporte` and `/privacidad`. In the
+   Staff app, **Perfil › Ajustes** shows the same two rows after
+   **Notificaciones**, also while an Administrator sees the app as someone
+   else.
+B. **In-person classes (3.1.3(e)).** **Comprar un plan ›** any Plan: «Qué
+   incluye» starts with «N clases presenciales».
+C. **No «prueba» on the courtesy Plan (2.2).** Grant tester access from the
+   admin web (Test 78) to a Client without it: her Inicio and **Mi plan** say
+   «Plan de cortesía». A hidden Plan still called «Acceso de prueba» from
+   before is renamed on its next grant; Payments and Subscriptions granted
+   earlier keep the old name until they end.
+D. **Reviewer Accounts.** `store-review-accounts` names the reviewer Client
+   and Trainer «Revisión tienda» (a rerun renames ones made as «Revisión
+   Google Play») and refuses with `no_upcoming_sessions` (dry run too) while
+   no scheduled class lies ahead.
+E. **Export compliance.** Both `app.json` files set
+   `ios.config.usesNonExemptEncryption: false`, so App Store Connect stops
+   asking on each build (seen only on a store build).

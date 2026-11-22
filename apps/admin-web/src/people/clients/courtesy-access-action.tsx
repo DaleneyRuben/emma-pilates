@@ -33,7 +33,7 @@ const refusals: Record<string, string> = {
 const failure = "No pudimos dar el acceso. Inténtalo de nuevo.";
 
 // REL-011 (follow-up 160): the Administrator gives a closed-test tester or a
-// store reviewer the hidden Bs 0 «Acceso de prueba» Plan of 16 classes until
+// store reviewer the hidden Bs 0 «Plan de cortesía» of 16 classes until
 // a chosen date. Only offered while the Client has no active Plan.
 export function CourtesyAccessAction({
   client,
@@ -102,7 +102,7 @@ export function CourtesyAccessAction({
         onConfirm={() => void confirm()}
       >
         <p>
-          Recibe el plan «Acceso de prueba»: 16 clases sin costo, desde hoy
+          Recibe el plan «Plan de cortesía»: 16 clases sin costo, desde hoy
           hasta la fecha que elijas. Es para las testers de la prueba cerrada y
           las cuentas de revisión de las tiendas; no cuenta como ingreso.
         </p>

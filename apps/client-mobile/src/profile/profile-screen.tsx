@@ -10,6 +10,7 @@ import {
   BrandToast,
   LoadingState,
   LogoutConfirmationSheet,
+  openPublicPage,
   QueryFailure,
   Screen,
   ScreenHeader,
@@ -182,6 +183,12 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
               icon="message"
               label="Enviar comentarios"
               onPress={() => navigation.navigate("Feedback")}
+            />
+            <ProfileRow icon="mail" label="Soporte" onPress={() => openPublicPage("support")} />
+            <ProfileRow
+              icon="lock"
+              label="Política de privacidad"
+              onPress={() => openPublicPage("privacy")}
             />
             <ProfileRow
               chevron={false}

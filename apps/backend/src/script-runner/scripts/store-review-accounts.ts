@@ -16,8 +16,9 @@ import type { ScriptContext, ScriptDefinition } from '../run-script';
 // with the hidden tester Plan (REL-011), so the reviewer can book, and a
 // Trainer with no Branch and no classes, both marked store_review. A rerun
 // gives both fresh passwords; it only ever touches Accounts it marked, so a
-// real person's Account is never taken over.
-const reviewerName = 'Revisión Google Play';
+// real person's Account is never taken over. With no class ahead to book,
+// a reviewer cannot test the app (App Review 2.1), so the run refuses.
+const reviewerName = 'Revisión tienda';
 const defaultTermDays = 90;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const civilPattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -107,6 +108,8 @@ const prepareAccount = async (
   const password = randomBytes(18).toString('base64url');
   const passwordHash = await hashPassword(password);
   if (input.existing !== null) {
+    // A rerun also renames Accounts made under the old Play reviewer name.
+    const rename = { update: { name: reviewerName } };
     await prisma.account.update({
       where: { id: input.existing.id },
       data: {
@@ -114,6 +117,9 @@ const prepareAccount = async (
         passwordChangedAt: now,
         disabledAt: null,
         pendingExpiresAt: null,
+        ...(input.kind === 'client'
+          ? { client: rename }
+          : { staffMember: rename }),
       },
     });
   } else {
@@ -224,6 +230,7 @@ export const storeReviewAccounts: ScriptDefinition = {
       where: { state: SessionState.SCHEDULED, startsAt: { gt: context.now() } },
     });
     context.log('store_review_schedule', { upcomingSessions });
+    if (upcomingSessions === 0) throw new Error('no_upcoming_sessions');
 
     if (context.dryRun) {
       context.log('store_review_dry_run', {

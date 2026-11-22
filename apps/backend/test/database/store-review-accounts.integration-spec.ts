@@ -14,13 +14,17 @@ type Logged = { event: string; fields: Record<string, unknown> };
 describe('the store-review Accounts script (REL-016)', () => {
   let world: PaymentWorld;
 
-  const run = async (params: Record<string, unknown>, dryRun = false) => {
+  const run = async (
+    params: Record<string, unknown>,
+    dryRun = false,
+    at: Date = now,
+  ) => {
     const logged: Logged[] = [];
     await storeReviewAccounts.run({
       prisma: world.prisma,
       params,
       dryRun,
-      now: () => now,
+      now: () => at,
       log: (event, fields = {}) => logged.push({ event, fields }),
     });
     return logged;
@@ -61,6 +65,17 @@ describe('the store-review Accounts script (REL-016)', () => {
     ]);
   });
 
+  it('refuses to prepare a review when the schedule has no class to book', async () => {
+    const afterEverySession = new Date('2030-01-01T12:00:00.000Z');
+
+    for (const dryRun of [true, false]) {
+      await expect(
+        run({ clientEmail, trainerEmail }, dryRun, afterEverySession),
+      ).rejects.toThrow('no_upcoming_sessions');
+    }
+    expect(await accountOf(clientEmail)).toBeNull();
+  });
+
   it('writes nothing on a dry run', async () => {
     const logged = await run({ clientEmail, trainerEmail }, true);
 
@@ -84,7 +99,7 @@ describe('the store-review Accounts script (REL-016)', () => {
       emailVerifiedAt: now,
       activatedAt: now,
       storeReview: true,
-      client: { name: 'Revisión Google Play' },
+      client: { name: 'Revisión tienda' },
       staffMember: null,
     });
     expect(
@@ -129,11 +144,25 @@ describe('the store-review Accounts script (REL-016)', () => {
 
   it('gives fresh passwords on a rerun without new Accounts or a second Plan', async () => {
     const before = await accountOf(clientEmail);
+    // Accounts made before the rename still carry the Play reviewer's name.
+    await world.prisma.client.update({
+      where: { id: before!.client!.id },
+      data: { name: 'Revisión Google Play' },
+    });
 
     const logged = await run({ clientEmail, trainerEmail });
 
     const after = await accountOf(clientEmail);
     expect(after!.client!.id).toBe(before!.client!.id);
+    expect(after!.client!.name).toBe('Revisión tienda');
+    expect(
+      (
+        await world.prisma.account.findFirstOrThrow({
+          where: { email: trainerEmail },
+          select: { staffMember: { select: { name: true } } },
+        })
+      ).staffMember!.name,
+    ).toBe('Revisión tienda');
     expect(after!.passwordHash).not.toBe(before!.passwordHash);
     expect(
       await verifyPassword(

@@ -13,6 +13,9 @@
     "ios": {
       "bundleIdentifier": "com.emmapilates.staff",
       "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "associatedDomains": [
         "applinks:links.emmapilatesstudio.com"
       ]

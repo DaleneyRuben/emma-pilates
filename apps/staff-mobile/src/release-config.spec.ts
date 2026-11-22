@@ -21,6 +21,12 @@ describe("staff release configuration", () => {
     expect(appConfig.expo.name).toBe("Emma Staff");
   });
 
+  // App Store Connect asks about export compliance on every build unless the
+  // binary says it uses only the system's standard HTTPS.
+  it("declares that it uses no non-exempt encryption", () => {
+    expect(appConfig.expo.ios.config).toEqual({ usesNonExemptEncryption: false });
+  });
+
   it("is linked to its own EAS project in the studio's Expo organization", () => {
     expect(appConfig.expo).toMatchObject({
       owner: "emma-pilates",
