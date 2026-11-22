@@ -123,7 +123,9 @@ No location, contacts, health data, browsing history, or usage analytics.
 ### Before each submission
 
 1. Production has been reset (REL-019) and holds the real schedule and
-   instructors: no «(prueba)» staff names from the Android closed test.
+   instructors: no «(prueba)» staff names from the Android closed test. The
+   reset also matters for the reviewer Account: a courtesy grant made before
+   2026-11-22 keeps the name «Acceso de prueba» until it ends.
 2. Run `store-review-accounts`; it refuses (`no_upcoming_sessions`) while the
    schedule has no class ahead. Check by hand that the next two weeks have
    classes with free places, and name those days in the review notes.

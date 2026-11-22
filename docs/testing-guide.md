@@ -11954,12 +11954,14 @@ A. **Privacy and support from the app (5.1.1(i)).** As Lucía, **Perfil**:
 B. **In-person classes (3.1.3(e)).** **Comprar un plan ›** any Plan: «Qué
    incluye» starts with «N clases presenciales».
 C. **No «prueba» on the courtesy Plan (2.2).** Grant tester access from the
-   admin web (Test 78): the Client's Inicio and **Mi plan** say «Plan de
-   cortesía». A hidden Plan still called «Acceso de prueba» from before is
-   renamed on its next grant; past Payments keep the old name.
+   admin web (Test 78) to a Client without it: her Inicio and **Mi plan** say
+   «Plan de cortesía». A hidden Plan still called «Acceso de prueba» from
+   before is renamed on its next grant; Payments and Subscriptions granted
+   earlier keep the old name until they end.
 D. **Reviewer Accounts.** `store-review-accounts` names the reviewer Client
-   «Revisión tienda» and refuses with `no_upcoming_sessions` (dry run too)
-   while no scheduled class lies ahead.
+   and Trainer «Revisión tienda» (a rerun renames ones made as «Revisión
+   Google Play») and refuses with `no_upcoming_sessions` (dry run too) while
+   no scheduled class lies ahead.
 E. **Export compliance.** Both `app.json` files set
    `ios.config.usesNonExemptEncryption: false`, so App Store Connect stops
    asking on each build (seen only on a store build).
