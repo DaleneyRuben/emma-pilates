@@ -219,14 +219,17 @@ off the device, so Play counts them as collected.
 
 ## Privacy policy gaps
 
-Play compares the Data safety form with the privacy policy, and
-`apps/public-site/privacidad/index.html` (last changed 2026-11-19) does not
-yet cover the Staff additions. Its «Si eres parte del equipo» list names no
-profile photo, invoice files, or payout QR, and «Permisos del teléfono» says
-the app «no usa la cámara», which is now false for the Staff app. It also
-omits the freeze «Motivo», fault reports, and the registration channel. Fix
-the page before the production application; the form edits above do not
-depend on it.
+Play compares the Data safety form with the privacy policy. The audit found
+that `apps/public-site/privacidad/index.html` did not cover the Staff
+additions: «Si eres parte del equipo» named no profile photo, invoice files,
+or payout QR, and «Permisos del teléfono» said the app «no usa la cámara»,
+false for the Staff app since FIX-044. It also omitted the freeze «Motivo»,
+fault reports and cash close notes, and the registration channel. Fixed on
+2026-11-22 (page dated 22/11/2026): the page now lists them and says the
+camera and file picker are Staff-only. The iOS camera and photos permission
+texts in `apps/staff-mobile/app.json` still mention only transfer receipts
+and the old name «Emma Pilates Staff»; Android never shows them, so Play is
+unaffected, but they should be widened with the next store build.
 
 ## Related gaps found by the audit
 
