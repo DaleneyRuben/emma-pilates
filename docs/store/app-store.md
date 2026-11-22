@@ -56,14 +56,14 @@ Reserva tus clases
 
 Tu plan, siempre a la vista
 • Revisa cuántas clases te quedan y hasta qué fecha está vigente tu plan.
-• Compra o renueva tu plan pagando con transferencia por QR: sube la foto de tu comprobante y te avisamos cuando el estudio lo confirme.
+• Compra o renueva tu plan de clases presenciales pagando al estudio con transferencia por QR: sube la foto de tu comprobante y te avisamos cuando el estudio lo confirme.
 • Consulta tu historial de clases y de pagos.
 
 Evaluación nutricional
 • Agenda una evaluación con nuestra nutricionista. Una evaluación al mes está incluida con algunos planes; el estudio te dice el costo de las demás.
 
 Invita a tus amigas
-• Comparte tu código de referido. Pronto podrás invitar a una amiga a una clase.
+• Comparte tu código de referido e invita a una amiga a una clase gratis.
 
 Notificaciones útiles
 • El estado de tus pagos, tu lugar confirmado desde la lista de espera, cambios del estudio en tus clases, recordatorios de tu evaluación y el aviso antes de que venza tu plan.
@@ -92,9 +92,9 @@ pilates,clases,reservas,horario,estudio,bienestar,reformer,entrenamiento,salud
 ### Review notes, to paste
 
 ```text
-Demo account: revision-tiendas@emmapilatesstudio.com (password sent separately, never in the repository). It holds a complimentary 8-class plan so the reviewer can book a class. Please cancel the booking after testing: it is a real class on the studio's schedule.
+Demo account: revision-tiendas@emmapilatesstudio.com (password sent separately, never in the repository). It holds a complimentary 16-class plan («Plan de cortesía») so the reviewer can book a class. Please cancel the booking after testing: it is a real class on the studio's schedule.
 
-Plans are in-person classes paid outside the app, by bank transfer or in cash at the studio. The app shows a QR and stores the receipt photo. No digital content is sold, so Guideline 3.1.3(e) applies and there is no in-app purchase.
+Plans are in-person classes at the studio («clases presenciales»), paid outside the app, by bank transfer or in cash at the studio. The app shows a QR and stores the receipt photo. No digital content is sold, so Guideline 3.1.3(e) applies and there is no in-app purchase.
 
 Account deletion is in the app: Perfil → Cerrar mi cuenta (Guideline 5.1.1(v)). It erases the name, email, phone, and photo.
 
@@ -105,11 +105,28 @@ ITSAppUsesNonExemptEncryption is false: the app uses only standard HTTPS.
 
 ### App Privacy labels
 
-Match `docs/store/play-data-safety.md`: name, email, and phone (account
-data); photos (profile and transfer receipts); the feedback text; the NIT or
-CI and business name, optional; crash reports without personal data; a push
-installation identifier. Not linked to tracking. No advertising, no location,
-no health measurements.
+Declare what `docs/store/play-data-safety.md` lists, in Apple's categories.
+Tracking: **No** (no advertising, no analytics, no IDFA, so no App Tracking
+Transparency prompt).
+
+| Apple category | Data type | Linked to the user | Purposes |
+| --- | --- | --- | --- |
+| Contact Info | Name, Email Address, Phone Number | Yes | App Functionality; Developer's Advertising or Marketing (the studio's promotions by WhatsApp and email, see `/privacidad`) |
+| Financial Info | Other Financial Info (NIT or CI and business name, optional, for an invoice) | Yes | App Functionality |
+| Purchases | Purchase History (Plans and Payments) | Yes | App Functionality |
+| User Content | Photos (profile, transfer receipts); Customer Support (the feedback text) | Yes | App Functionality |
+| Identifiers | User ID; Device ID (the random installation identifier for push) | Yes | App Functionality |
+| Diagnostics | Crash Data | No | App Functionality |
+
+No location, contacts, health data, browsing history, or usage analytics.
+
+### Before each submission
+
+1. Production has been reset (REL-019) and holds the real schedule and
+   instructors: no «(prueba)» staff names from the Android closed test.
+2. Run `store-review-accounts`; it refuses (`no_upcoming_sessions`) while the
+   schedule has no class ahead. Check by hand that the next two weeks have
+   classes with free places, and name those days in the review notes.
 
 ## REL-016 · Reviewer Accounts, created after the reset
 
@@ -117,7 +134,7 @@ Two Accounts on the studio's domain, never a real person's:
 
 | Account | What it is |
 | --- | --- |
-| `revision-tiendas@emmapilatesstudio.com` | A Client with an active `store_review` Plan of 8 classes, renewed before each review |
+| `revision-tiendas@emmapilatesstudio.com` | A Client with an active «Plan de cortesía» of 16 classes, renewed before each review |
 | `revision-staff@emmapilatesstudio.com` | A Trainer with no Sessions |
 
 Both are marked `store_review` and created after the production reset
