@@ -9,6 +9,7 @@ import {
   IconRow,
   LoadingState,
   LogoutConfirmationSheet,
+  openPublicPage,
   QueryFailure,
   Screen,
   spacing,
@@ -163,6 +164,12 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
             icon="bell"
             label="Notificaciones"
             onPress={() => navigation.navigate("Notifications")}
+          />
+          <ProfileRow icon="mail" label="Soporte" onPress={() => openPublicPage("support")} />
+          <ProfileRow
+            icon="document"
+            label="Política de privacidad"
+            onPress={() => openPublicPage("privacy")}
           />
           {viewingAs === null ? (
             <>
