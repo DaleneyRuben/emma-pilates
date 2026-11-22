@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
+import { Linking } from "react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -140,6 +141,8 @@ describe("Client Profile", () => {
       "Notificaciones",
       "Cambiar contraseña",
       "Enviar comentarios",
+      "Soporte",
+      "Política de privacidad",
       "Cerrar sesión",
     ]) {
       expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
@@ -148,7 +151,7 @@ describe("Client Profile", () => {
     expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
     // Rosa Emma (C18): every row's icon sits on a 36 pt 50 disc.
     const discs = screen.getAllByTestId("profile-row-disc");
-    expect(discs).toHaveLength(8);
+    expect(discs).toHaveLength(10);
     expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", height: 36, width: 36 });
     // The identity is the 600 hero under the «Perfil» band.
     expect(screen.getByRole("header", { name: "Perfil" })).toBeOnTheScreen();
@@ -292,6 +295,21 @@ describe("Client Profile", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
     expect(screen.queryByText("Contraseña actualizada")).toBeNull();
+  });
+
+  // App Review 5.1.1(i): the privacy policy and support open from the app.
+  it("opens Soporte and the privacy policy on the studio's public pages", async () => {
+    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true);
+    const screen = await openProfile();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Soporte" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Política de privacidad" }));
+
+    expect(openURL.mock.calls).toEqual([
+      ["https://app.emmapilatesstudio.com/soporte"],
+      ["https://app.emmapilatesstudio.com/privacidad"],
+    ]);
+    openURL.mockRestore();
   });
 
   it("opens «Enviar comentarios» from Perfil (REL-012)", async () => {
