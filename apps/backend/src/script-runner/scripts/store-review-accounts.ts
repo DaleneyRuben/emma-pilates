@@ -182,8 +182,9 @@ const prepareAccount = async (
 
 // A grant made before 2026-11-22 keeps «Acceso de prueba» on the reviewer's
 // Inicio and Mi plan until it ends, and App Review reads «prueba» as a
-// trial. Only this marked Account's Subscription changes, never a Client's;
-// its Payment keeps the snapshot, which the database never lets change.
+// trial. Only this marked Account's Subscription snapshot changes, never a
+// Client's; the hidden Plan is renamed as any grant would rename it, and the
+// Payment keeps its snapshot, which the database never lets change.
 const renameLegacyCourtesy = async (
   context: ScriptContext,
   email: string,
