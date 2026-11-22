@@ -24,7 +24,7 @@ const granted = {
   method: 'courtesy',
   state: 'confirmed',
   planId: '55555555-5555-4555-8555-555555555555',
-  planName: 'Acceso de prueba',
+  planName: 'Plan de cortesía',
   durationMonths: 1,
   classAllowance: 16,
   planPriceCentavos: 0,

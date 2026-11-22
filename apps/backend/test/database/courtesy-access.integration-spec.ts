@@ -56,7 +56,7 @@ describe('Courtesy Access (REL-011)', () => {
     expect(payment).toMatchObject({
       method: 'courtesy',
       state: 'confirmed',
-      planName: 'Acceso de prueba',
+      planName: 'Plan de cortesía',
       classAllowance: 16,
       planPriceCentavos: 0,
       creditAppliedCentavos: 0,
@@ -66,7 +66,7 @@ describe('Courtesy Access (REL-011)', () => {
     await expect(
       world.prisma.plan.findUniqueOrThrow({ where: { id: payment.planId } }),
     ).resolves.toMatchObject({
-      name: 'Acceso de prueba',
+      name: 'Plan de cortesía',
       classAllowance: 16,
       priceCentavos: 0,
       hiddenAt: expect.any(Date) as Date,
@@ -143,7 +143,7 @@ describe('Courtesy Access (REL-011)', () => {
     expect(replay).toEqual(first);
     expect(second.planId).toBe(first.planId);
     await expect(
-      world.prisma.plan.count({ where: { name: 'Acceso de prueba' } }),
+      world.prisma.plan.count({ where: { name: 'Plan de cortesía' } }),
     ).resolves.toBe(1);
     await expect(
       world.prisma.payment.count({ where: { clientId: tester.clientId } }),
@@ -157,6 +157,32 @@ describe('Courtesy Access (REL-011)', () => {
       world.prisma.creditLedgerEntry.count({
         where: { clientId: referrer.clientId },
       }),
+    ).resolves.toBe(0);
+  });
+
+  it('renames a hidden Plan still called «Acceso de prueba» and keeps using it', async () => {
+    const admin = await administrator();
+    const plan = await world.prisma.plan.findFirstOrThrow({
+      where: { name: 'Plan de cortesía', hiddenAt: { not: null } },
+    });
+    await world.prisma.plan.update({
+      where: { id: plan.id },
+      data: { name: 'Acceso de prueba' },
+    });
+    const tester = await world.newClient('Tester Renombre');
+
+    const payment = await access().grant(
+      { clientId: tester.clientId, endsOn },
+      admin,
+      randomUUID(),
+    );
+
+    expect(payment).toMatchObject({
+      planId: plan.id,
+      planName: 'Plan de cortesía',
+    });
+    await expect(
+      world.prisma.plan.count({ where: { name: 'Acceso de prueba' } }),
     ).resolves.toBe(0);
   });
 

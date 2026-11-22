@@ -1,4 +1,8 @@
-import { courtesyAccessPlan, evaluateCourtesyGrant } from './courtesy-access';
+import {
+  courtesyAccessPlan,
+  evaluateCourtesyGrant,
+  legacyCourtesyPlanName,
+} from './courtesy-access';
 import { PaymentRuleError } from './payment-errors';
 
 const today = new Date('2026-10-23T00:00:00.000Z');
@@ -24,11 +28,15 @@ const codeOf = (work: () => unknown): string | null => {
 describe('evaluateCourtesyGrant', () => {
   it('describes the hidden tester Plan of 16 classes valid for 30 days', () => {
     expect(courtesyAccessPlan).toEqual({
-      name: 'Acceso de prueba',
+      name: 'Plan de cortesía',
       classAllowance: 16,
       durationDays: 30,
       priceCentavos: 0,
     });
+  });
+
+  it('remembers the old name, which store reviewers must not see', () => {
+    expect(legacyCourtesyPlanName).toBe('Acceso de prueba');
   });
 
   it('grants access until today or a date within a year', () => {

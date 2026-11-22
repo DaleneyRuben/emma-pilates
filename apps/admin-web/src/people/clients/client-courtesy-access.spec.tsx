@@ -52,7 +52,7 @@ const granted = (endsOn: string) => {
       status: "active",
       subscription: {
         id: "5b000000-0000-5000-8000-000000000009",
-        planName: "Acceso de prueba",
+        planName: "Plan de cortesía",
         originalClassAllowance: 16,
         remainingClassAllowance: 16,
         startsOn: boliviaToday(),
@@ -114,7 +114,7 @@ describe("AW22 Acceso de prueba (REL-011)", () => {
 
     expect(
       within(dialog).getByText(
-        "Recibe el plan «Acceso de prueba»: 16 clases sin costo, desde hoy hasta la fecha que elijas. Es para las testers de la prueba cerrada y las cuentas de revisión de las tiendas; no cuenta como ingreso.",
+        "Recibe el plan «Plan de cortesía»: 16 clases sin costo, desde hoy hasta la fecha que elijas. Es para las testers de la prueba cerrada y las cuentas de revisión de las tiendas; no cuenta como ingreso.",
       ),
     ).toBeInTheDocument();
     expect(within(dialog).getByLabelText("Válido hasta")).toHaveValue(
