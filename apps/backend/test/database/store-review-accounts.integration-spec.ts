@@ -14,13 +14,17 @@ type Logged = { event: string; fields: Record<string, unknown> };
 describe('the store-review Accounts script (REL-016)', () => {
   let world: PaymentWorld;
 
-  const run = async (params: Record<string, unknown>, dryRun = false) => {
+  const run = async (
+    params: Record<string, unknown>,
+    dryRun = false,
+    at: Date = now,
+  ) => {
     const logged: Logged[] = [];
     await storeReviewAccounts.run({
       prisma: world.prisma,
       params,
       dryRun,
-      now: () => now,
+      now: () => at,
       log: (event, fields = {}) => logged.push({ event, fields }),
     });
     return logged;
@@ -61,6 +65,17 @@ describe('the store-review Accounts script (REL-016)', () => {
     ]);
   });
 
+  it('refuses to prepare a review when the schedule has no class to book', async () => {
+    const afterEverySession = new Date('2030-01-01T12:00:00.000Z');
+
+    for (const dryRun of [true, false]) {
+      await expect(
+        run({ clientEmail, trainerEmail }, dryRun, afterEverySession),
+      ).rejects.toThrow('no_upcoming_sessions');
+    }
+    expect(await accountOf(clientEmail)).toBeNull();
+  });
+
   it('writes nothing on a dry run', async () => {
     const logged = await run({ clientEmail, trainerEmail }, true);
 
@@ -84,7 +99,7 @@ describe('the store-review Accounts script (REL-016)', () => {
       emailVerifiedAt: now,
       activatedAt: now,
       storeReview: true,
-      client: { name: 'Revisión Google Play' },
+      client: { name: 'Revisión tienda' },
       staffMember: null,
     });
     expect(
