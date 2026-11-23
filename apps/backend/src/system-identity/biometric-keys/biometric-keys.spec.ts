@@ -235,7 +235,7 @@ describe('biometric keys', () => {
       const { dependencies, gateway } = createDependencies();
       gateway.readThrottleEvents.mockResolvedValue({
         loginLaneFailures: [],
-        clientFailures: Array.from({ length: 6 }, () => now),
+        clientFailures: Array.from({ length: 20 }, () => now),
         networkFailures: [],
       });
 
