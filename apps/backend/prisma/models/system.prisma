@@ -27,6 +27,20 @@ enum AuthenticationSessionRevocationReason {
   @@schema("system")
 }
 
+// MOB-006 / ADR-0112: why a biometric key stopped working.
+enum BiometricKeyRevocationReason {
+  ROTATED            @map("rotated")
+  REPLACED           @map("replaced")
+  TURNED_OFF         @map("turned_off")
+  REUSE_DETECTED     @map("reuse_detected")
+  PASSWORD_CHANGED   @map("password_changed")
+  PASSWORD_RECOVERED @map("password_recovered")
+  ACCOUNT_DISABLED   @map("account_disabled")
+  ACCOUNT_CLOSED     @map("account_closed")
+
+  @@schema("system")
+}
+
 enum ImpersonationEndReason {
   EXITED     @map("exited")
   EXPIRED    @map("expired")
@@ -188,6 +202,7 @@ model Account {
   staffMember               StaffMember?            @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   authenticationTokens      AuthenticationToken[]
   authenticationSessions    AuthenticationSession[]
+  biometricKeys             BiometricKey[]
   emailChanges              AccountEmailChange[]
   staffEmailRequests        AuthenticationThrottleEvent[]
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
@@ -322,6 +337,29 @@ model ImpersonationSession {
   @@index([administratorAccountId, startedAt])
   @@index([staffMemberId, startedAt])
   @@map("impersonation_sessions")
+  @@schema("system")
+}
+
+// MOB-006 / ADR-0112: what lets one app installation sign an Account in with
+// the fingerprint or Face ID. Each use replaces the row; the unlock secret,
+// kept behind the phone's biometrics, carries over. One live key per
+// installation (a partial index in the migration).
+model BiometricKey {
+  id                   String                        @id @default(uuid()) @db.Uuid
+  accountId            String                        @map("account_id") @db.Uuid
+  installationIdDigest Bytes                         @map("installation_id_digest") @db.ByteA
+  keyDigest            Bytes                         @unique @map("key_digest") @db.ByteA
+  unlockSecretDigest   Bytes                         @map("unlock_secret_digest") @db.ByteA
+  issuedAt             DateTime                      @map("issued_at") @db.Timestamptz(3)
+  expiresAt            DateTime                      @map("expires_at") @db.Timestamptz(3)
+  revokedAt            DateTime?                     @map("revoked_at") @db.Timestamptz(3)
+  revocationReason     BiometricKeyRevocationReason? @map("revocation_reason")
+  deletedAt            DateTime?                     @map("deleted_at") @db.Timestamptz(3)
+  account              Account                       @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, revokedAt])
+  @@index([installationIdDigest, revokedAt])
+  @@map("biometric_keys")
   @@schema("system")
 }
 
