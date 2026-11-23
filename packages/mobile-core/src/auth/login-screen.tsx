@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Image, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useEffectEvent, useState } from "react";
 import { z } from "zod";
 
 import logo from "../../assets/emma-logo.png";
@@ -30,14 +30,23 @@ const logoMaxWidth = 380;
 
 export type LoginValues = z.infer<typeof loginSchema>;
 
+/** Set while a biometric key waits on this phone (ADR-0112). */
+export type BiometricLock = {
+  /** The launch's first look: the prompt opens by itself over the bare logo. */
+  autoPrompt: boolean;
+  error: string | null;
+  onUnlock: () => Promise<void> | void;
+  onUseAnotherAccount: () => Promise<void> | void;
+};
+
 export type LoginSubmissionResult =
   { status: "rejected" } | { retryAfterSeconds: number; status: "throttled" };
 
 type LoginScreenProps = {
   /** A one-time message, such as the one left by closing the Account. */
   notice?: string | null;
-  /** Set while biometrics guard the saved session: the sheet greets first. */
-  onBiometricUnlock?: () => Promise<void> | void;
+  /** Set while a biometric key waits: the sheet greets instead of the form. */
+  biometricLock?: BiometricLock;
   onForgotPassword?: () => void;
   onRegister?: () => void;
   /** The Staff app marks its Login as the team's entrance (S01). */
@@ -48,15 +57,23 @@ type LoginScreenProps = {
 };
 
 export function LoginScreen({
+  biometricLock,
   notice = null,
-  onBiometricUnlock,
   onForgotPassword,
   onRegister,
   onSubmit = () => undefined,
   teamAccess = false,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
-  const [usePassword, setUsePassword] = useState(false);
+  // Until the launch's own prompt answers, only the logo shows (canvas Main, iOS-1).
+  const [autoPrompting, setAutoPrompting] = useState(biometricLock?.autoPrompt === true);
+  const promptOnce = useEffectEvent(() => {
+    if (biometricLock?.autoPrompt !== true) return;
+    void Promise.resolve(biometricLock.onUnlock()).finally(() => setAutoPrompting(false));
+  });
+  useEffect(() => {
+    promptOnce();
+  }, []);
   const { width } = useWindowDimensions();
   // The sheet reaches the bottom edge and keeps the home indicator clear itself.
   const bottomInset = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
@@ -104,92 +121,97 @@ export function LoginScreen({
           />
           {teamAccess ? <TeamAccessBadge /> : null}
         </View>
-        <View
-          style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
-          testID="login-sheet"
-        >
-          {notice === null ? null : (
-            <View accessibilityRole="summary" style={styles.notice}>
-              <Glyph color={colors.onEmphasis} name="check" size={20} strokeWidth={1.8} />
-              <Text style={styles.noticeText} tone="onDark" variant="cuerpo">
-                {notice}
-              </Text>
-            </View>
-          )}
-          {onBiometricUnlock !== undefined && !usePassword ? (
-            <BiometricWelcome
-              onUnlock={onBiometricUnlock}
-              onUsePassword={() => setUsePassword(true)}
-            />
-          ) : (
-            <>
-              {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
-              {retryAfterSeconds > 0 ? (
-                <WaitNotice
-                  message="Demasiados intentos. Intenta de nuevo en un momento."
-                  remainingSeconds={retryAfterSeconds}
-                  waitLabel="Podrás intentarlo en"
+        {autoPrompting ? null : (
+          <View
+            style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+            testID="login-sheet"
+          >
+            {notice === null ? null : (
+              <View accessibilityRole="summary" style={styles.notice}>
+                <Glyph color={colors.onEmphasis} name="check" size={20} strokeWidth={1.8} />
+                <Text style={styles.noticeText} tone="onDark" variant="cuerpo">
+                  {notice}
+                </Text>
+              </View>
+            )}
+            {biometricLock === undefined ? (
+              <>
+                {rejected ? (
+                  <FormAlert>El correo o la contraseña no son correctos.</FormAlert>
+                ) : null}
+                {retryAfterSeconds > 0 ? (
+                  <WaitNotice
+                    message="Demasiados intentos. Intenta de nuevo en un momento."
+                    remainingSeconds={retryAfterSeconds}
+                    waitLabel="Podrás intentarlo en"
+                  />
+                ) : null}
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <FormField
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      error={errors.email?.message}
+                      keyboardType="email-address"
+                      label="Correo electrónico"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      testID="login-email"
+                      value={value}
+                    />
+                  )}
                 />
-              ) : null}
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <FormField
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    error={errors.email?.message}
-                    keyboardType="email-address"
-                    label="Correo electrónico"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    testID="login-email"
-                    value={value}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <FormField
+                      autoComplete="current-password"
+                      error={errors.password?.message}
+                      label="Contraseña"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      secureTextEntry
+                      testID="login-password"
+                      value={value}
+                    />
+                  )}
+                />
+                <PrimaryButton
+                  busy={isSubmitting}
+                  disabled={retryAfterSeconds > 0}
+                  label="Iniciar sesión"
+                  onPress={submitLogin}
+                  testID="login-submit"
+                />
+                {onForgotPassword === undefined ? null : (
+                  <TextButton
+                    label="¿Olvidaste tu contraseña?"
+                    onPress={onForgotPassword}
+                    testID="login-forgot-password"
                   />
                 )}
-              />
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <FormField
-                    autoComplete="current-password"
-                    error={errors.password?.message}
-                    label="Contraseña"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    secureTextEntry
-                    testID="login-password"
-                    value={value}
-                  />
+                {onRegister === undefined ? null : (
+                  <View style={styles.register}>
+                    <FooterPrompt
+                      action="Regístrate"
+                      onPress={onRegister}
+                      prompt="¿No tienes una cuenta?"
+                    />
+                  </View>
                 )}
+              </>
+            ) : (
+              <BiometricWelcome
+                error={biometricLock.error}
+                onUnlock={biometricLock.onUnlock}
+                onUseAnotherAccount={biometricLock.onUseAnotherAccount}
               />
-              <PrimaryButton
-                busy={isSubmitting}
-                disabled={retryAfterSeconds > 0}
-                label="Iniciar sesión"
-                onPress={submitLogin}
-                testID="login-submit"
-              />
-              {onForgotPassword === undefined ? null : (
-                <TextButton
-                  label="¿Olvidaste tu contraseña?"
-                  onPress={onForgotPassword}
-                  testID="login-forgot-password"
-                />
-              )}
-              {onRegister === undefined ? null : (
-                <View style={styles.register}>
-                  <FooterPrompt
-                    action="Regístrate"
-                    onPress={onRegister}
-                    prompt="¿No tienes una cuenta?"
-                  />
-                </View>
-              )}
-            </>
-          )}
-        </View>
+            )}
+          </View>
+        )}
       </FormScrollView>
     </Screen>
   );

@@ -72,7 +72,7 @@ export function createClientRuntime(
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue({ accountId: "account-1", role: "client" }),
       start: jest.fn(),
-      unlockWithBiometrics: jest.fn(),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ status: "cancelled" }),
     },
     ...overrides,
   };

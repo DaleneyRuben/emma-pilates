@@ -59,13 +59,13 @@ describe("BiometricOffer", () => {
     const manager = managerWith(jest.fn().mockResolvedValue(true));
     const screen = await signInWith(manager);
 
-    expect(screen.getByRole("header", { name: "Entra más rápido" })).toBeOnTheScreen();
+    expect(screen.getByRole("header", { name: "¿Entrar con Face ID?" })).toBeOnTheScreen();
     await act(async () => {
       await fireEvent.press(screen.getByRole("button", { name: "Usar Face ID" }));
     });
 
     expect(manager.enableBiometrics).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole("header", { name: "Entra más rápido" })).toBeNull();
+    expect(screen.queryByRole("header", { name: "¿Entrar con Face ID?" })).toBeNull();
     expect(screen.getByText("Listo: la próxima vez entras con Face ID.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar aviso" }));
     expect(screen.queryByText("Listo: la próxima vez entras con Face ID.")).toBeNull();
@@ -78,7 +78,7 @@ describe("BiometricOffer", () => {
       await fireEvent.press(screen.getByRole("button", { name: "Usar Face ID" }));
     });
 
-    expect(screen.queryByRole("header", { name: "Entra más rápido" })).toBeNull();
+    expect(screen.queryByRole("header", { name: "¿Entrar con Face ID?" })).toBeNull();
     expect(screen.queryByText(/^Listo/)).toBeNull();
   });
 
@@ -91,6 +91,6 @@ describe("BiometricOffer", () => {
     });
 
     expect(manager.declineBiometricOffer).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole("header", { name: "Entra más rápido" })).toBeNull();
+    expect(screen.queryByRole("header", { name: "¿Entrar con Face ID?" })).toBeNull();
   });
 });

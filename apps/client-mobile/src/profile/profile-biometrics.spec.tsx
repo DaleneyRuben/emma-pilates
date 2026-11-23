@@ -37,7 +37,9 @@ describe("Client Perfil biometrics", () => {
 
     expect(runtime.sessionManager.enableBiometrics).toHaveBeenCalledTimes(1);
     await waitFor(() => {
-      expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
+      expect(
+        screen.getByText("Sirve cualquier cara guardada en el Face ID de este iPhone"),
+      ).toBeOnTheScreen();
     });
     expect(screen.getByText("Listo: la próxima vez entras con Face ID.")).toBeOnTheScreen();
   });

@@ -250,7 +250,7 @@ export function ClientNavigation({
   authenticationApi,
   authenticationIntent,
   installationIdentifier,
-  onBiometricUnlock,
+  biometricLock,
   onLogin,
   onRecoveryCredential,
   pendingRegistrationStore,
@@ -308,7 +308,7 @@ export function ClientNavigation({
       api={authenticationApi}
       intent={authenticationIntent}
       notice={signOutNotice}
-      onBiometricUnlock={onBiometricUnlock}
+      biometricLock={biometricLock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
       pendingRegistrationStore={pendingRegistrationStore}

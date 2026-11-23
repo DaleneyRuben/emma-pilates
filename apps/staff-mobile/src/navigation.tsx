@@ -34,7 +34,7 @@ export function StaffNavigation({
   authenticationIntent,
   impersonation,
   installationIdentifier,
-  onBiometricUnlock,
+  biometricLock,
   onLogin,
   onRecoveryCredential,
   pushPlatform,
@@ -148,7 +148,7 @@ export function StaffNavigation({
           ? null
           : authenticationIntent
       }
-      onBiometricUnlock={onBiometricUnlock}
+      biometricLock={biometricLock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
     />

@@ -6,7 +6,12 @@ import { Text } from "../ui/text";
 import { PrimaryButton } from "../ui/primary-button";
 import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
-import { LoginScreen, type LoginSubmissionResult, type LoginValues } from "./login-screen";
+import {
+  type BiometricLock,
+  LoginScreen,
+  type LoginSubmissionResult,
+  type LoginValues,
+} from "./login-screen";
 import {
   CheckEmailScreen,
   CorrectEmailScreen,
@@ -33,7 +38,7 @@ type AuthenticationFlowProps = {
   api: AuthenticationApi;
   intent?: AuthenticationLinkIntent | null;
   notice?: string | null;
-  onBiometricUnlock?: () => Promise<void> | void;
+  biometricLock?: BiometricLock;
   onLogin?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
@@ -131,8 +136,8 @@ export function AuthenticationFlow({
   allowClientRegistration = true,
   api,
   intent,
+  biometricLock,
   notice = null,
-  onBiometricUnlock,
   onLogin,
   onRecoveryCredential = () => undefined,
   pendingRegistrationStore,
@@ -263,8 +268,8 @@ export function AuthenticationFlow({
 
   return (
     <LoginScreen
+      biometricLock={biometricLock}
       notice={notice}
-      onBiometricUnlock={onBiometricUnlock}
       onForgotPassword={() => setRoute("recovery-request")}
       onRegister={allowClientRegistration ? () => setRoute("register") : undefined}
       onSubmit={onLogin === undefined ? undefined : login}

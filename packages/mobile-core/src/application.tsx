@@ -9,7 +9,7 @@ import { createAuthenticationApi, type AuthenticationApi } from "./auth/authenti
 import { createBiometricKeyApi } from "./auth/biometric-key-api";
 import { BiometricOffer } from "./auth/biometric-offer";
 import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provider";
-import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
+import type { BiometricLock, LoginSubmissionResult, LoginValues } from "./auth/login-screen";
 import type { PendingRegistrationStore } from "./auth/pending-registration-store";
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
 import {
@@ -62,7 +62,8 @@ export type MobileNavigationProps = {
   /** FUT-001: set while an Administrator sees the Staff app as a Staff Member. */
   impersonation?: MobileImpersonation;
   installationIdentifier?: () => Promise<string>;
-  onBiometricUnlock?: () => Promise<void> | void;
+  /** Set while a biometric key waits on this phone (ADR-0112). */
+  biometricLock?: BiometricLock;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
@@ -191,8 +192,15 @@ function IdentityNavigation({
         apiFetcher={apiFetcher}
         impersonation={identity.session?.impersonation}
         installationIdentifier={installationIdentifier}
-        onBiometricUnlock={
-          identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
+        biometricLock={
+          identity.status === "biometric-locked"
+            ? {
+                autoPrompt: identity.biometrics.autoPrompt,
+                error: identity.biometrics.unlockError,
+                onUnlock: identity.unlockWithBiometrics,
+                onUseAnotherAccount: identity.biometrics.useAnotherAccount,
+              }
+            : undefined
         }
         onLogin={handleLogin}
         onRecoveryCredential={identity.start}

@@ -59,7 +59,9 @@ describe("Staff Perfil biometrics", () => {
     const screen = await openProfile(runtime);
 
     await waitFor(() => {
-      expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
+      expect(
+        screen.getByText("Sirve cualquier cara guardada en el Face ID de este iPhone"),
+      ).toBeOnTheScreen();
     });
     await act(async () => {
       await fireEvent(
