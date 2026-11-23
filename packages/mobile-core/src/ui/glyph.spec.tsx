@@ -49,6 +49,7 @@ describe("Glyph", () => {
       "camera",
       "copy",
       "document",
+      "fingerprint",
       "flame",
       "health",
       "image",
