@@ -100,6 +100,8 @@ const dayMilliseconds = 24 * 60 * 60 * 1_000;
 /** Unused for this long, a key stops working; each use renews it. */
 export const biometricKeyLifetimeMilliseconds = 90 * dayMilliseconds;
 const failedCheckLifetimeMilliseconds = 60 * 60 * 1_000;
+/** A phone that lost the exchange's answer may send the key just replaced. */
+const lostAnswerGraceMilliseconds = 2 * 60 * 1_000;
 
 const installationDigest = (
   clientIdentifier: string,
@@ -166,6 +168,35 @@ export const issueBiometricKey = async (
   return { deviceKey: deviceKey.secret, unlockSecret: unlockSecret.secret };
 };
 
+/**
+ * The live key that replaced `stored` moments ago and was never used since:
+ * the phone holding `stored` simply never received it.
+ */
+const lostAnswerSuccessor = async (
+  stored: StoredBiometricKey,
+  unlockSecret: string,
+  now: Date,
+  dependencies: BiometricKeyDependencies,
+): Promise<StoredBiometricKey | null> => {
+  const rotatedAt = stored.revokedAt;
+  if (
+    rotatedAt === null ||
+    now.getTime() - rotatedAt.getTime() > lostAnswerGraceMilliseconds ||
+    !dependencies.tokens.matches(unlockSecret, stored.unlockSecretDigest)
+  ) {
+    return null;
+  }
+
+  const successor = await dependencies.gateway.findLiveKey({
+    accountId: stored.accountId,
+    installationIdDigest: stored.installationIdDigest,
+  });
+
+  return successor?.issuedAt.getTime() === rotatedAt.getTime()
+    ? successor
+    : null;
+};
+
 type ExchangeCommand = {
   deviceKey: string;
   unlockSecret: string;
@@ -226,24 +257,37 @@ export const exchangeBiometricKey = async (
     return reject();
   }
 
+  let current = stored;
+
   if (stored.revocationReason === 'rotated') {
-    await gateway.revokeInstallation({
-      accountId: stored.accountId,
-      installationIdDigest,
-      revokedAt: now,
-      reason: 'reuse_detected',
-      auditRecordId: dependencies.newId(),
-    });
-    return reject();
+    const successor = await lostAnswerSuccessor(
+      stored,
+      command.unlockSecret,
+      now,
+      dependencies,
+    );
+
+    if (successor === null) {
+      await gateway.revokeInstallation({
+        accountId: stored.accountId,
+        installationIdDigest,
+        revokedAt: now,
+        reason: 'reuse_detected',
+        auditRecordId: dependencies.newId(),
+      });
+      return reject();
+    }
+
+    current = successor;
   }
 
   if (
-    stored.revokedAt !== null ||
-    stored.expiresAt.getTime() <= now.getTime() ||
-    !stored.accountCanSignIn ||
+    current.revokedAt !== null ||
+    current.expiresAt.getTime() <= now.getTime() ||
+    !current.accountCanSignIn ||
     !dependencies.tokens.matches(
       command.unlockSecret,
-      stored.unlockSecretDigest,
+      current.unlockSecretDigest,
     )
   ) {
     return reject();
@@ -252,20 +296,20 @@ export const exchangeBiometricKey = async (
   const deviceKey = dependencies.tokens.issue();
   const credential = dependencies.tokens.issue();
   const rotated = await gateway.rotate({
-    previousKeyId: stored.id,
+    previousKeyId: current.id,
     key: newKey(
       {
-        accountId: stored.accountId,
+        accountId: current.accountId,
         installationIdDigest,
         keyDigest: deviceKey.digest,
-        unlockSecretDigest: stored.unlockSecretDigest,
+        unlockSecretDigest: current.unlockSecretDigest,
       },
       dependencies,
     ),
     session: newAuthenticationSession(
       {
         id: dependencies.newId(),
-        accountId: stored.accountId,
+        accountId: current.accountId,
         surface: 'mobile',
         credentialDigest: credential.digest,
       },

@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../generated/prisma/client';
+import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
   AuditActorKind,
   AuditOutcome,
@@ -6,10 +6,12 @@ import {
   BiometricKeyRevocationReason as PrismaReason,
 } from '../../generated/prisma/enums';
 import { toPrismaBytes } from '../../database/prisma-bytes';
+import { retrySerializable } from '../../database/retry-serializable';
 import type {
   BiometricKeyGateway,
   BiometricKeyRevocationReason,
   NewBiometricKey,
+  StoredBiometricKey,
 } from './biometric-keys';
 
 export type PrismaBiometricKeyGateway = Omit<
@@ -44,120 +46,158 @@ const keyData = (key: NewBiometricKey) => ({
 
 const live = { revokedAt: null, deletedAt: null } as const;
 
+// The partial unique index refuses a second live key for one installation.
+const isUniqueViolation = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  'code' in error &&
+  error.code === 'P2002';
+
+const storedKeySelect = {
+  id: true,
+  accountId: true,
+  installationIdDigest: true,
+  unlockSecretDigest: true,
+  issuedAt: true,
+  expiresAt: true,
+  revokedAt: true,
+  revocationReason: true,
+  deletedAt: true,
+  account: {
+    select: {
+      activatedAt: true,
+      emailVerifiedAt: true,
+      disabledAt: true,
+      deletedAt: true,
+    },
+  },
+} as const;
+
+type StoredKeyRow = Prisma.BiometricKeyGetPayload<{
+  select: typeof storedKeySelect;
+}>;
+
+const toStoredKey = (row: StoredKeyRow | null): StoredBiometricKey | null => {
+  if (row === null || row.deletedAt !== null) {
+    return null;
+  }
+
+  const { account } = row;
+
+  return {
+    id: row.id,
+    accountId: row.accountId,
+    installationIdDigest: Buffer.from(row.installationIdDigest),
+    unlockSecretDigest: Buffer.from(row.unlockSecretDigest),
+    issuedAt: row.issuedAt,
+    expiresAt: row.expiresAt,
+    revokedAt: row.revokedAt,
+    revocationReason:
+      row.revocationReason === null ? null : reasonOf(row.revocationReason),
+    accountCanSignIn:
+      account.activatedAt !== null &&
+      account.emailVerifiedAt !== null &&
+      account.disabledAt === null &&
+      account.deletedAt === null,
+  };
+};
+
 export const createPrismaBiometricKeyGateway = (
   prisma: PrismaClient,
 ): PrismaBiometricKeyGateway => ({
+  // Two issues racing on one installation: the loser starts again and
+  // replaces the winner's key.
   issue: ({ key, actor, auditRecordId }) =>
-    prisma.$transaction(async (transaction) => {
-      await transaction.biometricKey.updateMany({
+    retrySerializable(
+      () =>
+        prisma.$transaction(async (transaction) => {
+          await transaction.biometricKey.updateMany({
+            where: {
+              ...live,
+              installationIdDigest: toPrismaBytes(key.installationIdDigest),
+            },
+            data: {
+              revokedAt: key.issuedAt,
+              revocationReason: PrismaReason.REPLACED,
+            },
+          });
+          await transaction.biometricKey.create({ data: keyData(key) });
+          await transaction.auditRecord.create({
+            data: {
+              id: auditRecordId,
+              actionCode: 'account.biometric_key_issued',
+              outcome: AuditOutcome.SUCCEEDED,
+              actorKind: AuditActorKind.ACCOUNT,
+              actorAccountId: actor.accountId,
+              actorRole: actor.role,
+              impersonationId: actor.impersonationId,
+              targetType: 'account',
+              targetId: key.accountId,
+              correlationId: auditRecordId,
+              occurredAt: key.issuedAt,
+            },
+          });
+        }),
+      { retryAlso: isUniqueViolation },
+    ),
+
+  findByKeyDigest: async (digest) =>
+    toStoredKey(
+      await prisma.biometricKey.findUnique({
+        where: { keyDigest: toPrismaBytes(digest) },
+        select: storedKeySelect,
+      }),
+    ),
+
+  findLiveKey: async ({ accountId, installationIdDigest }) =>
+    toStoredKey(
+      await prisma.biometricKey.findFirst({
         where: {
           ...live,
-          installationIdDigest: toPrismaBytes(key.installationIdDigest),
+          accountId,
+          installationIdDigest: toPrismaBytes(installationIdDigest),
         },
-        data: {
-          revokedAt: key.issuedAt,
-          revocationReason: PrismaReason.REPLACED,
-        },
-      });
-      await transaction.biometricKey.create({ data: keyData(key) });
-      await transaction.auditRecord.create({
-        data: {
-          id: auditRecordId,
-          actionCode: 'account.biometric_key_issued',
-          outcome: AuditOutcome.SUCCEEDED,
-          actorKind: AuditActorKind.ACCOUNT,
-          actorAccountId: actor.accountId,
-          actorRole: actor.role,
-          impersonationId: actor.impersonationId,
-          targetType: 'account',
-          targetId: key.accountId,
-          correlationId: auditRecordId,
-          occurredAt: key.issuedAt,
-        },
-      });
-    }),
-
-  findLiveKey: () => Promise.resolve(null),
-
-  async findByKeyDigest(digest) {
-    const row = await prisma.biometricKey.findUnique({
-      where: { keyDigest: toPrismaBytes(digest) },
-      select: {
-        id: true,
-        accountId: true,
-        installationIdDigest: true,
-        unlockSecretDigest: true,
-        issuedAt: true,
-        expiresAt: true,
-        revokedAt: true,
-        revocationReason: true,
-        deletedAt: true,
-        account: {
-          select: {
-            activatedAt: true,
-            emailVerifiedAt: true,
-            disabledAt: true,
-            deletedAt: true,
-          },
-        },
-      },
-    });
-
-    if (row === null || row.deletedAt !== null) {
-      return null;
-    }
-
-    const { account } = row;
-
-    return {
-      id: row.id,
-      accountId: row.accountId,
-      installationIdDigest: Buffer.from(row.installationIdDigest),
-      unlockSecretDigest: Buffer.from(row.unlockSecretDigest),
-      issuedAt: row.issuedAt,
-      expiresAt: row.expiresAt,
-      revokedAt: row.revokedAt,
-      revocationReason:
-        row.revocationReason === null ? null : reasonOf(row.revocationReason),
-      accountCanSignIn:
-        account.activatedAt !== null &&
-        account.emailVerifiedAt !== null &&
-        account.disabledAt === null &&
-        account.deletedAt === null,
-    };
-  },
+        select: storedKeySelect,
+      }),
+    ),
 
   // The previous key is revoked first: of two requests racing with the same
   // key, the second finds it revoked and opens nothing.
   rotate: ({ previousKeyId, key, session }) =>
-    prisma.$transaction(async (transaction) => {
-      const { count } = await transaction.biometricKey.updateMany({
-        where: { ...live, id: previousKeyId },
-        data: {
-          revokedAt: key.issuedAt,
-          revocationReason: PrismaReason.ROTATED,
-        },
-      });
+    prisma
+      .$transaction(async (transaction) => {
+        const { count } = await transaction.biometricKey.updateMany({
+          where: { ...live, id: previousKeyId },
+          data: {
+            revokedAt: key.issuedAt,
+            revocationReason: PrismaReason.ROTATED,
+          },
+        });
 
-      if (count !== 1) {
-        return false;
-      }
+        if (count !== 1) {
+          return false;
+        }
 
-      await transaction.biometricKey.create({ data: keyData(key) });
-      await transaction.authenticationSession.create({
-        data: {
-          id: session.id,
-          accountId: session.accountId,
-          surface: AuthenticationSessionSurface.MOBILE,
-          credentialDigest: toPrismaBytes(session.credentialDigest),
-          createdAt: session.createdAt,
-          lastMeaningfulActivityAt: session.lastMeaningfulActivityAt,
-          idleExpiresAt: session.idleExpiresAt,
-          absoluteExpiresAt: session.absoluteExpiresAt,
-        },
-      });
-      return true;
-    }),
+        await transaction.biometricKey.create({ data: keyData(key) });
+        await transaction.authenticationSession.create({
+          data: {
+            id: session.id,
+            accountId: session.accountId,
+            surface: AuthenticationSessionSurface.MOBILE,
+            credentialDigest: toPrismaBytes(session.credentialDigest),
+            createdAt: session.createdAt,
+            lastMeaningfulActivityAt: session.lastMeaningfulActivityAt,
+            idleExpiresAt: session.idleExpiresAt,
+            absoluteExpiresAt: session.absoluteExpiresAt,
+          },
+        });
+        return true;
+      })
+      // A key issued for the installation meanwhile won: this one opens nothing.
+      .catch((error: unknown) => {
+        if (isUniqueViolation(error)) return false;
+        throw error;
+      }),
 
   revokeInstallation: (input) =>
     prisma.$transaction(async (transaction) => {
