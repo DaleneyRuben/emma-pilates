@@ -5,6 +5,8 @@ import { MobileIdentityProvider } from "../auth/identity-provider";
 import type { SessionManager } from "../auth/session-manager";
 import { BiometricSwitchRow } from "./biometric-switch-row";
 
+jest.mock("../monitoring/error-reporting", () => ({ reportRecoveredError: jest.fn() }));
+
 const session = { accountId: "account-1", role: "client" as const };
 
 function managerWith(overrides: Partial<SessionManager> = {}): SessionManager {
@@ -80,5 +82,20 @@ describe("BiometricSwitchRow", () => {
     const screen = await renderRow(managerWith({ canUseBiometrics: () => false }));
 
     expect(screen.queryByRole("switch")).toBeNull();
+  });
+
+  it("keeps the switch on when turning it off fails", async () => {
+    const manager = managerWith({
+      disableBiometrics: jest.fn().mockRejectedValue(new Error("keychain")),
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+    });
+    const screen = await renderRow(manager);
+    const toggle = await screen.findByRole("switch", { name: "Entrar con Face ID" });
+
+    await act(async () => {
+      await fireEvent(toggle, "valueChange", false);
+    });
+
+    expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
   });
 });
