@@ -62,7 +62,9 @@ describe("BiometricSwitchRow", () => {
     });
     expect(manager.enableBiometrics).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("switch", { name: "Entrar con Face ID" })).toHaveProp("value", true);
-    expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Sirve cualquier cara guardada en el Face ID de este iPhone"),
+    ).toBeOnTheScreen();
 
     await act(async () => {
       await fireEvent(
@@ -80,6 +82,17 @@ describe("BiometricSwitchRow", () => {
     const screen = await renderRow(managerWith());
 
     expect(await screen.findByRole("switch", { name: "Entrar con huella" })).toBeOnTheScreen();
+  });
+
+  it("warns on Android that any fingerprint on the phone works", async () => {
+    jest.replaceProperty(Platform, "OS", "android");
+    const screen = await renderRow(
+      managerWith({ hasBiometricSession: jest.fn().mockResolvedValue(true) }),
+    );
+
+    expect(
+      await screen.findByText("Sirve cualquier huella guardada en este celular"),
+    ).toBeOnTheScreen();
   });
 
   it("draws nothing on a phone without biometrics", async () => {
@@ -100,6 +113,8 @@ describe("BiometricSwitchRow", () => {
       await fireEvent(toggle, "valueChange", false);
     });
 
-    expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Sirve cualquier cara guardada en el Face ID de este iPhone"),
+    ).toBeOnTheScreen();
   });
 });
