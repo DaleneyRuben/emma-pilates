@@ -185,4 +185,35 @@ describe("MobileIdentityProvider biometrics", () => {
 
     expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
   });
+
+  it("signs in without an offer when the offer check cannot read the keychain", async () => {
+    const screen = await renderWith(
+      managerWith({ wasBiometricOfferDeclined: jest.fn().mockRejectedValue(new Error("-34018")) }),
+    );
+
+    await press(screen, "Password");
+
+    expect(screen.getByText(/^signed-in .* no-offer/)).toBeOnTheScreen();
+  });
+
+  it("keeps biometrics off when turning them on throws", async () => {
+    const screen = await renderWith(
+      managerWith({ enableBiometrics: jest.fn().mockRejectedValue(new Error("keychain")) }),
+    );
+    await press(screen, "Password");
+
+    await press(screen, "Enable");
+
+    expect(screen.getByText("signed-in available disabled no-offer no-notice")).toBeOnTheScreen();
+  });
+
+  it("reads the phone's ability again on each render", async () => {
+    const canUseBiometrics = jest.fn(() => true);
+    const screen = await renderWith(managerWith({ canUseBiometrics }));
+    canUseBiometrics.mockReturnValue(false);
+
+    await press(screen, "Recovery");
+
+    expect(screen.getByText(/^signed-in unavailable/)).toBeOnTheScreen();
+  });
 });
