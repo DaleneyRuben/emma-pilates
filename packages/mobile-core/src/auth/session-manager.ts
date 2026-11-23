@@ -60,6 +60,8 @@ export type SessionManager = {
   /** Resolves the current session again, such as after an Impersonation starts or ends. */
   refresh: () => Promise<MobileSession | null>;
   hasBiometricSession: () => Promise<boolean>;
+  /** The server already revoked the key, such as after a password change. */
+  forgetBiometricsLocally?: () => Promise<void>;
   /** Ends the session; the biometric key stays for the next launch. */
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;

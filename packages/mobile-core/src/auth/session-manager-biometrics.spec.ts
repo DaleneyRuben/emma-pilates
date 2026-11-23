@@ -208,6 +208,16 @@ describe("createSessionManager biometric key", () => {
     expect(store.clear).not.toHaveBeenCalled();
   });
 
+  it("forgets the key on this phone only, for a password the server changed", async () => {
+    const store = biometricStore();
+    const api = keyApi();
+
+    await managerWith(store, api).manager.forgetBiometricsLocally?.();
+
+    expect(store.forgetBiometricKey).toHaveBeenCalled();
+    expect(api.revoke).not.toHaveBeenCalled();
+  });
+
   it("stays locked when the prompt is cancelled", async () => {
     const store = biometricStore({
       readUnlockSecret: jest.fn().mockRejectedValue(new Error("User canceled")),

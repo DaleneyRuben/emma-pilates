@@ -260,6 +260,35 @@ describe("MobileIdentityProvider biometrics", () => {
     expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
   });
 
+  // Review finding 4: a keychain failure outside the prompt never escapes.
+  it("says to try again when the unlock itself throws", async () => {
+    const manager = managerWith({
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      unlockWithBiometrics: jest.fn().mockRejectedValue(new Error("keychain")),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Unlock");
+
+    expect(
+      screen.getByText(
+        "no-auto-prompt | No pudimos entrar. Revisa tu conexión e intenta de nuevo.",
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  it("still shows the password form when forgetting the key throws", async () => {
+    const manager = managerWith({
+      disableBiometrics: jest.fn().mockRejectedValue(new Error("keychain")),
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Another account");
+
+    expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
+  });
+
   it("signs in without an offer when the offer check cannot read the keychain", async () => {
     const screen = await renderWith(
       managerWith({ wasBiometricOfferDeclined: jest.fn().mockRejectedValue(new Error("-34018")) }),
