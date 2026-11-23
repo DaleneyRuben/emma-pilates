@@ -1,5 +1,6 @@
 import type { CurrentAuthenticationPrincipalDto } from "@pilates/api-contracts";
 
+import { reportRecoveredError } from "../monitoring/error-reporting";
 import type { BiometricKeyApi } from "./biometric-key-api";
 import { type BiometricKeychainStore, createBiometricKeychain } from "./biometric-keychain";
 
@@ -111,6 +112,15 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     return toMobileSession(principal);
   }
 
+  // Best effort: the server ends an idle session on its own anyway.
+  async function endQuietly(credential: string): Promise<void> {
+    try {
+      await revokeCurrent(credential);
+    } catch (error) {
+      reportRecoveredError(error);
+    }
+  }
+
   async function unlockWithBiometrics(): Promise<BiometricUnlockResult> {
     const unlocked = await keychain.unlock();
     if (unlocked.status !== "credential") {
@@ -129,7 +139,11 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
       return { status: "invalid" };
     }
 
+    const previous = await credentialStore.load();
     await credentialStore.save(unlocked.credential);
+    if (previous !== null && previous !== unlocked.credential) {
+      await endQuietly(previous);
+    }
     if (!unlocked.legacy) {
       return { session, status: "signed-in" };
     }
@@ -146,7 +160,15 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     async declineBiometricOffer(): Promise<void> {
       await credentialStore.declineBiometricOffer?.();
     },
-    disableBiometrics: () => keychain.turnOff(),
+    async disableBiometrics(): Promise<void> {
+      await keychain.turnOff();
+      // «Usar otra cuenta» on the lock: the session saved behind it ends too.
+      if (activeCredential === null) {
+        const saved = await credentialStore.load();
+        if (saved !== null) await endQuietly(saved);
+        await credentialStore.clear();
+      }
+    },
     async enableBiometrics(): Promise<boolean> {
       return activeCredential === null
         ? false
@@ -158,6 +180,11 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     wasBiometricOfferDeclined: async () =>
       (await credentialStore.wasBiometricOfferDeclined?.()) ?? false,
     async restore(): Promise<MobileSession | null> {
+      // Owner, 2026-11-23: with a key on the phone every launch asks first.
+      if ((await credentialStore.hasBiometricKey?.()) === true) {
+        return null;
+      }
+
       const credential = await credentialStore.load();
 
       if (credential === null) {
