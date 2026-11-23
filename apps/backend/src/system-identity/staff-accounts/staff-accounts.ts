@@ -4,7 +4,9 @@ import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuthenticationSessionRevocationReason,
   AuthenticationTokenPurpose,
+  BiometricKeyRevocationReason,
 } from '../../generated/prisma/enums';
+import { revokeAccountBiometricKeys } from '../biometric-keys/revoke-biometric-keys';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
 import { removePendingAccount } from '../registration/remove-pending-account';
@@ -295,6 +297,10 @@ export const createStaffAccountOperations = (
           reason: AuthenticationSessionRevocationReason.ACCOUNT_DISABLED,
         },
       );
+      await revokeAccountBiometricKeys(transaction, input.accountId, {
+        revokedAt: input.now,
+        reason: BiometricKeyRevocationReason.ACCOUNT_DISABLED,
+      });
       await transaction.authenticationToken.updateMany({
         where: {
           accountId: input.accountId,

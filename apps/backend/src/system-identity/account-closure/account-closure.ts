@@ -2,7 +2,9 @@ import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import {
   AccountDeviceDeactivationReason,
   AuthenticationSessionRevocationReason,
+  BiometricKeyRevocationReason,
 } from '../../generated/prisma/enums';
+import { revokeAccountBiometricKeys } from '../biometric-keys/revoke-biometric-keys';
 import { verifyPassword } from '../security/argon2-password-hasher';
 
 // System Identity's side of closing a Client's Account (BE-007 G6), run
@@ -24,6 +26,10 @@ export const createAccountClosureOperations = (
         revokedAt: occurredAt,
         revocationReason: AuthenticationSessionRevocationReason.ACCOUNT_CLOSED,
       },
+    });
+    await revokeAccountBiometricKeys(transaction, accountId, {
+      revokedAt: occurredAt,
+      reason: BiometricKeyRevocationReason.ACCOUNT_CLOSED,
     });
     await transaction.authenticationToken.updateMany({
       where: { accountId, usedAt: null, invalidatedAt: null },
