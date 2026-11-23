@@ -26,6 +26,7 @@ describe('biometric keys', () => {
     accountId: 'account-id',
     installationIdDigest: Buffer.from(`signal:installation:${installation}`),
     unlockSecretDigest: digest('unlock-secret'),
+    issuedAt: new Date('2026-11-01T00:00:00.000Z'),
     expiresAt: new Date('2027-01-01T00:00:00.000Z'),
     revokedAt: null,
     revocationReason: null,
@@ -44,6 +45,9 @@ describe('biometric keys', () => {
         .mockResolvedValue(stored()),
       rotate: jest.fn().mockResolvedValue(true),
       revokeInstallation: jest.fn().mockResolvedValue(undefined),
+      findLiveKey: jest
+        .fn<Promise<StoredBiometricKey | null>, [unknown]>()
+        .mockResolvedValue(null),
       readThrottleEvents: jest.fn().mockResolvedValue({
         loginLaneFailures: [],
         clientFailures: [],
@@ -221,6 +225,58 @@ describe('biometric keys', () => {
       });
       expect(gateway.rotate).not.toHaveBeenCalled();
     });
+
+    // Review finding 1: the server rotated but the phone never got the answer.
+    it('accepts the key just replaced once more while its successor is unused', async () => {
+      const { dependencies, gateway } = createDependencies();
+      const rotatedAt = new Date('2026-11-23T11:59:30.000Z');
+      gateway.findByKeyDigest.mockResolvedValue(
+        stored({ revokedAt: rotatedAt, revocationReason: 'rotated' }),
+      );
+      gateway.findLiveKey.mockResolvedValue(
+        stored({ id: 'successor-id', issuedAt: rotatedAt }),
+      );
+
+      await expect(
+        exchangeBiometricKey(exchange, dependencies),
+      ).resolves.toEqual({ credential: 'secret-2', deviceKey: 'secret-1' });
+
+      expect(gateway.revokeInstallation).not.toHaveBeenCalled();
+      expect(gateway.rotate).toHaveBeenCalledWith(
+        expect.objectContaining({ previousKeyId: 'successor-id' }) as unknown,
+      );
+    });
+
+    it.each([
+      [
+        'its successor was already used',
+        new Date('2026-11-23T11:59:30.000Z'),
+        new Date('2026-11-23T11:59:45.000Z'),
+      ],
+      [
+        'the grace has passed',
+        new Date('2026-11-23T11:55:00.000Z'),
+        new Date('2026-11-23T11:55:00.000Z'),
+      ],
+    ])(
+      'still treats a replaced key as copied when %s',
+      async (_case, rotatedAt, successorIssuedAt) => {
+        const { dependencies, gateway } = createDependencies();
+        gateway.findByKeyDigest.mockResolvedValue(
+          stored({ revokedAt: rotatedAt, revocationReason: 'rotated' }),
+        );
+        gateway.findLiveKey.mockResolvedValue(
+          stored({ id: 'successor-id', issuedAt: successorIssuedAt }),
+        );
+
+        await expect(
+          exchangeBiometricKey(exchange, dependencies),
+        ).rejects.toBeInstanceOf(BiometricKeyRejectedError);
+        expect(gateway.revokeInstallation).toHaveBeenCalledWith(
+          expect.objectContaining({ reason: 'reuse_detected' }) as unknown,
+        );
+      },
+    );
 
     it('rejects a key another request rotated first', async () => {
       const { dependencies, gateway } = createDependencies();

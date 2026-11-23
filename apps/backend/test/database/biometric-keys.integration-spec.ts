@@ -130,6 +130,7 @@ describe('Biometric keys (MOB-006)', () => {
       accountId: lucia,
       installationIdDigest: Buffer.from(key.installationIdDigest),
       unlockSecretDigest: Buffer.from(key.unlockSecretDigest),
+      issuedAt: at,
       expiresAt: later,
       revokedAt: null,
       revocationReason: null,
@@ -152,6 +153,40 @@ describe('Biometric keys (MOB-006)', () => {
       where: { id: camila },
       data: { disabledAt: null },
     });
+  });
+
+  it('finds the installation’s live key', async () => {
+    const accountId = await accountIdFor('valeria@example.com');
+    const key = await issued(accountId);
+
+    await expect(
+      createPrismaBiometricKeyGateway(prisma).findLiveKey({
+        accountId,
+        installationIdDigest: Buffer.from(key.installationIdDigest),
+      }),
+    ).resolves.toMatchObject({ id: key.id, issuedAt: at });
+  });
+
+  // Review finding 3: two issues racing on one installation keep one live key.
+  it('keeps one live key when two issues race on an installation', async () => {
+    const accountId = await accountIdFor('valeria@example.com');
+    const installation = Buffer.from(randomUUID());
+    const gateway = createPrismaBiometricKeyGateway(prisma);
+    const issue = () =>
+      gateway.issue({
+        key: newKey(accountId, installation),
+        actor: actor(accountId),
+        auditRecordId: randomUUID(),
+      });
+
+    await expect(
+      Promise.all([issue(), issue(), issue()]),
+    ).resolves.toBeDefined();
+    await expect(
+      prisma.biometricKey.count({
+        where: { installationIdDigest: installation, revokedAt: null },
+      }),
+    ).resolves.toBe(1);
   });
 
   it('rotates a key into a new session exactly once', async () => {

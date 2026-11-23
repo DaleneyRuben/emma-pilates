@@ -77,6 +77,8 @@ export const createPrismaBiometricKeyGateway = (
       });
     }),
 
+  findLiveKey: () => Promise.resolve(null),
+
   async findByKeyDigest(digest) {
     const row = await prisma.biometricKey.findUnique({
       where: { keyDigest: toPrismaBytes(digest) },
@@ -85,6 +87,7 @@ export const createPrismaBiometricKeyGateway = (
         accountId: true,
         installationIdDigest: true,
         unlockSecretDigest: true,
+        issuedAt: true,
         expiresAt: true,
         revokedAt: true,
         revocationReason: true,
@@ -111,6 +114,7 @@ export const createPrismaBiometricKeyGateway = (
       accountId: row.accountId,
       installationIdDigest: Buffer.from(row.installationIdDigest),
       unlockSecretDigest: Buffer.from(row.unlockSecretDigest),
+      issuedAt: row.issuedAt,
       expiresAt: row.expiresAt,
       revokedAt: row.revokedAt,
       revocationReason:

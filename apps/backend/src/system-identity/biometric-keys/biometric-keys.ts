@@ -33,6 +33,7 @@ export type StoredBiometricKey = {
   accountId: string;
   installationIdDigest: Uint8Array;
   unlockSecretDigest: Uint8Array;
+  issuedAt: Date;
   expiresAt: Date;
   revokedAt: Date | null;
   revocationReason: BiometricKeyRevocationReason | null;
@@ -53,6 +54,10 @@ export type BiometricKeyGateway = {
     auditRecordId: string;
   }): Promise<void>;
   findByKeyDigest(digest: Uint8Array): Promise<StoredBiometricKey | null>;
+  findLiveKey(input: {
+    accountId: string;
+    installationIdDigest: Uint8Array;
+  }): Promise<StoredBiometricKey | null>;
   /** False when another request revoked the previous key first. */
   rotate(input: {
     previousKeyId: string;
