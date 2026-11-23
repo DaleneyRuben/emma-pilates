@@ -8,6 +8,10 @@ const hidden = { includeHiddenElements: true };
 // «Opción A»: the next launch with biometrics on greets first and keeps the
 // password form one tap away.
 describe("LoginScreen with biometrics on", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("greets and unlocks with Face ID before showing the form", async () => {
     const onBiometricUnlock = jest.fn();
     const screen = await render(

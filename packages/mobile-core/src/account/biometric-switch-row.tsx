@@ -3,6 +3,7 @@ import { StyleSheet, Switch, View } from "react-native";
 
 import { biometricCopy } from "../auth/biometric-copy";
 import { useMobileIdentity } from "../auth/identity-provider";
+import { reportRecoveredError } from "../monitoring/error-reporting";
 import { Glyph } from "../ui/glyph";
 import { Text } from "../ui/text";
 import { colors, rosa, spacing } from "../ui/tokens";
@@ -32,6 +33,9 @@ export function BiometricSwitchRow({ appearance = "disc" }: BiometricSwitchRowPr
     try {
       if (on) await biometrics.enable();
       else await biometrics.disable();
+    } catch (error) {
+      // The switch keeps the state the identity still holds.
+      reportRecoveredError(error);
     } finally {
       setBusy(false);
     }

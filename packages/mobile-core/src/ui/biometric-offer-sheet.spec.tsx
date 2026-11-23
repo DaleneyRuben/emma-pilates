@@ -7,6 +7,10 @@ const hidden = { includeHiddenElements: true };
 
 // «Opción A»: the offer right after a password sign-in.
 describe("BiometricOfferSheet", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("offers Face ID on iOS with the glyph on its disc", async () => {
     const onEnable = jest.fn();
     const onDismiss = jest.fn();

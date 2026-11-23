@@ -41,6 +41,10 @@ async function renderRow(manager: SessionManager) {
 
 // «El interruptor de B»: Perfil turns biometrics on and off on this phone.
 describe("BiometricSwitchRow", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("turns Face ID on and off", async () => {
     const manager = managerWith();
     const screen = await renderRow(manager);

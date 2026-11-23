@@ -61,7 +61,6 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     status: "restoring",
   });
   const [signOutNotice, setSignOutNotice] = useState<string | null>(null);
-  const [biometricsAvailable] = useState(() => manager.canUseBiometrics());
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
   const [biometricOffer, setBiometricOffer] = useState(false);
   const [enabledNotice, setEnabledNotice] = useState(false);
@@ -101,11 +100,17 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
 
   const shouldOfferBiometrics = useCallback(async () => {
     if (!manager.canUseBiometrics()) return false;
-    const [enabled, declined] = await Promise.all([
-      manager.isBiometricsEnabled(),
-      manager.wasBiometricOfferDeclined(),
-    ]);
-    return !enabled && !declined;
+    try {
+      const [enabled, declined] = await Promise.all([
+        manager.isBiometricsEnabled(),
+        manager.wasBiometricOfferDeclined(),
+      ]);
+      return !enabled && !declined;
+    } catch (error) {
+      // The sign-in itself succeeded; an unreadable keychain only skips the offer.
+      reportRecoveredError(error);
+      return false;
+    }
   }, [manager]);
 
   const start = useCallback(
@@ -178,7 +183,12 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   );
 
   const enableBiometrics = useCallback(async () => {
-    const enabled = await manager.enableBiometrics();
+    let enabled = false;
+    try {
+      enabled = await manager.enableBiometrics();
+    } catch (error) {
+      reportRecoveredError(error);
+    }
     setBiometricOffer(false);
     setBiometricsEnabled(enabled);
     setEnabledNotice(enabled);
@@ -197,7 +207,8 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   }, [manager]);
 
   const biometrics: MobileBiometrics = {
-    available: biometricsAvailable,
+    // Read on each render: the person can deny Face ID or remove every fingerprint.
+    available: manager.canUseBiometrics(),
     disable: disableBiometrics,
     dismissEnabledNotice: () => setEnabledNotice(false),
     dismissOffer,
