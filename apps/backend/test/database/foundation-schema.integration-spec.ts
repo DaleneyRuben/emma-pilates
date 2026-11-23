@@ -87,6 +87,7 @@ describe('foundation migration', () => {
       'system.authentication_sessions',
       'system.authentication_throttle_events',
       'system.authentication_tokens',
+      'system.biometric_keys',
       'system.email_suppressions',
       'system.feedback',
       'system.idempotency_records',

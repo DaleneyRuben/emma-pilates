@@ -98,6 +98,9 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/admin-web/authentication-sessions': publicRoute,
   'POST /api/v1/admin-web/password-recoveries': publicRoute,
   'POST /api/v1/authentication-sessions': publicRoute,
+  // MOB-076 / ADR-0112: the exchange and «Usar otra cuenta» have no session.
+  'POST /api/v1/biometric-keys/exchange': publicRoute,
+  'POST /api/v1/biometric-keys/revocation': publicRoute,
   'POST /api/v1/email-changes': publicRoute,
   'POST /api/v1/client-email-verifications': publicRoute,
   'POST /api/v1/client-registrations/cancellations': publicRoute,
@@ -121,6 +124,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/accounts/current/email-change': both('allow'),
   'GET /api/v1/accounts/current/email-change': both('allow'),
   'DELETE /api/v1/accounts/current/email-change': both('allow'),
+  'POST /api/v1/biometric-keys': both('allow'),
   'POST /api/v1/accounts/current/email-change/resends': both('allow'),
   'GET /api/v1/staff-members/current': both('allow'),
   'GET /api/v1/notifications': both('allow'),
