@@ -1,5 +1,8 @@
 import type { CurrentAuthenticationPrincipalDto } from "@pilates/api-contracts";
 
+import type { BiometricKeyApi } from "./biometric-key-api";
+import { type BiometricKeychainStore, createBiometricKeychain } from "./biometric-keychain";
+
 export type AppRole =
   "client" | "trainer" | "assistant" | "administrator" | "nutritionist" | "coordinator";
 
@@ -12,33 +15,40 @@ export type MobileSession = {
   impersonation?: MobileImpersonation;
 };
 
-type CredentialStore = {
-  canUseBiometrics?: () => boolean;
+type CredentialStore = BiometricKeychainStore & {
   clear: () => Promise<void>;
-  confirmBiometrics?: () => Promise<boolean>;
   declineBiometricOffer?: () => Promise<void>;
-  hasBiometricCredential?: () => Promise<boolean>;
   load: () => Promise<string | null>;
-  loadWithBiometrics?: () => Promise<string | null>;
   save: (credential: string) => Promise<void>;
-  saveWithBiometrics?: (credential: string) => Promise<void>;
   wasBiometricOfferDeclined?: () => Promise<boolean>;
 };
 
 type SessionManagerOptions = {
   acceptedIdentityKind?: "client" | "staff";
+  /** ADR-0112's endpoints; absent where biometrics are never offered. */
+  biometricKeys?: BiometricKeyApi;
   clearAccountCache: (accountId: string) => Promise<void>;
   credentialStore: CredentialStore;
+  installationIdentifier?: () => Promise<string>;
   resolveCurrent: (credential: string) => Promise<CurrentAuthenticationPrincipalDto | null>;
   revokeCurrent: (credential: string) => Promise<void>;
 };
 
+/**
+ * «cancelled» stays on «Hola de nuevo»; «failed» says to try again; «invalid»
+ * means the key is gone and the password form follows. `keyLost` marks a
+ * phone from before ADR-0112 that signed in but could not keep a key.
+ */
+export type BiometricUnlockResult =
+  | { keyLost?: true; session: MobileSession; status: "signed-in" }
+  | { status: "cancelled" | "failed" | "invalid" };
+
 export type SessionManager = {
   canUseBiometrics: () => boolean;
   declineBiometricOffer: () => Promise<void>;
-  /** Stores the plain copy again, which drops the protected one. */
+  /** Turns the key off on the server, best effort, and forgets it here. */
   disableBiometrics: () => Promise<void>;
-  /** Protects the active credential behind the prompt; false keeps the plain session. */
+  /** Asks the server for a key and keeps it behind the prompt. */
   enableBiometrics: () => Promise<boolean>;
   /** The credential API requests carry: the active one, else the stored plain copy. */
   getCredential: () => Promise<string | null>;
@@ -49,13 +59,11 @@ export type SessionManager = {
   /** Resolves the current session again, such as after an Impersonation starts or ends. */
   refresh: () => Promise<MobileSession | null>;
   hasBiometricSession: () => Promise<boolean>;
+  /** Ends the session; the biometric key stays for the next launch. */
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
-  start: (
-    credential: string,
-    options?: { protectWithBiometrics?: boolean },
-  ) => Promise<MobileSession | null>;
-  unlockWithBiometrics: () => Promise<MobileSession | null>;
+  start: (credential: string) => Promise<MobileSession | null>;
+  unlockWithBiometrics: () => Promise<BiometricUnlockResult>;
 };
 
 function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSession {
@@ -69,11 +77,18 @@ function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSe
 export function createSessionManager(options: SessionManagerOptions): SessionManager {
   const {
     acceptedIdentityKind,
+    biometricKeys,
     clearAccountCache,
     credentialStore,
+    installationIdentifier,
     resolveCurrent,
     revokeCurrent,
   } = options;
+  const keychain = createBiometricKeychain({
+    api: biometricKeys,
+    installationIdentifier,
+    store: credentialStore,
+  });
   let activeCredential: string | null = null;
 
   async function resolveCredential(credential: string): Promise<MobileSession | null> {
@@ -96,28 +111,34 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     return toMobileSession(principal);
   }
 
-  async function hasBiometricCredential(): Promise<boolean> {
-    return (await credentialStore.hasBiometricCredential?.()) ?? false;
-  }
-
-  async function protect(credential: string): Promise<boolean> {
-    const { confirmBiometrics, saveWithBiometrics } = credentialStore;
-
-    if (saveWithBiometrics === undefined || confirmBiometrics === undefined) {
-      return false;
+  async function unlockWithBiometrics(): Promise<BiometricUnlockResult> {
+    const unlocked = await keychain.unlock();
+    if (unlocked.status !== "credential") {
+      return unlocked;
     }
 
+    let session: MobileSession | null;
     try {
-      await saveWithBiometrics(credential);
-      if (await confirmBiometrics()) {
-        return true;
-      }
+      session = await resolveCredential(unlocked.credential);
     } catch {
-      // A cancelled or failed prompt: the plain copy is restored below.
+      return { status: "failed" };
     }
 
-    await credentialStore.save(credential);
-    return false;
+    if (session === null) {
+      await (unlocked.legacy ? keychain.forgetLegacy() : keychain.forget());
+      return { status: "invalid" };
+    }
+
+    await credentialStore.save(unlocked.credential);
+    if (!unlocked.legacy) {
+      return { session, status: "signed-in" };
+    }
+
+    // A phone from before ADR-0112 moves to a key; the person just passed the prompt.
+    await keychain.forgetLegacy();
+    return (await keychain.protect(unlocked.credential, { confirm: false }))
+      ? { session, status: "signed-in" }
+      : { keyLost: true, session, status: "signed-in" };
   }
 
   return {
@@ -125,17 +146,15 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     async declineBiometricOffer(): Promise<void> {
       await credentialStore.declineBiometricOffer?.();
     },
-    async disableBiometrics(): Promise<void> {
-      if (activeCredential !== null) {
-        await credentialStore.save(activeCredential);
-      }
-    },
+    disableBiometrics: () => keychain.turnOff(),
     async enableBiometrics(): Promise<boolean> {
-      return activeCredential === null ? false : protect(activeCredential);
+      return activeCredential === null
+        ? false
+        : keychain.protect(activeCredential, { confirm: true });
     },
     getCredential: async () => activeCredential ?? credentialStore.load(),
-    hasBiometricSession: hasBiometricCredential,
-    isBiometricsEnabled: hasBiometricCredential,
+    hasBiometricSession: () => keychain.isEnabled(),
+    isBiometricsEnabled: () => keychain.isEnabled(),
     wasBiometricOfferDeclined: async () =>
       (await credentialStore.wasBiometricOfferDeclined?.()) ?? false,
     async restore(): Promise<MobileSession | null> {
@@ -147,28 +166,15 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
 
       return resolveCredential(credential);
     },
-    async start(credential: string, options = {}): Promise<MobileSession | null> {
-      if (options.protectWithBiometrics) {
-        if (credentialStore.saveWithBiometrics === undefined) {
-          throw new Error("Biometric credential storage is unavailable");
-        }
-
-        await credentialStore.saveWithBiometrics(credential);
-      } else {
-        await credentialStore.save(credential);
-      }
+    // A password or recovery sign-in follows «Usar otra cuenta», a key the
+    // server refused, or a recovery that revoked it: nothing to keep here.
+    async start(credential: string): Promise<MobileSession | null> {
+      await keychain.forget();
+      await credentialStore.save(credential);
 
       return resolveCredential(credential);
     },
-    async unlockWithBiometrics(): Promise<MobileSession | null> {
-      const credential = (await credentialStore.loadWithBiometrics?.()) ?? null;
-
-      if (credential === null) {
-        return null;
-      }
-
-      return resolveCredential(credential);
-    },
+    unlockWithBiometrics,
     async logout(session: MobileSession): Promise<void> {
       const credential = activeCredential ?? (await credentialStore.load());
 
@@ -192,6 +198,7 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     async endLocally(session: MobileSession): Promise<void> {
       activeCredential = null;
       await credentialStore.clear();
+      await keychain.forget();
       await clearAccountCache(session.accountId);
     },
   };

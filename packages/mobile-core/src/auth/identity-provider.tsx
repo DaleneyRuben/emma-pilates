@@ -15,7 +15,14 @@ type MobileIdentityState = {
   status: "biometric-locked" | "restoring" | "signed-in" | "signed-out";
 };
 
+export const biometricUnlockFailure = "No pudimos entrar. Revisa tu conexión e intenta de nuevo.";
+
 export type MobileBiometrics = {
+  /**
+   * The launch opened locked and the prompt has not been shown yet: the
+   * Login hero opens it by itself, once (not after signing out in the app).
+   */
+  autoPrompt: boolean;
   /** The phone can protect the session with Face ID or a fingerprint. */
   available: boolean;
   enabled: boolean;
@@ -28,12 +35,15 @@ export type MobileBiometrics = {
   /** «Ahora no»: never offered again on this phone. */
   dismissOffer: () => Promise<void>;
   enable: () => Promise<boolean>;
+  /** The scan worked but the server could not be reached. */
+  unlockError: string | null;
+  /** «Usar otra cuenta»: forgets biometrics on this phone and shows the form. */
+  useAnotherAccount: () => Promise<void>;
 };
 
 type StartOptions = {
   /** A password sign-in, which may offer biometrics next. */
   offerBiometrics?: boolean;
-  protectWithBiometrics?: boolean;
 };
 
 type MobileIdentity = MobileIdentityState & {
@@ -64,6 +74,8 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
   const [biometricOffer, setBiometricOffer] = useState(false);
   const [enabledNotice, setEnabledNotice] = useState(false);
+  const [autoPrompt, setAutoPrompt] = useState(false);
+  const [unlockError, setUnlockError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -72,6 +84,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
       ([session, hasBiometricSession]) => {
         if (active) {
           setBiometricsEnabled(hasBiometricSession);
+          setAutoPrompt(session === null && hasBiometricSession);
           setIdentity({
             session,
             status:
@@ -115,15 +128,13 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
 
   const start = useCallback(
     async (credential: string, options: StartOptions = {}) => {
-      const { offerBiometrics = false, ...startOptions } = options;
-      const session =
-        startOptions.protectWithBiometrics === undefined
-          ? await manager.start(credential)
-          : await manager.start(credential, startOptions);
+      const { offerBiometrics = false } = options;
+      const session = await manager.start(credential);
       const offer = session !== null && offerBiometrics && (await shouldOfferBiometrics());
 
       setSignOutNotice(null);
-      setBiometricsEnabled(startOptions.protectWithBiometrics === true && session !== null);
+      setUnlockError(null);
+      setBiometricsEnabled(false);
       setBiometricOffer(offer);
       setIdentity({
         session,
@@ -134,19 +145,24 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   );
 
   const unlockWithBiometrics = useCallback(async () => {
-    let session: MobileSession | null;
-    try {
-      session = await manager.unlockWithBiometrics();
-    } catch {
-      // A cancelled or failed prompt keeps the lock and the protected copy.
+    setAutoPrompt(false);
+    setUnlockError(null);
+    const result = await manager.unlockWithBiometrics();
+
+    if (result.status !== "signed-in") {
+      if (result.status === "failed") setUnlockError(biometricUnlockFailure);
+      if (result.status === "invalid") {
+        setBiometricsEnabled(false);
+        setIdentity({ session: null, status: "signed-out" });
+      }
       return;
     }
 
-    setBiometricsEnabled(session !== null);
-    setIdentity({
-      session,
-      status: session === null ? "signed-out" : "signed-in",
-    });
+    // A phone from before ADR-0112 that could not keep a key is offered again.
+    const reoffer = result.keyLost === true && manager.canUseBiometrics();
+    setBiometricsEnabled(result.keyLost !== true);
+    setBiometricOffer(reoffer);
+    setIdentity({ session: result.session, status: "signed-in" });
   }, [manager]);
 
   const logout = useCallback(async () => {
@@ -155,10 +171,20 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     }
 
     await manager.logout(identity.session);
-    setBiometricsEnabled(false);
+    // The key stays: the next screen greets with «Hola de nuevo».
+    const locked = await manager.hasBiometricSession().catch(() => false);
+    setBiometricsEnabled(locked);
     setBiometricOffer(false);
-    setIdentity({ session: null, status: "signed-out" });
+    setIdentity({ session: null, status: locked ? "biometric-locked" : "signed-out" });
   }, [identity.session, manager]);
+
+  const useAnotherAccount = useCallback(async () => {
+    setAutoPrompt(false);
+    setUnlockError(null);
+    await manager.disableBiometrics();
+    setBiometricsEnabled(false);
+    setIdentity({ session: null, status: "signed-out" });
+  }, [manager]);
 
   const refresh = useCallback(async () => {
     const session = await manager.refresh();
@@ -207,6 +233,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   }, [manager]);
 
   const biometrics: MobileBiometrics = {
+    autoPrompt,
     // Read on each render: the person can deny Face ID or remove every fingerprint.
     available: manager.canUseBiometrics(),
     disable: disableBiometrics,
@@ -216,6 +243,8 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     enabled: biometricsEnabled,
     enabledNotice,
     offer: biometricOffer,
+    unlockError,
+    useAnotherAccount,
   };
 
   return (

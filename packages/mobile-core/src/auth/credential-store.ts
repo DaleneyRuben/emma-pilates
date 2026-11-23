@@ -23,6 +23,13 @@ type CredentialStoreOptions = {
   promptsOnSave?: boolean;
 };
 
+export type BiometricKey = { deviceKey: string; unlockSecret: string };
+
+/**
+ * The session credential, plus the biometric key of ADR-0112: the unlock
+ * secret behind the fingerprint or Face ID, written once when biometrics are
+ * turned on, and the device key outside it, replaced on every use.
+ */
 export function createCredentialStore(
   storage: CredentialStorage,
   namespace = "",
@@ -30,73 +37,76 @@ export function createCredentialStore(
 ) {
   const prefix = namespace === "" ? "" : `${namespace}.`;
   const credentialKey = `${prefix}authentication-session`;
-  const biometricCredentialKey = `${prefix}authentication-session-biometric`;
-  const biometricCredentialMarkerKey = `${prefix}authentication-session-biometric-enabled`;
+  const unlockSecretKey = `${prefix}biometric-unlock-secret`;
+  const deviceKeyKey = `${prefix}biometric-device-key`;
+  // PR #372 kept the session itself behind the prompt.
+  const legacyCredentialKey = `${prefix}authentication-session-biometric`;
+  const legacyMarkerKey = `${prefix}authentication-session-biometric-enabled`;
   // Per device, so «Ahora no» outlives sign-out: `clear` never deletes it.
   const offerDeclinedKey = `${prefix}biometric-offer-declined`;
   function canUseBiometrics(): boolean {
     return storage.canUseBiometricAuthentication?.() ?? false;
   }
-  const hasBiometricCredential = async () =>
-    (await storage.getItemAsync(biometricCredentialMarkerKey)) === "true";
+  const loadBiometricDeviceKey = () => storage.getItemAsync(deviceKeyKey);
+  const hasBiometricKey = async () => (await loadBiometricDeviceKey()) !== null;
+  const forgetLegacyBiometricSession = async () => {
+    await Promise.all([
+      storage.deleteItemAsync(legacyCredentialKey),
+      storage.deleteItemAsync(legacyMarkerKey),
+    ]);
+  };
 
   return {
     canUseBiometrics,
+    /** Signing out ends the session only; the biometric key stays. */
     clear: async () => {
-      await Promise.all([
-        storage.deleteItemAsync(credentialKey),
-        storage.deleteItemAsync(biometricCredentialKey),
-        storage.deleteItemAsync(biometricCredentialMarkerKey),
-      ]);
+      await storage.deleteItemAsync(credentialKey);
+      await forgetLegacyBiometricSession();
     },
     /**
-     * Reads the protected copy back behind the prompt, so iOS asks for Face ID
-     * when it is turned on; where saving already asked, the marker suffices.
+     * Reads the unlock secret back behind the prompt, so iOS asks for Face ID
+     * when it is turned on; where saving already asked, the key suffices.
      * A cancelled prompt rejects.
      */
     async confirmBiometrics(): Promise<boolean> {
       if (promptsOnSave) {
-        return hasBiometricCredential();
+        return hasBiometricKey();
       }
 
-      return (await storage.getItemAsync(biometricCredentialKey, biometricOptions)) !== null;
+      return (await storage.getItemAsync(unlockSecretKey, biometricOptions)) !== null;
     },
     async declineBiometricOffer(): Promise<void> {
       await storage.setItemAsync(offerDeclinedKey, "true");
     },
-    hasBiometricCredential,
+    async forgetBiometricKey(): Promise<void> {
+      await Promise.all([
+        storage.deleteItemAsync(unlockSecretKey),
+        storage.deleteItemAsync(deviceKeyKey),
+      ]);
+    },
+    forgetLegacyBiometricSession,
+    hasBiometricKey,
+    hasLegacyBiometricSession: async () => (await storage.getItemAsync(legacyMarkerKey)) === "true",
     load: () => storage.getItemAsync(credentialKey),
-    /**
-     * A cancelled or failed prompt rejects and keeps the protected copy; only a
-     * copy the phone no longer has (null) is forgotten.
-     */
-    async loadWithBiometrics(): Promise<string | null> {
-      const credential = await storage.getItemAsync(biometricCredentialKey, biometricOptions);
-
-      if (credential === null) {
-        await Promise.all([
-          storage.deleteItemAsync(biometricCredentialKey),
-          storage.deleteItemAsync(biometricCredentialMarkerKey),
-        ]);
-      }
-
-      return credential;
+    loadBiometricDeviceKey,
+    /** Behind the prompt; a cancelled or failed prompt rejects. */
+    loadLegacyBiometricSession: () => storage.getItemAsync(legacyCredentialKey, biometricOptions),
+    /** Behind the prompt; a cancelled or failed prompt rejects and keeps the key. */
+    readUnlockSecret: () => storage.getItemAsync(unlockSecretKey, biometricOptions),
+    async replaceBiometricDeviceKey(deviceKey: string): Promise<void> {
+      await storage.setItemAsync(deviceKeyKey, deviceKey);
     },
     async save(credential: string): Promise<void> {
       await storage.setItemAsync(credentialKey, credential);
-      await Promise.all([
-        storage.deleteItemAsync(biometricCredentialKey),
-        storage.deleteItemAsync(biometricCredentialMarkerKey),
-      ]);
+      await forgetLegacyBiometricSession();
     },
-    async saveWithBiometrics(credential: string): Promise<void> {
+    async saveBiometricKey({ deviceKey, unlockSecret }: BiometricKey): Promise<void> {
       if (!canUseBiometrics()) {
         throw new Error("Biometric authentication is unavailable");
       }
 
-      await storage.setItemAsync(biometricCredentialKey, credential, biometricOptions);
-      await storage.setItemAsync(biometricCredentialMarkerKey, "true");
-      await storage.deleteItemAsync(credentialKey);
+      await storage.setItemAsync(unlockSecretKey, unlockSecret, biometricOptions);
+      await storage.setItemAsync(deviceKeyKey, deviceKey);
     },
     wasBiometricOfferDeclined: async () =>
       (await storage.getItemAsync(offerDeclinedKey)) === "true",

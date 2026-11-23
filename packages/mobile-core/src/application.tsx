@@ -6,6 +6,7 @@ import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-c
 import { type ComponentType, useCallback, useMemo } from "react";
 
 import { createAuthenticationApi, type AuthenticationApi } from "./auth/authentication-api";
+import { createBiometricKeyApi } from "./auth/biometric-key-api";
 import { BiometricOffer } from "./auth/biometric-offer";
 import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provider";
 import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
@@ -104,8 +105,10 @@ export function createDefaultMobileRuntime({
 
   const sessionManager = createSessionManager({
     acceptedIdentityKind,
+    biometricKeys: createBiometricKeyApi({ baseUrl: apiBaseUrl }),
     clearAccountCache,
     credentialStore,
+    installationIdentifier,
     resolveCurrent: sessionApi.resolveCurrent,
     revokeCurrent: sessionApi.revokeCurrent,
   });
@@ -114,8 +117,8 @@ export function createDefaultMobileRuntime({
     allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
     linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
-    // The session manager's credential: after a biometric unlock only the
-    // protected copy is stored, which the plain store cannot read.
+    // The session manager's credential: the active one first, so a biometric
+    // unlock is used even before the plain copy is written.
     apiFetcher: createApiFetcher({
       baseUrl: apiBaseUrl,
       getCredential: sessionManager.getCredential,

@@ -30,13 +30,11 @@ function biometricStore(overrides: Record<string, unknown> = {}) {
 
 function keyApi(overrides: Record<string, unknown> = {}) {
   return {
-    exchange: jest
-      .fn()
-      .mockResolvedValue({
-        credential: "new-credential",
-        deviceKey: "next-key",
-        status: "created",
-      }),
+    exchange: jest.fn().mockResolvedValue({
+      credential: "new-credential",
+      deviceKey: "next-key",
+      status: "created",
+    }),
     issue: jest.fn().mockResolvedValue({ deviceKey: "issued-key", unlockSecret: "issued-secret" }),
     revoke: jest.fn().mockResolvedValue(undefined),
     ...overrides,
