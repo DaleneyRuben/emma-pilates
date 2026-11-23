@@ -67,6 +67,7 @@ numbered tests.
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 | Resend a Client activation link from the admin web | Clientas › a pending Client's Resumen: the «Pendiente de activación» aviso with her link's expiry and «Reenviar enlace», the success line, and the server's wait after a second click (Test 26, step 3) | A self-registered Client still verifying her email shows the aviso without the link |
 | Login with the logo | Both apps open Login on the rosa band with the studio's logo and the form in a white sheet anchored to the bottom, no «Ej.:» under the email, the sheet above the keyboard, a 560 pt column on iPad (Test 193) | — |
+| Biometric login opt-in | The offer after a password sign-in, «Hola de nuevo» with Face ID or the fingerprint on the next launch, Perfil's «Entrar con huella» switch, cancel and logout (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 
 ## Where each designed screen is tested
 
@@ -1343,8 +1344,9 @@ biometric authentication like a physical iPhone. Expo Go also cannot test this
 Face ID configuration because it does not contain this project's native Face ID
 permission message.
 
-A complete manual biometric test therefore requires a physical iPhone and a
-Pilates development or release build. Run the mobile automated tests above for
+A complete manual biometric test therefore requires a Pilates development or
+release build (Test 195 walks the opt-in, unlock, cancel, Perfil switch and
+logout). Run the mobile automated tests above for
 the protected-session opt-in, locked, unlock, invalidation, and logout behavior
 without exposing a real credential.
 
@@ -11965,3 +11967,49 @@ D. **Reviewer Accounts.** `store-review-accounts` names the reviewer Client
 E. **Export compliance.** Both `app.json` files set
    `ios.config.usesNonExemptEncryption: false`, so App Store Connect stops
    asking on each build (seen only on a store build).
+
+## Test 195: Entrar con huella o Face ID (biometric opt-in)
+
+The owner's pick («Opción A + el interruptor de B»): after a password sign-in
+the apps offer Face ID (iOS) or the fingerprint (Android) for the next time,
+Perfil turns it on and off, and the next launch greets with one tap to unlock.
+JavaScript only (ships by OTA); the native Face ID message and Android's
+BiometricPrompt were already in the builds. Use a **development build** (Expo
+Go has no Face ID permission of its own): the iPhone 16 Pro Simulator with
+**Features › Face ID › Enrolled**, and an Android emulator with a fingerprint
+enrolled in **Settings › Security** (send it with `adb -e emu finger touch 1`).
+On a device without biometrics nothing below appears and Login is unchanged.
+
+A. **The offer.** Sign out, then sign in with email and password. A bottom
+   sheet slides up over the app: the fingerprint on a round rosa disc,
+   «Entra más rápido», «La próxima vez entra con tu huella, sin escribir tu
+   contraseña.» (iOS: «con Face ID»), «Puedes cambiarlo cuando quieras en
+   Perfil.», **Usar mi huella** (iOS **Usar Face ID**) and **Ahora no**.
+   It does not appear after a recovery link signs you in, nor on a launch
+   that restores a saved session.
+B. **Turn it on.** Tap **Usar mi huella**: the prompt opens (iOS: Simulator
+   **Features › Face ID › Matching Face**; Android: touch the sensor). The
+   sheet closes and the toast «Listo: la próxima vez entras con tu huella.»
+   (iOS «con Face ID») floats over the tab bar for a few seconds.
+C. **Cancel.** Sign out and in again, tap **Usar mi huella** and cancel the
+   prompt (iOS **Non-matching Face** or Cancel): the sheet just closes, you
+   stay signed in, and no toast shows. **Ahora no** closes it too and the
+   offer never comes back on this phone, even after signing out.
+D. **Unlock on the next launch.** With biometrics on, close the app fully and
+   open it again. Login shows «Hola de nuevo», **Entrar con tu huella** (iOS
+   **Entrar con Face ID**) with the fingerprint, and the outlined **Usar
+   correo y contraseña**. The first opens the prompt and lands on Inicio;
+   every screen loads its data (the API calls carry the unlocked session).
+   Cancel the prompt instead: Login stays as it was, still locked, and you can
+   try again. **Usar correo y contraseña** shows the usual form (email,
+   password, **Iniciar sesión**, **¿Olvidaste tu contraseña?**, and
+   **Regístrate** on the Client app); signing in there keeps the phone's
+   biometrics off until you turn them on again.
+E. **Perfil.** Client **Perfil › Cuenta** and Staff **Perfil › Ajustes**
+   (after **Cambiar contraseña**) show **Entrar con huella** (iOS **Entrar con
+   Face ID**) with a switch: «Sin escribir tu contraseña» while off,
+   «Activado en este celular» while on. Turning it on opens the prompt and
+   shows the same toast; turning it off asks nothing, and the next launch
+   restores the session without a prompt.
+F. **Log out.** **Cerrar sesión** forgets both copies of the session: the
+   next launch opens the plain Login. A declined offer stays declined.
