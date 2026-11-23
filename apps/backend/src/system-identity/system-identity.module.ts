@@ -62,6 +62,7 @@ import {
 } from './invitations/client-invitations.controller';
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { sendClientVerification } from './invitations/client-verification-resend';
+import { biometricKeysWiring } from './biometric-keys/biometric-keys-wiring';
 import { emailChangeWiring } from './email-change/email-change-wiring';
 import {
   impersonationGateway,
@@ -92,6 +93,7 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     AdminWebSessionController,
     AssistantClientInvitationsController,
     AuthenticationController,
+    ...biometricKeysWiring.controllers,
     ...emailChangeWiring.controllers,
     ...impersonationWiring.controllers,
     ...emailSuppressionWiring.controllers,
@@ -99,6 +101,7 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     ClientRegistrationController,
   ],
   providers: [
+    ...biometricKeysWiring.providers(PRISMA_CLIENT),
     ...emailChangeWiring.providers(PRISMA_CLIENT),
     ...impersonationWiring.providers(PRISMA_CLIENT),
     ...emailSuppressionWiring.providers(PRISMA_CLIENT),
