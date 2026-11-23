@@ -167,6 +167,47 @@ describe("createSessionManager biometric key", () => {
     await expect(manager.getCredential()).resolves.toBe("new-credential");
   });
 
+  // Owner, 2026-11-23: with a key on the phone every launch asks first.
+  it("opens no saved session on launch while a key waits", async () => {
+    const store = biometricStore({ load: jest.fn().mockResolvedValue("saved-credential") });
+    const resolveCurrent = jest.fn().mockResolvedValue(principal);
+
+    await expect(
+      managerWith(store, keyApi(), resolveCurrent).manager.restore(),
+    ).resolves.toBeNull();
+    expect(resolveCurrent).not.toHaveBeenCalled();
+  });
+
+  it("ends the session saved before the unlock, so sessions do not pile up", async () => {
+    const store = biometricStore({ load: jest.fn().mockResolvedValue("saved-credential") });
+    const { manager, revokeCurrent } = managerWith(store);
+
+    await manager.unlockWithBiometrics();
+
+    expect(revokeCurrent).toHaveBeenCalledWith("saved-credential");
+  });
+
+  it("ends the saved session too when «Usar otra cuenta» forgets the key", async () => {
+    const store = biometricStore({ load: jest.fn().mockResolvedValue("saved-credential") });
+    const { manager, revokeCurrent } = managerWith(store);
+
+    await manager.disableBiometrics();
+
+    expect(revokeCurrent).toHaveBeenCalledWith("saved-credential");
+    expect(store.clear).toHaveBeenCalled();
+  });
+
+  it("keeps the active session when Perfil turns biometrics off", async () => {
+    const store = biometricStore();
+    const { manager, revokeCurrent } = managerWith(store);
+    await manager.start("password-credential");
+
+    await manager.disableBiometrics();
+
+    expect(revokeCurrent).not.toHaveBeenCalled();
+    expect(store.clear).not.toHaveBeenCalled();
+  });
+
   it("stays locked when the prompt is cancelled", async () => {
     const store = biometricStore({
       readUnlockSecret: jest.fn().mockRejectedValue(new Error("User canceled")),
