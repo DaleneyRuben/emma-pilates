@@ -52,6 +52,7 @@ describe("BiometricSwitchRow", () => {
     const toggle = await screen.findByRole("switch", { name: "Entrar con Face ID" });
     expect(toggle).toHaveProp("value", false);
     expect(screen.getByText("Sin escribir tu contraseña")).toBeOnTheScreen();
+    expect(screen.getByTestId("glyph-faceId", { includeHiddenElements: true })).toBeOnTheScreen();
     expect(screen.getByTestId("biometric-switch-disc")).toHaveStyle({
       backgroundColor: "#FEF6F2",
       height: 36,
