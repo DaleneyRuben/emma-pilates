@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Image, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
-import { useContext, useEffect, useEffectEvent, useState } from "react";
+import { useContext, useEffect, useEffectEvent, useRef, useState } from "react";
 import { z } from "zod";
 
 import logo from "../../assets/emma-logo.png";
@@ -67,8 +67,11 @@ export function LoginScreen({
   const [rejected, setRejected] = useState(false);
   // Until the launch's own prompt answers, only the logo shows (canvas Main, iOS-1).
   const [autoPrompting, setAutoPrompting] = useState(biometricLock?.autoPrompt === true);
+  // A development build mounts effects twice; the phone takes one prompt at a time.
+  const prompted = useRef(false);
   const promptOnce = useEffectEvent(() => {
-    if (biometricLock?.autoPrompt !== true) return;
+    if (biometricLock?.autoPrompt !== true || prompted.current) return;
+    prompted.current = true;
     void Promise.resolve(biometricLock.onUnlock()).finally(() => setAutoPrompting(false));
   });
   useEffect(() => {
