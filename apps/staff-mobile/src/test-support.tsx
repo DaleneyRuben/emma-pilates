@@ -1,4 +1,5 @@
 import type { AppRole, MobileRuntime } from "@pilates/mobile-core";
+import { noBiometrics } from "@pilates/mobile-core/testing";
 
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -68,6 +69,7 @@ export function createStaffRuntime(
     },
     login: jest.fn(),
     sessionManager: {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),

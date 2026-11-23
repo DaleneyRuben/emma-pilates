@@ -59,7 +59,11 @@ describe("BiometricSwitchRow", () => {
     expect(screen.getByText("Activado en este celular")).toBeOnTheScreen();
 
     await act(async () => {
-      await fireEvent(screen.getByRole("switch", { name: "Entrar con Face ID" }), "valueChange", false);
+      await fireEvent(
+        screen.getByRole("switch", { name: "Entrar con Face ID" }),
+        "valueChange",
+        false,
+      );
     });
     expect(manager.disableBiometrics).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Sin escribir tu contraseña")).toBeOnTheScreen();

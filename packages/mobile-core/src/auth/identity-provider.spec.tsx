@@ -4,12 +4,14 @@ import { Pressable } from "react-native";
 import { reportRecoveredError } from "../monitoring/error-reporting";
 import { MobileIdentityProvider, useMobileIdentity } from "./identity-provider";
 import { Text } from "../ui/text";
+import { noBiometrics } from "../testing";
 
 jest.mock("../monitoring/error-reporting", () => ({ reportRecoveredError: jest.fn() }));
 
 // MOB-069: a keychain that cannot be read (an unsigned Simulator build
 // answered -34018) must not hold the identity, and the launch screen, forever.
 const failingManager = (failure: "hasBiometricSession" | "restore", error: Error) => ({
+  ...noBiometrics,
   endLocally: jest.fn(),
   refresh: jest.fn().mockResolvedValue(null),
   hasBiometricSession:
@@ -69,6 +71,7 @@ describe("MobileIdentityProvider", () => {
     let finishRestoration: (session: { accountId: string; role: "trainer" }) => void = () =>
       undefined;
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -99,6 +102,7 @@ describe("MobileIdentityProvider", () => {
   it("starts a newly authenticated session and logs it out", async () => {
     const session = { accountId: "account-2", role: "assistant" as const };
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -142,6 +146,7 @@ describe("MobileIdentityProvider", () => {
       expiresAt: "2026-10-22T15:30:00.000Z",
     };
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
@@ -181,6 +186,7 @@ describe("MobileIdentityProvider", () => {
   it("waits for an explicit biometric unlock before restoring the session", async () => {
     const session = { accountId: "account-3", role: "client" as const };
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(true),
@@ -211,6 +217,7 @@ describe("MobileIdentityProvider", () => {
 
   it("signs out a closed Account locally and keeps a notice for the login screen", async () => {
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn().mockResolvedValue(undefined),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -297,6 +304,7 @@ describe("MobileIdentityProvider", () => {
   it("leaves the identity alone when the restore rejects after unmounting (MOB-069)", async () => {
     let failRestoration: (error: Error) => void = () => undefined;
     const manager = {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),

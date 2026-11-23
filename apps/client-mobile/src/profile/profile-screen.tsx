@@ -7,6 +7,7 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
+  BiometricSwitchRow,
   BrandToast,
   LoadingState,
   LogoutConfirmationSheet,
@@ -179,6 +180,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
               label="Cambiar contraseña"
               onPress={() => navigation.navigate("ChangePassword")}
             />
+            {identity.biometrics.available ? <BiometricSwitchRow /> : null}
             <ProfileRow
               icon="message"
               label="Enviar comentarios"

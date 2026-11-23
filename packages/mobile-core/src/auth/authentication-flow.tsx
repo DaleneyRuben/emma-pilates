@@ -33,7 +33,7 @@ type AuthenticationFlowProps = {
   api: AuthenticationApi;
   intent?: AuthenticationLinkIntent | null;
   notice?: string | null;
-  onBiometricUnlock?: () => void;
+  onBiometricUnlock?: () => Promise<void> | void;
   onLogin?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;

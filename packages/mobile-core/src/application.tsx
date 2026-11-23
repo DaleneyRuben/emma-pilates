@@ -6,6 +6,7 @@ import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-c
 import { type ComponentType, useCallback, useMemo } from "react";
 
 import { createAuthenticationApi, type AuthenticationApi } from "./auth/authentication-api";
+import { BiometricOffer } from "./auth/biometric-offer";
 import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provider";
 import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
 import type { PendingRegistrationStore } from "./auth/pending-registration-store";
@@ -60,7 +61,7 @@ export type MobileNavigationProps = {
   /** FUT-001: set while an Administrator sees the Staff app as a Staff Member. */
   impersonation?: MobileImpersonation;
   installationIdentifier?: () => Promise<string>;
-  onBiometricUnlock?: () => void;
+  onBiometricUnlock?: () => Promise<void> | void;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
@@ -101,13 +102,23 @@ export function createDefaultMobileRuntime({
     await clearPersistedAccountCache(accountId);
   }
 
+  const sessionManager = createSessionManager({
+    acceptedIdentityKind,
+    clearAccountCache,
+    credentialStore,
+    resolveCurrent: sessionApi.resolveCurrent,
+    revokeCurrent: sessionApi.revokeCurrent,
+  });
+
   return {
     allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
     linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
+    // The session manager's credential: after a biometric unlock only the
+    // protected copy is stored, which the plain store cannot read.
     apiFetcher: createApiFetcher({
       baseUrl: apiBaseUrl,
-      getCredential: credentialStore.load,
+      getCredential: sessionManager.getCredential,
     }),
     authenticationApi: createAuthenticationApi({
       baseUrl: apiBaseUrl,
@@ -121,13 +132,7 @@ export function createDefaultMobileRuntime({
     },
     pendingRegistrationStore,
     pushPlatform: createExpoPushPlatform(),
-    sessionManager: createSessionManager({
-      acceptedIdentityKind,
-      clearAccountCache,
-      credentialStore,
-      resolveCurrent: sessionApi.resolveCurrent,
-      revokeCurrent: sessionApi.revokeCurrent,
-    }),
+    sessionManager,
   };
 }
 
@@ -160,7 +165,7 @@ function IdentityNavigation({
       const result = await login(values);
 
       if (result.status === "created") {
-        await identity.start(result.credential);
+        await identity.start(result.credential, { offerBiometrics: true });
         return undefined;
       }
 
@@ -174,25 +179,28 @@ function IdentityNavigation({
   }
 
   return (
-    <Navigation
-      accountId={identity.session?.accountId}
-      authenticationApi={authenticationApi}
-      authenticationIntent={intent}
-      apiBaseUrl={apiBaseUrl}
-      apiFetcher={apiFetcher}
-      impersonation={identity.session?.impersonation}
-      installationIdentifier={installationIdentifier}
-      onBiometricUnlock={
-        identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
-      }
-      onLogin={handleLogin}
-      onRecoveryCredential={identity.start}
-      pendingRegistrationStore={pendingRegistrationStore}
-      pushPlatform={pushPlatform}
-      refreshSession={identity.refresh}
-      role={identity.session?.role}
-      signOutNotice={identity.signOutNotice}
-    />
+    <>
+      <Navigation
+        accountId={identity.session?.accountId}
+        authenticationApi={authenticationApi}
+        authenticationIntent={intent}
+        apiBaseUrl={apiBaseUrl}
+        apiFetcher={apiFetcher}
+        impersonation={identity.session?.impersonation}
+        installationIdentifier={installationIdentifier}
+        onBiometricUnlock={
+          identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
+        }
+        onLogin={handleLogin}
+        onRecoveryCredential={identity.start}
+        pendingRegistrationStore={pendingRegistrationStore}
+        pushPlatform={pushPlatform}
+        refreshSession={identity.refresh}
+        role={identity.session?.role}
+        signOutNotice={identity.signOutNotice}
+      />
+      <BiometricOffer />
+    </>
   );
 }
 

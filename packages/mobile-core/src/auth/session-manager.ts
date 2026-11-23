@@ -15,11 +15,14 @@ export type MobileSession = {
 type CredentialStore = {
   canUseBiometrics?: () => boolean;
   clear: () => Promise<void>;
+  confirmBiometrics?: () => Promise<boolean>;
+  declineBiometricOffer?: () => Promise<void>;
   hasBiometricCredential?: () => Promise<boolean>;
   load: () => Promise<string | null>;
   loadWithBiometrics?: () => Promise<string | null>;
   save: (credential: string) => Promise<void>;
   saveWithBiometrics?: (credential: string) => Promise<void>;
+  wasBiometricOfferDeclined?: () => Promise<boolean>;
 };
 
 type SessionManagerOptions = {
@@ -31,6 +34,16 @@ type SessionManagerOptions = {
 };
 
 export type SessionManager = {
+  canUseBiometrics: () => boolean;
+  declineBiometricOffer: () => Promise<void>;
+  /** Stores the plain copy again, which drops the protected one. */
+  disableBiometrics: () => Promise<void>;
+  /** Protects the active credential behind the prompt; false keeps the plain session. */
+  enableBiometrics: () => Promise<boolean>;
+  /** The credential API requests carry: the active one, else the stored plain copy. */
+  getCredential: () => Promise<string | null>;
+  isBiometricsEnabled: () => Promise<boolean>;
+  wasBiometricOfferDeclined: () => Promise<boolean>;
   /** Forgets a session the server already revoked, such as a closed Account's. */
   endLocally: (session: MobileSession) => Promise<void>;
   /** Resolves the current session again, such as after an Impersonation starts or ends. */
@@ -83,10 +96,48 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     return toMobileSession(principal);
   }
 
+  async function hasBiometricCredential(): Promise<boolean> {
+    return (await credentialStore.hasBiometricCredential?.()) ?? false;
+  }
+
+  async function protect(credential: string): Promise<boolean> {
+    const { confirmBiometrics, saveWithBiometrics } = credentialStore;
+
+    if (saveWithBiometrics === undefined || confirmBiometrics === undefined) {
+      return false;
+    }
+
+    try {
+      await saveWithBiometrics(credential);
+      if (await confirmBiometrics()) {
+        return true;
+      }
+    } catch {
+      // A cancelled or failed prompt: the plain copy is restored below.
+    }
+
+    await credentialStore.save(credential);
+    return false;
+  }
+
   return {
-    async hasBiometricSession(): Promise<boolean> {
-      return (await credentialStore.hasBiometricCredential?.()) ?? false;
+    canUseBiometrics: () => credentialStore.canUseBiometrics?.() ?? false,
+    async declineBiometricOffer(): Promise<void> {
+      await credentialStore.declineBiometricOffer?.();
     },
+    async disableBiometrics(): Promise<void> {
+      if (activeCredential !== null) {
+        await credentialStore.save(activeCredential);
+      }
+    },
+    async enableBiometrics(): Promise<boolean> {
+      return activeCredential === null ? false : protect(activeCredential);
+    },
+    getCredential: async () => activeCredential ?? credentialStore.load(),
+    hasBiometricSession: hasBiometricCredential,
+    isBiometricsEnabled: hasBiometricCredential,
+    wasBiometricOfferDeclined: async () =>
+      (await credentialStore.wasBiometricOfferDeclined?.()) ?? false,
     async restore(): Promise<MobileSession | null> {
       const credential = await credentialStore.load();
 

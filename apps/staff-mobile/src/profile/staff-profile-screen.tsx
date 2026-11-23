@@ -5,6 +5,7 @@ import {
   staffRoleLabel,
 } from "@pilates/api-contracts";
 import {
+  BiometricSwitchRow,
   BrandToast,
   IconRow,
   LoadingState,
@@ -178,6 +179,7 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                 label="Cambiar contraseña"
                 onPress={() => navigation.navigate("ChangePassword")}
               />
+              {identity.biometrics.available ? <BiometricSwitchRow appearance="plain" /> : null}
               <ProfileRow
                 icon="message"
                 label="Enviar comentarios"

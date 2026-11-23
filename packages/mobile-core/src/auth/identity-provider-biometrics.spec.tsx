@@ -92,7 +92,10 @@ describe("MobileIdentityProvider biometrics", () => {
 
   it.each([
     ["the device cannot use biometrics", { canUseBiometrics: jest.fn(() => false) }],
-    ["the offer was declined before", { wasBiometricOfferDeclined: jest.fn().mockResolvedValue(true) }],
+    [
+      "the offer was declined before",
+      { wasBiometricOfferDeclined: jest.fn().mockResolvedValue(true) },
+    ],
     ["biometrics are already on", { isBiometricsEnabled: jest.fn().mockResolvedValue(true) }],
   ])("offers nothing when %s", async (_case, overrides) => {
     const screen = await renderWith(managerWith(overrides));
@@ -148,7 +151,9 @@ describe("MobileIdentityProvider biometrics", () => {
   it("starts locked with biometrics on, unlocks, and turns them off", async () => {
     const manager = managerWith({ hasBiometricSession: jest.fn().mockResolvedValue(true) });
     const screen = await renderWith(manager);
-    expect(screen.getByText("biometric-locked available enabled no-offer no-notice")).toBeOnTheScreen();
+    expect(
+      screen.getByText("biometric-locked available enabled no-offer no-notice"),
+    ).toBeOnTheScreen();
 
     await press(screen, "Unlock");
     expect(screen.getByText("signed-in available enabled no-offer no-notice")).toBeOnTheScreen();

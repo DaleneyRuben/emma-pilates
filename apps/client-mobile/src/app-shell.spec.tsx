@@ -1,6 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import App from "../App";
+import { noBiometrics } from "@pilates/mobile-core/testing";
 
 function createAuthenticationApiMock(overrides = {}) {
   return {
@@ -32,6 +33,7 @@ describe("Client App", () => {
           },
           login: jest.fn(),
           sessionManager: {
+            ...noBiometrics,
             endLocally: jest.fn(),
             refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -67,6 +69,7 @@ describe("Client App", () => {
           },
           login,
           sessionManager: {
+            ...noBiometrics,
             endLocally: jest.fn(),
             refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -110,6 +113,7 @@ describe("Client App", () => {
           },
           login: jest.fn(),
           sessionManager: {
+            ...noBiometrics,
             endLocally: jest.fn(),
             refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -141,6 +145,7 @@ describe("Client App", () => {
           },
           login: jest.fn(),
           sessionManager: {
+            ...noBiometrics,
             endLocally: jest.fn(),
             refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),

@@ -9,7 +9,7 @@ import logo from "../../assets/emma-logo.png";
 import { TeamAccessBadge } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
-import { BiometricLoginButton } from "../ui/biometric-login-button";
+import { BiometricWelcome } from "../ui/biometric-login-button";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
@@ -36,7 +36,8 @@ export type LoginSubmissionResult =
 type LoginScreenProps = {
   /** A one-time message, such as the one left by closing the Account. */
   notice?: string | null;
-  onBiometricUnlock?: () => void;
+  /** Set while biometrics guard the saved session: the sheet greets first. */
+  onBiometricUnlock?: () => Promise<void> | void;
   onForgotPassword?: () => void;
   onRegister?: () => void;
   /** The Staff app marks its Login as the team's entrance (S01). */
@@ -55,6 +56,7 @@ export function LoginScreen({
   teamAccess = false,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const { width } = useWindowDimensions();
   // The sheet reaches the bottom edge and keeps the home indicator clear itself.
   const bottomInset = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
@@ -114,72 +116,78 @@ export function LoginScreen({
               </Text>
             </View>
           )}
-          {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
-          {retryAfterSeconds > 0 ? (
-            <WaitNotice
-              message="Demasiados intentos. Intenta de nuevo en un momento."
-              remainingSeconds={retryAfterSeconds}
-              waitLabel="Podrás intentarlo en"
+          {onBiometricUnlock !== undefined && !usePassword ? (
+            <BiometricWelcome
+              onUnlock={onBiometricUnlock}
+              onUsePassword={() => setUsePassword(true)}
             />
-          ) : null}
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onBlur, onChange, value } }) => (
-              <FormField
-                autoCapitalize="none"
-                autoComplete="email"
-                error={errors.email?.message}
-                keyboardType="email-address"
-                label="Correo electrónico"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                testID="login-email"
-                value={value}
+          ) : (
+            <>
+              {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
+              {retryAfterSeconds > 0 ? (
+                <WaitNotice
+                  message="Demasiados intentos. Intenta de nuevo en un momento."
+                  remainingSeconds={retryAfterSeconds}
+                  waitLabel="Podrás intentarlo en"
+                />
+              ) : null}
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormField
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    error={errors.email?.message}
+                    keyboardType="email-address"
+                    label="Correo electrónico"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    testID="login-email"
+                    value={value}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onBlur, onChange, value } }) => (
-              <FormField
-                autoComplete="current-password"
-                error={errors.password?.message}
-                label="Contraseña"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                secureTextEntry
-                testID="login-password"
-                value={value}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <FormField
+                    autoComplete="current-password"
+                    error={errors.password?.message}
+                    label="Contraseña"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    secureTextEntry
+                    testID="login-password"
+                    value={value}
+                  />
+                )}
               />
-            )}
-          />
-          <PrimaryButton
-            busy={isSubmitting}
-            disabled={retryAfterSeconds > 0}
-            label="Iniciar sesión"
-            onPress={submitLogin}
-            testID="login-submit"
-          />
-          {onBiometricUnlock === undefined ? null : (
-            <BiometricLoginButton onPress={onBiometricUnlock} />
-          )}
-          {onForgotPassword === undefined ? null : (
-            <TextButton
-              label="¿Olvidaste tu contraseña?"
-              onPress={onForgotPassword}
-              testID="login-forgot-password"
-            />
-          )}
-          {onRegister === undefined ? null : (
-            <View style={styles.register}>
-              <FooterPrompt
-                action="Regístrate"
-                onPress={onRegister}
-                prompt="¿No tienes una cuenta?"
+              <PrimaryButton
+                busy={isSubmitting}
+                disabled={retryAfterSeconds > 0}
+                label="Iniciar sesión"
+                onPress={submitLogin}
+                testID="login-submit"
               />
-            </View>
+              {onForgotPassword === undefined ? null : (
+                <TextButton
+                  label="¿Olvidaste tu contraseña?"
+                  onPress={onForgotPassword}
+                  testID="login-forgot-password"
+                />
+              )}
+              {onRegister === undefined ? null : (
+                <View style={styles.register}>
+                  <FooterPrompt
+                    action="Regístrate"
+                    onPress={onRegister}
+                    prompt="¿No tienes una cuenta?"
+                  />
+                </View>
+              )}
+            </>
           )}
         </View>
       </FormScrollView>
