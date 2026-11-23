@@ -46,7 +46,7 @@ export function BiometricSwitchRow({ appearance = "disc" }: BiometricSwitchRowPr
   return (
     <View style={[styles.row, !disc && styles.plainRow]}>
       <View style={disc ? styles.disc : styles.plainIcon} testID="biometric-switch-disc">
-        <Glyph color={colors.text} name="fingerprint" size={disc ? 18 : 22} strokeWidth={1.6} />
+        <Glyph color={colors.text} name={copy.glyph} size={disc ? 18 : 22} strokeWidth={1.6} />
       </View>
       <View style={styles.text}>
         <Text variant="titulo-fila">{label}</Text>
