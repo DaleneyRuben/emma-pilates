@@ -176,6 +176,7 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
         ? false
         : keychain.protect(activeCredential, { confirm: true });
     },
+    forgetBiometricsLocally: () => keychain.forget(),
     getCredential: async () => activeCredential ?? credentialStore.load(),
     hasBiometricSession: () => keychain.isEnabled(),
     isBiometricsEnabled: () => keychain.isEnabled(),

@@ -37,6 +37,8 @@ export type MobileBiometrics = {
   enable: () => Promise<boolean>;
   /** The scan worked but the server could not be reached. */
   unlockError: string | null;
+  /** The password changed: the server already revoked this phone's key. */
+  forgetAfterPasswordChange: () => Promise<void>;
   /** «Usar otra cuenta»: forgets biometrics on this phone and shows the form. */
   useAnotherAccount: () => Promise<void>;
 };
@@ -147,7 +149,13 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   const unlockWithBiometrics = useCallback(async () => {
     setAutoPrompt(false);
     setUnlockError(null);
-    const result = await manager.unlockWithBiometrics();
+    let result: Awaited<ReturnType<SessionManager["unlockWithBiometrics"]>>;
+    try {
+      result = await manager.unlockWithBiometrics();
+    } catch (error) {
+      reportRecoveredError(error);
+      result = { status: "failed" };
+    }
 
     if (result.status !== "signed-in") {
       if (result.status === "failed") setUnlockError(biometricUnlockFailure);
@@ -181,7 +189,12 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   const useAnotherAccount = useCallback(async () => {
     setAutoPrompt(false);
     setUnlockError(null);
-    await manager.disableBiometrics();
+    try {
+      await manager.disableBiometrics();
+    } catch (error) {
+      // The form still shows: a key the phone keeps is refused on its next use.
+      reportRecoveredError(error);
+    }
     setBiometricsEnabled(false);
     setIdentity({ session: null, status: "signed-out" });
   }, [manager]);
@@ -232,8 +245,18 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     await manager.declineBiometricOffer();
   }, [manager]);
 
+  const forgetAfterPasswordChange = useCallback(async () => {
+    try {
+      await manager.forgetBiometricsLocally?.();
+    } catch (error) {
+      reportRecoveredError(error);
+    }
+    setBiometricsEnabled(false);
+  }, [manager]);
+
   const biometrics: MobileBiometrics = {
     autoPrompt,
+    forgetAfterPasswordChange,
     // Read on each render: the person can deny Face ID or remove every fingerprint.
     available: manager.canUseBiometrics(),
     disable: disableBiometrics,
@@ -263,6 +286,11 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
       {children}
     </MobileIdentityContext.Provider>
   );
+}
+
+/** For screens that also render outside the provider, such as in their own specs. */
+export function useOptionalMobileIdentity(): MobileIdentity | undefined {
+  return useContext(MobileIdentityContext);
 }
 
 export function useMobileIdentity(): MobileIdentity {

@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { z } from "zod";
 
+import { useOptionalMobileIdentity } from "../auth/identity-provider";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
@@ -36,6 +37,7 @@ type ChangePasswordScreenProps = {
 export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswordScreenProps) {
   const [currentPasswordError, setCurrentPasswordError] = useState<string | undefined>(undefined);
   const [failed, setFailed] = useState(false);
+  const identity = useOptionalMobileIdentity();
   const {
     control,
     formState: { errors, isSubmitting, isValid },
@@ -60,6 +62,7 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
       )) as { status: number; data: unknown };
 
       if (response.status === 204) {
+        await identity?.biometrics.forgetAfterPasswordChange();
         onSaved();
         return;
       }
