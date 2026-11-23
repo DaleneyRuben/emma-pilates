@@ -6,9 +6,10 @@ import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-c
 import { type ComponentType, useCallback, useMemo } from "react";
 
 import { createAuthenticationApi, type AuthenticationApi } from "./auth/authentication-api";
+import { createBiometricKeyApi } from "./auth/biometric-key-api";
 import { BiometricOffer } from "./auth/biometric-offer";
 import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provider";
-import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
+import type { BiometricLock, LoginSubmissionResult, LoginValues } from "./auth/login-screen";
 import type { PendingRegistrationStore } from "./auth/pending-registration-store";
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
 import {
@@ -61,7 +62,8 @@ export type MobileNavigationProps = {
   /** FUT-001: set while an Administrator sees the Staff app as a Staff Member. */
   impersonation?: MobileImpersonation;
   installationIdentifier?: () => Promise<string>;
-  onBiometricUnlock?: () => Promise<void> | void;
+  /** Set while a biometric key waits on this phone (ADR-0112). */
+  biometricLock?: BiometricLock;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
@@ -104,8 +106,10 @@ export function createDefaultMobileRuntime({
 
   const sessionManager = createSessionManager({
     acceptedIdentityKind,
+    biometricKeys: createBiometricKeyApi({ baseUrl: apiBaseUrl }),
     clearAccountCache,
     credentialStore,
+    installationIdentifier,
     resolveCurrent: sessionApi.resolveCurrent,
     revokeCurrent: sessionApi.revokeCurrent,
   });
@@ -114,8 +118,8 @@ export function createDefaultMobileRuntime({
     allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
     linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
-    // The session manager's credential: after a biometric unlock only the
-    // protected copy is stored, which the plain store cannot read.
+    // The session manager's credential: the active one first, so a biometric
+    // unlock is used even before the plain copy is written.
     apiFetcher: createApiFetcher({
       baseUrl: apiBaseUrl,
       getCredential: sessionManager.getCredential,
@@ -188,8 +192,15 @@ function IdentityNavigation({
         apiFetcher={apiFetcher}
         impersonation={identity.session?.impersonation}
         installationIdentifier={installationIdentifier}
-        onBiometricUnlock={
-          identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
+        biometricLock={
+          identity.status === "biometric-locked"
+            ? {
+                autoPrompt: identity.biometrics.autoPrompt,
+                error: identity.biometrics.unlockError,
+                onUnlock: identity.unlockWithBiometrics,
+                onUseAnotherAccount: identity.biometrics.useAnotherAccount,
+              }
+            : undefined
         }
         onLogin={handleLogin}
         onRecoveryCredential={identity.start}

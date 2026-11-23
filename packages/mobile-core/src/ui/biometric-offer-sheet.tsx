@@ -4,7 +4,6 @@ import { biometricCopy } from "../auth/biometric-copy";
 import { Glyph } from "./glyph";
 import { PrimaryButton } from "./primary-button";
 import { SheetTitle } from "./sheet-title";
-import { Text } from "./text";
 import { TextButton } from "./text-button";
 import { colors, radii, rosa, shadows, spacing } from "./tokens";
 
@@ -17,8 +16,9 @@ type BiometricOfferSheetProps = {
 };
 
 /**
- * «Opción A»: right after a password sign-in, a bottom sheet offers Face ID or
- * the fingerprint for the next time, the glyph on a 72 pt 100 disc.
+ * Right after a password sign-in, a bottom sheet asks about Face ID or the
+ * fingerprint: the glyph on a 72 pt 100 disc, one question, two answers
+ * (owner, 2026-11-23: canvas D and iOS-4).
  */
 export function BiometricOfferSheet({
   busy = false,
@@ -37,15 +37,9 @@ export function BiometricOfferSheet({
         <View style={styles.sheet} testID="biometric-offer-sheet">
           <View style={styles.grabber} />
           <View style={styles.disc} testID="biometric-offer-disc">
-            <Glyph name="fingerprint" size={36} strokeWidth={1.5} />
+            <Glyph name={copy.glyph} size={36} strokeWidth={1.5} />
           </View>
-          <SheetTitle style={styles.centered}>Entra más rápido</SheetTitle>
-          <Text style={styles.centered} variant="cuerpo">
-            {copy.offerBody}
-          </Text>
-          <Text style={styles.centered} variant="secundario">
-            Puedes cambiarlo cuando quieras en Perfil.
-          </Text>
+          <SheetTitle style={styles.centered}>{copy.offerTitle}</SheetTitle>
           <PrimaryButton
             busy={busy}
             label={copy.offerAction}

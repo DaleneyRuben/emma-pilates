@@ -76,7 +76,7 @@ export function createStaffRuntime(
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue({ accountId: "account-1", role }),
       start: jest.fn(),
-      unlockWithBiometrics: jest.fn(),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ status: "cancelled" }),
     },
     ...overrides,
   };

@@ -67,6 +67,8 @@ import type {
   AvailabilityBlockEndInputDto,
   AvailabilityBlockInputDto,
   AvailabilityBlockReplacementDto,
+  BiometricKeyDto,
+  BiometricKeyExchangeDto,
   BranchDto,
   BranchInputDto,
   CampaignPreviewDto,
@@ -135,6 +137,7 @@ import type {
   EquipmentTypeRenameDto,
   EvaluationAvailabilityDto,
   EvaluationSlotDto,
+  ExchangeBiometricKeyDto,
   ExpenseCategoryInputDto,
   ExpenseChangeDto,
   ExpenseInputDto,
@@ -254,6 +257,7 @@ import type {
   RequestPasswordRecoveryDto,
   RescheduleEvaluationBody,
   RevenueReportDto,
+  RevokeBiometricKeyDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
   SendFeedbackDto,
@@ -3198,6 +3202,359 @@ export const useLogoutCurrentAuthenticationSession = <
 > => {
   return useMutation(
     getLogoutCurrentAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type issueBiometricKeyResponse201 = {
+  data: BiometricKeyDto;
+  status: 201;
+};
+
+export type issueBiometricKeyResponseSuccess = issueBiometricKeyResponse201 & {
+  headers: Headers;
+};
+export type issueBiometricKeyResponse = issueBiometricKeyResponseSuccess;
+
+export const getIssueBiometricKeyUrl = () => {
+  return `/api/v1/biometric-keys`;
+};
+
+export const issueBiometricKey = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<issueBiometricKeyResponse> => {
+  const res = await (fetchFn ?? fetch)(getIssueBiometricKeyUrl(), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: issueBiometricKeyResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as issueBiometricKeyResponse;
+};
+
+export const getIssueBiometricKeyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof issueBiometricKey>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof issueBiometricKey>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["issueBiometricKey"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof issueBiometricKey>>,
+    void
+  > = () => {
+    return issueBiometricKey(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type IssueBiometricKeyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof issueBiometricKey>>
+>;
+
+export type IssueBiometricKeyMutationError = unknown;
+
+export const useIssueBiometricKey = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof issueBiometricKey>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof issueBiometricKey>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getIssueBiometricKeyMutationOptions(options), queryClient);
+};
+
+export type exchangeBiometricKeyResponse201 = {
+  data: BiometricKeyExchangeDto;
+  status: 201;
+};
+
+export type exchangeBiometricKeyResponseSuccess =
+  exchangeBiometricKeyResponse201 & {
+    headers: Headers;
+  };
+export type exchangeBiometricKeyResponse = exchangeBiometricKeyResponseSuccess;
+
+export const getExchangeBiometricKeyUrl = () => {
+  return `/api/v1/biometric-keys/exchange`;
+};
+
+export const exchangeBiometricKey = async (
+  exchangeBiometricKeyDto: ExchangeBiometricKeyDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<exchangeBiometricKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getExchangeBiometricKeyUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(exchangeBiometricKeyDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: exchangeBiometricKeyResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as exchangeBiometricKeyResponse;
+};
+
+export const getExchangeBiometricKeyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof exchangeBiometricKey>>,
+    TError,
+    ExchangeBiometricKeyMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof exchangeBiometricKey>>,
+  TError,
+  ExchangeBiometricKeyMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["exchangeBiometricKey"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof exchangeBiometricKey>>,
+    ExchangeBiometricKeyMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return exchangeBiometricKey(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ExchangeBiometricKeyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof exchangeBiometricKey>>
+>;
+export type ExchangeBiometricKeyMutationBody = ExchangeBiometricKeyDto;
+export type ExchangeBiometricKeyMutationError = unknown;
+export type ExchangeBiometricKeyMutationVariables = {
+  data: ExchangeBiometricKeyDto;
+};
+
+export const useExchangeBiometricKey = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof exchangeBiometricKey>>,
+      TError,
+      ExchangeBiometricKeyMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof exchangeBiometricKey>>,
+  TError,
+  ExchangeBiometricKeyMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getExchangeBiometricKeyMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type revokeBiometricKeyResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type revokeBiometricKeyResponseSuccess =
+  revokeBiometricKeyResponse204 & {
+    headers: Headers;
+  };
+export type revokeBiometricKeyResponse = revokeBiometricKeyResponseSuccess;
+
+export const getRevokeBiometricKeyUrl = () => {
+  return `/api/v1/biometric-keys/revocation`;
+};
+
+export const revokeBiometricKey = async (
+  revokeBiometricKeyDto: RevokeBiometricKeyDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<revokeBiometricKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRevokeBiometricKeyUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(revokeBiometricKeyDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: revokeBiometricKeyResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as revokeBiometricKeyResponse;
+};
+
+export const getRevokeBiometricKeyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof revokeBiometricKey>>,
+    TError,
+    RevokeBiometricKeyMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof revokeBiometricKey>>,
+  TError,
+  RevokeBiometricKeyMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["revokeBiometricKey"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof revokeBiometricKey>>,
+    RevokeBiometricKeyMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return revokeBiometricKey(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RevokeBiometricKeyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof revokeBiometricKey>>
+>;
+export type RevokeBiometricKeyMutationBody = RevokeBiometricKeyDto;
+export type RevokeBiometricKeyMutationError = unknown;
+export type RevokeBiometricKeyMutationVariables = {
+  data: RevokeBiometricKeyDto;
+};
+
+export const useRevokeBiometricKey = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof revokeBiometricKey>>,
+      TError,
+      RevokeBiometricKeyMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof revokeBiometricKey>>,
+  TError,
+  RevokeBiometricKeyMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRevokeBiometricKeyMutationOptions(options),
     queryClient,
   );
 };

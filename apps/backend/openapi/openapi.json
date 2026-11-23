@@ -690,6 +690,120 @@
         ]
       }
     },
+    "/api/v1/biometric-keys": {
+      "post": {
+        "operationId": "issueBiometricKey",
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BiometricKeyDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "BiometricKeys"
+        ]
+      }
+    },
+    "/api/v1/biometric-keys/exchange": {
+      "post": {
+        "operationId": "exchangeBiometricKey",
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeBiometricKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BiometricKeyExchangeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "BiometricKeys"
+        ]
+      }
+    },
+    "/api/v1/biometric-keys/revocation": {
+      "post": {
+        "operationId": "revokeBiometricKey",
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeBiometricKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "",
+        "tags": [
+          "BiometricKeys"
+        ]
+      }
+    },
     "/api/v1/accounts/current/email-change": {
       "post": {
         "operationId": "requestCurrentAccountEmailChange",
@@ -11869,6 +11983,72 @@
         },
         "required": [
           "credential"
+        ]
+      },
+      "BiometricKeyDto": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "description": "Opaque 43-character secret, returned only once; replaced by every exchange"
+          },
+          "unlockSecret": {
+            "type": "string",
+            "description": "Opaque 43-character secret, returned only once; kept behind the phone's biometrics"
+          }
+        },
+        "required": [
+          "deviceKey",
+          "unlockSecret"
+        ]
+      },
+      "ExchangeBiometricKeyDto": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43
+          },
+          "unlockSecret": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43
+          }
+        },
+        "required": [
+          "deviceKey",
+          "unlockSecret"
+        ]
+      },
+      "BiometricKeyExchangeDto": {
+        "type": "object",
+        "properties": {
+          "credential": {
+            "type": "string",
+            "description": "Opaque bearer credential returned only once"
+          },
+          "deviceKey": {
+            "type": "string",
+            "description": "The next device key; the one sent stops working"
+          }
+        },
+        "required": [
+          "credential",
+          "deviceKey"
+        ]
+      },
+      "RevokeBiometricKeyDto": {
+        "type": "object",
+        "properties": {
+          "deviceKey": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43
+          }
+        },
+        "required": [
+          "deviceKey"
         ]
       },
       "RequestEmailChangeDto": {

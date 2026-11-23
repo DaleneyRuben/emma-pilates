@@ -21,7 +21,7 @@ function managerWith(overrides: Partial<Record<keyof SessionManager, unknown>> =
     refresh: jest.fn().mockResolvedValue(null),
     restore: jest.fn().mockResolvedValue(null),
     start: jest.fn().mockResolvedValue(session),
-    unlockWithBiometrics: jest.fn().mockResolvedValue(session),
+    unlockWithBiometrics: jest.fn().mockResolvedValue({ session, status: "signed-in" }),
     wasBiometricOfferDeclined: jest.fn().mockResolvedValue(false),
     ...overrides,
   } as SessionManager;
@@ -45,10 +45,15 @@ function Probe() {
     biometrics.offer ? "offer" : "no-offer",
     biometrics.enabledNotice ? "notice" : "no-notice",
   ];
+  const lock = [
+    biometrics.autoPrompt ? "auto-prompt" : "no-auto-prompt",
+    biometrics.unlockError ?? "no-error",
+  ];
 
   return (
     <>
       <Text variant="cuerpo">{flags.join(" ")}</Text>
+      <Text variant="cuerpo">{lock.join(" | ")}</Text>
       <Action
         onPress={() => identity.start("password", { offerBiometrics: true })}
         title="Password"
@@ -58,6 +63,7 @@ function Probe() {
       <Action onPress={() => identity.logout()} title="Logout" />
       <Action onPress={() => biometrics.enable()} title="Enable" />
       <Action onPress={() => biometrics.disable()} title="Disable" />
+      <Action onPress={() => biometrics.useAnotherAccount()} title="Another account" />
       <Action onPress={() => biometrics.dismissOffer()} title="Dismiss" />
       <Action onPress={() => biometrics.dismissEnabledNotice()} title="Close notice" />
     </>
@@ -163,25 +169,122 @@ describe("MobileIdentityProvider biometrics", () => {
     expect(screen.getByText("signed-in available disabled no-offer no-notice")).toBeOnTheScreen();
   });
 
-  it("stays locked when the unlock prompt is cancelled", async () => {
+  // Owner, 2026-11-23: the prompt opens by itself once per launch.
+  it("asks for the prompt by itself only until the first unlock of the launch", async () => {
     const manager = managerWith({
       hasBiometricSession: jest.fn().mockResolvedValue(true),
-      unlockWithBiometrics: jest.fn().mockRejectedValue(new Error("User canceled")),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ status: "cancelled" }),
+    });
+    const screen = await renderWith(manager);
+    expect(screen.getByText("auto-prompt | no-error")).toBeOnTheScreen();
+
+    await press(screen, "Unlock");
+
+    expect(screen.getByText(/^biometric-locked available enabled/)).toBeOnTheScreen();
+    expect(screen.getByText("no-auto-prompt | no-error")).toBeOnTheScreen();
+    expect(manager.logout).not.toHaveBeenCalled();
+  });
+
+  it("says to try again when the scan worked but the server could not be reached", async () => {
+    const manager = managerWith({
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ status: "failed" }),
     });
     const screen = await renderWith(manager);
 
     await press(screen, "Unlock");
 
-    expect(screen.getByText(/^biometric-locked available enabled/)).toBeOnTheScreen();
-    expect(manager.logout).not.toHaveBeenCalled();
+    expect(screen.getByText(/^biometric-locked/)).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "no-auto-prompt | No pudimos entrar. Revisa tu conexión e intenta de nuevo.",
+      ),
+    ).toBeOnTheScreen();
   });
 
-  it("forgets the enabled state on logout", async () => {
+  it("falls back to the password when the key no longer works", async () => {
+    const manager = managerWith({
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ status: "invalid" }),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Unlock");
+
+    expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
+  });
+
+  it("offers biometrics again to a phone from before the key that could not keep one", async () => {
+    const manager = managerWith({
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      unlockWithBiometrics: jest
+        .fn()
+        .mockResolvedValue({ keyLost: true, session, status: "signed-in" }),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Unlock");
+
+    expect(screen.getByText("signed-in available disabled offer no-notice")).toBeOnTheScreen();
+  });
+
+  it("keeps biometrics on after signing out, without asking by itself", async () => {
     const manager = managerWith({ hasBiometricSession: jest.fn().mockResolvedValue(true) });
     const screen = await renderWith(manager);
     await press(screen, "Unlock");
 
     await press(screen, "Logout");
+
+    expect(
+      screen.getByText("biometric-locked available enabled no-offer no-notice"),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("no-auto-prompt | no-error")).toBeOnTheScreen();
+  });
+
+  it("signs out fully when biometrics were off", async () => {
+    const screen = await renderWith(managerWith());
+    await press(screen, "Password");
+
+    await press(screen, "Logout");
+
+    expect(screen.getByText(/^signed-out available disabled/)).toBeOnTheScreen();
+  });
+
+  it("forgets biometrics for «Usar otra cuenta» and shows the password form", async () => {
+    const manager = managerWith({ hasBiometricSession: jest.fn().mockResolvedValue(true) });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Another account");
+
+    expect(manager.disableBiometrics).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
+  });
+
+  // Review finding 4: a keychain failure outside the prompt never escapes.
+  it("says to try again when the unlock itself throws", async () => {
+    const manager = managerWith({
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      unlockWithBiometrics: jest.fn().mockRejectedValue(new Error("keychain")),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Unlock");
+
+    expect(
+      screen.getByText(
+        "no-auto-prompt | No pudimos entrar. Revisa tu conexión e intenta de nuevo.",
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  it("still shows the password form when forgetting the key throws", async () => {
+    const manager = managerWith({
+      disableBiometrics: jest.fn().mockRejectedValue(new Error("keychain")),
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+    });
+    const screen = await renderWith(manager);
+
+    await press(screen, "Another account");
 
     expect(screen.getByText("signed-out available disabled no-offer no-notice")).toBeOnTheScreen();
   });

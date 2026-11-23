@@ -12,7 +12,9 @@ import {
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
   AuthenticationTokenPurpose,
+  BiometricKeyRevocationReason,
 } from '../../generated/prisma/enums';
+import { revokeAccountBiometricKeys } from '../biometric-keys/revoke-biometric-keys';
 import { scheduleAuthenticationEmail } from '../../jobs/authentication-email/schedule-authentication-email';
 import {
   AuthenticationLinkStateChangedError,
@@ -262,6 +264,10 @@ export class PrismaAccountSecurityGateway
           reason: AuthenticationSessionRevocationReason.PASSWORD_CHANGED,
         },
       );
+      await revokeAccountBiometricKeys(transaction, input.accountId, {
+        revokedAt: input.changedAt,
+        reason: BiometricKeyRevocationReason.PASSWORD_CHANGED,
+      });
       await cancelPendingEmailChange(
         transaction,
         input.accountId,
@@ -328,6 +334,10 @@ export class PrismaAccountSecurityGateway
           reason: AuthenticationSessionRevocationReason.PASSWORD_RECOVERED,
         },
       );
+      await revokeAccountBiometricKeys(transaction, token.accountId, {
+        revokedAt: input.completedAt,
+        reason: BiometricKeyRevocationReason.PASSWORD_RECOVERED,
+      });
       await cancelPendingEmailChange(
         transaction,
         token.accountId,

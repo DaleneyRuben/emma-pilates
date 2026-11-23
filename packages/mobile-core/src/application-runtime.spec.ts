@@ -5,8 +5,8 @@ const principal = {
   identity: { clientId: "client-1", kind: "client" },
 };
 
-// After a biometric unlock only the protected copy is stored, so the API
-// fetcher must send the session manager's active credential.
+// After a biometric unlock the API fetcher must send the session manager's
+// active credential, whatever the plain store answers.
 describe("createDefaultMobileRuntime", () => {
   it("sends the unlocked credential with every API request", async () => {
     const fetchMock = jest.fn(
@@ -21,9 +21,9 @@ describe("createDefaultMobileRuntime", () => {
       acceptedIdentityKind: "client",
       credentialStore: {
         clear: jest.fn(),
-        hasBiometricCredential: jest.fn().mockResolvedValue(true),
+        hasLegacyBiometricSession: jest.fn().mockResolvedValue(true),
         load: jest.fn().mockResolvedValue(null),
-        loadWithBiometrics: jest.fn().mockResolvedValue("protected-credential"),
+        loadLegacyBiometricSession: jest.fn().mockResolvedValue("protected-credential"),
         save: jest.fn(),
       },
     });

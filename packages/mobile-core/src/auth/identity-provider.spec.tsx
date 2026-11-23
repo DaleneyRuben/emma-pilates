@@ -193,7 +193,7 @@ describe("MobileIdentityProvider", () => {
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue(null),
       start: jest.fn(),
-      unlockWithBiometrics: jest.fn().mockResolvedValue(session),
+      unlockWithBiometrics: jest.fn().mockResolvedValue({ session, status: "signed-in" }),
     };
     const screen = await render(
       <MobileIdentityProvider manager={manager}>

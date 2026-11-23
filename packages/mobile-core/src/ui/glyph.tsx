@@ -143,6 +143,18 @@ export const glyphShapes = {
       <Path d="M9 8h6M9 12h6M9 16h3" />
     </>
   ),
+  // ADR-0112 on iOS: the offer and «Entrar con Face ID» (canvas iOS-3, iOS-4).
+  faceId: (
+    <>
+      <Path d="M2.25 7.5v-3a2.25 2.25 0 0 1 2.25-2.25h3" />
+      <Path d="M16.5 2.25h3a2.25 2.25 0 0 1 2.25 2.25v3" />
+      <Path d="M21.75 16.5v3a2.25 2.25 0 0 1-2.25 2.25h-3" />
+      <Path d="M7.5 21.75h-3a2.25 2.25 0 0 1-2.25-2.25v-3" />
+      <Path d="M8.25 9v1.875M15.75 9v1.875" />
+      <Path d="M12 9v4.5h-1.125" />
+      <Path d="M8.625 16.125c1.875 1.875 4.875 1.875 6.75 0" />
+    </>
+  ),
   // Biometric opt-in: the sign-in offer, Perfil's switch and the unlock (lucide).
   fingerprint: (
     <>

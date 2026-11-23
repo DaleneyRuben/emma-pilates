@@ -1,5 +1,8 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
+import { MobileIdentityProvider } from "../auth/identity-provider";
+import type { SessionManager } from "../auth/session-manager";
+import { noBiometrics } from "../testing";
 import { ChangePasswordScreen } from "./change-password-screen";
 
 function jsonResponse(body: unknown, status: number) {
@@ -85,5 +88,39 @@ describe("ChangePasswordScreen", () => {
       expect(screen.getByText("La contraseña actual no es correcta.")).toBeOnTheScreen();
     });
     expect(onSaved).not.toHaveBeenCalled();
+  });
+
+  // ADR-0112: the server revoked this phone's biometric key with the old password.
+  it("forgets this phone's biometric key once the password changes", async () => {
+    const forgetBiometricsLocally = jest.fn().mockResolvedValue(undefined);
+    const manager: SessionManager = {
+      ...noBiometrics,
+      endLocally: jest.fn(),
+      forgetBiometricsLocally,
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      logout: jest.fn(),
+      refresh: jest.fn(),
+      restore: jest.fn().mockResolvedValue({ accountId: "account-1", role: "client" }),
+      start: jest.fn(),
+      unlockWithBiometrics: jest.fn(),
+    };
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <ChangePasswordScreen
+          fetcher={jest.fn().mockResolvedValue(new Response(null, { status: 204 }))}
+          onBack={jest.fn()}
+          onSaved={jest.fn()}
+        />
+      </MobileIdentityProvider>,
+    );
+    await fillForm(screen, {
+      current: "Emma2026lucia",
+      next: "Reformer2026lm",
+      confirm: "Reformer2026lm",
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
+
+    await waitFor(() => expect(forgetBiometricsLocally).toHaveBeenCalledTimes(1));
   });
 });

@@ -36,81 +36,11 @@ describe("createCredentialStore", () => {
     expect(await store.load()).toBeNull();
   });
 
-  it("stores and retrieves a credential behind biometric authentication", async () => {
-    const values = new Map<string, string>();
-    const setItemAsync = jest.fn(async (key: string, value: string) => {
-      values.set(key, value);
-    });
-    const getItemAsync = jest.fn(async (key: string) => values.get(key) ?? null);
-    const store = createCredentialStore({
-      canUseBiometricAuthentication: () => true,
-      deleteItemAsync: async (key) => {
-        values.delete(key);
-      },
-      getItemAsync,
-      setItemAsync,
-    });
-
-    await store.saveWithBiometrics("protected-credential");
-
-    expect(await store.hasBiometricCredential()).toBe(true);
-    expect(await store.load()).toBeNull();
-    await expect(store.loadWithBiometrics()).resolves.toBe("protected-credential");
-    expect(setItemAsync).toHaveBeenCalledWith(
-      "authentication-session-biometric",
-      "protected-credential",
-      {
-        authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
-        requireAuthentication: true,
-      },
-    );
-    expect(getItemAsync).toHaveBeenCalledWith("authentication-session-biometric", {
-      authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
-      requireAuthentication: true,
-    });
-  });
-
-  it("rejects biometric protection when the device cannot provide it", async () => {
-    const setItemAsync = jest.fn();
-    const store = createCredentialStore({
-      canUseBiometricAuthentication: () => false,
-      deleteItemAsync: jest.fn(),
-      getItemAsync: jest.fn(),
-      setItemAsync,
-    });
-
-    expect(store.canUseBiometrics()).toBe(false);
-    await expect(store.saveWithBiometrics("credential")).rejects.toThrow(
-      "Biometric authentication is unavailable",
-    );
-    expect(setItemAsync).not.toHaveBeenCalled();
-  });
-
-  it("clears both ordinary and biometric credentials on logout", async () => {
-    const values = new Map<string, string>([
-      ["authentication-session", "ordinary-credential"],
-      ["authentication-session-biometric", "protected-credential"],
-      ["authentication-session-biometric-enabled", "true"],
-    ]);
-    const store = createCredentialStore({
-      deleteItemAsync: async (key) => {
-        values.delete(key);
-      },
-      getItemAsync: async (key) => values.get(key) ?? null,
-      setItemAsync: async (key, value) => {
-        values.set(key, value);
-      },
-    });
-
-    await store.clear();
-
-    expect(values).toEqual(new Map());
-  });
-
-  it("replaces biometric storage after a password login without biometrics", async () => {
+  it("drops the protected session from before ADR-0112 after a password sign-in", async () => {
     const values = new Map<string, string>([
       ["authentication-session-biometric", "old-protected-credential"],
       ["authentication-session-biometric-enabled", "true"],
+      ["biometric-device-key", "device-key"],
     ]);
     const store = createCredentialStore({
       deleteItemAsync: async (key) => {
@@ -124,24 +54,9 @@ describe("createCredentialStore", () => {
 
     await store.save("new-ordinary-credential");
 
-    await expect(store.hasBiometricCredential()).resolves.toBe(false);
+    await expect(store.hasLegacyBiometricSession()).resolves.toBe(false);
     await expect(store.load()).resolves.toBe("new-ordinary-credential");
     expect(values.has("authentication-session-biometric")).toBe(false);
-  });
-
-  it("removes the biometric marker when the phone invalidates its key", async () => {
-    const values = new Map<string, string>([["authentication-session-biometric-enabled", "true"]]);
-    const store = createCredentialStore({
-      deleteItemAsync: async (key) => {
-        values.delete(key);
-      },
-      getItemAsync: async (key) => values.get(key) ?? null,
-      setItemAsync: async (key, value) => {
-        values.set(key, value);
-      },
-    });
-
-    await expect(store.loadWithBiometrics()).resolves.toBeNull();
-    await expect(store.hasBiometricCredential()).resolves.toBe(false);
+    expect(values.get("biometric-device-key")).toBe("device-key");
   });
 });

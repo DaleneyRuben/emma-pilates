@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
+import { FormAlert } from "../auth/auth-parts";
 import { biometricCopy } from "../auth/biometric-copy";
 import { Glyph } from "./glyph";
 import { OutlinedButton } from "./outlined-button";
@@ -8,54 +9,80 @@ import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
 type BiometricWelcomeProps = {
+  /** The scan worked but the server could not be reached. */
+  error: string | null;
   onUnlock: () => Promise<void> | void;
-  onUsePassword: () => void;
+  onUseAnotherAccount: () => Promise<void> | void;
 };
 
 /**
- * «Opción A», the next launch with biometrics on: «Hola de nuevo», the one
- * solid action that opens the prompt, and the way to the password form.
+ * «Hola de nuevo» (canvas B, iOS-3): after a cancelled prompt or a sign-out,
+ * the solid action opens the prompt again and «Usar otra cuenta» forgets
+ * biometrics on this phone for the password form.
  */
-export function BiometricWelcome({ onUnlock, onUsePassword }: BiometricWelcomeProps) {
-  const [busy, setBusy] = useState(false);
-  const unlock = async () => {
-    setBusy(true);
+export function BiometricWelcome({ error, onUnlock, onUseAnotherAccount }: BiometricWelcomeProps) {
+  const [busy, setBusy] = useState<"another-account" | "unlock" | null>(null);
+  const copy = biometricCopy();
+  const run = async (action: "another-account" | "unlock") => {
+    setBusy(action);
     try {
-      await onUnlock();
+      await (action === "unlock" ? onUnlock() : onUseAnotherAccount());
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   };
 
   return (
     <View style={styles.welcome} testID="biometric-welcome">
-      <Text accessibilityRole="header" style={styles.greeting} variant="titulo-bloque">
+      <Text accessibilityRole="header" style={styles.centered} variant="titulo-bloque">
         Hola de nuevo
       </Text>
-      <BiometricLoginButton busy={busy} onPress={() => void unlock()} />
-      <OutlinedButton disabled={busy} label="Usar correo y contraseña" onPress={onUsePassword} />
+      {error === null ? null : <FormAlert>{error}</FormAlert>}
+      <BiometricLoginButton
+        busy={busy === "unlock"}
+        disabled={busy !== null}
+        onPress={() => void run("unlock")}
+      />
+      <OutlinedButton
+        disabled={busy !== null}
+        label="Usar otra cuenta"
+        onPress={() => void run("another-account")}
+      />
+      {copy.otherAccountNote === null ? null : (
+        <Text style={styles.centered} variant="secundario">
+          {copy.otherAccountNote}
+        </Text>
+      )}
     </View>
   );
 }
 
-/** The 600 action with the fingerprint glyph before its white `boton` label. */
-export function BiometricLoginButton({ busy, onPress }: { busy: boolean; onPress: () => void }) {
-  const label = biometricCopy().unlockLabel;
+/** The 600 action with the Face ID or fingerprint glyph before its white `boton` label. */
+export function BiometricLoginButton({
+  busy,
+  disabled = busy,
+  onPress,
+}: {
+  busy: boolean;
+  disabled?: boolean;
+  onPress: () => void;
+}) {
+  const copy = biometricCopy();
 
   return (
     <Pressable
-      accessibilityLabel={label}
+      accessibilityLabel={copy.unlockLabel}
       accessibilityRole="button"
-      accessibilityState={{ busy, disabled: busy }}
-      disabled={busy}
+      accessibilityState={{ busy, disabled }}
+      disabled={disabled}
       onPress={onPress}
       style={styles.button}
       testID="login-biometric-unlock"
     >
       <View style={[styles.content, busy && styles.hidden]}>
-        <Glyph color={colors.onPrimary} name="fingerprint" size={22} strokeWidth={1.6} />
+        <Glyph color={colors.onPrimary} name={copy.glyph} size={22} strokeWidth={1.6} />
         <Text tone="onDark" variant="boton">
-          {label}
+          {copy.unlockLabel}
         </Text>
       </View>
       {busy ? (
@@ -76,8 +103,8 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
+  centered: { textAlign: "center" },
   content: { alignItems: "center", flexDirection: "row", gap: spacing.smd },
-  greeting: { textAlign: "center" },
   hidden: { opacity: 0 },
   spinner: { ...StyleSheet.absoluteFill },
   welcome: { gap: spacing.mdLg },
