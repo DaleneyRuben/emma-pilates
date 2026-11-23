@@ -1,6 +1,7 @@
 import { render, waitFor } from "@testing-library/react-native";
 
 import App from "../App";
+import { noBiometrics } from "@pilates/mobile-core/testing";
 
 function createAuthenticationApiMock() {
   return {
@@ -28,6 +29,7 @@ function createRuntime(role?: "client" | "trainer") {
     },
     login: jest.fn(),
     sessionManager: {
+      ...noBiometrics,
       endLocally: jest.fn(),
       refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),

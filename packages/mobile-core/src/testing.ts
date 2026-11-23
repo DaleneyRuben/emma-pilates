@@ -73,3 +73,17 @@ export function withTypeScaleAudit<Library extends TestingLibrary>(actual: Libra
     },
   });
 }
+
+/**
+ * A session manager's biometric half on a phone without biometrics, for the
+ * specs' hand-made managers.
+ */
+export const noBiometrics = {
+  canUseBiometrics: () => false,
+  declineBiometricOffer: async () => undefined,
+  disableBiometrics: async () => undefined,
+  enableBiometrics: async () => false,
+  getCredential: async (): Promise<string | null> => null,
+  isBiometricsEnabled: async () => false,
+  wasBiometricOfferDeclined: async () => false,
+};

@@ -15,7 +15,29 @@ type MobileIdentityState = {
   status: "biometric-locked" | "restoring" | "signed-in" | "signed-out";
 };
 
+export type MobileBiometrics = {
+  /** The phone can protect the session with Face ID or a fingerprint. */
+  available: boolean;
+  enabled: boolean;
+  /** Set once biometrics were turned on, for the confirming toast. */
+  enabledNotice: boolean;
+  /** Offered right after a password sign-in, until enabled or dismissed. */
+  offer: boolean;
+  disable: () => Promise<void>;
+  dismissEnabledNotice: () => void;
+  /** «Ahora no»: never offered again on this phone. */
+  dismissOffer: () => Promise<void>;
+  enable: () => Promise<boolean>;
+};
+
+type StartOptions = {
+  /** A password sign-in, which may offer biometrics next. */
+  offerBiometrics?: boolean;
+  protectWithBiometrics?: boolean;
+};
+
 type MobileIdentity = MobileIdentityState & {
+  biometrics: MobileBiometrics;
   /** Signs out after the server closed the Account and revoked every session. */
   endClosedSession: (notice: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -23,7 +45,7 @@ type MobileIdentity = MobileIdentityState & {
   refresh: () => Promise<void>;
   /** Shown once on the login screen after a closure; cleared by the next sign-in. */
   signOutNotice: string | null;
-  start: (credential: string, options?: { protectWithBiometrics?: boolean }) => Promise<void>;
+  start: (credential: string, options?: StartOptions) => Promise<void>;
   unlockWithBiometrics: () => Promise<void>;
 };
 
@@ -39,6 +61,9 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     status: "restoring",
   });
   const [signOutNotice, setSignOutNotice] = useState<string | null>(null);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+  const [biometricOffer, setBiometricOffer] = useState(false);
+  const [enabledNotice, setEnabledNotice] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +71,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     Promise.all([manager.restore(), manager.hasBiometricSession()]).then(
       ([session, hasBiometricSession]) => {
         if (active) {
+          setBiometricsEnabled(hasBiometricSession);
           setIdentity({
             session,
             status:
@@ -72,25 +98,51 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     };
   }, [manager]);
 
+  const shouldOfferBiometrics = useCallback(async () => {
+    if (!manager.canUseBiometrics()) return false;
+    try {
+      const [enabled, declined] = await Promise.all([
+        manager.isBiometricsEnabled(),
+        manager.wasBiometricOfferDeclined(),
+      ]);
+      return !enabled && !declined;
+    } catch (error) {
+      // The sign-in itself succeeded; an unreadable keychain only skips the offer.
+      reportRecoveredError(error);
+      return false;
+    }
+  }, [manager]);
+
   const start = useCallback(
-    async (credential: string, options?: { protectWithBiometrics?: boolean }) => {
+    async (credential: string, options: StartOptions = {}) => {
+      const { offerBiometrics = false, ...startOptions } = options;
       const session =
-        options === undefined
+        startOptions.protectWithBiometrics === undefined
           ? await manager.start(credential)
-          : await manager.start(credential, options);
+          : await manager.start(credential, startOptions);
+      const offer = session !== null && offerBiometrics && (await shouldOfferBiometrics());
 
       setSignOutNotice(null);
+      setBiometricsEnabled(startOptions.protectWithBiometrics === true && session !== null);
+      setBiometricOffer(offer);
       setIdentity({
         session,
         status: session === null ? "signed-out" : "signed-in",
       });
     },
-    [manager],
+    [manager, shouldOfferBiometrics],
   );
 
   const unlockWithBiometrics = useCallback(async () => {
-    const session = await manager.unlockWithBiometrics();
+    let session: MobileSession | null;
+    try {
+      session = await manager.unlockWithBiometrics();
+    } catch {
+      // A cancelled or failed prompt keeps the lock and the protected copy.
+      return;
+    }
 
+    setBiometricsEnabled(session !== null);
     setIdentity({
       session,
       status: session === null ? "signed-out" : "signed-in",
@@ -103,6 +155,8 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     }
 
     await manager.logout(identity.session);
+    setBiometricsEnabled(false);
+    setBiometricOffer(false);
     setIdentity({ session: null, status: "signed-out" });
   }, [identity.session, manager]);
 
@@ -120,16 +174,55 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
       if (identity.session !== null) {
         await manager.endLocally(identity.session);
       }
+      setBiometricsEnabled(false);
+      setBiometricOffer(false);
       setSignOutNotice(notice);
       setIdentity({ session: null, status: "signed-out" });
     },
     [identity.session, manager],
   );
 
+  const enableBiometrics = useCallback(async () => {
+    let enabled = false;
+    try {
+      enabled = await manager.enableBiometrics();
+    } catch (error) {
+      reportRecoveredError(error);
+    }
+    setBiometricOffer(false);
+    setBiometricsEnabled(enabled);
+    setEnabledNotice(enabled);
+    return enabled;
+  }, [manager]);
+
+  const disableBiometrics = useCallback(async () => {
+    await manager.disableBiometrics();
+    setBiometricsEnabled(false);
+    setEnabledNotice(false);
+  }, [manager]);
+
+  const dismissOffer = useCallback(async () => {
+    setBiometricOffer(false);
+    await manager.declineBiometricOffer();
+  }, [manager]);
+
+  const biometrics: MobileBiometrics = {
+    // Read on each render: the person can deny Face ID or remove every fingerprint.
+    available: manager.canUseBiometrics(),
+    disable: disableBiometrics,
+    dismissEnabledNotice: () => setEnabledNotice(false),
+    dismissOffer,
+    enable: enableBiometrics,
+    enabled: biometricsEnabled,
+    enabledNotice,
+    offer: biometricOffer,
+  };
+
   return (
     <MobileIdentityContext.Provider
       value={{
         ...identity,
+        biometrics,
         endClosedSession,
         logout,
         refresh,
