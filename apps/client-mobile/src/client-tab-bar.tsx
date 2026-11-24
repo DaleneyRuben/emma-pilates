@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     flexDirection: "row",
     gap: spacing.sm,
-    height: 48,
+    minHeight: 48,
+    paddingVertical: spacing.xs,
     paddingHorizontal: spacing.xlSm,
   },
 });

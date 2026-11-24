@@ -47,7 +47,7 @@ describe("The Client tab bar on a tablet", () => {
       justifyContent: "center",
     });
     const home = screen.getByTestId("tab-home", hidden);
-    expect(home).toHaveStyle({ flexDirection: "row", height: 48 });
+    expect(home).toHaveStyle({ flexDirection: "row", minHeight: 48 });
     expect(within(home).getByText("Inicio", hidden)).toHaveStyle({ color: "#FFFBFB" });
 
     await fireEvent.press(screen.getByTestId("tab-profile", hidden));
