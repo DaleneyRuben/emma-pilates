@@ -1,9 +1,11 @@
 name: Store deploy
 
 # REL-008 (ADR-0101, amending ADR-0038). Manual only, and only from a
-# release/* branch. Android submits to Play's internal track. iOS waits for
-# the Apple Developer account (gate 9) and is refused here until that account
-# exists. Nothing here promotes a track to production.
+# release/* branch. Android submits to Play's internal track; iOS uploads to
+# App Store Connect, where the build lands in TestFlight. Nothing here
+# promotes a track to production or sends a build to App Review. iOS needs
+# the owner's one-time credential setup on EAS first (mobile-release runbook,
+# "iOS: first TestFlight build").
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +15,7 @@ on:
         type: choice
         options: [client, staff]
       platform:
-        description: android now; ios stays refused until gate 9
+        description: android (Play internal testing) or ios (TestFlight)
         required: true
         type: choice
         options: [android, ios]
@@ -41,12 +43,6 @@ jobs:
           echo "Store deploy runs from a release/<app>-x.y.z branch (ADR-0101)."
           exit 1
 
-      - name: Refuse iOS until the Apple Developer account exists
-        if: inputs.platform == 'ios'
-        run: |
-          echo "iOS store deploy waits for gate 9 (the Apple Developer account). Do not dispatch this until that account exists and EAS has its credentials."
-          exit 1
-
       - name: Stop until the owner stores EXPO_TOKEN
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -66,8 +62,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build and submit to Play internal testing
+      # Android goes to Play's internal track. iOS goes to App Store Connect
+      # and shows up in TestFlight; it reads the distribution certificate,
+      # provisioning profile, push key, and App Store Connect API key the
+      # owner stored on EAS, and the submit profile's ascAppId.
+      - name: Build and submit to internal testing
         working-directory: apps/${{ inputs.app }}-mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx --yes eas-cli@"$EAS_CLI_VERSION" build --profile production --platform android --auto-submit --non-interactive --no-wait
+          PLATFORM: ${{ inputs.platform }}
+        run: npx --yes eas-cli@"$EAS_CLI_VERSION" build --profile production --platform "$PLATFORM" --auto-submit --non-interactive --no-wait
