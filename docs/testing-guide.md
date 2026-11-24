@@ -67,6 +67,7 @@ numbered tests.
 | Admin web round 2 | Insumos with one «Nuevo insumo» and «Retiro» · «Reposición» per row, Equipos' row links, compact phone cards for every list, pills only for exceptions, titles that match the menu, one date filter in Informes › Dinero, and a readable Simulador (Test 182) | Report summary tables (Totales por mes, Gastos por categoría, Proyección) keep their labelled cards at 420 px |
 | Resend a Client activation link from the admin web | Clientas › a pending Client's Resumen: the «Pendiente de activación» aviso with her link's expiry and «Reenviar enlace», the success line, and the server's wait after a second click (Test 26, step 3) | A self-registered Client still verifying her email shows the aviso without the link |
 | Login with the logo | Both apps open Login on the rosa band with the studio's logo and the form in a white sheet anchored to the bottom, no «Ej.:» under the email, the sheet above the keyboard, a 560 pt column on iPad (Test 193) | — |
+| Client app on tablet | Every Client screen on the iPad and Android tablets in both orientations: the 84 pt tab bar with each icon beside its label, the 40 pt page with the 36 pt title beside the back button, centred columns, two-column screens, and Reservar and Mis facturas as a list beside the chosen item (Test 196) | Needs a native build with `supportsTablet` (release 1.2.3); card internals keep their phone sizes |
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 
 ## Where each designed screen is tested
@@ -89,6 +90,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
+| 01T–25T, the same screens on a tablet | 196 |
 
 | Staff app | Tests |
 | --- | --- |
@@ -3866,6 +3868,13 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- from the Client app on tablet (Test 196): the boards' larger tablet sizes
+  inside cards (Lora 64 on Mi plan, 44 on Detalle del plan, 48 on the
+  referral code, the 05T and 10T heroes drawn as one row) and the row-style
+  day and month headers keep their phone styles; «Reservar otra clase» under
+  05T is not added (the phone has no such button); the footers of 11T, 14T,
+  22T, 23T and 25T keep the phone's fixed panel (centred at the column's
+  width) instead of the boards' inline button;
 - from the staff app redesign picks (Test 187): the **Pagos** and
   **Evaluaciones** rows of E4's staff client file need new staff read
   endpoints, which are not built; transfer receipts to review are not on the
@@ -12029,3 +12038,98 @@ J. **Phones from PR #372.** A phone that turned biometrics on before this
    change opens locked, unlocks with one prompt (Android asks once more to
    store the new key) and keeps working; if no key can be stored it stays
    signed in and the offer shows again.
+
+## Test 196: the Client app on iPad and Android tablets (follow-up 289)
+
+The owner's tablet layouts for every Client screen (2026-11-24, boards
+`design/01T`–`25T`, `design/README.md` «Client app on tablet»). The app now
+runs as a tablet app: `ios.supportsTablet` is on, the iPad turns to every
+orientation, and an Android tablet (shorter side 600 dp or more) lifts the
+manifest's portrait lock at launch through `expo-screen-orientation`. Phones
+stay upright. **This needs a native build**: an older development build still
+opens the iPad in iPhone mode and has no orientation module. Build locally
+(Test 45's local builds: `npx expo prebuild`, then `xcodebuild` for the
+Simulator and `./gradlew assembleDebug`) or use the 1.2.3 builds. Use the API
+on a copy of the fixtures, sign in as Lucía, and walk the iPad Pro 11 (M4) in
+portrait and landscape, an Android tablet emulator (for example a
+2560 × 1600, 320 dpi AVD: 1280 × 800 dp) in both orientations, and the iPhone
+16 Pro. Compare each screen with its `NNT … (Tablet).dc.html` board.
+
+A. **When.** From a window 768 pt wide the tablet layout applies, in either
+   orientation. The iPad and the Android tablet rotate; the iPhone and an
+   Android phone stay upright. The iPad shows the app full screen, never in
+   the small iPhone frame.
+B. **Tab bar.** On a tablet the white bar shows the four tabs centred in one
+   row, each 48 pt tall with the icon beside the label; the open tab is the
+   600 pill with white icon and label. Tapping a tab opens it on its root
+   screen, as on the phone. The bar hides on the same task screens as on the
+   phone (plans, payment, Congelar plan, booking an Evaluation, Reprogramar,
+   Editar perfil, Cambiar contraseña, Enviar comentarios, Cerrar mi cuenta).
+C. **Page and header.** Content keeps 40 pt from both sides. The Rubor band
+   pads 40 pt and its title is Lora 36; on a pushed screen the white back
+   button sits left of the title on the same row, and «Marcar leídas» on
+   Notificaciones sits at the end of that row.
+D. **Sign-in pages (01T, 20T, 21T).** Iniciar sesión, Recuperar contraseña
+   (and «Revisa tu correo») and Crea tu contraseña show the logo on the
+   Rubor screen (380 pt on Iniciar sesión, 300 pt on the other two) and a
+   560 pt white sheet anchored to the bottom with the page's title, text,
+   fields and button. Recuperar contraseña keeps a white back button at the
+   top left. On the first-load screen the logo is 300 pt.
+E. **Inicio (02T).** Everything sits in a centred 720 pt column, the band's
+   date, bell, avatar and greeting too. With a next class and a plan, the two
+   cards sit side by side; «Reservar otra clase» is full width; the promotion
+   card is 720 pt wide (narrower on a 768 pt window, never overflowing); the
+   two quick accesses share a row.
+F. **Reservar and Detalle de sesión (03T, 04T).** The band holds the title,
+   the branch pill and, when it applies, the week's notice; wider than
+   1000 pt (landscape) the pills move to the title's row. Below, a 392 pt
+   panel from the left edge holds the days, the class types and the list
+   (it scrolls and pulls to refresh); a rule separates the right panel,
+   which says «Elige una clase» until a class is tapped. Tapping a class
+   tints its row and shows its detail on the right, with «Reservar esta
+   clase» (or the waitlist button) and its note in a white bar at the foot of
+   the panel. Booking from there works as on the phone (toast, Mis reservas,
+   the list refreshes). Detalle de sesión is not a separate screen on a
+   tablet.
+G. **Mis reservas and Historial (05T, 07T).** The Próximas · Historial
+   switch sits in the band beside the title, 340 pt wide. The next-class
+   hero is full width and the other bookings go two per row; the history
+   groups each month over its classes two per row.
+H. **Reprogramar (06T).** Your current booking in a 300 pt column, the other
+   classes of the day beside it; «Confirmar cambio» and its note centred at
+   480 pt in the footer.
+I. **Planes y pagos (08T–12T).** Elige tu plan: the plans as cards two per
+   row, each row's cards the same height. Detalle del plan: price and «Qué
+   incluye» on the left, the start date and «Desglose» on the right, «Pagar»
+   centred at 480 pt in the footer. Pago: the amount on top, «1 · Paga con
+   el QR» and «2 · Sube tu comprobante» side by side, «Enviar comprobante»
+   at 480 pt. Estado del pago: a centred 480 pt column. Mi plan: the plan,
+   «Renovar mi plan» and notes on the left, Freeze, «Detalles» and «Tu plan»
+   on the right. Congelar plan: a centred 560 pt column.
+J. **Evaluación nutricional (13T–15T).** With nothing booked: the offer and
+   the nutritionist in a 300 pt column, the booking card with days and times
+   beside it. With a booked Evaluation: the coming ones on the left, «¿Otra
+   evaluación?» and «Anteriores» on the right. Confirma tu cita: a centred
+   520 pt column with its button at the same width.
+K. **Invita a una amiga (16T).** The code card and «Cómo funciona» on the
+   left, «Tus invitadas» on the right.
+L. **Mis facturas (17T).** The invoices in the 392 pt panel with the NIT
+   note under them; the right panel says «Elige una factura» («Toca una
+   factura de la lista para ver sus datos y descargarla aquí.») until one is
+   tapped, then shows «Factura» with its data and «Descargar» in a white bar
+   at the panel's foot. With no invoices the page shows «Aún no tienes
+   facturas» as on the phone. Opening an invoice from its notification still
+   shows the full invoice screen.
+M. **Perfil (18T).** Your card, «Cerrar sesión», the version and «Cerrar mi
+   cuenta» in a 300 pt column; the three lists beside it (on a tablet
+   «Cerrar sesión» is not repeated in «Cuenta»).
+N. **The rest (19T, 22T–25T).** Notificaciones in a centred 640 pt column;
+   Editar perfil 560 pt (and its button); Cambiar contraseña 480 pt; Cerrar
+   mi cuenta in two columns (what happens on the left; the data note,
+   promotions, password, «Cerrar mi cuenta» and «Cancelar» on the right,
+   with no footer); Enviar comentarios 560 pt.
+O. **States.** Loading, empty and error states show inside the same
+   column or panel as the screen.
+P. **The phone is unchanged.** On the iPhone 16 Pro every screen above looks
+   as before: labels under the tab icons, the back button above the title,
+   one column. The Staff app is unchanged on every device.
