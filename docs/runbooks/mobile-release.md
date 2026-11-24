@@ -150,10 +150,12 @@ journeys against freshly applied fixtures (see the testing guide, Test 19).
 Gate 9 is open since 2026-11-23: an individual Apple Developer account (Team
 ID `SN44D2645V`), the Free Apps Agreement, both bundle IDs registered with no
 capabilities, and both App Store Connect apps («Emma Pilates», «Emma Pilates
-Staff», Spanish (Mexico)). Each app's `eas.json` has a `production` submit
-profile for iOS with the team ID and the app's numeric App Store Connect
-Apple ID (`ascAppId`, App Information → General → Apple ID), so submits never
-ask which app. `ios.config.usesNonExemptEncryption: false` in `app.json`
+Staff», Spanish (Mexico); the Staff app shows as «Emma Staff» on the phone).
+Each app's `eas.json` has a `production` submit profile for iOS with the team
+ID and the app's numeric App Store Connect Apple ID (`ascAppId`, App
+Information → General → Apple ID). A non-interactive submit cannot look the
+app up without it, so the Store deploy workflow refuses `ios` while an app's
+`ascAppId` is missing. `ios.config.usesNonExemptEncryption: false` in `app.json`
 writes `ITSAppUsesNonExemptEncryption`, so TestFlight asks no export
 compliance question. The iOS build number is kept by EAS like Android's
 (`appVersionSource: remote`, `autoIncrement` on `production`), starting at 1.
@@ -172,7 +174,9 @@ nobody else types them. Each build spends one of the month's 15 iOS builds.
    running and go on.
 3. `eas submit --profile production --platform ios --latest` once the build
    finishes. The first time, choose to generate a new App Store Connect API
-   key; EAS stores it, and later submits (and the Store deploy workflow)
+   key (if EAS reports no API access, first open App Store Connect → Users
+   and Access → Integrations → App Store Connect API and press «Request
+   Access» once); EAS stores it, and later submits (and the Store deploy workflow)
    use it without an Apple login.
 4. `cd ../staff-mobile` and repeat 1–3. When EAS offers the existing
    distribution certificate, the APNs key, and the API key, reuse them:
