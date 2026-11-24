@@ -11,6 +11,7 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  TabletColumns,
   Text,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -73,30 +74,39 @@ export function ReferralsScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        <ReferralCodeCard
-          code={referralCode}
-          fetcher={fetcher}
-          onChanged={() => {
-            setNotice("Código actualizado");
-            void referrals.refetch();
-          }}
-          onCopied={() => setNotice("Código copiado")}
-          onShare={share}
-        />
-        <HowItWorks />
-        <View>
-          <SectionTitle>Tus invitadas</SectionTitle>
-          {referred.length === 0 ? (
-            // Rosa Emma C16b: the quiet line in a white card; sharing is above.
-            <View style={styles.emptyCard} testID="referrals-empty">
-              <Text variant="cuerpo">
-                Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
-              </Text>
+        {/* 16T: the code and how it works beside «Tus invitadas» on a tablet. */}
+        <TabletColumns
+          left={
+            <>
+              <ReferralCodeCard
+                code={referralCode}
+                fetcher={fetcher}
+                onChanged={() => {
+                  setNotice("Código actualizado");
+                  void referrals.refetch();
+                }}
+                onCopied={() => setNotice("Código copiado")}
+                onShare={share}
+              />
+              <HowItWorks />
+            </>
+          }
+          right={
+            <View>
+              <SectionTitle>Tus invitadas</SectionTitle>
+              {referred.length === 0 ? (
+                // Rosa Emma C16b: the quiet line in a white card; sharing is above.
+                <View style={styles.emptyCard} testID="referrals-empty">
+                  <Text variant="cuerpo">
+                    Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
+                  </Text>
+                </View>
+              ) : (
+                <ReferredList referred={referred} />
+              )}
             </View>
-          ) : (
-            <ReferredList referred={referred} />
-          )}
-        </View>
+          }
+        />
       </ScrollView>
       {toast === null ? null : <BrandToast onClose={() => setNotice(undefined)} title={toast} />}
     </Screen>

@@ -2,6 +2,7 @@ import { useContext, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
+import { tabletPageMargin, useWideScreen } from "./tablet-layout";
 import { colors, shadows, spacing } from "./tokens";
 
 /**
@@ -13,8 +14,13 @@ import { colors, shadows, spacing } from "./tokens";
 export function FooterPanel({ children, testID }: { children: ReactNode; testID?: string }) {
   // The recovery screen can stand above the app's safe area provider.
   const bottom = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
+  // A tablet page's 40 pt margins: the panel still reaches the sides.
+  const wide = useWideScreen();
   return (
-    <View style={[styles.panel, { paddingBottom: spacing.mdLg + bottom }]} testID={testID}>
+    <View
+      style={[styles.panel, wide && styles.wide, { paddingBottom: spacing.mdLg + bottom }]}
+      testID={testID}
+    >
       {children}
     </View>
   );
@@ -32,6 +38,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
     paddingTop: spacing.mdLg,
   },
+  wide: { marginHorizontal: -tabletPageMargin, paddingHorizontal: tabletPageMargin },
 });
 
 /** The `Screen` style that hands its bottom padding to the panel. */

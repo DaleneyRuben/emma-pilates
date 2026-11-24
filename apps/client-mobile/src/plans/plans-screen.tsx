@@ -16,7 +16,9 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  TabletGrid,
   Text,
+  useWideScreen,
 } from "@pilates/mobile-core";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { Fragment, useEffect } from "react";
@@ -118,6 +120,35 @@ function PlanRow({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
   );
 }
 
+/**
+ * 08T: on a tablet each Plan is its own white card, two to a row of equal
+ * height, the price at the card's foot.
+ */
+function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityLabel={describePlanCardLabel(plan)}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      testID={`plan-card-${plan.id}`}
+    >
+      <View style={styles.rowBody}>
+        <Text variant="titulo-fila">{plan.name}</Text>
+        <Text variant="secundario">{planRowTerms(plan)}</Text>
+      </View>
+      <View style={styles.cardPrices}>
+        <Text variant="cifra">{formatBolivianos(plan.priceCentavos)}</Text>
+        {plan.listPriceCentavos === undefined ? null : (
+          <Text strike variant="secundario">
+            {formatBolivianos(plan.listPriceCentavos)}
+          </Text>
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
 export function PlansScreen({ route }: { route?: { params?: PlansParams } }) {
   const navigation = useNavigation<PlansNavigation>();
   const fetcher = useClientFetcher();
@@ -172,6 +203,7 @@ function PlanList({
   plans: readonly PlanDto[];
   renewal: PlanDto | null;
 }) {
+  const wide = useWideScreen();
   const others = plans.filter((plan) => plan.id !== renewal?.id);
   const banner = plans.some((plan) => plan.listPriceCentavos !== undefined) ? (
     <LaunchBanner placesLeft={launchPlacesLeft(plans)} quiet={renewal !== null} />
@@ -186,14 +218,22 @@ function PlanList({
       {others.length === 0 ? null : (
         <View>
           {renewal === null ? null : <SectionTitle>Otros planes</SectionTitle>}
-          <View style={styles.group}>
-            {others.map((plan, index) => (
-              <Fragment key={plan.id}>
-                {index === 0 ? null : <View style={styles.hairline} />}
-                <PlanRow onPress={() => onOpen(plan.id)} plan={plan} />
-              </Fragment>
-            ))}
-          </View>
+          {wide ? (
+            <TabletGrid gap={spacing.mdLg}>
+              {others.map((plan) => (
+                <PlanCard key={plan.id} onPress={() => onOpen(plan.id)} plan={plan} />
+              ))}
+            </TabletGrid>
+          ) : (
+            <View style={styles.group}>
+              {others.map((plan, index) => (
+                <Fragment key={plan.id}>
+                  {index === 0 ? null : <View style={styles.hairline} />}
+                  <PlanRow onPress={() => onOpen(plan.id)} plan={plan} />
+                </Fragment>
+              ))}
+            </View>
+          )}
         </View>
       )}
       {renewal === null ? null : banner}
@@ -212,6 +252,13 @@ const styles = StyleSheet.create({
   },
   bannerStrong: { ...surfaces.emphasis, padding: spacing.lgXl },
   bannerText: { flex: 1 },
+  card: { ...surfaces.card, flex: 1, gap: spacing.smLg, padding: spacing.lgXl },
+  cardPrices: {
+    alignItems: "baseline",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    marginTop: "auto",
+  },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },

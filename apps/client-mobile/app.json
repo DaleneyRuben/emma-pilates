@@ -12,7 +12,15 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.emmapilates.client",
-      "supportsTablet": false,
+      "supportsTablet": true,
+      "infoPlist": {
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ]
+      },
       "config": {
         "usesNonExemptEncryption": false
       },

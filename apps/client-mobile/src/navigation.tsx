@@ -10,6 +10,7 @@ import {
   tabBarItemStyle,
   tabBarTints,
   TabLabel,
+  WideScreens,
   type MobileNavigationProps,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
@@ -26,6 +27,7 @@ import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
+import { ClientTabBar } from "./client-tab-bar";
 import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
@@ -186,7 +188,9 @@ const ClientTabs = createBottomTabNavigator({
   // Walkthrough n.º 28 and 55: tapping a tab opens it on its root screen,
   // even when a notification opened it on another screen.
   screenListeners: returnTabsToRoot(tabRoots),
-  // Labels stay under the icons on a tablet too.
+  // Follow-up 289: a tablet draws its own bar, each icon beside its label.
+  tabBar: (props) => <ClientTabBar {...props} />,
+  // A phone keeps its labels under the icons.
   screenOptions: {
     headerShown: false,
     // Rosa Emma: the open tab is a 600 pill with white icon and label.
@@ -243,7 +247,16 @@ function SignedInEmailChangeLink({
   );
 }
 
-export function ClientNavigation({
+// Follow-up 289: every Client screen, signed in or not, takes the tablet page.
+export function ClientNavigation(props: MobileNavigationProps) {
+  return (
+    <WideScreens>
+      <ClientScreens {...props} />
+    </WideScreens>
+  );
+}
+
+function ClientScreens({
   accountId,
   apiBaseUrl,
   apiFetcher,

@@ -26,6 +26,8 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  TabletColumn,
+  TabletColumns,
   Text,
   type InvoiceChoice,
 } from "@pilates/mobile-core";
@@ -172,23 +174,30 @@ export function PaymentScreen() {
             {formatBolivianos(current.amountDueCentavos)}
           </Text>
         </EmphasisCard>
-        <View>
-          <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
-          <TransferQrCard fetcher={fetcher} />
-        </View>
-        <View>
-          <SectionTitle>2 · Sube tu comprobante</SectionTitle>
-          <View style={styles.group}>
-            <ReceiptRow
-              onAttach={() => void attach()}
-              onRemove={() => setReceipt(null)}
-              receipt={receipt}
-              uploading={uploading}
-            />
-            <View style={styles.hairline} />
-            <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
-          </View>
-        </View>
+        {/* 10T: the QR beside the receipt and the invoice. */}
+        <TabletColumns
+          left={
+            <View>
+              <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
+              <TransferQrCard fetcher={fetcher} />
+            </View>
+          }
+          right={
+            <View>
+              <SectionTitle>2 · Sube tu comprobante</SectionTitle>
+              <View style={styles.group}>
+                <ReceiptRow
+                  onAttach={() => void attach()}
+                  onRemove={() => setReceipt(null)}
+                  receipt={receipt}
+                  uploading={uploading}
+                />
+                <View style={styles.hairline} />
+                <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
+              </View>
+            </View>
+          }
+        />
         {error === null ? null : (
           <View style={styles.errorBox}>
             <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
@@ -198,20 +207,22 @@ export function PaymentScreen() {
       </FormScrollView>
       {/* Rosa Emma C10: the button and its line on a white panel cast upward. */}
       <FooterPanel testID="payment-footer">
-        {offReason === undefined ? (
-          <Text style={styles.note} variant="secundario">
-            El estudio revisa tu pago y te avisa por la app
-          </Text>
-        ) : null}
-        <PrimaryButton
-          busy={submitting}
-          disabled={receipt === null || uploading || invoiceData === "incomplete"}
-          // FIX-089: the reason is the off button's own line, under it.
-          disabledReason={offReason}
-          label="Enviar comprobante"
-          onPress={() => void submit()}
-          testID="payment-submit"
-        />
+        <TabletColumn gap={spacing.sm} width={480}>
+          {offReason === undefined ? (
+            <Text style={styles.note} variant="secundario">
+              El estudio revisa tu pago y te avisa por la app
+            </Text>
+          ) : null}
+          <PrimaryButton
+            busy={submitting}
+            disabled={receipt === null || uploading || invoiceData === "incomplete"}
+            // FIX-089: the reason is the off button's own line, under it.
+            disabledReason={offReason}
+            label="Enviar comprobante"
+            onPress={() => void submit()}
+            testID="payment-submit"
+          />
+        </TabletColumn>
       </FooterPanel>
     </Screen>
   );

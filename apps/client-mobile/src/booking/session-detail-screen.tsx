@@ -38,6 +38,7 @@ import { FrozenBookingFooter } from "./frozen-booking-footer";
 import { problemMessage, usesLine } from "./session-detail-copy";
 import { SessionFacts } from "./session-facts";
 import { SessionHero } from "./session-hero";
+import { useInSessionPanel } from "./session-panel-context";
 
 export type ConfirmedBooking = {
   bookingId: string;
@@ -77,19 +78,24 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   const [message, setMessage] = useState<string | null>(null);
   const [forcedFull, setForcedFull] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
+  // 03T: beside Reservar's list the class has no header of its own, and the
+  // panel keeps its own 24 pt padding and footer.
+  const inPanel = useInSessionPanel();
+  const screenProps = inPanel
+    ? { edges: [] as const, style: [styles.screen, styles.panelScreen] }
+    : { style: styles.screen };
 
   // Until the class is known the header says «Clase»; then C4 A's block names
   // it, so the header is only the arrow (FIX-089: never the screen before).
-  const header =
-    session.data?.status === 200 ? (
-      <ScreenHeader fullBleed inset onBack={() => navigation.goBack()} testID="screen-top-bar" />
-    ) : (
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Clase" />
-    );
+  const header = inPanel ? null : session.data?.status === 200 ? (
+    <ScreenHeader fullBleed inset onBack={() => navigation.goBack()} testID="screen-top-bar" />
+  ) : (
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Clase" />
+  );
 
   if (session.isPending) {
     return (
-      <Screen style={styles.screen}>
+      <Screen {...screenProps}>
         {header}
         <LoadingState label="Cargando clase" />
       </Screen>
@@ -98,7 +104,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 
   if (session.isError || session.data.status !== 200) {
     return (
-      <Screen style={styles.screen}>
+      <Screen {...screenProps}>
         {header}
         <QueryFailure label="No pudimos cargar la clase." onRetry={() => void session.refetch()} />
       </Screen>
@@ -233,7 +239,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
   };
 
   return (
-    <Screen style={styles.screen}>
+    <Screen {...screenProps}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <SessionHero detail={detail} quiet={frozenOnClassDay} />
@@ -262,7 +268,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
         )}
       </ScrollView>
       {/* C04: the action and its line sit on the white footer. */}
-      <View style={styles.actions} testID="session-footer">
+      <View style={[styles.actions, inPanel && styles.panelActions]} testID="session-footer">
         {message !== null ? (
           <View style={styles.messageBox}>
             <InlineError>{message}</InlineError>
@@ -345,6 +351,13 @@ const styles = StyleSheet.create({
   },
   centered: { textAlign: "center" },
   content: { gap: spacing.md, paddingBottom: spacing.lg, paddingTop: spacing.xxs },
+  panelActions: {
+    marginHorizontal: -spacing.xl,
+    paddingBottom: spacing.xlSm,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+  },
+  panelScreen: { gap: spacing.md, padding: spacing.xl, paddingBottom: 0 },
   messageBox: {
     backgroundColor: colors.primaryTint,
     borderColor: colors.borderStrong,

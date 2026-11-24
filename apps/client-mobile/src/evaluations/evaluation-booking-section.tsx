@@ -32,6 +32,7 @@ export function EvaluationBookingSection({
   failure,
   hasPlan,
   moving,
+  nutritionistApart = false,
   offer,
   onPick,
   onPlans,
@@ -45,6 +46,8 @@ export function EvaluationBookingSection({
   failure: ReactNode;
   hasPlan: boolean;
   moving: ClientEvaluationDto | null;
+  /** 13T: a tablet shows the Nutritionist's card in the column beside. */
+  nutritionistApart?: boolean;
   offer: string | null;
   onPick: (slot: EvaluationSlotDto) => void;
   onPlans: () => void;
@@ -117,7 +120,7 @@ export function EvaluationBookingSection({
 
   return (
     <View style={styles.section}>
-      {moving === null ? <SoleNutritionist days={days} /> : null}
+      {moving === null && !nutritionistApart ? <SoleNutritionist days={days} /> : null}
       <SectionTitle>
         {moving !== null ? "Elige el nuevo horario" : "Reserva tu evaluación"}
       </SectionTitle>

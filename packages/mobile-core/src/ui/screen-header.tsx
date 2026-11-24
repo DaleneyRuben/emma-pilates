@@ -4,6 +4,7 @@ import { Polyline } from "react-native-svg";
 
 import { LineIcon } from "./line-icon";
 import { ScreenFrameContext } from "./screen";
+import { type TabletColumnWidth, tabletPageMargin, useWideScreen } from "./tablet-layout";
 import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
@@ -62,6 +63,7 @@ export function ScreenHeader({
   eyebrow,
   onBack,
   subtitle,
+  tabletWidth,
   testID = "screen-header",
   title,
   titleAccessory,
@@ -80,6 +82,8 @@ export function ScreenHeader({
   onBack?: () => void;
   /** One line under the title, on a white capsule. */
   subtitle?: string;
+  /** On a tablet page, the centred width the band's content keeps (02T: 720). */
+  tabletWidth?: TabletColumnWidth;
   testID?: string;
   /** Omitted only when the screen draws its own large title right below. */
   title?: string;
@@ -89,37 +93,32 @@ export function ScreenHeader({
   titleLabel?: string;
 }) {
   const { band, bleed, onLayout } = useBandBleed();
-  const showRow = onBack !== undefined || (action !== undefined && eyebrow === undefined);
-  return (
-    <View
-      onLayout={onLayout}
-      ref={band}
-      style={[
-        styles.band,
-        bleed !== null && {
-          marginHorizontal: -bleed.left,
-          marginTop: -bleed.top,
-          paddingTop: Math.max(bleed.top, spacing.lg),
-        },
-      ]}
-      testID={testID}
-    >
+  // Follow-up 289: on a tablet the back button and the action share the
+  // title's row, and the title is 36 pt.
+  const wide = useWideScreen();
+  const showRow =
+    !wide && (onBack !== undefined || (action !== undefined && eyebrow === undefined));
+  const backButton =
+    onBack === undefined ? null : (
+      <Pressable
+        accessibilityLabel="Volver"
+        accessibilityRole="button"
+        hitSlop={spacing.xs}
+        onPress={onBack}
+        style={({ pressed }) => [styles.back, pressed && styles.pressed]}
+        testID="back-bar"
+      >
+        <LineIcon color={colors.text} size={22} strokeWidth={1.7}>
+          <Polyline points="15,5 8,12 15,19" />
+        </LineIcon>
+      </Pressable>
+    );
+  const actionInTitle = wide && action !== undefined && eyebrow === undefined;
+  const content = (
+    <>
       {showRow ? (
         <View style={styles.row}>
-          {onBack === undefined ? null : (
-            <Pressable
-              accessibilityLabel="Volver"
-              accessibilityRole="button"
-              hitSlop={spacing.xs}
-              onPress={onBack}
-              style={({ pressed }) => [styles.back, pressed && styles.pressed]}
-              testID="back-bar"
-            >
-              <LineIcon color={colors.text} size={22} strokeWidth={1.7}>
-                <Polyline points="15,5 8,12 15,19" />
-              </LineIcon>
-            </Pressable>
-          )}
+          {backButton}
           {action === undefined ? null : <View style={styles.action}>{action}</View>}
         </View>
       ) : null}
@@ -131,19 +130,21 @@ export function ScreenHeader({
           {action !== undefined && !showRow ? <View style={styles.action}>{action}</View> : null}
         </View>
       )}
-      {title === undefined && titleAccessory === undefined ? null : (
-        <View style={styles.titleRow}>
+      {title === undefined && titleAccessory === undefined && !(wide && onBack) ? null : (
+        <View style={[styles.titleRow, wide && styles.wideTitleRow]}>
+          {wide ? backButton : null}
           {title === undefined ? null : (
             <Text
               accessibilityLabel={titleLabel ?? title}
               accessibilityRole="header"
               style={styles.title}
-              variant="titulo-pagina"
+              variant={wide ? "titulo-pagina-tablet" : "titulo-pagina"}
             >
               {title}
             </Text>
           )}
           {titleAccessory}
+          {actionInTitle ? <View style={styles.action}>{action}</View> : null}
         </View>
       )}
       {subtitle === undefined ? null : (
@@ -152,6 +153,30 @@ export function ScreenHeader({
         </View>
       )}
       {children}
+    </>
+  );
+  return (
+    <View
+      onLayout={onLayout}
+      ref={band}
+      style={[
+        styles.band,
+        wide && styles.wideBand,
+        bleed !== null && {
+          marginHorizontal: -bleed.left,
+          marginTop: -bleed.top,
+          paddingTop: Math.max(bleed.top, spacing.lg),
+        },
+      ]}
+      testID={testID}
+    >
+      {wide && tabletWidth !== undefined ? (
+        <View style={[styles.content, { maxWidth: tabletWidth }]} testID={`${testID}-content`}>
+          {content}
+        </View>
+      ) : (
+        content
+      )}
     </View>
   );
 }
@@ -184,6 +209,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 3,
   },
+  // The band's own gap, kept inside a tablet's centred content.
+  content: { alignSelf: "center", gap: spacing.md, width: "100%" },
   eyebrowRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   pressed: { opacity: 0.6 },
   row: { alignItems: "center", flexDirection: "row", minHeight: 44 },
@@ -196,4 +223,6 @@ const styles = StyleSheet.create({
   },
   title: { flex: 1 },
   titleRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  wideBand: { paddingBottom: spacing.xl, paddingHorizontal: tabletPageMargin },
+  wideTitleRow: { gap: spacing.lg },
 });

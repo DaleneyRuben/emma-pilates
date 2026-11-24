@@ -15,6 +15,7 @@ import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
+import { tabletPageMargin, useWideScreen } from "../ui/tablet-layout";
 import { TextButton } from "../ui/text-button";
 import { Text } from "../ui/text";
 import { colors, radii, shadows, spacing } from "../ui/tokens";
@@ -78,6 +79,8 @@ export function LoginScreen({
     promptOnce();
   }, []);
   const { width } = useWindowDimensions();
+  // Follow-up 289 (`01T`): the tablet sheet pads 32 pt over and 40 pt beside its form.
+  const wide = useWideScreen();
   // The sheet reaches the bottom edge and keeps the home indicator clear itself.
   const bottomInset = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
   const logoWidth = Math.min(Math.round(width * 0.7), logoMaxWidth);
@@ -126,7 +129,11 @@ export function LoginScreen({
         </View>
         {autoPrompting ? null : (
           <View
-            style={[styles.sheet, { paddingBottom: spacing.xl + bottomInset }]}
+            style={[
+              styles.sheet,
+              wide && styles.wideSheet,
+              { paddingBottom: (wide ? spacing.xxxl : spacing.xl) + bottomInset },
+            ]}
             testID="login-sheet"
           >
             {notice === null ? null : (
@@ -264,6 +271,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     width: "100%",
   },
+  wideSheet: { paddingHorizontal: tabletPageMargin, paddingTop: spacing.xxl },
   underlay: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "flex-end" },
   underlaySheet: { backgroundColor: colors.card, height: "50%", maxWidth: 560, width: "100%" },
 });

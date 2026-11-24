@@ -1,5 +1,13 @@
 import type { PromotionDto } from "@pilates/api-contracts";
-import { colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import {
+  colors,
+  radii,
+  spacing,
+  surfaces,
+  tabletPageMargin,
+  Text,
+  useWideScreen,
+} from "@pilates/mobile-core";
 import { useState } from "react";
 import {
   Image,
@@ -48,7 +56,9 @@ export function PromotionsCarousel({
   const resolve = useResolvePublicUrl();
   const [missingUrls, setMissingUrls] = useState<ReadonlySet<string>>(new Set());
   const [current, setCurrent] = useState(0);
-  const cardWidth = promotionCardWidth(width);
+  const wide = useWideScreen();
+  // Follow-up 289: a tablet page's 40 pt margins leave the 720 pt card room at 768.
+  const cardWidth = promotionCardWidth(width, wide ? tabletPageMargin : spacing.lg);
 
   if (loading) {
     return (

@@ -30,10 +30,15 @@ export const openDays = (
     .filter((day) => day.slots.length > 0);
 
 /** C13's Nutritionist on her own white card, when one sees every open slot. */
+/** One Nutritionist holds every open slot, so her card names her. */
+export function hasSoleNutritionist(days: OpenDay[]): boolean {
+  const names = new Set(days.flatMap((day) => day.slots).map((slot) => slot.nutritionistName));
+  return names.size === 1;
+}
+
 export function SoleNutritionist({ days }: { days: OpenDay[] }) {
   const openSlots = days.flatMap((day) => day.slots);
-  const names = new Set(openSlots.map((slot) => slot.nutritionistName));
-  if (names.size !== 1) return null;
+  if (!hasSoleNutritionist(days)) return null;
   return (
     <NutritionistCard
       branchName={openSlots[0]?.branchName ?? ""}

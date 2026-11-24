@@ -12,6 +12,7 @@ describe("the Rosa Emma type scale", () => {
   it("holds exactly the approved styles and variants", () => {
     expect(textVariants).toEqual({
       "titulo-pagina": { fontFamily: serif, fontSize: 30, lineHeight: 33 },
+      "titulo-pagina-tablet": { fontFamily: serif, fontSize: 36, lineHeight: 40 },
       "titulo-seccion": { fontFamily: serif, fontSize: 24, lineHeight: 28 },
       "titulo-bloque": { fontFamily: serif, fontSize: 22, lineHeight: 26 },
       "cifra-grande": {
@@ -62,6 +63,7 @@ describe("the Rosa Emma type scale", () => {
   it("allows only titles, figures and destacado on 100, 200 or 500", () => {
     expect(largeTextVariants).toEqual([
       "titulo-pagina",
+      "titulo-pagina-tablet",
       "titulo-seccion",
       "titulo-bloque",
       "cifra-grande",

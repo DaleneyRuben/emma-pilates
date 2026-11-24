@@ -12,7 +12,6 @@ import {
   BrandToast,
   colors,
   ConfirmationSheet,
-  Glyph,
   InlineError,
   LoadingState,
   QueryFailure,
@@ -22,10 +21,12 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  TabletColumns,
   Text,
   usePullToRefresh,
   useRefetchOnFocus,
   useStickyNotice,
+  useWideScreen,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -43,7 +44,8 @@ import {
 import { planOfferLine } from "./evaluation-offer-copy";
 import { EvaluationReceiptSheet } from "./evaluation-receipt-sheet";
 import { EvaluationBookingSection } from "./evaluation-booking-section";
-import { openDays } from "./evaluation-slot-picker";
+import { OfferCard } from "./evaluation-screen-parts";
+import { hasSoleNutritionist, openDays, SoleNutritionist } from "./evaluation-slot-picker";
 import { NextEvaluationCard } from "./next-evaluation-card";
 import { RescheduleConfirmSheet } from "./reschedule-confirm-sheet";
 import { useEvaluationCommands } from "./use-evaluation-commands";
@@ -79,6 +81,7 @@ export function EvaluationAvailabilityScreen({
   route?: { params?: { confirmed?: ClientEvaluationDto } };
 }) {
   const navigation = useNavigation<EvaluationNavigation>();
+  const wide = useWideScreen();
   const fetcher = useClientFetcher();
   const commands = useEvaluationCommands(fetcher);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
@@ -177,6 +180,34 @@ export function EvaluationAvailabilityScreen({
         <InlineError>{commands.failure}</InlineError>
       </View>
     );
+  // 13T: with nothing booked, a tablet sets her offer and the Nutritionist
+  // in a 300 pt column beside the turnos.
+  const nutritionistApart =
+    wide && items.length === 0 && movingNow === null && hasSoleNutritionist(days);
+  const offerCard = items.length === 0 && offer !== null ? <OfferCard offer={offer} /> : null;
+  const booking = awaitingNewSlot ? null : (
+    <EvaluationBookingSection
+      availability={availability}
+      booked={items.length > 0}
+      days={days}
+      failure={failure}
+      hasPlan={hasPlan}
+      moving={movingNow}
+      nutritionistApart={nutritionistApart}
+      offer={offer}
+      onPick={pick}
+      onPlans={() => navigation.navigate("Plans")}
+      onRetry={() => void slots.refetch()}
+      onStopMoving={() => setMoving(null)}
+    />
+  );
+  const history =
+    pastItems.length > 0 ? (
+      <View>
+        <SectionTitle>Anteriores</SectionTitle>
+        <PastEvaluations evaluations={pastItems} label={evaluationHistoryLabel} />
+      </View>
+    ) : null;
   const confirmMove = async () => {
     if (movingNow === null || target === null) return;
     const moved = await commands.move(movingNow, target.slot);
@@ -194,63 +225,69 @@ export function EvaluationAvailabilityScreen({
         refreshControl={refreshControl}
         testID="evaluation-scroll"
       >
-        {items.length === 0 && offer !== null ? (
-          // C13: her Plan's offer on a white card with the tag glyph.
-          <View style={styles.offer} testID="evaluation-offer">
-            <Glyph color={colors.text} name="tag" size={18} strokeWidth={1.5} />
-            <Text style={styles.offerText} variant="titulo-fila">
-              {offer}
-            </Text>
-          </View>
-        ) : null}
-        {movingNow === null ? failure : null}
         {items.length > 0 ? (
-          <View>
-            {/* One appointment names itself in its block («Tu cita»). */}
-            {items.length > 1 ? <SectionTitle>Tus próximas evaluaciones</SectionTitle> : null}
-            <View style={styles.cards}>
-              {items.map((evaluation, index) => (
-                <NextEvaluationCard
-                  evaluation={evaluation}
-                  key={evaluation.id}
-                  moving={movingNow !== null}
-                  onAttachReceipt={() => setReceiptFor(evaluation)}
-                  onCancel={() => setCancelling(evaluation)}
-                  onMove={() => {
-                    // The toast would sit over the turnos she now has to tap.
-                    setMovedNotice(null);
-                    dismissConfirmed();
-                    commands.clearFailure();
-                    setMoving(evaluation);
-                  }}
-                  secondary={index > 0}
-                  uploading={commands.uploadingId === evaluation.id}
-                />
-              ))}
-            </View>
-          </View>
-        ) : null}
-        {awaitingNewSlot ? null : (
-          <EvaluationBookingSection
-            availability={availability}
-            booked={items.length > 0}
-            days={days}
-            failure={failure}
-            hasPlan={hasPlan}
-            moving={movingNow}
-            offer={offer}
-            onPick={pick}
-            onPlans={() => navigation.navigate("Plans")}
-            onRetry={() => void slots.refetch()}
-            onStopMoving={() => setMoving(null)}
+          // 15T: her appointments beside the turnos and «Anteriores».
+          <TabletColumns
+            left={
+              <>
+                {movingNow === null ? failure : null}
+                <View>
+                  {/* One appointment names itself in its block («Tu cita»). */}
+                  {items.length > 1 ? <SectionTitle>Tus próximas evaluaciones</SectionTitle> : null}
+                  <View style={styles.cards}>
+                    {items.map((evaluation, index) => (
+                      <NextEvaluationCard
+                        evaluation={evaluation}
+                        key={evaluation.id}
+                        moving={movingNow !== null}
+                        onAttachReceipt={() => setReceiptFor(evaluation)}
+                        onCancel={() => setCancelling(evaluation)}
+                        onMove={() => {
+                          // The toast would sit over the turnos she now has to tap.
+                          setMovedNotice(null);
+                          dismissConfirmed();
+                          commands.clearFailure();
+                          setMoving(evaluation);
+                        }}
+                        secondary={index > 0}
+                        uploading={commands.uploadingId === evaluation.id}
+                      />
+                    ))}
+                  </View>
+                </View>
+              </>
+            }
+            right={
+              <>
+                {booking}
+                {history}
+              </>
+            }
+          />
+        ) : offerCard === null && !nutritionistApart ? (
+          <>
+            {failure}
+            {booking}
+            {history}
+          </>
+        ) : (
+          <TabletColumns
+            left={
+              <>
+                {offerCard}
+                {nutritionistApart ? <SoleNutritionist days={days} /> : null}
+              </>
+            }
+            leftWidth={300}
+            right={
+              <>
+                {failure}
+                {booking}
+                {history}
+              </>
+            }
           />
         )}
-        {pastItems.length > 0 ? (
-          <View>
-            <SectionTitle>Anteriores</SectionTitle>
-            <PastEvaluations evaluations={pastItems} label={evaluationHistoryLabel} />
-          </View>
-        ) : null}
       </ScrollView>
       <RescheduleConfirmSheet
         busy={commands.movingBusy}
@@ -324,14 +361,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
     paddingVertical: spacing.md,
   },
-  offer: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.smLg,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.mdLg,
-  },
-  offerText: { flex: 1 },
   screen: { gap: spacing.md },
 });

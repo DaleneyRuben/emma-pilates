@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
-import { openProfile, readRoutes } from "../profile/profile-test-support";
+import { openProfile, openProfileOnTablet, readRoutes } from "../profile/profile-test-support";
 import { clientNotificationDestination } from "../notifications/notification-destinations";
 import {
   ancestorBackgrounds,
@@ -57,8 +57,8 @@ const pngPage = () => {
   return new Response(bytes, { headers: { "Content-Type": "image/png", "X-Page-Count": "2" } });
 };
 
-const openInvoices = async (items: unknown[]) => {
-  const screen = await openProfile(
+const openInvoices = async (items: unknown[], tablet = false) => {
+  const screen = await (tablet ? openProfileOnTablet : openProfile)(
     createClientRuntime(
       routeFetcher({
         ...readRoutes,
@@ -78,6 +78,7 @@ describe("Mis facturas", () => {
     await cleanup();
     clearMobileQueryCache();
     mockDownloadInvoice.mockReset();
+    jest.restoreAllMocks();
   });
 
   it("says she has none yet", async () => {
@@ -215,5 +216,38 @@ describe("Mis facturas", () => {
       "ProfileTab",
       { screen: "MyInvoices" },
     ]);
+  });
+
+  // Follow-up 289 (17T, S04): the list in the 392 pt panel, the chosen invoice
+  // beside it with «Descargar» on the panel's white footer.
+  it("opens an invoice beside the list on a tablet", async () => {
+    mockDownloadInvoice.mockResolvedValue("shared");
+    const screen = await openInvoices([ready, preparing], true);
+
+    const list = await screen.findByTestId("split-panels-list");
+    expect(list).toHaveStyle({ width: 392 });
+    const detail = screen.getByTestId("split-panels-detail");
+    expect(within(detail).getByText("Elige una factura")).toBeOnTheScreen();
+
+    const row = within(list).getByRole("button", { name: /Paquete de 8 clases, jue 5 nov/ });
+    await fireEvent.press(row);
+
+    expect(await within(detail).findByText("Mariana Quiroga")).toBeOnTheScreen();
+    expect(within(detail).getByRole("header", { name: "Factura" })).toBeOnTheScreen();
+    expect(within(detail).queryByTestId("back-bar")).toBeNull();
+    expect(row).toBeSelected();
+    expect(screen.getByRole("header", { name: "Mis facturas" })).toBeOnTheScreen();
+    expect(within(detail).getByTestId("invoice-footer")).toHaveStyle({
+      backgroundColor: "#FFFBFB",
+    });
+    await fireEvent.press(within(detail).getByRole("button", { name: "Descargar" }));
+    await waitFor(() => expect(mockDownloadInvoice).toHaveBeenCalledTimes(1));
+
+    await fireEvent.press(
+      within(list).getByRole("button", { name: /Evaluación nutricional, mar 3 nov/ }),
+    );
+    expect(
+      await within(detail).findByText("El estudio está preparando tu factura"),
+    ).toBeOnTheScreen();
   });
 });

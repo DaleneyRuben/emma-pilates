@@ -176,16 +176,36 @@ export function BranchSheet({
   );
 }
 
-/** C03's Class Type filter: a row of Rosa Emma chips under the band. */
+/**
+ * C03's Class Type filter: a row of Rosa Emma chips under the band. `wrap`
+ * folds them onto more lines, as the tablet's list panel draws them (03T).
+ */
 export function ClassTypeStrip({
   onSelect,
   options,
   selected,
+  wrap = false,
 }: {
   onSelect: (id: string) => void;
   options: readonly { id: string; label: string }[];
   selected: string;
+  wrap?: boolean;
 }) {
+  const chips = options.map((option) => (
+    <Chip
+      key={option.id}
+      label={option.label}
+      onPress={() => onSelect(option.id)}
+      selected={option.id === selected}
+    />
+  ));
+  if (wrap) {
+    return (
+      <View style={[styles.tabRow, styles.wrapRow]} testID="browse-class-type-strip">
+        {chips}
+      </View>
+    );
+  }
   return (
     <ScrollView
       contentContainerStyle={styles.tabRow}
@@ -194,14 +214,7 @@ export function ClassTypeStrip({
       style={styles.strip}
       testID="browse-class-type-strip"
     >
-      {options.map((option) => (
-        <Chip
-          key={option.id}
-          label={option.label}
-          onPress={() => onSelect(option.id)}
-          selected={option.id === selected}
-        />
-      ))}
+      {chips}
     </ScrollView>
   );
 }
@@ -245,4 +258,5 @@ const styles = StyleSheet.create({
   strip: { flexGrow: 0, flexShrink: 0 },
   // The chips' 38 pt plus their hit slop reach 44 pt; the row keeps the room.
   tabRow: { alignItems: "center", flexGrow: 1, gap: spacing.sm, paddingVertical: spacing.xxs },
+  wrapRow: { flexDirection: "row", flexGrow: 0, flexWrap: "wrap" },
 });
