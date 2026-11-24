@@ -25,8 +25,6 @@ channel.
 
 Still to come:
 
-- an Apple Developer team and App Store Connect records for both bundle IDs
-  (gate 9);
 - EAS environment variables for readable mobile stacks (EXT-013) in the
   `preview` and `production` environments of both projects (the DSN,
   `EXPO_PUBLIC_ERROR_REPORTING_DSN`, has been set as plain text in all three
@@ -39,9 +37,8 @@ Still to come:
   `--environment production` (or `preview` for the `staging` channel) so it carries the DSN, and its
   maps go up with `pnpm exec sentry-expo-upload-sourcemaps dist` from the app
   folder afterwards.
-- for iOS push, an APNs key from the Apple Developer team, added to each EAS
-  project with `eas credentials` (iOS → Push Notifications) before the first
-  iOS store build; Android push already works (below).
+- the owner's one-time iOS credential setup on EAS (below, "iOS: first
+  TestFlight build"); Android push already works (below).
 
 ## Development builds (EAS, no store account needed)
 
@@ -63,7 +60,8 @@ needs none, a native change needs a new one per app and platform.
   needs a new native build. The FCM V1 service account key sits in each EAS
   project's Android credentials and is used by Expo's servers, so replacing
   it needs no build.
-- **iOS:** waits for the APNs key (gate 9). Development builds still register
+- **iOS:** the APNs key is created and stored on EAS during the first
+  TestFlight build (below), and is shared by both apps. Development builds register
   and show pushes sent with `xcrun simctl push` (testing guide, Test 46).
 - **Sending:** the worker sends through Expo Push Service with the
   `push-sender` robot's `EXPO_ACCESS_TOKEN`; enhanced push security is on, so
@@ -147,6 +145,58 @@ EXPO_PUBLIC_API_URL=https://<api-host> pnpm --filter @pilates/staff-mobile relea
 Android and fails if either cannot be built. Then run the Maestro critical
 journeys against freshly applied fixtures (see the testing guide, Test 19).
 
+## iOS: first TestFlight build
+
+Gate 9 is open since 2026-11-23: an individual Apple Developer account (Team
+ID `SN44D2645V`), the Free Apps Agreement, both bundle IDs registered with no
+capabilities, and both App Store Connect apps («Emma Pilates», «Emma Pilates
+Staff», Spanish (Mexico); the Staff app shows as «Emma Staff» on the phone).
+Each app's `eas.json` has a `production` submit profile for iOS with the team
+ID and the app's numeric App Store Connect Apple ID (`ascAppId`, App
+Information → General → Apple ID: Client `6838534444`, Staff `6838534425`).
+A non-interactive submit cannot look the app up without it, so the Store
+deploy workflow refuses `ios` if an app's `ascAppId` goes missing. `ios.config.usesNonExemptEncryption: false` in `app.json`
+writes `ITSAppUsesNonExemptEncryption`, so TestFlight asks no export
+compliance question. The iOS build number is kept by EAS like Android's
+(`appVersionSource: remote`, `autoIncrement` on `production`), starting at 1.
+
+The owner runs this once per app on the Mac, with his own Apple login; EAS
+asks for the Apple ID password and the two-factor code in the terminal, and
+nobody else types them. Each build spends one of the month's 15 iOS builds.
+
+1. `cd apps/client-mobile && eas whoami` must answer `daleneyfernando`.
+2. `eas build --profile production --platform ios` (interactive, from
+   `main`). Answer yes to logging in to Apple and pick the team
+   `SN44D2645V`. EAS turns on the Push Notifications and Associated Domains
+   capabilities from the entitlements, and creates the distribution
+   certificate, the App Store provisioning profile, and the APNs key ("Set
+   up Push Notifications? → yes, generate a new key"). Leave the build
+   running and go on.
+3. `eas submit --profile production --platform ios --latest` once the build
+   finishes. The first time, choose to generate a new App Store Connect API
+   key (if EAS reports no API access, first open App Store Connect → Users
+   and Access → Integrations → App Store Connect API and press «Request
+   Access» once); EAS stores it, and later submits (and the Store deploy workflow)
+   use it without an Apple login.
+4. `cd ../staff-mobile` and repeat 1–3. When EAS offers the existing
+   distribution certificate, the APNs key, and the API key, reuse them:
+   an individual account may hold only a few of each, and one of each
+   serves both apps.
+5. In App Store Connect, open the app → TestFlight. The build shows
+   «Processing» for 10–30 minutes. Then set up internal testing once:
+   Internal Testing → «+» → a group such as «Equipo» with
+   automatic distribution on, then add testers. Internal testers must be
+   users of the App Store Connect account (Users and Access, up to 100);
+   they install the TestFlight app on the iPhone and accept the email
+   invitation. Internal testing needs no Beta App Review.
+6. Do **not** press «Add for Review» or «Submit for Review» on the App Store
+   tab, and do not add external testers (that sends the build to Beta App
+   Review): the store submission waits for the production reset (REL-019).
+
+From then on, the **Store deploy** workflow builds and uploads with
+`ios` (below); every build lands in TestFlight and reaches the internal
+group by itself.
+
 ## Native release (EAS Build and Submit)
 
 1. Confirm `expo.version` in the app's `app.json`. A native change (new
@@ -221,9 +271,11 @@ check and publishes nothing.
   OTA updates from reaching installed builds of the previous version.
 - **Store deploy** (`mobile-store-deploy.yml`) runs from that release branch.
   Android builds with `eas build --profile production --auto-submit` to
-  Play's internal track and spends one free-plan build. iOS is refused
-  until gate 9 (the Apple Developer account). The workflow does not promote
-  a track to production.
+  Play's internal track and spends one free-plan build. iOS does the same
+  and uploads to App Store Connect, where the build reaches TestFlight's
+  internal group; it needs the one-time setup above (the workflow cannot
+  log in to Apple). The workflow does not promote a track to production or
+  send anything to App Review.
 
 A local `eas build` remains the fallback when Actions, EAS, or the free
 allocation is unavailable. State the build count before dispatching a native
