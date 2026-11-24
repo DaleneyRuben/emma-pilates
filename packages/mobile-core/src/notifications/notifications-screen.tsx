@@ -16,6 +16,7 @@ import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { SectionTitle } from "../ui/section-title";
+import { TabletColumn } from "../ui/tablet-layout";
 import { TextButton } from "../ui/text-button";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
@@ -195,9 +196,12 @@ export function NotificationsScreen({
         refreshControl={refreshControl}
         testID="notifications-scroll"
       >
-        <DeniedNotice />
-        {unread.length > 0 ? section(`Nuevas · ${unread.length}`, unread) : null}
-        {earlier.length > 0 ? section("Anteriores", earlier) : null}
+        {/* 19T: a centred 640 pt column on a Client tablet page. */}
+        <TabletColumn gap={spacing.md} width={640}>
+          <DeniedNotice />
+          {unread.length > 0 ? section(`Nuevas · ${unread.length}`, unread) : null}
+          {earlier.length > 0 ? section("Anteriores", earlier) : null}
+        </TabletColumn>
       </ScrollView>
     </Screen>
   );

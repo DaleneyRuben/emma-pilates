@@ -1,8 +1,11 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import type { ReactNode } from "react";
+import { Dimensions } from "react-native";
 
 import { clearMobileQueryCache, MobileQueryProvider } from "../query/provider";
 import { NotificationsScreen, type NotificationsScreenProps } from "./notifications-screen";
 import { PushNotificationsContext } from "./push-notifications";
+import { WideScreens } from "../ui/tablet-layout";
 
 const now = () => new Date("2026-09-22T15:00:00.000Z");
 
@@ -301,5 +304,49 @@ describe("NotificationsScreen", () => {
       expect(screen.getByText("Nuevas · 2")).toBeOnTheScreen();
     });
     expect(screen.queryByRole("button", { name: "Abrir Ajustes" })).not.toBeOnTheScreen();
+  });
+});
+
+// Follow-up 289 (19T): the Client's tablet page keeps the inbox in a centred
+// 640 pt column; the Staff app, without `WideScreens`, keeps its phone frame.
+describe("NotificationsScreen on a tablet", () => {
+  afterEach(() => {
+    cleanup();
+    clearMobileQueryCache();
+    jest.restoreAllMocks();
+  });
+
+  const renderAt = async (wrapper?: (props: { children: ReactNode }) => ReactNode) => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ fontScale: 1, height: 1194, scale: 2, width: 834 });
+    const fetcher = createFetcher([{ items, hasMore: false, nextCursor: null }]);
+    const screen = await render(
+      <MobileQueryProvider>
+        <NotificationsScreen
+          emptySupport="Aquí te avisaremos."
+          fetcher={fetcher}
+          now={now}
+          onBack={jest.fn()}
+        />
+      </MobileQueryProvider>,
+      { wrapper },
+    );
+    await waitFor(() =>
+      expect(screen.getByText("Tu clase de Reformer Pilates fue cancelada.")).toBeOnTheScreen(),
+    );
+    return screen;
+  };
+
+  it("centres the inbox in a 640 pt column on a Client tablet page", async () => {
+    const screen = await renderAt(WideScreens);
+
+    expect(screen.getByTestId("tablet-column")).toHaveStyle({ alignSelf: "center", maxWidth: 640 });
+  });
+
+  it("keeps the Staff app's inbox at full width on a tablet", async () => {
+    const screen = await renderAt();
+
+    expect(screen.queryByTestId("tablet-column")).toBeNull();
   });
 });
