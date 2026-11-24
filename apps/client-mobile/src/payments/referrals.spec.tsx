@@ -1,6 +1,6 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Share, StyleSheet } from "react-native";
+import { Dimensions, Share, StyleSheet } from "react-native";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -147,5 +147,36 @@ describe("Invita a una amiga (BKM-014)", () => {
     ).toBeOnTheScreen();
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Compartir" })).toBeNull();
+  });
+
+  // Follow-up 289 (16T): two equal columns on a tablet.
+  it("puts the code and how it works beside «Tus invitadas» on a tablet", async () => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ fontScale: 1, height: 1194, scale: 2, width: 834 });
+    try {
+      const screen = await render(<App runtime={createClientRuntime(routeFetcher(routes([])))} />);
+      const hidden = { includeHiddenElements: true };
+      await waitFor(() => expect(screen.getByTestId("tab-profile", hidden)).toBeOnTheScreen(), {
+        timeout: 10_000,
+      });
+      await fireEvent.press(screen.getByTestId("tab-profile", hidden));
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Invita a una amiga" })).toBeOnTheScreen(),
+      );
+      await fireEvent.press(screen.getByRole("button", { name: "Invita a una amiga" }));
+
+      await waitFor(() => expect(screen.getByText("LUCIA")).toBeOnTheScreen());
+      const left = screen.getByTestId("tablet-columns-left");
+      const right = screen.getByTestId("tablet-columns-right");
+      expect(left).toHaveStyle({ flex: 1 });
+      expect(right).toHaveStyle({ flex: 1 });
+      expect(within(left).getByTestId("referral-code-card")).toBeOnTheScreen();
+      expect(within(left).getByTestId("referral-how-it-works")).toBeOnTheScreen();
+      expect(within(right).getByText("Tus invitadas")).toBeOnTheScreen();
+      expect(within(right).getByTestId("referrals-empty")).toBeOnTheScreen();
+    } finally {
+      jest.restoreAllMocks();
+    }
   });
 });
