@@ -3,6 +3,7 @@ import { Dimensions, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
+  FooterPanel,
   Screen,
   ScreenHeader,
   SplitPanels,
@@ -142,5 +143,19 @@ describe("WideScreens", () => {
     const title = screen.getByRole("header", { name: "Mi plan" });
     expect(title).toHaveStyle(textVariants["titulo-pagina"]);
     expect(screen.getByTestId("back-bar").parent).not.toBe(title.parent);
+  });
+});
+
+describe("FooterPanel on a tablet page", () => {
+  it("reaches past the page's 40 pt margins to the screen's sides", async () => {
+    windowWidth(834);
+    const screen = await render(
+      <FooterPanel testID="footer">
+        <View />
+      </FooterPanel>,
+      { wrapper: WideScreens },
+    );
+
+    expect(screen.getByTestId("footer")).toHaveStyle({ marginHorizontal: -40 });
   });
 });
