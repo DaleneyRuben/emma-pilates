@@ -46,7 +46,8 @@
   "submit": {
     "production": {
       "ios": {
-        "appleTeamId": "SN44D2645V"
+        "appleTeamId": "SN44D2645V",
+        "ascAppId": "6838534444"
       }
     }
   }
