@@ -10,6 +10,7 @@
       "env": {
         "SHARP_IGNORE_GLOBAL_LIBVIPS": "1",
         "SENTRY_ALLOW_FAILURE": "true",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true",
         "SENTRY_DISABLE_XCODE_DEBUG_UPLOAD": "true",
         "SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD": "true"
       }
