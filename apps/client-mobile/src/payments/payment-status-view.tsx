@@ -7,6 +7,7 @@ import {
   ScreenHeader,
   spacing,
   surfaces,
+  TabletColumn,
   Text,
   TextButton,
   type GlyphName,
@@ -94,20 +95,25 @@ function StatusLayout({
         </Text>
       </ScreenHeader>
       <ScrollView contentContainerStyle={styles.content} style={styles.scroll}>
-        <View style={styles.noteCard}>
-          <Text variant="cuerpo">{note}</Text>
-        </View>
-        {children}
-        {error === undefined || error === null ? null : (
-          <View style={styles.errorBox}>
-            <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
-            <InlineError style={styles.error}>{error}</InlineError>
+        {/* 11T: the result in a centred 480 pt column. */}
+        <TabletColumn gap={spacing.md} width={480}>
+          <View style={styles.noteCard}>
+            <Text variant="cuerpo">{note}</Text>
           </View>
-        )}
+          {children}
+          {error === undefined || error === null ? null : (
+            <View style={styles.errorBox}>
+              <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
+              <InlineError style={styles.error}>{error}</InlineError>
+            </View>
+          )}
+        </TabletColumn>
       </ScrollView>
       <FooterPanel testID="payment-status-actions">
-        {primaryAction === undefined ? null : <PrimaryButton {...primaryAction} />}
-        {textAction === undefined ? null : <TextButton {...textAction} />}
+        <TabletColumn gap={spacing.sm} width={480}>
+          {primaryAction === undefined ? null : <PrimaryButton {...primaryAction} />}
+          {textAction === undefined ? null : <TextButton {...textAction} />}
+        </TabletColumn>
       </FooterPanel>
     </>
   );

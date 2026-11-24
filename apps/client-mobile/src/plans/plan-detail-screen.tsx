@@ -24,6 +24,8 @@ import {
   spacing,
   StartDateChooser,
   surfaces,
+  TabletColumn,
+  TabletColumns,
   Text,
   useStudioRules,
 } from "@pilates/mobile-core";
@@ -166,50 +168,63 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={detail.name} />
       <ScrollView contentContainerStyle={styles.content}>
-        <PlanHero plan={detail} />
-        <PlanIncludes
-          activeBranchCount={activeBranchCount}
-          cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
-          plan={detail}
+        {/* 09T: the price and what it includes beside the start and the breakdown. */}
+        <TabletColumns
+          left={
+            <>
+              <PlanHero plan={detail} />
+              <PlanIncludes
+                activeBranchCount={activeBranchCount}
+                cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
+                plan={detail}
+              />
+            </>
+          }
+          right={
+            <>
+              {renewalStartsOn === undefined ? null : (
+                <NextPlanStartChooser
+                  currentPlan="Tu plan actual"
+                  firstDay={renewalStartsOn}
+                  onSelect={setNextStart}
+                  selected={nextStart ?? renewalStartsOn}
+                />
+              )}
+              {studioRules === undefined ||
+              subscription.isPending ||
+              renewalStartsOn !== undefined ? null : (
+                <StartDateChooser
+                  openingDate={studioRules.openingDate}
+                  selected={startsOn}
+                  startDateLimitDays={studioRules.startDateLimitDays}
+                  today={today}
+                  onSelect={setChosenStart}
+                />
+              )}
+              {firstStart === null || renewalStartsOn !== undefined ? null : beforeGuestClass ? (
+                <Aside alert text={bookedClassRule} />
+              ) : (
+                <Aside text={bookedClassRule} />
+              )}
+              <PlanBreakdown plan={detail} />
+              {error === null ? null : <Aside alert text={error} />}
+            </>
+          }
         />
-        {renewalStartsOn === undefined ? null : (
-          <NextPlanStartChooser
-            currentPlan="Tu plan actual"
-            firstDay={renewalStartsOn}
-            onSelect={setNextStart}
-            selected={nextStart ?? renewalStartsOn}
-          />
-        )}
-        {studioRules === undefined ||
-        subscription.isPending ||
-        renewalStartsOn !== undefined ? null : (
-          <StartDateChooser
-            openingDate={studioRules.openingDate}
-            selected={startsOn}
-            startDateLimitDays={studioRules.startDateLimitDays}
-            today={today}
-            onSelect={setChosenStart}
-          />
-        )}
-        {firstStart === null || renewalStartsOn !== undefined ? null : beforeGuestClass ? (
-          <Aside alert text={bookedClassRule} />
-        ) : (
-          <Aside text={bookedClassRule} />
-        )}
-        <PlanBreakdown plan={detail} />
-        {error === null ? null : <Aside alert text={error} />}
       </ScrollView>
       {/* Rosa Emma C09: the button and its line on a white panel cast upward. */}
       <FooterPanel testID="plan-detail-footer">
-        <Text style={styles.note} variant="secundario">
-          Pagas por QR y subes tu comprobante
-        </Text>
-        <PrimaryButton
-          busy={busy}
-          label={`Pagar ${price}`}
-          onPress={() => void continueToPayment()}
-          testID="plan-continue-to-payment"
-        />
+        <TabletColumn gap={spacing.sm} width={480}>
+          <Text style={styles.note} variant="secundario">
+            Pagas por QR y subes tu comprobante
+          </Text>
+          <PrimaryButton
+            busy={busy}
+            label={`Pagar ${price}`}
+            onPress={() => void continueToPayment()}
+            testID="plan-continue-to-payment"
+          />
+        </TabletColumn>
       </FooterPanel>
     </Screen>
   );

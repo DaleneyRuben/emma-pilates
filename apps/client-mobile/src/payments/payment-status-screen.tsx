@@ -6,6 +6,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  TabletColumn,
 } from "@pilates/mobile-core";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -76,7 +77,9 @@ export function PaymentStatusScreen() {
     return (
       <Screen style={styles.screen}>
         <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Tu pago" />
-        <QueryFailure label="No encontramos tu pago." onRetry={() => void payment.refetch()} />
+        <TabletColumn width={480}>
+          <QueryFailure label="No encontramos tu pago." onRetry={() => void payment.refetch()} />
+        </TabletColumn>
       </Screen>
     );
   }
