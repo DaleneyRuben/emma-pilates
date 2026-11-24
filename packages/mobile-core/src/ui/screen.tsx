@@ -22,6 +22,7 @@ import {
   type SafeAreaViewProps,
 } from "react-native-safe-area-context";
 
+import { tabletPageMargin, useWideScreen } from "./tablet-layout";
 import { colors, spacing } from "./tokens";
 
 const allEdges: readonly Edge[] = ["top", "right", "bottom", "left"];
@@ -76,7 +77,10 @@ export function Screen({ edges, style, ...props }: SafeAreaViewProps) {
   const insetTop = useContext(SafeAreaInsetsContext)?.top ?? 0;
   const ref = useRef<View>(null);
   const chosen = edges ?? (insideTabBar ? tabEdges : allEdges);
-  const left = paddingOf(style, "Left", spacing.lg);
+  // Follow-up 289: a tablet page keeps 40 pt side margins.
+  const wide = useWideScreen();
+  const wideStyle = wide ? { paddingHorizontal: tabletPageMargin } : undefined;
+  const left = paddingOf([style, wideStyle], "Left", spacing.lg);
   const reach = parent !== null ? parent.top : keepsTopEdge(chosen) ? insetTop : 0;
   const top = paddingOf(style, "Top", spacing.lg) + reach;
   const frame = useMemo<ScreenFrame>(() => ({ ref, left, top }), [left, top]);
@@ -87,7 +91,7 @@ export function Screen({ edges, style, ...props }: SafeAreaViewProps) {
         {...props}
         edges={chosen}
         ref={ref}
-        style={[styles.screen, insideTabBar && styles.insideTabBar, style]}
+        style={[styles.screen, insideTabBar && styles.insideTabBar, style, wideStyle]}
       />
     </ScreenFrameContext.Provider>
   );

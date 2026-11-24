@@ -4,6 +4,7 @@ import { Polyline } from "react-native-svg";
 
 import { LineIcon } from "./line-icon";
 import { ScreenFrameContext } from "./screen";
+import { tabletPageMargin, useWideScreen } from "./tablet-layout";
 import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
@@ -89,13 +90,34 @@ export function ScreenHeader({
   titleLabel?: string;
 }) {
   const { band, bleed, onLayout } = useBandBleed();
-  const showRow = onBack !== undefined || (action !== undefined && eyebrow === undefined);
+  // Follow-up 289: on a tablet the back button and the action share the
+  // title's row, and the title is 36 pt.
+  const wide = useWideScreen();
+  const showRow =
+    !wide && (onBack !== undefined || (action !== undefined && eyebrow === undefined));
+  const backButton =
+    onBack === undefined ? null : (
+      <Pressable
+        accessibilityLabel="Volver"
+        accessibilityRole="button"
+        hitSlop={spacing.xs}
+        onPress={onBack}
+        style={({ pressed }) => [styles.back, pressed && styles.pressed]}
+        testID="back-bar"
+      >
+        <LineIcon color={colors.text} size={22} strokeWidth={1.7}>
+          <Polyline points="15,5 8,12 15,19" />
+        </LineIcon>
+      </Pressable>
+    );
+  const actionInTitle = wide && action !== undefined && eyebrow === undefined;
   return (
     <View
       onLayout={onLayout}
       ref={band}
       style={[
         styles.band,
+        wide && styles.wideBand,
         bleed !== null && {
           marginHorizontal: -bleed.left,
           marginTop: -bleed.top,
@@ -106,20 +128,7 @@ export function ScreenHeader({
     >
       {showRow ? (
         <View style={styles.row}>
-          {onBack === undefined ? null : (
-            <Pressable
-              accessibilityLabel="Volver"
-              accessibilityRole="button"
-              hitSlop={spacing.xs}
-              onPress={onBack}
-              style={({ pressed }) => [styles.back, pressed && styles.pressed]}
-              testID="back-bar"
-            >
-              <LineIcon color={colors.text} size={22} strokeWidth={1.7}>
-                <Polyline points="15,5 8,12 15,19" />
-              </LineIcon>
-            </Pressable>
-          )}
+          {backButton}
           {action === undefined ? null : <View style={styles.action}>{action}</View>}
         </View>
       ) : null}
@@ -131,19 +140,21 @@ export function ScreenHeader({
           {action !== undefined && !showRow ? <View style={styles.action}>{action}</View> : null}
         </View>
       )}
-      {title === undefined && titleAccessory === undefined ? null : (
-        <View style={styles.titleRow}>
+      {title === undefined && titleAccessory === undefined && !(wide && onBack) ? null : (
+        <View style={[styles.titleRow, wide && styles.wideTitleRow]}>
+          {wide ? backButton : null}
           {title === undefined ? null : (
             <Text
               accessibilityLabel={titleLabel ?? title}
               accessibilityRole="header"
               style={styles.title}
-              variant="titulo-pagina"
+              variant={wide ? "titulo-pagina-tablet" : "titulo-pagina"}
             >
               {title}
             </Text>
           )}
           {titleAccessory}
+          {actionInTitle ? <View style={styles.action}>{action}</View> : null}
         </View>
       )}
       {subtitle === undefined ? null : (
@@ -196,4 +207,6 @@ const styles = StyleSheet.create({
   },
   title: { flex: 1 },
   titleRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  wideBand: { paddingBottom: spacing.xl, paddingHorizontal: tabletPageMargin },
+  wideTitleRow: { gap: spacing.lg },
 });

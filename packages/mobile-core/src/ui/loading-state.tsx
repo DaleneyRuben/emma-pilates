@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  AccessibilityInfo,
-  Animated,
-  Easing,
-  Image,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { AccessibilityInfo, Animated, Easing, Image, StyleSheet, View } from "react-native";
 
 import logo from "../../assets/emma-logo.png";
+import { useIsTablet } from "./tablet-layout";
 import { colors } from "./tokens";
 
 // Design follow-up 94: nothing for 400 ms, a 300 ms fade, then one breath every
@@ -21,9 +14,8 @@ const halfBreathMilliseconds = 1400;
 const rest = { opacity: 0.8, scale: 0.96 };
 const top = { opacity: 1, scale: 1 };
 
-// The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed); tablets start at the Staff app's 768 pt split width.
+// The logo is 1312 × 565 (the owner's 2026-11-06 file, background removed).
 const logoAspect = 565 / 1312;
-const tabletMinimumWidth = 768;
 const haloToLogo = 1.25;
 
 /**
@@ -31,7 +23,7 @@ const haloToLogo = 1.25;
  * space it is given, announced as progress with the screen's Spanish label.
  */
 export function LoadingState({ label }: { label: string }) {
-  const { width: windowWidth } = useWindowDimensions();
+  const tablet = useIsTablet();
   const [visible, setVisible] = useState(false);
   const reduceMotion = useReduceMotion();
   const [opacity] = useState(() => new Animated.Value(0));
@@ -66,7 +58,7 @@ export function LoadingState({ label }: { label: string }) {
 
   // Follow-ups 286 and 287 (E-A12, Rosa Emma option A): the logo on a white
   // halo over the screen's own Rosa 100; the halo breathes with the logo as one piece.
-  const logoWidth = windowWidth >= tabletMinimumWidth ? 300 : 240;
+  const logoWidth = tablet ? 300 : 240;
   const halo = Math.round(logoWidth * haloToLogo);
   return (
     // The area never collapses below the halo, so a parent that does not grow

@@ -41,6 +41,8 @@ const underline = { textDecorationLine: "underline" as const };
 
 export const textVariants = {
   "titulo-pagina": face(typeFaces.serif, 30, 1.1),
+  /** The page title in a tablet's header band (follow-up 289). */
+  "titulo-pagina-tablet": face(typeFaces.serif, 36, 1.1),
   "titulo-seccion": face(typeFaces.serif, 24, 1.15),
   "titulo-bloque": face(typeFaces.serif, 22, 1.2),
   "cifra-grande": { ...face(typeFaces.serif, 34, 1.1), ...tabular },
@@ -76,6 +78,7 @@ export type TextVariant = keyof typeof textVariants;
  */
 export const largeTextVariants: readonly TextVariant[] = [
   "titulo-pagina",
+  "titulo-pagina-tablet",
   "titulo-seccion",
   "titulo-bloque",
   "cifra-grande",

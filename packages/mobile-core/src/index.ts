@@ -104,6 +104,7 @@ export * from "./ui/outlined-button";
 export * from "./ui/picker-check";
 export * from "./ui/screen";
 export * from "./ui/tab-bar";
+export * from "./ui/tablet-layout";
 export * from "./ui/type-bar";
 export * from "./ui/tab-stack-layout";
 export * from "./ui/screen-header";
