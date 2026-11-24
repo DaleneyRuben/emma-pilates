@@ -91,9 +91,10 @@ describe("staff release configuration", () => {
         // without source maps; Better Stack takes no dSYMs or ProGuard mappings.
         SENTRY_ALLOW_FAILURE: "true",
         // Sentry's iOS bundling phase runs react-native-xcode.sh through
-        // sentry-cli; when sentry-cli fails (no org), SENTRY_ALLOW_FAILURE exits 0
-        // before bundling, and the app ships without main.jsbundle and crashes at
-        // launch (TestFlight 1.2.1 build 1). Source maps go up separately.
+        // sentry-cli, which fails its org check before starting the script;
+        // SENTRY_ALLOW_FAILURE turns that into exit 0, so the app ships without
+        // main.jsbundle and crashes at launch (TestFlight 1.2.1 build 1). Store
+        // binaries carry no source maps; EAS Updates upload theirs.
         SENTRY_DISABLE_AUTO_UPLOAD: "true",
         SENTRY_DISABLE_XCODE_DEBUG_UPLOAD: "true",
         SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD: "true",
