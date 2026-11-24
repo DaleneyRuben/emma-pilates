@@ -36,8 +36,8 @@ export function useWideScreen(): boolean {
 export type TabletColumnWidth = 480 | 520 | 560 | 640 | 720;
 
 /**
- * A single-purpose screen's centred column on a tablet. On a phone it adds
- * nothing: its children stand in the parent as they always did.
+ * A single-purpose screen's centred column on a tablet page (`WideScreens`).
+ * On a phone it adds nothing: its children stand in the parent as before.
  */
 export function TabletColumn({
   children,
@@ -51,7 +51,7 @@ export function TabletColumn({
   testID?: string;
   width: TabletColumnWidth;
 }) {
-  const tablet = useIsTablet();
+  const tablet = useWideScreen();
   if (!tablet) return <>{children}</>;
   return (
     <View style={[styles.column, { gap, maxWidth: width }]} testID={testID}>
@@ -78,7 +78,7 @@ export function TabletColumns({
   right: ReactNode;
   testID?: string;
 }) {
-  const tablet = useIsTablet();
+  const tablet = useWideScreen();
   if (!tablet) {
     return (
       <>
@@ -113,7 +113,7 @@ export function TabletGrid({
   gap?: number;
   testID?: string;
 }) {
-  const tablet = useIsTablet();
+  const tablet = useWideScreen();
   if (!tablet) return <>{children}</>;
   const items = Children.toArray(children);
   const rows: ReactNode[][] = [];

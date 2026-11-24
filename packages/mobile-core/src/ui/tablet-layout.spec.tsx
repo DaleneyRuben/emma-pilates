@@ -44,6 +44,7 @@ describe("tablet layout", () => {
           <View testID="e" />
         </TabletGrid>
       </View>,
+      { wrapper: WideScreens },
     );
 
     expect(screen.queryByTestId("tablet-column")).toBeNull();
@@ -63,6 +64,7 @@ describe("tablet layout", () => {
       <TabletColumn width={480}>
         <View testID="form" />
       </TabletColumn>,
+      { wrapper: WideScreens },
     );
 
     expect(screen.getByTestId("tablet-column")).toHaveStyle({ alignSelf: "center", maxWidth: 480 });
@@ -70,7 +72,10 @@ describe("tablet layout", () => {
 
   it("sets two stacks side by side, or 300 pt and the rest", async () => {
     windowWidth(834);
-    const screen = await render(<TabletColumns left={<View />} leftWidth={300} right={<View />} />);
+    const screen = await render(
+      <TabletColumns left={<View />} leftWidth={300} right={<View />} />,
+      { wrapper: WideScreens },
+    );
 
     expect(screen.getByTestId("tablet-columns")).toHaveStyle({ flexDirection: "row", gap: 16 });
     expect(screen.getByTestId("tablet-columns-left")).toHaveStyle({ width: 300 });
@@ -85,6 +90,7 @@ describe("tablet layout", () => {
         <View testID="two" />
         <View testID="three" />
       </TabletGrid>,
+      { wrapper: WideScreens },
     );
 
     const rows = screen.getByTestId("tablet-grid").children;
@@ -96,6 +102,7 @@ describe("tablet layout", () => {
     windowWidth(834);
     const screen = await render(
       <SplitPanels detail={<View testID="detail" />} list={<View testID="list" />} />,
+      { wrapper: WideScreens },
     );
 
     expect(screen.getByTestId("split-panels-list")).toHaveStyle({ width: 392 });
