@@ -23,10 +23,13 @@ import {
   Screen,
   ScreenHeader,
   spacing,
+  TabletColumn,
+  TabletColumns,
   useIsOnline,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
+  useWideScreen,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
@@ -77,6 +80,7 @@ export function HomeScreen() {
   const studioRules = useStudioRules(fetcher);
   const { pending: paymentPending, standing } = usePaymentStanding(fetcher);
   const resendReceipt = useResendReceipt();
+  const wide = useWideScreen();
   const queryKeys = [
     getGetCurrentClientProfileQueryKey(),
     getGetCurrentClientSubscriptionQueryKey(),
@@ -164,6 +168,75 @@ export function HomeScreen() {
     onPress: () => navigation.navigate("Referrals"),
   } as const;
 
+  const nextClassBlock =
+    nextClass === undefined ? null : (
+      // C7 A (owner 2026-11-19): the next class leads Inicio.
+      <View style={styles.underPromotion}>
+        <NextClassCard
+          booking={nextClass}
+          onPress={() => navigation.navigate("Bookings")}
+          // Rosa Emma C02c2, C02f: a notice or the Guest Pass card is the
+          // screen's one hero.
+          quiet={
+            standing.kind !== "none" ||
+            freezeNotice !== null ||
+            view.subscription?.guestPass !== undefined
+          }
+        />
+      </View>
+    );
+  const promotionsBlock = (
+    <PromotionsCarousel
+      loading={promotions.isPending}
+      onImageMissing={() => void promotions.refetch()}
+      promotions={promotions.data?.status === 200 ? promotions.data.data : []}
+    />
+  );
+  const bookBlock =
+    hasActivePlan && view.subscription?.guestPass === undefined ? (
+      // FIX-082 (Inicio option A): the one solid action, under the promotion;
+      // a Guest Pass card carries its own. A rejected receipt's block holds
+      // the solid action, so booking turns secondary there (C8 C).
+      <View style={styles.underPromotion} testID="home-book-frame">
+        {standing.kind === "rejected" ? (
+          <OutlinedButton
+            label="Reservar una clase"
+            onPress={() => navigation.navigate("Booking")}
+            testID="home-book"
+          />
+        ) : (
+          <PrimaryButton
+            label={nextClass === undefined ? "Reservar una clase" : "Reservar otra clase"}
+            onPress={() => navigation.navigate("Booking")}
+            testID="home-book"
+          />
+        )}
+      </View>
+    ) : null;
+  const planBlock =
+    hasActivePlan && view.subscription?.guestPass !== undefined ? (
+      <GuestPassCard
+        onDetail={() => navigation.navigate("Subscription")}
+        onPurchase={() => navigation.navigate("Plans")}
+        view={view}
+      />
+    ) : hasActivePlan ? (
+      <PlanRow
+        expiringSoon={view.status === "expiring_soon"}
+        onPress={() => navigation.navigate("Subscription")}
+        subscription={view.subscription!}
+      />
+    ) : standing.kind === "none" ? (
+      <PurchasePlanCard
+        onPurchase={() => navigation.navigate("Plans")}
+        plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
+      />
+    ) : null;
+  // 02T: on a tablet the next class and the Plan row sit side by side, then
+  // «Reservar otra clase» and the promotion.
+  const pairedOnTablet =
+    wide && nextClass !== undefined && hasActivePlan && view.subscription?.guestPass === undefined;
+
   return (
     <Screen style={styles.screen}>
       <BandScrollView
@@ -176,112 +249,69 @@ export function HomeScreen() {
           onProfile={() => navigation.navigate("ProfileTab")}
           profile={loadedProfile.data}
         />
-        {standing.kind === "in_review" ? (
-          <PaymentInReviewCard
-            hasActivePlan={hasActivePlan}
-            onOpen={() => navigation.navigate("PaymentStatus")}
-            payment={standing.payment}
-          />
-        ) : standing.kind === "rejected" ? (
-          <PaymentRejectedCard
-            busy={resendReceipt.busy}
-            error={resendReceipt.error}
-            hasActivePlan={hasActivePlan}
-            onResend={() => void resendReceipt.resend(standing.payment.planId)}
-            payment={standing.payment}
-          />
-        ) : null}
-        {freezeNotice === null ? null : (
-          <HomeFreezeNotice
-            freeze={freezeNotice}
-            onOpen={() => navigation.navigate("Subscription")}
-          />
-        )}
-        {nextClass === undefined ? null : (
-          // C7 A (owner 2026-11-19): the next class leads Inicio.
-          <View style={styles.underPromotion}>
-            <NextClassCard
-              booking={nextClass}
-              onPress={() => navigation.navigate("Bookings")}
-              // Rosa Emma C02c2, C02f: a notice or the Guest Pass card is the
-              // screen's one hero.
-              quiet={
-                standing.kind !== "none" ||
-                freezeNotice !== null ||
-                view.subscription?.guestPass !== undefined
-              }
+        <TabletColumn gap={spacing.md} width={720}>
+          {standing.kind === "in_review" ? (
+            <PaymentInReviewCard
+              hasActivePlan={hasActivePlan}
+              onOpen={() => navigation.navigate("PaymentStatus")}
+              payment={standing.payment}
             />
-          </View>
-        )}
-        <PromotionsCarousel
-          loading={promotions.isPending}
-          onImageMissing={() => void promotions.refetch()}
-          promotions={promotions.data?.status === 200 ? promotions.data.data : []}
-        />
-        {hasActivePlan && view.subscription?.guestPass === undefined ? (
-          // FIX-082 (Inicio option A): the one solid action, under the promotion;
-          // a Guest Pass card carries its own. A rejected receipt's block holds
-          // the solid action, so booking turns secondary there (C8 C).
-          <View style={styles.underPromotion} testID="home-book-frame">
-            {standing.kind === "rejected" ? (
-              <OutlinedButton
-                label="Reservar una clase"
-                onPress={() => navigation.navigate("Booking")}
-                testID="home-book"
-              />
-            ) : (
-              <PrimaryButton
-                label={nextClass === undefined ? "Reservar una clase" : "Reservar otra clase"}
-                onPress={() => navigation.navigate("Booking")}
-                testID="home-book"
-              />
-            )}
-          </View>
-        ) : null}
-        {hasActivePlan && view.subscription?.guestPass !== undefined ? (
-          <GuestPassCard
-            onDetail={() => navigation.navigate("Subscription")}
-            onPurchase={() => navigation.navigate("Plans")}
-            view={view}
-          />
-        ) : hasActivePlan ? (
-          <PlanRow
-            expiringSoon={view.status === "expiring_soon"}
-            onPress={() => navigation.navigate("Subscription")}
-            subscription={view.subscription!}
-          />
-        ) : standing.kind === "none" ? (
-          <PurchasePlanCard
-            onPurchase={() => navigation.navigate("Plans")}
-            plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
-          />
-        ) : null}
-        <ShortcutSection>
-          {hasActivePlan ? (
-            <ShortcutTiles>
-              <ShortcutTile {...evaluationTile} />
-              <ShortcutTile {...referralTile} />
-            </ShortcutTiles>
+          ) : standing.kind === "rejected" ? (
+            <PaymentRejectedCard
+              busy={resendReceipt.busy}
+              error={resendReceipt.error}
+              hasActivePlan={hasActivePlan}
+              onResend={() => void resendReceipt.resend(standing.payment.planId)}
+              payment={standing.payment}
+            />
+          ) : null}
+          {freezeNotice === null ? null : (
+            <HomeFreezeNotice
+              freeze={freezeNotice}
+              onOpen={() => navigation.navigate("Subscription")}
+            />
+          )}
+          {pairedOnTablet ? (
+            <>
+              <TabletColumns left={nextClassBlock} right={planBlock} />
+              {bookBlock}
+              {promotionsBlock}
+            </>
           ) : (
             <>
-              <LockedShortcutRow
-                label="Reservar una clase"
-                note={
-                  standing.kind === "none"
-                    ? "Necesitas un plan activo"
-                    : bookingLockNote[standing.kind]
-                }
-              />
-              <ShortcutTiles>
-                <ShortcutTile
-                  {...evaluationTile}
-                  note={nextEvaluation === undefined ? "Agenda tu cita" : evaluationTile.hint}
-                />
-                <ShortcutTile {...referralTile} note="Su primera clase es gratis" />
-              </ShortcutTiles>
+              {nextClassBlock}
+              {promotionsBlock}
+              {bookBlock}
+              {planBlock}
             </>
           )}
-        </ShortcutSection>
+          <ShortcutSection>
+            {hasActivePlan ? (
+              <ShortcutTiles>
+                <ShortcutTile {...evaluationTile} />
+                <ShortcutTile {...referralTile} />
+              </ShortcutTiles>
+            ) : (
+              <>
+                <LockedShortcutRow
+                  label="Reservar una clase"
+                  note={
+                    standing.kind === "none"
+                      ? "Necesitas un plan activo"
+                      : bookingLockNote[standing.kind]
+                  }
+                />
+                <ShortcutTiles>
+                  <ShortcutTile
+                    {...evaluationTile}
+                    note={nextEvaluation === undefined ? "Agenda tu cita" : evaluationTile.hint}
+                  />
+                  <ShortcutTile {...referralTile} note="Su primera clase es gratis" />
+                </ShortcutTiles>
+              </>
+            )}
+          </ShortcutSection>
+        </TabletColumn>
       </BandScrollView>
       <PhonePrompt client={loadedProfile.data} />
     </Screen>

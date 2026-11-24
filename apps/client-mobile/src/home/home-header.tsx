@@ -72,6 +72,7 @@ export function HomeHeader({
         </View>
       }
       eyebrow={todayLabel(new Date())}
+      tabletWidth={720}
       testID="home-header"
       title={`Hola, ${firstName(profile.name)}`}
       titleLabel="Inicio"

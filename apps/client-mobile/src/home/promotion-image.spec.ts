@@ -31,4 +31,9 @@ describe("promotionCardWidth", () => {
     expect(promotionCardWidth(393)).toBe(361);
     expect(promotionCardWidth(1024)).toBe(720);
   });
+
+  it("keeps a tablet page's 40 pt margins at the narrowest tablet", () => {
+    expect(promotionCardWidth(768, 40)).toBe(688);
+    expect(promotionCardWidth(834, 40)).toBe(720);
+  });
 });
