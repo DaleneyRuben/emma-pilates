@@ -175,10 +175,18 @@ describe("client release configuration", () => {
     );
   });
 
-  // Its screens are drawn for a phone held upright. On an iPad it runs in
-  // iPhone mode, upright, so App Review never sees a stretched or landscape
-  // layout (Guideline 2.1, 4.0) and no iPad screenshots are needed.
-  it("runs on iPad as an iPhone app", () => {
-    expect(appConfig.expo.ios.supportsTablet).toBe(false);
+  // Follow-up 289 (owner, 2026-11-24): tablets get their own layout in both
+  // orientations; phones stay upright. Android tablets are unlocked at launch
+  // (`unlockTabletOrientation`), since the manifest's lock covers every size.
+  it("runs on iPad as a tablet app in every orientation, phones upright", () => {
+    expect(appConfig.expo.ios.supportsTablet).toBe(true);
+    expect(appConfig.expo.orientation).toBe("portrait");
+    expect(appConfig.expo.ios.infoPlist["UISupportedInterfaceOrientations~ipad"]).toEqual([
+      "UIInterfaceOrientationPortrait",
+      "UIInterfaceOrientationPortraitUpsideDown",
+      "UIInterfaceOrientationLandscapeLeft",
+      "UIInterfaceOrientationLandscapeRight",
+    ]);
+    expect(packageJson.dependencies).toHaveProperty("expo-screen-orientation");
   });
 });
