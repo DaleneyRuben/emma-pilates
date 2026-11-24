@@ -99,6 +99,8 @@ export function MyInvoicesScreen() {
     );
   }
   const items = list.data.data.items;
+  // An invoice a refresh no longer lists is not shown.
+  const shownId = items.some((invoice) => invoice.paymentId === selectedId) ? selectedId : null;
   const rows = (
     <>
       <ProfileRowCard>
@@ -111,7 +113,7 @@ export function MyInvoicesScreen() {
                 ? setSelectedId(invoice.paymentId)
                 : navigation.navigate("InvoiceDetail", { paymentId: invoice.paymentId })
             }
-            selected={wide && invoice.paymentId === selectedId}
+            selected={wide && invoice.paymentId === shownId}
           />
         ))}
       </ProfileRowCard>
@@ -136,7 +138,7 @@ export function MyInvoicesScreen() {
       ) : wide ? (
         // 17T (the S04 split): the list in the 392 pt panel, the chosen invoice beside it.
         <SplitPanels
-          detail={<InvoicePanel onClose={close} paymentId={selectedId} />}
+          detail={<InvoicePanel onClose={close} paymentId={shownId} />}
           list={
             <ScrollView contentContainerStyle={styles.panelList} refreshControl={refreshControl}>
               {rows}

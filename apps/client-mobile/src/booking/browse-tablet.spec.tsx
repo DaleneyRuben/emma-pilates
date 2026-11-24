@@ -120,6 +120,19 @@ describe("Reservar on a tablet", () => {
     expect(booked).toHaveBeenCalledTimes(1);
   });
 
+  it("closes the class when another day no longer lists it", async () => {
+    windowSize(834, 1194);
+    const { screen } = await openReservar({});
+
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    const detail = within(screen.getByTestId("split-panels-detail"));
+    await waitFor(() => expect(detail.getByText("Sobre la clase")).toBeOnTheScreen());
+    const days = within(screen.getByTestId("browse-day-strip")).getAllByRole("button");
+    await fireEvent.press(days[days.length - 1]!);
+
+    await waitFor(() => expect(screen.getByTestId("session-panel-empty")).toBeOnTheScreen());
+  });
+
   it("puts the title and the pills on one row on a landscape tablet", async () => {
     windowSize(1194, 834);
     const { screen } = await openReservar();

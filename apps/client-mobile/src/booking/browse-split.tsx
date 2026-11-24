@@ -37,6 +37,10 @@ export function BrowseSplit({
     [queryClient],
   );
   const close = useCallback(() => select(null), [select]);
+  // A class no longer in the list (another day, Branch or Class Type) is not shown.
+  const shownId = state.visibleSessions.some((session) => session.id === selectedId)
+    ? selectedId
+    : null;
 
   const pills = (
     <View style={styles.pills} testID="browse-band-pills">
@@ -64,7 +68,7 @@ export function BrowseSplit({
         {oneRow ? null : pills}
       </ScreenHeader>
       <SplitPanels
-        detail={<SessionPanel onClose={close} sessionId={selectedId} />}
+        detail={<SessionPanel onClose={close} sessionId={shownId} />}
         list={
           <ScrollView
             contentContainerStyle={styles.list}
@@ -78,7 +82,7 @@ export function BrowseSplit({
               onOpen={select}
               onOpenFreeze={onOpenFreeze}
               scroll={false}
-              selectedId={selectedId}
+              selectedId={shownId}
               state={state}
             />
           </ScrollView>
