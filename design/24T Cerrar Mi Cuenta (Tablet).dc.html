@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cerrar mi cuenta · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}input:focus{outline:none}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="18T%20Perfil%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Cerrar mi cuenta</h1>
+  </div>
+  <div style="padding: 24px 40px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+    <div style="background: #FFFBFB; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10); font-size: 15px; line-height: 1.5">
+      <span style="font-size: 16px; font-weight: 600">Esto pasa al cerrar tu cuenta en Emma Pilates Studio:</span>
+      <span>Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.</span>
+      <span>Sales de 1 lista de espera.</span>
+      <span style="font-weight: 600">Tu plan Trimestral 24 clases termina hoy. No se devuelve dinero y pierdes las 18 clases que te quedan.</span>
+      <span>Cerramos tu sesión en todos tus dispositivos.</span>
+      <span>Tu correo queda libre por si quieres registrarte de nuevo.</span>
+      <span>Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases sin tus datos, para su contabilidad.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <label style="background: #FFFBFB; border-radius: 20px; padding: 18px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10); cursor: pointer">
+        <input type="checkbox" style="width: 22px; height: 22px; margin: 2px 0 0; accent-color: #93615D">
+        <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 600">Quiero seguir recibiendo promociones de Emma Pilates Studio</span><span style="font-size: 13px; line-height: 1.45">Guardamos solo tu nombre, correo y teléfono para enviarte promociones. Puedes pedir que paremos cuando quieras.</span></span>
+      </label>
+      <div style="background: #FFFBFB; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; font-weight: 600">Tu contraseña, para confirmar</span><input type="password" autocomplete="current-password" placeholder="Tu contraseña" value="{{pw}}" onChange="{{type}}" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 14px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-family: 'Work Sans', sans-serif; font-size: 16px; color: #93615D"></label>
+        <sc-if value="{{ready}}" hint-placeholder-val="{{false}}"><a href="01T%20Iniciar%20Sesi%C3%B3n%20%28Tablet%29.dc.html" style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 16px; font-weight: 700; text-decoration: none">Cerrar mi cuenta</a></sc-if>
+        <sc-if value="{{waiting}}" hint-placeholder-val="{{true}}"><span aria-disabled="true" style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #E7CCBF; font-size: 16px; font-weight: 700">Cerrar mi cuenta</span><span style="text-align: center; font-size: 13px">Escribe tu contraseña para confirmar</span></sc-if>
+        <a href="18T%20Perfil%20%28Tablet%29.dc.html" style="align-self: center; min-height: 44px; display: inline-flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px">Cancelar</a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var pw = (this.state || {}).pw || '';
+    return { pw: pw, ready: pw.length > 0, waiting: pw.length === 0, type: function (e) { self.setState({ pw: e.target.value }); } };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Detalle del plan · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="08T%20Elegir%20Plan%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Trimestral 24 clases</h1>
+  </div>
+  <div style="padding: 24px 40px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #93615D; color: #FFFBFB; border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 10px 28px rgba(147,97,93,.30)">
+        <span style="align-self: flex-start; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #FFFBFB; color: #93615D; font-size: 12px; font-weight: 700">15 % de descuento</span>
+        <span style="display: flex; align-items: baseline; gap: 12px"><span style="font-family: Lora, serif; font-weight: 500; font-size: 44px; line-height: 1.1; font-variant-numeric: tabular-nums">Bs 1.352</span><span style="font-size: 19px; font-weight: 700; text-decoration: line-through">Bs 1.590</span></span>
+        <span style="font-size: 19px; font-weight: 700">Válido por 90 días</span>
+      </div>
+      <div style="background: #FFFBFB; border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10); font-size: 15px; line-height: 1.5">
+        <h2 style="margin: 0 0 2px; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">Qué incluye</h2>
+        <span>24 clases en cualquier sucursal</span>
+        <span>Cancela sin costo hasta 2 h 30 antes</span>
+        <span>90 días desde la fecha de inicio</span>
+        <span>Hasta 3 clases por semana</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #FFFBFB; border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <h2 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">Fecha de inicio</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+            <button type="button" onClick="{{d.pick}}" aria-pressed="{{d.pressed}}" style="height: 72px; border: 0; border-radius: 14px; background: {{d.bg}}; color: {{d.fg}}; box-shadow: {{d.ring}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-family: 'Work Sans', sans-serif; cursor: pointer"><span style="font-size: 12px; font-weight: 700">{{d.wd}}</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 22px; line-height: 1.2">{{d.num}}</span><span style="font-size: 12px; font-weight: 700">nov</span></button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <div style="padding: 16px 16px 4px"><h2 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">Desglose</h2></div>
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Precio del plan</span><span style="font-size: 16px; font-weight: 600">Bs 1.590</span></div>
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Descuento 15 %</span><span style="font-size: 16px; font-weight: 600">−Bs 238</span></div>
+        <div style="display: flex; align-items: baseline; padding: 12px 16px"><span style="flex: 1; font-size: 16px; font-weight: 700">Total</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 24px">Bs 1.352</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFBFB; padding: 16px 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 -1px 2px rgba(147,97,93,.08), 0 -4px 14px rgba(147,97,93,.10)">
+    <a href="10T%20Pago%20%28Tablet%29.dc.html" style="width: 480px; display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 16px; font-weight: 700; text-decoration: none">Pagar Bs 1.352</a>
+    <span style="font-size: 13px; line-height: 1.45">Pagas por QR y subes tu comprobante</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var DAYS = [['Hoy', '20'], ['sáb', '21'], ['dom', '22'], ['lun', '23'], ['mar', '24'], ['mié', '25']];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var sel = (this.state || {}).sel || '20';
+    return {
+      days: DAYS.map(function (d) {
+        var on = d[1] === sel;
+        return { wd: d[0], num: d[1], bg: on ? '#93615D' : '#FEF6F2', fg: on ? '#FFFBFB' : '#93615D', ring: on ? 'none' : 'inset 0 0 0 1px #E7CCBF', pressed: on ? 'true' : 'false', pick: function () { self.setState({ sel: d[1] }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

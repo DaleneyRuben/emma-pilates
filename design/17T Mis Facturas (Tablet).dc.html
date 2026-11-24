@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mis facturas · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="flex: none; background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="18T%20Perfil%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Mis facturas</h1>
+  </div>
+  <div style="flex: 1 1 auto; min-height: 0; display: flex; padding-bottom: 84px">
+    <div style="flex: none; width: 392px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #E7CCBF">
+      <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <sc-for list="{{items}}" as="f" hint-placeholder-count="3">
+          <button type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-bottom: 1px solid #FEF6F2; background: {{f.bg}}; box-shadow: {{f.ring}}; color: #93615D; font-family: 'Work Sans', sans-serif; text-align: left; cursor: pointer">
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600">{{f.name}}</span><span style="font-size: 13px">{{f.date}} · {{f.amount}}</span><span style="align-self: flex-start; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; background: {{f.tagBg}}; color: {{f.tagFg}}; box-shadow: inset 0 0 0 1px #E7CCBF; font-size: 12px; font-weight: 700">{{f.status}}</span></span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+      <span style="padding: 0 4px; font-size: 13px; line-height: 1.45">Las facturas salen a nombre del NIT o CI que diste al pagar. Si un dato está mal, avísale al estudio.</span>
+    </div>
+    <div style="flex: 1 1 auto; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 26px; line-height: 1.15">Factura</h2>
+      <sc-if value="{{cur.ready}}" hint-placeholder-val="{{true}}">
+        <div style="height: 300px; border-radius: 16px; background: #FFFBFB; box-shadow: inset 0 0 0 1px #E7CCBF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px"><svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v4h4M10 12h5M10 16h5"></path></svg><span style="font-size: 14px; font-weight: 700">Ver · 2 páginas</span></div>
+      </sc-if>
+      <sc-if value="{{cur.waiting}}" hint-placeholder-val="{{false}}">
+        <div style="background: #FEF6F2; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 0 1px #E7CCBF; font-size: 15px; line-height: 1.5">{{cur.msg}}</div>
+      </sc-if>
+      <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Compra</span><span style="font-size: 16px; font-weight: 600">{{cur.name}}</span></div>
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Monto</span><span style="font-size: 16px; font-weight: 600">{{cur.amount}}</span></div>
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">NIT o CI</span><span style="font-size: 16px; font-weight: 600">4872391</span></div>
+        <div style="display: flex; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">A nombre de</span><span style="font-size: 16px; font-weight: 600">Carla Paz</span></div>
+        <div style="display: flex; padding: 12px 16px"><span style="flex: 1; font-size: 15px">Pagado</span><span style="font-size: 16px; font-weight: 600">{{cur.date}}</span></div>
+      </div>
+      <sc-if value="{{cur.ready}}" hint-placeholder-val="{{true}}">
+        <button type="button" style="height: 52px; border: 0; border-radius: 16px; background: #93615D; color: #FFFBFB; font-family: 'Work Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer">Descargar</button>
+      </sc-if>
+    </div>
+  </div>
+  <nav aria-label="Secciones" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #FFFBFB; box-shadow: 0 -1px 0 #E7CCBF; display: flex; justify-content: center; align-items: flex-start; gap: 12px; padding-top: 12px; box-sizing: border-box">
+    <a href="02T%20Inicio%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6h-6v6H4z"></path></svg>Inicio</a>
+    <a href="03T%20Reservar%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Reservar</a>
+    <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Mis reservas</a>
+    <a href="18T%20Perfil%20%28Tablet%29.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFBFB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4-6 8-6s7 2 8 6"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var DATA = [
+  { id: 'a', name: 'Plan Trimestral 24 clases', date: 'jue 5 nov', amount: 'Bs 1.352', status: 'Lista', ready: true },
+  { id: 'b', name: 'Paquete de 8 clases', date: 'mar 6 oct', amount: 'Bs 502', status: 'En preparación', msg: 'El estudio está preparando esta factura. Te avisamos cuando esté lista.' },
+  { id: 'c', name: 'Paquete de 8 clases', date: 'lun 7 sept', amount: 'Bs 502', status: 'Pago anulado', msg: 'Este pago se anuló, así que no tiene factura.' }
+];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var sel = (this.state || {}).sel || 'a';
+    var cur = DATA[0];
+    var items = DATA.map(function (f) {
+      var on = f.id === sel;
+      if (on) cur = f;
+      return Object.assign({}, f, {
+        bg: on ? '#FEF6F2' : '#FFFBFB', ring: on ? 'inset 0 0 0 2px #B78380' : 'none', pressed: on ? 'true' : 'false',
+        tagBg: f.ready ? '#93615D' : '#FEF6F2', tagFg: f.ready ? '#FFFBFB' : '#93615D',
+        pick: function () { self.setState({ sel: f.id }); }
+      });
+    });
+    return { items: items, cur: Object.assign({}, cur, { ready: !!cur.ready, waiting: !cur.ready }) };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Detalle de sesión · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: {{w}}px; height: {{h}}px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="flex: none; background: #E7CCBF; padding: {{bandPad}}; border-radius: 0 0 28px 28px; display: flex; flex-direction: {{bandDir}}; justify-content: space-between; gap: 14px">
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Reservar</h1>
+    <div style="display: flex; gap: 12px; align-items: center">
+      <button type="button" style="display: flex; gap: 8px; align-items: center; height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #FFFBFB; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 14px; cursor: pointer"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.5-6-11a6 6 0 0112 0c0 5.5-6 11-6 11z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>Sucursal: Achumani<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"></path></svg></button>
+      <span style="display: flex; gap: 8px; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px; background: #FFFBFB; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Te quedan 3 clases esta semana</span>
+    </div>
+  </div>
+  <div style="flex: 1 1 auto; min-height: 0; display: flex; padding-bottom: 84px">
+    <div style="flex: none; width: 392px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #E7CCBF; overflow: hidden">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px">
+        <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+          <span style="height: 64px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; background: {{d.bg}}; color: {{d.fg}}"><span style="font-size: 12px; font-weight: 700; line-height: 1.2">{{d.name}}</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 22px; line-height: 1.2; font-variant-numeric: tabular-nums">{{d.num}}</span></span>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: #93615D; color: #FFFBFB; font-size: 14px">Todas</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-size: 14px">Reformer Pilates</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-size: 14px">Mat Pilates</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; background: #FFFBFB; box-shadow: inset 0 0 0 1.5px #CDA697; font-size: 14px">Cadillac</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 0"><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase">Viernes 20 de noviembre</span><span style="font-size: 12px; font-weight: 700">6 clases</span></div>
+      <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <sc-for list="{{classes}}" as="c" hint-placeholder-count="6">
+          <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.pressed}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; border-bottom: 1px solid #FEF6F2; background: {{c.rowBg}}; box-shadow: {{c.ring}}; color: #93615D; font-family: 'Work Sans', sans-serif; text-align: left; cursor: pointer">
+            <span style="width: 5px; align-self: stretch; border-radius: 3px; background: {{c.bar}}; flex-shrink: 0"></span>
+            <span style="font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; width: 68px; flex-shrink: 0">{{c.time}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600; line-height: 1.35; white-space: nowrap">{{c.name}}</span><span style="display: flex; gap: 6px; align-items: center; white-space: nowrap"><span style="width: 24px; height: 24px; border-radius: 12px; background: #FEF6F2; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700">DO</span><span style="font-size: 13px; line-height: 1.45">Daniela Ortiz · 50 min</span></span><span style="font-size: 12px; font-weight: 700">{{c.cap}}</span></span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
+      <sc-if value="{{none}}" hint-placeholder-val="{{true}}">
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; text-align: center">
+          <span style="width: 64px; height: 64px; border-radius: 32px; background: #FFFBFB; box-shadow: inset 0 0 0 1px #E7CCBF; display: inline-flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg></span>
+          <span style="font-family: Lora, serif; font-weight: 400; font-size: 24px; line-height: 1.2">Elige una clase</span>
+          <span style="max-width: 300px; font-size: 15px; line-height: 1.5">Toca una clase de la lista para ver el detalle y reservarla aquí.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{some}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; padding: 24px; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+          <div style="background: #93615D; color: #FFFBFB; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 10px 28px rgba(147,97,93,.30)"><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase">Viernes 20 de noviembre</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 26px; line-height: 1.2">{{cur.time}} · {{cur.name}}</span><span style="font-size: 15px; line-height: 1.5">50 minutos · termina {{cur.end}}</span></div>
+          <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Instructora</span><span style="display: flex; gap: 8px; align-items: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: #FEF6F2; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700">DO</span><span style="font-size: 16px; font-weight: 600">Daniela Ortiz</span></span></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Sucursal</span><span style="font-size: 16px; font-weight: 600">Achumani</span></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #FEF6F2"><span style="flex: 1; font-size: 15px">Lugares</span><span style="display: flex; flex-direction: column; align-items: flex-end"><span style="font-size: 16px; font-weight: 600">{{cur.places}}</span><sc-if value="{{cur.full}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px">Te avisamos si se libera un lugar</span></sc-if></span></div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px"><span style="flex: 1; font-size: 15px">Cancelas gratis hasta</span><span style="font-size: 16px; font-weight: 600">vie 20 nov · {{cur.cancel}}</span></div>
+          </div>
+          <div style="background: #FEF6F2; border-radius: 16px; padding: 14px 16px; box-shadow: inset 0 0 0 1px #E7CCBF; text-align: center; font-size: 16px; font-weight: 600">Te quedan 3 clases esta semana</div>
+          <div style="background: #FFFBFB; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)"><span style="font-size: 16px; font-weight: 600">Sobre la clase</span><span style="font-size: 15px; line-height: 1.5">{{cur.about}}</span></div>
+        </div>
+        <div style="flex: none; padding: 16px 24px 20px; background: #FFFBFB; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -1px 2px rgba(147,97,93,.08), 0 -4px 14px rgba(147,97,93,.10)">
+          <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 16px; font-weight: 700; text-decoration: none">{{cur.cta}}</a>
+          <span style="text-align: center; font-size: 13px; line-height: 1.45">{{cur.note}}</span>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <nav aria-label="Secciones" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #FFFBFB; box-shadow: 0 -1px 0 #E7CCBF; display: flex; justify-content: center; align-items: flex-start; gap: 12px; padding-top: 12px; box-sizing: border-box">
+    <a href="02T%20Inicio%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6h-6v6H4z"></path></svg>Inicio</a>
+    <a href="03T%20Reservar%20%28Tablet%29.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFBFB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Reservar</a>
+    <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Mis reservas</a>
+    <a href="18T%20Perfil%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4-6 8-6s7 2 8 6"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":null,"tsType":"string"},"w":{"editor":null,"tsType":"number"},"h":{"editor":null,"tsType":"number"},"$preview":{"width":834,"height":1194}}'>
+var START = '10:00';
+var REF = 'Trabajo de fuerza y control en la máquina Reformer, con resortes que se ajustan a tu nivel. Ideal para todas.';
+var MAT = 'Trabajo en colchoneta con tu propio peso para fortalecer el centro y mejorar la postura.';
+var CAD = 'Ejercicios en la Cadillac con barras y resortes para ganar fuerza y flexibilidad.';
+var DATA = [
+  { time: '08:00', end: '08:50', cancel: '05:30', name: 'Reformer Pilates', cap: '5 de 12', places: '7 de 12 libres', bar: '#93615D', about: REF },
+  { time: '10:00', end: '10:50', cancel: '07:30', name: 'Mat Pilates', cap: 'Quedan 2 lugares', places: '2 de 12 libres', bar: '#DAB9AB', about: MAT },
+  { time: '16:00', end: '16:50', cancel: '13:30', name: 'Cadillac', cap: '3 de 6', places: '3 de 6 libres', bar: '#B78380', about: CAD },
+  { time: '18:00', end: '18:50', cancel: '15:30', name: 'Reformer Pilates', cap: 'Lleno', places: 'Clase llena', full: true, bar: '#93615D', about: REF },
+  { time: '19:00', end: '19:50', cancel: '16:30', name: 'Mat Pilates', cap: 'Queda 1 lugar', places: '1 de 12 libres', bar: '#DAB9AB', about: MAT },
+  { time: '20:00', end: '20:50', cancel: '17:30', name: 'Reformer Pilates', cap: '8 de 12', places: '4 de 12 libres', bar: '#93615D', about: REF }
+];
+var DAYS = [['Hoy', '19'], ['vie', '20'], ['sáb', '21'], ['dom', '22'], ['lun', '23'], ['mar', '24'], ['Otra', '…']];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var sel = st.sel === undefined ? (this.props.start ?? START) : st.sel;
+    var cur = null;
+    var classes = DATA.map(function (c) {
+      var on = c.time === sel;
+      if (on) cur = c;
+      return Object.assign({}, c, {
+        rowBg: on ? '#FEF6F2' : '#FFFBFB',
+        ring: on ? 'inset 0 0 0 2px #B78380' : 'none',
+        pressed: on ? 'true' : 'false',
+        pick: function () { self.setState({ sel: c.time }); }
+      });
+    });
+    if (cur) {
+      cur = Object.assign({}, cur, {
+        cta: cur.full ? 'Unirme a la lista de espera' : 'Reservar esta clase',
+        note: cur.full ? 'La lista de espera no usa clases de tu plan' : 'Usarás 1 de tus 25 clases.'
+      });
+    }
+    var wide = (this.props.w ?? 834) > 1000;
+    return {
+      w: this.props.w ?? 834, h: this.props.h ?? 1194,
+      bandPad: wide ? '32px 40px 20px' : '56px 40px 24px',
+      bandDir: wide ? 'row' : 'column',
+      days: DAYS.map(function (d, i) { return { name: d[0], num: d[1], bg: i === 1 ? '#93615D' : '#FFFBFB', fg: i === 1 ? '#FFFBFB' : '#93615D' }; }),
+      classes: classes, cur: cur || {}, none: !cur, some: !!cur
+    };
+  }
+}
+</script>
+</body>
+</html>
