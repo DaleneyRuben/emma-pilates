@@ -24,11 +24,13 @@ import {
   StateScreen,
   spacing,
   surfaces,
+  TabletGrid,
   useMountedAt,
   usePullToRefresh,
   useRefetchOnFocus,
   useStudioRules,
   useStickyNotice,
+  useWideScreen,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -60,6 +62,7 @@ export function BookingsScreen({
   route: { params?: { confirmed?: ConfirmedBooking; tab?: BookingsTab } };
 }) {
   const navigation = useNavigation<BookingsNavigation>();
+  const wide = useWideScreen();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const dismissConfirmed = () => navigation.setParams({ confirmed: undefined });
@@ -175,19 +178,34 @@ export function BookingsScreen({
     onReschedule: () => navigation.navigate("Reschedule", { booking: item }),
   });
 
+  const tabs = (
+    <SegmentedTabs
+      accessibilityLabel="Reservas"
+      onSelect={(key) => navigation.setParams({ tab: key })}
+      options={[
+        { key: "upcoming", label: "Próximas", testID: "bookings-tab-upcoming" },
+        { key: "history", label: "Historial", testID: "bookings-tab-history" },
+      ]}
+      selected={tab}
+    />
+  );
+
   return (
     <Screen style={styles.screen}>
-      {/* C05: the Próximas and Historial tabs ride in the band. */}
-      <ScreenHeader testID="bookings-header" title="Mis reservas">
-        <SegmentedTabs
-          accessibilityLabel="Reservas"
-          onSelect={(key) => navigation.setParams({ tab: key })}
-          options={[
-            { key: "upcoming", label: "Próximas", testID: "bookings-tab-upcoming" },
-            { key: "history", label: "Historial", testID: "bookings-tab-history" },
-          ]}
-          selected={tab}
-        />
+      {/* C05: the Próximas and Historial tabs ride in the band; on a tablet
+          they sit at the end of the title's row, 340 pt wide (05T, 07T). */}
+      <ScreenHeader
+        action={
+          wide ? (
+            <View style={styles.wideTabs} testID="bookings-band-tabs">
+              {tabs}
+            </View>
+          ) : undefined
+        }
+        testID="bookings-header"
+        title="Mis reservas"
+      >
+        {wide ? null : tabs}
       </ScreenHeader>
       {failure !== null ? (
         // C05i: the refusal on a soft notice with the alert glyph.
@@ -219,16 +237,19 @@ export function BookingsScreen({
         </ScrollView>
       ) : (
         <ScrollView
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, wide && styles.wideList]}
           refreshControl={refreshControl}
           testID="bookings-scroll"
         >
           {next === undefined ? null : <NextBookingHero {...cardProps(next)} today={today} />}
-          {items
-            .filter((item) => item !== next)
-            .map((item) => (
-              <BookingCard key={item.bookingId ?? item.waitlistEntryId} {...cardProps(item)} />
-            ))}
+          {/* 05T: the other bookings two to a row on a tablet. */}
+          <TabletGrid testID="bookings-grid">
+            {items
+              .filter((item) => item !== next)
+              .map((item) => (
+                <BookingCard key={item.bookingId ?? item.waitlistEntryId} {...cardProps(item)} />
+              ))}
+          </TabletGrid>
         </ScrollView>
       )}
       <ConfirmationSheet
@@ -315,4 +336,6 @@ const styles = StyleSheet.create({
   },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
+  wideList: { gap: spacing.lg },
+  wideTabs: { width: 340 },
 });

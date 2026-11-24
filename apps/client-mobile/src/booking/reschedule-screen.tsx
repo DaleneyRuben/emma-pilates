@@ -22,6 +22,8 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  TabletColumn,
+  TabletColumns,
   Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -147,76 +149,91 @@ export function RescheduleScreen({
     <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <ScrollView contentContainerStyle={styles.content}>
-        <View>
-          <SectionTitle>Tu reserva actual</SectionTitle>
-          <View style={styles.current}>
-            <View style={styles.currentRow}>
-              <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
-              <View style={styles.currentBody}>
-                <Text variant="titulo-fila">{booking.classTypeName}</Text>
-                <Text variant="secundario">
-                  {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
-                </Text>
+        {/* 06T: the booking on a 300 pt column, today's other classes beside it. */}
+        <TabletColumns
+          left={
+            <View>
+              <SectionTitle>Tu reserva actual</SectionTitle>
+              <View style={styles.current}>
+                <View style={styles.currentRow}>
+                  <DayTile startsAt={booking.startsAt} today={boliviaCivilDate(new Date())} />
+                  <View style={styles.currentBody}>
+                    <Text variant="titulo-fila">{booking.classTypeName}</Text>
+                    <Text variant="secundario">
+                      {`${formatTimeRange(booking.startsAt, booking.endsAt)} · ${booking.trainerName}`}
+                    </Text>
+                  </View>
+                </View>
+                {options.length === 0 ? null : (
+                  <View style={styles.replaced}>
+                    <Text variant="pastilla">Se reemplaza</Text>
+                  </View>
+                )}
               </View>
             </View>
-            {options.length === 0 ? null : (
-              <View style={styles.replaced}>
-                <Text variant="pastilla">Se reemplaza</Text>
-              </View>
-            )}
-          </View>
-        </View>
-        {loading ? (
-          <LoadingState label="Cargando alternativas" />
-        ) : failed ? (
-          <QueryFailure
-            label="No pudimos cargar las clases del día."
-            onRetry={() => void alternatives.refetch()}
-          />
-        ) : options.length === 0 ? (
-          <StateScreen
-            icon="calendar"
-            layout="inList"
-            note="Tu reserva sigue en pie. Si no puedes asistir, escríbenos al estudio."
-            primaryAction={{ label: "Volver a mis reservas", onPress: () => navigation.goBack() }}
-            title="No hay otras clases hoy"
-          />
-        ) : (
-          <View>
-            <SectionTitle>Otras clases de hoy</SectionTitle>
-            <RescheduleOptions>
-              {options.map((session) => (
-                <RescheduleOption
-                  key={session.id}
-                  onPress={() => setSelectedId(session.id)}
-                  selected={session.id === selectedId}
-                  session={session}
+          }
+          leftWidth={300}
+          right={
+            <>
+              {loading ? (
+                <LoadingState label="Cargando alternativas" />
+              ) : failed ? (
+                <QueryFailure
+                  label="No pudimos cargar las clases del día."
+                  onRetry={() => void alternatives.refetch()}
                 />
-              ))}
-            </RescheduleOptions>
-          </View>
-        )}
-        {failure !== null ? (
-          <View style={styles.failureBox}>
-            <InlineError>{failure}</InlineError>
-          </View>
-        ) : null}
+              ) : options.length === 0 ? (
+                <StateScreen
+                  icon="calendar"
+                  layout="inList"
+                  note="Tu reserva sigue en pie. Si no puedes asistir, escríbenos al estudio."
+                  primaryAction={{
+                    label: "Volver a mis reservas",
+                    onPress: () => navigation.goBack(),
+                  }}
+                  title="No hay otras clases hoy"
+                />
+              ) : (
+                <View>
+                  <SectionTitle>Otras clases de hoy</SectionTitle>
+                  <RescheduleOptions>
+                    {options.map((session) => (
+                      <RescheduleOption
+                        key={session.id}
+                        onPress={() => setSelectedId(session.id)}
+                        selected={session.id === selectedId}
+                        session={session}
+                      />
+                    ))}
+                  </RescheduleOptions>
+                </View>
+              )}
+              {failure !== null ? (
+                <View style={styles.failureBox}>
+                  <InlineError>{failure}</InlineError>
+                </View>
+              ) : null}
+            </>
+          }
+        />
       </ScrollView>
       {!loading && !failed && options.length > 0 ? (
         // C06: the line and the button sit on the white footer.
         <FooterPanel testID="reschedule-footer">
-          <Text style={styles.note} variant="secundario">
-            {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
-          </Text>
-          <PrimaryButton
-            busy={submitting}
-            disabled={selectedId === null}
-            // FIX-089: an off button says why on its own line.
-            disabledReason="Elige una clase para continuar"
-            label="Confirmar cambio"
-            onPress={() => void confirm()}
-            testID="reschedule-confirm"
-          />
+          <TabletColumn gap={spacing.sm} width={480}>
+            <Text style={styles.note} variant="secundario">
+              {`Tu lugar de las ${formatStartTime(booking.startsAt)} se libera al confirmar`}
+            </Text>
+            <PrimaryButton
+              busy={submitting}
+              disabled={selectedId === null}
+              // FIX-089: an off button says why on its own line.
+              disabledReason="Elige una clase para continuar"
+              label="Confirmar cambio"
+              onPress={() => void confirm()}
+              testID="reschedule-confirm"
+            />
+          </TabletColumn>
         </FooterPanel>
       ) : null}
     </Screen>
