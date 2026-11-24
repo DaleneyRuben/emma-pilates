@@ -31,6 +31,7 @@ import { Image, StyleSheet, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { downloadInvoice } from "./invoice-download";
 import { invoiceDate } from "./invoice-parts";
+import { useInInvoicePanel } from "./invoice-panel-context";
 
 function Details({ invoice }: { invoice: ClientInvoiceDto }) {
   const rows: [string, string][] = [
@@ -97,11 +98,23 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
   // FIX-049: where the file went, for the toast: Descargas, or the folder
   // she picked.
   const [saved, setSaved] = useState<string | null>(null);
-  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Factura" />;
+  // 17T: beside Mis facturas on a tablet the invoice keeps the panel's 24 pt
+  // padding, a section title and its footer, with no band of its own.
+  const inPanel = useInInvoicePanel();
+  const screenProps = inPanel
+    ? { edges: [] as const, style: [styles.screen, styles.panelScreen] }
+    : { style: styles.screen };
+  const header = inPanel ? (
+    <Text accessibilityRole="header" variant="titulo-seccion">
+      Factura
+    </Text>
+  ) : (
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Factura" />
+  );
 
   if (list.isPending) {
     return (
-      <Screen style={styles.screen}>
+      <Screen {...screenProps}>
         {header}
         <LoadingState label="Cargando la factura" />
       </Screen>
@@ -113,7 +126,7 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
       : undefined;
   if (invoice === undefined) {
     return (
-      <Screen style={styles.screen}>
+      <Screen {...screenProps}>
         {header}
         <QueryFailure label="No pudimos cargar la factura." onRetry={() => void list.refetch()} />
       </Screen>
@@ -122,7 +135,7 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
 
   if (invoice.file === null) {
     return (
-      <Screen style={styles.screen}>
+      <Screen {...screenProps}>
         {header}
         <EmptyState
           icon="hourglass"
@@ -165,11 +178,11 @@ export function InvoiceDetailScreen({ route }: { route: { params: { paymentId: s
   );
 
   return (
-    <Screen style={styles.screen}>
+    <Screen {...screenProps}>
       <FormScrollView
         contentContainerStyle={styles.content}
         footer={
-          <View style={styles.footer}>
+          <View style={[styles.footer, inPanel && styles.panelFooter]} testID="invoice-footer">
             {failed ? (
               <View accessibilityRole="alert">
                 <NoticeRow message="No pudimos descargar la factura. Inténtalo de nuevo." />
@@ -213,6 +226,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   kvValue: { flexShrink: 1, textAlign: "right" },
+  panelFooter: {
+    marginHorizontal: -spacing.xl,
+    paddingBottom: spacing.xlSm,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+  },
+  panelScreen: { padding: spacing.xl, paddingBottom: 0 },
   photo: { alignSelf: "center", borderRadius: 10, maxHeight: 320, width: "100%" },
   previewCard: { ...surfaces.card, padding: spacing.md },
   screen: { gap: spacing.md },
