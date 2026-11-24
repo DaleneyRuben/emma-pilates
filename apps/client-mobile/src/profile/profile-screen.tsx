@@ -12,16 +12,19 @@ import {
   LoadingState,
   LogoutConfirmationSheet,
   openPublicPage,
+  OutlinedButton,
   QueryFailure,
   Screen,
   ScreenHeader,
   SectionTitle,
   spacing,
   surfaces,
+  TabletColumns,
   Text,
   useMobileIdentity,
   useRefetchOnFocus,
   useStickyNotice,
+  useWideScreen,
   phoneWithFlag,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -60,6 +63,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
   const identity = useMobileIdentity();
   const fetcher = useClientFetcher();
   const [confirmingLogout, setConfirmingLogout] = useState(false);
+  const wide = useWideScreen();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
@@ -98,126 +102,159 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
   const status = subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : undefined;
 
+  // Follow-up 256 § 2: «Cerrar mi cuenta» is a quiet link after the
+  // version, away from «Cerrar sesión»; it still opens C24.
+  const endBlock = (
+    <View style={styles.end}>
+      <Text
+        style={styles.centered}
+        variant="secundario"
+      >{`Emma Pilates Studio · versión ${appVersionLabel()} ·`}</Text>
+      <Pressable
+        accessibilityRole="button"
+        hitSlop={spacing.md}
+        onPress={() => navigation.navigate("CloseAccount")}
+        testID="profile-close-account"
+      >
+        <Text style={styles.centered} variant="enlace">
+          Cerrar mi cuenta
+        </Text>
+      </Pressable>
+    </View>
+  );
+
   return (
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* C18: the identity is the screen's one 600 hero. */}
-        <View style={styles.hero}>
-          <ClientAvatar name={client.name} onEmphasis photoUri={photoUri} size={56} />
-          <View style={styles.heroBody}>
-            <Text tone="onDark" variant="titulo-bloque">
-              {client.name}
-            </Text>
-            <Text tone="onDark" variant="cuerpo">
-              {client.email}
-            </Text>
-            {client.phone ? (
-              <Text tone="onDark" variant="cuerpo">
-                {phoneWithFlag(client.phone)}
-              </Text>
-            ) : null}
-          </View>
-          <Pressable
-            accessibilityLabel="Editar"
-            accessibilityRole="button"
-            hitSlop={spacing.sm}
-            onPress={() => navigation.navigate("EditProfile")}
-            style={styles.edit}
-          >
-            <Text tone="onDark" variant="enlace">
-              Editar
-            </Text>
-          </Pressable>
-        </View>
-        <View>
-          <SectionTitle>Tu plan y tus clases</SectionTitle>
-          <ProfileRowCard>
-            <ProfileRow
-              icon="card"
-              label="Mi plan"
-              onPress={() => navigation.navigate("Subscription")}
-              pill
-              value={status === null || status === "none" ? undefined : planPill[status]}
-            />
-            <ProfileRow
-              icon="leaf"
-              label="Evaluación nutricional"
-              onPress={() => navigation.navigate("EvaluationAvailability")}
-            />
-            <ProfileRow
-              icon="document"
-              label="Mis facturas"
-              onPress={() => navigation.navigate("MyInvoices")}
-            />
-            <ProfileRow
-              icon="personAdd"
-              label="Invita a una amiga"
-              onPress={() => navigation.navigate("Referrals")}
-            />
-          </ProfileRowCard>
-        </View>
-        <View>
-          <SectionTitle>Preferencias</SectionTitle>
-          <ProfileRowCard>
-            <ProfileRow
-              icon="bell"
-              label="Notificaciones"
-              onPress={() => navigation.navigate("Notifications")}
-              value={
-                unreadCount === undefined || unreadCount === 0
-                  ? undefined
-                  : `${unreadCount} sin leer`
-              }
-            />
-          </ProfileRowCard>
-        </View>
-        <View>
-          <SectionTitle>Cuenta</SectionTitle>
-          <ProfileRowCard>
-            <ProfileRow
-              icon="password"
-              label="Cambiar contraseña"
-              onPress={() => navigation.navigate("ChangePassword")}
-            />
-            {identity.biometrics.available ? <BiometricSwitchRow /> : null}
-            <ProfileRow
-              icon="message"
-              label="Enviar comentarios"
-              onPress={() => navigation.navigate("Feedback")}
-            />
-            <ProfileRow icon="mail" label="Soporte" onPress={() => openPublicPage("support")} />
-            <ProfileRow
-              icon="lock"
-              label="Política de privacidad"
-              onPress={() => openPublicPage("privacy")}
-            />
-            <ProfileRow
-              chevron={false}
-              icon="logout"
-              label="Cerrar sesión"
-              onPress={() => setConfirmingLogout(true)}
-            />
-          </ProfileRowCard>
-        </View>
-        {/* Follow-up 256 § 2: «Cerrar mi cuenta» is a quiet link after the
-            version, away from «Cerrar sesión»; it still opens C24. */}
-        <View style={styles.end}>
-          <Text
-            style={styles.centered}
-            variant="secundario"
-          >{`Emma Pilates Studio · versión ${appVersionLabel()} ·`}</Text>
-          <Pressable
-            accessibilityRole="button"
-            hitSlop={spacing.md}
-            onPress={() => navigation.navigate("CloseAccount")}
-            testID="profile-close-account"
-          >
-            <Text style={styles.centered} variant="enlace">
-              Cerrar mi cuenta
-            </Text>
-          </Pressable>
-        </View>
+        {/* 18T: on a tablet the identity, «Cerrar sesión» and the version sit
+            in a 300 pt column beside the lists. */}
+        <TabletColumns
+          left={
+            <>
+              {/* C18: the identity is the screen's one 600 hero. */}
+              <View style={[styles.hero, wide && styles.heroStacked]} testID="profile-identity">
+                <ClientAvatar name={client.name} onEmphasis photoUri={photoUri} size={56} />
+                <View style={[styles.heroBody, wide && styles.heroBodyStacked]}>
+                  <Text tone="onDark" variant="titulo-bloque">
+                    {client.name}
+                  </Text>
+                  <Text tone="onDark" variant="cuerpo">
+                    {client.email}
+                  </Text>
+                  {client.phone ? (
+                    <Text tone="onDark" variant="cuerpo">
+                      {phoneWithFlag(client.phone)}
+                    </Text>
+                  ) : null}
+                </View>
+                <Pressable
+                  accessibilityLabel="Editar"
+                  accessibilityRole="button"
+                  hitSlop={spacing.sm}
+                  onPress={() => navigation.navigate("EditProfile")}
+                  style={styles.edit}
+                >
+                  <Text tone="onDark" variant="enlace">
+                    Editar
+                  </Text>
+                </Pressable>
+              </View>
+              {wide ? (
+                <>
+                  <OutlinedButton
+                    label="Cerrar sesión"
+                    onPress={() => setConfirmingLogout(true)}
+                    testID="profile-logout"
+                  />
+                  {endBlock}
+                </>
+              ) : null}
+            </>
+          }
+          leftWidth={300}
+          right={
+            <>
+              <View>
+                <SectionTitle>Tu plan y tus clases</SectionTitle>
+                <ProfileRowCard>
+                  <ProfileRow
+                    icon="card"
+                    label="Mi plan"
+                    onPress={() => navigation.navigate("Subscription")}
+                    pill
+                    value={status === null || status === "none" ? undefined : planPill[status]}
+                  />
+                  <ProfileRow
+                    icon="leaf"
+                    label="Evaluación nutricional"
+                    onPress={() => navigation.navigate("EvaluationAvailability")}
+                  />
+                  <ProfileRow
+                    icon="document"
+                    label="Mis facturas"
+                    onPress={() => navigation.navigate("MyInvoices")}
+                  />
+                  <ProfileRow
+                    icon="personAdd"
+                    label="Invita a una amiga"
+                    onPress={() => navigation.navigate("Referrals")}
+                  />
+                </ProfileRowCard>
+              </View>
+              <View>
+                <SectionTitle>Preferencias</SectionTitle>
+                <ProfileRowCard>
+                  <ProfileRow
+                    icon="bell"
+                    label="Notificaciones"
+                    onPress={() => navigation.navigate("Notifications")}
+                    value={
+                      unreadCount === undefined || unreadCount === 0
+                        ? undefined
+                        : `${unreadCount} sin leer`
+                    }
+                  />
+                </ProfileRowCard>
+              </View>
+              <View>
+                <SectionTitle>Cuenta</SectionTitle>
+                <ProfileRowCard>
+                  <ProfileRow
+                    icon="password"
+                    label="Cambiar contraseña"
+                    onPress={() => navigation.navigate("ChangePassword")}
+                  />
+                  {identity.biometrics.available ? <BiometricSwitchRow /> : null}
+                  <ProfileRow
+                    icon="message"
+                    label="Enviar comentarios"
+                    onPress={() => navigation.navigate("Feedback")}
+                  />
+                  <ProfileRow
+                    icon="mail"
+                    label="Soporte"
+                    onPress={() => openPublicPage("support")}
+                  />
+                  <ProfileRow
+                    icon="lock"
+                    label="Política de privacidad"
+                    onPress={() => openPublicPage("privacy")}
+                  />
+                  {wide ? null : (
+                    <ProfileRow
+                      chevron={false}
+                      icon="logout"
+                      label="Cerrar sesión"
+                      onPress={() => setConfirmingLogout(true)}
+                    />
+                  )}
+                </ProfileRowCard>
+              </View>
+            </>
+          }
+        />
+        {wide ? null : endBlock}
       </ScrollView>
       {passwordChanged === null ? null : (
         <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />
@@ -262,5 +299,8 @@ const styles = StyleSheet.create({
     padding: spacing.xlSm,
   },
   heroBody: { flex: 1, gap: spacing.xxs },
+  // 18T: the identity stands centred in the tablet's 300 pt column.
+  heroBodyStacked: { alignItems: "center", flex: 0 },
+  heroStacked: { flexDirection: "column" },
   screen: { gap: spacing.md },
 });

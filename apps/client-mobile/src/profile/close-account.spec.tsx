@@ -1,8 +1,8 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { openProfile, readRoutes } from "./profile-test-support";
+import { openProfile, openProfileOnTablet, readRoutes } from "./profile-test-support";
 
 jest.setTimeout(20_000);
 
@@ -72,9 +72,9 @@ const closureRoutes = (overrides: Record<string, (init?: RequestInit) => Respons
   ...overrides,
 });
 
-async function openClosure(routes = closureRoutes()) {
+async function openClosure(routes = closureRoutes(), tablet = false) {
   const runtime = createClientRuntime(routeFetcher(routes));
-  const screen = await openProfile(runtime);
+  const screen = await (tablet ? openProfileOnTablet : openProfile)(runtime);
 
   await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
   await waitFor(() => {
@@ -90,6 +90,7 @@ describe("Cerrar mi cuenta", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
+    jest.restoreAllMocks();
   });
 
   it("lists what closing does and waits for the password", async () => {
@@ -280,5 +281,21 @@ describe("Cerrar mi cuenta", () => {
     await waitFor(() => {
       expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
     });
+  });
+
+  // Follow-up 289 (24T): the consequences beside the confirmation on a tablet,
+  // the button closing the right column instead of a footer.
+  it("puts the consequences beside the confirmation on a tablet", async () => {
+    const { screen } = await openClosure(closureRoutes(), true);
+
+    const left = screen.getByTestId("tablet-columns-left");
+    const right = screen.getByTestId("tablet-columns-right");
+    expect(left).toHaveStyle({ flex: 1 });
+    expect(right).toHaveStyle({ flex: 1 });
+    expect(within(left).getByTestId("close-account-lines")).toBeOnTheScreen();
+    const card = within(right).getByTestId("close-account-confirm-card");
+    expect(within(card).getByLabelText("Tu contraseña, para confirmar")).toBeOnTheScreen();
+    expect(within(card).getByRole("button", { name: "Cerrar mi cuenta" })).toBeDisabled();
+    expect(within(card).getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
   });
 });

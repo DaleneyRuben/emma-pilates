@@ -11,6 +11,7 @@ import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
+import { TabletColumn } from "../ui/tablet-layout";
 import { InlineError } from "../ui/inline-error";
 import { spacing, surfaces } from "../ui/tokens";
 import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
@@ -86,69 +87,74 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
         footer={
           // C23: the button on the white footer panel.
           <FooterPanel>
-            <PrimaryButton
-              busy={isSubmitting}
-              disabled={!isValid}
-              label="Guardar contraseña"
-              onPress={() => void save()}
-            />
+            <TabletColumn width={480}>
+              <PrimaryButton
+                busy={isSubmitting}
+                disabled={!isValid}
+                label="Guardar contraseña"
+                onPress={() => void save()}
+              />
+            </TabletColumn>
           </FooterPanel>
         }
         keyboardVerticalOffset={spacing.xxl}
       >
-        <View style={styles.card}>
-          <Controller
-            control={control}
-            name="currentPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={currentPasswordError}
-                label="Contraseña actual"
-                onBlur={field.onBlur}
-                onChangeText={(value) => {
-                  setCurrentPasswordError(undefined);
-                  field.onChange(value);
-                }}
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="newPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={errors.newPassword?.message}
-                label="Contraseña nueva"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={errors.confirmPassword?.message}
-                label="Confirmar contraseña"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          {failed ? (
-            <InlineError>No pudimos cambiar la contraseña. Inténtalo de nuevo.</InlineError>
-          ) : null}
-        </View>
+        {/* 23T: a centred 480 pt column on a Client tablet page. */}
+        <TabletColumn width={480}>
+          <View style={styles.card}>
+            <Controller
+              control={control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormField
+                  autoCapitalize="none"
+                  error={currentPasswordError}
+                  label="Contraseña actual"
+                  onBlur={field.onBlur}
+                  onChangeText={(value) => {
+                    setCurrentPasswordError(undefined);
+                    field.onChange(value);
+                  }}
+                  secureTextEntry
+                  value={field.value}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormField
+                  autoCapitalize="none"
+                  error={errors.newPassword?.message}
+                  label="Contraseña nueva"
+                  onBlur={field.onBlur}
+                  onChangeText={field.onChange}
+                  secureTextEntry
+                  value={field.value}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormField
+                  autoCapitalize="none"
+                  error={errors.confirmPassword?.message}
+                  label="Confirmar contraseña"
+                  onBlur={field.onBlur}
+                  onChangeText={field.onChange}
+                  secureTextEntry
+                  value={field.value}
+                />
+              )}
+            />
+            {failed ? (
+              <InlineError>No pudimos cambiar la contraseña. Inténtalo de nuevo.</InlineError>
+            ) : null}
+          </View>
+        </TabletColumn>
       </FormScrollView>
     </Screen>
   );

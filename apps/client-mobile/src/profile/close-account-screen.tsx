@@ -23,10 +23,12 @@ import {
   spacing,
   StateScreen,
   surfaces,
+  TabletColumns,
   Text,
   TextButton,
   type GlyphName,
   useMobileIdentity,
+  useWideScreen,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -52,6 +54,7 @@ function consequenceIcon(line: string): GlyphName {
 export function CloseAccountScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const identity = useMobileIdentity();
+  const wide = useWideScreen();
   const fetcher = useClientFetcher();
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const bookings = useListUpcomingBookings(queryOptions);
@@ -151,76 +154,91 @@ export function CloseAccountScreen() {
     setSubmitting(false);
   }
 
+  const actions = (
+    <>
+      {failed ? (
+        <View accessibilityRole="alert" style={styles.failure}>
+          <Text variant="cuerpo">No pudimos cerrar tu cuenta. Inténtalo de nuevo.</Text>
+        </View>
+      ) : null}
+      {/* FIX-089: destructive is the secondary look, confirmed by the
+          password, and the off button says why. */}
+      <PrimaryButton
+        busy={submitting}
+        disabled={password === ""}
+        disabledReason="Escribe tu contraseña para confirmar"
+        label="Cerrar mi cuenta"
+        onPress={() => void close()}
+        testID="close-account-confirm"
+        tone="error"
+      />
+      <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
+    </>
+  );
+
   return (
     <Screen edges={footerEdges} style={[styles.screen, footerScreen]}>
       {header}
       <FormScrollView
         contentContainerStyle={styles.content}
-        footer={
-          <FooterPanel>
-            {failed ? (
-              <View accessibilityRole="alert" style={styles.failure}>
-                <Text variant="cuerpo">No pudimos cerrar tu cuenta. Inténtalo de nuevo.</Text>
-              </View>
-            ) : null}
-            {/* FIX-089: destructive is the secondary look, confirmed by the
-                password, and the off button says why. */}
-            <PrimaryButton
-              busy={submitting}
-              disabled={password === ""}
-              disabledReason="Escribe tu contraseña para confirmar"
-              label="Cerrar mi cuenta"
-              onPress={() => void close()}
-              testID="close-account-confirm"
-              tone="error"
-            />
-            <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
-          </FooterPanel>
-        }
+        // 24T: on a tablet the confirmation closes the right column instead.
+        footer={wide ? undefined : <FooterPanel>{actions}</FooterPanel>}
         keyboardVerticalOffset={spacing.xxl}
       >
         {/* C24: the lead, the consequences, then the data note, the consent
-            and the password, each on a white card. */}
-        <View style={styles.card}>
-          {/* C24 draws the lead as `titulo-fila`. */}
-          <Text variant="titulo-fila">Esto pasa al cerrar tu cuenta en Emma Pilates Studio:</Text>
-        </View>
-        <View style={styles.lines} testID="close-account-lines">
-          {closure.lines.map((line, index) => (
-            <View key={line} style={[styles.line, index > 0 && styles.divided]}>
-              <View style={styles.disc}>
-                <Glyph
-                  color={colors.text}
-                  name={consequenceIcon(line)}
-                  size={16}
-                  strokeWidth={1.6}
-                />
+            and the password, each on a white card; on a tablet the
+            consequences and the confirmation stand side by side. */}
+        <TabletColumns
+          left={
+            <>
+              <View style={styles.card}>
+                {/* C24 draws the lead as `titulo-fila`. */}
+                <Text variant="titulo-fila">
+                  Esto pasa al cerrar tu cuenta en Emma Pilates Studio:
+                </Text>
               </View>
-              <Text style={styles.lineText} variant="cuerpo">
-                {line}
+              <View style={styles.lines} testID="close-account-lines">
+                {closure.lines.map((line, index) => (
+                  <View key={line} style={[styles.line, index > 0 && styles.divided]}>
+                    <View style={styles.disc}>
+                      <Glyph
+                        color={colors.text}
+                        name={consequenceIcon(line)}
+                        size={16}
+                        strokeWidth={1.6}
+                      />
+                    </View>
+                    <Text style={styles.lineText} variant="cuerpo">
+                      {line}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          }
+          right={
+            <View style={styles.card} testID="close-account-confirm-card">
+              <Text variant="secundario">
+                Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus
+                clases sin tus datos, para su contabilidad.
               </Text>
+              <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
+              <FormField
+                autoCapitalize="none"
+                error={passwordError}
+                label="Tu contraseña, para confirmar"
+                onChangeText={(value) => {
+                  setPasswordError(undefined);
+                  setPassword(value);
+                }}
+                placeholder="Tu contraseña"
+                secureTextEntry
+                value={password}
+              />
+              {wide ? actions : null}
             </View>
-          ))}
-        </View>
-        <View style={styles.card}>
-          <Text variant="secundario">
-            Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
-            sin tus datos, para su contabilidad.
-          </Text>
-          <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
-          <FormField
-            autoCapitalize="none"
-            error={passwordError}
-            label="Tu contraseña, para confirmar"
-            onChangeText={(value) => {
-              setPasswordError(undefined);
-              setPassword(value);
-            }}
-            placeholder="Tu contraseña"
-            secureTextEntry
-            value={password}
-          />
-        </View>
+          }
+        />
       </FormScrollView>
     </Screen>
   );

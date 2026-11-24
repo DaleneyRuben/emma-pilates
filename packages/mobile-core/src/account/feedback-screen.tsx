@@ -10,6 +10,7 @@ import { PrimaryButton } from "../ui/primary-button";
 import { StateScreen } from "../ui/state-screen";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
+import { TabletColumn } from "../ui/tablet-layout";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import type { FeedbackMetadata } from "./feedback-metadata";
@@ -111,14 +112,17 @@ export function FeedbackScreen({
                   <InlineError style={styles.failure}>{feedback.failure}</InlineError>
                 </View>
               )}
-              <PrimaryButton
-                busy={feedback.sending}
-                disabled={!ready}
-                label="Enviar comentario"
-                onPress={() => {
-                  if (type !== null) void feedback.send(type, text);
-                }}
-              />
+              {/* 25T: the button keeps the form's 560 pt column on a Client tablet page. */}
+              <TabletColumn width={560}>
+                <PrimaryButton
+                  busy={feedback.sending}
+                  disabled={!ready}
+                  label="Enviar comentario"
+                  onPress={() => {
+                    if (type !== null) void feedback.send(type, text);
+                  }}
+                />
+              </TabletColumn>
             </FooterPanel>
           }
           keyboardVerticalOffset={spacing.xxl}

@@ -26,6 +26,7 @@ import {
   spacing,
   storedPhone,
   surfaces,
+  TabletColumn,
   type PhoneValue,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -137,64 +138,73 @@ function EditProfileForm({
       footer={
         // C22: the button on the white footer panel.
         <FooterPanel>
-          <PrimaryButton busy={isSubmitting} label="Guardar cambios" onPress={() => void save()} />
+          <TabletColumn width={560}>
+            <PrimaryButton
+              busy={isSubmitting}
+              label="Guardar cambios"
+              onPress={() => void save()}
+            />
+          </TabletColumn>
         </FooterPanel>
       }
       keyboardVerticalOffset={spacing.xxl}
     >
-      <FormErrorSummary
-        fields={(Object.keys(fieldLabels) as (keyof ProfileValues)[])
-          .filter((field) => errors[field] !== undefined)
-          .map((field) => fieldLabels[field])}
-      />
-      <ProfilePhotoSection client={client} />
-      <View style={styles.card}>
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => (
-            <FormField
-              autoCapitalize="words"
-              error={errors.name?.message}
-              label="Nombre"
-              onBlur={field.onBlur}
-              onChangeText={field.onChange}
-              value={field.value}
-            />
-          )}
+      {/* 22T: a centred 560 pt column on a tablet. */}
+      <TabletColumn gap={spacing.md} width={560}>
+        <FormErrorSummary
+          fields={(Object.keys(fieldLabels) as (keyof ProfileValues)[])
+            .filter((field) => errors[field] !== undefined)
+            .map((field) => fieldLabels[field])}
         />
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <FormField
-              autoCapitalize="none"
-              autoCorrect={false}
-              error={errors.email?.message}
-              keyboardType="email-address"
-              label="Correo electrónico"
-              onBlur={field.onBlur}
-              onChangeText={field.onChange}
-              value={field.value}
-            />
-          )}
-        />
-        <EmailChangeSection />
-        <Controller
-          control={control}
-          name="phone"
-          render={({ field }) => (
-            <PhoneField
-              error={errors.phone?.message}
-              onChange={field.onChange}
-              value={field.value}
-            />
-          )}
-        />
-        {failed ? (
-          <InlineError>No pudimos guardar los cambios. Inténtalo de nuevo.</InlineError>
-        ) : null}
-      </View>
+        <ProfilePhotoSection client={client} />
+        <View style={styles.card}>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <FormField
+                autoCapitalize="words"
+                error={errors.name?.message}
+                label="Nombre"
+                onBlur={field.onBlur}
+                onChangeText={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <FormField
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={errors.email?.message}
+                keyboardType="email-address"
+                label="Correo electrónico"
+                onBlur={field.onBlur}
+                onChangeText={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+          <EmailChangeSection />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneField
+                error={errors.phone?.message}
+                onChange={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+          {failed ? (
+            <InlineError>No pudimos guardar los cambios. Inténtalo de nuevo.</InlineError>
+          ) : null}
+        </View>
+      </TabletColumn>
     </FormScrollView>
   );
 }
