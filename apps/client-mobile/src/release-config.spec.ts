@@ -70,6 +70,16 @@ describe("client release configuration", () => {
     expect(packageJson.dependencies).toHaveProperty("expo-dev-client");
   });
 
+  // An app built with the iOS 27 SDK launches on iOS 27 only with the UIKit
+  // scene life cycle, which SDK 57 leaves off unless asked.
+  it("turns on the scene life cycle that the iOS 27 SDK requires", () => {
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-build-properties",
+      { ios: { enableSceneSupport: true } },
+    ]);
+    expect(packageJson.dependencies).toHaveProperty("expo-build-properties");
+  });
+
   it("builds every profile with the workspace's Node and pnpm versions", () => {
     const { base, development, staging, production }: Record<string, unknown> = easConfig.build;
     const pnpmVersion = workspacePackageJson.packageManager.replace("pnpm@", "");
@@ -77,6 +87,9 @@ describe("client release configuration", () => {
     expect(base).toEqual({
       node: "24.13.0",
       pnpm: pnpmVersion,
+      // ITMS-90725: from April 2027 App Store Connect only takes builds made with
+      // the iOS 27 SDK; SDK 57 would otherwise build on an Xcode 26 image.
+      ios: { image: "macos-tahoe-26.6-xcode-27.2" },
       // The backend's sharp would otherwise compile against the macOS builder's Homebrew libvips.
       env: {
         SHARP_IGNORE_GLOBAL_LIBVIPS: "1",
