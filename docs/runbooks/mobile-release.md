@@ -153,9 +153,9 @@ capabilities, and both App Store Connect apps («Emma Pilates», «Emma Pilates
 Staff», Spanish (Mexico); the Staff app shows as «Emma Staff» on the phone).
 Each app's `eas.json` has a `production` submit profile for iOS with the team
 ID and the app's numeric App Store Connect Apple ID (`ascAppId`, App
-Information → General → Apple ID). A non-interactive submit cannot look the
-app up without it, so the Store deploy workflow refuses `ios` while an app's
-`ascAppId` is missing. `ios.config.usesNonExemptEncryption: false` in `app.json`
+Information → General → Apple ID: Client `6838534444`, Staff `6838534425`).
+A non-interactive submit cannot look the app up without it, so the Store
+deploy workflow refuses `ios` if an app's `ascAppId` goes missing. `ios.config.usesNonExemptEncryption: false` in `app.json`
 writes `ITSAppUsesNonExemptEncryption`, so TestFlight asks no export
 compliance question. The iOS build number is kept by EAS like Android's
 (`appVersionSource: remote`, `autoIncrement` on `production`), starting at 1.
