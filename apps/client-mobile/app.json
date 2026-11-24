@@ -3,7 +3,7 @@
     "name": "Emma Pilates",
     "slug": "emma-pilates-client",
     "scheme": "emmapilates-client",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "runtimeVersion": {
       "policy": "fingerprint"
     },
