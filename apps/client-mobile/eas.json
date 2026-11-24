@@ -7,6 +7,9 @@
     "base": {
       "node": "24.13.0",
       "pnpm": "11.19.0",
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.2"
+      },
       "env": {
         "SHARP_IGNORE_GLOBAL_LIBVIPS": "1",
         "SENTRY_ALLOW_FAILURE": "true",
