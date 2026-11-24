@@ -62,10 +62,19 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Stop until the iOS submit profile names the App Store Connect app
+        if: inputs.platform == 'ios'
+        working-directory: apps/${{ inputs.app }}-mobile
+        run: |
+          if ! node -e 'process.exit(require("./eas.json").submit?.production?.ios?.ascAppId ? 0 : 1)'; then
+            echo "eas.json has no submit.production.ios.ascAppId. A non-interactive submit cannot look up the App Store Connect app without it; add the app's numeric Apple ID (App Store Connect, App Information, Apple ID)."
+            exit 1
+          fi
+
       # Android goes to Play's internal track. iOS goes to App Store Connect
       # and shows up in TestFlight; it reads the distribution certificate,
       # provisioning profile, push key, and App Store Connect API key the
-      # owner stored on EAS, and the submit profile's ascAppId.
+      # owner stored on EAS, and the submit profile's ascAppId (checked above).
       - name: Build and submit to internal testing
         working-directory: apps/${{ inputs.app }}-mobile
         env:
