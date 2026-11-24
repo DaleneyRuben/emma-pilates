@@ -22,6 +22,7 @@ import {
   SectionTitle,
   spacing,
   surfaces,
+  TabletColumn,
   Text,
   usePushNotifications,
 } from "@pilates/mobile-core";
@@ -149,71 +150,78 @@ export function BookEvaluationScreen({
     <Screen edges={footerEdges} style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirma tu cita" />
       <ScrollView contentContainerStyle={styles.content}>
-        <EmphasisCard
-          eyebrow={capitalized(evaluationDate(slot.startsAt))}
-          note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
-          testID="evaluation-hero"
-        >
-          <Text tone="onDark" variant="cifra-grande">
-            {clockTime(slot.startsAt)}
-          </Text>
-        </EmphasisCard>
-        <IconRowGroup>
-          <IconRow
-            icon={slot.included ? "check" : "card"}
-            label={
-              slot.included
-                ? "Es gratis: no usa clases de tu plan"
-                : `Cuesta ${formatBolivianos(slot.priceCentavos)} · se paga por transferencia`
-            }
-          />
-          <IconRow icon="bell" label="Te avisamos un día y una hora antes" />
-          <IconRow icon="undo" label="Cancela hasta 3 horas antes" />
-        </IconRowGroup>
-        {slot.included ? null : (
-          // C14b: C10's two steps, the studio QR then the receipt (follow-up 262).
-          <>
-            <View>
-              <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
-              <TransferQrCard amount={formatBolivianos(slot.priceCentavos)} fetcher={fetcher} />
-            </View>
-            <View>
-              <SectionTitle>2 · Sube tu comprobante</SectionTitle>
-              <View style={styles.group}>
-                <ReceiptRow
-                  onAttach={() => void attach()}
-                  onRemove={() => setReceipt(null)}
-                  receipt={receipt}
-                  testID="evaluation-receipt"
-                  uploading={uploading}
-                />
+        {/* 14T: the appointment in a centred 520 pt column. */}
+        <TabletColumn gap={spacing.md} width={520}>
+          <EmphasisCard
+            eyebrow={capitalized(evaluationDate(slot.startsAt))}
+            note={`${slot.durationMinutes} minutos · ${slot.nutritionistName} · ${slot.branchName}`}
+            testID="evaluation-hero"
+          >
+            <Text tone="onDark" variant="cifra-grande">
+              {clockTime(slot.startsAt)}
+            </Text>
+          </EmphasisCard>
+          <IconRowGroup>
+            <IconRow
+              icon={slot.included ? "check" : "card"}
+              label={
+                slot.included
+                  ? "Es gratis: no usa clases de tu plan"
+                  : `Cuesta ${formatBolivianos(slot.priceCentavos)} · se paga por transferencia`
+              }
+            />
+            <IconRow icon="bell" label="Te avisamos un día y una hora antes" />
+            <IconRow icon="undo" label="Cancela hasta 3 horas antes" />
+          </IconRowGroup>
+          {slot.included ? null : (
+            // C14b: C10's two steps, the studio QR then the receipt (follow-up 262).
+            <>
+              <View>
+                <SectionTitle>1 · Paga con el QR del estudio</SectionTitle>
+                <TransferQrCard amount={formatBolivianos(slot.priceCentavos)} fetcher={fetcher} />
               </View>
+              <View>
+                <SectionTitle>2 · Sube tu comprobante</SectionTitle>
+                <View style={styles.group}>
+                  <ReceiptRow
+                    onAttach={() => void attach()}
+                    onRemove={() => setReceipt(null)}
+                    receipt={receipt}
+                    testID="evaluation-receipt"
+                    uploading={uploading}
+                  />
+                </View>
+              </View>
+            </>
+          )}
+          {message !== null ? (
+            <View style={styles.failureBox}>
+              <InlineError>{message}</InlineError>
             </View>
-          </>
-        )}
-        {message !== null ? (
-          <View style={styles.failureBox}>
-            <InlineError>{message}</InlineError>
-          </View>
-        ) : null}
+          ) : null}
+        </TabletColumn>
       </ScrollView>
       {/* C14: the button and its line sit on the white footer. */}
       <FooterPanel testID="evaluation-footer">
-        {slot.included || receipt === null ? null : (
-          <Text style={styles.note} variant="secundario">
-            El estudio revisa tu pago y te avisa por la app
-          </Text>
-        )}
-        <PrimaryButton
-          busy={submitting}
-          disabled={!slot.included && (receipt === null || uploading)}
-          // FIX-089: the reason is the off button's own line, under it.
-          disabledReason={
-            !slot.included && receipt === null ? "Adjunta tu comprobante para continuar" : undefined
-          }
-          label="Confirmar evaluación"
-          onPress={() => void confirm()}
-        />
+        <TabletColumn gap={spacing.sm} width={520}>
+          {slot.included || receipt === null ? null : (
+            <Text style={styles.note} variant="secundario">
+              El estudio revisa tu pago y te avisa por la app
+            </Text>
+          )}
+          <PrimaryButton
+            busy={submitting}
+            disabled={!slot.included && (receipt === null || uploading)}
+            // FIX-089: the reason is the off button's own line, under it.
+            disabledReason={
+              !slot.included && receipt === null
+                ? "Adjunta tu comprobante para continuar"
+                : undefined
+            }
+            label="Confirmar evaluación"
+            onPress={() => void confirm()}
+          />
+        </TabletColumn>
       </FooterPanel>
     </Screen>
   );

@@ -1,5 +1,5 @@
 import type { ClientEvaluationDto, EvaluationAvailabilityDto } from "@pilates/api-contracts";
-import { spacing, surfaces, Text } from "@pilates/mobile-core";
+import { colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { clockTime, evaluationDate } from "./evaluation-format";
@@ -39,6 +39,18 @@ export function MovingBand({
   );
 }
 
+/** C13: her Plan's offer on a white card with the tag glyph. */
+export function OfferCard({ offer }: { offer: string }) {
+  return (
+    <View style={styles.offer} testID="evaluation-offer">
+      <Glyph color={colors.text} name="tag" size={18} strokeWidth={1.5} />
+      <Text style={styles.offerText} variant="titulo-fila">
+        {offer}
+      </Text>
+    </View>
+  );
+}
+
 export function NoSlots({
   availability,
   showUsed,
@@ -65,4 +77,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xs,
   },
   bandButton: { justifyContent: "center", minHeight: 44 },
+  offer: {
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
+  },
+  offerText: { flex: 1 },
 });
