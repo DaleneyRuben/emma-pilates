@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Elige tu plan · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="12T%20Mi%20Plan%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Elige tu plan</h1>
+  </div>
+  <div style="padding: 24px 40px 40px; display: flex; flex-direction: column; gap: 16px">
+    <div style="background: #FFFBFB; border-radius: 20px; padding: 14px 18px; display: flex; gap: 10px; align-items: center; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="1"></rect><path d="M4 13h16M12 9v11M12 9c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1"></path></svg><span style="font-size: 16px; font-weight: 600">Oferta por tiempo limitado · 15 % en tu plan</span></div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+      <sc-for list="{{plans}}" as="p" hint-placeholder-count="8">
+        <a href="09T%20Detalle%20del%20Plan%20%28Tablet%29.dc.html" style="background: #FFFBFB; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+          <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 17px; font-weight: 600; line-height: 1.35">{{p.name}}</span><span style="font-size: 13px; line-height: 1.45">{{p.valid}}</span></span>
+          <span style="display: flex; align-items: baseline; gap: 10px; margin-top: auto"><span style="font-family: Lora, serif; font-weight: 500; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums">{{p.price}}</span><span style="font-size: 13px; text-decoration: line-through">{{p.was}}</span></span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var PLANS = [
+  { name: 'Clase suelta', valid: 'Válido por 30 días', price: 'Bs 80', was: '' },
+  { name: '4 clases', valid: 'Válido por 30 días', price: 'Bs 247', was: 'Bs 290' },
+  { name: '8 clases', valid: 'Válido por 30 días', price: 'Bs 502', was: 'Bs 590' },
+  { name: '12 clases', valid: 'Válido por 30 días', price: 'Bs 697', was: 'Bs 820' },
+  { name: 'Bimestral 16 clases', valid: 'Válido por 60 días · hasta 3 por semana', price: 'Bs 952', was: 'Bs 1.120' },
+  { name: 'Bimestral 24 clases', valid: 'Válido por 60 días · hasta 4 por semana', price: 'Bs 1.326', was: 'Bs 1.560' },
+  { name: 'Trimestral 24 clases', valid: 'Válido por 90 días · hasta 3 por semana', price: 'Bs 1.352', was: 'Bs 1.590' },
+  { name: 'Trimestral 36 clases', valid: 'Válido por 90 días · hasta 4 por semana', price: 'Bs 1.862', was: 'Bs 2.190' }
+];
+class Component extends DCLogic { renderVals() { return { plans: PLANS }; } }
+</script>
+</body>
+</html>

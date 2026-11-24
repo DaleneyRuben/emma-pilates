@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reprogramar · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Reprogramar clase</h1>
+  </div>
+  <div style="padding: 24px 40px 0; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 4px 4px 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">Tu reserva actual</h2>
+      <div style="background: #FFFBFB; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <div style="display: flex; gap: 12px; align-items: flex-start"><span style="width: 52px; height: 56px; border-radius: 14px; background: #FEF6F2; box-shadow: inset 0 0 0 1px #E7CCBF; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0"><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em">HOY</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.2">20</span></span><span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600">Reformer Pilates</span><span style="font-size: 13px; line-height: 1.45">19:00 – 19:50 · Daniela Ortiz</span></span></div>
+        <span style="align-self: flex-start; display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; background: #FEF6F2; box-shadow: inset 0 0 0 1px #E7CCBF; font-size: 12px; font-weight: 700">Se reemplaza</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 4px 4px 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">Otras clases de hoy</h2>
+      <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+        <sc-for list="{{opts}}" as="o" hint-placeholder-count="3">
+          <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-bottom: 1px solid #FEF6F2; background: {{o.bg}}; box-shadow: {{o.ring}}; color: #93615D; font-family: 'Work Sans', sans-serif; text-align: left; cursor: pointer">
+            <span style="font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.2; width: 72px; font-variant-numeric: tabular-nums">{{o.time}}</span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 600">{{o.name}}</span><span style="font-size: 13px">Daniela Ortiz · {{o.cap}}</span></span>
+            <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 11px; box-shadow: inset 0 0 0 2px #B78380; display: inline-flex; align-items: center; justify-content: center"><span style="width: 12px; height: 12px; border-radius: 6px; background: {{o.dot}}"></span></span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFBFB; padding: 16px 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 -1px 2px rgba(147,97,93,.08), 0 -4px 14px rgba(147,97,93,.10)">
+    <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" style="width: 480px; display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 16px; font-weight: 700; text-decoration: none">Confirmar cambio</a>
+    <span style="font-size: 13px; line-height: 1.45">Tu lugar de las 19:00 se libera al confirmar</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var OPTS = [
+  { time: '18:00', name: 'Mat Pilates', cap: '4 de 12 lugares' },
+  { time: '20:00', name: 'Reformer Pilates', cap: '8 de 12 lugares' },
+  { time: '20:30', name: 'Cadillac', cap: '2 de 6 lugares' }
+];
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var sel = (this.state || {}).sel || '20:00';
+    return {
+      opts: OPTS.map(function (o) {
+        var on = o.time === sel;
+        return Object.assign({}, o, {
+          bg: on ? '#FEF6F2' : '#FFFBFB', ring: on ? 'inset 0 0 0 2px #B78380' : 'none',
+          dot: on ? '#93615D' : 'transparent', pressed: on ? 'true' : 'false',
+          pick: function () { self.setState({ sel: o.time }); }
+        });
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

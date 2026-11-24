@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pago · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <a href="12T%20Mi%20Plan%20%28Tablet%29.dc.html" aria-label="Volver" style="width: 44px; height: 44px; border-radius: 22px; background: #FFFBFB; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Pago por transferencia</h1>
+  </div>
+  <div style="padding: 24px 40px 0; display: flex; flex-direction: column; gap: 16px">
+    <div style="background: #93615D; color: #FFFBFB; border-radius: 24px; padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; box-shadow: 0 10px 28px rgba(147,97,93,.30)">
+      <span style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase">Monto exacto a transferir</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 40px; line-height: 1.1; font-variant-numeric: tabular-nums">Bs 1.352</span></span>
+      <span style="font-size: 15px; line-height: 1.5; text-align: right">Plan Trimestral 24 clases<br>empieza hoy</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 8px 4px 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">1 · Paga con el QR del estudio</h2>
+        <div style="background: #FFFBFB; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+          <span role="img" aria-label="QR del estudio" style="width: 240px; height: 240px; padding: 14px; box-sizing: border-box; border-radius: 12px; box-shadow: inset 0 0 0 1px #E7CCBF; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; align-self: center">
+            <sc-for list="{{qr}}" as="q" hint-placeholder-count="81"><span style="background: {{q.c}}"></span></sc-for>
+          </span>
+          <div style="display: flex; justify-content: center; gap: 12px">
+            <button type="button" style="display: flex; gap: 6px; align-items: center; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>Ampliar</button>
+            <button type="button" style="display: flex; gap: 6px; align-items: center; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #93615D; font-family: 'Work Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"></path></svg>Guardar QR</button>
+          </div>
+          <span style="font-size: 15px; line-height: 1.5; text-align: center">Escanéalo con tu app bancaria y transfiere el monto exacto.</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 8px 4px 0; font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.15">2 · Sube tu comprobante</h2>
+        <div style="background: #FFFBFB; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+          <button type="button" onClick="{{pick}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-bottom: 1px solid #FEF6F2; background: #FFFBFB; color: #93615D; font-family: 'Work Sans', sans-serif; text-align: left; cursor: pointer">
+            <span style="width: 40px; height: 40px; border-radius: 20px; background: #FEF6F2; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"></path></svg></span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 600">{{fileTitle}}</span><span style="font-size: 13px">{{fileNote}}</span></span>
+          </button>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px">
+            <span style="flex: 1; font-size: 16px; font-weight: 600">¿Necesitas factura?</span>
+            <span aria-hidden="true" style="width: 48px; height: 28px; border-radius: 14px; background: #E7CCBF; position: relative"><span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 11px; background: #FFFBFB"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFBFB; padding: 16px 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 -1px 2px rgba(147,97,93,.08), 0 -4px 14px rgba(147,97,93,.10)">
+    <sc-if value="{{ready}}" hint-placeholder-val="{{false}}"><a href="11T%20Estado%20del%20Pago%20%28Tablet%29.dc.html" style="width: 480px; display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 16px; font-weight: 700; text-decoration: none">Enviar comprobante</a></sc-if>
+    <sc-if value="{{waiting}}" hint-placeholder-val="{{true}}"><span aria-disabled="true" style="width: 480px; display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 16px; background: #E7CCBF; font-size: 16px; font-weight: 700">Enviar comprobante</span><span style="font-size: 13px; line-height: 1.45">Adjunta tu comprobante para continuar</span></sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var BITS = '011011011110110110101101101101101011101101101101101101101101101101101111011011011';
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var ready = !!st.file;
+    return {
+      qr: BITS.split('').map(function (b) { return { c: b === '1' ? '#93615D' : '#FFFBFB' }; }),
+      ready: ready, waiting: !ready,
+      fileTitle: ready ? 'comprobante-bnb.jpg' : 'Elegir comprobante',
+      fileNote: ready ? 'Listo · toca para cambiarlo' : 'JPG o PNG · hasta 5 MB',
+      pick: function () { self.setState({ file: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

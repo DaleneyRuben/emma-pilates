@@ -13,6 +13,7 @@ Three surfaces for a Pilates studio in Santa Cruz de la Sierra, Bolivia:
 | Surface | Files | Form factor | Users |
 |---|---|---|---|
 | **Client app** | `01`–`24` | Mobile (iOS/Android, 390×844 reference) | Clients: booking, plans, payments, nutrition, referrals |
+| **Client app on tablet** | `01T`–`25T` | iPad and Android tablet (834×1194 portrait reference; 1194×834 landscape, 800×1280 Android) | The same Clients; see «Client app on tablet» below |
 | **Staff app** | `S01`–`S23` | Mobile | Trainers, front desk, administration, nutritionist |
 | **Admin web** | `AW01`–`AW34` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
 | **Design system** | `Sistema de Diseño.dc.html` | — | Source of truth for tokens and components |
@@ -205,6 +206,19 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - `02`'s «Paquetes desde Bs 560.» is the lowest price among the Plans the Client app shows (hidden Plans excluded), written as `formatBolivianos` does («Bs 80», «Bs 1.050»). While it is unknown the card says only «Puedes pagar en el estudio o desde la app.»
 - The values change on `AW36` or with a release, and reach the apps within a minute without a store update.
 
+### Client app on tablet (`01T`–`25T`)
+
+Approved by the owner on 2026-11-24 (follow-up [289](../docs/design/prompts/followups/289-client-app-on-tablet.md)). The tablet files show the main state of each screen; error, empty, loading and other states keep the phone screen's copy and behaviour inside the tablet layout below.
+
+- **When.** A window at least 768 px wide uses the tablet layout, the same breakpoint as the Staff app. Both orientations are supported; landscape (`03T Reservar Horizontal`) keeps the same rules with a shorter header band (title and pills on one row). Android tablets use the same layout (`02T Inicio (Tablet Android)`, 800×1280).
+- **Navigation.** The bottom tab bar stays: 84 px tall, white, the four tabs centred in one row with the icon beside the label (48 px tall, 20 px side padding, Rosa profundo pill on the active tab). No side navigation, same as the Staff app on iPad.
+- **Header band.** Rubor, 28 px bottom corners, 40 px side padding, Lora 36 title; pushed screens put the 44 px white back button left of the title.
+- **Widths.** Content keeps 40 px side margins. Single-purpose screens sit in a centred column: 480 px for short forms and confirmations (`11T`, `23T`, bottom action bars), 520 px for `14T`, 560 px for longer forms and the sign-in sheet (`01T`, `20T`, `21T`, `22T`, `25T`), 640 px for `19T`, 720 px for `02T` (with the 720 px Promotions card). Other screens use two equal columns (16 px gap), or a 300 px column plus the rest (`06T`, `13T`, `18T`).
+- **List and detail.** Screens with a list and one selected item (`03T`/`04T` Reservar and Detalle de sesión, `17T` Mis facturas) use the `S04` pattern: a fixed 392 px left panel (24 px padding) and the detail on the right, with an empty state («Elige una clase») until something is chosen; the detail's main action sits in a white bar at the foot of the right panel. `04T` is not a separate screen on tablet.
+- **Grids.** Repeated cards go two per row (`05T`, `07T`, `08T`); the next class or plan hero stays full width above them.
+- **Sign-in and account links.** `01T`, `20T` and `21T` use the approved Login A layout (follow-up 288): the logo (380 px; 300 px on `20T`/`21T`) on the Rubor screen and a 560 px white sheet anchored to the bottom.
+- **Copy.** Unchanged from the phone screens. `17T` takes the place of the retired `17 Mi crédito`; its «En preparación» and «Pago anulado» detail lines are new. Every «2 h 30» follows «Studio rules in copy» above.
+
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
 
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
@@ -282,6 +296,38 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `22` | Editar perfil | Edit name, email, phone; a different email is asked for, not saved: the field returns to the current address and the «Revisa tu correo nuevo» card (Reenviar correo · Cancelar cambio, «Te enviamos otro enlace.») stays until the link from the new mailbox is opened; the link's screen («Confirmando tu correo», then Tu correo cambió · Enlace vencido · Enlace no válido · Correo no disponible, «Continuar») opens with or without a session; the chosen photo previews in the circle as its centre crop («Se recorta al centro en forma de círculo.»); «Cambiar foto» (photo library) and, with a photo, «Quitar foto» (no confirmation); «Subiendo foto…» while it uploads and the photo saves on its own, apart from «Guardar cambios»; upload and removal errors |
 | `23` | Cambiar contraseña | Self-service change, session open |
 | `24` | Cerrar mi cuenta | Close the Account for good from `18`: the consequences that apply (future bookings and evaluation cancelled, waitlists left, plan ended without refund, every session closed, email freed), a note that the name, email, phone, and photo are erased while payments and classes stay without them, an unticked «Quiero seguir recibiendo promociones de Emma Pilates» checkbox, password re-entry, Error-outline button; refused while a transfer payment awaits review; ends on `01` with a success notice |
+
+### Client app (tablet)
+
+Each `NNT … (Tablet).dc.html` is the tablet layout of the phone screen with the same number; the rules are in «Client app on tablet» above.
+
+| File | Screen | Tablet layout |
+|---|---|---|
+| `01T` | Iniciar sesión | Login A: logo on Rubor, 560 px sheet at the bottom |
+| `02T` | Inicio | 720 px column: next class and plan side by side, «Reservar otra clase», 720 px Promotions card, shortcuts in two columns; `02T Inicio (Tablet Android)` at 800×1280 |
+| `03T` | Reservar | 392 px list panel (days, filters, classes) and an empty right panel; `03T Reservar Horizontal` at 1194×834 |
+| `04T` | Detalle de sesión | The chosen class in `03T`'s right panel, with the action bar at its foot |
+| `05T` | Mis reservas | Full-width next class, other bookings two per row |
+| `06T` | Reprogramar | Current booking (300 px) beside today's other classes; action bar centred |
+| `07T` | Historial de clases | Attendance summary, months with classes two per row |
+| `08T` | Elegir plan | Offer line, the eight Plans two per row |
+| `09T` | Detalle del plan | Price and «Qué incluye» beside start date and breakdown; action bar centred |
+| `10T` | Pago | Amount on top; QR (step 1) beside receipt and invoice (step 2); action bar centred |
+| `11T` | Estado del pago | Centred 480 px column |
+| `12T` | Mi plan | Plan card and «Renovar mi plan» beside details and «Congelar plan» |
+| `13T` | Evaluación nutricional | Offer and Nutritionist (300 px) beside days and times |
+| `14T` | Confirmar evaluación | Centred column |
+| `15T` | Mis evaluaciones | Upcoming beside «Anteriores» |
+| `16T` | Mis referidos | Code and «Cómo funciona» beside «Tus invitadas» |
+| `17T` | Mis facturas | 392 px invoice list, the chosen invoice on the right |
+| `18T` | Perfil | Profile card and «Cerrar sesión» (300 px) beside the menu groups |
+| `19T` | Notificaciones | Centred 640 px column |
+| `20T` | Recuperar contraseña | Login A layout |
+| `21T` | Crear contraseña | Login A layout |
+| `22T` | Editar perfil | Centred 560 px form |
+| `23T` | Cambiar contraseña | Centred 480 px form |
+| `24T` | Cerrar mi cuenta | Consequences beside the promotions choice and password confirmation |
+| `25T` | Enviar comentarios | Centred 560 px form |
 
 ### Staff app (mobile)
 

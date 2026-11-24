@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Historial de clases · tablet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap"><style>body{margin:0}a{color:#93615D}a:hover{color:#93615D}</style></helmet>
+<div style="width: 834px; height: 1194px; position: relative; overflow: hidden; background: #F9E7DF; font-family: 'Work Sans', sans-serif; color: #93615D">
+  <div style="background: #E7CCBF; padding: 56px 40px 24px; border-radius: 0 0 28px 28px; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+    <h1 style="margin: 0; font-family: Lora, serif; font-weight: 500; font-size: 36px; line-height: 1.1">Mis reservas</h1>
+    <div role="tablist" style="width: 340px; display: flex; padding: 4px; border-radius: 999px; background: #FFFBFB">
+      <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" role="tab" aria-selected="false" style="flex: 1; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; text-decoration: none">Próximas</a>
+      <span role="tab" aria-selected="true" style="flex: 1; height: 40px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: #93615D; color: #FFFBFB">Historial</span>
+    </div>
+  </div>
+  <div style="padding: 24px 40px 120px; display: flex; flex-direction: column; gap: 16px">
+    <div style="background: #B78380; color: #FFFBFB; border-radius: 24px; padding: 22px 24px; display: flex; align-items: baseline; gap: 12px">
+      <span style="font-size: 19px; font-weight: 700">Has asistido a</span><span style="font-family: Lora, serif; font-weight: 500; font-size: 40px; line-height: 1.1">37 clases</span><span style="font-size: 19px; font-weight: 700">desde marzo</span>
+    </div>
+    <sc-for list="{{months}}" as="m" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; padding: 8px 4px 0"><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase">{{m.name}}</span><span style="font-size: 12px; font-weight: 700">{{m.count}}</span></div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{m.items}}" as="c" hint-placeholder-count="2">
+            <div style="background: #FFFBFB; border-radius: 20px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; box-shadow: 0 1px 2px rgba(147,97,93,.08), 0 4px 14px rgba(147,97,93,.10)">
+              <span style="width: 52px; height: 56px; border-radius: 14px; background: #FEF6F2; box-shadow: inset 0 0 0 1px #E7CCBF; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0"><span style="font-family: Lora, serif; font-weight: 500; font-size: 24px; line-height: 1.2">{{c.day}}</span><span style="font-size: 12px; font-weight: 700; letter-spacing: .12em">{{c.wd}}</span></span>
+              <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 16px; font-weight: 600">{{c.name}}</span><span style="font-size: 13px; line-height: 1.45">Daniela Ortiz · {{c.branch}}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <nav aria-label="Secciones" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #FFFBFB; box-shadow: 0 -1px 0 #E7CCBF; display: flex; justify-content: center; align-items: flex-start; gap: 12px; padding-top: 12px; box-sizing: border-box">
+    <a href="02T%20Inicio%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6h-6v6H4z"></path></svg>Inicio</a>
+    <a href="03T%20Reservar%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Reservar</a>
+    <a href="05T%20Mis%20Reservas%20%28Tablet%29.dc.html" aria-current="page" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; background: #93615D; color: #FFFBFB; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFBFB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>Mis reservas</a>
+    <a href="18T%20Perfil%20%28Tablet%29.dc.html" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 16px; color: #93615D; font-size: 15px; font-weight: 700; text-decoration: none"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93615D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4-6 8-6s7 2 8 6"></path></svg>Perfil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":834,"height":1194}}'>
+var MONTHS = [
+  { name: 'Noviembre 2026', count: '4 clases', items: [
+    { day: '18', wd: 'MIÉ', name: 'Mat Pilates', branch: 'Achumani' },
+    { day: '16', wd: 'LUN', name: 'Reformer Pilates', branch: 'Achumani' },
+    { day: '11', wd: 'MIÉ', name: 'Cadillac', branch: 'Achumani' },
+    { day: '9', wd: 'LUN', name: 'Reformer Pilates', branch: 'Achumani' } ] },
+  { name: 'Octubre 2026', count: '3 clases', items: [
+    { day: '30', wd: 'VIE', name: 'Cadillac', branch: 'Norte' },
+    { day: '27', wd: 'MAR', name: 'Reformer Pilates', branch: 'Achumani' },
+    { day: '22', wd: 'JUE', name: 'Mat Pilates', branch: 'Achumani' } ] }
+];
+class Component extends DCLogic { renderVals() { return { months: MONTHS }; } }
+</script>
+</body>
+</html>
