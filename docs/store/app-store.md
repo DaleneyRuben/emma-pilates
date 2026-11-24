@@ -164,3 +164,8 @@ organization with a D-U-N-S number. Move to Unlisted only if the team grows or
 registering devices becomes a burden.
 
 Android Staff stays on Play Internal testing, up to 100 testers, no review.
+
+Until the first phone is registered for ad hoc, both iOS apps go out through
+TestFlight internal testing (2026-11-23): up to 100 testers who are users of
+the App Store Connect account, no Beta App Review, nothing published. The
+steps are in the [mobile release runbook](../runbooks/mobile-release.md#ios-first-testflight-build).

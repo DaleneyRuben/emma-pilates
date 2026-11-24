@@ -37,7 +37,7 @@ If a release mixes fixes and something new, it is `minor`. The build number (And
 
 1. Merge the change into `main` and wait for that commit's CI to pass.
 2. Run **Create native release** with the app and the bump. It opens a `release/<app>-x.y.z` pull request. Merge that pull request only after the version is published in the stores.
-3. Run **Store deploy** from that release branch, with the app and `android`. It builds with EAS and submits to Play's internal track. iOS stays refused until gate 9.
+3. Run **Store deploy** from that release branch, with the app and `android`, then `ios`. Android submits to Play's internal track; iOS uploads to App Store Connect and lands in TestFlight. Neither sends anything to App Review. iOS needs the owner's one-time credential setup first ([runbook](../../../docs/runbooks/mobile-release.md#ios-first-testflight-build)).
 4. For an OTA, run **Publish OTA** on `preview` first and on `production` after.
 
 A local `eas build` is only the fallback for when Actions or EAS are down. It never replaces the workflows on a normal day, and never runs from an unmerged branch.
