@@ -8,6 +8,8 @@ import { Screen } from "../ui/screen";
 import { ScreenHeader } from "../ui/screen-header";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
+import { useWideScreen } from "../ui/tablet-layout";
+import { TabletAuthScreen } from "./auth-tablet-sheet";
 import { OutcomeDisc } from "./outcome-disc";
 
 /** The white capsule under the Staff wordmark (E-A01, E-A04): the team's entrance. */
@@ -66,6 +68,22 @@ export function AuthenticationScreen({
   /** The band's way back and title (20, S18, «Cambiar correo»). */
   topBar?: { onBack: () => void; title: string };
 }>) {
+  // Follow-up 289: a Client tablet draws the page as Login A's sheet.
+  const wide = useWideScreen();
+  if (wide && !staff && !teamAccess) {
+    return (
+      <TabletAuthScreen
+        actions={actions}
+        badge={badge}
+        eyebrow={eyebrow}
+        footer={footer}
+        title={title}
+        topBar={topBar}
+      >
+        {children}
+      </TabletAuthScreen>
+    );
+  }
   const outcomeOnBand = badge !== undefined && !staff && topBar === undefined;
   const outcomeInCard = badge !== undefined && staff;
   const outcomeOnScreen = badge !== undefined && !staff && topBar !== undefined;
