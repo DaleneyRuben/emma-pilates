@@ -176,7 +176,7 @@ so each `app.json` turns it on with `ios.enableSceneSupport` in
 scene life cycle is the default: remove the property and the pinned image
 then.
 
-The owner runs this once per app on the Mac, with his own Apple login; EAS
+The owner runs the first build once per app on the Mac, with his own Apple login; EAS
 asks for the Apple ID password and the two-factor code in the terminal, and
 nobody else types them. Each build spends one of the month's 15 iOS builds.
 
