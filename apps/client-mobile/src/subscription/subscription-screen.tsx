@@ -18,6 +18,7 @@ import {
   surfaces,
   SectionTitle,
   spacing,
+  TabletColumns,
   Text,
   usePullToRefresh,
   useRefetchOnFocus,
@@ -142,64 +143,87 @@ export function SubscriptionScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
-        {guestPass === null ? (
-          <SubscriptionHero status={status} subscription={subscription} />
-        ) : (
-          <View testID="subscription-guest-pass">
-            <EmphasisCard
-              eyebrow={guestPass.eyebrow}
-              note={guestPass.note}
-              title={guestPass.title}
-            />
-          </View>
-        )}
-        {canRenew ? (
-          // Rosa Emma C12: the button and its hint together in a white card.
-          <View style={styles.renew} testID="subscription-renew">
-            <PrimaryButton label="Renovar mi plan" onPress={() => navigation.navigate("Plans")} />
-            <Text style={styles.renewNote} variant="secundario">
-              {renewNote}
-            </Text>
-          </View>
-        ) : null}
-        {notices.length === 0 ? null : <NoticeList notices={notices} />}
-        {freeze == null || cardState === null ? null : (
-          <FreezeCard
-            freeze={freeze}
-            onWithdrawn={(withdrawn) => {
-              if (withdrawn) setWithdrawnToast(true);
-              void view.refetch();
-            }}
-            planEndsOn={subscription.endsOn}
-            state={cardState}
-          />
-        )}
-        <DetailRows rows={details} title="Detalles" />
-        {expired || (guestPass !== null && nextSubscription == null) ? (
-          <View>
-            <SectionTitle>Elige tu próximo plan</SectionTitle>
-            <View style={styles.purchase} testID="subscription-purchase">
-              <Text variant="cuerpo">{purchaseNote(studioRules?.plansFromPriceCentavos)}</Text>
-              <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
-            </View>
-          </View>
-        ) : guestPass === null && canFreeze ? (
-          <View>
-            <SectionTitle>Tu plan</SectionTitle>
-            <ActionRows>
-              {window.available ? (
-                <ActionRow
-                  icon="sun"
-                  label={refused ? "Pedir otro congelamiento" : "Congelar plan"}
-                  note="Hasta 15 días, una vez por plan"
-                  onPress={() => navigation.navigate("FreezePlan")}
-                />
+        {/* 12T: the plan and renewing beside its details and what she can do with it. */}
+        <TabletColumns
+          left={
+            <>
+              {guestPass === null ? (
+                <SubscriptionHero status={status} subscription={subscription} />
               ) : (
-                <ActionRow icon="sun" label="Congelar plan" note={window.unavailableReason ?? ""} />
+                <View testID="subscription-guest-pass">
+                  <EmphasisCard
+                    eyebrow={guestPass.eyebrow}
+                    note={guestPass.note}
+                    title={guestPass.title}
+                  />
+                </View>
               )}
-            </ActionRows>
-          </View>
-        ) : null}
+              {canRenew ? (
+                // Rosa Emma C12: the button and its hint together in a white card.
+                <View style={styles.renew} testID="subscription-renew">
+                  <PrimaryButton
+                    label="Renovar mi plan"
+                    onPress={() => navigation.navigate("Plans")}
+                  />
+                  <Text style={styles.renewNote} variant="secundario">
+                    {renewNote}
+                  </Text>
+                </View>
+              ) : null}
+              {notices.length === 0 ? null : <NoticeList notices={notices} />}
+            </>
+          }
+          right={
+            <>
+              {freeze == null || cardState === null ? null : (
+                <FreezeCard
+                  freeze={freeze}
+                  onWithdrawn={(withdrawn) => {
+                    if (withdrawn) setWithdrawnToast(true);
+                    void view.refetch();
+                  }}
+                  planEndsOn={subscription.endsOn}
+                  state={cardState}
+                />
+              )}
+              <DetailRows rows={details} title="Detalles" />
+              {expired || (guestPass !== null && nextSubscription == null) ? (
+                <View>
+                  <SectionTitle>Elige tu próximo plan</SectionTitle>
+                  <View style={styles.purchase} testID="subscription-purchase">
+                    <Text variant="cuerpo">
+                      {purchaseNote(studioRules?.plansFromPriceCentavos)}
+                    </Text>
+                    <PrimaryButton
+                      label="Comprar un plan"
+                      onPress={() => navigation.navigate("Plans")}
+                    />
+                  </View>
+                </View>
+              ) : guestPass === null && canFreeze ? (
+                <View>
+                  <SectionTitle>Tu plan</SectionTitle>
+                  <ActionRows>
+                    {window.available ? (
+                      <ActionRow
+                        icon="sun"
+                        label={refused ? "Pedir otro congelamiento" : "Congelar plan"}
+                        note="Hasta 15 días, una vez por plan"
+                        onPress={() => navigation.navigate("FreezePlan")}
+                      />
+                    ) : (
+                      <ActionRow
+                        icon="sun"
+                        label="Congelar plan"
+                        note={window.unavailableReason ?? ""}
+                      />
+                    )}
+                  </ActionRows>
+                </View>
+              ) : null}
+            </>
+          }
+        />
       </ScrollView>
       {withdrawnToast ? (
         <BrandToast onClose={() => setWithdrawnToast(false)} title="Retiramos tu solicitud" />

@@ -20,6 +20,7 @@ import {
   ScreenTopBar,
   spacing,
   surfaces,
+  TabletColumn,
   Text,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -71,7 +72,9 @@ export function FreezePlanScreen() {
     return (
       <Screen>
         {header}
-        <QueryFailure label="No pudimos cargar tu plan." onRetry={() => void view.refetch()} />
+        <TabletColumn width={560}>
+          <QueryFailure label="No pudimos cargar tu plan." onRetry={() => void view.refetch()} />
+        </TabletColumn>
       </Screen>
     );
   }
@@ -184,70 +187,76 @@ export function FreezePlanScreen() {
     <Screen edges={footerEdges} style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {attempted && open ? <FormErrorSummary fields={missing} /> : null}
-        <View style={styles.leadCard}>
-          <Text variant="cuerpo">
-            Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
-          </Text>
-        </View>
-        {open ? (
-          // Audit d4, d5: the calendar and its prompt on a white card, never
-          // straight on the 100 screen (follow-up 285, rule 3).
-          <View style={styles.calendarCard} testID="freeze-calendar-card">
-            <Calendar
-              firstMonth={window.firstDay.slice(0, 7)}
-              isOff={(day) => window.whyOff(day, choosingEnd ? start : null) !== null}
-              lastMonth={window.lastDay.slice(0, 7)}
-              onPressDay={pressDay}
-              rangeEnd={end}
-              rangeStart={start}
-              today={today}
-            />
-            {why === null ? null : <Reason live text={why} />}
-            {prompt === null ? null : <Text variant="cuerpo">{prompt}</Text>}
+        {/* A tablet keeps the form in a centred 560 pt column. */}
+        <TabletColumn gap={spacing.md} width={560}>
+          {attempted && open ? <FormErrorSummary fields={missing} /> : null}
+          <View style={styles.leadCard}>
+            <Text variant="cuerpo">
+              Elige el primer y el último día. Puedes congelar hasta 15 días, una vez por plan.
+            </Text>
           </View>
-        ) : (
-          message === null && <Reason text={blocked ?? genericRefusal} />
-        )}
-        {summary === null ? null : (
-          <View style={styles.summary} testID="freeze-summary">
-            <Text variant="titulo-bloque">{summary.range}</Text>
-            <View style={styles.summaryRows}>
-              <SummaryRow label="Días congelados" value={summary.days} />
-              <View style={styles.hairline} />
-              <SummaryRow label="Tu plan vencerá el" value={summary.newEnd} />
+          {open ? (
+            // Audit d4, d5: the calendar and its prompt on a white card, never
+            // straight on the 100 screen (follow-up 285, rule 3).
+            <View style={styles.calendarCard} testID="freeze-calendar-card">
+              <Calendar
+                firstMonth={window.firstDay.slice(0, 7)}
+                isOff={(day) => window.whyOff(day, choosingEnd ? start : null) !== null}
+                lastMonth={window.lastDay.slice(0, 7)}
+                onPressDay={pressDay}
+                rangeEnd={end}
+                rangeStart={start}
+                today={today}
+              />
+              {why === null ? null : <Reason live text={why} />}
+              {prompt === null ? null : <Text variant="cuerpo">{prompt}</Text>}
             </View>
-            <Text style={styles.was} variant="secundario">
-              {summary.was}
-            </Text>
+          ) : (
+            message === null && <Reason text={blocked ?? genericRefusal} />
+          )}
+          {summary === null ? null : (
+            <View style={styles.summary} testID="freeze-summary">
+              <Text variant="titulo-bloque">{summary.range}</Text>
+              <View style={styles.summaryRows}>
+                <SummaryRow label="Días congelados" value={summary.days} />
+                <View style={styles.hairline} />
+                <SummaryRow label="Tu plan vencerá el" value={summary.newEnd} />
+              </View>
+              <Text style={styles.was} variant="secundario">
+                {summary.was}
+              </Text>
+            </View>
+          )}
+          <View style={styles.reasonCard}>
+            <FormField
+              error={attempted && reason.trim().length === 0 ? "Falta este dato" : undefined}
+              label="Motivo"
+              maxLength={300}
+              onChangeText={setReason}
+              placeholder="Cuéntale a la administración por qué"
+              value={reason}
+            />
+            <View style={styles.info}>
+              <Glyph color={colors.primary} name="alert" size={18} strokeWidth={1.7} />
+              <Text style={styles.infoText} variant="secundario">
+                Si tienes reservas esos días, se cancelan al aprobarse y las clases vuelven a tu
+                plan.
+              </Text>
+            </View>
           </View>
-        )}
-        <View style={styles.reasonCard}>
-          <FormField
-            error={attempted && reason.trim().length === 0 ? "Falta este dato" : undefined}
-            label="Motivo"
-            maxLength={300}
-            onChangeText={setReason}
-            placeholder="Cuéntale a la administración por qué"
-            value={reason}
-          />
-          <View style={styles.info}>
-            <Glyph color={colors.primary} name="alert" size={18} strokeWidth={1.7} />
-            <Text style={styles.infoText} variant="secundario">
-              Si tienes reservas esos días, se cancelan al aprobarse y las clases vuelven a tu plan.
-            </Text>
-          </View>
-        </View>
-        {message === null ? null : <Reason alert text={message} />}
+          {message === null ? null : <Reason alert text={message} />}
+        </TabletColumn>
       </ScrollView>
       {/* Rosa Emma C12i: the button on a white panel cast upward. */}
       <FooterPanel testID="freeze-footer">
-        <PrimaryButton
-          busy={submitting}
-          disabled={!open || submitting}
-          label="Enviar solicitud"
-          onPress={() => void submit()}
-        />
+        <TabletColumn width={480}>
+          <PrimaryButton
+            busy={submitting}
+            disabled={!open || submitting}
+            label="Enviar solicitud"
+            onPress={() => void submit()}
+          />
+        </TabletColumn>
       </FooterPanel>
     </Screen>
   );
