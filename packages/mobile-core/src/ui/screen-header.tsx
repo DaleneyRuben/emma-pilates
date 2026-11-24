@@ -4,7 +4,7 @@ import { Polyline } from "react-native-svg";
 
 import { LineIcon } from "./line-icon";
 import { ScreenFrameContext } from "./screen";
-import { tabletPageMargin, useWideScreen } from "./tablet-layout";
+import { type TabletColumnWidth, tabletPageMargin, useWideScreen } from "./tablet-layout";
 import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
 
@@ -63,6 +63,7 @@ export function ScreenHeader({
   eyebrow,
   onBack,
   subtitle,
+  tabletWidth,
   testID = "screen-header",
   title,
   titleAccessory,
@@ -81,6 +82,8 @@ export function ScreenHeader({
   onBack?: () => void;
   /** One line under the title, on a white capsule. */
   subtitle?: string;
+  /** On a tablet page, the centred width the band's content keeps (02T: 720). */
+  tabletWidth?: TabletColumnWidth;
   testID?: string;
   /** Omitted only when the screen draws its own large title right below. */
   title?: string;
@@ -111,21 +114,8 @@ export function ScreenHeader({
       </Pressable>
     );
   const actionInTitle = wide && action !== undefined && eyebrow === undefined;
-  return (
-    <View
-      onLayout={onLayout}
-      ref={band}
-      style={[
-        styles.band,
-        wide && styles.wideBand,
-        bleed !== null && {
-          marginHorizontal: -bleed.left,
-          marginTop: -bleed.top,
-          paddingTop: Math.max(bleed.top, spacing.lg),
-        },
-      ]}
-      testID={testID}
-    >
+  const content = (
+    <>
       {showRow ? (
         <View style={styles.row}>
           {backButton}
@@ -163,6 +153,30 @@ export function ScreenHeader({
         </View>
       )}
       {children}
+    </>
+  );
+  return (
+    <View
+      onLayout={onLayout}
+      ref={band}
+      style={[
+        styles.band,
+        wide && styles.wideBand,
+        bleed !== null && {
+          marginHorizontal: -bleed.left,
+          marginTop: -bleed.top,
+          paddingTop: Math.max(bleed.top, spacing.lg),
+        },
+      ]}
+      testID={testID}
+    >
+      {wide && tabletWidth !== undefined ? (
+        <View style={[styles.content, { maxWidth: tabletWidth }]} testID={`${testID}-content`}>
+          {content}
+        </View>
+      ) : (
+        content
+      )}
     </View>
   );
 }
@@ -195,6 +209,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 3,
   },
+  // The band's own gap, kept inside a tablet's centred content.
+  content: { alignSelf: "center", gap: spacing.md, width: "100%" },
   eyebrowRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   pressed: { opacity: 0.6 },
   row: { alignItems: "center", flexDirection: "row", minHeight: 44 },

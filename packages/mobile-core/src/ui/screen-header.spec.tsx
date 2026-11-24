@@ -1,8 +1,9 @@
 import { fireEvent, render } from "@testing-library/react-native";
+import { Dimensions } from "react-native";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { Screen, ScreenHeader, ScreenTopBar } from "../index";
+import { Screen, ScreenHeader, ScreenTopBar, WideScreens } from "../index";
 import { spacing } from "./tokens";
 import { textVariants } from "./type-scale";
 import { Text } from "./text";
@@ -126,6 +127,37 @@ describe("ScreenHeader", () => {
       backgroundColor: "#FFFBFB",
     });
     expect(screen.getByText("Campana")).toBeOnTheScreen();
+  });
+});
+
+// Follow-up 289 (02T): a tablet page can keep the band's content in its column.
+describe("ScreenHeader's tablet width", () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  const header = <ScreenHeader eyebrow="Jueves 19" tabletWidth={720} title="Hola, Carla" />;
+
+  it("centres the band's content at that width on a tablet page", async () => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ fontScale: 1, height: 1194, scale: 2, width: 834 });
+    const screen = await render(header, { wrapper: WideScreens });
+
+    expect(screen.getByTestId("screen-header-content")).toHaveStyle({
+      alignSelf: "center",
+      gap: spacing.md,
+      maxWidth: 720,
+    });
+  });
+
+  it("adds nothing on a phone or outside a tablet page", async () => {
+    const phone = await render(header, { wrapper: WideScreens });
+    expect(phone.queryByTestId("screen-header-content")).toBeNull();
+
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ fontScale: 1, height: 1194, scale: 2, width: 834 });
+    const staff = await render(header);
+    expect(staff.queryByTestId("screen-header-content")).toBeNull();
   });
 });
 
