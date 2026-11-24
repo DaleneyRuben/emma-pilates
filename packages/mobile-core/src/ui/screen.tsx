@@ -60,6 +60,13 @@ function paddingOf(
   return typeof value === "number" ? value : fallback;
 }
 
+function setsSidePadding(style: SafeAreaViewProps["style"]): boolean {
+  const flat: ViewStyle = StyleSheet.flatten(style) ?? {};
+  return [flat.padding, flat.paddingHorizontal, flat.paddingLeft].some(
+    (value) => value !== undefined,
+  );
+}
+
 function keepsTopEdge(edges: SafeAreaViewProps["edges"]): boolean {
   if (edges === undefined) return true;
   if (Array.isArray(edges)) return edges.includes("top");
@@ -78,7 +85,8 @@ export function Screen({ edges, style, ...props }: SafeAreaViewProps) {
   const ref = useRef<View>(null);
   const chosen = edges ?? (insideTabBar ? tabEdges : allEdges);
   // Follow-up 289: a tablet page keeps 40 pt side margins.
-  const wide = useWideScreen();
+  // A screen that sets its own side padding (the sign-in sheet) keeps it.
+  const wide = useWideScreen() && !setsSidePadding(style);
   const wideStyle = wide ? { paddingHorizontal: tabletPageMargin } : undefined;
   const left = paddingOf([style, wideStyle], "Left", spacing.lg);
   const reach = parent !== null ? parent.top : keepsTopEdge(chosen) ? insetTop : 0;
