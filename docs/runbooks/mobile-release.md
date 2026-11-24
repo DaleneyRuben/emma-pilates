@@ -31,9 +31,15 @@ Still to come:
   environments since 2026-10-15, through `eas env:set` from each app
   folder): `SENTRY_URL`, `SENTRY_ORG`, and `SENTRY_PROJECT` (plain text, from the application's Advanced settings in Better Stack) with
   `SENTRY_AUTH_TOKEN` (secret, a Telemetry API token). Every profile sets
-  `SENTRY_ALLOW_FAILURE`, so a build without them succeeds and its log shows
-  the failed upload; the native debug-file uploads are off because Better
-  Stack does not take them. An EAS Update must be published with
+  `SENTRY_ALLOW_FAILURE` and `SENTRY_DISABLE_AUTO_UPLOAD`, so store builds
+  upload no source maps: errors from a binary's embedded bundle stay
+  unsymbolicated until an EAS Update replaces it (updates upload theirs, below);
+  the native debug-file uploads are off because Better Stack does not take
+  them. Never drop `SENTRY_DISABLE_AUTO_UPLOAD`: on iOS the Sentry build phase
+  runs the JS bundling through `sentry-cli`, which fails its org check before
+  starting it, and `SENTRY_ALLOW_FAILURE` turns that into exit 0, so the app
+  ships without `main.jsbundle` and crashes at launch (TestFlight 1.2.1 build
+  1, 2026-11-24). An EAS Update must be published with
   `--environment production` (or `preview` for the `staging` channel) so it carries the DSN, and its
   maps go up with `pnpm exec sentry-expo-upload-sourcemaps dist` from the app
   folder afterwards.
