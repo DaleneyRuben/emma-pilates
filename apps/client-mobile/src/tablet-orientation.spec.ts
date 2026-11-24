@@ -1,7 +1,8 @@
-import { Dimensions, Platform } from "react-native";
+import { renderHook } from "@testing-library/react-native";
+import { AppState, Dimensions, Platform } from "react-native";
 import { unlockAsync } from "expo-screen-orientation";
 
-import { unlockTabletOrientation } from "./tablet-orientation";
+import { unlockTabletOrientation, useTabletOrientation } from "./tablet-orientation";
 
 jest.mock("expo-screen-orientation", () => ({ unlockAsync: jest.fn(() => Promise.resolve()) }));
 
@@ -44,5 +45,22 @@ describe("unlockTabletOrientation", () => {
     unlockTabletOrientation();
 
     expect(unlockAsync).not.toHaveBeenCalled();
+  });
+
+  // A new activity after Back, or a return to the foreground, re-reads the manifest.
+  it("unlocks again when the app comes back to the foreground", async () => {
+    Platform.OS = "android";
+    screen(1280, 800);
+    let onChange: ((state: string) => void) | undefined;
+    jest.spyOn(AppState, "addEventListener").mockImplementation((_type, handler) => {
+      onChange = handler as (state: string) => void;
+      return { remove: jest.fn() };
+    });
+
+    await renderHook(() => useTabletOrientation());
+    expect(unlockAsync).toHaveBeenCalledTimes(1);
+    onChange?.("active");
+
+    expect(unlockAsync).toHaveBeenCalledTimes(2);
   });
 });
