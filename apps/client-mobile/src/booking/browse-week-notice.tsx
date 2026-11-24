@@ -2,6 +2,7 @@ import {
   addCivilDays,
   colors,
   Glyph,
+  radii,
   spacing,
   surfaces,
   Text,
@@ -43,19 +44,22 @@ export function weekNoticeLine(
  */
 export function WeekNotice({
   classesLeft,
+  pill = false,
   selectedDate,
   today,
 }: {
   classesLeft: number | null | undefined;
+  /** 03T: a white 40 pt pill beside the Branch's, as the tablet band draws it. */
+  pill?: boolean;
   selectedDate: string;
   today: string;
 }) {
   const line = weekNoticeLine(classesLeft, selectedDate, today);
   if (line === null) return null;
   return (
-    <View style={styles.notice} testID="browse-week-notice">
-      <Glyph color={colors.textMuted} name="calendar" size={18} strokeWidth={1.5} />
-      <Text style={styles.line} variant="titulo-fila">
+    <View style={pill ? styles.pill : styles.notice} testID="browse-week-notice">
+      <Glyph color={colors.textMuted} name="calendar" size={pill ? 16 : 18} strokeWidth={1.5} />
+      <Text style={pill ? undefined : styles.line} variant={pill ? "compacto-600" : "titulo-fila"}>
         {line}
       </Text>
     </View>
@@ -64,6 +68,16 @@ export function WeekNotice({
 
 const styles = StyleSheet.create({
   line: { flex: 1 },
+  pill: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    flexDirection: "row",
+    gap: spacing.sm,
+    minHeight: 40,
+    paddingHorizontal: spacing.mdLg,
+  },
   notice: {
     ...surfaces.card,
     alignItems: "center",
