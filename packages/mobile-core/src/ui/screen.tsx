@@ -62,9 +62,14 @@ function paddingOf(
 
 function setsSidePadding(style: SafeAreaViewProps["style"]): boolean {
   const flat: ViewStyle = StyleSheet.flatten(style) ?? {};
-  return [flat.padding, flat.paddingHorizontal, flat.paddingLeft].some(
-    (value) => value !== undefined,
-  );
+  return [
+    flat.padding,
+    flat.paddingHorizontal,
+    flat.paddingLeft,
+    flat.paddingRight,
+    flat.paddingStart,
+    flat.paddingEnd,
+  ].some((value) => value !== undefined);
 }
 
 function keepsTopEdge(edges: SafeAreaViewProps["edges"]): boolean {
