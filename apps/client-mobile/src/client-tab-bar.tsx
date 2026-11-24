@@ -37,7 +37,7 @@ function TabletTabBar({ descriptors, insets, navigation, state }: BottomTabBarPr
           });
           if (!focused && !event.defaultPrevented) {
             navigation.dispatch({
-              ...CommonActions.navigate(route),
+              ...CommonActions.navigate(route.name, route.params),
               target: state.key,
             });
           }
