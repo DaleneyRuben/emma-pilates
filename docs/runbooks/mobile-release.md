@@ -166,7 +166,17 @@ writes `ITSAppUsesNonExemptEncryption`, so TestFlight asks no export
 compliance question. The iOS build number is kept by EAS like Android's
 (`appVersionSource: remote`, `autoIncrement` on `production`), starting at 1.
 
-The owner runs this once per app on the Mac, with his own Apple login; EAS
+iOS builds run on a pinned Xcode 27 image (`build.base.ios.image` in each
+`eas.json`): from April 2027 App Store Connect only accepts uploads built
+with the iOS 27 SDK, and builds made with an older Xcode get the warning
+email ITMS-90725. Expo SDK 57 defaults to an Xcode 26 image, and an app built
+with the iOS 27 SDK launches on iOS 27 only with the UIKit scene life cycle,
+so each `app.json` turns it on with `ios.enableSceneSupport` in
+`expo-build-properties` (needs `expo` 57.0.23 or later). On Expo SDK 58 the
+scene life cycle is the default: remove the property and the pinned image
+then.
+
+The owner runs the first build once per app on the Mac, with his own Apple login; EAS
 asks for the Apple ID password and the two-factor code in the terminal, and
 nobody else types them. Each build spends one of the month's 15 iOS builds.
 
