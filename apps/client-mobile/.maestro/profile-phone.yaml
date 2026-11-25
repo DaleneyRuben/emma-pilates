@@ -28,6 +28,12 @@ env:
 - inputText: "22123456"
 - tapOn: "Editar perfil"
 - tapOn: "Guardar cambios"
+# Android's phone keypad stays open over the line under the field.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - extendedWaitUntil:
     visible: "Ese número no parece un celular de Bolivia."
     timeout: 10000
