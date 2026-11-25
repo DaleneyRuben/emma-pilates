@@ -3,7 +3,8 @@
 // 2026-11-03). A shot's `file` names its raw capture in raw/<app>/<device>/.
 // Screenshots carry a label and a title only: in Rosa Emma small text may not
 // sit on the rosa 100 ground (owner, 2026-11-21). The feature graphic keeps
-// its note, on a white card.
+// its note, on a white card. The App Store header carries only the studio's
+// name, no tagline (owner, 2026-11-25).
 export const apps = {
   client: {
     logo: { file: "apps/admin-web/public/emma-logo.png", kind: "wordmark" },
@@ -12,6 +13,7 @@ export const apps = {
       title: "Tus clases de Pilates, a un toque",
       note: "Reserva, revisa tu plan y paga con QR.",
     },
+    header: { logo: { file: "apps/admin-web/public/emma-logo.png", kind: "wordmark" } },
     shots: [
       { file: "1-reservar", eyebrow: "Reservar", title: "Reserva tu lugar en segundos" },
       { file: "2-clase", eyebrow: "Cada clase", title: "Quién la da y cuántos cupos quedan" },
@@ -26,6 +28,11 @@ export const apps = {
       label: "Para el equipo",
       title: "Emma Pilates Staff",
       note: "Agenda, clientas y pagos del estudio, en una sola app.",
+    },
+    header: {
+      logo: { file: "apps/staff-mobile/assets/icon.png", kind: "icon" },
+      label: "Staff",
+      title: "Emma Pilates Studio",
     },
     shots: [
       { file: "1-agenda", eyebrow: "Agenda", title: "Tu agenda de clases, día por día" },

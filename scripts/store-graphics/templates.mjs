@@ -4,7 +4,7 @@
 // (packages/mobile-core/src/ui/tokens.ts): rosa 100 fills the ground, rosa
 // 600 inks the Lora title and draws the device frame. Small text sits only on
 // white, crema, rosa 50 or rosa 600, so the label rides on a white pill.
-const rosa = { 50: "#FEF6F2", 100: "#F9E7DF", 200: "#E7CCBF", 600: "#93615D", white: "#FFFBFB" };
+const rosa = { 50: "#FEF6F2", 100: "#F9E7DF", 200: "#E7CCBF", 300: "#DAB9AB", 600: "#93615D", white: "#FFFBFB" };
 const shadow = "rgba(147,97,93,";
 
 const escape = (text) =>
@@ -72,5 +72,36 @@ export function featureHtml({ label, title, note, logo, fonts }) {
     <h1>${escape(title)}</h1>
     <p>${escape(note)}</p>
   </div>
+  </body></html>`;
+}
+
+// The 3840 × 1646 (21:9) App Store product page header, option A «Logo al
+// centro» (owner, 2026-11-25), drawn on a 1280-wide grid. Apple keeps only the
+// centred 1646 × 661 art safe area on every device and orientation, so the
+// logo (and the Staff name) sits inside it; rosa 200 discs and rosa 300 rings
+// fill the rest as atmosphere. The Client app shows the studio wordmark; the
+// Staff app its grey icon unchanged, the label on a white pill and the name.
+export function headerHtml({ logo, label, title, width, fonts }) {
+  const u = width / 1280;
+  const px = (value) => `${(value * u).toFixed(2)}px`;
+  const shape = (left, top, size, fill) =>
+    `<div style="position:absolute;left:${px(left)};top:${px(top)};width:${px(size)};height:${px(size)};border-radius:50%;${fill ? `background:${rosa[200]}` : `box-sizing:border-box;border:${px(2)} solid ${rosa[300]}`}"></div>`;
+  const content =
+    logo.kind === "icon"
+      ? `<img class="icon" src="${logo.src}" alt=""><div class="name"><span class="label">${escape(label)}</span><h1>${escape(title)}</h1></div>`
+      : `<img class="wordmark" src="${logo.src}" alt="">`;
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><style>
+  ${fontFaces(fonts)}
+  html, body { margin: 0; }
+  body { width: 100vw; height: 100vh; overflow: hidden; background: ${rosa[100]}; color: ${rosa[600]}; font-family: Work, sans-serif; position: relative; }
+  .safe { position: absolute; left: ${px(366)}; top: ${px(164)}; width: ${px(549)}; height: ${px(221)}; display: flex; align-items: center; justify-content: center; gap: ${px(36)}; }
+  .wordmark { width: ${px(500)}; }
+  .icon { flex: none; width: ${px(200)}; height: ${px(200)}; border-radius: ${px(45)}; box-shadow: 0 ${px(20)} ${px(40)} ${shadow}0.28); }
+  .name { width: ${px(300)}; display: flex; flex-direction: column; align-items: flex-start; gap: ${px(14)}; }
+  .label { padding: ${px(6)} ${px(14)}; border-radius: ${px(999)}; background: ${rosa.white}; font-size: ${px(14)}; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; }
+  h1 { margin: 0; font-family: Lora, serif; font-weight: 500; font-size: ${px(48)}; line-height: 1.06; letter-spacing: -0.01em; }
+  </style></head><body>
+  ${shape(-170, 250, 520, true)}${shape(-60, 120, 360, false)}${shape(960, -230, 500, true)}${shape(1010, 200, 420, false)}
+  <div class="safe">${content}</div>
   </body></html>`;
 }
