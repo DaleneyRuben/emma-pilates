@@ -7,7 +7,7 @@ import {
 import {
   isStorableMobile,
   normalizeContactPhone,
-} from '../../phone/bolivian-mobile';
+} from '../../phone/contact-phone';
 
 const startClientRegistrationSchema = z.strictObject({
   name: z.string().trim().min(1),
@@ -58,7 +58,7 @@ export class StartClientRegistrationDto {
   @ApiPropertyOptional({
     example: '+591 71234567',
     description:
-      'Mobile number with its country code, stored as «+<code> <digits>» (Bolivia: 8 digits starting with 6 or 7). Required by current builds; a build that omits it registers without a phone (FIX-037)',
+      'Mobile number with its country code, stored as «+<code> <digits>» (a mobile in Google libphonenumber metadata). Required by current builds; a build that omits it registers without a phone (FIX-037)',
   })
   phone?: string;
 }

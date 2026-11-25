@@ -1,7 +1,7 @@
 import {
   isStorableMobile,
   normalizeContactPhone,
-} from '../../../phone/bolivian-mobile';
+} from '../../../phone/contact-phone';
 import type { StaffRoleName } from '../../../booking/staff/staff-management';
 
 // The Android closed test (2026-11-20): the shared staff Accounts are fixed

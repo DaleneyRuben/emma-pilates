@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
-import { normalizeContactPhone } from '../../src/phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../src/phone/contact-phone';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,

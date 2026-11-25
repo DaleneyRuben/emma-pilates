@@ -1,6 +1,6 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { normalizeContactPhone } from '../../phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../phone/contact-phone';
 import type { ClientProfile } from './client-profile';
 
 export type ClientProfileChanges = {

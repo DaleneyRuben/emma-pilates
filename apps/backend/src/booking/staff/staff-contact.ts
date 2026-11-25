@@ -1,4 +1,4 @@
-import { normalizeContactPhone } from '../../phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../phone/contact-phone';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   audit,
