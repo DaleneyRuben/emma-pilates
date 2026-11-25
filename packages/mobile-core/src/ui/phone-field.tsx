@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
-import type { PhoneCountry } from "../account/phone-number";
+import { phonePlaceholder, type PhoneCountry } from "../account/phone-number";
 import { Chevron } from "./chevron";
 import { CountryPicker } from "./country-picker";
 import { fieldTextProps } from "./field-text";
@@ -63,7 +63,7 @@ export function PhoneField({
           keyboardType="phone-pad"
           maxFontSizeMultiplier={fieldText.maxFontSizeMultiplier}
           onChangeText={(typed) => onChange({ country, digits: typed })}
-          placeholder={`${country.lengths[0]} dígitos`}
+          placeholder={phonePlaceholder(country)}
           placeholderTextColor={fieldText.placeholderTextColor}
           style={[fieldText.style, styles.input]}
           testID={testID}

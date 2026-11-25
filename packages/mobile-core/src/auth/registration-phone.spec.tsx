@@ -67,7 +67,7 @@ describe("Client registration phone (C01b)", () => {
 
     expect(
       screen.getByRole("alert", {
-        name: "! Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
+        name: "! Ese número no parece un celular de Bolivia.",
       }),
     ).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();

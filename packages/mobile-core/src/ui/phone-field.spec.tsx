@@ -84,14 +84,12 @@ describe("PhoneField", () => {
   it("shows the error under the field instead of the helper", async () => {
     const screen = await render(
       <Harness
-        error="Un celular de Perú tiene 9 dígitos y empieza con 9."
+        error="Ese número no parece un celular de Perú."
         initial={{ country: phoneCountryByIso("PE"), digits: "81234" }}
       />,
     );
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Un celular de Perú tiene 9 dígitos y empieza con 9.",
-    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Ese número no parece un celular de Perú.");
     expect(screen.queryByText("Te escribimos por WhatsApp si hace falta.")).not.toBeOnTheScreen();
   });
 });
