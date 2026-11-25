@@ -54,11 +54,13 @@ jobs:
               - apps/admin-web/**
               - packages/api-contracts/**
               - packages/studio-economics/**
+              - packages/phone-number/**
             mobile:
               - *shared
               - apps/client-mobile/**
               - apps/staff-mobile/**
               - packages/mobile-core/**
+              - packages/phone-number/**
               - packages/tooling/**
               - packages/api-contracts/**
             public:
@@ -165,6 +167,10 @@ jobs:
       - run: pnpm --filter @pilates/admin-web format:check
       - run: pnpm --filter @pilates/admin-web typecheck
       - run: pnpm --filter @pilates/admin-web build
+      # the phone rules the admin web shares with mobile-core
+      - run: pnpm --filter @pilates/phone-number lint
+      - run: pnpm --filter @pilates/phone-number format:check
+      - run: pnpm --filter @pilates/phone-number typecheck
 
   quality-mobile:
     needs: changes
@@ -319,6 +325,8 @@ jobs:
       # FIX-008: the simulator's economics (break-even, projections, the
       # BKO-006 Trainer pay) are tested in their own package
       - run: pnpm --filter @pilates/studio-economics exec jest --ci
+      # the libphonenumber adapter shared with mobile-core
+      - run: pnpm --filter @pilates/phone-number exec jest --ci
 
   # the ten Playwright journeys of Test 31 through the built backend and the
   # built admin web; the suite's global setup makes its own pilates_test_*
