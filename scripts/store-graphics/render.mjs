@@ -63,9 +63,9 @@ try {
   };
   for (const [app, copy] of Object.entries(apps)) {
     if (only !== undefined && only !== app) continue;
-    const logoOf = (logo) => ({ ...logo, src: dataUri(path.join(root, logo.file)) });
+    const brand = { label: copy.brand.label, logo: { src: dataUri(path.join(root, copy.brand.logo)) }, fonts };
     await shoot(
-      headerHtml({ ...copy.header, logo: logoOf(copy.header.logo), ...header, fonts }),
+      headerHtml({ ...brand, ...header }),
       header.width,
       header.height,
       path.join(graphics, "apple", "header", app, "header.png"),
@@ -78,7 +78,7 @@ try {
         await shoot(html, target.width, target.height, path.join(graphics, target.out, app, `${shot.file}.png`));
       }
     }
-    await shoot(featureHtml({ ...copy.feature, logo: logoOf(copy.logo), fonts }), 1024, 500, path.join(graphics, "play", app, "feature-graphic.png"));
+    await shoot(featureHtml(brand), 1024, 500, path.join(graphics, "play", app, "feature-graphic.png"));
   }
 } finally {
   await browser.close();

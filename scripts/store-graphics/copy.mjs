@@ -1,19 +1,13 @@
 // What each store image says, per app, in store order. Literal Spanish and
 // never a price or the launch discount: the offer is temporary (owner,
 // 2026-11-03). A shot's `file` names its raw capture in raw/<app>/<device>/.
-// Screenshots carry a label and a title only: in Rosa Emma small text may not
-// sit on the rosa 100 ground (owner, 2026-11-21). The feature graphic keeps
-// its note, on a white card. The App Store header carries only the studio's
-// name, no tagline (owner, 2026-11-25).
+// Screenshots carry a label and a title only (owner, 2026-11-21). The Play
+// feature graphic and the App Store header (`brand`) carry only the studio's
+// wordmark, no tagline; the Staff app adds «Equipo» (owner, 2026-11-25). The
+// Staff app's grey icon never changes, but these graphics do not show it.
 export const apps = {
   client: {
-    logo: { file: "apps/admin-web/public/emma-logo.png", kind: "wordmark" },
-    feature: {
-      label: "La app del estudio",
-      title: "Tus clases de Pilates, a un toque",
-      note: "Reserva, revisa tu plan y paga con QR.",
-    },
-    header: { logo: { file: "apps/admin-web/public/emma-logo.png", kind: "wordmark" } },
+    brand: { logo: "apps/admin-web/public/emma-logo.png" },
     shots: [
       { file: "1-reservar", eyebrow: "Reservar", title: "Reserva tu lugar en segundos" },
       { file: "2-clase", eyebrow: "Cada clase", title: "Quién la da y cuántos cupos quedan" },
@@ -23,17 +17,7 @@ export const apps = {
     ],
   },
   staff: {
-    logo: { file: "apps/staff-mobile/assets/android-icon-foreground.png", kind: "tile" },
-    feature: {
-      label: "Para el equipo",
-      title: "Emma Pilates Staff",
-      note: "Agenda, clientas y pagos del estudio, en una sola app.",
-    },
-    header: {
-      logo: { file: "apps/staff-mobile/assets/icon.png", kind: "icon" },
-      label: "Staff",
-      title: "Emma Pilates Studio",
-    },
+    brand: { logo: "apps/admin-web/public/emma-logo.png", label: "Equipo" },
     shots: [
       { file: "1-agenda", eyebrow: "Agenda", title: "Tu agenda de clases, día por día" },
       { file: "2-asistentes", eyebrow: "Asistencia", title: "Marca la asistencia en un toque" },
