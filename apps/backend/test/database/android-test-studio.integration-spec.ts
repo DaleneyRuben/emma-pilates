@@ -1,4 +1,5 @@
 import { StaffRole } from '../../src/generated/prisma/enums';
+import { isStorableMobile } from '../../src/phone/contact-phone';
 import { boliviaDate } from '../../src/time/bolivia-time';
 import {
   administratorEmail,
@@ -171,7 +172,7 @@ describe('the Android closed-test studio script', () => {
     ]);
     expect(staff.every((account) => account.activatedAt === null)).toBe(true);
     expect(staff[2].staffMember!.name).toBe('Instructora 1');
-    expect(staff[2].staffMember!.phone).toMatch(/^\+591 [67]\d{7}$/);
+    expect(isStorableMobile(staff[2].staffMember!.phone!)).toBe(true);
     expect(
       await prisma.auditRecord.count({
         where: { actionCode: 'staff_member.created' },

@@ -111,7 +111,7 @@ export class CorrectStaffEmailDto {
 }
 
 // FIX-038: the Administrator's correction of another member's contact. The
-// phone follows decision §19.20 on the server too (`normalizeContactPhone`).
+// phone is normalized on the server too (`normalizeContactPhone`).
 export class ChangeStaffContactDto {
   @ApiProperty({ minLength: 1, maxLength: 120 })
   name!: string;

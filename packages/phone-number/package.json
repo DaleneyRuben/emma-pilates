@@ -1,0 +1,29 @@
+{
+  "name": "@pilates/phone-number",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src scripts",
+    "typecheck": "tsc --noEmit",
+    "generate:countries": "node scripts/generate-country-names.mjs",
+    "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.mjs\""
+  },
+  "dependencies": {
+    "libphonenumber-js": "1.13.17"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/jest": "^29.5.14",
+    "eslint": "^10.12.0",
+    "jest": "^29.7.0",
+    "prettier": "3.9.8",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.68.0"
+  }
+}

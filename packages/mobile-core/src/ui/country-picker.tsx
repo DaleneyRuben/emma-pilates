@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { FlatList, Modal, Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
 import {
@@ -30,6 +30,11 @@ type CountryPickerProps = {
  */
 export function CountryPicker({ onClose, onPick, selected, visible }: CountryPickerProps) {
   const [query, setQuery] = useState("");
+  // The list (a FlatList of every country) is created on the first open and
+  // then kept, so the sheet slides out with its rows; a closed picker under
+  // every phone field never builds it.
+  const [listMounted, setListMounted] = useState(visible);
+  if (visible && !listMounted) setListMounted(true);
   const android = Platform.OS === "android";
   const close = () => {
     setQuery("");
@@ -95,16 +100,15 @@ export function CountryPicker({ onClose, onPick, selected, visible }: CountryPic
               <SheetTitle>Elige el país</SheetTitle>
             </View>
           ) : null}
-          <ScrollView keyboardShouldPersistTaps="handled">
-            <CountryRows onPick={pick} query={query} selected={selected} />
-          </ScrollView>
+          {listMounted ? <CountryList onPick={pick} query={query} selected={selected} /> : null}
         </View>
       </View>
     </Modal>
   );
 }
 
-function CountryRows({
+/** Every country libphonenumber knows (about 245 rows): only the rows on screen mount. */
+function CountryList({
   onPick,
   query,
   selected,
@@ -113,35 +117,54 @@ function CountryRows({
   query: string;
   selected: PhoneCountry;
 }) {
-  if (query.trim() !== "") {
-    return searchPhoneCountries(query).map((country) => (
-      <CountryRow
-        country={country}
-        key={country.iso}
-        onPick={onPick}
-        selected={country.iso === selected.iso}
-      />
-    ));
-  }
-  const others = (list: readonly PhoneCountry[]) =>
-    list.filter((country) => country.iso !== selected.iso);
   return (
-    <>
-      <CountryRow country={selected} onPick={onPick} selected />
-      <Text style={styles.section} variant="etiqueta">
-        Frecuentes
-      </Text>
-      {others(frequentPhoneCountries).map((country) => (
-        <CountryRow country={country} key={country.iso} onPick={onPick} selected={false} />
-      ))}
-      <Text style={styles.section} variant="etiqueta">
-        Todos los países
-      </Text>
-      {others(phoneCountries).map((country) => (
-        <CountryRow country={country} key={country.iso} onPick={onPick} selected={false} />
-      ))}
-    </>
+    <FlatList
+      data={countryItems(query, selected)}
+      initialNumToRender={20}
+      keyExtractor={(item) => item.key}
+      keyboardShouldPersistTaps="handled"
+      renderItem={({ item }) =>
+        item.kind === "section" ? (
+          <Text style={styles.section} variant="etiqueta">
+            {item.title}
+          </Text>
+        ) : (
+          <CountryRow country={item.country} onPick={onPick} selected={item.selected} />
+        )
+      }
+    />
   );
+}
+
+type CountryItem =
+  | { kind: "section"; key: string; title: string }
+  | { kind: "country"; key: string; country: PhoneCountry; selected: boolean };
+
+const countryItem = (country: PhoneCountry, selected: boolean, group: string): CountryItem => ({
+  country,
+  key: `${group}-${country.iso}`,
+  kind: "country",
+  selected,
+});
+
+/** The chosen country, «Frecuentes» and «Todos los países»; or the matches. */
+function countryItems(query: string, selected: PhoneCountry): CountryItem[] {
+  if (query.trim() !== "") {
+    return searchPhoneCountries(query).map((country) =>
+      countryItem(country, country.iso === selected.iso, "match"),
+    );
+  }
+  const others = (list: readonly PhoneCountry[], group: string) =>
+    list
+      .filter((country) => country.iso !== selected.iso)
+      .map((country) => countryItem(country, false, group));
+  return [
+    countryItem(selected, true, "chosen"),
+    { key: "frequent", kind: "section", title: "Frecuentes" },
+    ...others(frequentPhoneCountries, "frequent"),
+    { key: "all", kind: "section", title: "Todos los países" },
+    ...others(phoneCountries, "all"),
+  ];
 }
 
 function CountryRow({

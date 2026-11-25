@@ -6,9 +6,10 @@ import { assistantRoutes, openClientSearch } from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
-// FIX-030 with MOB-070 and decision §19.20: Nueva clienta takes a Bolivian mobile,
-// 8 digits starting with 6 or 7, and sends it with the implicit +591. FIX-037
-// (follow-up 236): «Celular» is required, and another country can be chosen.
+// FIX-030 with MOB-070: Nueva clienta takes a Bolivian mobile, as Google's
+// libphonenumber metadata knows it, and sends it with the implicit +591.
+// FIX-037 (follow-up 236): «Celular» is required, and another country can be
+// chosen.
 describe("Nueva clienta phone", () => {
   afterEach(async () => {
     await cleanup();
@@ -16,8 +17,9 @@ describe("Nueva clienta phone", () => {
   });
 
   it.each([
-    ["7000004", "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."],
-    ["80000001", "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."],
+    ["7000004", "Ese número no parece un celular de Bolivia."],
+    ["80000001", "Ese número no parece un celular de Bolivia."],
+    ["22123456", "Ese número no parece un celular de Bolivia."],
     ["", "Escribe su celular. Lo necesitamos para escribirle por WhatsApp."],
   ])("refuses %p and sends nothing", async (typed, message) => {
     const invited = jest.fn();

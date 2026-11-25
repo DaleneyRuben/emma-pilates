@@ -2,7 +2,11 @@ import { ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import { cn } from "../../lib/cn";
-import { phoneCountryByIso, type PhoneCountry } from "../../lib/phone-number";
+import {
+  phoneCountryByIso,
+  phonePlaceholder,
+  type PhoneCountry,
+} from "../../lib/phone-number";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   FormControl,
@@ -77,7 +81,7 @@ function PhoneInput({
           inputMode="numeric"
           autoComplete="tel-national"
           name={name}
-          placeholder={`${country.lengths[0] ?? 8} dígitos`}
+          placeholder={phonePlaceholder(country)}
           value={value.digits}
           onChange={(event) =>
             onChange({ ...value, digits: event.target.value })

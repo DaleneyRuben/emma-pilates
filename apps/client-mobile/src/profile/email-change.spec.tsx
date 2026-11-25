@@ -66,9 +66,7 @@ describe("Client email change", () => {
     // refused before the save.
     await fireEvent.changeText(screen.getByLabelText("Celular"), "5123456");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
-    expect(
-      screen.getByText("Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Ese número no parece un celular de Bolivia.")).toBeOnTheScreen();
     expect(calls).toEqual([]);
     // Decision §19.20: the +591 is implicit and sent.
     await fireEvent.changeText(screen.getByLabelText("Celular"), "7001 1004");

@@ -293,17 +293,19 @@ estado **Activo**. Pulsa **Nuevo miembro** para cada persona.
 | Gabriela Flores | gabriela@example.com | 🇦🇷 +54 · 91123456789 | Nutricionista | Centro |
 
 **Celular** es obligatorio. A la izquierda del campo está el país, con
-**🇧🇴 +591** ya elegido: para Bolivia escribes solo los 8 dígitos. Un celular
-de Bolivia empieza con 6 o 7, y lo puedes escribir con espacios o guiones.
+**🇧🇴 +591** ya elegido: para Bolivia escribes solo los 8 dígitos, con
+espacios o guiones si quieres. La app revisa el número con la base de números
+de Google, así que acepta cualquier celular real de Bolivia (también los que
+empiezan con 5, como `57007684`) y rechaza los fijos, como `22123456`.
 Para Gabriela, pulsa **🇧🇴 +591**, busca `Argentina` (o `+54`) en la lista y
 elígelo; después escribe sus 11 dígitos. Al guardar, la lista muestra cada
 número con su bandera: `🇧🇴 +591 70000001`, `🇦🇷 +54 91123456789`.
 
 - Vacío: «Escribe su celular. Lo necesitamos para escribirle por WhatsApp.»
-- Un número de Bolivia de 7 dígitos, o que empieza con otro número: «Un
-  celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.»
-- Con otro país, la regla de ese país, por ejemplo «Un celular de Perú tiene
-  9 dígitos y empieza con 9.»
+- Un número de Bolivia que no es celular (de 7 dígitos, o un fijo como
+  `22123456`): «Ese número no parece un celular de Bolivia.»
+- Con otro país, el mismo mensaje con su nombre, por ejemplo «Ese número no
+  parece un celular de Perú.»
 
 En los tres casos no se guarda nada. El campo es el mismo en **Nuevo
 cliente** de la app del equipo, en **Regístrate** y **Editar perfil** de la

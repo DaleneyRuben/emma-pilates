@@ -1,12 +1,17 @@
-# Critical journey: the +591 is implicit (decision §19.20, FIX-036). Editar
-# perfil refuses a number that is not a Bolivian mobile, takes the 8 digits
-# alone, and Perfil shows them stored as «+591 XXXXXXXX». The flow puts
-# Lucía's fixture phone back at the end, so it can repeat on one database.
+# Critical journey: the +591 is implicit (FIX-036) and libphonenumber decides
+# what a mobile is (decision 27, Test 197). Editar perfil refuses a La Paz
+# fixed line, takes a real Bolivian mobile that starts with 5 as its 8 digits
+# alone, and Perfil shows it stored as «+591 XXXXXXXX». The flow puts Lucía's
+# fixture phone back at the end, so it can repeat on one database.
 appId: ${APP_ID}
 env:
   EMAIL: lucia@example.com
 ---
 - runFlow: subflows/login.yaml
+# Test 195: the Face ID offer after login covers the tab bar.
+- tapOn:
+    text: "Ahora no"
+    optional: true
 - tapOn:
     id: "tab-profile"
 - extendedWaitUntil:
@@ -16,33 +21,40 @@ env:
 - extendedWaitUntil:
     visible: "Guardar cambios"
     timeout: 10000
+# FIX-037: the field holds the digits; the code sits in the prefix.
 - tapOn:
-    text: "\\+591 70011001"
+    text: "70011001"
 - eraseText: 20
-- inputText: "7000004"
+- inputText: "22123456"
 - tapOn: "Editar perfil"
 - tapOn: "Guardar cambios"
+# Android's phone keypad stays open over the line under the field.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
 - extendedWaitUntil:
-    visible: "Escribe un celular de Bolivia de 8 dígitos, por ejemplo 71234567."
+    visible: "Ese número no parece un celular de Bolivia."
     timeout: 10000
-- takeScreenshot: fix036-client-1-refused
+- takeScreenshot: phonelib-client-1-refused
 - tapOn:
-    text: "7000004"
+    text: "22123456"
 - eraseText: 20
-- inputText: "70011009"
+- inputText: "57007684"
 - tapOn: "Editar perfil"
 - tapOn: "Guardar cambios"
 - extendedWaitUntil:
     visible: "Cambiar contraseña"
     timeout: 15000
-- assertVisible: "\\+591 70011009"
-- takeScreenshot: fix036-client-2-saved
+- assertVisible: ".*\\+591 57007684"
+- takeScreenshot: phonelib-client-2-saved
 - tapOn: "Editar"
 - extendedWaitUntil:
     visible: "Guardar cambios"
     timeout: 10000
 - tapOn:
-    text: "\\+591 70011009"
+    text: "57007684"
 - eraseText: 20
 - inputText: "70011001"
 - tapOn: "Editar perfil"
@@ -50,4 +62,4 @@ env:
 - extendedWaitUntil:
     visible: "Cambiar contraseña"
     timeout: 15000
-- assertVisible: "\\+591 70011001"
+- assertVisible: ".*\\+591 70011001"

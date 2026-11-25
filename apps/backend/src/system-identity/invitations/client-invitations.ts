@@ -1,5 +1,5 @@
 import { normalizeReferralCode } from '../../booking/acquisition/acquisition';
-import { normalizeContactPhone } from '../../phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../phone/contact-phone';
 import { auditActorOf } from '../authentication/audit-actor';
 import type { StaffRoleCode } from '../authentication/staff-role';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';

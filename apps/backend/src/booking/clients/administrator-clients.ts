@@ -1,6 +1,6 @@
 import type { ClientPhotoRef } from '../client/client-photo-of';
 import type { AuditActor } from '../../system-identity/authentication/audit-actor';
-import { normalizeContactPhone } from '../../phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../phone/contact-phone';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import {

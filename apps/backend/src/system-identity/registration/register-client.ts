@@ -2,7 +2,7 @@ import type {
   AcquisitionChannel,
   DeclaredAcquisitionChannel,
 } from '../../booking/acquisition/acquisition';
-import { normalizeContactPhone } from '../../phone/bolivian-mobile';
+import { normalizeContactPhone } from '../../phone/contact-phone';
 import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';

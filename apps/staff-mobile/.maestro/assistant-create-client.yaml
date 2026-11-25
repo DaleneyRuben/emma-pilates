@@ -3,7 +3,8 @@
 # every run (scripts/seed.js «new-client»), so the flow can repeat on the same
 # database; each run leaves one more pending invitation. The phone goes in
 # without +591 and the overview shows it stored with it and its flag
-# (FIX-036, FIX-037).
+# (FIX-036, FIX-037); it is a real Bolivian mobile that starts with 5, which
+# libphonenumber knows (Test 197).
 appId: ${APP_ID}
 env:
   EMAIL: camila.rojas@example.com
@@ -13,17 +14,33 @@ env:
     env:
       SEED: new-client
 - runFlow: subflows/login.yaml
+# Test 195: the Face ID offer after login covers the screen.
+- tapOn:
+    text: "Ahora no"
+    optional: true
+- waitForAnimationToEnd
 - runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
       id: "client-search-new-client"
     timeout: 30000
-- tapOn:
-    id: "client-search-new-client"
-- extendedWaitUntil:
-    visible:
-      id: "new-client-name"
-    timeout: 10000
+# The first tap after the Face ID sheet closes can be swallowed.
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "new-client-name"
+    commands:
+      - tapOn:
+          id: "client-search-new-client"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "new-client-name"
+          timeout: 5000
+          optional: true
+- assertVisible:
+    id: "new-client-name"
 - tapOn:
     id: "new-client-name"
 - waitForAnimationToEnd
@@ -33,7 +50,7 @@ env:
 - tapOn:
     id: "new-client-phone"
 - waitForAnimationToEnd
-- inputText: "70012345"
+- inputText: "57007684"
 - tapOn:
     id: "new-client-email"
 - waitForAnimationToEnd
@@ -60,7 +77,7 @@ env:
       id: "pending-card"
     timeout: 20000
 - assertVisible: "Cuenta pendiente de activación"
-# Decision §19.20: the phone typed without +591 is stored with it; FIX-037
+# The phone typed without +591 is stored with it; FIX-037
 # shows it after its flag.
-- assertVisible: ".*\\+591 70012345 · .*"
+- assertVisible: ".*\\+591 57007684 · .*"
 - takeScreenshot: staff-new-client-2-pending

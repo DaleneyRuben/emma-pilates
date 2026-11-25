@@ -1,3 +1,4 @@
+import { isStorableMobile } from '../../../phone/contact-phone';
 import { parseStudioParams } from './params';
 
 const ana = { email: ' Ana@Example.com ', name: ' Ana ', phone: '7123 4567' };
@@ -52,11 +53,24 @@ describe('the Android closed-test studio params', () => {
     );
   });
 
+  // A tester's real Bolivian mobile starts with 5, which libphonenumber knows.
+  it('takes a Bolivian mobile starting with 5', () => {
+    const parsed = parseStudioParams({
+      clients: [{ ...ana, phone: '+591 57007684' }],
+      staff: { asistente: { phone: '5700 7684' } },
+    });
+
+    expect(parsed.clients[0].phone).toBe('+591 57007684');
+    expect(parsed.staff.find((m) => m.key === 'asistente')!.phone).toBe(
+      '+591 57007684',
+    );
+  });
+
   it('gives every Staff Member a distinct placeholder mobile', () => {
     const phones = parseStudioParams({}).staff.map((member) => member.phone);
 
     expect(new Set(phones).size).toBe(5);
-    expect(phones.every((phone) => /^\+591 [67]\d{7}$/.test(phone))).toBe(true);
+    expect(phones.every(isStorableMobile)).toBe(true);
   });
 
   it.each([
@@ -68,6 +82,8 @@ describe('the Android closed-test studio params', () => {
     [{ clients: [{ ...ana, email: 'ana' }] }, 'client_email_invalid'],
     [{ clients: [{ ...ana, name: '' }] }, 'client_name_missing'],
     [{ clients: [{ ...ana, phone: '12' }] }, 'client_phone_invalid'],
+    // A La Paz fixed line is no mobile.
+    [{ clients: [{ ...ana, phone: '2 2123456' }] }, 'client_phone_invalid'],
     [{ clients: [{ ...ana, phone: undefined }] }, 'client_phone_invalid'],
     [
       { clients: [ana, { ...ana, email: 'ANA@example.com' }] },

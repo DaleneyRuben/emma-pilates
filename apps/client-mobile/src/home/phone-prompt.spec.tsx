@@ -74,9 +74,7 @@ describe("Asking for a missing or invalid phone", () => {
 
     expect(await screen.findByText("Revisa tu celular")).toBeOnTheScreen();
     expect(screen.getByTestId("phone-prompt-field")).toHaveProp("value", "7000004");
-    expect(
-      screen.getByText("Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Ese número no parece un celular de Bolivia.")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
     expect(saved).not.toHaveBeenCalled();
   });
