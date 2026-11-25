@@ -30,6 +30,11 @@ type CountryPickerProps = {
  */
 export function CountryPicker({ onClose, onPick, selected, visible }: CountryPickerProps) {
   const [query, setQuery] = useState("");
+  // The list (a FlatList of every country) is created on the first open and
+  // then kept, so the sheet slides out with its rows; a closed picker under
+  // every phone field never builds it.
+  const [listMounted, setListMounted] = useState(visible);
+  if (visible && !listMounted) setListMounted(true);
   const android = Platform.OS === "android";
   const close = () => {
     setQuery("");
@@ -95,26 +100,39 @@ export function CountryPicker({ onClose, onPick, selected, visible }: CountryPic
               <SheetTitle>Elige el país</SheetTitle>
             </View>
           ) : null}
-          {/* Every country libphonenumber knows (about 245 rows): a FlatList
-              mounts only the rows on screen. */}
-          <FlatList
-            data={countryItems(query, selected)}
-            initialNumToRender={20}
-            keyExtractor={(item) => item.key}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) =>
-              item.kind === "section" ? (
-                <Text style={styles.section} variant="etiqueta">
-                  {item.title}
-                </Text>
-              ) : (
-                <CountryRow country={item.country} onPick={pick} selected={item.selected} />
-              )
-            }
-          />
+          {listMounted ? <CountryList onPick={pick} query={query} selected={selected} /> : null}
         </View>
       </View>
     </Modal>
+  );
+}
+
+/** Every country libphonenumber knows (about 245 rows): only the rows on screen mount. */
+function CountryList({
+  onPick,
+  query,
+  selected,
+}: {
+  onPick: (country: PhoneCountry) => void;
+  query: string;
+  selected: PhoneCountry;
+}) {
+  return (
+    <FlatList
+      data={countryItems(query, selected)}
+      initialNumToRender={20}
+      keyExtractor={(item) => item.key}
+      keyboardShouldPersistTaps="handled"
+      renderItem={({ item }) =>
+        item.kind === "section" ? (
+          <Text style={styles.section} variant="etiqueta">
+            {item.title}
+          </Text>
+        ) : (
+          <CountryRow country={item.country} onPick={onPick} selected={item.selected} />
+        )
+      }
+    />
   );
 }
 
