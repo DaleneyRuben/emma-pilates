@@ -69,6 +69,7 @@ numbered tests.
 | Login with the logo | Both apps open Login on the rosa band with the studio's logo and the form in a white sheet anchored to the bottom, no «Ej.:» under the email, the sheet above the keyboard, a 560 pt column on iPad (Test 193) | — |
 | Client app on tablet | Every Client screen on the iPad and Android tablets in both orientations: the 84 pt tab bar with each icon beside its label, the 40 pt page with the 36 pt title beside the back button, centred columns, two-column screens, and Reservar and Mis facturas as a list beside the chosen item (Test 196) | Needs a native build with `supportsTablet` (release 1.2.3); card internals keep their phone sizes |
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
+| Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
 
 ## Where each designed screen is tested
 
@@ -3202,8 +3203,8 @@ the same four names as the Staff app and the user menu, UX-005),
    member, active or pending: correct the name, type `70000001` for a member
    without a phone (Camila Rojas), and **Guardar**: the list shows the new name
    and `🇧🇴 +591 70000001`, and the page says "Guardamos los cambios de <new
-   name>.". The phone follows Test 132's rule (`12345` shows "Un celular de
-   Bolivia tiene 8 dígitos y empieza con 6 o 7." and nothing is
+   name>.". The phone follows Test 197's rule (`12345` shows "Ese número
+   no parece un celular de Bolivia." and nothing is
    sent), a stored phone from before the rule (`+54 9 11 5555 0000`) can stay
    as it is while you change something else (it is never rewritten unless
    you edit it), and clearing a stored phone refuses the save with "Escribe
@@ -9099,7 +9100,8 @@ E. **Phones (FIX-036).** Test 125 H for the forms. After the migration,
    treatment. `PATCH /api/v1/clients/current` with
    `"phone":"71234567"` answers `"phone":"+591 71234567"`; a foreign number is
    saved as typed, so an older app keeps working. Specs:
-   `bolivian-mobile.spec.ts` (backend; `mobile-core`'s rule is `phone-number.spec.ts` since FIX-037),
+   `contact-phone.spec.ts` (backend, renamed from `bolivian-mobile.spec.ts`;
+   the rule is libphonenumber's since Test 197),
    `normalize-bolivian-mobiles.integration-spec.ts`,
    `new-client-phone.spec.tsx`, `email-change.spec.tsx`,
    `staff-create.spec.tsx`.
@@ -9149,24 +9151,26 @@ Specs: `login-page.spec.tsx`, `recover-password-page.spec.tsx`,
 
 Proposal A of DES-006 (follow-up 236): one «Celular» field whose left end is
 a tappable flag and code, «🇧🇴 +591 ⌄», and the digits after it. Any country
-is stored as `+<code> <digits>`; Bolivia keeps Test 130's rule. No migration.
+is stored as `+<code> <digits>`. Since Test 197 every country, Bolivia
+included, is checked with Google's libphonenumber. No migration.
 Use a copy of `pilates_golden`.
 
 A. **Registration (C01b).** In the Client app tap **Regístrate**. «Celular»
    sits after the email with **🇧🇴 +591**, the placeholder «8 dígitos» and
    «Te escribimos por WhatsApp si hace falta.» under it. **Crear cuenta** with
    it empty shows «Escribe tu celular. Lo necesitamos para escribirte por
-   WhatsApp.»; `5123456` shows «Un celular de Bolivia tiene 8 dígitos y
-   empieza con 6 o 7.»; nothing is sent. `7123 4567` registers, and after the
+   WhatsApp.»; `5123456` shows «Ese número no parece un celular de
+   Bolivia.»; nothing is sent. `7123 4567` registers, and after the
    email link **Perfil** shows `🇧🇴 +591 71234567`.
 B. **The country list.** Tap **🇧🇴 +591**. On the iPhone and iPad a sheet
    opens with a grabber, «Elige el país», **Cancelar** and «Buscar país o
    código»; on Android a full-screen list with a back arrow and the search in
    the top bar. Bolivia comes first, ticked, then «Frecuentes» (Argentina,
-   Brasil, Chile, Perú, Paraguay) and «Todos los países» A–Z. `peru` and
+   Brasil, Chile, Perú, Paraguay) and «Todos los países» A–Z (every
+   country libphonenumber knows, from Afganistán). `peru` and
    `+51` both find Perú. Picking it closes the list, the prefix reads
    **🇵🇪 +51**, the placeholder «9 dígitos», and the digits already typed stay.
-   `81234` says «Un celular de Perú tiene 9 dígitos y empieza con 9.».
+   `81234` says «Ese número no parece un celular de Perú.».
 C. **Editar perfil (C22).** The field shows the stored number split into its
    country and digits. Emptying it refuses the save with the same «Escribe tu
    celular…» line. Pick Perú, type `912 345 678`, save: the API receives
@@ -9194,7 +9198,7 @@ F. **The API.** `POST /api/v1/client-registrations` takes an optional
 
 Specs: `phone-number.spec.ts` (mobile-core and admin web),
 `phone-field.spec.tsx` (both), `registration-phone.spec.tsx`,
-`register-client-phone.spec.ts`, `bolivian-mobile.spec.ts`,
+`register-client-phone.spec.ts`, `contact-phone.spec.ts` (backend),
 `new-client-phone.spec.tsx`, `contact-phone.spec.ts`,
 `profile-screen.spec.tsx`, `email-change.spec.tsx`, `staff-create.spec.tsx`,
 `contact-alerts-page.spec.tsx`.
@@ -9641,7 +9645,7 @@ F. **Receipt from the gallery (n.º 38).** **Registrar pago › QR**: the
 G. **Phone prompt (n.º 34).** Set a Client's phone to null, and another's to
    `7000004`, in `booking.clients`. Opening the Client app shows over
    **Inicio** «Agrega tu celular» (or «Revisa tu celular» with the number and
-   «Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.»). A valid
+   «Ese número no parece un celular de Bolivia.»). A valid
    number and **Guardar** store `+591 7xxxxxxx` and show «Celular
    guardado»; **Ahora no** closes it until the app is opened again. A Client
    with a valid number never sees it.
@@ -12133,3 +12137,45 @@ O. **States.** Loading, empty and error states show inside the same
 P. **The phone is unchanged.** On the iPhone 16 Pro every screen above looks
    as before: labels under the tab icons, the back button above the title,
    one column. The Staff app is unchanged on every device.
+
+## Test 197: phones checked by libphonenumber
+
+Every phone rule now comes from Google's libphonenumber metadata
+(`libphonenumber-js`, full "max" metadata), decision 27 of
+`decisiones-emma-pilates.md` (2026-11-25). A number is accepted when it is
+valid for the chosen country and is a mobile (or a US/Canadian number, which
+may be either). No prefix or length is kept by hand. The stored shape is the
+same as before, `+<code> <national digits>`, so no migration. The apps and the
+admin web share `packages/phone-number`; the backend reads the same metadata
+in `apps/backend/src/phone/contact-phone.ts`. An OTA carries it: the
+fingerprints of both apps do not change. Use a copy of `pilates_golden`.
+
+A. **A Bolivian mobile starting with 5.** In the Client app's **Editar
+   perfil** (iPhone 16 Pro and Android), type `57007684` with **🇧🇴 +591**
+   and save: Perfil shows `🇧🇴 +591 57007684`. The same number is accepted by
+   **Regístrate**, the Staff app's **Nuevo cliente**, and the admin web's
+   **Nuevo miembro**, **Editar miembro** and a client's **Editar perfil**.
+B. **A fixed line is refused.** `22123456` (La Paz) under Bolivia shows «Ese
+   número no parece un celular de Bolivia.» and nothing is sent; so does
+   `5123456` (seven digits). Spain: `612 34 56 78` is accepted,
+   `912 34 56 78` (Madrid) refused with «… de España.».
+C. **Other countries.** Argentina accepts `9 11 1234 5678` and the local
+   `11 15 1234 5678`, both stored as `+54 91112345678`; Perú `912 345 678`;
+   Estados Unidos `(201) 555-0123` as `+1 2015550123`. The placeholder is the
+   digits of the country's example mobile («8 dígitos» for Bolivia, «9
+   dígitos» for Perú).
+D. **The country list.** It offers every country libphonenumber knows (about
+   245), A–Z by Spanish name, with the chosen country first and the same
+   «Frecuentes». A stored `+1 4165550123` opens as Canadá.
+E. **Stored numbers still count.** `+591 70011001`, `+591 7001-1001`,
+   `70011001`, `+54 9 11 1234 5678` and `+51 912345678` show without
+   «Celular incompleto»; `+591 7000004` and `+591 22123456` show it.
+F. **The API and the tester script.** `POST /api/v1/client-registrations`
+   with `phone: "+591 57007684"` registers; `"+591 22123456"` answers `400`.
+   The `20261120-android-test-studio` script takes a client with
+   `+591 57007684` and refuses `2 2123456` with `client_phone_invalid`.
+
+Specs: `packages/phone-number/src/phone-number.spec.ts` and
+`country-names.spec.ts`, `apps/backend/src/phone/contact-phone.spec.ts`,
+`android-test-studio/params.spec.ts`, `phone-field.spec.tsx` (both),
+`new-client-phone.spec.tsx`, `staff-create.spec.tsx`.
