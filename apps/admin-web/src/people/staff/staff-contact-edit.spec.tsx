@@ -146,9 +146,7 @@ describe("AW24 Editar miembro contact", () => {
 
     expect(await within(panel).findByText("Escribe el nombre.")).toBeVisible();
     expect(
-      within(panel).getByText(
-        "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
-      ),
+      within(panel).getByText("Ese número no parece un celular de Bolivia."),
     ).toBeVisible();
     expect(sent).toEqual([]);
   });

@@ -233,9 +233,9 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
     );
   });
 
-  // FIX-036/FIX-037 and decision §19.20: a Bolivian mobile has 8 digits
-  // starting with 6 or 7.
-  it.each(["7000004", "80000001"])(
+  // FIX-036/FIX-037: a Bolivian mobile as libphonenumber knows it; a La Paz
+  // fixed line is no mobile.
+  it.each(["7000004", "80000001", "22123456"])(
     "refuses the phone %s before sending anything",
     async (typed) => {
       server.use(...staffHandlers(() => jsonResponse(valentina, 201)));
@@ -254,7 +254,7 @@ describe("AW24 Nuevo miembro on a desktop browser", () => {
 
       expect(
         await within(panel).findByText(
-          "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
+          "Ese número no parece un celular de Bolivia.",
         ),
       ).toBeInTheDocument();
       expect(created).toEqual([]);

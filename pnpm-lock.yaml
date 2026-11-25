@@ -24,6 +24,9 @@ importers:
       '@pilates/api-contracts':
         specifier: workspace:*
         version: link:../../packages/api-contracts
+      '@pilates/phone-number':
+        specifier: workspace:*
+        version: link:../../packages/phone-number
       '@pilates/studio-economics':
         specifier: workspace:*
         version: link:../../packages/studio-economics

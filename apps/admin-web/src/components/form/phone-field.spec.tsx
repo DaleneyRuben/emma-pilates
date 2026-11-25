@@ -84,9 +84,7 @@ describe("PhoneFormField", () => {
     await user.type(screen.getByLabelText("Celular"), "8123456");
     await user.click(screen.getByRole("button", { name: "Guardar" }));
     expect(
-      await screen.findByText(
-        "Un celular de Bolivia tiene 8 dígitos y empieza con 6 o 7.",
-      ),
+      await screen.findByText("Ese número no parece un celular de Bolivia."),
     ).toBeVisible();
     expect(sent).toEqual([]);
   });
@@ -119,9 +117,10 @@ describe("PhoneFormField", () => {
     const all = within(popover).getByRole("group", {
       name: "Todos los países",
     });
-    expect(within(all).getAllByRole("option")[0]).toHaveAccessibleName(
-      "Alemania +49",
-    );
+    // Every country libphonenumber knows, not only the 17 the web listed.
+    const countries = within(all).getAllByRole("option");
+    expect(countries.length).toBeGreaterThan(240);
+    expect(countries[0]).toHaveAccessibleName("Afganistán +93");
   });
 
   it("picks a country from the search with the keyboard", async () => {
@@ -148,9 +147,7 @@ describe("PhoneFormField", () => {
     await user.type(digits, "81234");
     await user.click(screen.getByRole("button", { name: "Guardar" }));
     expect(
-      await screen.findByText(
-        "Un celular de Perú tiene 9 dígitos y empieza con 9.",
-      ),
+      await screen.findByText("Ese número no parece un celular de Perú."),
     ).toBeVisible();
 
     await user.clear(digits);
