@@ -3,16 +3,18 @@
 // rosa 600, and the real screen in a rosa 600 frame under it. No price or
 // launch discount on any image: the offer is temporary.
 //
-//   node scripts/store-graphics/render.mjs [client|staff]
+//   node scripts/store-graphics/render.mjs [client|staff] [header]
 //
 // Reads the raw captures in docs/store/graphics/raw/ and writes every size
-// to docs/store/graphics/{play,apple}/<device>/<app>/. Playwright comes from the admin web.
+// to docs/store/graphics/{play,apple}/<device>/<app>/, and the App Store
+// product page header to docs/store/graphics/apple/header/<app>/. With
+// `header` it writes only the headers. Playwright comes from the admin web.
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { apps } from "./copy.mjs";
-import { featureHtml, shotHtml } from "./templates.mjs";
+import { featureHtml, headerHtml, shotHtml } from "./templates.mjs";
 
 const root = path.resolve(import.meta.dirname, "../..");
 const require = createRequire(path.join(root, "apps/admin-web/package.json"));
@@ -40,7 +42,12 @@ const targets = [
   { out: "apple/ipad-13", device: "tablet", width: 2064, height: 2752 },
 ];
 
-const only = process.argv[2];
+// Apple's product page header: 21:9, PNG with no alpha channel.
+const header = { width: 3840, height: 1646 };
+
+const args = process.argv.slice(2);
+const only = args.find((arg) => arg in apps);
+const headersOnly = args.includes("header");
 
 const dataUri = (file) => `data:image/png;base64,${readFileSync(file).toString("base64")}`;
 
@@ -56,6 +63,14 @@ try {
   };
   for (const [app, copy] of Object.entries(apps)) {
     if (only !== undefined && only !== app) continue;
+    const brand = { label: copy.brand.label, logo: { src: dataUri(path.join(root, copy.brand.logo)) }, fonts };
+    await shoot(
+      headerHtml({ ...brand, ...header }),
+      header.width,
+      header.height,
+      path.join(graphics, "apple", "header", app, "header.png"),
+    );
+    if (headersOnly) continue;
     for (const target of targets) {
       for (const shot of copy.shots) {
         const screen = dataUri(path.join(graphics, "raw", app, target.device, `${shot.file}.png`));
@@ -63,10 +78,9 @@ try {
         await shoot(html, target.width, target.height, path.join(graphics, target.out, app, `${shot.file}.png`));
       }
     }
-    const logo = { ...copy.logo, src: dataUri(path.join(root, copy.logo.file)) };
-    await shoot(featureHtml({ ...copy.feature, logo, fonts }), 1024, 500, path.join(graphics, "play", app, "feature-graphic.png"));
+    await shoot(featureHtml(brand), 1024, 500, path.join(graphics, "play", app, "feature-graphic.png"));
   }
 } finally {
   await browser.close();
 }
-console.log("store graphics written to docs/store/graphics/{play,apple}");
+console.log(`store graphics written to docs/store/graphics/${headersOnly ? "apple/header" : "{play,apple}"}`);
