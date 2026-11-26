@@ -76,6 +76,8 @@ numbered tests.
 | Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
 | Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
 | Class detail knows your bookings | A class she booked opens with «Ya reservaste esta clase», **Cancelar reserva** and «Cancelas gratis hasta …»; a class at the time of another of hers keeps «Reservar esta clase» off with «Ya tienes Mat Pilates a las 10:00 ese día…» and **Ver esa reserva** (Test 203) | «Ver esa reserva» opens Mis reservas, not that one booking |
+| Sharing the code from one card | Client «Invita a una amiga» and Staff «Tu código de referido» show the code on one line with «Copiar código», «Compartir tu código» (the system sheet with the invite link) and «Editar código» in the same card; a friend who signs up with a Trainer's code becomes that Trainer's Client (Test 205) | The link's app half needs the 1.3.0 native build |
+| A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
 
 ## Where each designed screen is tested
 
@@ -12489,3 +12491,55 @@ D. **The API.** `GET /api/v1/sessions/{id}` as the Client answers
    classTypeName, startsAt, endsAt }`, or `null` when she holds none; Staff
    get no `yourBooking`. A cancelled booking does not count. An app build
    without this change ignores the field and keeps working.
+
+## Test 205: sharing the referral code from one card (mejoras del recorrido 26, 27)
+
+Boards C16, E-F13, E-F14, E-F21 and E-F22. Run the API on a copy of
+`pilates_golden` and Metro for both apps, the Client app on the iPhone 16 Pro
+and the Staff app on the Android emulator.
+
+A. **The Client's card.** In the Client app open Perfil → «Invita a una
+   amiga». One card holds the code on a single line (a long code shrinks,
+   never wraps), **Copiar código** («Código copiado»), **Compartir tu código**
+   (the system sheet with `https://links.emmapilatesstudio.com/client/invite/CODE`)
+   and **Editar código**, which edits it in place.
+B. **The Trainer's card.** Log in to the Staff app as a fixture Trainer and
+   open Perfil → «Tu código de referido». The same card on Rosa Emma 600, with
+   «Cómo funciona» in three steps («Compartes tu código o tu enlace con tus
+   clientas», «Ella instala la app y crea su cuenta con tu código», «Queda
+   registrada como tu clienta»). **Compartir tu código** sends «Crea tu cuenta
+   en Emma Pilates Studio con mi código CODE.» with the link, and promises no
+   free class.
+C. **Attribution.** Open the Trainer's link on a desktop browser: «Ana te
+   invita a Emma Pilates Studio» with both stores. Register a new Client with
+   that code: the admin web's Clientas file names the Trainer under «Cómo nos
+   conoció», as before this change.
+
+## Test 206: a bounced email (mejoras del recorrido 2)
+
+Boards C01c3 and RW-clientas-ficha-correo-rebotado. A bounce is what Resend's
+webhook stores in `system.email_suppressions` (ADR-0094); on a local database
+insert one by hand for the address's digest, or send a signed
+`email.bounced` event with `bounce.type: "Permanent"` to
+`POST /api/v1/email-delivery-events/resend` when `RESEND_WEBHOOK_SECRET` is
+set (the admin web's Playwright journey does that).
+
+A. **The app (C01c3).** Register in the Client app with an address, then
+   record its hard bounce. Reopen the app on «Revisa tu correo» (or bring it
+   back to the front): a card says «El correo rebotó · No pudimos entregar el
+   correo a {email}. Revisa la dirección.», with **Cambiar correo** and
+   **Volver a iniciar sesión**; «Reenviar correo» is gone. **Cambiar correo**
+   opens «Cambiar correo»; once the new address is sent, «Revisa tu correo»
+   waits for it as usual. `POST /api/v1/client-registrations/status-checks`
+   answers `bounced`; a complaint or a resolved bounce keeps `pending`.
+B. **The Clientas file.** Invite a Client from the Staff app and record the
+   bounce of her address. In the admin web open her file: the aviso reads «El
+   correo rebotó · No pudimos entregar el correo de activación a {email}: esa
+   dirección no existe. Confirma el correo con la clienta.», with no
+   «Reenviar enlace» and no expiry line. A pending Client whose email did not
+   bounce keeps «Pendiente de activación». `GET
+   /api/v1/assistant/client-invitations/{clientId}/email-delivery` answers
+   `{ clientId, email, bounced }` to the Administrator and the Coordinator.
+C. **Automated.** `pnpm test:e2e e2e/clients.spec.ts` in `apps/admin-web`
+   walks B at 1440 and 420 px through the real backend.
+
