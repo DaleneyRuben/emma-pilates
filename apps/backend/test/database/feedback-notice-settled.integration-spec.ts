@@ -94,7 +94,7 @@ describe('a triaged comment and its notices (PostgreSQL)', () => {
       feedbackId,
       status: 'reviewed',
       changeNote: null,
-      actor: { accountId: administrators[0]!, staffMemberId },
+      actor: { accountId: administrators[0], staffMemberId },
       occurredAt,
     });
 
@@ -111,7 +111,7 @@ describe('a triaged comment and its notices (PostgreSQL)', () => {
       feedbackId,
       status: 'new',
       changeNote: null,
-      actor: { accountId: administrators[0]!, staffMemberId },
+      actor: { accountId: administrators[0], staffMemberId },
       occurredAt: new Date(sentAt.getTime() + 60_000),
     });
 
