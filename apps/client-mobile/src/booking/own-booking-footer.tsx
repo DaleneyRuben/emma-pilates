@@ -1,8 +1,10 @@
 import { cancelBooking, type SessionOwnBookingDto } from "@pilates/api-contracts";
 import {
+  colors,
   ConfirmationSheet,
   formatCancellationDeadline,
   formatStartTime,
+  Glyph,
   InlineError,
   PrimaryButton,
   spacing,
@@ -11,7 +13,7 @@ import {
   useMountedAt,
 } from "@pilates/mobile-core";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
@@ -77,7 +79,7 @@ function BookedFooter({
   const freeLine =
     deadline === null || deadline.getTime() <= mountedAt
       ? null
-      : `Cancelas gratis hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}`;
+      : `Cancelas gratis hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}.`;
 
   const cancel = async () => {
     setConfirming(false);
@@ -102,9 +104,17 @@ function BookedFooter({
 
   return (
     <>
-      <Text style={styles.status} variant="titulo-fila">
-        Ya reservaste esta clase
-      </Text>
+      {/* C04p: a check before the status, centred. */}
+      <View style={styles.status}>
+        <Glyph
+          color={colors.text}
+          name="check"
+          size={18}
+          strokeWidth={1.7}
+          testID="own-booking-check"
+        />
+        <Text variant="titulo-fila">Ya reservaste esta clase</Text>
+      </View>
       <PrimaryButton
         busy={busy}
         label="Cancelar reserva"
@@ -135,5 +145,11 @@ function BookedFooter({
 
 const styles = StyleSheet.create({
   centered: { textAlign: "center" },
-  status: { paddingVertical: spacing.sm, textAlign: "center" },
+  status: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    paddingVertical: spacing.sm,
+  },
 });
