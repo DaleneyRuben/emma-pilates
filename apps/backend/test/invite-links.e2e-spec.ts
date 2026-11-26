@@ -7,7 +7,7 @@ import { configureApplication } from '../src/http/configure-application';
 import {
   InviteLinksController,
   inviteCodeLookup,
-} from '../src/links/invite-links.controller';
+} from '../src/booking/acquisition/invite-links.controller';
 
 // Walkthrough n.º 13: the invite link on the link host.
 describe('invite links (e2e)', () => {

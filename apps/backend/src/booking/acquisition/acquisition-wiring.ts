@@ -27,6 +27,10 @@ import {
   referralCodeLookup,
 } from './referral-code-lookup.controller';
 import {
+  InviteLinksController,
+  inviteCodeLookup,
+} from './invite-links.controller';
+import {
   createPrismaClientAcquisitionStore,
   createPrismaTrainerReferralCodeStore,
 } from './prisma-acquisition-stores';
@@ -43,8 +47,16 @@ export const acquisitionWiring = {
     AdministratorTrainerReferralCodeController,
     OwnReferralCodeController,
     ReferralCodeLookupController,
+    // Walkthrough n.º 13: the shared invite link, on the link host.
+    InviteLinksController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
+    {
+      provide: inviteCodeLookup,
+      inject: [prismaToken],
+      useFactory: (prisma: PrismaClient) => (code: string) =>
+        lookUpReferralCode(prisma, code),
+    },
     {
       provide: referralCodeLookup,
       inject: [prismaToken],

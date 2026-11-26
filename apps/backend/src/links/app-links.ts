@@ -53,9 +53,16 @@ export const androidAssetLinks = (apps: readonly AndroidApp[]) =>
 // 2026-11-23). Team IDs are public: Apple serves them in this very file.
 export const appleTeamId: string | null = 'SN44D2645V';
 
+// Walkthrough n.º 13: the Client app also opens its invite links.
 const iosApps = [
-  { bundleIdentifier: 'com.emmapilates.client', prefix: '/client' },
-  { bundleIdentifier: 'com.emmapilates.staff', prefix: '/staff' },
+  {
+    bundleIdentifier: 'com.emmapilates.client',
+    paths: ['/client/authentication/*', '/client/invite/*'],
+  },
+  {
+    bundleIdentifier: 'com.emmapilates.staff',
+    paths: ['/staff/authentication/*'],
+  },
 ] as const;
 
 export const appleAppSiteAssociation = (teamId: string | null) => ({
@@ -68,7 +75,7 @@ export const appleAppSiteAssociation = (teamId: string | null) => ({
               `${teamId}.${app.bundleIdentifier}`,
               `${teamId}.${app.bundleIdentifier}.staging`,
             ],
-            components: [{ '/': `${app.prefix}/authentication/*` }],
+            components: app.paths.map((path) => ({ '/': path })),
           })),
   },
 });
