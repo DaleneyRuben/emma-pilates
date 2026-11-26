@@ -195,32 +195,78 @@ describe("Client profile photo", () => {
     );
   });
 
-  it("reports a failed upload and keeps the initials", async () => {
+  // Walkthrough n.º 14 (C22d): only a failure speaks, and «Reintentar» sends
+  // the same photo again; the circle keeps showing it meanwhile.
+  it("keeps the new photo after a failed upload and retries it", async () => {
     pickedPhoto();
+    let attempts = 0;
     const screen = await openProfile(
       createClientRuntime(
         routeFetcher({
           ...readRoutes,
           ...uploadRoutes([]),
-          "PUT /api/v1/clients/current/photo": () =>
-            jsonResponse({ code: "profile_photo_not_ready", status: 409 }, 409),
+          "PUT /api/v1/clients/current/photo": () => {
+            attempts += 1;
+            return attempts === 1
+              ? jsonResponse({ code: "profile_photo_not_ready", status: 409 }, 409)
+              : jsonResponse(withPhoto);
+          },
+          "/api/v1/clients/current/photo?variant=display":
+            photoRoutes["/api/v1/clients/current/photo?variant=display"],
         }),
       ),
     );
 
     await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
-    });
-    await fireEvent.press(screen.getByRole("button", { name: "Cambiar foto" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar foto" }));
 
-    await waitFor(
-      () => {
-        expect(screen.getByText("No pudimos subir la foto. Inténtalo de nuevo.")).toBeOnTheScreen();
-      },
-      { timeout: 10_000 },
+    expect(
+      await screen.findByText(
+        "No pudimos subir tu foto. Tus otros cambios sí se guardaron.",
+        {},
+        { timeout: 10_000 },
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", { uri: "file:///me.jpg" });
+    expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeEnabled();
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledTimes(1);
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+
+    await waitFor(() => expect(attempts).toBe(2), { timeout: 10_000 });
+    await waitFor(() =>
+      expect(screen.queryByText(/No pudimos subir tu foto/)).not.toBeOnTheScreen(),
     );
-    expect(screen.getByText("SG")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledTimes(1);
+  });
+
+  // C22c: the new photo shows at once with a ring while it uploads; the
+  // links and «Guardar cambios» never wait for it.
+  it("shows the new photo at once with its ring and never blocks saving", async () => {
+    pickedPhoto();
+    let finishPut: () => void = () => undefined;
+    const putDone = new Promise<void>((resolve) => {
+      finishPut = resolve;
+    });
+    const routes = routeFetcher({
+      ...readRoutes,
+      ...uploadRoutes([]),
+      "PUT /api/v1/clients/current/photo": () => jsonResponse(withPhoto),
+    });
+    const fetcher = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (init?.method === "PUT" && String(input).endsWith("/object")) await putDone;
+      return routes(input, init);
+    }) as ReturnType<typeof routeFetcher>;
+    const screen = await openProfile(createClientRuntime(fetcher));
+
+    await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar foto" }));
+
+    expect(await screen.findByTestId("photo-upload-ring")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", { uri: "file:///me.jpg" });
+    expect(screen.queryByText("Subiendo foto…")).toBeNull();
+    expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeEnabled();
+    finishPut();
+    await waitFor(() => expect(screen.queryByTestId("photo-upload-ring")).toBeNull());
   });
 });
