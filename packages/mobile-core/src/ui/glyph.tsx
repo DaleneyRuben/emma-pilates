@@ -169,6 +169,13 @@ export const glyphShapes = {
       <Path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
     </>
   ),
+  // A gift, for the free class a friend gives (walkthrough n.º 22, C02j).
+  gift: (
+    <>
+      <Rect height={11} rx={1} width={16} x={4} y={9} />
+      <Path d="M4 13h16M12 9v11M12 9c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1" />
+    </>
+  ),
   flame: (
     <Path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1 2.5 2 3 0-3.5.5-6 1-8.5z" />
   ),

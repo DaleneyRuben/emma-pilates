@@ -42,7 +42,7 @@ import { freezeToAnnounce, HomeFreezeNotice } from "./home-freeze-notice";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
-import { GuestPassCard, PurchasePlanCard } from "./home-plan-card";
+import { GuestPassCard, InactiveInviteNotice, PurchasePlanCard } from "./home-plan-card";
 import { PlanRow } from "./home-plan-row";
 import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { useRetryCachedHome } from "./retry-cached-home";
@@ -216,6 +216,7 @@ export function HomeScreen() {
   const planBlock =
     hasActivePlan && view.subscription?.guestPass !== undefined ? (
       <GuestPassCard
+        onBook={() => navigation.navigate("Booking")}
         onDetail={() => navigation.navigate("Subscription")}
         onPurchase={() => navigation.navigate("Plans")}
         view={view}
@@ -227,10 +228,15 @@ export function HomeScreen() {
         subscription={view.subscription!}
       />
     ) : standing.kind === "none" ? (
-      <PurchasePlanCard
-        onPurchase={() => navigation.navigate("Plans")}
-        plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
-      />
+      <>
+        {view?.inactiveInvite === undefined ? null : (
+          <InactiveInviteNotice hostFirstName={view.inactiveInvite.hostFirstName} />
+        )}
+        <PurchasePlanCard
+          onPurchase={() => navigation.navigate("Plans")}
+          plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
+        />
+      </>
     ) : null;
   // 02T: on a tablet the next class and the Plan row sit side by side, then
   // «Reservar otra clase» and the promotion.

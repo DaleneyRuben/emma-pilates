@@ -13,6 +13,8 @@ export type EmphasisCardProps = {
   children?: ReactNode;
   /** The uppercase `etiqueta` on top, in white. */
   eyebrow?: string;
+  /** A row above everything, such as «Te invitó Lucía» with her initials (C02f). */
+  lead?: ReactNode;
   /** One line of white `cuerpo`. */
   note?: string;
   /** A short fact such as «15 % de descuento», white `pastilla` (no pill, FIX-089). */
@@ -27,6 +29,7 @@ export function EmphasisCard({
   action,
   children,
   eyebrow,
+  lead,
   note,
   pill,
   testID,
@@ -34,6 +37,7 @@ export function EmphasisCard({
 }: EmphasisCardProps) {
   return (
     <View style={styles.card} testID={testID}>
+      {lead}
       {eyebrow === undefined ? null : (
         <Text tone="onDark" variant="etiqueta">
           {eyebrow}
