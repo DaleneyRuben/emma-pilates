@@ -104,7 +104,8 @@ describe("Invita a una amiga (BKM-014)", () => {
     // Walkthrough n.º 13 (C16g): the system's own share sheet, with the link.
     expect(share).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining("https://links.emmapilatesstudio.com/client/invite/LUCIA"),
+        message:
+          "Únete a Emma Pilates Studio con mi código LUCIA: tu primera clase es gratis. https://links.emmapilatesstudio.com/client/invite/LUCIA",
       }),
     );
     share.mockRestore();
