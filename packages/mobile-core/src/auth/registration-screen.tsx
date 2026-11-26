@@ -251,6 +251,7 @@ export function RegistrationScreen({
       />
       <AcquisitionChannelField
         error={channelError}
+        locked={markedBy !== null && codeCheck.status === "valid"}
         note={
           markedBy !== null && codeCheck.status === "valid"
             ? `La marcamos por el código de ${markedBy}.`

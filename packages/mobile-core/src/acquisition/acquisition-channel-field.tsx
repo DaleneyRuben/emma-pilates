@@ -30,12 +30,18 @@ export const acquisitionChannelRequired = "Elige cómo nos conociste.";
 export function AcquisitionChannelField({
   error,
   label = "¿Cómo nos conociste?",
+  locked = false,
   note,
   onChange,
   value,
 }: {
   error?: string;
   label?: string;
+  /**
+   * A valid referral code chose the answer: the other chips are locked, since
+   * the server stores the code's channel anyway (#18).
+   */
+  locked?: boolean;
   /** Why an answer is marked already, after a check: «La marcamos por el código de Lucía.» (C01b5) */
   note?: string;
   onChange: (value: AcquisitionChannelChoice) => void;
@@ -47,6 +53,7 @@ export function AcquisitionChannelField({
       <View accessibilityLabel={label} accessibilityRole="radiogroup" style={styles.options}>
         {acquisitionChannelOptions.map((option) => (
           <Chip
+            disabled={locked && option.value !== value}
             key={option.value}
             label={option.label}
             onPress={() => {

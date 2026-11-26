@@ -28,6 +28,7 @@ export const chipStyles = StyleSheet.create({
  */
 export function Chip({
   accessibilityLabel,
+  disabled = false,
   label,
   onPress,
   role = "button",
@@ -36,6 +37,8 @@ export function Chip({
   testID,
 }: {
   accessibilityLabel?: string;
+  /** Locked on another answer, as «¿Cómo nos conociste?» under a valid code (#18). */
+  disabled?: boolean;
   label: string;
   onPress: () => void;
   role?: "button" | "radio";
@@ -48,7 +51,10 @@ export function Chip({
     <Pressable
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole={role}
-      accessibilityState={role === "radio" ? { checked: selected } : { selected }}
+      accessibilityState={
+        role === "radio" ? { checked: selected, disabled } : { disabled, selected }
+      }
+      disabled={disabled}
       hitSlop={{ bottom: 3, left: 0, right: 0, top: 3 }}
       onPress={onPress}
       style={[
