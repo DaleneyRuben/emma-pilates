@@ -15,6 +15,7 @@ import { CorrectPendingClientEmail } from '../src/system-identity/registration/c
 import { RegisterClient } from '../src/system-identity/registration/register-client';
 import { ResendPendingClientVerification } from '../src/system-identity/registration/resend-pending-client-verification';
 import { VerifyClientEmail } from '../src/system-identity/registration/verify-client-email';
+import { pendingRegistrationStatusReader } from '../src/system-identity/registration/client-registration.controller';
 
 describe('client registration (e2e)', () => {
   let app: INestApplication<App>;
@@ -25,6 +26,10 @@ describe('client registration (e2e)', () => {
   const cancelRegistration =
     jest.fn<CancelPendingClientRegistration['execute']>();
   const verifyEmail = jest.fn<VerifyClientEmail['execute']>();
+  const readStatus =
+    jest.fn<
+      (continuation: string) => Promise<'pending' | 'verified' | 'expired'>
+    >();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
@@ -38,6 +43,7 @@ describe('client registration (e2e)', () => {
     resendVerification.mockResolvedValue({ status: 'sent' });
     cancelRegistration.mockResolvedValue({ status: 'cancelled' });
     verifyEmail.mockResolvedValue({ status: 'verified' });
+    readStatus.mockResolvedValue('verified');
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [
         ClientEmailVerificationController,
@@ -58,6 +64,7 @@ describe('client registration (e2e)', () => {
           useValue: { execute: resendVerification },
         },
         { provide: VerifyClientEmail, useValue: { execute: verifyEmail } },
+        { provide: pendingRegistrationStatusReader, useValue: readStatus },
         { provide: emailSourceAdmission, useValue: () => Promise.resolve() },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
@@ -193,6 +200,21 @@ describe('client registration (e2e)', () => {
       .expect(({ body }) => {
         expect(body).toMatchObject({ code: 'referral_code_invalid' });
       });
+  });
+
+  // Walkthrough n.º 4 (C01c2): «Revisa tu correo» asks whether it was confirmed.
+  it('answers the status of a pending registration from its continuation', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations/status-checks')
+      .send({ registrationContinuation: 'registration-secret' })
+      .expect(200)
+      .expect({ status: 'verified' });
+    expect(readStatus).toHaveBeenCalledWith('registration-secret');
+
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations/status-checks')
+      .send({})
+      .expect(400);
   });
 
   afterEach(async () => {
