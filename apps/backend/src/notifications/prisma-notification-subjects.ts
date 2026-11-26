@@ -119,7 +119,8 @@ export const readNotificationSubjects = async (
     freezeIds.length === 0
       ? []
       : await prisma.freeze.findMany({
-          where: { id: { in: freezeIds } },
+          // A removed row is not described (soft delete, ADR-0086).
+          where: { id: { in: freezeIds }, deletedAt: null },
           select: {
             id: true,
             state: true,
@@ -135,7 +136,7 @@ export const readNotificationSubjects = async (
     feedbackIds.length === 0
       ? []
       : await prisma.feedback.findMany({
-          where: { id: { in: feedbackIds } },
+          where: { id: { in: feedbackIds }, deletedAt: null },
           select: {
             id: true,
             type: true,
