@@ -264,6 +264,7 @@ function ClientScreens({
   authenticationIntent,
   installationIdentifier,
   biometricLock,
+  onAuthenticationIntentHandled,
   onLogin,
   onRecoveryCredential,
   pendingRegistrationStore,
@@ -322,6 +323,7 @@ function ClientScreens({
       intent={authenticationIntent}
       notice={signOutNotice}
       biometricLock={biometricLock}
+      onIntentHandled={onAuthenticationIntentHandled}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
       pendingRegistrationStore={pendingRegistrationStore}

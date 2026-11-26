@@ -2,9 +2,6 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { BackHandler } from "react-native";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
-import { Text } from "../ui/text";
-import { PrimaryButton } from "../ui/primary-button";
-import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
 import {
   type BiometricLock,
@@ -22,6 +19,7 @@ import { PasswordLinkScreen } from "./password-link-screen";
 import { RecoveryRequestScreen } from "./recovery-request-screen";
 import { RegistrationScreen } from "./registration-screen";
 import { usePendingRegistration } from "./use-pending-registration";
+import { VerifyEmailScreen } from "./verify-email-screen";
 
 type AuthenticationRoute =
   | "activate"
@@ -39,6 +37,11 @@ type AuthenticationFlowProps = {
   intent?: AuthenticationLinkIntent | null;
   notice?: string | null;
   biometricLock?: BiometricLock;
+  /**
+   * Called once a link's screen has used it (verified, invalid, left for
+   * Login, or signed in), so the app forgets it (walkthrough n.º 17).
+   */
+  onIntentHandled?: (intent: AuthenticationLinkIntent) => void;
   onLogin?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
@@ -66,78 +69,13 @@ function previousRoute(route: AuthenticationRoute): AuthenticationRoute | null {
   return route === "correct-email" ? "check-email" : "login";
 }
 
-function VerifyEmailScreen({
-  api,
-  onBack,
-  onVerified,
-  token,
-}: {
-  api: AuthenticationApi;
-  onBack: () => void;
-  onVerified: () => void;
-  token: string;
-}) {
-  const [status, setStatus] = useState<"loading" | "verified" | "invalid">("loading");
-  // The token is consumed by its first use: the verification follows the api
-  // and the token, never the parent's latest `onVerified` closure.
-  const verified = useEffectEvent(onVerified);
-
-  useEffect(() => {
-    let active = true;
-
-    void api.verifyClientEmail(token).then((result) => {
-      if (active) {
-        setStatus(result.status === "verified" ? "verified" : "invalid");
-        if (result.status === "verified") verified();
-      }
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [api, token]);
-
-  // C01k: the outcome on the band, its line in the card, the button under it.
-  return (
-    <AuthenticationScreen
-      actions={
-        status === "loading" ? undefined : (
-          <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />
-        )
-      }
-      badge={
-        status === "loading"
-          ? { icon: "mail", tone: "primary" }
-          : status === "verified"
-            ? { icon: "check", tone: "success" }
-            : { icon: "blocked", tone: "primary" }
-      }
-      brand={false}
-      title={
-        status === "loading"
-          ? "Verificando correo"
-          : status === "verified"
-            ? "Correo verificado"
-            : "Enlace no válido"
-      }
-    >
-      <Text variant="cuerpo">
-        {status === "loading"
-          ? "Estamos verificando tu enlace."
-          : status === "verified"
-            ? "Tu cuenta está lista. Ahora puedes iniciar sesión."
-            : "Este enlace venció o ya fue utilizado."}
-      </Text>
-    </AuthenticationScreen>
-  );
-}
-
 export function AuthenticationFlow({
   allowClientRegistration = true,
   api,
   intent,
   biometricLock,
   notice = null,
+  onIntentHandled,
   onLogin,
   onRecoveryCredential = () => undefined,
   pendingRegistrationStore,
@@ -153,17 +91,27 @@ export function AuthenticationFlow({
 
   // A link received while the flow is up opens its screen in the same render
   // (state adjusted when a prop changes, as the React docs prescribe).
+  // The flow keeps its own copy, so the screen stays once the app forgets it.
+  const [link, setLink] = useState(intent ?? null);
   const [seenIntent, setSeenIntent] = useState(intent);
   if (intent !== seenIntent) {
     setSeenIntent(intent);
     if (intent !== null && intent !== undefined) {
+      setLink(intent);
       setRoute(routeForIntent(intent));
     }
   }
 
+  function linkHandled() {
+    if (link !== null) onIntentHandled?.(link);
+  }
+
   function showLogin() {
+    linkHandled();
     setRoute("login");
   }
+
+  const leaveForLogin = useEffectEvent(showLogin);
 
   // The flow switches screens without a navigator, so the Android back button
   // would close the app from every screen past the login (MOB-074).
@@ -171,17 +119,26 @@ export function AuthenticationFlow({
     const target = previousRoute(route);
     if (target === null) return;
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      setRoute(target);
+      if (target === "login") leaveForLogin();
+      else setRoute(target);
       return true;
     });
     return () => subscription.remove();
   }, [route]);
 
-  // A signed-in Client no longer has a registration to continue.
+  // A signed-in Client no longer has a registration to continue, nor a link.
   const login = async (values: LoginValues) => {
     const result = await onLogin?.(values);
-    if (result === undefined) setPending(null);
+    if (result === undefined) {
+      setPending(null);
+      linkHandled();
+    }
     return result;
+  };
+
+  const recovered = async (credential: string) => {
+    linkHandled();
+    await onRecoveryCredential(credential);
   };
 
   if (restoring) return null;
@@ -239,29 +196,33 @@ export function AuthenticationFlow({
     );
   }
 
-  if (route === "verify-email" && intent?.type === "verify-email") {
+  if (route === "verify-email" && link?.type === "verify-email") {
     return (
       <VerifyEmailScreen
         api={api}
         onBack={showLogin}
+        onSettled={linkHandled}
         onVerified={() => setPending(null)}
-        token={intent.token}
+        token={link.token}
       />
     );
   }
 
   if (
-    (route === "activate" && intent?.type === "activate-account") ||
-    (route === "recover" && intent?.type === "recover-password")
+    (route === "activate" && link?.type === "activate-account") ||
+    (route === "recover" && link?.type === "recover-password")
   ) {
     return (
       <PasswordLinkScreen
         api={api}
         audience={allowClientRegistration ? "client" : "staff"}
-        intent={intent}
+        intent={link}
         onLogin={showLogin}
-        onRecovered={onRecoveryCredential}
-        onRequestRecovery={() => setRoute("recovery-request")}
+        onRecovered={recovered}
+        onRequestRecovery={() => {
+          linkHandled();
+          setRoute("recovery-request");
+        }}
       />
     );
   }
