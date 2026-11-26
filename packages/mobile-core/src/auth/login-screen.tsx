@@ -8,6 +8,7 @@ import { z } from "zod";
 import logo from "../../assets/emma-logo.png";
 import { TeamAccessBadge } from "./auth-layout";
 import { UnconfirmedEmailCard } from "./unconfirmed-email-card";
+import { useOptionalMobileIdentity } from "./identity-provider";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricWelcome } from "../ui/biometric-login-button";
@@ -62,7 +63,20 @@ type LoginScreenProps = {
   onSubmit?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
+  /**
+   * Walkthrough n.º 5 (C01q, C01r): the system may fill and save the password
+   * only on a phone without Face ID or a fingerprint; elsewhere the app's own
+   * biometric offer is the only one. Read from the identity when omitted.
+   */
+  passwordAutofill?: boolean;
 };
+
+// No autofill, no «Save password?»: email and password fields alike.
+const autofillOff = {
+  autoComplete: "off",
+  importantForAutofill: "no",
+  textContentType: "none",
+} as const;
 
 export function LoginScreen({
   biometricLock,
@@ -71,11 +85,14 @@ export function LoginScreen({
   onRegister,
   onResendConfirmation,
   onSubmit = () => undefined,
+  passwordAutofill,
   teamAccess = false,
   unconfirmedEmail = null,
 }: LoginScreenProps) {
   // The address the last refusal was for.
   const [rejected, setRejected] = useState<string | null>(null);
+  const biometricsAvailable = useOptionalMobileIdentity()?.biometrics.available === true;
+  const autofill = passwordAutofill ?? !biometricsAvailable;
   // Until the launch's own prompt answers, only the logo shows (canvas Main, iOS-1).
   const [autoPrompting, setAutoPrompting] = useState(biometricLock?.autoPrompt === true);
   // A development build mounts effects twice; the phone takes one prompt at a time.
@@ -176,7 +193,7 @@ export function LoginScreen({
                   render={({ field: { onBlur, onChange, value } }) => (
                     <FormField
                       autoCapitalize="none"
-                      autoComplete="email"
+                      {...(autofill ? { autoComplete: "email" as const } : autofillOff)}
                       error={errors.email?.message}
                       keyboardType="email-address"
                       label="Correo electrónico"
@@ -192,7 +209,7 @@ export function LoginScreen({
                   name="password"
                   render={({ field: { onBlur, onChange, value } }) => (
                     <FormField
-                      autoComplete="current-password"
+                      {...(autofill ? { autoComplete: "current-password" as const } : autofillOff)}
                       error={errors.password?.message}
                       label="Contraseña"
                       onBlur={onBlur}
