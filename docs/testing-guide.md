@@ -12610,8 +12610,7 @@ C. **Automated.** `pnpm test:e2e e2e/clients.spec.ts` in `apps/admin-web`
 Run the API on a copy of `pilates_golden` and Metro for both apps.
 
 A. **Staff first sign-in with Face ID.** On an iPhone Simulator with Face ID
-   enrolled (`xcrun simctl spawn <udid> notifyutil -s
-   com.apple.BiometricKit.enrollmentChanged 1` and `-p` the same key), sign in
+   enrolled (Simulator › Features › Face ID › Enrolled), sign in
    to the Staff app for the first time as Paola. «¿Entrar con Face ID?» comes
    first; after **Ahora no** the notification sheet «¿Te avisamos?» follows,
    never under it, and every tap on Pagos pendientes works afterwards.
