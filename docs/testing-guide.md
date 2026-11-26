@@ -12552,6 +12552,20 @@ H. **Seeing the app as someone.** As an Administrator, use **Ver la app
    como…**: Perfil hides the photo links, **Cambiar contraseña**, **Cerrar
    sesión** and **Enviar comentarios**, and shows **Dejar de ver como …** at
    the end of Ajustes.
+I. **Staff screens on the same edge.** Step A holds on every Staff screen
+   too (Hoy, Agenda, Pagos, Comentarios, Notificaciones, Mis pagos), lists
+   and fixed footers included.
+J. **Images and invoices (E-D19, E-D30, C10v).** The invoice drop box has a
+   solid outline with a dashed line just inside it. Opening the uploaded
+   invoice, the attached receipt (Client) or a QR shows a white page with
+   the serif title and **Cerrar** with its × on one row, the image under it
+   and the note under the image, on no inner card.
+K. **Comentarios (E-F18, E-F19).** The comments are rows of one white card
+   split by hairlines: two initials, two lines of text with «…», a chevron.
+   **Filtrar** has a tag before it. In a comment, **Guardar** stays on the
+   white footer at the bottom while the page scrolls.
+L. **«Borrar» for screen readers.** With VoiceOver or TalkBack on, a
+   notification row in either app offers «Borrar» among its actions.
 
 ## Test 205: sharing the referral code from one card (mejoras del recorrido 26, 27)
 
