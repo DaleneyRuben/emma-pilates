@@ -97,6 +97,8 @@ export interface ClientInvitationTransaction {
   findAccountByEmail: (email: string) => Promise<ExistingAccount | null>;
   /** The Client's pending Account, from a staff invitation or her own registration. */
   findInvitation: (clientId: string) => Promise<ClientInvitationRecord | null>;
+  /** Walkthrough n.º 2: an unresolved hard bounce for this address. */
+  isEmailBounced: (email: string) => Promise<boolean>;
   /** Seconds until the recipient lane has room again, 0 when it has. */
   authenticationEmailWaitSeconds: (input: {
     email: string;

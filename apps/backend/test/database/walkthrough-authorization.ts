@@ -10,6 +10,8 @@ export const walkthroughAuthorizationRows = (): Record<string, MatrixRow> => ({
   'POST /api/v1/client-registrations/status-checks': publicRoute,
   // n.º 18: «Crea tu cuenta» names a code's holder before the Account exists.
   'GET /api/v1/referral-codes/lookup': publicRoute,
+  // n.º 2: the Clientas file says a pending Client's email bounced.
+  'GET /api/v1/assistant/client-invitations/{clientId}/email-delivery': allow,
   // n.º 10: every Account removes and restores its own notifications.
   'DELETE /api/v1/notifications/{notificationId}': allow,
   'POST /api/v1/notifications/{notificationId}/restore': allow,

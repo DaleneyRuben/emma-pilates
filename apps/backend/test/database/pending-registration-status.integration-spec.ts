@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { readPendingRegistrationStatus } from '../../src/system-identity/registration/prisma-pending-registration-status';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
+import { PrismaClientInvitationUnitOfWork } from '../../src/system-identity/invitations/prisma-client-invitation-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import { VerifyClientEmail } from '../../src/system-identity/registration/verify-client-email';
 import {
@@ -173,5 +174,22 @@ describe('the status of a pending Client registration', () => {
     await expect(statusOf(second.registrationContinuation)).resolves.toBe(
       'pending',
     );
+  });
+
+  // RW-clientas-ficha-correo-rebotado: the Clientas file asks the same
+  // question about a pending Client's address.
+  it('tells the Clientas file the same about a pending address', async () => {
+    const bounced = await register();
+    await suppress(bounced.email, 'HARD_BOUNCE');
+    const quiet = await register();
+    const isBounced = (email: string) =>
+      new PrismaClientInvitationUnitOfWork({
+        prisma,
+        boss: world.boss,
+        digestEmail: digestTestEmail,
+      }).execute((transaction) => transaction.isEmailBounced(email));
+
+    await expect(isBounced(bounced.email)).resolves.toBe(true);
+    await expect(isBounced(quiet.email)).resolves.toBe(false);
   });
 });
