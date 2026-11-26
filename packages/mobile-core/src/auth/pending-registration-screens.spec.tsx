@@ -166,6 +166,7 @@ describe("Revisa tu correo (01)", () => {
         api={createApiMock()}
         onBack={jest.fn()}
         onCancelled={jest.fn()}
+        onConfirmed={jest.fn()}
         onCorrect={jest.fn()}
         onRegisterAgain={onRegisterAgain}
         onResent={jest.fn()}

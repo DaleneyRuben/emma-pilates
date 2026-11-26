@@ -5,6 +5,8 @@ import {
   completePasswordRecovery as completePasswordRecoveryRequest,
   correctPendingClientEmail,
   inspectAuthenticationLink,
+  lookUpReferralCode as lookUpReferralCodeRequest,
+  readPendingClientRegistrationStatus,
   registerClient,
   requestPasswordRecovery as requestPasswordRecoveryRequest,
   resendPendingClientVerification,
@@ -140,6 +142,30 @@ export function createAuthenticationApi({
       }
 
       return response.data;
+    },
+    /** Whose code it is before registering (walkthrough n.º 18). */
+    async lookUpReferralCode(code: string) {
+      const response = await lookUpReferralCodeRequest({ code }, undefined, fetcher);
+
+      if (response.status !== 200) {
+        throw failure("Referral code lookup", response);
+      }
+
+      return response.data;
+    },
+    /** Whether the pending registration's email was confirmed (n.º 4). */
+    async readRegistrationStatus(registrationContinuation: string) {
+      const response = await readPendingClientRegistrationStatus(
+        { registrationContinuation },
+        undefined,
+        fetcher,
+      );
+
+      if (response.status !== 200) {
+        throw failure("Registration status", response);
+      }
+
+      return response.data.status;
     },
     async register(values: StartClientRegistrationDto) {
       const response = await registerClient(values, await identified(), fetcher);

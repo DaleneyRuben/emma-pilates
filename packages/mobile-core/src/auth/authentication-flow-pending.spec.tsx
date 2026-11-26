@@ -14,6 +14,8 @@ function createApiMock(overrides: Partial<AuthenticationApi> = {}): Authenticati
     completePasswordRecovery: jest.fn(),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn(),
+    lookUpReferralCode: jest.fn(),
+    readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
     register: jest.fn().mockResolvedValue({
       email: "ana@example.com",
       registrationContinuation: "continuation",

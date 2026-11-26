@@ -81,6 +81,9 @@ export function AuthenticationFlow({
   pendingRegistrationStore,
 }: AuthenticationFlowProps) {
   const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
+  // C01c2: the flow's own one-time notice over Login, ahead of the app's.
+  const [loginNotice, setLoginNotice] = useState<string | null>(null);
+  const [resendOnOpen, setResendOnOpen] = useState(false);
   const { pending, restoring, setPending } = usePendingRegistration({
     // A link that arrived while the kept registration was loading keeps its
     // screen; the registration stays stored for a launch without one (MOB-056).
@@ -108,6 +111,7 @@ export function AuthenticationFlow({
 
   function showLogin() {
     linkHandled();
+    setResendOnOpen(false);
     setRoute("login");
   }
 
@@ -165,13 +169,25 @@ export function AuthenticationFlow({
           setPending(null);
           showLogin();
         }}
-        onCorrect={() => setRoute("correct-email")}
+        onConfirmed={() => {
+          setPending(null);
+          setLoginNotice("Tu correo ya está confirmado. Inicia sesión para entrar.");
+          showLogin();
+        }}
+        onCorrect={() => {
+          setResendOnOpen(false);
+          setRoute("correct-email");
+        }}
         onRegisterAgain={() => {
           setPending(null);
           setRoute("register");
         }}
-        onResent={() => setPending(restartPendingWindow(pending))}
+        onResent={() => {
+          setResendOnOpen(false);
+          setPending(restartPendingWindow(pending));
+        }}
         pending={pending}
+        resendOnOpen={resendOnOpen}
       />
     );
   }
@@ -230,11 +246,16 @@ export function AuthenticationFlow({
   return (
     <LoginScreen
       biometricLock={biometricLock}
-      notice={notice}
+      notice={loginNotice ?? notice}
+      onResendConfirmation={() => {
+        setResendOnOpen(true);
+        setRoute("check-email");
+      }}
       onForgotPassword={() => setRoute("recovery-request")}
       onRegister={allowClientRegistration ? () => setRoute("register") : undefined}
       onSubmit={onLogin === undefined ? undefined : login}
       teamAccess={!allowClientRegistration}
+      unconfirmedEmail={pending?.email ?? null}
     />
   );
 }

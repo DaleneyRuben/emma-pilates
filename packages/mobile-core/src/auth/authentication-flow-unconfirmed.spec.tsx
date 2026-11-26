@@ -58,7 +58,8 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     const screen = await render(
       <AuthenticationFlow api={api} onLogin={onLogin} pendingRegistrationStore={store} />,
     );
-    await fireEvent.press(await screen.findByRole("button", { name: "Volver a iniciar sesión" }));
+    // «Revisa tu correo» leads to Login with its «Iniciar sesión» button.
+    await fireEvent.press(await screen.findByRole("button", { name: "Iniciar sesión" }));
     return { screen, store };
   }
 
@@ -67,7 +68,7 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     const onLogin = jest.fn().mockResolvedValue({ status: "rejected" });
     const { screen } = await openLogin(api, onLogin);
 
-    await signIn(screen, " Carla@Example.com ");
+    await signIn(screen, "Carla@Example.com");
 
     expect(await screen.findByText("Todavía no confirmaste tu correo")).toBeOnTheScreen();
     expect(

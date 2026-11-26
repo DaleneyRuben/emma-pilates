@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import logo from "../../assets/emma-logo.png";
 import { TeamAccessBadge } from "./auth-layout";
+import { UnconfirmedEmailCard } from "./unconfirmed-email-card";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricWelcome } from "../ui/biometric-login-button";
@@ -52,6 +53,12 @@ type LoginScreenProps = {
   onRegister?: () => void;
   /** The Staff app marks its Login as the team's entrance (S01). */
   teamAccess?: boolean;
+  /**
+   * The address this phone registered and has not confirmed (n.º 4): a
+   * refusal for it says so, with «Reenviar correo», instead of the generic one.
+   */
+  unconfirmedEmail?: string | null;
+  onResendConfirmation?: () => void;
   onSubmit?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
@@ -62,10 +69,13 @@ export function LoginScreen({
   notice = null,
   onForgotPassword,
   onRegister,
+  onResendConfirmation,
   onSubmit = () => undefined,
   teamAccess = false,
+  unconfirmedEmail = null,
 }: LoginScreenProps) {
-  const [rejected, setRejected] = useState(false);
+  // The address the last refusal was for.
+  const [rejected, setRejected] = useState<string | null>(null);
   // Until the launch's own prompt answers, only the logo shows (canvas Main, iOS-1).
   const [autoPrompting, setAutoPrompting] = useState(biometricLock?.autoPrompt === true);
   // A development build mounts effects twice; the phone takes one prompt at a time.
@@ -94,11 +104,11 @@ export function LoginScreen({
     resolver: zodResolver(loginSchema),
   });
   const submitLogin = handleSubmit(async (values) => {
-    setRejected(false);
+    setRejected(null);
     const result = await onSubmit(values);
 
     if (result?.status === "rejected") {
-      setRejected(true);
+      setRejected(values.email.trim().toLowerCase());
     }
 
     if (result?.status === "throttled") {
@@ -146,9 +156,13 @@ export function LoginScreen({
             )}
             {biometricLock === undefined ? (
               <>
-                {rejected ? (
+                {rejected === null ? null : unconfirmedEmail !== null &&
+                  onResendConfirmation !== undefined &&
+                  rejected === unconfirmedEmail.trim().toLowerCase() ? (
+                  <UnconfirmedEmailCard email={unconfirmedEmail} onResend={onResendConfirmation} />
+                ) : (
                   <FormAlert>El correo o la contraseña no son correctos.</FormAlert>
-                ) : null}
+                )}
                 {retryAfterSeconds > 0 ? (
                   <WaitNotice
                     message="Demasiados intentos. Intenta de nuevo en un momento."

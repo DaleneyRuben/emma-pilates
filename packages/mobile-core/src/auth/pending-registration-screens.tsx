@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Text } from "../ui/text";
@@ -13,6 +13,7 @@ import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api"
 import { useMountedAt } from "../time/mounted-at";
 import { formatCountdown, useCountdown } from "./countdown";
 import { limitKeepsCurrentLink } from "./request-limit-copy";
+import { useRegistrationConfirmed } from "./use-registration-confirmed";
 
 // ADR-0029: the pending registration is removed after 7 days without a
 // verification, correction, or resend; each correction or resend restarts it.
@@ -71,19 +72,25 @@ export function CheckEmailScreen({
   api,
   onBack,
   onCancelled,
+  onConfirmed,
   onCorrect,
   onRegisterAgain,
   onResent,
   pending,
+  resendOnOpen = false,
 }: {
   api: AuthenticationApi;
   onBack: () => void;
   onCancelled: () => void;
+  /** The email was confirmed elsewhere meanwhile (C01c2). */
+  onConfirmed: () => void;
   onCorrect: () => void;
   onRegisterAgain: () => void;
   /** A resend restarts the 7-day window, whatever the neutral answer hides. */
   onResent: () => void;
   pending: PendingRegistration;
+  /** Login's «Reenviar correo» (C01e2) opens this screen already sending. */
+  resendOnOpen?: boolean;
 }) {
   const [resent, setResent] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
@@ -91,6 +98,11 @@ export function CheckEmailScreen({
   const [sheet, setSheet] = useState<Sheet>(null);
   const [waitSeconds, startWait] = useCountdown();
   const shownAt = useMountedAt();
+  useRegistrationConfirmed(api, pending.registrationContinuation, onConfirmed);
+  const resendNow = useEffectEvent(() => void resend());
+  useEffect(() => {
+    if (resendOnOpen) resendNow();
+  }, [resendOnOpen]);
 
   if (shownAt >= pending.pendingExpiresAt) {
     return <RegistrationLapsed onBack={onBack} onRegisterAgain={onRegisterAgain} />;

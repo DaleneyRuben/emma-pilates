@@ -17,6 +17,8 @@ function createApiMock(
       .mockResolvedValue({ credential: "credential", status: "recovered" }),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn().mockResolvedValue(inspection),
+    lookUpReferralCode: jest.fn(),
+    readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
     register: jest.fn(),
     requestPasswordRecovery: jest.fn(),
     resendRegistrationVerification: jest.fn(),
