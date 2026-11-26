@@ -46,7 +46,7 @@ const staffMember = (role: string) =>
     branches: [],
   });
 
-async function openComments() {
+async function openComments(triageStatus = 200) {
   const lists: string[] = [];
   const triaged: unknown[] = [];
   const routes = routeFetcher({
@@ -56,7 +56,9 @@ async function openComments() {
     [`/api/v1/administrator/feedback/${feedbackId}`]: () => jsonResponse(comment),
     [`POST /api/v1/administrator/feedback/${feedbackId}/triage`]: (init) => {
       triaged.push(JSON.parse(String(init?.body)));
-      return jsonResponse({ ...comment, status: "reviewed" });
+      return triageStatus === 200
+        ? jsonResponse({ ...comment, status: "reviewed" })
+        : jsonResponse({ code: "invalid_request" }, triageStatus);
     },
   });
   // The list answers by its query: four comments once filtered by type.
@@ -139,6 +141,28 @@ describe("Comentarios in the Staff app", () => {
         { status: "reviewed", changeNote: "Arreglamos la lista en la 1.1.1." },
       ]),
     );
+  });
+
+  // Review: a refused save is not «Guardado.».
+  it("does not say saved when the server refuses the triage", async () => {
+    const { screen, triaged } = await openComments(400);
+
+    await fireEvent.press(screen.getByRole("button", { name: /^Ana Pérez/ }));
+    await fireEvent.press(await screen.findByRole("tab", { name: "Revisado" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() => expect(triaged).toHaveLength(1));
+    expect(await screen.findByText(/No pudimos guardar/)).toBeOnTheScreen();
+    expect(screen.queryByText("Guardado.")).toBeNull();
+  });
+
+  // Review: past the first 50 the list offers the rest.
+  it("offers more comments when the tab holds more than it shows", async () => {
+    const { lists, screen } = await openComments();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Ver más comentarios" }));
+
+    await waitFor(() => expect(lists.some((path) => path.includes("pageSize=100"))).toBe(true));
   });
 
   it("keeps Comentarios out of a Trainer's Perfil", async () => {
