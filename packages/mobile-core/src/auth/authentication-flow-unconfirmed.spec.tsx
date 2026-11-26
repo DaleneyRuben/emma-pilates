@@ -139,6 +139,8 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     );
 
     expect(await screen.findByText("El correo rebotó")).toBeOnTheScreen();
+    // The notice stands on the screen, not inside the page's white card.
+    expect(screen.queryByTestId("authentication-panel")).toBeNull();
     expect(screen.getByTestId("check-email-bounced")).toHaveStyle({
       backgroundColor: "#FEF6F2",
       borderColor: "#CDA697",
