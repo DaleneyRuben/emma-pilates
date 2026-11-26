@@ -75,11 +75,11 @@ describe("Perfil on a tablet", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
 
     await waitFor(() => expect(screen.getByLabelText("Nombre")).toBeOnTheScreen());
-    const columns = screen.getAllByTestId("tablet-column");
-    expect(columns).toHaveLength(2);
-    for (const column of columns) expect(column).toHaveStyle({ maxWidth: 560 });
-    expect(within(columns[0]).getByLabelText("Nombre")).toBeOnTheScreen();
-    expect(within(columns[1]).getByRole("button", { name: "Guardar cambios" })).toBeOnTheScreen();
+    // Walkthrough n.º 6: one column, the button at the end of the form.
+    const column = screen.getByTestId("tablet-column");
+    expect(column).toHaveStyle({ maxWidth: 560 });
+    expect(within(column).getByLabelText("Nombre")).toBeOnTheScreen();
+    expect(within(column).getByRole("button", { name: "Guardar cambios" })).toBeOnTheScreen();
   });
 
   it("changes the password in a centred 480 pt column (23T)", async () => {

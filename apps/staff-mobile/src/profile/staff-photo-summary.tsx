@@ -8,6 +8,7 @@ import {
   colors,
   NoticeRow,
   PersonAvatar,
+  PhotoUploadRing,
   profilePhotoMaxEdge,
   phoneWithFlag,
   spacing,
@@ -19,20 +20,25 @@ import {
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { loadImageUpload } from "../uploads/load-image-upload";
 
+type PickedImage = { uri: string; bytes: Uint8Array<ArrayBuffer> };
+
 type PhotoState =
   | { status: "idle"; previewUri?: string }
-  | { status: "uploading"; localUri: string }
+  | { status: "uploading"; picked: PickedImage }
+  | { status: "upload-failed"; picked: PickedImage }
   | { status: "removing" }
   | { status: "failed"; message: string };
 
 type ProfileQueryData = { data: StaffProfileDto; status: number; headers: Headers };
 
-const uploadFailed = "No pudimos subir la foto. Inténtalo de nuevo.";
+// Walkthrough n.º 14 (C22d): Perfil has no other changes to keep, so the
+// notice says only what failed.
+const uploadFailed = "No pudimos subir tu foto.";
 const removalFailed = "No pudimos quitar la foto. Inténtalo de nuevo.";
 const avatarSize = 64;
 
@@ -58,8 +64,8 @@ export function StaffPhotoSummary({
   const storedUri = useStaffPhoto(fetcher, member.photo, "display");
   // The picked photo stays until the stored one loads: no initials between.
   const shownUri =
-    state.status === "uploading"
-      ? state.localUri
+    state.status === "uploading" || state.status === "upload-failed"
+      ? state.picked.uri
       : state.status === "removing"
         ? null
         : (storedUri ?? (state.status === "idle" ? (state.previewUri ?? null) : null));
@@ -78,12 +84,11 @@ export function StaffPhotoSummary({
         query.queryKey[0] !== getGetCurrentStaffMemberProfileQueryKey()[0],
     });
 
-  const change = async () => {
+  // C22c: the photo shows at once under the ring; «Reintentar» sends it again.
+  const upload = async (picked: PickedImage) => {
+    setState({ status: "uploading", picked });
     try {
-      const { pickImage, uploadImage } = await loadImageUpload();
-      const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
-      if (picked === null) return;
-      setState({ status: "uploading", localUri: picked.uri });
+      const { uploadImage } = await loadImageUpload();
       const imageAssetId = await uploadImage(picked, "profile_photo", fetcher);
       const response = await setCurrentStaffMemberPhoto(
         { imageAssetId },
@@ -94,6 +99,18 @@ export function StaffPhotoSummary({
       remember(response.data.photo);
       setState({ status: "idle", previewUri: picked.uri });
       refreshOthers();
+    } catch {
+      setState({ status: "upload-failed", picked });
+    }
+  };
+
+  const change = async () => {
+    // One upload at a time: the links stay visible while it runs (C22c).
+    if (state.status === "uploading") return;
+    try {
+      const { pickImage } = await loadImageUpload();
+      const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
+      if (picked !== null) await upload(picked);
     } catch {
       setState({ status: "failed", message: uploadFailed });
     }
@@ -115,23 +132,16 @@ export function StaffPhotoSummary({
   return (
     <View style={styles.block}>
       <View style={styles.summary}>
-        <View>
+        <PhotoUploadRing size={avatarSize} uploading={state.status === "uploading"}>
           <PersonAvatar name={member.name} photoUri={shownUri} size={avatarSize} />
-          {state.status === "uploading" ? (
-            <View style={styles.veil} testID="photo-veil">
-              <ActivityIndicator color={colors.primary} size="small" />
-            </View>
-          ) : null}
-        </View>
+        </PhotoUploadRing>
         <View style={styles.body}>
           <Text variant="titulo-bloque">{member.name}</Text>
           <Text variant="secundario">{member.email}</Text>
           {member.phone ? <Text variant="secundario">{phoneWithFlag(member.phone)}</Text> : null}
           <View style={styles.actions}>
-            {!editable ? null : state.status === "uploading" || state.status === "removing" ? (
-              <Text variant="secundario">
-                {state.status === "uploading" ? "Subiendo foto…" : "Quitando foto…"}
-              </Text>
+            {!editable ? null : state.status === "removing" ? (
+              <Text variant="secundario">Quitando foto…</Text>
             ) : (
               <>
                 <TintButton label="Cambiar foto" onPress={() => void change()} />
@@ -144,6 +154,14 @@ export function StaffPhotoSummary({
         </View>
       </View>
       {state.status === "failed" ? <NoticeRow message={state.message} /> : null}
+      {state.status === "upload-failed" ? (
+        <>
+          <NoticeRow message={uploadFailed} />
+          <View style={styles.retry}>
+            <TextButton label="Reintentar" onPress={() => void upload(state.picked)} />
+          </View>
+        </>
+      ) : null}
       <Text variant="secundario">{note}</Text>
     </View>
   );
@@ -186,16 +204,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 14,
   },
-  // Marfil at 55 % with the busy ring (follow-up 241 §2), only while uploading.
-  veil: {
-    alignItems: "center",
-    backgroundColor: colors.scrim,
-    borderRadius: avatarSize / 2,
-    bottom: 0,
-    justifyContent: "center",
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
-  },
+  retry: { flexDirection: "row", justifyContent: "center" },
 });

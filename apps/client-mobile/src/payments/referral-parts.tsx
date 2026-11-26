@@ -10,6 +10,13 @@ const invitationStatus = {
   bought: "Compró su plan",
 } as const;
 
+// Walkthrough n.º 20 (C16s): what comes next for each friend.
+const nextStep = {
+  registered: "Todavía no reservó su clase gratis.",
+  class_booked: "Si compra su primer plan, ganas una clase.",
+  bought: "Ganaste 1 clase. Ya está en tu plan.",
+} as const;
+
 const steps = [
   "1. Compartes tu código.",
   "2. Tu amiga toma una clase gratis.",
@@ -32,15 +39,16 @@ export function HowItWorks() {
             </Text>
           ))}
         </View>
-        <Text variant="secundario">
-          Una amiga por mes. La clase gratis es una sola vez para ella.
-        </Text>
+        <Text variant="secundario">Puedes invitar a una amiga por mes.</Text>
       </View>
     </View>
   );
 }
 
-/** C16's «Tus invitadas»: initials, the name, and the invitation's status. */
+/**
+ * C16s' «Tus invitadas»: initials, the name with the invitation's status on
+ * its right, and the next step under them.
+ */
 export function ReferredList({ referred }: { referred: readonly ReferredClientDto[] }) {
   return (
     <View style={styles.group}>
@@ -49,10 +57,15 @@ export function ReferredList({ referred }: { referred: readonly ReferredClientDt
           {index === 0 ? null : <View style={styles.hairline} />}
           <View style={styles.row}>
             <PersonAvatar name={entry.referredName} photoUri={null} size={36} />
-            <Text style={styles.label} variant="titulo-fila">
-              {entry.referredName}
-            </Text>
-            <Text variant="cuerpo">{invitationStatus[entry.invitationStatus]}</Text>
+            <View style={styles.label}>
+              <View style={styles.nameLine}>
+                <Text style={styles.label} variant="titulo-fila">
+                  {entry.referredName}
+                </Text>
+                <Text variant="secundario">{invitationStatus[entry.invitationStatus]}</Text>
+              </View>
+              <Text variant="secundario">{nextStep[entry.invitationStatus]}</Text>
+            </View>
           </View>
         </Fragment>
       ))}
@@ -64,7 +77,8 @@ const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   group: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
-  label: { flex: 1 },
+  label: { flex: 1, gap: 2 },
+  nameLine: { flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
   steps: { gap: spacing.sm },
   row: {
     alignItems: "center",

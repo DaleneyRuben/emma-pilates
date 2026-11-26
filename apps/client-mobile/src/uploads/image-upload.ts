@@ -80,6 +80,12 @@ function downscaleActions(
   return width >= height ? [{ resize: { width: maxEdge } }] : [{ resize: { height: maxEdge } }];
 }
 
+/**
+ * How far an upload got, from 0 to 1, step by step: declared, sent, finalized,
+ * ready (walkthrough n.º 7). React Native's fetch reports no byte progress.
+ */
+export type UploadProgress = (fraction: number) => void;
+
 // Declares, uploads, finalizes, and waits until the worker has verified the
 // image; resolves with the READY asset id.
 export async function uploadImage(
@@ -87,6 +93,7 @@ export async function uploadImage(
   purpose: CreatePendingUploadDtoPurpose,
   fetcher: typeof globalThis.fetch,
   sleep?: (milliseconds: number) => Promise<void>,
+  onProgress: UploadProgress = () => undefined,
 ): Promise<string> {
   // expo-crypto's native digest only accepts typed arrays, never a bare buffer.
   const digest = await Crypto.digest(Crypto.CryptoDigestAlgorithm.SHA256, image.bytes);
@@ -102,6 +109,7 @@ export async function uploadImage(
   );
   if (declared.status !== 201) throw new Error("upload_declaration_failed");
   const imageAssetId = declared.data.id;
+  onProgress(0.1);
 
   const stored = await fetcher(getPutPendingUploadObjectUrl(imageAssetId), {
     method: "PUT",
@@ -112,14 +120,17 @@ export async function uploadImage(
     ) as ArrayBuffer,
   });
   if (!stored.ok) throw new Error("upload_failed");
+  onProgress(0.7);
 
   const finalized = await finalizeUpload(imageAssetId, idempotency(), fetcher);
   if (finalized.status !== 202) throw new Error("upload_finalization_failed");
+  onProgress(0.8);
 
   await waitForUploadReady(async () => {
     const status = await getUploadStatus(imageAssetId, undefined, fetcher);
     return status.status === 200 ? status.data.state : null;
   }, sleep);
+  onProgress(0.95);
 
   return imageAssetId;
 }

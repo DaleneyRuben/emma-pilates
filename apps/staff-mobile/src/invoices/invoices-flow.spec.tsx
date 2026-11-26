@@ -178,9 +178,11 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     expect(await screen.findByText("Sube la factura emitida")).toBeOnTheScreen();
     expect(screen.getByText("Mariana Quiroga")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
     await sheetClosed();
+    // Walkthrough n.º 24 (E-D28): the file shows first; «Subir factura» confirms.
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(screen.getByText("factura-000123.jpg")).toBeOnTheScreen();
@@ -203,7 +205,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
-    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir un PDF" }));
     await sheetClosed();
     return screen;
@@ -230,6 +232,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     mockUploadImage.mockResolvedValue("asset-10");
 
     const screen = await openUpload(uploadRoutes(attached));
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(mockPickImage).not.toHaveBeenCalled();
@@ -286,9 +289,10 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
-    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
     await sheetClosed();
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
 
     expect(
       await screen.findByText(
@@ -376,9 +380,10 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
-    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
     await sheetClosed();
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Reintentar" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();

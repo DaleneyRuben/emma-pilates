@@ -29,7 +29,7 @@ describe("Client icons and initials in palette B", () => {
 
   it("draws the receipt row's upload icon plain", async () => {
     const screen = await render(
-      <ReceiptRow onAttach={jest.fn()} onRemove={jest.fn()} receipt={null} uploading={false} />,
+      <ReceiptRow onAttach={jest.fn()} onRemove={jest.fn()} receipt={{ status: "empty" }} />,
     );
 
     expect(ancestorBackgrounds(screen.getByTestId("glyph-upload", hidden))).not.toContain(rubor);

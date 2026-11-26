@@ -268,7 +268,7 @@ describe("Paid Evaluation receipt", () => {
     await act(async () => {
       fireEvent.press(upload);
     });
-    expect((await screen.findAllByText("Subiendo comprobante…")).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText("Subiendo comprobante")).length).toBeGreaterThan(0);
 
     await act(async () => {
       fireEvent.press(upload);

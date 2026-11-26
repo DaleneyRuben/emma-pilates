@@ -24,11 +24,17 @@ import { PushPermissionSheet } from "./push-permission-sheet";
 import type { PushPermissionStatus, PushPlatform } from "./push-platform";
 import { syncPushRegistration } from "./push-registration";
 
+/** An action's own words for the offer sheet (walkthrough n.º 9, C11n). */
+export type PermissionOfferCopy = { reason: string; title: string };
+
 export type PushNotificationsState = {
   /** Null until known, and always without a push platform (tests, web). */
   permissionStatus: PushPermissionStatus | null;
-  /** Offers the explanation sheet after an action that makes push useful. */
-  offerPermission: () => void;
+  /**
+   * Offers the explanation sheet after an action that makes push useful, in
+   * the app's words or the action's own; one thirty-day «Ahora no» for all.
+   */
+  offerPermission: (copy?: PermissionOfferCopy) => void;
   openSettings: () => void;
 };
 
@@ -81,6 +87,7 @@ export function PushNotificationsProvider({
   const queryClient = useQueryClient();
   const [permissionStatus, setPermissionStatus] = useState<PushPermissionStatus | null>(null);
   const [offering, setOffering] = useState(false);
+  const [offerCopy, setOfferCopy] = useState<PermissionOfferCopy | null>(null);
   const onOpenRef = useRef(onOpen);
   useLayoutEffect(() => {
     onOpenRef.current = onOpen;
@@ -163,15 +170,19 @@ export function PushNotificationsProvider({
     [platform],
   );
 
-  const offerPermission = useCallback(() => {
-    if (platform === undefined || !registrationEnabled) return;
-    void (async () => {
-      if ((await platform.getPermissionStatus()) !== "undetermined") return;
-      const snoozedUntil = Number((await AsyncStorage.getItem(snoozeKey)) ?? 0);
-      if (snoozedUntil > now()) return;
-      setOffering(true);
-    })();
-  }, [now, platform, registrationEnabled]);
+  const offerPermission = useCallback(
+    (copy?: PermissionOfferCopy) => {
+      if (platform === undefined || !registrationEnabled) return;
+      void (async () => {
+        if ((await platform.getPermissionStatus()) !== "undetermined") return;
+        const snoozedUntil = Number((await AsyncStorage.getItem(snoozeKey)) ?? 0);
+        if (snoozedUntil > now()) return;
+        setOfferCopy(copy ?? null);
+        setOffering(true);
+      })();
+    },
+    [now, platform, registrationEnabled],
+  );
 
   const accept = useCallback(async () => {
     setOffering(false);
@@ -201,8 +212,8 @@ export function PushNotificationsProvider({
       <PushPermissionSheet
         onAccept={() => void accept()}
         onDecline={() => void decline()}
-        reason={permissionReason}
-        title={permissionTitle}
+        reason={offerCopy?.reason ?? permissionReason}
+        title={offerCopy?.title ?? permissionTitle}
         visible={offering}
       />
     </PushNotificationsContext.Provider>

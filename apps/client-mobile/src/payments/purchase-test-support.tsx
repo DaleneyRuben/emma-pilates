@@ -79,8 +79,11 @@ export const baseRoutes = (credit: number) => ({
   "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
 });
 
-export async function openPlanDetail(fetcher: ReturnType<typeof routeFetcher>) {
-  const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+export async function openPlanDetail(
+  fetcher: ReturnType<typeof routeFetcher>,
+  overrides: Parameters<typeof createClientRuntime>[1] = {},
+) {
+  const screen = await render(<App runtime={createClientRuntime(fetcher, overrides)} />);
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();

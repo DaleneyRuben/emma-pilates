@@ -15,14 +15,15 @@ const profile = {
   referralCode: "LUCIA",
 };
 
-const routes = (referrals: unknown[]) => ({
+const routes = (referrals: unknown[], codeActive = true) => ({
   "/api/v1/clients/current": () => jsonResponse(profile),
   "/api/v1/clients/current/subscription": () =>
     jsonResponse({ status: "none", subscription: null }),
   "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
   "/api/v1/clients/current/credit": () =>
     jsonResponse({ availableCentavos: 0, reservedCentavos: 0, activity: [] }),
-  "/api/v1/clients/current/referrals": () => jsonResponse({ referralCode: "LUCIA", referrals }),
+  "/api/v1/clients/current/referrals": () =>
+    jsonResponse({ referralCode: "LUCIA", codeActive, referrals }),
   "/api/v1/referral-codes/current": () =>
     jsonResponse({ referralCode: "LUCIA", editableFrom: null }),
 });
@@ -88,9 +89,8 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("1. Compartes tu código.")).toBeOnTheScreen();
     expect(screen.getByText("2. Tu amiga toma una clase gratis.")).toBeOnTheScreen();
     expect(screen.getByText("3. Si compra su primer plan, tú ganas una clase.")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Una amiga por mes. La clase gratis es una sola vez para ella."),
-    ).toBeOnTheScreen();
+    // Owner, 26 Nov (C16): the shorter footnote.
+    expect(screen.getByText("Puedes invitar a una amiga por mes.")).toBeOnTheScreen();
     expect(screen.queryByText("Tu crédito")).toBeNull();
     expect(screen.queryByText(/crédito/i)).toBeNull();
     expect(screen.queryByText(/Bs/)).toBeNull();
@@ -101,10 +101,47 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("Registrada")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Compartir tu código" }));
+    // Walkthrough n.º 13 (C16g): the system's own share sheet, with the link.
     expect(share).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringContaining("LUCIA") }),
+      expect.objectContaining({
+        message: expect.stringContaining("https://links.emmapilatesstudio.com/client/invite/LUCIA"),
+      }),
     );
     share.mockRestore();
+  });
+
+  // Walkthrough n.º 20 (C16s): each friend's next step under her status.
+  it("tells the host what comes next for each friend", async () => {
+    const friend = (id: string, invitationStatus: string) => ({
+      referredClientId: id,
+      referredName: `Amiga ${id}`,
+      state: invitationStatus === "bought" ? "awarded" : "pending",
+      invitationStatus,
+      createdAt: "2026-09-10T15:00:00.000Z",
+      awardedAt: null,
+      awardCentavos: null,
+    });
+    const screen = await openInvita(
+      routeFetcher(
+        routes([friend("1", "bought"), friend("2", "class_booked"), friend("3", "registered")]),
+      ),
+    );
+
+    expect(await screen.findByText("Ganaste 1 clase. Ya está en tu plan.")).toBeOnTheScreen();
+    expect(screen.getByText("Si compra su primer plan, ganas una clase.")).toBeOnTheScreen();
+    expect(screen.getByText("Todavía no reservó su clase gratis.")).toBeOnTheScreen();
+  });
+
+  // Walkthrough n.º 22 (C16h): without a paid Plan in force the code gives no
+  // class yet, so the card asks for a Plan instead of sharing.
+  it("asks a host without a paid Plan to buy one instead of sharing", async () => {
+    const screen = await openInvita(routeFetcher(routes([], false)));
+
+    expect(await screen.findByText("Se activa cuando compres un plan.")).toBeOnTheScreen();
+    expect(screen.getByText("LUCIA")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Compartir tu código" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Editar código" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
   });
 
   // BKM-017: copy next to the code, and «Editar código» on the card. FIX-082
