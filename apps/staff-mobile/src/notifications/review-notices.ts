@@ -1,5 +1,9 @@
-import type { NotificationDto, NotificationReviewDto } from "@pilates/api-contracts";
-import { formatBolivianos, formatNotificationTime } from "@pilates/mobile-core";
+import {
+  formatMoney,
+  type NotificationDto,
+  type NotificationReviewDto,
+} from "@pilates/api-contracts";
+import { formatNotificationTime } from "@pilates/mobile-core";
 
 export type NoticeLine = { title: string; detail: string };
 
@@ -57,7 +61,7 @@ export function reviewLine(notification: NotificationDto, now: Date): NoticeLine
   if (review === undefined || review === null) {
     return { title: notification.title, detail: notification.message };
   }
-  const amount = review.amountCentavos === null ? null : formatBolivianos(review.amountCentavos);
+  const amount = review.amountCentavos === null ? null : formatMoney(review.amountCentavos);
   const days = freezeDays(review.startsOn, review.endsOn);
   if (review.outcome === "pending") {
     return review.subject === "payment"
