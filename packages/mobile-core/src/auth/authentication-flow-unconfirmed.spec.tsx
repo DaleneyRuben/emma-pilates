@@ -112,6 +112,8 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     ).toBeOnTheScreen();
     expect(api.readRegistrationStatus).toHaveBeenCalledWith("continuation");
     expect(screen.queryByText("Revisa tu correo")).toBeNull();
+    // C01c2: the email field already holds the registered address.
+    expect(screen.getByTestId("login-email")).toHaveProp("value", "carla@example.com");
     await waitFor(() => expect(store.clear).toHaveBeenCalled());
   });
 
