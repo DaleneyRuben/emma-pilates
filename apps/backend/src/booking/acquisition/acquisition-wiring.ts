@@ -30,6 +30,7 @@ import {
   InviteLinksController,
   inviteCodeLookup,
 } from './invite-links.controller';
+import { lookUpInviteCode } from './invite-code-lookup';
 import {
   createPrismaClientAcquisitionStore,
   createPrismaTrainerReferralCodeStore,
@@ -55,7 +56,7 @@ export const acquisitionWiring = {
       provide: inviteCodeLookup,
       inject: [prismaToken],
       useFactory: (prisma: PrismaClient) => (code: string) =>
-        lookUpReferralCode(prisma, code),
+        lookUpInviteCode(prisma, code, new Date()),
     },
     {
       provide: referralCodeLookup,

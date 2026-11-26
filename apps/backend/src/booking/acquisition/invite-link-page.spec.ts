@@ -81,7 +81,7 @@ describe('the invite link', () => {
     const html = page(
       inviteLinkDestination({
         userAgent: desktop,
-        invite: { code: 'A<B', holderFirstName: '<script>' },
+        invite: { code: 'A<B', holderFirstName: '<script>', freeClass: true },
       }),
     );
 

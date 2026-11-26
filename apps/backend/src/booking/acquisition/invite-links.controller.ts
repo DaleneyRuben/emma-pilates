@@ -9,15 +9,16 @@ import {
 } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { Response } from 'express';
-import type { ReferralCodeLookup } from './referral-code-lookup';
+import type { InviteCodeLookup } from './invite-code-lookup';
 import { inviteLinkDestination } from './invite-link-page';
 
 export const inviteCodeLookup = Symbol('inviteCodeLookup');
 
 // The page prints only the code and a first name, and runs one inline script
 // (copy the code, then open the App Store).
+// CW01c: the board's two Google fonts load from Google, nothing else does.
 const pageSecurityPolicy =
-  "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+  "default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 
 // Walkthrough n.º 13: a hosting path on the link host, like the
 // authentication fallback pages, so it stays out of OpenAPI.
@@ -26,7 +27,7 @@ const pageSecurityPolicy =
 export class InviteLinksController {
   constructor(
     @Inject(inviteCodeLookup)
-    private readonly lookUp: (code: string) => Promise<ReferralCodeLookup>,
+    private readonly lookUp: (code: string) => Promise<InviteCodeLookup>,
   ) {}
 
   @Get('client/invite/:code')
@@ -39,7 +40,7 @@ export class InviteLinksController {
     const destination = inviteLinkDestination({
       userAgent: userAgent ?? '',
       // #26: a Client's or a Trainer's live code travels with the link; the
-      // page promises a free class only for a Client's (BKM-014).
+      // page promises a free class only when the code opens one (BKM-014).
       invite:
         found?.status === 'valid' &&
         found.holderFirstName !== null &&
@@ -47,7 +48,7 @@ export class InviteLinksController {
           ? {
               code: found.code,
               holderFirstName: found.holderFirstName,
-              holderKind: found.holderKind,
+              freeClass: found.freeClass,
             }
           : null,
     });

@@ -11,8 +11,11 @@ export type InviteLinkInput = {
   invite: {
     code: string;
     holderFirstName: string;
-    /** A Trainer's code attributes the client but opens no free class (#26). */
-    holderKind?: 'client' | 'trainer';
+    /**
+     * The code opens a Guest Pass: a Client's with a paid Plan in force. A
+     * Trainer's code, or an inactive one, still carries the code (#26, #22).
+     */
+    freeClass: boolean;
   } | null;
 };
 
@@ -24,6 +27,9 @@ const appStoreUrl = 'https://apps.apple.com/app/id6838534444';
 const playUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
 // Served by the public site (apps/public-site), 1200 × 630.
 const previewImage = 'https://app.emmapilatesstudio.com/compartir.png';
+// CW01c sets the title and the code in Lora, everything else in Work Sans.
+const fontsUrl =
+  'https://fonts.googleapis.com/css2?family=Lora:wght@500&family=Work+Sans:wght@400;700&display=swap';
 
 const escapeHtml = (value: string): string =>
   value
@@ -45,23 +51,23 @@ const copyThenOpen = (code: string): string =>
   `<script>document.getElementById('copy-and-open').addEventListener('click',function(e){e.preventDefault();var go=function(){location.href=${JSON.stringify(appStoreUrl)};};try{navigator.clipboard.writeText(${JSON.stringify(code)}).then(go,go);}catch(_){go();}});</script>`;
 
 const render = (input: InviteLinkInput, iphone: boolean): string => {
-  const trainer = input.invite?.holderKind === 'trainer';
+  const noFreeClass = input.invite?.freeClass === false;
   const title =
     input.invite === null
       ? 'Tu primera clase en Emma Pilates Studio'
-      : trainer
+      : noFreeClass
         ? `${input.invite.holderFirstName} te invita a Emma Pilates Studio`
         : `${input.invite.holderFirstName} te regala tu primera clase`;
   const description =
     input.invite === null
       ? 'Descarga la app de Emma Pilates Studio.'
-      : trainer
+      : noFreeClass
         ? `Usa su código ${input.invite.code} al crear tu cuenta.`
         : `Usa su código ${input.invite.code} al crear tu cuenta y tu primera clase es gratis.`;
   const code =
     input.invite === null
       ? ''
-      : `<div style="background:#93615D;color:#FFFBFB;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:8px;"><span style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">SU CÓDIGO</span><span style="font-family:Lora,Georgia,serif;font-weight:500;font-size:34px;line-height:1.1;">${escapeHtml(input.invite.code)}</span></div>`;
+      : `<div style="background:#93615D;color:#FFFBFB;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 28px rgba(147,97,93,.30);"><span style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">SU CÓDIGO</span><span style="font-family:Lora,Georgia,serif;font-weight:500;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums;">${escapeHtml(input.invite.code)}</span></div>`;
   const buttons = iphone
     ? button(
         appStoreUrl,
@@ -81,8 +87,12 @@ const render = (input: InviteLinkInput, iphone: boolean): string => {
     `<meta property="og:site_name" content="Emma Pilates Studio">` +
     `<meta property="og:type" content="website">` +
     `<meta property="og:image" content="${previewImage}">` +
-    `</head><body style="margin:0;background:#F9E7DF;color:#93615D;font-family:'Work Sans',Helvetica,Arial,sans-serif;">` +
-    `<main style="max-width:520px;margin:0 auto;padding:40px 16px;display:flex;flex-direction:column;gap:20px;">` +
+    `<link rel="preconnect" href="https://fonts.googleapis.com">` +
+    `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` +
+    `<link rel="stylesheet" href="${fontsUrl}">` +
+    // CW01c: the block sits in the middle of the window.
+    `</head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F9E7DF;color:#93615D;font-family:'Work Sans',Helvetica,Arial,sans-serif;">` +
+    `<main style="box-sizing:border-box;width:100%;max-width:520px;padding:40px 16px;display:flex;flex-direction:column;gap:20px;">` +
     `<span style="align-self:flex-start;padding:4px 10px;border-radius:999px;background:#FFFBFB;font-size:12px;font-weight:700;letter-spacing:.12em;">EMMA PILATES STUDIO</span>` +
     `<h1 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.1;">${escapeHtml(title)}</h1>` +
     code +
