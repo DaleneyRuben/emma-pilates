@@ -2,6 +2,7 @@ import {
   androidApps,
   androidAssetLinks,
   appleAppSiteAssociation,
+  appleTeamId,
 } from './app-links';
 
 // ADR-0095: the verification files the link hosts serve for both apps.
@@ -71,6 +72,20 @@ describe('app links', () => {
     expect(appleAppSiteAssociation(null)).toEqual({
       applinks: { details: [] },
     });
+  });
+
+  it('claims both iOS apps for the studio team', () => {
+    expect(appleTeamId).toBe('SN44D2645V');
+    expect(
+      appleAppSiteAssociation(appleTeamId).applinks.details.flatMap(
+        (detail) => detail.appIDs,
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        'SN44D2645V.com.emmapilates.client',
+        'SN44D2645V.com.emmapilates.staff',
+      ]),
+    );
   });
 
   it('gives each iOS app only its own path prefix', () => {
