@@ -1,4 +1,4 @@
-import { act, fireEvent, render } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render } from "@testing-library/react-native";
 import { DeviceEventEmitter, ScrollView } from "react-native";
 
 import type { AuthenticationApi } from "./authentication-api";
@@ -8,6 +8,7 @@ function createApiMock(): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
+    completeEmailChange: jest.fn(),
     completePasswordRecovery: jest.fn(),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn(),
@@ -36,6 +37,7 @@ async function openReferral() {
   const scrollToEnd = jest
     .spyOn(ScrollView.prototype as { scrollToEnd: () => void }, "scrollToEnd")
     .mockImplementation(() => undefined);
+  scrollToEnd.mockClear();
   const screen = await render(<AuthenticationFlow api={createApiMock()} />);
   await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
   await fireEvent.press(screen.getByRole("button", { name: "¿Tienes un código de referido?" }));
@@ -47,7 +49,9 @@ async function openReferral() {
 // nothing scrolled. The field sits at the end of the form, so the form
 // scrolls to its end while that field has the keyboard.
 describe("«Crea tu cuenta» with the keyboard on the referral code", () => {
-  afterEach(() => {
+  afterEach(async () => {
+    // Unmount first: a form left mounted would answer the next test's keyboard.
+    await cleanup();
     jest.restoreAllMocks();
   });
 

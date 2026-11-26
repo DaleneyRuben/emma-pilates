@@ -59,6 +59,7 @@ export function RegistrationScreen({
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
   const [referralOpen, setReferralOpen] = useState(initialReferralCode !== null);
   const [referralCode, setReferralCode] = useState(initialReferralCode ?? "");
+  const [codeFocused, setCodeFocused] = useState(false);
   // A code that arrives while the form is open (the install referrer answers
   // late) fills an empty field.
   const [givenCode, setGivenCode] = useState(initialReferralCode);
@@ -194,6 +195,8 @@ export function RegistrationScreen({
         </>
       }
       brand={false}
+      // C01b3: the code field ends the form, so the form scrolls to its end.
+      revealEndWithKeyboard={referralOpen && codeFocused}
       topBar={{ onBack, title: "Crea tu cuenta" }}
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
@@ -283,7 +286,9 @@ export function RegistrationScreen({
             errorIcon={unknownCode === undefined ? undefined : "alert"}
             hint="Ej.: LUCIA"
             label="Código de referido"
+            onBlur={() => setCodeFocused(false)}
             onChangeText={setReferralCode}
+            onFocus={() => setCodeFocused(true)}
             value={referralCode}
           />
           {codeCheck.status === "valid" ? (

@@ -47,6 +47,7 @@ export function AuthenticationScreen({
   children,
   eyebrow,
   footer,
+  revealEndWithKeyboard = false,
   staff = false,
   teamAccess = false,
   title,
@@ -64,6 +65,8 @@ export function AuthenticationScreen({
   eyebrow?: string;
   /** A fixed white panel at the bottom, such as «Crear cuenta». */
   footer?: ReactNode;
+  /** Scroll to the end above the keyboard, while the last field has it (C01b3). */
+  revealEndWithKeyboard?: boolean;
   /** The team boards (E-A05–A10) draw the outcome and its actions in the card. */
   staff?: boolean;
   teamAccess?: boolean;
@@ -105,6 +108,7 @@ export function AuthenticationScreen({
         band
         contentContainerStyle={styles.content}
         footer={footer === undefined ? undefined : <FooterPanel>{footer}</FooterPanel>}
+        revealEndWithKeyboard={revealEndWithKeyboard}
       >
         {topBar === undefined ? (
           <ScreenHeader>
