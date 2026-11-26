@@ -42,7 +42,9 @@ export function parseVerifiedLink(
     allowedHosts.includes(url.hostname) &&
     url.pathname.startsWith(invitePrefix)
   ) {
-    const code = decodeURIComponent(url.pathname.slice(invitePrefix.length)).toUpperCase();
+    // Valid codes carry no escapes, so the raw segment is checked as it is:
+    // decoding a broken escape would throw inside the running app.
+    const code = url.pathname.slice(invitePrefix.length).toUpperCase();
     return inviteCode.test(code) ? { type: "referral-invite", token: code } : null;
   }
 
