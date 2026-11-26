@@ -75,9 +75,22 @@ function createFetcher({ unread = 2, readStatus = 204 } = {}) {
 function OfferButton() {
   const { offerPermission } = usePushNotifications();
   return (
-    <Pressable accessibilityRole="button" onPress={offerPermission}>
-      <Text variant="boton">Reservar</Text>
-    </Pressable>
+    <>
+      <Pressable accessibilityRole="button" onPress={() => offerPermission()}>
+        <Text variant="boton">Reservar</Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() =>
+          offerPermission({
+            reason: "Te escribimos apenas el estudio revise tu comprobante.",
+            title: "Te avisamos cuando aprobemos tu pago",
+          })
+        }
+      >
+        <Text variant="boton">Enviar comprobante</Text>
+      </Pressable>
+    </>
   );
 }
 
@@ -206,6 +219,27 @@ describe("PushNotificationsProvider", () => {
     await waitFor(() => expect(platform.setBadgeCount).toHaveBeenLastCalledWith(4));
     await screen.unmount();
     expect(platform.setBadgeCount).toHaveBeenLastCalledWith(0);
+  });
+
+  // Walkthrough n.º 9 (C11n): the same sheet and the same thirty-day rule,
+  // with the action's own title and text.
+  it("offers the permission with an action's own copy", async () => {
+    const { screen } = await renderProvider({ platform: fakePlatform("undetermined") });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Te avisamos cuando aprobemos tu pago")).toBeOnTheScreen(),
+    );
+    expect(
+      screen.getByText("Te escribimos apenas el estudio revise tu comprobante."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Te avisamos si tu clase cambia.")).toBeNull();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Ahora no" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await act(async () => undefined);
+    expect(screen.queryByText("Te avisamos si tu clase cambia.")).toBeNull();
   });
 
   it("explains the value first and asks the system only on the person's yes", async () => {

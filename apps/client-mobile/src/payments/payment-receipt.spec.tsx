@@ -1,11 +1,15 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
+import {
+  clearMobileQueryCache,
+  createMemoryPushPlatform,
+  encodeBase64,
+} from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 
 import { jsonResponse, routeFetcher } from "../test-support";
-import { baseRoutes, intent, openPlanDetail, receiptBytes } from "./purchase-test-support";
+import { baseRoutes, intent, openPlanDetail, payment, receiptBytes } from "./purchase-test-support";
 
 jest.setTimeout(30_000);
 
@@ -75,5 +79,56 @@ describe("the transfer receipt on Pago por transferencia", () => {
     expect(screen.getByRole("button", { name: "Cambiar comprobante" })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
     await waitFor(() => expect(screen.queryByText("Tu comprobante")).toBeNull());
+  });
+
+  // Walkthrough n.º 9 (C11n): «Te avisaremos apenas esté listo» needs the
+  // permission, so sending the receipt offers it with its own words.
+  it("offers notifications with the payment's own words after sending", async () => {
+    pickOneReceipt();
+    const { platform } = createMemoryPushPlatform("undetermined");
+    const sent: string[] = [];
+    const fetcher = routeFetcher({
+      ...baseRoutes(0),
+      "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
+      "POST /api/v1/uploads": () =>
+        jsonResponse(
+          { id: "asset-1", uploadUrl: "/u", expiresAt: "2026-09-21T15:15:00.000Z" },
+          201,
+        ),
+      "PUT /api/v1/uploads/asset-1/object": () => new Response(null, { status: 204 }),
+      "POST /api/v1/uploads/asset-1/finalize": () =>
+        jsonResponse({ id: "asset-1", state: "processing" }, 202),
+      "/api/v1/uploads/asset-1": () =>
+        jsonResponse({ id: "asset-1", state: "ready", mediaType: "image/jpeg" }),
+      "POST /api/v1/purchase-intents/intent-1/receipt": () =>
+        jsonResponse({ ...intent, receiptAttached: true }),
+      "POST /api/v1/purchase-intents/intent-1/submit": () => {
+        sent.push("submit");
+        return jsonResponse(payment, 201);
+      },
+      "/api/v1/payments/current": () =>
+        sent.length > 0 ? jsonResponse(payment) : jsonResponse({ code: "payment_not_found" }, 404),
+    });
+    const screen = await openPlanDetail(fetcher, { pushPlatform: platform });
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    await waitFor(
+      () => expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled(),
+      {
+        timeout: 10_000,
+      },
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+
+    expect(await screen.findByText("Te avisamos cuando aprobemos tu pago")).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "Activa las notificaciones y te escribimos apenas el estudio revise tu comprobante.",
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
   });
 });
