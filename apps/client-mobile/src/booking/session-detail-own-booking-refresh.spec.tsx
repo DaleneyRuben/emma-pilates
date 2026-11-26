@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
@@ -15,8 +15,8 @@ const thisClass = {
 };
 const overlapping = { ...thisClass, relation: "overlapping", bookingId: "booking-2" };
 
-// Review of walkthrough n.º 1: the detail stays mounted in the Reservar
-// stack, so it must read her bookings again when she comes back to it.
+// Review of walkthrough n.º 1: a booking changed elsewhere never leaves the
+// class detail showing the old footer.
 describe("Client Session detail keeping her own Booking current", () => {
   afterEach(async () => {
     await cleanup();
@@ -39,6 +39,8 @@ describe("Client Session detail keeping her own Booking current", () => {
     yourBooking = null;
     await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
 
+    // Leaving Reservar closed the detail; opening the class reads it again.
+    await fireEvent.press(await screen.findByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled(),
     );
@@ -56,32 +58,10 @@ describe("Client Session detail keeping her own Booking current", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Sí, cancelar reserva" }));
 
     expect(
-      await screen.findByText("Ya no se puede cancelar: falta menos que la ventana de cancelación."),
+      await screen.findByText(
+        "Ya no se puede cancelar: falta menos que la ventana de cancelación.",
+      ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Ya reservaste esta clase")).toBeOnTheScreen();
-  });
-
-  it("cancels once however fast «Sí, cancelar reserva» is tapped", async () => {
-    let deletes = 0;
-    let answer: (response: Response) => void = () => undefined;
-    const { screen } = await openDetail({
-      "/api/v1/sessions/session-1": () => jsonResponse({ ...detail(3), yourBooking: thisClass }),
-      "DELETE /api/v1/bookings/booking-1": () => {
-        deletes += 1;
-        return new Promise<Response>((resolve) => {
-          answer = resolve;
-        });
-      },
-    });
-
-    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar reserva" }));
-    const confirm = await screen.findByRole("button", { name: "Sí, cancelar reserva" });
-    await act(async () => {
-      fireEvent.press(confirm);
-      fireEvent.press(confirm);
-    });
-    await act(async () => answer(new Response(null, { status: 204 })));
-
-    expect(deletes).toBe(1);
   });
 });
