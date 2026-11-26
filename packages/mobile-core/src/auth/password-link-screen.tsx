@@ -18,7 +18,7 @@ type LinkState = "activated" | "current" | "expired" | "loading" | "removed";
 const passwordSchema = z
   .object({
     password: z.string().min(8, "Mínimo 8 caracteres."),
-    confirmation: z.string().min(1),
+    confirmation: z.string().min(1, "Repite la contraseña."),
   })
   .refine((values) => values.password === values.confirmation, {
     message: "Las contraseñas no coinciden.",
@@ -73,7 +73,7 @@ export function PasswordLinkScreen({
   const [failed, setFailed] = useState(false);
   const {
     control,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm<PasswordValues>({
     defaultValues: { confirmation: "", password: "" },
@@ -226,11 +226,11 @@ export function PasswordLinkScreen({
     );
   }
 
-  // C21 pins the button in a white footer; E-A06 keeps it in the card.
+  // Walkthrough n.º 6 and 15: the button ends the form (under the card, or in
+  // it on E-A06) and is always on; a tap marks what is missing.
   const save = (
     <PrimaryButton
       busy={isSubmitting}
-      disabled={!isValid}
       label={activation ? "Activar cuenta" : "Guardar contraseña"}
       onPress={submit}
     />
@@ -238,9 +238,8 @@ export function PasswordLinkScreen({
 
   return (
     <AuthenticationScreen
-      actions={staff ? save : undefined}
+      actions={save}
       eyebrow={activation ? "Activar cuenta" : "Restablecer contraseña"}
-      footer={staff ? undefined : save}
       staff={staff}
       title={activation ? "Crea tu contraseña" : "Crea una contraseña nueva"}
     >
@@ -272,7 +271,7 @@ export function PasswordLinkScreen({
         render={({ field: { onBlur, onChange, value } }) => (
           <FormField
             autoComplete="new-password"
-            error={errors.confirmation?.type === "custom" ? errors.confirmation.message : undefined}
+            error={errors.confirmation?.message}
             label="Confirmar contraseña"
             onBlur={onBlur}
             onChangeText={onChange}

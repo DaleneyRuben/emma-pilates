@@ -14,7 +14,6 @@ import { ScreenTopBar } from "../ui/screen-top-bar";
 import { TabletColumn } from "../ui/tablet-layout";
 import { InlineError } from "../ui/inline-error";
 import { spacing, surfaces } from "../ui/tokens";
-import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
 
 const passwordSchema = z
   .object({
@@ -41,7 +40,7 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
   const identity = useOptionalMobileIdentity();
   const {
     control,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm<PasswordValues>({
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
@@ -80,25 +79,9 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
   });
 
   return (
-    <Screen edges={footerEdges} style={[styles.screen, footerScreen]}>
+    <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={onBack} title="Cambiar contraseña" />
-      <FormScrollView
-        contentContainerStyle={styles.form}
-        footer={
-          // C23: the button on the white footer panel.
-          <FooterPanel>
-            <TabletColumn width={480}>
-              <PrimaryButton
-                busy={isSubmitting}
-                disabled={!isValid}
-                label="Guardar contraseña"
-                onPress={() => void save()}
-              />
-            </TabletColumn>
-          </FooterPanel>
-        }
-        keyboardVerticalOffset={spacing.xxl}
-      >
+      <FormScrollView contentContainerStyle={styles.form} keyboardVerticalOffset={spacing.xxl}>
         {/* 23T: a centred 480 pt column on a Client tablet page. */}
         <TabletColumn width={480}>
           <View style={styles.card}>
@@ -154,6 +137,14 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
               <InlineError>No pudimos cambiar la contraseña. Inténtalo de nuevo.</InlineError>
             ) : null}
           </View>
+          {/* Walkthrough n.º 6 and 15: the button ends the form, always on. */}
+          <View style={styles.end} testID="change-password-form">
+            <PrimaryButton
+              busy={isSubmitting}
+              label="Guardar contraseña"
+              onPress={() => void save()}
+            />
+          </View>
         </TabletColumn>
       </FormScrollView>
     </Screen>
@@ -163,6 +154,7 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
 const styles = StyleSheet.create({
   // The fields on one white card (C23).
   card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lg },
+  end: { marginTop: spacing.md },
   form: { paddingBottom: spacing.lg },
   screen: { gap: spacing.md },
 });

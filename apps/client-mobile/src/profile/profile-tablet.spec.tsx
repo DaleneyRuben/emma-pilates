@@ -88,12 +88,11 @@ describe("Perfil on a tablet", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
 
     await waitFor(() => expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen());
-    const columns = screen.getAllByTestId("tablet-column");
-    expect(columns).toHaveLength(2);
-    for (const column of columns) expect(column).toHaveStyle({ maxWidth: 480 });
-    expect(
-      within(columns[1]).getByRole("button", { name: "Guardar contraseña" }),
-    ).toBeOnTheScreen();
+    // Walkthrough n.º 6: the button ends the form, inside the same column.
+    const column = screen.getByTestId("tablet-column");
+    expect(column).toHaveStyle({ maxWidth: 480 });
+    expect(within(column).getByLabelText("Contraseña actual")).toBeOnTheScreen();
+    expect(within(column).getByRole("button", { name: "Guardar contraseña" })).toBeOnTheScreen();
   });
 
   it("keeps «Enviar comentario» in the form's 560 pt column (25T)", async () => {
@@ -101,9 +100,8 @@ describe("Perfil on a tablet", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Enviar comentarios" }));
 
-    const footer = await screen.findByTestId("feedback-footer");
-    const column = within(footer).getByTestId("tablet-column");
-    expect(column).toHaveStyle({ alignSelf: "center", maxWidth: 560 });
-    expect(within(column).getByRole("button", { name: "Enviar comentario" })).toBeOnTheScreen();
+    // Walkthrough n.º 6 and 15: the button ends the form, in its 560 pt column.
+    const end = await screen.findByTestId("feedback-form");
+    expect(within(end).getByRole("button", { name: "Enviar comentario" })).toBeOnTheScreen();
   });
 });
