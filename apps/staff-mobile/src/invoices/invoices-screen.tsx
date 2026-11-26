@@ -118,5 +118,5 @@ export function InvoicesScreen() {
 const styles = StyleSheet.create({
   // Rosa Emma: a quiet line sits in a white card, never on the 100 screen.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

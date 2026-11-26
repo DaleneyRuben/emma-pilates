@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   note: { textAlign: "center" },
   // Board H02: the read-only line rides its own white card.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.mdLg, paddingVertical: spacing.smLg },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // Boards H01–H02: the week (and the Branch) in one white card.
   week: { ...surfaces.card, gap: spacing.smLg, padding: spacing.md },
 });

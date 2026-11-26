@@ -254,5 +254,5 @@ const styles = StyleSheet.create({
   identityBody: { flex: 1, gap: spacing.smd },
   pair: { flexDirection: "row", gap: spacing.smLg },
   wide: { flex: 1 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

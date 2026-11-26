@@ -91,7 +91,7 @@ export function ClientSearchScreen() {
 
 const styles = StyleSheet.create({
   detailPanel: { borderLeftColor: colors.hairline, borderLeftWidth: 1, flex: 1 },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.lg },
   searchPanel: { gap: spacing.md, paddingRight: spacing.lg, width: 360 },
   split: { flexDirection: "row", paddingRight: 0 },
 });

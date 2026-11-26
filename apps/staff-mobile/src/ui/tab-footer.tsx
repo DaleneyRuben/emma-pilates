@@ -9,7 +9,7 @@ import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
  * area, so the panel pads only 14 under its content.
  */
 export function TabFooter({
-  bleed = spacing.xlSm,
+  bleed = spacing.lg,
   children,
   style,
   testID,

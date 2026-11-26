@@ -288,5 +288,5 @@ const styles = StyleSheet.create({
   column: { gap: 0 },
   end: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
   note: { textAlign: "center" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

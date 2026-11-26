@@ -203,5 +203,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.mdLg,
   },
   pressed: { opacity: 0.7 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

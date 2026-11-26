@@ -91,7 +91,7 @@ export function SoftNote({
  * with `taskScreen` (a task hides the tab bar, so the panel keeps the safe area).
  */
 export function FooterPanel({
-  bleed = spacing.xlSm,
+  bleed = spacing.lg,
   children,
   testID,
 }: {
@@ -119,13 +119,13 @@ export const bodyScroll = StyleSheet.create({
   content: {
     gap: spacing.smLg,
     paddingBottom: spacing.xl,
-    paddingHorizontal: spacing.xlSm,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
   },
-  scroll: { marginHorizontal: -spacing.xlSm },
+  scroll: { marginHorizontal: -spacing.lg },
   // For `FormScrollView`, whose scroll lets content overflow: this clips it
   // under the band. Its footer then needs no side bleed (`bleed={0}`).
-  clip: { flex: 1, marginHorizontal: -spacing.xlSm, overflow: "hidden" },
+  clip: { flex: 1, marginHorizontal: -spacing.lg, overflow: "hidden" },
   // `taskEdges`' screen: the footer panel pads the bottom itself.
   taskScreen: { paddingBottom: 0 },
 });

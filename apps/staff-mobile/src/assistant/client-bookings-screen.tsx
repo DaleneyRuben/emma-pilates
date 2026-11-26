@@ -285,9 +285,9 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.smLg,
     paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.xlSm,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
   },
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.lg },
   withAction: cardWithActionRow,
 });

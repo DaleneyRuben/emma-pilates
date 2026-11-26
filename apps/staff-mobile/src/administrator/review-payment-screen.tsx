@@ -344,5 +344,5 @@ const styles = StyleSheet.create({
   receiptCard: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   receiptLabel: { flex: 1 },
   receiptTop: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

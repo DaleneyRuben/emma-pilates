@@ -164,7 +164,7 @@ export function ContactListScreen() {
 const styles = StyleSheet.create({
   // Board K05: the empty card sits in the middle of the space under the band.
   balance: { flex: 1 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   state: { paddingTop: spacing.md },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

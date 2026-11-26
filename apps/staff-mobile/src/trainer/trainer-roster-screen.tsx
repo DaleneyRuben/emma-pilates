@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   missing: { textAlign: "center" },
   // Board I05: the link sits at the footer's start, underlined.
   reportFault: { alignSelf: "flex-start", paddingHorizontal: 0 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // On a tablet the roster keeps a phone's column, so the block never stretches.
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   tabletFooter: { alignSelf: "center", maxWidth: 560, width: "100%" },

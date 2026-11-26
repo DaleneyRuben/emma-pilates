@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   factLabel: { flex: 1 },
   facts: { ...surfaces.card, overflow: "hidden" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   sender: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   senderText: { flex: 1, gap: 2 },
   type: {

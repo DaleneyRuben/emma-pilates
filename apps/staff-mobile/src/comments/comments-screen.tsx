@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   filterOn: { backgroundColor: colors.primary },
   name: { flex: 1 },
   pressed: { opacity: 0.7 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   summary: { ...surfaces.card, gap: spacing.smd, padding: spacing.sm, paddingLeft: spacing.lg },
   summaryHead: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
 });
