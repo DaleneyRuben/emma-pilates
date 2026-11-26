@@ -6,10 +6,11 @@ import {
 } from "@pilates/api-contracts";
 import {
   InlineError,
+  NoticeRow,
+  PhotoUploadRing,
   profilePhotoMaxEdge,
   spacing,
   surfaces,
-  Text,
   TextButton,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,22 +18,25 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { pickImage, uploadImage } from "../uploads/image-upload";
+import { pickImage, uploadImage, type PickedImage } from "../uploads/image-upload";
 import { ClientAvatar } from "./client-avatar";
 import { useClientPhoto } from "./use-client-photo";
 
 type PhotoState =
   | { status: "idle" }
-  | { status: "uploading"; localUri: string }
+  | { status: "uploading"; picked: PickedImage }
+  | { status: "upload-failed"; picked: PickedImage }
   | { status: "removing" }
-  | { status: "failed"; message: string };
+  | { status: "removal-failed" };
 
-const uploadFailed = "No pudimos subir la foto. Inténtalo de nuevo.";
+const uploadFailed = "No pudimos subir tu foto. Tus otros cambios sí se guardaron.";
 const removalFailed = "No pudimos quitar la foto. Inténtalo de nuevo.";
+const avatarSize = 96;
 
-// Client 22's «Cambiar foto» / «Quitar foto»: the chosen image shows inside
-// the circle at once (as the centre crop will frame it, follow-up 60 §1)
-// while the shared upload protocol runs and the READY asset is attached.
+// Client 22's «Cambiar foto» / «Quitar foto». Walkthrough n.º 14 (C22c,
+// C22d): the chosen photo shows in the circle at once, under a ring while it
+// uploads in the background; nothing else waits for it, «Guardar cambios»
+// included. Only a failure speaks, and «Reintentar» sends the same photo.
 export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
@@ -40,7 +44,11 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
   const storedUri = useClientPhoto(client.photo?.imageAssetId ?? null);
   const busy = state.status === "uploading" || state.status === "removing";
   const shownUri =
-    state.status === "uploading" ? state.localUri : state.status === "removing" ? null : storedUri;
+    state.status === "uploading" || state.status === "upload-failed"
+      ? state.picked.uri
+      : state.status === "removing"
+        ? null
+        : storedUri;
 
   const remember = (profile: ClientProfileDto) =>
     queryClient.setQueryData(getGetCurrentClientProfileQueryKey(), {
@@ -49,10 +57,8 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
       headers: new Headers(),
     });
 
-  const change = async () => {
-    const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
-    if (picked === null) return;
-    setState({ status: "uploading", localUri: picked.uri });
+  const upload = async (picked: PickedImage) => {
+    setState({ status: "uploading", picked });
     try {
       const imageAssetId = await uploadImage(picked, "profile_photo", fetcher);
       const response = await setCurrentClientPhoto(
@@ -64,15 +70,20 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
       remember(response.data);
       setState({ status: "idle" });
     } catch {
-      setState({ status: "failed", message: uploadFailed });
+      setState({ status: "upload-failed", picked });
     }
+  };
+
+  const change = async () => {
+    const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
+    if (picked !== null) await upload(picked);
   };
 
   const remove = async () => {
     setState({ status: "removing" });
     const response = await removeCurrentClientPhoto(undefined, fetcher);
     if (response.status !== 204) {
-      setState({ status: "failed", message: removalFailed });
+      setState({ status: "removal-failed" });
       return;
     }
     remember({ ...client, photo: null });
@@ -81,31 +92,37 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
 
   return (
     <View style={styles.section}>
-      <ClientAvatar name={client.name} photoUri={shownUri} size={96} />
-      {state.status === "uploading" ? (
-        <Text accessibilityLabel="Subiendo foto" style={styles.centered} variant="secundario">
-          Subiendo foto…
-        </Text>
-      ) : (
-        <View style={styles.actions}>
+      <PhotoUploadRing size={avatarSize} uploading={state.status === "uploading"}>
+        <ClientAvatar name={client.name} photoUri={shownUri} size={avatarSize} />
+      </PhotoUploadRing>
+      <View style={styles.actions}>
+        <TextButton
+          disabled={busy}
+          label="Cambiar foto"
+          onPress={() => void change()}
+          style={styles.link}
+        />
+        {client.photo === null || state.status === "removing" ? null : (
           <TextButton
             disabled={busy}
-            label="Cambiar foto"
-            onPress={() => void change()}
+            label="Quitar foto"
+            onPress={() => void remove()}
             style={styles.link}
           />
-          {client.photo === null || state.status === "removing" ? null : (
-            <TextButton
-              disabled={busy}
-              label="Quitar foto"
-              onPress={() => void remove()}
-              style={styles.link}
-            />
-          )}
-        </View>
-      )}
-      {state.status === "failed" ? (
-        <InlineError style={styles.centered}>{state.message}</InlineError>
+        )}
+      </View>
+      {state.status === "upload-failed" ? (
+        <>
+          <NoticeRow message={uploadFailed} testID="photo-upload-failed" />
+          <TextButton
+            label="Reintentar"
+            onPress={() => void upload(state.picked)}
+            style={styles.link}
+          />
+        </>
+      ) : null}
+      {state.status === "removal-failed" ? (
+        <InlineError style={styles.centered}>{removalFailed}</InlineError>
       ) : null}
     </View>
   );

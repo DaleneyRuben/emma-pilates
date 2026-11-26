@@ -101,6 +101,7 @@ export * from "./ui/loading-state";
 export * from "./ui/notice-row";
 export * from "./ui/offline-banner";
 export * from "./ui/outlined-button";
+export * from "./ui/photo-upload-ring";
 export * from "./ui/picker-check";
 export * from "./ui/screen";
 export * from "./ui/tab-bar";
