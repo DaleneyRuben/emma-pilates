@@ -20,6 +20,7 @@ import {
 import { AppState } from "react-native";
 
 import { parsePushPayload, type PushPayload } from "./push-payload";
+import { useBiometricOfferOpen } from "../auth/identity-provider";
 import { PushPermissionSheet } from "./push-permission-sheet";
 import type { PushPermissionStatus, PushPlatform } from "./push-platform";
 import { syncPushRegistration } from "./push-registration";
@@ -170,6 +171,8 @@ export function PushNotificationsProvider({
     [platform],
   );
 
+  // iOS presents one modal at a time: wait for «¿Entrar con Face ID?».
+  const biometricOfferOpen = useBiometricOfferOpen();
   const offerPermission = useCallback(
     (copy?: PermissionOfferCopy) => {
       if (platform === undefined || !registrationEnabled) return;
@@ -214,7 +217,7 @@ export function PushNotificationsProvider({
         onDecline={() => void decline()}
         reason={offerCopy?.reason ?? permissionReason}
         title={offerCopy?.title ?? permissionTitle}
-        visible={offering}
+        visible={offering && !biometricOfferOpen}
       />
     </PushNotificationsContext.Provider>
   );

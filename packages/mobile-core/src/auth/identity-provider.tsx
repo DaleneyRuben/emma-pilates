@@ -293,6 +293,15 @@ export function useOptionalMobileIdentity(): MobileIdentity | undefined {
   return useContext(MobileIdentityContext);
 }
 
+/**
+ * Testing session (#5, Staff): whether «¿Entrar con Face ID?» is up. iOS
+ * presents one modal at a time, so another sheet waits for it. False outside
+ * the identity provider.
+ */
+export function useBiometricOfferOpen(): boolean {
+  return useContext(MobileIdentityContext)?.biometrics.offer ?? false;
+}
+
 export function useMobileIdentity(): MobileIdentity {
   const identity = useContext(MobileIdentityContext);
 
