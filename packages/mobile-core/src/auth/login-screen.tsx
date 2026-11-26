@@ -116,13 +116,25 @@ export function LoginScreen({
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
+    setValue,
   } = useForm<LoginValues>({
     defaultValues: { email: "", password: "" },
     resolver: zodResolver(loginSchema),
   });
   const submitLogin = handleSubmit(async (values) => {
     setRejected(null);
-    const result = await onSubmit(values);
+    // Testing session (#5, iOS 26): iOS offers «Save Password?» when a filled
+    // password field leaves the screen after a sign-in, so where biometrics
+    // are the offer the field is emptied now and refilled only if refused.
+    if (!autofill) setValue("password", "");
+    let result: LoginSubmissionResult | void;
+    try {
+      result = await onSubmit(values);
+    } catch (error) {
+      if (!autofill) setValue("password", values.password);
+      throw error;
+    }
+    if (!autofill && result !== undefined) setValue("password", values.password);
 
     if (result?.status === "rejected") {
       setRejected(values.email.trim().toLowerCase());
