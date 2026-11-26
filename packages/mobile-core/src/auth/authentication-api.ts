@@ -57,6 +57,9 @@ function failure(label: string, response: ApiResponse): AuthenticationApiError {
   );
 }
 
+/** How long a link verification may wait for the server (walkthrough n.º 3). */
+export const verificationTimeoutMilliseconds = 15_000;
+
 type AuthenticationApiOptions = {
   baseUrl: string;
   /** The installation identifier Login sends, for the device email budget. */
@@ -170,7 +173,19 @@ export function createAuthenticationApi({
       return response.data;
     },
     async verifyClientEmail(verificationToken: string) {
-      const response = await verifyClientEmailRequest({ verificationToken }, undefined, fetcher);
+      // A stalled network would otherwise leave «Verificando correo» up for ever.
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), verificationTimeoutMilliseconds);
+      let response: Awaited<ReturnType<typeof verifyClientEmailRequest>>;
+      try {
+        response = await verifyClientEmailRequest(
+          { verificationToken },
+          { signal: controller.signal },
+          fetcher,
+        );
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (response.status !== 200) {
         throw failure("Email verification", response);
