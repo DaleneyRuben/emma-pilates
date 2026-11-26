@@ -10,6 +10,7 @@ import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
 import { staffPhotoAuthorizationRows } from './staff-photo-authorization';
 import { transferQrAuthorizationRows } from './transfer-qr-authorization';
+import { walkthroughAuthorizationRows } from './walkthrough-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
 // IDN-009 / ADR-0102 / ADR-0108: every endpoint the API serves, with an
@@ -105,7 +106,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/client-email-verifications': publicRoute,
   'POST /api/v1/client-registrations/cancellations': publicRoute,
   'POST /api/v1/client-registrations/verification-resends': publicRoute,
-  'POST /api/v1/client-registrations/status-checks': publicRoute,
   'POST /api/v1/client-registrations/email-corrections': publicRoute,
   'POST /api/v1/client-registrations': publicRoute,
   'GET /api/v1/plans': publicRoute,
@@ -132,8 +132,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/notifications/unread-count': both('allow'),
   'POST /api/v1/notifications/read-all': both('allow'),
   'POST /api/v1/notifications/{notificationId}/read': both('allow'),
-  'DELETE /api/v1/notifications/{notificationId}': both('allow'),
-  'POST /api/v1/notifications/{notificationId}/restore': both('allow'),
   'PUT /api/v1/notifications/devices/current': both('allow'),
   'POST /api/v1/notifications/devices/current/deactivate': both('allow'),
   // Pending uploads belong to the Account; attaching one is authorized where
@@ -158,9 +156,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
       osVersion: '18.2',
     },
   }),
-  'GET /api/v1/administrator/feedback': both('allow'),
-  'GET /api/v1/administrator/feedback/export': both('allow'),
-  'GET /api/v1/administrator/feedback/{feedbackId}': both('allow'),
   'GET /api/v1/administrator/founder-memberships': administratorOnly(),
   'POST /api/v1/administrator/feedback/{feedbackId}/triage': both('allow', {
     body: { status: 'reviewed', changeNote: null },
@@ -198,7 +193,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/referral-codes/current': both('deny'),
   'PUT /api/v1/referral-codes/current': both('deny'),
   'GET /api/v1/referral-codes/availability': both('deny'),
-  'GET /api/v1/referral-codes/lookup': publicRoute,
   // The studio's bank details for a transfer: shown to anyone signed in.
   'GET /api/v1/transfer-instructions': both('allow'),
   'GET /api/v1/transfer-instructions/qr': both('allow'),
@@ -472,6 +466,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   ...campaignAuthorizationRows(),
   ...transferQrAuthorizationRows(),
   ...staffPhotoAuthorizationRows(),
+  ...walkthroughAuthorizationRows(),
   ...payoutQrAuthorizationRows(),
 };
 
