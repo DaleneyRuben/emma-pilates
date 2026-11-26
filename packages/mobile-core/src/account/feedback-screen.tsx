@@ -40,7 +40,7 @@ function TypeChips({
 }) {
   return (
     <View style={styles.field}>
-      <Text variant="compacto-600">Tipo</Text>
+      <Text variant="etiqueta">TIPO</Text>
       <View style={styles.chips}>
         {types.map(([type, label]) => {
           const selected = type === value;
@@ -51,7 +51,11 @@ function TypeChips({
               accessibilityState={{ selected }}
               key={type}
               onPress={() => onChange(type)}
-              style={[styles.chip, selected && styles.chipSelected]}
+              style={[
+                styles.chip,
+                error !== undefined && styles.chipMissing,
+                selected && styles.chipSelected,
+              ]}
             >
               <Text tone={selected ? "onDark" : "ink"} variant="compacto">
                 {label}
@@ -60,7 +64,19 @@ function TypeChips({
           );
         })}
       </View>
-      {error === undefined ? null : <InlineError field>{error}</InlineError>}
+      {error === undefined ? null : (
+        // C25c: the missing type stands out, with its icon, in titulo-fila.
+        <View accessibilityRole="alert" style={styles.missing}>
+          <Glyph
+            color={colors.text}
+            name="alert"
+            size={16}
+            strokeWidth={1.7}
+            testID="feedback-type-error-icon"
+          />
+          <Text variant="titulo-fila">{error}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -179,12 +195,16 @@ const styles = StyleSheet.create({
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1.5,
+    // C25c: the three chips share the row.
+    flex: 1,
     justifyContent: "center",
     minHeight: 36,
     paddingHorizontal: spacing.mdLg,
   },
+  chipMissing: { borderColor: colors.primary, borderWidth: 2 },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  chips: { flexDirection: "row", gap: spacing.sm },
+  missing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   counterRow: { flexDirection: "row", justifyContent: "space-between" },
   end: { gap: spacing.sm, marginTop: spacing.md },
   failure: { flex: 1 },

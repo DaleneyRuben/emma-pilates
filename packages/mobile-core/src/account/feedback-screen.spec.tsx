@@ -60,7 +60,9 @@ describe("FeedbackScreen (REL-012)", () => {
     expect(screen.getByText("Elige el tipo de comentario")).toHaveStyle(
       textVariants["titulo-fila"],
     );
-    expect(screen.getByTestId("feedback-type-error-icon")).toBeOnTheScreen();
+    expect(
+      screen.getByTestId("feedback-type-error-icon", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(screen.getByText("TIPO")).toBeOnTheScreen();
     for (const name of ["Problema", "Sugerencia", "Otro"]) {
       expect(screen.getByRole("button", { name })).toHaveStyle({
