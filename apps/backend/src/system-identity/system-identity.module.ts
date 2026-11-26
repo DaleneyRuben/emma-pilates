@@ -347,12 +347,14 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     },
     {
       provide: pendingRegistrationStatusReader,
-      inject: [PRISMA_CLIENT],
+      inject: [PRISMA_CLIENT, ConfigService],
       useFactory:
-        (prisma: PrismaClient) => (registrationContinuation: string) =>
+        (prisma: PrismaClient, config: ConfigService<Environment, true>) =>
+        (registrationContinuation: string) =>
           readPendingRegistrationStatus(prisma, {
             registrationContinuation,
             now: new Date(),
+            digestEmail: authenticationDigest(config),
           }),
     },
     {

@@ -6,7 +6,7 @@
  */
 
 /**
- * `verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue
+ * `verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue; `bounced`: the verification email hard-bounced, so the address needs correcting
  */
 export type PendingRegistrationStatusDtoStatus =
   (typeof PendingRegistrationStatusDtoStatus)[keyof typeof PendingRegistrationStatusDtoStatus];
@@ -15,4 +15,5 @@ export const PendingRegistrationStatusDtoStatus = {
   pending: "pending",
   verified: "verified",
   expired: "expired",
+  bounced: "bounced",
 } as const;

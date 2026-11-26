@@ -98,21 +98,34 @@ describe('the status of a pending Client registration', () => {
       digestEmail: digestTestEmail,
     });
 
-  const suppress = (
+  const suppress = async (
     email: string,
     reason: 'HARD_BOUNCE' | 'COMPLAINT',
-    resolvedAt: Date | null = null,
-  ) =>
-    prisma.emailSuppression.create({
+    resolved = false,
+  ) => {
+    const resolver = resolved
+      ? await prisma.account.findFirstOrThrow({
+          where: { email },
+          select: { id: true },
+        })
+      : null;
+    await prisma.emailSuppression.create({
       data: {
         emailDigest: new Uint8Array(digestTestEmail(email)),
         reason,
         provider: 'resend',
         providerEventId: `event-${randomUUID()}`,
         providerOccurredAt: now,
-        resolvedAt,
+        ...(resolver === null
+          ? {}
+          : {
+              resolvedAt: now,
+              resolvedByAccountId: resolver.id,
+              resolutionReason: 'address_fixed',
+            }),
       },
     });
+  };
 
   it('answers pending while the email waits for its link', async () => {
     const { registrationContinuation } = await register();
@@ -152,7 +165,7 @@ describe('the status of a pending Client registration', () => {
     const first = await register();
     await suppress(first.email, 'COMPLAINT');
     const second = await register();
-    await suppress(second.email, 'HARD_BOUNCE', now);
+    await suppress(second.email, 'HARD_BOUNCE', true);
 
     await expect(statusOf(first.registrationContinuation)).resolves.toBe(
       'pending',

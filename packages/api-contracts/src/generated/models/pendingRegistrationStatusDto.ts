@@ -7,6 +7,6 @@
 import type { PendingRegistrationStatusDtoStatus } from "./pendingRegistrationStatusDtoStatus";
 
 export interface PendingRegistrationStatusDto {
-  /** `verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue */
+  /** `verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue; `bounced`: the verification email hard-bounced, so the address needs correcting */
   status: PendingRegistrationStatusDtoStatus;
 }

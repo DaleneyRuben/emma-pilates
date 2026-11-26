@@ -97,11 +97,11 @@ export class PendingRegistrationContinuationDto {
 
 export class PendingRegistrationStatusDto {
   @ApiProperty({
-    enum: ['pending', 'verified', 'expired'],
+    enum: ['pending', 'verified', 'expired', 'bounced'],
     description:
-      '`verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue',
+      '`verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue; `bounced`: the verification email hard-bounced, so the address needs correcting',
   })
-  status!: 'pending' | 'verified' | 'expired';
+  status!: 'pending' | 'verified' | 'expired' | 'bounced';
 }
 
 export class PendingVerificationResendDto {

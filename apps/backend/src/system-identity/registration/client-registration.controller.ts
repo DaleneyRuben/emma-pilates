@@ -42,7 +42,7 @@ export const pendingRegistrationStatusReader = Symbol(
 
 type PendingRegistrationStatusReader = (
   registrationContinuation: string,
-) => Promise<'pending' | 'verified' | 'expired'>;
+) => Promise<'pending' | 'verified' | 'expired' | 'bounced'>;
 
 @Controller({ path: 'client-registrations', version: '1' })
 export class ClientRegistrationController {
