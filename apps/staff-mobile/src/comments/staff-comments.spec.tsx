@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -141,6 +141,17 @@ describe("Comentarios in the Staff app", () => {
         { status: "reviewed", changeNote: "Arreglamos la lista en la 1.1.1." },
       ]),
     );
+  });
+
+  // E-F19: «Guardar» stays on a fixed white footer panel, out of the scroll.
+  it("keeps «Guardar» on the comment's fixed footer panel", async () => {
+    const { screen } = await openComments();
+
+    await fireEvent.press(screen.getByRole("button", { name: /^Ana Pérez/ }));
+
+    const footer = within(await screen.findByTestId("comment-footer"));
+    expect(footer.getByRole("button", { name: "Guardar" })).toBeOnTheScreen();
+    expect(footer.queryByText("Qué cambiamos")).toBeNull();
   });
 
   // Review: a refused save is not «Guardado.».
