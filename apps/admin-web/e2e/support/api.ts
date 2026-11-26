@@ -1,7 +1,7 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 import { addDays, boliviaToday } from "./bolivia";
-import { apiOrigin, fixtures } from "./environment";
+import { apiOrigin, fixtures, resendWebhookSecret } from "./environment";
 import { receiptPng } from "./receipt-png";
 
 type CallOptions = {
@@ -252,4 +252,35 @@ export async function inviteClient(name: string, email: string): Promise<void> {
     body: { name, email },
     headers: idempotent(),
   });
+}
+
+/** Resend reports a permanent bounce for this address (ADR-0094), signed. */
+export async function bounceEmail(email: string): Promise<void> {
+  const id = `msg_${randomUUID()}`;
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const body = JSON.stringify({
+    type: "email.bounced",
+    created_at: new Date().toISOString(),
+    data: { to: [email], bounce: { type: "Permanent" } },
+  });
+  const key = Buffer.from(resendWebhookSecret.replace(/^whsec_/, ""), "base64");
+  const signature = createHmac("sha256", key)
+    .update(`${id}.${timestamp}.${body}`)
+    .digest("base64");
+  const response = await fetch(
+    `${apiOrigin}/api/v1/email-delivery-events/resend`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "svix-id": id,
+        "svix-timestamp": timestamp,
+        "svix-signature": `v1,${signature}`,
+      },
+      body,
+    },
+  );
+  if (response.status !== 204) {
+    throw new Error(`Resend bounce answered ${response.status}`);
+  }
 }

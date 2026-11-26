@@ -28,3 +28,7 @@ export const fixtures = {
   },
   password: "emma-local-2026",
 } as const;
+
+// Walkthrough n.º 2: the backend under test accepts Resend delivery events
+// signed with this throwaway secret, so a journey can report a bounce.
+export const resendWebhookSecret = `whsec_${Buffer.from("e2e-resend-webhook-secret").toString("base64")}`;
