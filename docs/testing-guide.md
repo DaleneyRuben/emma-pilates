@@ -71,6 +71,7 @@ numbered tests.
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
 | Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
+| Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
 
 ## Where each designed screen is tested
 
@@ -12246,3 +12247,59 @@ F. **Faster uploads (n.º 7 and 14).** Both apps now ask for the upload's
    remaining time is the PUT over the mobile network, which the smaller
    profile photo cuts by three quarters. Read the production numbers with
    the query of Test 53 step 4.
+
+## Test 200: walkthrough designs — notifications and comments
+
+The owner approved these boards on 26 Nov 2026 (`aprobacion-disenos-recorrido.md`
+rows 3–6): C19, C19c, C19d, E-F06, E-F15 (n.º 10), E-F07 (n.º 12), and E-F20,
+E-F18, E-F25, E-F26, E-F19 (n.º 11). Run the API and the worker on a copy of
+`pilates_golden` (Test 2, Test 46), Metro for both apps, and use the iPhone 16
+Pro and the Android emulator. The new API pieces are additive: `DELETE
+/api/v1/notifications/{id}`, `POST /api/v1/notifications/{id}/restore`,
+`review` and `feedback` on each notification, `type` on `GET
+/api/v1/administrator/feedback`, and `GET /api/v1/administrator/feedback/{id}`.
+
+A. **Swipe a notification away (n.º 10, Client app).** As Lucía, Inicio's bell
+   › Notificaciones. Swipe a notice to the left: «Borrar» shows on the 600
+   ground. Tap it: the notice leaves, «Nuevas · N» counts one less, and «Notificación
+   borrada» shows with «Deshacer» over the tab bar for about five seconds.
+   «Deshacer» brings it back in place. With VoiceOver or TalkBack the row
+   offers «Borrar» as an action. There is no «Borrar todas»; «Marcar leídas»
+   stays. In the database the row keeps its data with `deleted_at` set
+   (`select id, deleted_at from system.notifications where account_id = …`);
+   «Deshacer» clears it. A notice removed more than two minutes ago answers
+   `404 notification_not_found` to `POST …/restore`.
+B. **The same in the Staff app (E-F06, E-F15).** As any Staff Member,
+   Perfil › Notificaciones: swipe a single notice or one inside an opened group;
+   a group row itself does not swipe. «Marcar todo leído» stays.
+C. **A month of notifications.** Back-date a notice of yours past 30 days
+   (`update system.notifications set created_at = now() - interval '31 days'
+   where id = …`, on your copy only): it leaves the list and the bell's count
+   in both apps.
+D. **Reviews for the Administrator (n.º 12, E-F07).** As a Client submit a
+   transfer receipt; as Paola open Notificaciones. «Por revisar» on top reads
+   «<Client> · <plan> · Bs <amount>», «Comprobante por revisar» and the time,
+   and opens Revisar pago. Approve it and go back: it moves to the dimmed «Ya
+   revisados» card with a ✓ and no chevron, «Pago de <Client> aprobado por
+   Paola · hace un momento» and «<plan> · Bs <amount>». A rejected receipt reads
+   «rechazado por»; a Freeze reads «Congelamiento de <Client> aprobado por …»
+   with «Del lun 23 al dom 29 nov». They are no longer grouped as «N
+   comprobantes recibidos». Every other notice keeps its grouped rows.
+E. **A comment's notice (n.º 11, E-F20).** As Lucía send «Enviar comentarios»;
+   as Paola the comments group lists «Lucía … · Problema: «<start of the
+   text>…»» and «App de clientas · Hace un momento», opens that comment, and
+   ends with «Ver todos los comentarios».
+F. **Comentarios (E-F18, E-F25, E-F26).** As Paola, Perfil › «Comentarios»
+   (only the Administrator sees the row). The tabs read «Nuevos · N»,
+   «Revisados» and «Resueltos»; each card shows the initials, the name, «hoy
+   11:20», «Problema · App de clientas» and the text. «Filtrar» opens «Filtrar
+   comentarios» with Tipo (Todos, Problema, Sugerencia, Otro) and App (Las
+   dos, Clientas, Personal); «Ver N comentarios» counts the choice. After it
+   the button reads «Filtrar · 2» and one chip «Problema · Clientas» with
+   «Quitar filtro» clears both. «Quitar filtros» in the sheet does the same.
+G. **One comment (E-F19).** The detail shows who sent it («Clienta · email»),
+   the type, the text, «App de clientas · 1.1.0 · iOS 26.2», «Enviado» with the
+   day and time, «Estado» (Nuevo, Revisado, Resuelto) and «Qué cambiamos»,
+   the internal note. «Guardar» triages it like the admin web (Test 80): the
+   web shows the same status and note, and `system.audit_records` holds
+   `feedback.triaged`.
