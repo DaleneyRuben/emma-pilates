@@ -35,7 +35,17 @@ export const idempotency = () => ({
 // MOB-065: the system photo picker runs outside the app (PHPicker on iOS, the
 // photo picker on Android), so no photo library permission is asked for.
 // A profile photo asks for a smaller `maxEdge` (walkthrough n.º 14).
-export async function pickImage({ maxEdge = uploadMaxEdge } = {}): Promise<PickedImage | null> {
+export async function pickImage({
+  maxEdge = uploadMaxEdge,
+  onPicked,
+}: {
+  maxEdge?: number;
+  /**
+   * The picker's own uri, before the photo is re-encoded and read, which takes
+   * seconds on Android (a `content://` uri there): enough to draw a preview.
+   */
+  onPicked?: (uri: string) => void;
+} = {}): Promise<PickedImage | null> {
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
     // The original, so the photo is encoded only once, by ensureAcceptedFormat.
@@ -43,6 +53,7 @@ export async function pickImage({ maxEdge = uploadMaxEdge } = {}): Promise<Picke
   });
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
+  onPicked?.(asset.uri);
   const { uri, mediaType } = await ensureAcceptedFormat(asset, maxEdge);
   const base64 = await FileSystem.readAsStringAsync(uri, {
     encoding: FileSystem.EncodingType.Base64,

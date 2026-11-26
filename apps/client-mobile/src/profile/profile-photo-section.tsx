@@ -24,7 +24,9 @@ import { useClientPhoto } from "./use-client-photo";
 
 type PhotoState =
   | { status: "idle" }
+  | { status: "preparing"; previewUri: string }
   | { status: "uploading"; picked: PickedImage }
+  | { status: "saved"; picked: PickedImage }
   | { status: "upload-failed"; picked: PickedImage }
   | { status: "removing" }
   | { status: "removal-failed" };
@@ -42,13 +44,23 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
   const queryClient = useQueryClient();
   const [state, setState] = useState<PhotoState>({ status: "idle" });
   const storedUri = useClientPhoto(client.photo?.imageAssetId ?? null);
-  const busy = state.status === "uploading" || state.status === "removing";
+  const busy =
+    state.status === "preparing" || state.status === "uploading" || state.status === "removing";
+  const uploading = state.status === "preparing" || state.status === "uploading";
+  // The chosen photo shows at once, the picker's own uri while it is being
+  // prepared (Android's `content://`), and stays until the stored one loads.
   const shownUri =
-    state.status === "uploading" || state.status === "upload-failed"
-      ? state.picked.uri
-      : state.status === "removing"
-        ? null
-        : storedUri;
+    state.status === "preparing"
+      ? state.previewUri
+      : state.status === "uploading" || state.status === "upload-failed"
+        ? state.picked.uri
+        : state.status === "saved"
+          ? (storedUri ?? state.picked.uri)
+          : state.status === "removing"
+            ? null
+            : storedUri;
+  // C22c, C22d: a first photo has «Quitar foto» too, while and after it uploads.
+  const removable = state.status !== "removing" && (client.photo !== null || shownUri !== null);
 
   const remember = (profile: ClientProfileDto) =>
     queryClient.setQueryData(getGetCurrentClientProfileQueryKey(), {
@@ -68,18 +80,31 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
       );
       if (response.status !== 200) throw new Error("photo_attachment_failed");
       remember(response.data);
-      setState({ status: "idle" });
+      setState({ status: "saved", picked });
     } catch {
       setState({ status: "upload-failed", picked });
     }
   };
 
   const change = async () => {
-    const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
-    if (picked !== null) await upload(picked);
+    const previous = state;
+    const picked = await pickImage({
+      maxEdge: profilePhotoMaxEdge,
+      onPicked: (previewUri) => setState({ status: "preparing", previewUri }),
+    }).catch(() => null);
+    if (picked === null) {
+      setState(previous);
+      return;
+    }
+    await upload(picked);
   };
 
   const remove = async () => {
+    // A first photo that never reached the server just leaves the circle.
+    if (client.photo === null) {
+      setState({ status: "idle" });
+      return;
+    }
     setState({ status: "removing" });
     const response = await removeCurrentClientPhoto(undefined, fetcher);
     if (response.status !== 204) {
@@ -92,7 +117,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
 
   return (
     <View style={styles.section}>
-      <PhotoUploadRing size={avatarSize} uploading={state.status === "uploading"}>
+      <PhotoUploadRing size={avatarSize} uploading={uploading}>
         <ClientAvatar name={client.name} photoUri={shownUri} size={avatarSize} />
       </PhotoUploadRing>
       <View style={styles.actions}>
@@ -102,7 +127,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
           onPress={() => void change()}
           style={styles.link}
         />
-        {client.photo === null || state.status === "removing" ? null : (
+        {!removable ? null : (
           <TextButton
             disabled={busy}
             label="Quitar foto"
