@@ -1,9 +1,39 @@
-import { useState, type ReactNode } from "react";
-import { Animated, PanResponder, Pressable, StyleSheet, View } from "react-native";
+import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  type AccessibilityActionEvent,
+  Animated,
+  PanResponder,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import { Glyph } from "./glyph";
 import { Text } from "./text";
 import { colors } from "./tokens";
+
+const removeActions = [{ name: "remove", label: "Borrar" }];
+const RemoveContext = createContext<(() => void) | null>(null);
+
+/**
+ * The «Borrar» action for the focusable row inside a `SwipeToRemove`: the
+ * frame is no screen reader element, so VoiceOver and TalkBack offer the
+ * action only on the row they focus. Spread it on that row; outside a swipe it
+ * is empty.
+ */
+export function useRemoveAction(): {
+  accessibilityActions?: typeof removeActions;
+  onAccessibilityAction?: (event: AccessibilityActionEvent) => void;
+} {
+  const onRemove = useContext(RemoveContext);
+  if (onRemove === null) return {};
+  return {
+    accessibilityActions: removeActions,
+    onAccessibilityAction: ({ nativeEvent }) => {
+      if (nativeEvent.actionName === "remove") onRemove();
+    },
+  };
+}
 
 const actionWidth = 96;
 // A drag shorter than this, or more vertical than horizontal, is a tap or a
@@ -40,8 +70,10 @@ function createSwipe() {
 /**
  * Walkthrough n.º 10 (C19c, E-F15): swiping the row to the left uncovers a
  * 96 pt «Borrar» on the 600 ground; tapping it removes the row. Screen
- * readers reach the same «Borrar» as the row's action. Built on React
- * Native's own responder, so it needs no native module (an OTA carries it).
+ * readers reach the same «Borrar» as the action of the row inside, which
+ * takes it from `useRemoveAction`; Maestro taps the button by `${testID}-remove`.
+ * Built on React Native's own responder, so it needs no native module (an OTA
+ * carries it).
  */
 export function SwipeToRemove({
   children,
@@ -57,7 +89,7 @@ export function SwipeToRemove({
 
   return (
     <View
-      accessibilityActions={[{ name: "remove", label: "Borrar" }]}
+      accessibilityActions={removeActions}
       onAccessibilityAction={({ nativeEvent }) => {
         if (nativeEvent.actionName === "remove") onRemove();
       }}
@@ -71,6 +103,7 @@ export function SwipeToRemove({
         importantForAccessibility="no-hide-descendants"
         onPress={onRemove}
         style={styles.action}
+        testID={testID === undefined ? undefined : `${testID}-remove`}
       >
         <Glyph color={colors.onEmphasis} name="trash" size={22} strokeWidth={1.7} />
         <Text tone="onDark" variant="boton-chico">
@@ -81,7 +114,7 @@ export function SwipeToRemove({
         style={[styles.content, { transform: [{ translateX: offset }] }]}
         {...responder.panHandlers}
       >
-        {children}
+        <RemoveContext.Provider value={onRemove}>{children}</RemoveContext.Provider>
       </Animated.View>
     </View>
   );
