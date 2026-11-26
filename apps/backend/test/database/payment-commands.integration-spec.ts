@@ -321,6 +321,7 @@ describe('Prisma payment commands', () => {
         referredName: 'Sofía G.',
         state: 'awarded',
         invitationStatus: 'registered',
+        freeClass: false,
         createdAt: now,
         awardedAt: now,
         awardCentavos: 6000,

@@ -133,6 +133,32 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("Todavía no reservó su clase gratis.")).toBeOnTheScreen();
   });
 
+  // Testing session (#20 + #22): a friend who registered while the code was
+  // not active got no Guest Pass, so her row promises no free class.
+  it("promises no free class to a friend who never got one", async () => {
+    const screen = await openInvita(
+      routeFetcher(
+        routes([
+          {
+            referredClientId: "rosa",
+            referredName: "Rosa A.",
+            state: "pending",
+            invitationStatus: "registered",
+            freeClass: false,
+            createdAt: "2026-09-10T15:00:00.000Z",
+            awardedAt: null,
+            awardCentavos: null,
+          },
+        ]),
+      ),
+    );
+
+    expect(
+      await screen.findByText("Tu código no estaba activo: no recibió la clase gratis."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Todavía no reservó su clase gratis.")).toBeNull();
+  });
+
   // Walkthrough n.º 22 (C16h): without a paid Plan in force the code gives no
   // class yet, so the card asks for a Plan instead of sharing.
   it("asks a host without a paid Plan to buy one instead of sharing", async () => {
