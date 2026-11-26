@@ -8,6 +8,9 @@ import {
 import { Pool } from 'pg';
 import { prismaSessionOptions } from '../../src/database/prisma-adapter';
 
+// PostgreSQL's admin_shutdown: a session ended by drop database ... with (force).
+const adminShutdownCode = '57P01';
+
 const backendRoot = resolve(process.cwd());
 const disposableDatabasePrefix = 'pilates_test_';
 const watchdogScript = resolve(
@@ -129,11 +132,22 @@ export const startDatabaseTestContext =
       connectionString: databaseUrl,
       options: prismaSessionOptions,
     });
+    // The forced drop in stop() ends every session on this database with
+    // 57P01 (admin_shutdown). A client the pool still held idle reports it
+    // through the pool's error event, which with no listener became an
+    // unhandled error that failed whichever suite was running. During stop
+    // that ending is expected; any other pool error still surfaces.
+    let stopping = false;
+    pool.on('error', (error: Error & { code?: string }) => {
+      if (stopping && error.code === adminShutdownCode) return;
+      throw error;
+    });
 
     return {
       databaseUrl,
       pool,
       stop: async () => {
+        stopping = true;
         await pool.end();
         await dropDatabase();
         await container?.stop();

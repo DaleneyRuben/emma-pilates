@@ -65,4 +65,25 @@ describe('database test context', () => {
       databaseExists(adminPool, databaseName(override)),
     ).resolves.toBe(true);
   });
+
+  it('lets the forced drop end idle sessions during stop without failing the suite', async () => {
+    const context = await startDatabaseTestContext();
+    const adminShutdown = Object.assign(new Error('terminating connection'), {
+      code: '57P01',
+    });
+
+    expect(() => context.pool.emit('error', adminShutdown)).toThrow(
+      'terminating connection',
+    );
+
+    await context.stop();
+
+    expect(() => context.pool.emit('error', adminShutdown)).not.toThrow();
+    expect(() =>
+      context.pool.emit(
+        'error',
+        Object.assign(new Error('other failure'), { code: '08006' }),
+      ),
+    ).toThrow('other failure');
+  });
 });
