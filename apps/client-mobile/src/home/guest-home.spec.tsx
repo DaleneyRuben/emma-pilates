@@ -51,6 +51,13 @@ describe("the guest's Inicio", () => {
     expect(card.getByText("LF")).toBeOnTheScreen();
     expect(card.getByText("Tu clase gratis de invitada")).toBeOnTheScreen();
     expect(card.queryByRole("button", { name: "Mi plan" })).toBeNull();
+    // C02f: a full-width white button, not a content-width pill.
+    expect(card.getByRole("button", { name: "Reservar mi clase gratis" })).toHaveStyle({
+      alignSelf: "stretch",
+      backgroundColor: "#FFFBFB",
+      borderRadius: 16,
+      minHeight: 48,
+    });
 
     await fireEvent.press(card.getByRole("button", { name: "Reservar mi clase gratis" }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Reservar" })).toBeOnTheScreen());
