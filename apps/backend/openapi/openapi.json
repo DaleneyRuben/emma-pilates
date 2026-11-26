@@ -6640,6 +6640,37 @@
         ]
       }
     },
+    "/api/v1/referral-codes/lookup": {
+      "get": {
+        "operationId": "lookUpReferralCode",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralCodeLookupDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ReferralCodeLookup"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -18022,6 +18053,34 @@
               "current"
             ],
             "description": "`in_use`: another Client or Trainer holds or held it; `blocked`: a reserved or blocked word; `current`: already hers"
+          }
+        },
+        "required": [
+          "code",
+          "status"
+        ]
+      },
+      "ReferralCodeLookupDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "LUCIA",
+            "description": "The code as it is stored"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "unknown"
+            ],
+            "description": "`unknown`: registering with it would be refused"
+          },
+          "holderFirstName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Lucía",
+            "description": "The holder's first name; null when unknown"
           }
         },
         "required": [

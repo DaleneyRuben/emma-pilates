@@ -31,12 +31,9 @@ describe('looking up a referral code before registering', () => {
 
   it('names a live Client’s code by her first name, whatever the case typed', async () => {
     const lucia = code();
-    const client = await prisma.client.create({
+    // A Client's code joins the registry when she is created.
+    await prisma.client.create({
       data: { name: 'Lucía Fernández', referralCode: lucia },
-      select: { id: true },
-    });
-    await prisma.referralCode.create({
-      data: { code: lucia, clientId: client.id },
     });
 
     await expect(
@@ -58,12 +55,12 @@ describe('looking up a referral code before registering', () => {
 
   it('flags a retired code as unknown', async () => {
     const retired = code();
-    const client = await prisma.client.create({
-      data: { name: 'Sofía Gómez', referralCode: `S-${randomUUID()}` },
-      select: { id: true },
+    await prisma.client.create({
+      data: { name: 'Sofía Gómez', referralCode: retired },
     });
-    await prisma.referralCode.create({
-      data: { code: retired, clientId: client.id, retiredAt: new Date() },
+    await prisma.referralCode.update({
+      where: { code: retired },
+      data: { retiredAt: new Date() },
     });
 
     await expect(lookUpReferralCode(prisma, retired)).resolves.toMatchObject({

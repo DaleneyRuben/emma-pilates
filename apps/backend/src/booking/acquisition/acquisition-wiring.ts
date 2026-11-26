@@ -21,6 +21,11 @@ import {
   type OwnReferralCodeOperations,
 } from './own-referral-code.controller';
 import { createPrismaOwnReferralCodeStore } from './prisma-own-referral-code-store';
+import { lookUpReferralCode } from './referral-code-lookup';
+import {
+  ReferralCodeLookupController,
+  referralCodeLookup,
+} from './referral-code-lookup.controller';
 import {
   createPrismaClientAcquisitionStore,
   createPrismaTrainerReferralCodeStore,
@@ -37,8 +42,15 @@ export const acquisitionWiring = {
     AdministratorClientAcquisitionController,
     AdministratorTrainerReferralCodeController,
     OwnReferralCodeController,
+    ReferralCodeLookupController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
+    {
+      provide: referralCodeLookup,
+      inject: [prismaToken],
+      useFactory: (prisma: PrismaClient) => (code: string) =>
+        lookUpReferralCode(prisma, code),
+    },
     {
       provide: acquisitionOperations,
       inject: [prismaToken],

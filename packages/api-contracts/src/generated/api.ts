@@ -207,6 +207,7 @@ import type {
   ListStaffMembersParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
+  LookUpReferralCodeParams,
   MarkedNotificationsDto,
   MonthKpisDto,
   MonthResultDto,
@@ -251,6 +252,7 @@ import type {
   RecordCashPaymentDto,
   RecordFrontDeskTransferDto,
   ReferralCodeAvailabilityDto,
+  ReferralCodeLookupDto,
   ReferralsDto,
   RejectPaymentDto,
   RequestEmailChangeDto,
@@ -25462,6 +25464,212 @@ export function useGetReferralCodeAvailability<
     params,
     options,
   );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type lookUpReferralCodeResponse200 = {
+  data: ReferralCodeLookupDto;
+  status: 200;
+};
+
+export type lookUpReferralCodeResponseSuccess =
+  lookUpReferralCodeResponse200 & {
+    headers: Headers;
+  };
+export type lookUpReferralCodeResponse = lookUpReferralCodeResponseSuccess;
+
+export const getLookUpReferralCodeUrl = (params: LookUpReferralCodeParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/referral-codes/lookup?${stringifiedParams}`
+    : `/api/v1/referral-codes/lookup`;
+};
+
+export const lookUpReferralCode = async (
+  params: LookUpReferralCodeParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<lookUpReferralCodeResponse> => {
+  const res = await (fetchFn ?? fetch)(getLookUpReferralCodeUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: lookUpReferralCodeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as lookUpReferralCodeResponse;
+};
+
+export const getLookUpReferralCodeQueryKey = (
+  params?: LookUpReferralCodeParams,
+) => {
+  return [
+    `/api/v1/referral-codes/lookup`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getLookUpReferralCodeQueryOptions = <
+  TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
+  TError = unknown,
+>(
+  params: LookUpReferralCodeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lookUpReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getLookUpReferralCodeQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof lookUpReferralCode>>
+  > = ({ signal }) =>
+    lookUpReferralCode(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof lookUpReferralCode>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type LookUpReferralCodeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lookUpReferralCode>>
+>;
+export type LookUpReferralCodeQueryError = unknown;
+
+export function useLookUpReferralCode<
+  TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
+  TError = unknown,
+>(
+  params: LookUpReferralCodeParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lookUpReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lookUpReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof lookUpReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useLookUpReferralCode<
+  TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
+  TError = unknown,
+>(
+  params: LookUpReferralCodeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lookUpReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lookUpReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof lookUpReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useLookUpReferralCode<
+  TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
+  TError = unknown,
+>(
+  params: LookUpReferralCodeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lookUpReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useLookUpReferralCode<
+  TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
+  TError = unknown,
+>(
+  params: LookUpReferralCodeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lookUpReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getLookUpReferralCodeQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
