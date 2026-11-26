@@ -71,7 +71,9 @@ describe("NotificationsScreen removal", () => {
     await waitFor(() => expect(screen.getByText("Pago confirmado")).toBeOnTheScreen());
     expect(screen.queryByText(/Borrar todas/)).not.toBeOnTheScreen();
 
-    await fireEvent.press(screen.getAllByRole("button", { name: "Borrar" })[0]!);
+    await fireEvent.press(
+      screen.getAllByRole("button", { name: "Borrar", includeHiddenElements: true })[0]!,
+    );
 
     await waitFor(() => expect(screen.queryByText("Pago confirmado")).not.toBeOnTheScreen());
     expect(screen.getByText("Nuevas · 1")).toBeOnTheScreen();
@@ -94,7 +96,9 @@ describe("NotificationsScreen removal", () => {
     await waitFor(() => expect(screen.getByText("Pago confirmado")).toBeOnTheScreen());
     jest.useFakeTimers();
 
-    await fireEvent.press(screen.getAllByRole("button", { name: "Borrar" })[0]!);
+    await fireEvent.press(
+      screen.getAllByRole("button", { name: "Borrar", includeHiddenElements: true })[0]!,
+    );
     expect(screen.getByText("Notificación borrada")).toBeOnTheScreen();
     await act(() => jest.advanceTimersByTime(6000));
 

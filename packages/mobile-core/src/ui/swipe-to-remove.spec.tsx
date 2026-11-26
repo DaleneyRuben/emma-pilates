@@ -14,7 +14,9 @@ describe("SwipeToRemove", () => {
       </SwipeToRemove>,
     );
 
-    await fireEvent.press(screen.getByRole("button", { name: "Borrar" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Borrar", includeHiddenElements: true }),
+    );
 
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
