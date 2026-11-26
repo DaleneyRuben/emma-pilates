@@ -175,11 +175,11 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     expect(screen.getByText("Mariana Quiroga")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(screen.getByText("factura-000123.jpg")).toBeOnTheScreen();
-    expect(mockPickImage).toHaveBeenCalledWith({ camera: false });
+    expect(mockPickImage).toHaveBeenCalledWith();
     expect(mockUploadImage).toHaveBeenCalledWith(photo, "invoice", expect.any(Function));
     expect(attached).toHaveBeenCalledWith({ imageAssetId: "asset-9", fileName: "factura.jpg" });
 
@@ -281,7 +281,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Tomar foto" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
 
     expect(
       await screen.findByText(
@@ -289,6 +289,19 @@ describe("Invoices in the Staff app (FIX-044)", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
+  });
+
+  // Walkthrough n.º 25: a picker that fails is not a connection problem.
+  it("says the files could not be opened when the picker fails", async () => {
+    mockPickPdf.mockRejectedValueOnce(new Error("Another picker is already presented"));
+
+    const screen = await openUpload(uploadRoutes(jest.fn()));
+
+    expect(
+      await screen.findByText("No pudimos abrir tus archivos. Inténtalo de nuevo."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/Revisa tu conexión/)).not.toBeOnTheScreen();
+    expect(mockUploadImage).not.toHaveBeenCalled();
   });
 
   it("opens Facturas por subir from Clientas for the Assistant", async () => {
@@ -357,7 +370,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Reintentar" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
