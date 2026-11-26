@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PropsWithChildren, type ReactNode } from "react";
+import { useEffect, useRef, type PropsWithChildren, type ReactNode, type RefObject } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -27,6 +27,7 @@ export function FormScrollView({
   footer,
   keyboardVerticalOffset,
   revealEndWithKeyboard = false,
+  scrollRef,
   style,
   testID,
 }: PropsWithChildren<{
@@ -36,10 +37,13 @@ export function FormScrollView({
   footer?: ReactNode;
   keyboardVerticalOffset?: number;
   revealEndWithKeyboard?: boolean;
+  /** Lets the form scroll back to a field it marks (walkthrough n.º 15). */
+  scrollRef?: RefObject<ScrollView | null>;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }>) {
-  const scroller = useRef<ScrollView>(null);
+  const ownScroller = useRef<ScrollView>(null);
+  const scroller = scrollRef ?? ownScroller;
   const bleed = useBandScroll();
   const keyboardUp = useRef(false);
 
@@ -56,7 +60,7 @@ export function FormScrollView({
       shown.remove();
       hidden.remove();
     };
-  }, [revealEndWithKeyboard]);
+  }, [revealEndWithKeyboard, scroller]);
 
   return (
     <KeyboardAvoidingView

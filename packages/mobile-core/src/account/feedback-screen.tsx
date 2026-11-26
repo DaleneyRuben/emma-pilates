@@ -1,6 +1,6 @@
 import { randomUUID } from "expo-crypto";
-import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { useRef, useState } from "react";
+import { Keyboard, Pressable, type ScrollView, StyleSheet, View } from "react-native";
 
 import { FormField } from "../ui/form-field";
 import { FormScrollView } from "../ui/form-scroll-view";
@@ -10,11 +10,9 @@ import { PrimaryButton } from "../ui/primary-button";
 import { StateScreen } from "../ui/state-screen";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
-import { TabletColumn } from "../ui/tablet-layout";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import type { FeedbackMetadata } from "./feedback-metadata";
-import { FooterPanel, footerEdges, footerScreen } from "../ui/footer-panel";
 import { useSendFeedback, type FeedbackType } from "./use-send-feedback";
 
 const types: readonly (readonly [FeedbackType, string])[] = [
@@ -32,9 +30,11 @@ type FeedbackScreenProps = {
 };
 
 function TypeChips({
+  error,
   value,
   onChange,
 }: {
+  error?: string;
   value: FeedbackType | null;
   onChange: (type: FeedbackType) => void;
 }) {
@@ -60,6 +60,7 @@ function TypeChips({
           );
         })}
       </View>
+      {error === undefined ? null : <InlineError field>{error}</InlineError>}
     </View>
   );
 }
@@ -88,51 +89,43 @@ export function FeedbackScreen({
   const [text, setText] = useState("");
   const feedback = useSendFeedback({ fetcher, metadata, newIdempotencyKey });
   const length = text.trim().length;
-  const ready =
-    !feedback.limitReached && type !== null && length >= textLength.min && length <= textLength.max;
+  // n.º 15 (C25c): the button stays on; a tap marks what is missing.
+  const [tried, setTried] = useState(false);
+  const scroller = useRef<ScrollView>(null);
+  const typeMissing = tried && type === null;
+  const textShort = tried && length < textLength.min;
+
+  const send = () => {
+    if (type === null || length < textLength.min || length > textLength.max) {
+      setTried(true);
+      Keyboard.dismiss();
+      scroller.current?.scrollTo({ animated: true, y: 0 });
+      return;
+    }
+    void feedback.send(type, text);
+  };
 
   return (
-    <Screen
-      edges={feedback.sent ? undefined : footerEdges}
-      style={[styles.screen, !feedback.sent && footerScreen]}
-    >
+    <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={onBack} title="Enviar comentarios" />
       {feedback.sent ? (
         <Thanks onBack={onBack} />
       ) : (
         <FormScrollView
           contentContainerStyle={styles.form}
-          footer={
-            // Walkthrough n.º 76: the failure sits above the pinned button, so
-            // the keyboard never hides part of it under the footer.
-            <FooterPanel testID="feedback-footer">
-              {feedback.failure === null ? null : (
-                <View style={styles.failureBox}>
-                  <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.6} />
-                  <InlineError style={styles.failure}>{feedback.failure}</InlineError>
-                </View>
-              )}
-              {/* 25T: the button keeps the form's 560 pt column on a Client tablet page. */}
-              <TabletColumn width={560}>
-                <PrimaryButton
-                  busy={feedback.sending}
-                  disabled={!ready}
-                  label="Enviar comentario"
-                  onPress={() => {
-                    if (type !== null) void feedback.send(type, text);
-                  }}
-                />
-              </TabletColumn>
-            </FooterPanel>
-          }
           keyboardVerticalOffset={spacing.xxl}
           revealEndWithKeyboard
+          scrollRef={scroller}
         >
           <View style={styles.card}>
             <Text variant="cuerpo">
               Cuéntanos qué falló o qué mejorarías. Lo lee el equipo de Emma Pilates Studio.
             </Text>
-            <TypeChips value={type} onChange={setType} />
+            <TypeChips
+              error={typeMissing ? "Elige el tipo de comentario" : undefined}
+              value={type}
+              onChange={setType}
+            />
             <View style={styles.field}>
               <FormField
                 label="Comentario"
@@ -149,7 +142,24 @@ export function FeedbackScreen({
                 <Text variant="secundario">Mínimo 10 caracteres.</Text>
                 <Text variant="secundario">{`${text.length} / ${textLength.max}`}</Text>
               </View>
+              {textShort ? <InlineError field>Escribe al menos 10 caracteres.</InlineError> : null}
             </View>
+          </View>
+          {/* n.º 6 and 15 (C25d): the button ends the form and scrolls with it;
+              the day's limit (walkthrough n.º 76) sits right above it. */}
+          <View style={styles.end} testID="feedback-form">
+            {feedback.failure === null ? null : (
+              <View style={styles.failureBox}>
+                <Glyph color={colors.text} name="alert" size={18} strokeWidth={1.6} />
+                <InlineError style={styles.failure}>{feedback.failure}</InlineError>
+              </View>
+            )}
+            <PrimaryButton
+              busy={feedback.sending}
+              disabled={feedback.limitReached}
+              label="Enviar comentario"
+              onPress={send}
+            />
           </View>
         </FormScrollView>
       )}
@@ -176,6 +186,7 @@ const styles = StyleSheet.create({
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   counterRow: { flexDirection: "row", justifyContent: "space-between" },
+  end: { gap: spacing.sm, marginTop: spacing.md },
   failure: { flex: 1 },
   // C25e: the day's limit on 50 with a 1.5 pt 400 rule, above the button.
   failureBox: {
