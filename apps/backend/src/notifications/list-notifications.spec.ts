@@ -57,4 +57,34 @@ describe('listNotifications', () => {
       ),
     ).rejects.toThrow('Invalid notification cursor');
   });
+
+  // Walkthrough n.º 11 and 12 (E-F07, E-F20).
+  it('adds what a review or feedback notice is about to its item', async () => {
+    const rows = [notification(2), notification(1)];
+    const review = {
+      subject: 'payment' as const,
+      clientName: 'Ana Pérez',
+      planName: 'Trimestral 36 clases',
+      amountCentavos: 186_200,
+      startsOn: null,
+      endsOn: null,
+      outcome: 'pending' as const,
+      decidedByName: null,
+      decidedAt: null,
+    };
+    const describe = jest
+      .fn()
+      .mockResolvedValue(new Map([[rows[0]!.id, { review, feedback: null }]]));
+
+    const page = await listNotifications(
+      { limit: 20, cursor: null },
+      { principal, findPage: jest.fn().mockResolvedValue(rows), describe },
+    );
+
+    expect(describe).toHaveBeenCalledWith(rows);
+    expect(page.items).toEqual([
+      { ...rows[0], review, feedback: null },
+      { ...rows[1], review: null, feedback: null },
+    ]);
+  });
 });
