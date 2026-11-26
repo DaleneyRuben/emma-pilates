@@ -21,6 +21,21 @@ export function UnconfirmedEmailCard({ email, onResend }: { email: string; onRes
   );
 }
 
+/**
+ * C01c3 (walkthrough n.º 2): Resend reported the verification email bounced,
+ * so «Revisa tu correo» asks her to check the address instead of waiting.
+ */
+export function BouncedEmailCard({ email }: { email: string }) {
+  return (
+    <View accessibilityRole="alert" style={styles.card} testID="check-email-bounced">
+      <Text variant="titulo-fila">El correo rebotó</Text>
+      <Text variant="cuerpo">
+        {`No pudimos entregar el correo a ${email}. Revisa la dirección.`}
+      </Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surfaceSubtle,

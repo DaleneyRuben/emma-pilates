@@ -13,6 +13,7 @@ import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api"
 import { useMountedAt } from "../time/mounted-at";
 import { formatCountdown, useCountdown } from "./countdown";
 import { limitKeepsCurrentLink } from "./request-limit-copy";
+import { BouncedEmailCard } from "./unconfirmed-email-card";
 import { useRegistrationConfirmed } from "./use-registration-confirmed";
 
 // ADR-0029: the pending registration is removed after 7 days without a
@@ -98,7 +99,7 @@ export function CheckEmailScreen({
   const [sheet, setSheet] = useState<Sheet>(null);
   const [waitSeconds, startWait] = useCountdown();
   const shownAt = useMountedAt();
-  useRegistrationConfirmed(api, pending.registrationContinuation, onConfirmed);
+  const { bounced } = useRegistrationConfirmed(api, pending.registrationContinuation, onConfirmed);
   const resendNow = useEffectEvent(() => void resend());
   useEffect(() => {
     if (resendOnOpen) resendNow();
@@ -150,6 +151,24 @@ export function CheckEmailScreen({
   }
 
   const waiting = waitSeconds > 0;
+
+  if (bounced) {
+    return (
+      <AuthenticationScreen
+        actions={
+          <>
+            <PrimaryButton label="Cambiar correo" onPress={onCorrect} />
+            <TextButton label="Volver a iniciar sesión" onPress={onBack} style={authStyles.pill} />
+          </>
+        }
+        badge={{ icon: "mail", tone: "primary" }}
+        brand={false}
+        title="Revisa tu correo"
+      >
+        <BouncedEmailCard email={pending.email} />
+      </AuthenticationScreen>
+    );
+  }
 
   return (
     <AuthenticationScreen
