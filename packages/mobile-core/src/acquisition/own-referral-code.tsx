@@ -5,15 +5,13 @@ import {
   useGetOwnReferralCode,
 } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
-import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { useMountedAt } from "../time/mounted-at";
-import { Glyph } from "../ui/glyph";
 import { Text } from "../ui/text";
 import { TextButton } from "../ui/text-button";
-import { colors, radii, spacing, surfaces } from "../ui/tokens";
+import { spacing } from "../ui/tokens";
 import { type CodeStatus, ReferralCodeSheet } from "./referral-code-sheet";
 
 // The API's refusals of a save (BKM-017), shown on the sheet's status line.
@@ -23,38 +21,6 @@ const refusals: Record<string, CodeStatus> = {
   referral_code_in_use: "in_use",
   referral_code_malformed: "malformed",
 };
-
-type ReferralCodeCardProps = { code: string; onCopied: () => void };
-
-/** C16 / S30: the code on the screen's emphasis card, with «Copiar». */
-export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
-  const copy = async () => {
-    await Clipboard.setStringAsync(code);
-    onCopied();
-  };
-  return (
-    <View style={styles.card}>
-      <View style={styles.codeColumn}>
-        <Text tone="onDark" variant="etiqueta">
-          Tu código
-        </Text>
-        {/* Up to 20 characters: a long code wraps, it never shrinks below cifra-grande. */}
-        <Text selectable tone="onDark" variant="cifra-grande">
-          {code}
-        </Text>
-      </View>
-      <Pressable
-        accessibilityLabel="Copiar"
-        accessibilityRole="button"
-        onPress={() => void copy()}
-        style={({ pressed }) => [styles.copy, pressed && styles.pressed]}
-      >
-        <Glyph color={colors.text} name="copy" size={16} strokeWidth={1.6} />
-        <Text variant="boton-chico">Copiar</Text>
-      </Pressable>
-    </View>
-  );
-}
 
 type EditReferralCodeProps = {
   fetcher: typeof fetch;
@@ -151,27 +117,6 @@ export function EditReferralCode({ fetcher, onChanged, onDark = false }: EditRef
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.emphasis,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    paddingBottom: spacing.lg,
-    paddingLeft: spacing.xlSm,
-    paddingRight: spacing.lg,
-    paddingTop: spacing.lg,
-  },
-  codeColumn: { flex: 1, gap: spacing.xs },
-  copy: {
-    alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    gap: spacing.sm,
-    minHeight: 40,
-    paddingHorizontal: spacing.mdLg,
-  },
   edit: { alignSelf: "flex-start", minHeight: 40, paddingHorizontal: 0 },
-  pressed: { opacity: 0.85 },
   waitLine: { paddingVertical: spacing.sm },
 });

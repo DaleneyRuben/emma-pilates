@@ -3,7 +3,8 @@ import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react
 import * as Clipboard from "expo-clipboard";
 import type { ReactNode } from "react";
 
-import { EditReferralCode, ReferralCodeCard } from "./own-referral-code";
+import { EditReferralCode } from "./own-referral-code";
+import { ShareableReferralCodeCard } from "./shareable-referral-code-card";
 
 jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn(async () => true) }));
 
@@ -43,10 +44,19 @@ describe("own referral code (BKM-017)", () => {
 
   it("copies the code and tells the screen it was copied", async () => {
     const onCopied = jest.fn();
-    const screen = await render(<ReferralCodeCard code="LUCIA" onCopied={onCopied} />);
+    const screen = await render(
+      <ShareableReferralCodeCard
+        code="LUCIA"
+        fetcher={jest.fn().mockResolvedValue(new Response("{}", { status: 404 }))}
+        onChanged={jest.fn()}
+        onCopied={onCopied}
+        onShare={jest.fn()}
+      />,
+      { wrapper },
+    );
 
     expect(screen.getByText("LUCIA")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Copiar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Copiar código" }));
 
     await waitFor(() => {
       expect(onCopied).toHaveBeenCalled();
