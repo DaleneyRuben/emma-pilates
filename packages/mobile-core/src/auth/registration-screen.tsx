@@ -8,16 +8,18 @@ import {
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
 import { FormErrorSummary } from "../ui/form-error-summary";
 import { FormField } from "../ui/form-field";
+import { Glyph } from "../ui/glyph";
 import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Text } from "../ui/text";
-import { spacing } from "../ui/tokens";
+import { colors, spacing } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
 import { restartPendingWindow, type PendingRegistration } from "./pending-registration-screens";
 import { limitKeepsAnyLink } from "./request-limit-copy";
+import { useReferralCodeCheck } from "./use-referral-code-check";
 
 export const minimumPasswordLength = 8;
 
@@ -54,6 +56,23 @@ export function RegistrationScreen({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
+  // n.º 18: whose code it is, and the channel it marked by itself.
+  const codeCheck = useReferralCodeCheck(api, referralOpen ? referralCode : "");
+  const [markedBy, setMarkedBy] = useState<string | null>(null);
+  // Adjusted while rendering when a new code is confirmed (React's pattern
+  // for state that follows a value), so the chip is marked in the same frame.
+  const [seenCheck, setSeenCheck] = useState(codeCheck);
+  if (codeCheck !== seenCheck) {
+    setSeenCheck(codeCheck);
+    if (codeCheck.status === "valid") {
+      setChannel(codeCheck.holderKind === "client" ? "friend" : "trainer");
+      setMarkedBy(codeCheck.holderFirstName);
+    }
+  }
+  const unknownCode =
+    codeCheck.status === "unknown"
+      ? `No encontramos el código ${codeCheck.code}. Revisa cómo lo escribiste.`
+      : undefined;
 
   // C6 B: a short error under each marked field, after a «!».
   const nameError = submitted && name.trim() === "" ? "! Escribe tu nombre" : undefined;
@@ -99,7 +118,8 @@ export function RegistrationScreen({
       phoneMistake !== null ||
       password.length < minimumPasswordLength ||
       password !== confirmation ||
-      channel === null
+      channel === null ||
+      codeCheck.status === "unknown"
     ) {
       return;
     }
@@ -134,8 +154,8 @@ export function RegistrationScreen({
 
   return (
     <AuthenticationScreen
-      brand={false}
-      footer={
+      // n.º 6 (C01b3, C01b4): the button ends the form and scrolls with it.
+      actions={
         <>
           <PrimaryButton
             busy={submitting}
@@ -143,9 +163,15 @@ export function RegistrationScreen({
             label="Crear cuenta"
             onPress={submit}
           />
-          <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
+          <FooterPrompt
+            action="Inicia sesión"
+            onPress={onBack}
+            pill
+            prompt="¿Ya tienes una cuenta?"
+          />
         </>
       }
+      brand={false}
       topBar={{ onBack, title: "Crea tu cuenta" }}
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
@@ -198,19 +224,35 @@ export function RegistrationScreen({
         secureTextEntry
         value={confirmation}
       />
-      <AcquisitionChannelField error={channelError} onChange={setChannel} value={channel} />
+      <AcquisitionChannelField
+        error={channelError}
+        note={
+          markedBy !== null && codeCheck.status === "valid"
+            ? `La marcamos por el código de ${markedBy}.`
+            : undefined
+        }
+        onChange={setChannel}
+        value={channel}
+      />
       {referralOpen ? (
         <View style={styles.referral}>
           <FormField
             autoCapitalize="characters"
             autoCorrect={false}
-            error={referralError ? "! Revisa el código de referido" : undefined}
-            hint="Ej.: EMMA-2026"
+            error={unknownCode ?? (referralError ? "! Revisa el código de referido" : undefined)}
+            hint="Ej.: LUCIA"
             label="Código de referido"
             onChangeText={setReferralCode}
             value={referralCode}
           />
-          <Text variant="secundario">De una amiga o de tu instructora.</Text>
+          {codeCheck.status === "valid" ? (
+            <View style={styles.holder}>
+              <Glyph color={colors.text} name="check" size={18} strokeWidth={1.7} />
+              <Text variant="compacto-600">{`Código de ${codeCheck.holderFirstName}`}</Text>
+            </View>
+          ) : (
+            <Text variant="secundario">De una amiga o de tu instructora.</Text>
+          )}
         </View>
       ) : (
         <Pressable
@@ -228,6 +270,7 @@ export function RegistrationScreen({
 }
 
 const styles = StyleSheet.create({
+  holder: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   referral: { gap: spacing.xs },
   referralToggle: {
     alignItems: "center",

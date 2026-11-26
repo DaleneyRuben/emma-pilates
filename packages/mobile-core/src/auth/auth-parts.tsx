@@ -102,15 +102,18 @@ export function QuietButton({
 export function FooterPrompt({
   action,
   onPress,
+  pill = false,
   prompt,
 }: {
   action: string;
   onPress: () => void;
+  /** On the 100 screen, under the form, the line rides on a white pill (C01b4). */
+  pill?: boolean;
   prompt: string;
 }) {
   return (
     <View style={styles.footer}>
-      <View style={styles.footerLine}>
+      <View style={[styles.footerLine, pill && styles.footerPill]}>
         <Text variant="cuerpo">{prompt}</Text>
         <Pressable
           accessibilityLabel={action}
@@ -126,6 +129,13 @@ export function FooterPrompt({
 }
 
 const styles = StyleSheet.create({
+  footerPill: {
+    alignSelf: "center",
+    backgroundColor: colors.card,
+    borderRadius: radii.pill,
+    minHeight: 40,
+    paddingHorizontal: spacing.lg,
+  },
   quiet: {
     alignItems: "center",
     justifyContent: "center",

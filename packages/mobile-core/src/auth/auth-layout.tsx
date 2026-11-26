@@ -142,7 +142,11 @@ export function AuthenticationScreen({
             <View style={styles.cardActions}>{actions}</View>
           ) : null}
         </View>
-        {!staff && actions !== undefined ? <View style={styles.actions}>{actions}</View> : null}
+        {!staff && actions !== undefined ? (
+          <View style={styles.actions} testID="auth-actions">
+            {actions}
+          </View>
+        ) : null}
       </FormScrollView>
     </Screen>
   );

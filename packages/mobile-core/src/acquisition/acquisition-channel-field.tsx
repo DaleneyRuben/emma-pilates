@@ -29,11 +29,14 @@ export const acquisitionChannelRequired = "Elige cómo nos conociste.";
 export function AcquisitionChannelField({
   error,
   label = "¿Cómo nos conociste?",
+  note,
   onChange,
   value,
 }: {
   error?: string;
   label?: string;
+  /** Why an answer is marked already, such as «La marcamos por el código de Lucía.» */
+  note?: string;
   onChange: (value: AcquisitionChannelChoice) => void;
   value: AcquisitionChannelChoice | null;
 }) {
@@ -57,6 +60,7 @@ export function AcquisitionChannelField({
           />
         ))}
       </View>
+      {note === undefined ? null : <Text variant="secundario">{note}</Text>}
       {error === undefined ? null : <InlineError field>{error}</InlineError>}
     </View>
   );
