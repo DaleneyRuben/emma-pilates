@@ -48,12 +48,23 @@ describe('authentication links (e2e)', () => {
     ).toContain('com.emmapilates.client');
   });
 
-  it('serves the Apple association as JSON without an extension', () =>
-    request(app.getHttpServer())
+  it('serves the Apple association as JSON without an extension', async () => {
+    const response = await request(app.getHttpServer())
       .get('/.well-known/apple-app-site-association')
       .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .expect({ applinks: { details: [] } }));
+      .expect(200);
+
+    expect(
+      (
+        response.body as { applinks: { details: { appIDs: string[] }[] } }
+      ).applinks.details.flatMap((detail) => detail.appIDs),
+    ).toEqual(
+      expect.arrayContaining([
+        'SN44D2645V.com.emmapilates.client',
+        'SN44D2645V.com.emmapilates.staff',
+      ]),
+    );
+  });
 
   it('answers a Client link opened in a browser with a page that keeps the token private', async () => {
     const response = await request(app.getHttpServer())

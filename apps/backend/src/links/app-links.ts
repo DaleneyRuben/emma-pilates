@@ -49,8 +49,9 @@ export const androidAssetLinks = (apps: readonly AndroidApp[]) =>
       },
     }));
 
-// Gate 9: the Apple Developer account, and with it the Team ID, is pending.
-export const appleTeamId: string | null = null;
+// The Apple Developer Program team that signs both iOS apps (gate 9, approved
+// 2026-11-23). Team IDs are public: Apple serves them in this very file.
+export const appleTeamId: string | null = 'SN44D2645V';
 
 const iosApps = [
   { bundleIdentifier: 'com.emmapilates.client', prefix: '/client' },

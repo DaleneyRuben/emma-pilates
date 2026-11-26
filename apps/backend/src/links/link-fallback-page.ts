@@ -30,10 +30,18 @@ const actions: Record<
 
 const apps: Record<
   AuthenticationLinkIdentityKind,
-  { name: string; packageName: string }
+  { name: string; packageName: string; appStoreId: string }
 > = {
-  client: { name: 'Emma Pilates', packageName: 'com.emmapilates.client' },
-  staff: { name: 'Emma Pilates Staff', packageName: 'com.emmapilates.staff' },
+  client: {
+    name: 'Emma Pilates',
+    packageName: 'com.emmapilates.client',
+    appStoreId: '6838534444',
+  },
+  staff: {
+    name: 'Emma Pilates Staff',
+    packageName: 'com.emmapilates.staff',
+    appStoreId: '6838534425',
+  },
 };
 
 const escapeHtml = (value: string): string =>
@@ -95,6 +103,11 @@ export const renderLinkFallbackPage = (
     button(
       `https://play.google.com/store/apps/details?id=${app.packageName}`,
       'Descargar en Google Play',
+      true,
+    ) +
+    button(
+      `https://apps.apple.com/app/id${app.appStoreId}`,
+      'Descargar en App Store',
       true,
     ) +
     browser +

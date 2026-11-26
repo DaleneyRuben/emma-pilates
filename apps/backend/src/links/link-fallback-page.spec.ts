@@ -25,6 +25,8 @@ describe('renderLinkFallbackPage', () => {
     expect(page).toContain(
       'href="https://play.google.com/store/apps/details?id=com.emmapilates.client"',
     );
+    expect(page).toContain('href="https://apps.apple.com/app/id6838534444"');
+    expect(page).toContain('Descargar en App Store');
     expect(page).not.toContain('secret-1');
     expect(page).not.toContain('Continuar en el navegador');
     expect(page).toContain('Emma Pilates Studio');
@@ -49,6 +51,7 @@ describe('renderLinkFallbackPage', () => {
       expect(page).toContain(
         'href="https://play.google.com/store/apps/details?id=com.emmapilates.staff"',
       );
+      expect(page).toContain('href="https://apps.apple.com/app/id6838534425"');
       expect(page).toContain(
         'href="https://emma-pilates-admin.vercel.app/crear-contrasena?token=secret%2F1%26x"',
       );
