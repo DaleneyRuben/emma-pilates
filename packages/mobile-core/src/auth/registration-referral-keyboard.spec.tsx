@@ -1,5 +1,7 @@
 import { act, cleanup, fireEvent, render } from "@testing-library/react-native";
-import { DeviceEventEmitter, ScrollView } from "react-native";
+import { DeviceEventEmitter, Dimensions, ScrollView } from "react-native";
+
+import { WideScreens } from "../ui/tablet-layout";
 
 import type { AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
@@ -33,12 +35,13 @@ const keyboardShown = () =>
     });
   });
 
-async function openReferral() {
+async function openReferral(wide = false) {
   const scrollToEnd = jest
     .spyOn(ScrollView.prototype as { scrollToEnd: () => void }, "scrollToEnd")
     .mockImplementation(() => undefined);
   scrollToEnd.mockClear();
-  const screen = await render(<AuthenticationFlow api={createApiMock()} />);
+  const flow = <AuthenticationFlow api={createApiMock()} />;
+  const screen = await render(wide ? <WideScreens>{flow}</WideScreens> : flow);
   await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
   await fireEvent.press(screen.getByRole("button", { name: "¿Tienes un código de referido?" }));
   return { scrollToEnd, screen };
@@ -82,5 +85,20 @@ describe("«Crea tu cuenta» with the keyboard on the referral code", () => {
     await keyboardShown();
 
     expect(scrollToEnd).not.toHaveBeenCalled();
+  });
+
+  // The testing session on an iPad Pro 11 (tablet sheet, follow-up 289): the
+  // form barely moved and the code field stayed behind the keyboard.
+  it("scrolls the code field above the keyboard on a tablet too", async () => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ fontScale: 1, height: 1194, scale: 2, width: 834 });
+    const { screen, scrollToEnd } = await openReferral(true);
+    expect(screen.getByTestId("tablet-auth-hero")).toBeOnTheScreen();
+
+    await fireEvent(screen.getByLabelText("Código de referido"), "focus");
+    await keyboardShown();
+
+    expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
   });
 });
