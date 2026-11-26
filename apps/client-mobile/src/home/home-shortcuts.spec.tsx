@@ -141,14 +141,10 @@ describe("Client Home shortcut tiles", () => {
 
     await waitFor(() => expect(screen.getByText("Te invitó Lucía")).toBeOnTheScreen());
     expect(screen.queryByText("Accesos rápidos")).toBeNull();
+    await waitFor(() => expect(screen.getByTestId("promotions-carousel")).toBeOnTheScreen());
     const order = screen
-      .getByTestId("home-scroll")
-      .findAll((node) =>
-        ["home-guest-pass-card", "promotions-carousel"].includes(node.props.testID),
-      )
+      .getAllByTestId(/^(home-guest-pass-card|promotions-carousel)$/)
       .map((node) => node.props.testID as string);
-    expect(order.indexOf("home-guest-pass-card")).toBeLessThan(
-      order.indexOf("promotions-carousel"),
-    );
+    expect(order).toEqual(["home-guest-pass-card", "promotions-carousel"]);
   });
 });
