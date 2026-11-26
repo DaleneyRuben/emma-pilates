@@ -65,8 +65,10 @@ describe('invite links (e2e)', () => {
     );
   });
 
-  // Review: a Trainer's code opens no Guest Pass, so the page promises none.
-  it('does not promise a free class for a Trainer code', async () => {
+  // #26 (owner): a Trainer's link works like a friend's, so her client is
+  // attributed to her, but a Trainer's code opens no Guest Pass: the page
+  // carries the code without promising a free class.
+  it('carries a Trainer code without promising a free class', async () => {
     lookUp.mockResolvedValue({
       code: 'DANIELA',
       status: 'valid',
@@ -74,12 +76,25 @@ describe('invite links (e2e)', () => {
       holderKind: 'trainer',
     });
 
-    const response = await request(app.getHttpServer())
+    const iphone = await request(app.getHttpServer())
       .get('/client/invite/DANIELA')
-      .set('User-Agent', 'Mozilla/5.0 (Macintosh)')
+      .set(
+        'User-Agent',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X)',
+      )
       .expect(200);
+    expect(iphone.text).toContain('Daniela te invita a Emma Pilates Studio');
+    expect(iphone.text).not.toContain('te regala tu primera clase');
+    expect(iphone.text).toContain('>DANIELA<');
+    expect(iphone.text).toContain('Copiar código y abrir App Store');
 
-    expect(response.text).not.toContain('te regala tu primera clase');
-    expect(response.text).toContain('Tu primera clase en Emma Pilates Studio');
+    await request(app.getHttpServer())
+      .get('/client/invite/DANIELA')
+      .set('User-Agent', 'Mozilla/5.0 (Linux; Android 14)')
+      .expect(302)
+      .expect(
+        'Location',
+        'https://play.google.com/store/apps/details?id=com.emmapilates.client&referrer=invite_code%3DDANIELA',
+      );
   });
 });
