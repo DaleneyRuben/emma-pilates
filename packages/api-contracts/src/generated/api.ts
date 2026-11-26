@@ -29666,6 +29666,232 @@ export function useGetCurrentClientInvoicePage<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type getStaffInvoiceUploadPageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getStaffInvoiceUploadPageResponseSuccess =
+  getStaffInvoiceUploadPageResponse200 & {
+    headers: Headers;
+  };
+export type getStaffInvoiceUploadPageResponse =
+  getStaffInvoiceUploadPageResponseSuccess;
+
+export const getGetStaffInvoiceUploadPageUrl = (
+  imageAssetId: string,
+  page: number,
+) => {
+  return `/api/v1/staff/invoice-uploads/${imageAssetId}/pages/${page}`;
+};
+
+export const getStaffInvoiceUploadPage = async (
+  imageAssetId: string,
+  page: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffInvoiceUploadPageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffInvoiceUploadPageUrl(imageAssetId, page),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getStaffInvoiceUploadPageResponse["data"] =
+    body as getStaffInvoiceUploadPageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffInvoiceUploadPageResponse;
+};
+
+export const getGetStaffInvoiceUploadPageQueryKey = (
+  imageAssetId: string,
+  page: number,
+) => {
+  return [
+    `/api/v1/staff/invoice-uploads/${imageAssetId}/pages/${page}`,
+  ] as const;
+};
+
+export const getGetStaffInvoiceUploadPageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  page: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetStaffInvoiceUploadPageQueryKey(imageAssetId, page);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>
+  > = ({ signal }) =>
+    getStaffInvoiceUploadPage(
+      imageAssetId,
+      page,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled:
+      imageAssetId !== null &&
+      imageAssetId !== undefined &&
+      page !== null &&
+      page !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffInvoiceUploadPageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>
+>;
+export type GetStaffInvoiceUploadPageQueryError = unknown;
+
+export function useGetStaffInvoiceUploadPage<
+  TData = Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  page: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffInvoiceUploadPage<
+  TData = Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  page: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffInvoiceUploadPage<
+  TData = Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  page: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffInvoiceUploadPage<
+  TData = Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  page: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffInvoiceUploadPage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffInvoiceUploadPageQueryOptions(
+    imageAssetId,
+    page,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type listEvaluationSlotsResponse200 = {
   data: EvaluationAvailabilityDto;
   status: 200;
