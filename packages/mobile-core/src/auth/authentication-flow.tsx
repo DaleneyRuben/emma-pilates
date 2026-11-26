@@ -48,6 +48,8 @@ type AuthenticationFlowProps = {
   onRecoveryCredential?: (credential: string) => Promise<void> | void;
   /** Keeps «Revisa tu correo» across launches (Client app, MOB-028). */
   pendingRegistrationStore?: PendingRegistrationStore;
+  /** A friend's code from the install referrer or the clipboard (n.º 13). */
+  suggestedReferralCode?: string | null;
 };
 
 function routeForIntent(intent: AuthenticationLinkIntent | null | undefined): AuthenticationRoute {
@@ -58,6 +60,8 @@ function routeForIntent(intent: AuthenticationLinkIntent | null | undefined): Au
       return "recover";
     case "verify-email":
       return "verify-email";
+    case "referral-invite":
+      return "register";
     default:
       return "login";
   }
@@ -79,6 +83,7 @@ export function AuthenticationFlow({
   onLogin,
   onRecoveryCredential = () => undefined,
   pendingRegistrationStore,
+  suggestedReferralCode = null,
 }: AuthenticationFlowProps) {
   const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
   // C01c2: the flow's own one-time notice over Login, ahead of the app's.
@@ -151,8 +156,10 @@ export function AuthenticationFlow({
     return (
       <RegistrationScreen
         api={api}
+        initialReferralCode={link?.type === "referral-invite" ? link.token : suggestedReferralCode}
         onBack={showLogin}
         onRegistered={(registration) => {
+          linkHandled();
           setPending(registration);
           setRoute("check-email");
         }}

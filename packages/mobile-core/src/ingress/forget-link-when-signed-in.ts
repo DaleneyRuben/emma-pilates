@@ -8,6 +8,7 @@ const signInLinks = new Set<AuthenticationLinkIntent["type"]>([
   "verify-email",
   "activate-account",
   "recover-password",
+  "referral-invite",
 ]);
 
 /**

@@ -36,10 +36,13 @@ function problemCode(error: unknown): string | null {
 
 export function RegistrationScreen({
   api,
+  initialReferralCode = null,
   onBack,
   onRegistered,
 }: {
   api: AuthenticationApi;
+  /** A friend's code it was given (invite link, install referrer, n.º 13). */
+  initialReferralCode?: string | null;
   onBack: () => void;
   onRegistered: (registration: PendingRegistration) => void;
 }) {
@@ -49,8 +52,18 @@ export function RegistrationScreen({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
-  const [referralOpen, setReferralOpen] = useState(false);
-  const [referralCode, setReferralCode] = useState("");
+  const [referralOpen, setReferralOpen] = useState(initialReferralCode !== null);
+  const [referralCode, setReferralCode] = useState(initialReferralCode ?? "");
+  // A code that arrives while the form is open (the install referrer answers
+  // late) fills an empty field.
+  const [givenCode, setGivenCode] = useState(initialReferralCode);
+  if (initialReferralCode !== givenCode) {
+    setGivenCode(initialReferralCode);
+    if (initialReferralCode !== null && referralCode.trim() === "") {
+      setReferralOpen(true);
+      setReferralCode(initialReferralCode);
+    }
+  }
   const [submitted, setSubmitted] = useState(false);
   const [referralError, setReferralError] = useState(false);
   const [error, setError] = useState<string | null>(null);
