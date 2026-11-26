@@ -17,9 +17,10 @@ const nextStep = {
   bought: "Ganaste 1 clase. Ya está en tu plan.",
 } as const;
 
-// Testing session (#20 + #22): she registered while the code was not active,
-// so no Guest Pass was opened for her. Older APIs leave `freeClass` out.
-const noFreeClass = "Tu código no estaba activo: no recibió la clase gratis.";
+// Testing session (#20 + #22): no Guest Pass was opened for her, because the
+// code was not active or the month's friend was already invited; the line
+// names neither. Older APIs leave `freeClass` out.
+const noFreeClass = "No recibió la clase gratis.";
 
 const steps = [
   "1. Compartes tu código.",
