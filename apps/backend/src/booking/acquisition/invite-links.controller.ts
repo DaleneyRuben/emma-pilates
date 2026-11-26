@@ -38,13 +38,17 @@ export class InviteLinksController {
     const found = await this.lookUp(code).catch(() => null);
     const destination = inviteLinkDestination({
       userAgent: userAgent ?? '',
+      // #26: a Client's or a Trainer's live code travels with the link; the
+      // page promises a free class only for a Client's (BKM-014).
       invite:
-        // Only a Client's code opens a Guest Pass (BKM-014): a Trainer's
-        // leads to the stores without promising a free class.
         found?.status === 'valid' &&
-        found.holderKind === 'client' &&
-        found.holderFirstName !== null
-          ? { code: found.code, holderFirstName: found.holderFirstName }
+        found.holderFirstName !== null &&
+        found.holderKind !== null
+          ? {
+              code: found.code,
+              holderFirstName: found.holderFirstName,
+              holderKind: found.holderKind,
+            }
           : null,
     });
     response.setHeader('Cache-Control', 'no-store');

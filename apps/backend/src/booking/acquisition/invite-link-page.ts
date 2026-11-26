@@ -8,7 +8,12 @@
 export type InviteLinkInput = {
   userAgent: string;
   /** Null when nobody holds the code: the link still leads to the stores. */
-  invite: { code: string; holderFirstName: string } | null;
+  invite: {
+    code: string;
+    holderFirstName: string;
+    /** A Trainer's code attributes the client but opens no free class (#26). */
+    holderKind?: 'client' | 'trainer';
+  } | null;
 };
 
 export type InviteLinkDestination =
@@ -40,14 +45,19 @@ const copyThenOpen = (code: string): string =>
   `<script>document.getElementById('copy-and-open').addEventListener('click',function(e){e.preventDefault();var go=function(){location.href=${JSON.stringify(appStoreUrl)};};try{navigator.clipboard.writeText(${JSON.stringify(code)}).then(go,go);}catch(_){go();}});</script>`;
 
 const render = (input: InviteLinkInput, iphone: boolean): string => {
+  const trainer = input.invite?.holderKind === 'trainer';
   const title =
     input.invite === null
       ? 'Tu primera clase en Emma Pilates Studio'
-      : `${input.invite.holderFirstName} te regala tu primera clase`;
+      : trainer
+        ? `${input.invite.holderFirstName} te invita a Emma Pilates Studio`
+        : `${input.invite.holderFirstName} te regala tu primera clase`;
   const description =
     input.invite === null
       ? 'Descarga la app de Emma Pilates Studio.'
-      : `Usa su código ${input.invite.code} al crear tu cuenta y tu primera clase es gratis.`;
+      : trainer
+        ? `Usa su código ${input.invite.code} al crear tu cuenta.`
+        : `Usa su código ${input.invite.code} al crear tu cuenta y tu primera clase es gratis.`;
   const code =
     input.invite === null
       ? ''
