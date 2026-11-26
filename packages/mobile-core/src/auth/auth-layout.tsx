@@ -42,10 +42,12 @@ export function BrandHeader({ teamAccess = false }: { teamAccess?: boolean }) {
 export function AuthenticationScreen({
   actions,
   badge,
+  bare = false,
   brand = true,
   children,
   eyebrow,
   footer,
+  revealEndWithKeyboard = false,
   staff = false,
   teamAccess = false,
   title,
@@ -55,12 +57,16 @@ export function AuthenticationScreen({
   actions?: ReactNode;
   /** A confirmation's outcome: the disc over a centred title (MOB-035). */
   badge?: OutcomeBadgeProps;
+  /** The children stand on the screen with no white card around them (C01c3's notice). */
+  bare?: boolean;
   /** «Revisa tu correo» and its siblings draw no wordmark. */
   brand?: boolean;
   /** A small uppercase line over the title, such as «Activar cuenta». */
   eyebrow?: string;
   /** A fixed white panel at the bottom, such as «Crear cuenta». */
   footer?: ReactNode;
+  /** Scroll to the end above the keyboard, while the last field has it (C01b3). */
+  revealEndWithKeyboard?: boolean;
   /** The team boards (E-A05–A10) draw the outcome and its actions in the card. */
   staff?: boolean;
   teamAccess?: boolean;
@@ -102,6 +108,7 @@ export function AuthenticationScreen({
         band
         contentContainerStyle={styles.content}
         footer={footer === undefined ? undefined : <FooterPanel>{footer}</FooterPanel>}
+        revealEndWithKeyboard={revealEndWithKeyboard}
       >
         {topBar === undefined ? (
           <ScreenHeader>
@@ -128,8 +135,8 @@ export function AuthenticationScreen({
           </View>
         ) : null}
         <View
-          style={[styles.panel, outcomeInCard && styles.panelOutcome]}
-          testID="authentication-panel"
+          style={[bare ? styles.barePanel : styles.panel, outcomeInCard && styles.panelOutcome]}
+          testID={bare ? "authentication-bare" : "authentication-panel"}
         >
           {outcomeInCard ? <OutcomeDisc {...badge} surface="card" /> : null}
           {outcomeInCard ? outcomeTitle : null}
@@ -174,6 +181,7 @@ export const authStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   actions: { gap: spacing.md },
+  barePanel: { gap: spacing.mdLg, marginTop: spacing.xs },
   bandBody: { gap: spacing.md, paddingBottom: spacing.xs, paddingTop: spacing.xl },
   brand: {
     alignItems: "center",

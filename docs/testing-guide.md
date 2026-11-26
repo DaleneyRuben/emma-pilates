@@ -2411,7 +2411,9 @@ In the Client app as `lucia@example.com`:
    hint) and
    **Invita a una amiga**. Without an active Plan the booking shortcut is a
    full-width row at 60 % with «Necesitas un plan activo» and a lock, over
-   two tiles with «Agenda tu cita» and «Su primera clase es gratis».
+   a white **Evaluación nutricional** row with «Agenda tu cita» and a
+   chevron; there is no «Invita a una amiga» without a paid Plan
+   (walkthrough n.º 22, C02b, C02c, C02d, C02j).
 2. Tapping the plan row anywhere opens **Mi plan** (`C12`, Test 176 E): a
    Lino card with the plan name and an «Activo» dot, the classes left in
    large Lora «de N clases restantes» and «Vence el …»; the solid **Renovar
@@ -12275,7 +12277,8 @@ B. **Confirmed elsewhere (n.º 4, C01c2).** With «Revisa tu correo» open,
    confirm the email from its link in a browser
    (`POST /api/v1/client-email-verifications` with the captured token). Send
    the app to the background and back, or reopen it: it goes to Login with
-   «Tu correo ya está confirmado. Inicia sesión para entrar.» The server
+   «Tu correo ya está confirmado. Inicia sesión para entrar.», the email
+   field already holding the registered address (C01c2). The server
    answers `POST /api/v1/client-registrations/status-checks` with
    `{ "registrationContinuation": … }` as `pending`, `verified` or `expired`.
 C. **Only the Face ID offer (n.º 5, C01q, C01r).** On a phone with Face ID
@@ -12303,7 +12306,15 @@ F. **A referral code on «Crea tu cuenta» (n.º 18, C01b5, C01b6).** The
    shows under the field and «Recomendación de una amiga» is marked with «La
    marcamos por el código de Lucía.» A Trainer's code marks «Una
    instructora». A code nobody holds shows «No encontramos el código … Revisa
-   cómo lo escribiste.» and **Crear cuenta** creates nothing.
+   cómo lo escribiste.» after an alert circle and **Crear cuenta** creates
+   nothing. The open field keeps «¿Tienes un código de referido?» above it
+   with an up chevron (tapping it closes the field and drops the code), the
+   «La marcamos…» line starts with a check, and while a valid code is typed
+   the other «¿Cómo nos conociste?» chips do not respond. With the code
+   field focused on a phone (iPhone 16 Pro, the emulator) the form scrolls
+   so the field and «Código de Lucía» sit above the keyboard. The «¿Te
+   invitó Lucía?» sheet (C01b8) shows the gift on a round disc above a
+   centred title and note.
    `GET /api/v1/referral-codes/lookup?code=lucia` answers without a
    credential: `{ code, status, holderFirstName, holderKind }`.
 
@@ -12376,7 +12387,8 @@ A. **The receipt (C10u, C10b, C10v, C10c).** As Mariana, buy «Paquete de 8
    clases» by transfer and tap «Elegir comprobante». The upload starts as soon
    as the photo is chosen: the row reads «Subiendo comprobante» with a bar and
    the percentage, and «Enviar comprobante» is off with «Espera a que termine
-   de subir». Then «Comprobante listo» with an outlined **Cambiar** and the ×;
+   de subir». Then «Comprobante listo» with an outlined **Cambiar** and the ×,
+   the title whole on a 390–402 pt phone;
    the row itself no longer opens the picker. Tap the thumbnail: «Tu
    comprobante» over the whole screen, «Revisa que se lean el monto, la fecha
    y el destinatario.», **Cambiar comprobante** and **Cerrar**. Open «¿Necesitas
@@ -12397,6 +12409,11 @@ C. **The profile photo (C22c, C22d).** Client app: Perfil › Editar › Cambiar
    Stop the API before choosing to make it fail: the photo stays, with «No
    pudimos subir tu foto. Tus otros cambios sí se guardaron.» and
    **Reintentar**, which sends the same photo without opening the picker.
+   **Quitar foto** shows beside **Cambiar foto** for a first photo too, while
+   it uploads and after it fails; after a failure it takes the photo away and
+   the initials come back. On Android the picker's photo shows under the ring
+   right after choosing it, never the initials while it is prepared, and it
+   stays until the uploaded one has loaded.
    Staff app: Perfil › Cambiar foto behaves the same, with «No pudimos subir
    tu foto.» (Perfil has no other fields to keep). «Guardar cambios» now ends
    the Editar perfil form and scrolls with it, never pinned over the keyboard
@@ -12412,14 +12429,18 @@ D. **The Staff invoice (E-D19, E-D20, E-D27, E-D28, E-D30).** As Paola,
    **Subir factura**; then «Factura subida» as before. Cancelling the picker
    after **Cambiar** keeps the file already chosen; the × clears it.
 E. **Invita a una amiga (C16, C16s, C16g, C16h).** As Lucía (paid Plan in
-   force), **Compartir tu código** opens the phone's own share sheet with the
+   force), the code card is the deep-rose hero: white code, outlined white
+   copy button, a white **Compartir tu código** with the share icon (also in
+   the Staff app's «Tu código de referido», E-F13) and a white **Editar
+   código** link. **Compartir tu código** opens the phone's own share sheet with the
    text and `https://links.emmapilatesstudio.com/client/invite/LUCIA`. «Tus
    invitadas» shows under each status its next step: «Todavía no reservó su
    clase gratis.», «Si compra su primer plan, ganas una clase.» or «Ganaste 1
    clase. Ya está en tu plan.». «Cómo funciona» ends with «Puedes invitar a una
    amiga por mes.». As Mariana (no Plan) the card shows the code with «Se
-   activa cuando compres un plan.» and **Comprar un plan**, which opens the
-   Plans; there is no share or edit button. The link itself opens no page yet
+   activa cuando compres un plan.» and a white **Comprar un plan** on the
+   deep-rose card, which opens the Plans; there is no share or edit button,
+   and no «Tus invitadas» while she has invited nobody. The link itself opens no page yet
    (CW01 waits for approval).
 
 ## Test 202: the invite link and the guest's Inicio (mejoras del recorrido 13, 19, 22)
@@ -12461,7 +12482,9 @@ E. **After installing (CW01b, C01b8).** Android: on the first launch the app
 F. **The guest's Inicio (C02f).** Register a friend with the code of a host
    with a paid Plan and verify her: Inicio's card reads «Te invitó Lucía»
    (with her initials), «Tu clase gratis de invitada», «Úsala antes del …»
-   and **Reservar mi clase gratis**, which opens Reservar. `GET
+   and a full-width white **Reservar mi clase gratis**, which opens Reservar.
+   The card comes before the promotions, and there is no «Accesos rápidos»
+   while she only holds the pass (no «Invita a una amiga» either). `GET
    /api/v1/clients/current/subscription` carries `guestPass.hostFirstName`
    and `hostInitials`.
 G. **Booking it (C05j).** Book a class with the pass: «Reserva confirmada ·
@@ -12482,8 +12505,10 @@ active Plan and classes left.
 
 A. **A class she booked (C04p).** Book a class from Reservar, then open the
    same class again from Reservar. The footer says «Ya reservaste esta clase»
-   with **Cancelar reserva** instead of «Reservar esta clase», and «Cancelas
-   gratis hasta …» while the free-cancellation window is still open.
+   after a check, with **Cancelar reserva** instead of «Reservar esta clase»,
+   and «Cancelas gratis hasta el vie 20 nov a las 07:30.» (or «hoy» /
+   «mañana a las …», with the month otherwise and a final period) while the
+   free-cancellation window is still open.
 B. **Cancelling it there.** Tap **Cancelar reserva**: «¿Cancelar esta
    reserva?» asks first; **Sí, cancelar reserva** cancels it and the footer
    turns back to **Reservar esta clase**. Mis reservas no longer lists it.

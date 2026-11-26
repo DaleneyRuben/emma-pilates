@@ -6,6 +6,7 @@ import {
   type AcquisitionChannelChoice,
 } from "../acquisition/acquisition-channel-field";
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
+import { Chevron } from "../ui/chevron";
 import { FormErrorSummary } from "../ui/form-error-summary";
 import { FormField } from "../ui/form-field";
 import { Glyph } from "../ui/glyph";
@@ -58,6 +59,7 @@ export function RegistrationScreen({
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
   const [referralOpen, setReferralOpen] = useState(initialReferralCode !== null);
   const [referralCode, setReferralCode] = useState(initialReferralCode ?? "");
+  const [codeFocused, setCodeFocused] = useState(false);
   // A code that arrives while the form is open (the install referrer answers
   // late) fills an empty field.
   const [givenCode, setGivenCode] = useState(initialReferralCode);
@@ -193,6 +195,8 @@ export function RegistrationScreen({
         </>
       }
       brand={false}
+      // C01b3: the code field ends the form, so the form scrolls to its end.
+      revealEndWithKeyboard={referralOpen && codeFocused}
       topBar={{ onBack, title: "Crea tu cuenta" }}
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
@@ -247,6 +251,7 @@ export function RegistrationScreen({
       />
       <AcquisitionChannelField
         error={channelError}
+        locked={markedBy !== null && codeCheck.status === "valid"}
         note={
           markedBy !== null && codeCheck.status === "valid"
             ? `La marcamos por el código de ${markedBy}.`
@@ -255,15 +260,36 @@ export function RegistrationScreen({
         onChange={setChannel}
         value={channel}
       />
+      {/* C01b5/C01b6: the row stays above the open field, its chevron up. */}
+      <Pressable
+        accessibilityLabel="¿Tienes un código de referido?"
+        accessibilityRole="button"
+        accessibilityState={{ expanded: referralOpen }}
+        onPress={() => setReferralOpen((open) => !open)}
+        style={styles.referralToggle}
+      >
+        <Text style={styles.referralQuestion} variant="titulo-fila">
+          ¿Tienes un código de referido?
+        </Text>
+        <Chevron
+          direction={referralOpen ? "up" : "down"}
+          size={18}
+          strokeWidth={1.7}
+          testID="referral-toggle-chevron"
+        />
+      </Pressable>
       {referralOpen ? (
         <View style={styles.referral}>
           <FormField
             autoCapitalize="characters"
             autoCorrect={false}
             error={unknownCode ?? (referralError ? "! Revisa el código de referido" : undefined)}
+            errorIcon={unknownCode === undefined ? undefined : "alert"}
             hint="Ej.: LUCIA"
             label="Código de referido"
+            onBlur={() => setCodeFocused(false)}
             onChangeText={setReferralCode}
+            onFocus={() => setCodeFocused(true)}
             value={referralCode}
           />
           {codeCheck.status === "valid" ? (
@@ -275,17 +301,7 @@ export function RegistrationScreen({
             <Text variant="secundario">De una amiga o de tu instructora.</Text>
           )}
         </View>
-      ) : (
-        <Pressable
-          accessibilityLabel="¿Tienes un código de referido?"
-          accessibilityRole="button"
-          onPress={() => setReferralOpen(true)}
-          style={styles.referralToggle}
-        >
-          <Text variant="compacto-600">¿Tienes un código de referido?</Text>
-          <Text variant="compacto-600">⌄</Text>
-        </Pressable>
-      )}
+      ) : null}
       <ClipboardInviteSheet
         offer={clipboard.offer}
         onDismiss={clipboard.dismiss}
@@ -302,12 +318,11 @@ export function RegistrationScreen({
 const styles = StyleSheet.create({
   holder: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   referral: { gap: spacing.xs },
+  referralQuestion: { flex: 1 },
   referralToggle: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
+    gap: spacing.md,
     minHeight: 44,
-    paddingHorizontal: spacing.xxs,
   },
 });

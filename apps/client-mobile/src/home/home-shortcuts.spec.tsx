@@ -28,6 +28,22 @@ const active = {
   },
 };
 
+const promotion = {
+  id: "promotion-1",
+  headline: "Noviembre en Reformer",
+  description: "Trae a una amiga y las dos entrenan juntas el sábado.",
+  image: {
+    sources: [
+      {
+        url: "/api/v1/promotion-images/asset-1/promotion_1440/version-1",
+        mediaType: "image/webp",
+        width: 1440,
+        height: 810,
+      },
+    ],
+  },
+};
+
 async function openHome(subscription: unknown) {
   const screen = await render(
     <App
@@ -35,6 +51,7 @@ async function openHome(subscription: unknown) {
         routeFetcher({
           "/api/v1/clients/current": () => jsonResponse(profile),
           "/api/v1/clients/current/subscription": () => jsonResponse(subscription),
+          "/api/v1/promotions": () => jsonResponse([promotion]),
         }),
       )}
     />,
@@ -99,6 +116,35 @@ describe("Client Home shortcut tiles", () => {
     });
     expect(screen.getByTestId("shortcut-lock", hidden)).toBeOnTheScreen();
     expect(screen.getByText("Agenda tu cita")).toBeOnTheScreen();
-    expect(screen.getByText("Su primera clase es gratis")).toBeOnTheScreen();
+    // Walkthrough n.º 22 (C02b): only a paid plan can give a free class.
+    expect(screen.queryByRole("button", { name: "Invita a una amiga" })).toBeNull();
+    expect(screen.queryByText("Su primera clase es gratis")).toBeNull();
+    // The evaluation is a full-width row with a chevron, as the board draws it.
+    expect(screen.getByRole("button", { name: "Evaluación nutricional" })).toHaveStyle({
+      backgroundColor: "#FFFBFB",
+      flexDirection: "row",
+    });
+    expect(screen.getByTestId("shortcut-row-chevron", hidden)).toBeOnTheScreen();
+  });
+
+  it("leaves «Accesos rápidos» out for a guest-pass holder, her card before the promotions (C02f)", async () => {
+    const screen = await openHome({
+      status: "active",
+      subscription: {
+        ...active.subscription,
+        planName: "Pase de invitada",
+        originalClassAllowance: 1,
+        remainingClassAllowance: 0,
+        guestPass: { usedClassStartsAt: null, hostFirstName: "Lucía", hostInitials: "LF" },
+      },
+    });
+
+    await waitFor(() => expect(screen.getByText("Te invitó Lucía")).toBeOnTheScreen());
+    expect(screen.queryByText("Accesos rápidos")).toBeNull();
+    await waitFor(() => expect(screen.getByTestId("promotions-carousel")).toBeOnTheScreen());
+    const order = screen
+      .getAllByTestId(/^(home-guest-pass-card|promotions-carousel)$/)
+      .map((node) => node.props.testID as string);
+    expect(order).toEqual(["home-guest-pass-card", "promotions-carousel"]);
   });
 });

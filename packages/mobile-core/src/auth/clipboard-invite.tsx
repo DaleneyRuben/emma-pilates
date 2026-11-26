@@ -66,6 +66,7 @@ export function ClipboardInviteSheet({
     <ConfirmationSheet
       confirmLabel={offer === null ? "" : `Usar código ${offer.code}`}
       dismissLabel="No, gracias"
+      icon="gift"
       note={
         offer?.trainer === true
           ? "Usa su código al crear tu cuenta."

@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
+import { Glyph, type GlyphName } from "./glyph";
 import { OutlinedButton } from "./outlined-button";
 import { PrimaryButton } from "./primary-button";
 import { SheetTitle } from "./sheet-title";
@@ -27,6 +28,8 @@ type ConfirmationSheetProps = PropsWithChildren<{
   /** An outlined second action under the main one (S28's «Marcar contactada»). */
   secondaryAction?: { label: string; onPress: () => void; busy?: boolean };
   testID?: string;
+  /** A 52 pt disc above a centred title and note (C01b8's gift). */
+  icon?: GlyphName;
 }>;
 
 /**
@@ -40,6 +43,7 @@ export function ConfirmationSheet({
   confirmLabel,
   confirmTestID,
   dismissLabel = "Volver",
+  icon,
   note,
   onConfirm,
   onDismiss,
@@ -65,9 +69,26 @@ export function ConfirmationSheet({
       <View style={styles.backdrop}>
         <View style={styles.sheet} testID={testID}>
           <View style={styles.grabber} />
-          <SheetTitle>{title}</SheetTitle>
-          {children}
-          {note === undefined ? null : <Text variant="cuerpo">{note}</Text>}
+          {icon === undefined ? (
+            <>
+              <SheetTitle>{title}</SheetTitle>
+              {children}
+              {note === undefined ? null : <Text variant="cuerpo">{note}</Text>}
+            </>
+          ) : (
+            <View style={styles.hero}>
+              <View style={styles.disc} testID="confirmation-sheet-disc">
+                <Glyph color={colors.text} name={icon} size={26} strokeWidth={1.7} />
+              </View>
+              <SheetTitle style={styles.centred}>{title}</SheetTitle>
+              {children}
+              {note === undefined ? null : (
+                <Text style={styles.centred} variant="cuerpo">
+                  {note}
+                </Text>
+              )}
+            </View>
+          )}
           <PrimaryButton
             busy={busy}
             disabled={locked && !busy}
@@ -97,6 +118,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
   },
+  centred: { textAlign: "center" },
+  disc: {
+    alignItems: "center",
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: 26,
+    height: 52,
+    justifyContent: "center",
+    width: 52,
+  },
   grabber: {
     alignSelf: "center",
     backgroundColor: colors.band,
@@ -104,6 +134,7 @@ const styles = StyleSheet.create({
     height: 5,
     width: 40,
   },
+  hero: { alignItems: "center", gap: spacing.smLg },
   sheet: {
     ...shadows.sheet,
     backgroundColor: colors.card,

@@ -1,4 +1,5 @@
 import {
+  Chevron,
   colors,
   Glyph,
   type GlyphName,
@@ -61,6 +62,41 @@ export function LockedShortcutRow({ label, note }: { label: string; note: string
 }
 
 /**
+ * A full-width white row: the icon, the label over its note, and a chevron
+ * (C02b's «Evaluación nutricional» without a paid Plan).
+ */
+export function ShortcutRow({
+  hint,
+  icon,
+  label,
+  note,
+  onPress,
+}: {
+  hint?: string;
+  icon: GlyphName;
+  label: string;
+  note: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityHint={hint}
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.cardRow, pressed && styles.pressed]}
+    >
+      <TileIcon icon={icon} onWhite />
+      <View style={styles.rowBody}>
+        <Text variant="titulo-fila">{label}</Text>
+        <Text variant="secundario">{note}</Text>
+      </View>
+      <Chevron size={18} strokeWidth={1.7} testID="shortcut-row-chevron" />
+    </Pressable>
+  );
+}
+
+/**
  * A tile: the icon and the label, and a note only when the board draws one
  * (without a Plan). `hint` carries the live summary for screen readers.
  */
@@ -109,6 +145,14 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: "center",
     width: 36,
+  },
+  cardRow: {
+    ...surfaces.card,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.mdLg,
   },
   pressed: { opacity: 0.7 },
   row: {

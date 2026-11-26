@@ -103,9 +103,12 @@ describe("Session formatting", () => {
       );
     });
 
-    it("names the weekday and the day otherwise", () => {
+    it("names the weekday, the day and the month otherwise (C04p)", () => {
       expect(formatCancellationDeadline(at("2026-11-07T05:30:00"), at("2026-11-05T09:00:00"))).toBe(
-        "el sáb 7 a las 05:30",
+        "el sáb 7 nov a las 05:30",
+      );
+      expect(formatCancellationDeadline(at("2026-12-01T18:00:00"), at("2026-11-26T09:00:00"))).toBe(
+        "el mar 1 dic a las 18:00",
       );
     });
 

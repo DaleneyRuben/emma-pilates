@@ -48,6 +48,8 @@ export type LoginSubmissionResult =
 type LoginScreenProps = {
   /** A one-time message, such as the one left by closing the Account. */
   notice?: string | null;
+  /** The address to start with, such as the one just confirmed elsewhere (C01c2). */
+  initialEmail?: string;
   /** Set while a biometric key waits: the sheet greets instead of the form. */
   biometricLock?: BiometricLock;
   onForgotPassword?: () => void;
@@ -80,6 +82,7 @@ const autofillOff = {
 
 export function LoginScreen({
   biometricLock,
+  initialEmail = "",
   notice = null,
   onForgotPassword,
   onRegister,
@@ -118,7 +121,7 @@ export function LoginScreen({
     handleSubmit,
     setValue,
   } = useForm<LoginValues>({
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: initialEmail, password: "" },
     resolver: zodResolver(loginSchema),
   });
   const submitLogin = handleSubmit(async (values) => {

@@ -96,7 +96,7 @@ export function ReceiptRow({
     />
   );
   return (
-    <View style={styles.row} testID={testID}>
+    <View style={[styles.row, styles.readyRow]} testID={testID}>
       {onOpen === undefined ? (
         thumbnail
       ) : (
@@ -108,41 +108,50 @@ export function ReceiptRow({
           {thumbnail}
         </Pressable>
       )}
-      <Text numberOfLines={1} style={styles.body} variant="titulo-fila">
+      {/* Shrinks a little rather than cut on a narrow phone or a large text size. */}
+      <Text
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        numberOfLines={1}
+        style={styles.body}
+        variant="titulo-fila"
+      >
         Comprobante listo
       </Text>
-      <Pressable
-        accessibilityLabel="Cambiar"
-        accessibilityRole="button"
-        onPress={onAttach}
-        style={({ pressed }) => [styles.change, pressed && styles.pressed]}
-      >
-        <Text variant="boton">Cambiar</Text>
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Quitar comprobante"
-        accessibilityRole="button"
-        hitSlop={spacing.xs}
-        onPress={onRemove}
-        style={({ pressed }) => [styles.remove, pressed && styles.pressed]}
-      >
-        <Glyph color={colors.text} name="cross" size={16} strokeWidth={1.6} />
-      </Pressable>
+      <View style={styles.readyActions} testID="receipt-ready-actions">
+        <Pressable
+          accessibilityLabel="Cambiar"
+          accessibilityRole="button"
+          onPress={onAttach}
+          style={({ pressed }) => [styles.change, pressed && styles.pressed]}
+        >
+          <Text variant="boton-chico">Cambiar</Text>
+        </Pressable>
+        <Pressable
+          accessibilityLabel="Quitar comprobante"
+          accessibilityRole="button"
+          hitSlop={spacing.xs}
+          onPress={onRemove}
+          style={({ pressed }) => [styles.remove, pressed && styles.pressed]}
+        >
+          <Glyph color={colors.text} name="cross" size={16} strokeWidth={1.6} />
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   body: { flex: 1, gap: spacing.xxs },
-  // C10b: «Cambiar» outlined in 600, 36 pt high.
+  // C10b: «Cambiar» outlined in 600, 36 pt high, radius 12, 14 pt bold.
   change: {
     alignItems: "center",
     borderColor: colors.text,
-    borderRadius: radii.control,
+    borderRadius: spacing.md,
     borderWidth: 1.5,
     height: 36,
     justifyContent: "center",
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.mdLg,
   },
   fill: { backgroundColor: colors.text, height: "100%" },
   // Rosa Emma C10: the glyph on a 36 pt 50 disc.
@@ -155,6 +164,9 @@ const styles = StyleSheet.create({
     width: 36,
   },
   pressed: { opacity: 0.7 },
+  readyActions: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
+  // C10b: 12 pt over and 14 pt beside, so the title fits whole at 390 pt.
+  readyRow: { paddingHorizontal: spacing.mdLg, paddingVertical: spacing.md },
   // C10b: the × on a 36 pt 50 disc with its hairline.
   remove: {
     alignItems: "center",

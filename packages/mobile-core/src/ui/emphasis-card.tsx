@@ -1,10 +1,19 @@
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { Glyph, type GlyphName } from "./glyph";
 import { Text } from "./text";
 import { colors, radii, spacing, surfaces } from "./tokens";
 
-type Action = { label: string; onPress: () => void; testID?: string };
+type Action = {
+  /** A line icon before the label, such as «Compartir tu código»'s share (C16, E-F13). */
+  icon?: GlyphName;
+  label: string;
+  onPress: () => void;
+  testID?: string;
+  /** Fills the card's width at 48 pt, radius 16: C02f's «Reservar mi clase gratis», E-F13. */
+  wide?: boolean;
+};
 
 export type EmphasisCardProps = {
   /** At most one «On emphasis» white pill button. */
@@ -67,15 +76,7 @@ export function EmphasisCard({
 }
 
 /** The white pill action on the hero block, 44 high (follow-up 225 §4), in ink `boton`. */
-export function OnEmphasisButton({
-  label,
-  onPress,
-  testID,
-  wide = false,
-}: Action & {
-  /** Fills the card's width, as E-F13's «Compartir tu código». */
-  wide?: boolean;
-}) {
+export function OnEmphasisButton({ icon, label, onPress, testID, wide = false }: Action) {
   return (
     <Pressable
       accessibilityLabel={label}
@@ -84,6 +85,9 @@ export function OnEmphasisButton({
       style={({ pressed }) => [styles.button, wide && styles.wide, pressed && styles.pressed]}
       testID={testID}
     >
+      {icon === undefined ? null : (
+        <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.7} />
+      )}
       <Text variant="boton">{label}</Text>
     </Pressable>
   );
@@ -95,11 +99,13 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: colors.white,
     borderRadius: radii.pill,
+    flexDirection: "row",
+    gap: spacing.sm,
     justifyContent: "center",
     minHeight: 44,
     paddingHorizontal: spacing.xlSm,
   },
   card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
-  wide: { alignSelf: "stretch", minHeight: 48 },
+  wide: { alignSelf: "stretch", borderRadius: radii.button, minHeight: 48 },
   pressed: { opacity: 0.85 },
 });

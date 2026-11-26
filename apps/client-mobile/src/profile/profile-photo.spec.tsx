@@ -229,6 +229,8 @@ describe("Client profile photo", () => {
     ).toBeOnTheScreen();
     expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", { uri: "file:///me.jpg" });
     expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeEnabled();
+    // C22d: a first photo that did not upload can still be taken away.
+    expect(screen.getByRole("button", { name: "Quitar foto" })).toBeEnabled();
     const picks = jest.mocked(ImagePicker.launchImageLibraryAsync).mock.calls.length;
 
     await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
@@ -267,7 +269,84 @@ describe("Client profile photo", () => {
     expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", { uri: "file:///me.jpg" });
     expect(screen.queryByText("Subiendo foto…")).toBeNull();
     expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeEnabled();
+    // C22c: «Quitar foto» shows beside «Cambiar foto» for a first photo too.
+    expect(screen.getByRole("button", { name: "Quitar foto" })).toBeOnTheScreen();
     finishPut();
     await waitFor(() => expect(screen.queryByTestId("photo-upload-ring")).toBeNull());
+  });
+
+  // C22d: «Quitar foto» on a first photo that failed drops it, nothing to delete.
+  it("drops a first photo that failed to upload on «Quitar foto»", async () => {
+    pickedPhoto();
+    const screen = await openProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          ...uploadRoutes([]),
+          "PUT /api/v1/clients/current/photo": () =>
+            jsonResponse({ code: "profile_photo_not_ready", status: 409 }, 409),
+        }),
+      ),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar foto" }));
+    await screen.findByText(/No pudimos subir tu foto/, {}, { timeout: 10_000 });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Quitar foto" }));
+
+    expect(screen.getByText("SG")).toBeOnTheScreen();
+    expect(screen.queryByText(/No pudimos subir tu foto/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Quitar foto" })).toBeNull();
+  });
+
+  // Testing session, Android API 36: the system picker hands back a
+  // `content://` uri and the photo is prepared for seconds before it uploads.
+  // The circle shows that uri under the ring at once, and keeps the chosen
+  // photo until the stored one has loaded, never the initials in between.
+  it("draws the picker's content uri under the ring at once, then keeps it", async () => {
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: "content://media/picker/0/42", width: 10, height: 10 }],
+    } as never);
+    let finishPreparing: () => void = () => undefined;
+    jest.mocked(ImageManipulator.manipulateAsync).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishPreparing = () => resolve({ uri: "file:///me.jpg", width: 10, height: 10 });
+        }),
+    );
+    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(pngBytes));
+    let current: ClientProfileDto = profile;
+    const routes = routeFetcher({
+      ...readRoutes,
+      ...uploadRoutes([]),
+      "/api/v1/clients/current": () => jsonResponse(current),
+      "PUT /api/v1/clients/current/photo": () => {
+        current = withPhoto;
+        return jsonResponse(withPhoto);
+      },
+    });
+    // The stored photo has not loaded yet.
+    const fetcher = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).includes("/clients/current/photo?variant=display")) {
+        return new Promise<Response>(() => undefined);
+      }
+      return routes(input, init);
+    }) as ReturnType<typeof routeFetcher>;
+    const screen = await openProfile(createClientRuntime(fetcher));
+    await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar foto" }));
+
+    expect(await screen.findByTestId("photo-upload-ring")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", {
+      uri: "content://media/picker/0/42",
+    });
+
+    finishPreparing();
+    await waitFor(() => expect(screen.queryByTestId("photo-upload-ring")).toBeNull(), {
+      timeout: 10_000,
+    });
+    expect(screen.queryByText("SG")).toBeNull();
+    expect(screen.getByLabelText("Foto de perfil")).toHaveProp("source", { uri: "file:///me.jpg" });
   });
 });

@@ -50,4 +50,31 @@ describe("ReceiptRow", () => {
     expect(actions.onRemove).toHaveBeenCalledTimes(1);
     expect(actions.onOpen).toHaveBeenCalledTimes(1);
   });
+
+  // Testing session: «Comprobante l…» on a 402 pt iPhone. The board's
+  // measures leave the title whole: 14 pt row sides, «Cambiar» in 14 pt bold
+  // with 14 pt sides, 8 pt between it and the ×, and the title shrinks a
+  // little rather than cut on a narrower phone or a larger text size.
+  it("lays the ready row out as C10b so the title is never cut", async () => {
+    const screen = await render(
+      <ReceiptRow {...handlers()} receipt={{ localUri: "file:///r.jpg", status: "ready" }} />,
+    );
+
+    expect(screen.getByTestId("payment-receipt")).toHaveStyle({
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    });
+    expect(screen.getByText("Cambiar")).toHaveStyle({ fontSize: 14 });
+    expect(screen.getByRole("button", { name: "Cambiar" })).toHaveStyle({
+      borderRadius: 12,
+      paddingHorizontal: 14,
+    });
+    expect(screen.getByTestId("receipt-ready-actions")).toHaveStyle({
+      flexDirection: "row",
+      gap: 8,
+    });
+    const title = screen.getByText("Comprobante listo");
+    expect(title).toHaveProp("adjustsFontSizeToFit", true);
+    expect(title).toHaveProp("numberOfLines", 1);
+  });
 });

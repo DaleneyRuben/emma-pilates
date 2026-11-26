@@ -167,30 +167,41 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.queryByRole("button", { name: "Compartir tu código" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Editar código" })).toBeNull();
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+    // C16h: the deep-rose hero with a white «Comprar un plan», and no
+    // «Tus invitadas» while there are none.
+    expect(screen.getByTestId("referral-code-card")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
+      alignSelf: "stretch",
+      backgroundColor: "#FFFBFB",
+    });
+    expect(screen.queryByText("Tus invitadas")).toBeNull();
   });
 
   // BKM-017: copy next to the code, and «Editar código» on the card. FIX-082
   // (Invita option A): one white card, the code in Lora, a 44 pt outlined copy
   // icon, «Compartir tu código» right under it and «Editar código» centred.
-  it("holds the code, copy, share and edit on one light card", async () => {
+  // C16, C16s, C16g (walkthrough 291): the deep-rose hero, like the Staff one.
+  it("holds the code, copy, share and edit on one deep-rose card", async () => {
     const screen = await openInvita(routeFetcher(routes([])));
 
     const card = await screen.findByTestId("referral-code-card");
-    expect(card).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
+    expect(card).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 24 });
     expect(screen.getByText("Tu código")).toBeOnTheScreen();
     // Follow-up 285: the code is `cifra-grande`, with no hand-made spacing.
     expect(screen.getByText("LUCIA")).toHaveStyle({
-      color: "#93615D",
+      color: "#FFFBFB",
       fontFamily: "Lora_500Medium",
       fontSize: 34,
     });
     expect(StyleSheet.flatten(screen.getByText("LUCIA").props.style).letterSpacing).toBeUndefined();
     const copy = screen.getByRole("button", { name: "Copiar código" });
-    expect(copy).toHaveStyle({ borderWidth: 1.5, height: 44, width: 44 });
+    expect(copy).toHaveStyle({ borderColor: "#FFFBFB", borderWidth: 1.5, height: 44, width: 44 });
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
-    expect(screen.getByRole("button", { name: "Compartir tu código" })).toHaveStyle({
-      backgroundColor: "#93615D",
-    });
+    const shareButton = screen.getByRole("button", { name: "Compartir tu código" });
+    expect(shareButton).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 16 });
+    expect(
+      within(shareButton).getByTestId("glyph-share", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
 
     await fireEvent.press(copy);
     expect(await screen.findByText("Código copiado")).toBeOnTheScreen();

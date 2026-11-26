@@ -72,6 +72,12 @@ describe("Tu código de referido (S30)", () => {
     expect(await screen.findByText("Código copiado")).toBeOnTheScreen();
     expect(await card.findByRole("button", { name: "Editar código" })).toBeOnTheScreen();
 
+    // E-F13: the share icon leads «Compartir tu código», as in the Client app.
+    expect(
+      within(card.getByRole("button", { name: "Compartir tu código" })).getByTestId("glyph-share", {
+        includeHiddenElements: true,
+      }),
+    ).toBeOnTheScreen();
     await fireEvent.press(card.getByRole("button", { name: "Compartir tu código" }));
     expect(share).toHaveBeenCalledWith({
       message:

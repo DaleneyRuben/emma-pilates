@@ -91,6 +91,7 @@ export function AuthenticationFlow({
   const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
   // C01c2: the flow's own one-time notice over Login, ahead of the app's.
   const [loginNotice, setLoginNotice] = useState<string | null>(null);
+  const [confirmedEmail, setConfirmedEmail] = useState<string | undefined>(undefined);
   const [resendOnOpen, setResendOnOpen] = useState(false);
   const { pending, restoring, setPending } = usePendingRegistration({
     // A link that arrived while the kept registration was loading keeps its
@@ -181,6 +182,8 @@ export function AuthenticationFlow({
           showLogin();
         }}
         onConfirmed={() => {
+          // C01c2: Login opens with the address she just confirmed.
+          setConfirmedEmail(pending.email);
           setPending(null);
           setLoginNotice("Tu correo ya está confirmado. Inicia sesión para entrar.");
           showLogin();
@@ -257,6 +260,7 @@ export function AuthenticationFlow({
   return (
     <LoginScreen
       biometricLock={biometricLock}
+      initialEmail={confirmedEmail}
       notice={loginNotice ?? notice}
       onResendConfirmation={() => {
         setResendOnOpen(true);

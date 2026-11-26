@@ -113,9 +113,25 @@ export function formatSessionDate(startsAt: string): string {
   return formatTitleDate(startsAt);
 }
 
+// Fixed, so no platform's Intl adds a period («nov.»).
+const shortMonths = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sep",
+  "oct",
+  "nov",
+  "dic",
+] as const;
+
 /**
- * The free-cancellation limit with its day, in La Paz (walkthrough n.º 27):
- * «hoy a las 05:30», «mañana a las 05:30», or «el sáb 7 a las 05:30».
+ * The free-cancellation limit with its day, in La Paz (walkthrough n.º 27,
+ * C04p): «hoy a las 05:30», «mañana a las 05:30», or «el vie 20 nov a las 07:30».
  */
 export function formatCancellationDeadline(deadline: Date, now: Date): string {
   const time = `a las ${formatStartTime(deadline.toISOString())}`;
@@ -124,5 +140,6 @@ export function formatCancellationDeadline(deadline: Date, now: Date): string {
   if (day === today) return `hoy ${time}`;
   if (day === tomorrow) return `mañana ${time}`;
   const { weekday, day: dayOfMonth } = dayChipLabel(day);
-  return `el ${weekday} ${dayOfMonth} ${time}`;
+  const month = shortMonths[Number(day.slice(5, 7)) - 1];
+  return `el ${weekday} ${dayOfMonth} ${month} ${time}`;
 }

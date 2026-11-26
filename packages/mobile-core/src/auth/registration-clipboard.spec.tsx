@@ -53,6 +53,20 @@ describe("«Crea tu cuenta» and a code on the clipboard", () => {
     expect(screen.queryByText("¿Te invitó Lucía?")).toBeNull();
   });
 
+  it("draws the gift disc above a centred title and note", async () => {
+    const screen = await openRegistration(jest.fn().mockResolvedValue("lucia"));
+    const hidden = { includeHiddenElements: true };
+
+    const title = await screen.findByText("¿Te invitó Lucía?");
+    const disc = screen.getByTestId("confirmation-sheet-disc", hidden);
+    expect(disc).toHaveStyle({ backgroundColor: "#FEF6F2", height: 52, width: 52 });
+    expect(screen.getByTestId("glyph-gift", hidden)).toBeOnTheScreen();
+    expect(title).toHaveStyle({ textAlign: "center" });
+    expect(screen.getByText("Usa su código y tu primera clase es gratis.")).toHaveStyle({
+      textAlign: "center",
+    });
+  });
+
   it("leaves the form as it was on «No, gracias»", async () => {
     const screen = await openRegistration(jest.fn().mockResolvedValue("LUCIA"));
 

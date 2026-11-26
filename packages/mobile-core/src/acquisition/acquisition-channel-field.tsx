@@ -1,9 +1,10 @@
 import { Keyboard, StyleSheet, View } from "react-native";
 
 import { Chip } from "../ui/chip";
+import { Glyph } from "../ui/glyph";
 import { InlineError } from "../ui/inline-error";
 import { Text } from "../ui/text";
-import { spacing } from "../ui/tokens";
+import { colors, spacing } from "../ui/tokens";
 
 /** BKM-011: the eight answers to «¿Cómo nos conociste?», in the owner's order. */
 export const acquisitionChannelOptions = [
@@ -29,13 +30,19 @@ export const acquisitionChannelRequired = "Elige cómo nos conociste.";
 export function AcquisitionChannelField({
   error,
   label = "¿Cómo nos conociste?",
+  locked = false,
   note,
   onChange,
   value,
 }: {
   error?: string;
   label?: string;
-  /** Why an answer is marked already, such as «La marcamos por el código de Lucía.» */
+  /**
+   * A valid referral code chose the answer: the other chips are locked, since
+   * the server stores the code's channel anyway (#18).
+   */
+  locked?: boolean;
+  /** Why an answer is marked already, after a check: «La marcamos por el código de Lucía.» (C01b5) */
   note?: string;
   onChange: (value: AcquisitionChannelChoice) => void;
   value: AcquisitionChannelChoice | null;
@@ -46,6 +53,7 @@ export function AcquisitionChannelField({
       <View accessibilityLabel={label} accessibilityRole="radiogroup" style={styles.options}>
         {acquisitionChannelOptions.map((option) => (
           <Chip
+            disabled={locked && option.value !== value}
             key={option.value}
             label={option.label}
             onPress={() => {
@@ -60,7 +68,20 @@ export function AcquisitionChannelField({
           />
         ))}
       </View>
-      {note === undefined ? null : <Text variant="secundario">{note}</Text>}
+      {note === undefined ? null : (
+        <View style={styles.note}>
+          <Glyph
+            color={colors.text}
+            name="check"
+            size={16}
+            strokeWidth={1.7}
+            testID="acquisition-channel-note-check"
+          />
+          <Text style={styles.noteText} variant="secundario">
+            {note}
+          </Text>
+        </View>
+      )}
       {error === undefined ? null : <InlineError field>{error}</InlineError>}
     </View>
   );
@@ -68,5 +89,7 @@ export function AcquisitionChannelField({
 
 const styles = StyleSheet.create({
   field: { gap: spacing.sm },
+  note: { alignItems: "center", flexDirection: "row", gap: spacing.smd },
+  noteText: { flexShrink: 1 },
   options: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
 });

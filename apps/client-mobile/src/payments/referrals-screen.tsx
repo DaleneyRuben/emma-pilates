@@ -105,19 +105,22 @@ export function ReferralsScreen() {
             </>
           }
           right={
-            <View>
-              <SectionTitle>Tus invitadas</SectionTitle>
-              {referred.length === 0 ? (
-                // Rosa Emma C16b: the quiet line in a white card; sharing is above.
-                <View style={styles.emptyCard} testID="referrals-empty">
-                  <Text variant="cuerpo">
-                    Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
-                  </Text>
-                </View>
-              ) : (
-                <ReferredList referred={referred} />
-              )}
-            </View>
+            // C16h: without a paid Plan and nobody invited, no «Tus invitadas».
+            !codeActive && referred.length === 0 ? null : (
+              <View>
+                <SectionTitle>Tus invitadas</SectionTitle>
+                {referred.length === 0 ? (
+                  // Rosa Emma C16b: the quiet line in a white card; sharing is above.
+                  <View style={styles.emptyCard} testID="referrals-empty">
+                    <Text variant="cuerpo">
+                      Aún no invitaste a nadie. Cuando una amiga use tu código, la verás aquí.
+                    </Text>
+                  </View>
+                ) : (
+                  <ReferredList referred={referred} />
+                )}
+              </View>
+            )
           }
         />
       </ScrollView>

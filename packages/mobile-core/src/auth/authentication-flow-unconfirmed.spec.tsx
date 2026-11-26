@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor, within } from "@testing-library/react-native";
 
 import type { AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
@@ -112,6 +112,8 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     ).toBeOnTheScreen();
     expect(api.readRegistrationStatus).toHaveBeenCalledWith("continuation");
     expect(screen.queryByText("Revisa tu correo")).toBeNull();
+    // C01c2: the email field already holds the registered address.
+    expect(screen.getByTestId("login-email")).toHaveProp("value", "carla@example.com");
     await waitFor(() => expect(store.clear).toHaveBeenCalled());
   });
 
@@ -139,6 +141,20 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     );
 
     expect(await screen.findByText("El correo rebotó")).toBeOnTheScreen();
+    // The notice stands on the screen, not inside the page's white card.
+    expect(screen.queryByTestId("authentication-panel")).toBeNull();
+    expect(screen.getByTestId("check-email-bounced")).toHaveStyle({
+      backgroundColor: "#FEF6F2",
+      borderColor: "#CDA697",
+      borderRadius: 14,
+      borderWidth: 1.5,
+      flexDirection: "row",
+    });
+    expect(
+      within(screen.getByTestId("check-email-bounced")).getByTestId("glyph-alert", {
+        includeHiddenElements: true,
+      }),
+    ).toBeOnTheScreen();
     expect(
       screen.getByText("No pudimos entregar el correo a carla@example.com. Revisa la dirección."),
     ).toBeOnTheScreen();
