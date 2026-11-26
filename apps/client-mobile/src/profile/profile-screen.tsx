@@ -217,7 +217,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                   />
                 </ProfileRowCard>
               </View>
-              <View>
+              <View testID="profile-section-account">
                 <SectionTitle>Cuenta</SectionTitle>
                 <ProfileRowCard>
                   <ProfileRow
@@ -226,6 +226,20 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => navigation.navigate("ChangePassword")}
                   />
                   {identity.biometrics.available ? <BiometricSwitchRow /> : null}
+                  {wide ? null : (
+                    <ProfileRow
+                      chevron={false}
+                      icon="logout"
+                      label="Cerrar sesión"
+                      onPress={() => setConfirmingLogout(true)}
+                    />
+                  )}
+                </ProfileRowCard>
+              </View>
+              {/* Walkthrough n.º 16 (C18): help and the studio's pages close Perfil. */}
+              <View testID="profile-section-help">
+                <SectionTitle>Ayuda y legal</SectionTitle>
+                <ProfileRowCard>
                   <ProfileRow
                     icon="message"
                     label="Enviar comentarios"
@@ -237,18 +251,10 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => openPublicPage("support")}
                   />
                   <ProfileRow
-                    icon="lock"
+                    icon="shield"
                     label="Política de privacidad"
                     onPress={() => openPublicPage("privacy")}
                   />
-                  {wide ? null : (
-                    <ProfileRow
-                      chevron={false}
-                      icon="logout"
-                      label="Cerrar sesión"
-                      onPress={() => setConfirmingLogout(true)}
-                    />
-                  )}
                 </ProfileRowCard>
               </View>
             </>
