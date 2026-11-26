@@ -83,7 +83,13 @@ describe("Client Session detail", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
     await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
     expect(screen.queryByText(/Te quedan \d+ clases en tu plan/)).toBeNull();
-    expect(screen.getByText("Tu pase de invitada ya se usó.")).toBeOnTheScreen();
+    // Walkthrough n.º 19 (C05j): good news, with the day and the time.
+    expect(
+      screen.getByText(
+        /^Usaste tu clase gratis\. ¡Te esperamos el [a-zé]{3} \d{1,2} a las \d{2}:\d{2}!$/,
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Tu pase de invitada ya se usó.")).toBeNull();
   });
 
   // MOB-070: joining inside the Cancellation Window is refused, so the
