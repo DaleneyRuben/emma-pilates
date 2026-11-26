@@ -44,7 +44,10 @@ import { PrismaAuthenticationGateway } from './authentication/prisma-authenticat
 import { principalResolverProvider } from './authentication/principal-resolver-wiring';
 import { CancelPendingClientRegistration } from './registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from './registration/client-email-verification.controller';
-import { ClientRegistrationController } from './registration/client-registration.controller';
+import {
+  ClientRegistrationController,
+  pendingRegistrationStatusReader,
+} from './registration/client-registration.controller';
 import { CorrectPendingClientEmail } from './registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from './registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from './registration/register-client';
@@ -73,6 +76,7 @@ import { emailSourceBudgetProviders } from './email-source-budget/email-source-b
 import { staffEmailBudgetProviders } from './staff-email-budget/staff-email-budget-providers';
 import { staffEmailAdmission } from './staff-email-budget/staff-email-budget.guard';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
+import { readPendingRegistrationStatus } from './registration/prisma-pending-registration-status';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
 import { authenticationDigest } from './security/authentication-digest';
@@ -340,6 +344,16 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
           now: () => new Date(),
           newId: randomUUID,
         }),
+    },
+    {
+      provide: pendingRegistrationStatusReader,
+      inject: [PRISMA_CLIENT],
+      useFactory:
+        (prisma: PrismaClient) => (registrationContinuation: string) =>
+          readPendingRegistrationStatus(prisma, {
+            registrationContinuation,
+            now: new Date(),
+          }),
     },
     {
       provide: VerifyClientEmail,

@@ -14,6 +14,7 @@ import { referralProblem } from '../../booking/payments/referral-attribution';
 import {
   ApiAcceptedResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
 import { CancelPendingClientRegistration } from './cancel-pending-client-registration';
@@ -22,6 +23,7 @@ import {
   PendingEmailCorrectionDto,
   PendingClientRegistrationDto,
   PendingRegistrationContinuationDto,
+  PendingRegistrationStatusDto,
   PendingVerificationResendDto,
   parseCorrectPendingClientEmail,
   parsePendingRegistrationContinuation,
@@ -32,6 +34,15 @@ import { EmailSourceBudget } from '../email-source-budget/email-source-budget.gu
 import { CorrectPendingClientEmail } from './correct-pending-client-email';
 import { RegisterClient } from './register-client';
 import { ResendPendingClientVerification } from './resend-pending-client-verification';
+
+/** Reads a pending registration's status from its continuation (n.º 4). */
+export const pendingRegistrationStatusReader = Symbol(
+  'pendingRegistrationStatusReader',
+);
+
+type PendingRegistrationStatusReader = (
+  registrationContinuation: string,
+) => Promise<'pending' | 'verified' | 'expired'>;
 
 @Controller({ path: 'client-registrations', version: '1' })
 export class ClientRegistrationController {
@@ -44,7 +55,27 @@ export class ClientRegistrationController {
     private readonly resendPendingClientVerification: ResendPendingClientVerification,
     @Inject(CancelPendingClientRegistration)
     private readonly cancelPendingClientRegistration: CancelPendingClientRegistration,
+    @Inject(pendingRegistrationStatusReader)
+    private readonly readStatus: PendingRegistrationStatusReader,
   ) {}
+
+  // Walkthrough n.º 4 (C01c2): the registering phone asks whether its email
+  // was confirmed meanwhile, then goes to Login instead of waiting.
+  @Post('status-checks')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'readPendingClientRegistrationStatus' })
+  @ApiOkResponse({ type: PendingRegistrationStatusDto })
+  async status(
+    @Body() body: PendingRegistrationContinuationDto,
+  ): Promise<PendingRegistrationStatusDto> {
+    const command = parsePendingRegistrationContinuation(body);
+
+    if (command === null) {
+      throw new BadRequestException('Invalid registration status request');
+    }
+
+    return { status: await this.readStatus(command.registrationContinuation) };
+  }
 
   @Post('cancellations')
   @HttpCode(HttpStatus.NO_CONTENT)

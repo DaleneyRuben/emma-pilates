@@ -1032,6 +1032,38 @@
         ]
       }
     },
+    "/api/v1/client-registrations/status-checks": {
+      "post": {
+        "operationId": "readPendingClientRegistrationStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PendingRegistrationContinuationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingRegistrationStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
+        ]
+      }
+    },
     "/api/v1/client-registrations/cancellations": {
       "post": {
         "operationId": "cancelPendingClientRegistration",
@@ -12212,6 +12244,23 @@
         },
         "required": [
           "registrationContinuation"
+        ]
+      },
+      "PendingRegistrationStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified",
+              "expired"
+            ],
+            "description": "`verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "PendingVerificationResendDto": {

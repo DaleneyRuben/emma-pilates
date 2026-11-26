@@ -95,6 +95,15 @@ export class PendingRegistrationContinuationDto {
   registrationContinuation!: string;
 }
 
+export class PendingRegistrationStatusDto {
+  @ApiProperty({
+    enum: ['pending', 'verified', 'expired'],
+    description:
+      '`verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue',
+  })
+  status!: 'pending' | 'verified' | 'expired';
+}
+
 export class PendingVerificationResendDto {
   @ApiProperty({ enum: ['verification_required'] })
   status!: 'verification_required';

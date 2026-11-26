@@ -387,6 +387,8 @@ export * from "./pendingEmailCorrectionDtoStatus";
 export * from "./pendingPaymentDto";
 export * from "./pendingPaymentDtoKind";
 export * from "./pendingRegistrationContinuationDto";
+export * from "./pendingRegistrationStatusDto";
+export * from "./pendingRegistrationStatusDtoStatus";
 export * from "./pendingUploadDto";
 export * from "./pendingVerificationResendDto";
 export * from "./pendingVerificationResendDtoStatus";

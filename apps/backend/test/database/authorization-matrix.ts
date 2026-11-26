@@ -105,6 +105,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/client-email-verifications': publicRoute,
   'POST /api/v1/client-registrations/cancellations': publicRoute,
   'POST /api/v1/client-registrations/verification-resends': publicRoute,
+  'POST /api/v1/client-registrations/status-checks': publicRoute,
   'POST /api/v1/client-registrations/email-corrections': publicRoute,
   'POST /api/v1/client-registrations': publicRoute,
   'GET /api/v1/plans': publicRoute,
