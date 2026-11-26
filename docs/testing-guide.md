@@ -71,6 +71,7 @@ numbered tests.
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
 | Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
+| Walkthrough designs: sign-in and forms | «Todavía no confirmaste tu correo» on Login, «Revisa tu correo» that leaves once the email is confirmed elsewhere, no «Guardar contraseña» where Face ID or a fingerprint works, buttons at the end of every form and always on, and «Código de Lucía» on «Crea tu cuenta» (Test 199) | The «Guardar contraseña» rule needs real phones with and without biometrics to see the system's own prompt |
 
 ## Where each designed screen is tested
 
@@ -12246,3 +12247,54 @@ F. **Faster uploads (n.º 7 and 14).** Both apps now ask for the upload's
    remaining time is the PUT over the mobile network, which the smaller
    profile photo cuts by three quarters. Read the production numbers with
    the query of Test 53 step 4.
+
+## Test 199: walkthrough designs — sign-in and forms (mejoras del recorrido 4, 5, 6, 15, 18)
+
+The owner approved these boards on 26 Nov 2026 (C01e2, C01c2, C01q, C01r,
+C01b3–C01b6, C25c, C25d). Run the API and the worker on a copy of
+`pilates_golden`, Metro for both apps, the iPhone 16 Pro and the Android
+emulator. Emails land in `apps/backend/.data/email-capture/` (Test 34).
+
+A. **An unconfirmed email on Login (n.º 4, C01e2).** In the Client app
+   register a new Client and leave «Revisa tu correo» with **Iniciar
+   sesión**. Log in with that address and its password: instead of «El
+   correo o la contraseña no son correctos.» Login shows «Todavía no
+   confirmaste tu correo · Te enviamos un enlace a … Ábrelo para activar tu
+   cuenta y después inicia sesión.» with **Reenviar correo**, which opens
+   «Revisa tu correo» and sends the email again. Any other address keeps the
+   generic message (the server still answers the same for both).
+B. **Confirmed elsewhere (n.º 4, C01c2).** With «Revisa tu correo» open,
+   confirm the email from its link in a browser
+   (`POST /api/v1/client-email-verifications` with the captured token). Send
+   the app to the background and back, or reopen it: it goes to Login with
+   «Tu correo ya está confirmado. Inicia sesión para entrar.» The server
+   answers `POST /api/v1/client-registrations/status-checks` with
+   `{ "registrationContinuation": … }` as `pending`, `verified` or `expired`.
+C. **Only the Face ID offer (n.º 5, C01q, C01r).** On a phone with Face ID
+   or a fingerprint enrolled, sign in for the first time: iOS or Android
+   does not ask to save the password; only «¿Entrar con Face ID?» (or the
+   fingerprint) appears. On a phone without biometrics (the emulator with no
+   fingerprint enrolled) the email and password fields keep autofill and the
+   system may offer to save the password, with no biometric offer. Same in
+   the Staff app. The Simulator cannot show the system prompt reliably;
+   check on real phones.
+D. **Buttons at the end of the form (n.º 6, C01b3, C01b4).** With the
+   keyboard open, «Crear cuenta» and «¿Ya tienes una cuenta? Inicia sesión»
+   sit after the last field and scroll with it; nothing is pinned over the
+   keyboard. The same in «Crea tu contraseña» / «Crea una contraseña nueva»
+   (links), «Cambiar contraseña», «Enviar comentarios» and the Staff app's
+   «Nueva clienta» (its note and «Crear cuenta» on a white card at the end).
+E. **Always-on buttons (n.º 15, C25c, C25d).** In «Enviar comentarios» tap
+   **Enviar comentario** with nothing chosen: «Elige el tipo de comentario»
+   appears under the chips, «Escribe al menos 10 caracteres.» under a short
+   text, and the screen scrolls back up; nothing is sent. «Guardar
+   contraseña» and «Activar cuenta» likewise mark the missing fields on tap.
+F. **A referral code on «Crea tu cuenta» (n.º 18, C01b5, C01b6).** The
+   example reads «Ej.: LUCIA». Type Lucía's code (`lucia@example.com`'s, see
+   Perfil › Invita a una amiga): after a moment «Código de Lucía» with a ✓
+   shows under the field and «Recomendación de una amiga» is marked with «La
+   marcamos por el código de Lucía.» A Trainer's code marks «Una
+   instructora». A code nobody holds shows «No encontramos el código … Revisa
+   cómo lo escribiste.» and **Crear cuenta** creates nothing.
+   `GET /api/v1/referral-codes/lookup?code=lucia` answers without a
+   credential: `{ code, status, holderFirstName, holderKind }`.
