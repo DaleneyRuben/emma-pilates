@@ -38,14 +38,16 @@ export const readPendingRegistrationStatus = async (
     continuation === null ||
     continuation.purpose !==
       AuthenticationTokenPurpose.REGISTRATION_CONTINUATION ||
-    continuation.invalidatedAt !== null ||
     continuation.account.clientId === null ||
     continuation.account.deletedAt !== null
   ) {
     return 'expired';
   }
+  // Verifying invalidates the continuation with every other open token, so
+  // a confirmed email is read before that mark (review of n.º 4).
   if (continuation.account.emailVerifiedAt !== null) return 'verified';
   if (
+    continuation.invalidatedAt !== null ||
     continuation.expiresAt <= input.now ||
     continuation.account.pendingExpiresAt === null ||
     continuation.account.pendingExpiresAt <= input.now
