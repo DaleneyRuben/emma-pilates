@@ -8,6 +8,7 @@ import {
   colors,
   NoticeRow,
   PersonAvatar,
+  profilePhotoMaxEdge,
   phoneWithFlag,
   spacing,
   surfaces,
@@ -80,7 +81,7 @@ export function StaffPhotoSummary({
   const change = async () => {
     try {
       const { pickImage, uploadImage } = await loadImageUpload();
-      const picked = await pickImage();
+      const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
       if (picked === null) return;
       setState({ status: "uploading", localUri: picked.uri });
       const imageAssetId = await uploadImage(picked, "profile_photo", fetcher);

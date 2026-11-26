@@ -4,7 +4,14 @@ import {
   setCurrentClientPhoto,
   type ClientProfileDto,
 } from "@pilates/api-contracts";
-import { InlineError, spacing, surfaces, Text, TextButton } from "@pilates/mobile-core";
+import {
+  InlineError,
+  profilePhotoMaxEdge,
+  spacing,
+  surfaces,
+  Text,
+  TextButton,
+} from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -43,7 +50,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
     });
 
   const change = async () => {
-    const picked = await pickImage();
+    const picked = await pickImage({ maxEdge: profilePhotoMaxEdge });
     if (picked === null) return;
     setState({ status: "uploading", localUri: picked.uri });
     try {
