@@ -100,3 +100,15 @@ describe("PrimaryButton palette B", () => {
     expect(screen.queryByText("Motivo")).toBeNull();
   });
 });
+
+// The testing session on Android (#24): «Subir factura» was measured a pixel
+// short, so «factura» wrapped to a clipped second line and only «Subir»
+// showed. A one-line label uses Android's simple line breaking, which
+// measures and lays out the same way.
+describe("PrimaryButton label on Android", () => {
+  it("breaks its one line the simple way", async () => {
+    const screen = await render(<PrimaryButton label="Subir factura" />);
+
+    expect(screen.getByText("Subir factura")).toHaveProp("textBreakStrategy", "simple");
+  });
+});
