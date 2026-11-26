@@ -192,6 +192,20 @@ export const readPaymentInvoiceFile = async (
   return gateway.readFileForStaff(command.paymentId);
 };
 
+// Walkthrough n.º 24 (E-D29): the file she just uploaded, read back by her
+// alone (the gateway matches its owner) before «Subir factura» attaches it.
+export const readUploadedInvoiceFile = async (
+  command: { imageAssetId: string },
+  principal: AuthenticatedPrincipal,
+  { gateway }: { gateway: InvoiceFileGateway },
+): Promise<InvoiceFileObject> => {
+  requireInvoiceStaff(principal);
+  return gateway.readUploadedFile({
+    imageAssetId: command.imageAssetId,
+    accountId: principal.accountId,
+  });
+};
+
 export const listStaffInvoices = async (
   command: { filter: StaffInvoiceFilter },
   principal: AuthenticatedPrincipal,
