@@ -151,4 +151,3 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     ).toBeOnTheScreen();
   });
 });
-
