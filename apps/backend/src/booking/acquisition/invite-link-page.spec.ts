@@ -118,4 +118,23 @@ describe('the invite link', () => {
     expect(html).toMatch(/<body[^>]*min-height:100vh[^>]*align-items:center/);
     expect(html).toContain('box-shadow:0 10px 28px rgba(147,97,93,.30)');
   });
+
+  // CW01: on an iPhone the brand pill and the title sit on the rosa 200
+  // band at the top, the code and the button below it; the computer page
+  // (CW01c) has no band and is centred.
+  it('puts the iPhone title on the band, as CW01', () => {
+    const band =
+      'background:#E7CCBF;padding:40px 16px 22px;border-radius:0 0 28px 28px';
+    const phone = page(
+      inviteLinkDestination({ userAgent: iphone, invite: lucia }),
+    );
+    const computer = page(
+      inviteLinkDestination({ userAgent: desktop, invite: lucia }),
+    );
+
+    expect(phone).toContain(band);
+    expect(phone.indexOf(band)).toBeLessThan(phone.indexOf('Lucía te regala'));
+    expect(phone).not.toMatch(/<body[^>]*align-items:center/);
+    expect(computer).not.toContain(band);
+  });
 });
