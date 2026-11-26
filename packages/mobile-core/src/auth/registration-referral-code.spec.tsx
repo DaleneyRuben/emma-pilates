@@ -47,14 +47,12 @@ describe("«Crea tu cuenta» with a referral code", () => {
   });
 
   it("names a friend's code and marks «Recomendación de una amiga» by itself", async () => {
-    const lookUpReferralCode = jest
-      .fn()
-      .mockResolvedValue({
-        code: "LUCIA",
-        holderFirstName: "Lucía",
-        holderKind: "client",
-        status: "valid",
-      });
+    const lookUpReferralCode = jest.fn().mockResolvedValue({
+      code: "LUCIA",
+      holderFirstName: "Lucía",
+      holderKind: "client",
+      status: "valid",
+    });
     const api = createApiMock({ lookUpReferralCode });
     const screen = await openWithCode(api, "lucia");
 
@@ -88,14 +86,12 @@ describe("«Crea tu cuenta» with a referral code", () => {
 
   it("flags a code that does not exist before creating the account", async () => {
     const api = createApiMock({
-      lookUpReferralCode: jest
-        .fn()
-        .mockResolvedValue({
-          code: "LUCIAA",
-          holderFirstName: null,
-          holderKind: null,
-          status: "unknown",
-        }),
+      lookUpReferralCode: jest.fn().mockResolvedValue({
+        code: "LUCIAA",
+        holderFirstName: null,
+        holderKind: null,
+        status: "unknown",
+      }),
     });
     const screen = await openWithCode(api, "luciaa");
 
