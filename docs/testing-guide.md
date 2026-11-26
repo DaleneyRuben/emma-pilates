@@ -79,6 +79,7 @@ numbered tests.
 | One left margin, error screens and profiles | The band, section titles, cards and footers share one 16 pt left edge; «No pudimos verificar tu enlace», «Enlace ya utilizado» and «Correo verificado» use the payment status layout; both Perfil screens end with «Ayuda y legal»; Staff Perfil has the deep-rose identity card and serif section titles (Test 204) | No «Términos y condiciones» row yet: the public site has no terms page |
 | Sharing the code from one card | Client «Invita a una amiga» and Staff «Tu código de referido» show the code on one line with «Copiar código», «Compartir tu código» (the system sheet with the invite link) and «Editar código» in the same card; a friend who signs up with a Trainer's code becomes that Trainer's Client (Test 205) | The link's app half needs the 1.3.0 native build |
 | A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
+| Fixes from the testing session | The Staff app keeps answering after «Ahora no» on the first sign-in with Face ID; no «Save Password?» over «¿Entrar con Face ID?»; a triaged comment's notice turns read; a friend without a Guest Pass reads «No recibió la clase gratis.»; Inicio says whose code was not active (Test 207) | «Save Password?» needs a real iPhone |
 
 ## Where each designed screen is tested
 
@@ -12603,4 +12604,30 @@ B. **The Clientas file.** Invite a Client from the Staff app and record the
    `{ clientId, email, bounced }` to the Administrator and the Coordinator.
 C. **Automated.** `pnpm test:e2e e2e/clients.spec.ts` in `apps/admin-web`
    walks B at 1440 and 420 px through the real backend.
+
+## Test 207: fixes from the testing session (mejoras del recorrido 5, 11, 20, 22)
+
+Run the API on a copy of `pilates_golden` and Metro for both apps.
+
+A. **Staff first sign-in with Face ID.** On an iPhone Simulator with Face ID
+   enrolled (`xcrun simctl spawn <udid> notifyutil -s
+   com.apple.BiometricKit.enrollmentChanged 1` and `-p` the same key), sign in
+   to the Staff app for the first time as Paola. «¿Entrar con Face ID?» comes
+   first; after **Ahora no** the notification sheet «¿Te avisamos?» follows,
+   never under it, and every tap on Pagos pendientes works afterwards.
+B. **No «Save Password?» where biometrics are offered (#5).** On a real iPhone
+   with Face ID, the first sign-in shows only «¿Entrar con Face ID?». The
+   password field empties as she signs in and comes back if the sign-in is
+   refused. A phone without biometrics keeps the system's autofill and its
+   «Save Password?».
+C. **A triaged comment (E-F20).** Send a comment from the Client app, then
+   mark it «Revisado» from the Staff app's Comentarios as Paola: its
+   «Nuevo comentario» notice turns read on every Administrator's bell. Setting
+   it back to «Nuevo» does not.
+D. **A friend without a free class (#20, #22).** Register a friend with
+   MARIANA's code (no paid Plan) and verify her: Mariana's «Tus invitadas»
+   reads «Rosa A. · Registrada · No recibió la clase gratis.», the same as a
+   second friend of Lucía's in one month. The friend's Inicio reads «El código
+   de Mariana todavía no está activo» (`GET /clients/current/subscription`
+   answers `inactiveInvite`).
 
