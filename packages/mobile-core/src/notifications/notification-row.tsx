@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { Glyph } from "../ui/glyph";
-import { SwipeToRemove } from "../ui/swipe-to-remove";
+import { SwipeToRemove, useRemoveAction } from "../ui/swipe-to-remove";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
@@ -61,10 +61,12 @@ function NotificationRow({
   const message = readableNotificationMessage(notification.message);
   const icon = notificationTopicIcon(notification);
   // The action is a sibling of the row's button, never nested in it, so
-  // VoiceOver and TalkBack reach both.
+  // VoiceOver and TalkBack reach both; the row's button carries its swipe's «Borrar».
+  const removeAction = useRemoveAction();
   return (
     <View style={styles.row}>
       <Pressable
+        {...removeAction}
         accessibilityLabel={`${notification.title}. ${message}`}
         accessibilityRole="button"
         onPress={onPress}
