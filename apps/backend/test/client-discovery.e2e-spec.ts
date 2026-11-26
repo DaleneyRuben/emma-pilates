@@ -261,6 +261,27 @@ describe('client discovery (e2e)', () => {
     }
   });
 
+  // Walkthrough n.º 22 (C02j): a friend whose host's code was not active
+  // learns why her account has no free class.
+  it('says whose code was not active yet when she has no Plan', async () => {
+    subscriptionView.mockResolvedValueOnce({
+      status: 'none',
+      subscription: null,
+      inactiveInvite: { hostFirstName: 'Mariana' },
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/v1/clients/current/subscription')
+      .set('authorization', bearer)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({
+          status: 'none',
+          inactiveInvite: { hostFirstName: 'Mariana' },
+        });
+      });
+  });
+
   it('serves the Plan, Branch, and Class Type catalogs', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/plans')
