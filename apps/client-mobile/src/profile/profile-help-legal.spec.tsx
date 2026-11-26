@@ -36,6 +36,7 @@ describe("Perfil › Ayuda y legal", () => {
     for (const row of ["Enviar comentarios", "Soporte", "Política de privacidad"]) {
       expect(help.getByRole("button", { name: row })).toBeOnTheScreen();
     }
+    expect(help.getByText("Contacto y WhatsApp del estudio")).toBeOnTheScreen();
     // C18: the privacy policy wears the shield, not the padlock.
     expect(help.getByTestId("glyph-shield", hidden)).toBeOnTheScreen();
     expect(help.queryByTestId("glyph-lock", hidden)).toBeNull();
