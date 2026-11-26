@@ -48,8 +48,10 @@ type AuthenticationFlowProps = {
   onRecoveryCredential?: (credential: string) => Promise<void> | void;
   /** Keeps «Revisa tu correo» across launches (Client app, MOB-028). */
   pendingRegistrationStore?: PendingRegistrationStore;
-  /** A friend's code from the install referrer or the clipboard (n.º 13). */
+  /** A friend's code from the install referrer (n.º 13, CW01b). */
   suggestedReferralCode?: string | null;
+  /** iPhone: reads a copied invite code, once (n.º 13, C01b8). */
+  readClipboardCode?: () => Promise<string | null>;
 };
 
 function routeForIntent(intent: AuthenticationLinkIntent | null | undefined): AuthenticationRoute {
@@ -83,6 +85,7 @@ export function AuthenticationFlow({
   onLogin,
   onRecoveryCredential = () => undefined,
   pendingRegistrationStore,
+  readClipboardCode,
   suggestedReferralCode = null,
 }: AuthenticationFlowProps) {
   const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
@@ -158,6 +161,7 @@ export function AuthenticationFlow({
         api={api}
         initialReferralCode={link?.type === "referral-invite" ? link.token : suggestedReferralCode}
         onBack={showLogin}
+        readClipboardCode={readClipboardCode}
         onRegistered={(registration) => {
           linkHandled();
           setPending(registration);

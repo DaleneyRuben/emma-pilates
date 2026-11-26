@@ -20,6 +20,7 @@ import { useCountdown } from "./countdown";
 import { restartPendingWindow, type PendingRegistration } from "./pending-registration-screens";
 import { limitKeepsAnyLink } from "./request-limit-copy";
 import { useReferralCodeCheck } from "./use-referral-code-check";
+import { ClipboardInviteSheet, useClipboardInvite } from "./clipboard-invite";
 
 export const minimumPasswordLength = 8;
 
@@ -39,12 +40,15 @@ export function RegistrationScreen({
   initialReferralCode = null,
   onBack,
   onRegistered,
+  readClipboardCode,
 }: {
   api: AuthenticationApi;
   /** A friend's code it was given (invite link, install referrer, n.º 13). */
   initialReferralCode?: string | null;
   onBack: () => void;
   onRegistered: (registration: PendingRegistration) => void;
+  /** iPhone only: the copied invite code, read once (n.º 13, C01b8). */
+  readClipboardCode?: () => Promise<string | null>;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -69,6 +73,10 @@ export function RegistrationScreen({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
+  const clipboard = useClipboardInvite(
+    api,
+    initialReferralCode === null ? readClipboardCode : undefined,
+  );
   // n.º 18: whose code it is, and the channel it marked by itself.
   const codeCheck = useReferralCodeCheck(api, referralOpen ? referralCode : "");
   const [markedBy, setMarkedBy] = useState<string | null>(null);
@@ -278,6 +286,15 @@ export function RegistrationScreen({
           <Text variant="compacto-600">⌄</Text>
         </Pressable>
       )}
+      <ClipboardInviteSheet
+        offer={clipboard.offer}
+        onDismiss={clipboard.dismiss}
+        onUse={(code) => {
+          clipboard.dismiss();
+          setReferralOpen(true);
+          setReferralCode(code);
+        }}
+      />
     </AuthenticationScreen>
   );
 }
