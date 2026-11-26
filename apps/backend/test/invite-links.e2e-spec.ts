@@ -34,6 +34,7 @@ describe('invite links (e2e)', () => {
       status: 'valid',
       holderFirstName: 'Lucía',
       holderKind: 'client',
+      freeClass: true,
     });
   });
 
@@ -74,6 +75,7 @@ describe('invite links (e2e)', () => {
       status: 'valid',
       holderFirstName: 'Daniela',
       holderKind: 'trainer',
+      freeClass: false,
     });
 
     const iphone = await request(app.getHttpServer())
@@ -96,5 +98,37 @@ describe('invite links (e2e)', () => {
         'Location',
         'https://play.google.com/store/apps/details?id=com.emmapilates.client&referrer=invite_code%3DDANIELA',
       );
+  });
+
+  // Review (testing session): Mariana has never bought a Plan, so her code
+  // opens no Guest Pass and the page must not promise one.
+  it('promises no free class for a Client code that is not active', async () => {
+    lookUp.mockResolvedValue({
+      code: 'MARIANA',
+      status: 'valid',
+      holderFirstName: 'Mariana',
+      holderKind: 'client',
+      freeClass: false,
+    });
+
+    const response = await request(app.getHttpServer())
+      .get('/client/invite/MARIANA')
+      .set('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)')
+      .expect(200);
+    expect(response.text).toContain('Mariana te invita a Emma Pilates Studio');
+    expect(response.text).not.toContain('gratis');
+  });
+
+  // CW01c: the page may load its two Google fonts and nothing else.
+  it('lets the page load the board fonts', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/client/invite/LUCIA')
+      .set('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)')
+      .expect(200);
+    const policy = response.headers['content-security-policy'];
+    expect(policy).toContain(
+      "style-src 'unsafe-inline' https://fonts.googleapis.com",
+    );
+    expect(policy).toContain('font-src https://fonts.gstatic.com');
   });
 });

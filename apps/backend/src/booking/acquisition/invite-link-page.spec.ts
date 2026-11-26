@@ -6,7 +6,7 @@ const iphone =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Mobile/15E148 Safari/604.1';
 const desktop =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Safari/605.1.15';
-const lucia = { code: 'LUCIA', holderFirstName: 'Lucía' };
+const lucia = { code: 'LUCIA', holderFirstName: 'Lucía', freeClass: true };
 const page = (destination: ReturnType<typeof inviteLinkDestination>) =>
   destination.kind === 'page' ? destination.html : '';
 
@@ -87,5 +87,35 @@ describe('the invite link', () => {
 
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
+  });
+
+  // Review (testing session): a code that opens no Guest Pass, a Trainer's
+  // or a Client's without a paid Plan in force, promises no free class.
+  it('promises no free class for a code that opens none', () => {
+    const html = page(
+      inviteLinkDestination({
+        userAgent: desktop,
+        invite: { ...lucia, freeClass: false },
+      }),
+    );
+
+    expect(html).toContain('Lucía te invita a Emma Pilates Studio');
+    expect(html).toContain('Usa su código LUCIA al crear tu cuenta.');
+    expect(html).not.toContain('gratis');
+    expect(html).not.toContain('te regala');
+  });
+
+  // CW01c: Lora and Work Sans, the block in the middle of the window, and
+  // the code card lifted by its shadow.
+  it('draws the board: its fonts, centred, with the card shadow', () => {
+    const html = page(
+      inviteLinkDestination({ userAgent: desktop, invite: lucia }),
+    );
+
+    expect(html).toContain(
+      'https://fonts.googleapis.com/css2?family=Lora:wght@500&family=Work+Sans:wght@400;700&display=swap',
+    );
+    expect(html).toMatch(/<body[^>]*min-height:100vh[^>]*align-items:center/);
+    expect(html).toContain('box-shadow:0 10px 28px rgba(147,97,93,.30)');
   });
 });
