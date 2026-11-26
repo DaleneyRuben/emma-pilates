@@ -5,7 +5,7 @@ import type { AuthenticationApi } from "./authentication-api";
 
 const codePattern = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
 
-type Offer = { code: string; holderFirstName: string };
+type Offer = { code: string; holderFirstName: string; trainer: boolean };
 
 /**
  * Walkthrough n.º 13 (C01b8): on an iPhone the invite page copied the code
@@ -33,10 +33,15 @@ export function useClipboardInvite(
         if (
           active &&
           found.status === "valid" &&
-          found.holderKind === "client" &&
+          (found.holderKind === "client" || found.holderKind === "trainer") &&
           typeof found.holderFirstName === "string"
         ) {
-          setOffer({ code: found.code, holderFirstName: found.holderFirstName });
+          setOffer({
+            code: found.code,
+            holderFirstName: found.holderFirstName,
+            // #26: a Trainer's code attributes her client, with no free class.
+            trainer: found.holderKind === "trainer",
+          });
         }
       })
       .catch(() => undefined);
@@ -61,7 +66,11 @@ export function ClipboardInviteSheet({
     <ConfirmationSheet
       confirmLabel={offer === null ? "" : `Usar código ${offer.code}`}
       dismissLabel="No, gracias"
-      note="Usa su código y tu primera clase es gratis."
+      note={
+        offer?.trainer === true
+          ? "Usa su código al crear tu cuenta."
+          : "Usa su código y tu primera clase es gratis."
+      }
       onConfirm={() => {
         if (offer !== null) onUse(offer.code);
       }}
