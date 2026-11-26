@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
+import type { NotificationSubject } from './prisma-notification-subjects';
 import {
   decodeNotificationCursor,
   encodeNotificationCursor,
@@ -20,8 +21,12 @@ export type NotificationRecord = {
   readAt: Date | null;
 };
 
+/** A listed notification; review and feedback notices say what they are about. */
+export type NotificationItem = NotificationRecord &
+  Partial<NotificationSubject>;
+
 export type NotificationPage = {
-  items: NotificationRecord[];
+  items: NotificationItem[];
   hasMore: boolean;
   nextCursor: string | null;
 };
@@ -33,6 +38,10 @@ type ListNotificationsDependencies = {
     after: NotificationCursor | null;
     limit: number;
   }): Promise<NotificationRecord[]>;
+  /** Walkthrough n.º 11 and 12: what each review or feedback notice is about. */
+  describe?(
+    items: NotificationRecord[],
+  ): Promise<Map<string, NotificationSubject>>;
 };
 
 export const listNotifications = async (
@@ -51,9 +60,18 @@ export const listNotifications = async (
     after,
     limit: query.limit + 1,
   });
-  const items = rows.slice(0, query.limit);
+  const records = rows.slice(0, query.limit);
   const hasMore = rows.length > query.limit;
-  const last = items.at(-1);
+  const last = records.at(-1);
+  const subjects = await dependencies.describe?.(records);
+  const items: NotificationItem[] =
+    subjects === undefined
+      ? records
+      : records.map((record) => ({
+          ...record,
+          review: subjects.get(record.id)?.review ?? null,
+          feedback: subjects.get(record.id)?.feedback ?? null,
+        }));
 
   return {
     items,

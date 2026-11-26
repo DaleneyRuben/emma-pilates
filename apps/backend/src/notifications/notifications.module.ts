@@ -26,6 +26,7 @@ import {
   NOTIFICATION_RECORDER,
 } from './notification-recorder.provider';
 import { createNotificationStore } from './prisma-notification-store';
+import { readNotificationSubjects } from './prisma-notification-subjects';
 import {
   NotificationRemovalController,
   notificationRemove,
@@ -75,9 +76,9 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
     },
     {
       provide: notificationList,
-      inject: [notificationStore],
+      inject: [notificationStore, PRISMA_CLIENT],
       useFactory:
-        (store: Store) =>
+        (store: Store, prisma: PrismaClient) =>
         (
           query: { limit: number; cursor: string | null },
           principal: AuthenticatedPrincipal,
@@ -90,6 +91,9 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
                 ...input,
                 since: notificationCutoff(new Date()),
               }),
+            // Walkthrough n.º 11 and 12: what review and feedback notices
+            // are about.
+            describe: (items) => readNotificationSubjects(prisma, items),
           }),
     },
     {

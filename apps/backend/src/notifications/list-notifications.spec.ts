@@ -74,7 +74,7 @@ describe('listNotifications', () => {
     };
     const describe = jest
       .fn()
-      .mockResolvedValue(new Map([[rows[0]!.id, { review, feedback: null }]]));
+      .mockResolvedValue(new Map([[rows[0].id, { review, feedback: null }]]));
 
     const page = await listNotifications(
       { limit: 20, cursor: null },
