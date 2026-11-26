@@ -982,6 +982,111 @@
    "w": 390,
    "h": 844,
    "title": "M11 · Mi QR de cobro · ¿hasta cuándo vale?"
+  },
+  "E-D27.dc.html": {
+   "x": 0,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Factura del pago · PDF elegido"
+  },
+  "E-D28.dc.html": {
+   "x": 470,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Factura del pago · imagen elegida"
+  },
+  "E-D29.dc.html": {
+   "x": 940,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Factura del pago · PDF en grande"
+  },
+  "E-D30.dc.html": {
+   "x": 1410,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Factura del pago · imagen en grande"
+  },
+  "E-F15.dc.html": {
+   "x": 1880,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Notificaciones · deslizar para borrar"
+  },
+  "E-F18.dc.html": {
+   "x": 2350,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Comentarios · nuevos"
+  },
+  "E-F19.dc.html": {
+   "x": 2820,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Comentario · detalle"
+  },
+  "E-F20.dc.html": {
+   "x": 3290,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Notificaciones · comentarios con su texto"
+  },
+  "E-F21.dc.html": {
+   "x": 3760,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Tu código de referido · código largo"
+  },
+  "E-F22.dc.html": {
+   "x": 4230,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Tu código de referido · hoja nativa para compartir"
+  },
+  "E-F23.dc.html": {
+   "x": 4700,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Perfil · administradora · desplazado hasta abajo"
+  },
+  "E-F24.dc.html": {
+   "x": 5170,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Perfil · instructora · desplazado hasta abajo"
+  },
+  "E-F25.dc.html": {
+   "x": 5640,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Comentarios · hoja Filtrar"
+  },
+  "E-F26.dc.html": {
+   "x": 6110,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Comentarios · con filtro"
+  },
+  "E-F27.dc.html": {
+   "x": 6580,
+   "y": 15748,
+   "w": 390,
+   "h": 844,
+   "title": "Perfil · asistente · desplazado hasta abajo"
   }
  },
  "order": [
@@ -1123,7 +1228,22 @@
   "E-M08.dc.html",
   "E-M09.dc.html",
   "E-M10.dc.html",
-  "E-M11.dc.html"
+  "E-M11.dc.html",
+  "E-D27.dc.html",
+  "E-D28.dc.html",
+  "E-D29.dc.html",
+  "E-D30.dc.html",
+  "E-F15.dc.html",
+  "E-F18.dc.html",
+  "E-F19.dc.html",
+  "E-F20.dc.html",
+  "E-F21.dc.html",
+  "E-F22.dc.html",
+  "E-F23.dc.html",
+  "E-F24.dc.html",
+  "E-F25.dc.html",
+  "E-F26.dc.html",
+  "E-F27.dc.html"
  ],
  "notes": {
   "t0": {
@@ -1209,6 +1329,13 @@
    "text": "Mis pagos y QR de cobro · instructora, nutricionista, coordinadora y asistente",
    "kind": "title1",
    "maxW": 5170
+  },
+  "n-mejoras-recorrido": {
+   "x": 0,
+   "y": 15468,
+   "text": "Mejoras del recorrido (follow-up 291, 26/11)",
+   "kind": "title1",
+   "maxW": 7050
   }
  },
  "designSystems": []
