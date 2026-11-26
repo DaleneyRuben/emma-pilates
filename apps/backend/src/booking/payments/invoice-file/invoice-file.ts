@@ -67,6 +67,11 @@ export type InvoiceFileGateway = {
     paymentId: string;
     clientId: string;
   }) => Promise<InvoiceFileObject>;
+  /** The uploader's own file before it is attached (walkthrough n.º 24). */
+  readUploadedFile: (input: {
+    imageAssetId: string;
+    accountId: string;
+  }) => Promise<InvoiceFileObject>;
 };
 
 export type InvoiceFileErrorCode =

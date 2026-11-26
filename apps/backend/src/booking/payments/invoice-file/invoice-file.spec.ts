@@ -40,6 +40,7 @@ const gatewayStub = (): jest.Mocked<InvoiceFileGateway> => ({
   listForClient: jest.fn().mockResolvedValue([]),
   readFileForStaff: jest.fn(),
   readFileForClient: jest.fn(),
+  readUploadedFile: jest.fn(),
 });
 
 describe('who handles invoice files', () => {
