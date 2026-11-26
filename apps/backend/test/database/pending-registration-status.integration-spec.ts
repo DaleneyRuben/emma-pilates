@@ -3,6 +3,11 @@ import { PrismaClient } from '../../src/generated/prisma/client';
 import { readPendingRegistrationStatus } from '../../src/system-identity/registration/prisma-pending-registration-status';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
+import { VerifyClientEmail } from '../../src/system-identity/registration/verify-client-email';
+import {
+  AUTHENTICATION_EMAIL_QUEUE,
+  parseAuthenticationEmailJob,
+} from '../../src/jobs/authentication-email/authentication-email-job';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
 import {
@@ -51,6 +56,41 @@ describe('the status of a pending Client registration', () => {
       password: 'correct horse battery staple',
     });
 
+  // Confirms the email the way the link does, so every token is handled as
+  // in production (review: verification invalidates the continuation).
+  const confirm = async (email: string) => {
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email, deletedAt: null },
+      select: { id: true },
+    });
+    const jobs = await world.boss.findJobs(AUTHENTICATION_EMAIL_QUEUE, {
+      id: undefined,
+    });
+    const job = parseAuthenticationEmailJob(
+      jobs.find(
+        ({ data }) =>
+          typeof data === 'object' &&
+          data !== null &&
+          'accountId' in data &&
+          data.accountId === account.id,
+      )?.data,
+    );
+    const secret = await new AuthenticationLinkCipher(
+      'local-test-key',
+      Buffer.alloc(32, 7),
+    ).decrypt(job.encryptedLinkSecret, job.encryptionKeyId);
+    await new VerifyClientEmail({
+      gateway: new PrismaClientRegistrationUnitOfWork({
+        prisma,
+        boss: world.boss,
+        digestEmail: digestTestEmail,
+        now: () => now,
+      }),
+      tokens: authenticationTokens,
+      now: () => now,
+    }).execute({ verificationToken: secret });
+  };
+
   const statusOf = (registrationContinuation: string, at = now) =>
     readPendingRegistrationStatus(prisma, {
       registrationContinuation,
@@ -65,10 +105,7 @@ describe('the status of a pending Client registration', () => {
 
   it('answers verified once the email was confirmed', async () => {
     const { email, registrationContinuation } = await register();
-    await prisma.account.updateMany({
-      where: { email },
-      data: { emailVerifiedAt: now, pendingExpiresAt: null },
-    });
+    await confirm(email);
 
     await expect(statusOf(registrationContinuation)).resolves.toBe('verified');
   });
