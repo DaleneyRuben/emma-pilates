@@ -73,6 +73,7 @@ describe("Client Session detail with her own Booking", () => {
     );
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver esa reserva" }));
-    await waitFor(() => expect(screen.getByText("Mis reservas")).toBeOnTheScreen());
+    // Mis reservas opens on its upcoming list (empty here).
+    await waitFor(() => expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen());
   });
 });

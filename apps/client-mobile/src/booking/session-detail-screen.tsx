@@ -1,6 +1,7 @@
 import {
   createBooking,
   getGetCurrentClientSubscriptionQueryKey,
+  getListUpcomingBookingsQueryKey,
   joinSessionWaitlist,
   useGetCurrentClientSubscription,
   useGetSession,
@@ -35,6 +36,7 @@ import { usePaymentStanding } from "../payments/payment-standing";
 import { useResendReceipt } from "../payments/use-resend-receipt";
 import { BookingOffFooter, bookingOffReason } from "./booking-off-footer";
 import { FrozenBookingFooter } from "./frozen-booking-footer";
+import { OwnBookingFooter } from "./own-booking-footer";
 import { problemMessage, usesLine } from "./session-detail-copy";
 import { SessionFacts } from "./session-facts";
 import { SessionHero } from "./session-hero";
@@ -56,7 +58,7 @@ type DetailNavigation = {
     (screen: "Plans" | "PaymentStatus"): void;
     (
       screen: "Bookings",
-      params: { screen: "MyBookings"; params: { confirmed: ConfirmedBooking } },
+      params: { screen: "MyBookings"; params?: { confirmed: ConfirmedBooking } },
     ): void;
   };
 };
@@ -274,7 +276,22 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
             <InlineError>{message}</InlineError>
           </View>
         ) : null}
-        {frozenOnClassDay && view?.freeze != null ? (
+        {detail.yourBooking != null ? (
+          <OwnBookingFooter
+            booking={detail.yourBooking}
+            cancellationWindowMinutes={studioRules?.cancellationWindowMinutes}
+            onCancelled={() =>
+              Promise.all([
+                session.refetch(),
+                queryClient.invalidateQueries({
+                  queryKey: getGetCurrentClientSubscriptionQueryKey(),
+                }),
+                queryClient.invalidateQueries({ queryKey: getListUpcomingBookingsQueryKey() }),
+              ])
+            }
+            onOpenBooking={() => navigation.navigate("Bookings", { screen: "MyBookings" })}
+          />
+        ) : frozenOnClassDay && view?.freeze != null ? (
           <FrozenBookingFooter
             endsOn={view.freeze.endsOn}
             onOtherDay={() => navigation.goBack()}
