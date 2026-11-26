@@ -72,6 +72,8 @@ export type ReferralsView = {
     referredName: string;
     state: 'pending' | 'awarded';
     invitationStatus: InvitationStatus;
+    /** A Guest Pass was opened for her: false when the code was not active. */
+    freeClass: boolean;
     createdAt: Date;
     awardedAt: Date | null;
     awardCentavos: number | null;

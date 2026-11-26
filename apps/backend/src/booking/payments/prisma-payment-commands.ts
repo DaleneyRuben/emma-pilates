@@ -58,18 +58,18 @@ import {
   type PaymentRow,
   type PaymentView,
   type PendingPaymentSummary,
-  type InvitationStatus,
   type PurchaseIntentView,
   type ReferralsView,
 } from './payment-views';
+import { invitationOf } from './referral-invitation';
 import {
   scheduleReceiptDeletion,
   settleReservation,
 } from './purchase-intent-settlement';
 
+export type { InvitationStatus } from './payment-views';
 export type {
   CreditActivityEntry,
-  InvitationStatus,
   PaymentReview,
   PaymentView,
   PendingPaymentSummary,
@@ -1365,19 +1365,12 @@ export function createPrismaPaymentCommands(
       referralCode: client.referralCode,
       codeActive,
       referrals: referrals.map((referral) => {
-        const pass = referral.referred.guestPassesReceived[0] ?? null;
-        const invitationStatus: InvitationStatus = (() => {
-          if (pass === null) return 'registered';
-          if (pass.rewardedAt !== null || pass.rewardOwed) return 'bought';
-          if (pass.bookingId !== null) return 'class_booked';
-          return 'registered';
-        })();
         return {
           referredClientId: referral.referred.id,
           referredName: abbreviateName(referral.referred.name),
           state:
             referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
-          invitationStatus,
+          ...invitationOf(referral.referred.guestPassesReceived[0] ?? null),
           createdAt: referral.createdAt,
           awardedAt: referral.awardedAt,
           awardCentavos: referral.awardCentavos,
