@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, within } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -112,6 +112,26 @@ describe("Factura del pago before uploading", () => {
 
     expect(await screen.findByRole("button", { name: "Elegir factura" })).toBeOnTheScreen();
     expect(screen.queryByText("factura-000123.pdf")).toBeNull();
+  });
+
+  // Review: a new pick while «Subir factura» sends the old one would be lost.
+  it("locks «Cambiar» and the × while the file is being sent", async () => {
+    mockPickPdf.mockResolvedValue({
+      uri: "file:///cache/factura-000123.pdf",
+      bytes: twoPages,
+      mediaType: "application/pdf",
+      fileName: "factura-000123.pdf",
+    });
+    mockUploadImage.mockReturnValue(new Promise(() => undefined));
+    const screen = await openInvoice();
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir un PDF" }));
+    await sheetClosed();
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Cambiar" })).toBeDisabled());
+    expect(screen.getByRole("button", { name: "Quitar archivo" })).toBeDisabled();
   });
 
   it("shows a chosen photo, opens it big, and changes it from there", async () => {
