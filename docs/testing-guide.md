@@ -71,6 +71,7 @@ numbered tests.
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
 | Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
+| Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | A chosen PDF is not shown page by page before it is sent; the invite link opens no page yet |
 
 ## Where each designed screen is tested
 
@@ -12246,3 +12247,62 @@ F. **Faster uploads (n.º 7 and 14).** Both apps now ask for the upload's
    remaining time is the PUT over the mobile network, which the smaller
    profile photo cuts by three quarters. Read the production numbers with
    the query of Test 53 step 4.
+
+## Test 201: walkthrough designs — payments, profile photo, invoice and referrals
+
+The owner's approved boards for walkthrough n.º 6 (Editar perfil), 7, 9, 13,
+14, 20, 22, 23, 24 and 25 (canvas «Mejoras del recorrido»: C10u, C10b, C10v,
+C10c, C11n, C22c, C22d, E-D19, E-D20, E-D27, E-D28, E-D30, C16, C16s, C16g,
+C16h). Run the API and the worker on a copy of `pilates_golden` (Test 2,
+Test 46), Metro for both apps, and use the iPhone 16 Pro and the Android
+emulator.
+
+A. **The receipt (C10u, C10b, C10v, C10c).** As Mariana, buy «Paquete de 8
+   clases» by transfer and tap «Elegir comprobante». The upload starts as soon
+   as the photo is chosen: the row reads «Subiendo comprobante» with a bar and
+   the percentage, and «Enviar comprobante» is off with «Espera a que termine
+   de subir». Then «Comprobante listo» with an outlined **Cambiar** and the ×;
+   the row itself no longer opens the picker. Tap the thumbnail: «Tu
+   comprobante» over the whole screen, «Revisa que se lean el monto, la fecha
+   y el destinatario.», **Cambiar comprobante** and **Cerrar**. Open «¿Necesitas
+   factura?» with an empty NIT: «Completa el NIT o CI, o cierra la factura»
+   under the button. The percentage follows the steps (declared, sent,
+   finalized, ready, attached), not each byte. The paid Evaluation's receipt
+   uses the same row, with «Cambiar» and the ×, without the big view.
+B. **Notifications after the receipt (C11n).** On a phone that was never
+   asked for notifications, send the receipt: over «Tu pago está en revisión»
+   the sheet «Te avisamos cuando aprobemos tu pago» · «Activa las
+   notificaciones y te escribimos apenas el estudio revise tu comprobante.»
+   with **Activar notificaciones** and **Ahora no**. After «Ahora no», neither
+   this sheet nor the booking one (C04n) comes back for thirty days; once the
+   phone has answered the system prompt, never again.
+C. **The profile photo (C22c, C22d).** Client app: Perfil › Editar › Cambiar
+   foto. The new photo shows in the circle at once, under a ring while it
+   uploads; there is no «Subiendo foto…» line and «Guardar cambios» stays on.
+   Stop the API before choosing to make it fail: the photo stays, with «No
+   pudimos subir tu foto. Tus otros cambios sí se guardaron.» and
+   **Reintentar**, which sends the same photo without opening the picker.
+   Staff app: Perfil › Cambiar foto behaves the same, with «No pudimos subir
+   tu foto.» (Perfil has no other fields to keep). «Guardar cambios» now ends
+   the Editar perfil form and scrolls with it, never pinned over the keyboard
+   (walkthrough n.º 6).
+D. **The Staff invoice (E-D19, E-D20, E-D27, E-D28, E-D30).** As Paola,
+   Pagos › Facturas por subir › a payment with invoice data. The dashed box
+   reads «Toca para elegir un PDF o una imagen, hasta 10 MB» and opens the
+   sheet, like the button, which reads **Elegir factura**. Choose a photo:
+   «Factura lista» · «Foto · toca la miniatura para verla» with **Cambiar** and
+   the ×; the thumbnail opens «Tu factura» big («Pellizca para ampliar. Revisa
+   que se lean el NIT, el nombre y el monto.», **Cerrar**, **Cambiar**). Choose
+   a PDF: its name and «PDF · N páginas · size». Nothing is sent until
+   **Subir factura**; then «Factura subida» as before. Cancelling the picker
+   after **Cambiar** keeps the file already chosen; the × clears it.
+E. **Invita a una amiga (C16, C16s, C16g, C16h).** As Lucía (paid Plan in
+   force), **Compartir tu código** opens the phone's own share sheet with the
+   text and `https://links.emmapilatesstudio.com/client/invite/LUCIA`. «Tus
+   invitadas» shows under each status its next step: «Todavía no reservó su
+   clase gratis.», «Si compra su primer plan, ganas una clase.» or «Ganaste 1
+   clase. Ya está en tu plan.». «Cómo funciona» ends with «Puedes invitar a una
+   amiga por mes.». As Mariana (no Plan) the card shows the code with «Se
+   activa cuando compres un plan.» and **Comprar un plan**, which opens the
+   Plans; there is no share or edit button. The link itself opens no page yet
+   (CW01 waits for approval).
