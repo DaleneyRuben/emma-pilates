@@ -181,6 +181,11 @@ export function StaffNotificationsScreen() {
             now={now}
             onOpen={open}
             onRemove={remove}
+            onSeeAllComments={
+              role === "administrator"
+                ? () => navigation.navigate("ProfileTab", { screen: "Comments", initial: false })
+                : undefined
+            }
           />
         )}
       </ScrollView>

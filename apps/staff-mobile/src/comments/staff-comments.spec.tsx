@@ -91,13 +91,13 @@ describe("Comentarios in the Staff app", () => {
   it("lists the new comments with who sent them, from where, and the text", async () => {
     const { lists, screen } = await openComments();
 
-    expect(screen.getByRole("button", { name: "Nuevos · 19" })).toBeOnTheScreen();
+    expect(screen.getByRole("tab", { name: "Nuevos · 19" })).toBeOnTheScreen();
     expect(screen.getByText("19 comentarios")).toBeOnTheScreen();
     expect(screen.getByText("Problema · App de clientas")).toBeOnTheScreen();
     expect(screen.getByText(comment.text)).toBeOnTheScreen();
     expect(lists.at(-1)).toContain("status=new");
 
-    await fireEvent.press(screen.getByRole("button", { name: "Revisados" }));
+    await fireEvent.press(screen.getByRole("tab", { name: "Revisados" }));
     await waitFor(() => expect(lists.at(-1)).toContain("status=reviewed"));
   });
 
@@ -127,7 +127,7 @@ describe("Comentarios in the Staff app", () => {
 
     expect(await screen.findByText("Clienta · ana@example.com")).toBeOnTheScreen();
     expect(screen.getByText("App de clientas · 1.1.0 · iOS 26.2")).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Revisado" }));
+    await fireEvent.press(screen.getByRole("tab", { name: "Revisado" }));
     await fireEvent.changeText(
       screen.getByLabelText("Qué cambiamos"),
       "Arreglamos la lista en la 1.1.1.",

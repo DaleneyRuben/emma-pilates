@@ -67,4 +67,13 @@ describe("staffNotificationDestination", () => {
   ] as const)("opens nothing for a %s notice about %s", (role, destinationType) => {
     expect(staffNotificationDestination(role, destinationType, paymentId)).toBeNull();
   });
+
+  // Walkthrough n.º 11 (E-F20).
+  it("opens a comment for the Administrator, and nothing for a Trainer", () => {
+    expect(staffNotificationDestination("administrator", "feedback", paymentId)).toEqual([
+      "ProfileTab",
+      { screen: "Comment", params: { feedbackId: paymentId }, initial: false },
+    ]);
+    expect(staffNotificationDestination("trainer", "feedback", paymentId)).toBeNull();
+  });
 });

@@ -8,6 +8,7 @@ jest.setTimeout(30_000);
 
 const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
 const paymentId = "22222222-2222-4222-8222-222222222222";
+const feedbackId = "44444444-4444-4444-8444-444444444444";
 
 const review = (
   outcome: "pending" | "approved",
@@ -65,6 +66,25 @@ const items = [
     review: null,
     feedback: null,
   },
+  {
+    id: "f1",
+    category: "announcement",
+    type: "feedback_received",
+    title: "Comentario nuevo",
+    message: "Llegó un problema desde la app de clientas.",
+    destinationType: "feedback",
+    destinationId: feedbackId,
+    createdAt: minutesAgo(30),
+    readAt: null,
+    review: null,
+    feedback: {
+      feedbackId,
+      authorName: "Lucía Vargas",
+      type: "problem",
+      app: "client",
+      excerpt: "No encuentro dónde ver mi lista de espera desde Inicio…",
+    },
+  },
 ];
 
 async function openNotifications() {
@@ -82,6 +102,26 @@ async function openNotifications() {
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 2 }),
     "/api/v1/notifications": () => jsonResponse({ items, hasMore: false, nextCursor: null }),
     "/api/v1/administrator/payments/pending": () => jsonResponse([]),
+    [`/api/v1/administrator/feedback/${feedbackId}`]: () =>
+      jsonResponse({
+        id: feedbackId,
+        app: "client",
+        role: "client",
+        type: "problem",
+        text: "No encuentro dónde ver mi lista de espera desde Inicio.",
+        appVersion: "1.1.0",
+        appBuild: "12",
+        platform: "ios",
+        osVersion: "26.2",
+        status: "new",
+        changeNote: null,
+        senderEmail: "lucia@example.com",
+        senderName: "Lucía Vargas",
+        senderClientId: null,
+        senderGender: null,
+        createdAt: minutesAgo(30),
+        triagedAt: null,
+      }),
     "DELETE /api/v1/notifications/c1": () => {
       calls.push("DELETE c1");
       return new Response(null, { status: 204 });
@@ -145,5 +185,19 @@ describe("Staff Notificaciones for the Administrator", () => {
     expect(screen.getByText("Notificación borrada")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Deshacer" })).toBeOnTheScreen();
     await waitFor(() => expect(calls).toEqual(["DELETE c1"]));
+  });
+
+  // Walkthrough n.º 11 (E-F20): a comment's notice says who wrote it and how
+  // it begins, and opens that comment.
+  it("opens the comment from its notice", async () => {
+    const { screen } = await openNotifications();
+
+    await fireEvent.press(
+      screen.getByText(
+        "Lucía Vargas · Problema: «No encuentro dónde ver mi lista de espera desde Inicio…»",
+      ),
+    );
+
+    expect(await screen.findByText("Clienta · lucia@example.com")).toBeOnTheScreen();
   });
 });
