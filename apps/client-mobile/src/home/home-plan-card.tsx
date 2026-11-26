@@ -35,7 +35,13 @@ export function GuestPassCard({
           copy.next === "purchase"
             ? { label: "Comprar un plan", onPress: onPurchase, testID: "home-buy-plan" }
             : copy.next === "book"
-              ? { label: "Reservar mi clase gratis", onPress: onBook, testID: "home-book-guest" }
+              ? {
+                  label: "Reservar mi clase gratis",
+                  onPress: onBook,
+                  testID: "home-book-guest",
+                  // C02f: a full-width white button inside the card.
+                  wide: true,
+                }
               : { label: "Mi plan", onPress: onDetail, testID: "home-plan-detail" }
         }
         eyebrow={copy.eyebrow}
