@@ -154,7 +154,7 @@ describe("Invita a una amiga (BKM-014)", () => {
     );
 
     expect(
-      await screen.findByText("Tu código no estaba activo: no recibió la clase gratis."),
+      await screen.findByText("No recibió la clase gratis."),
     ).toBeOnTheScreen();
     expect(screen.queryByText("Todavía no reservó su clase gratis.")).toBeNull();
   });
