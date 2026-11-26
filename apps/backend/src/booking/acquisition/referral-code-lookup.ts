@@ -1,5 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { normalizeReferralCode } from './acquisition';
+import { findReferralCodeHolder } from './record-client-acquisition';
 
 export type ReferralCodeLookup = {
   code: string;
@@ -13,46 +14,41 @@ export type ReferralCodeLookup = {
 const firstName = (name: string): string => name.trim().split(/\s+/)[0] ?? '';
 
 // Walkthrough n.º 18 (C01b5, C01b6): the code a friend types is checked
-// before her Account exists. A live Client's or Trainer's code answers her
-// first name; anything else, retired codes included, is «unknown», which is
-// what registration itself would refuse.
+// before her Account exists, with the very rule registration applies
+// (`findReferralCodeHolder`), so the two never disagree. A live Client's or
+// Trainer's code answers her first name; anything else is «unknown».
 export const lookUpReferralCode = async (
-  prisma: Pick<PrismaClient, 'referralCode'>,
+  prisma: PrismaClient,
   typed: string,
 ): Promise<ReferralCodeLookup> => {
   const code = normalizeReferralCode(typed) ?? '';
-  const row =
-    code === ''
-      ? null
-      : await prisma.referralCode.findFirst({
-          where: {
-            code,
-            retiredAt: null,
-            OR: [
-              { client: { deletedAt: null } },
-              { staffMember: { role: 'TRAINER', deletedAt: null } },
-            ],
-          },
-          select: {
-            client: { select: { name: true } },
-            staffMember: { select: { name: true } },
-          },
-        });
-  if (row?.client != null) {
-    return {
-      code,
-      status: 'valid',
-      holderFirstName: firstName(row.client.name),
-      holderKind: 'client',
-    };
-  }
-  if (row?.staffMember != null) {
-    return {
-      code,
-      status: 'valid',
-      holderFirstName: firstName(row.staffMember.name),
-      holderKind: 'trainer',
-    };
-  }
-  return { code, status: 'unknown', holderFirstName: null, holderKind: null };
+  const unknown: ReferralCodeLookup = {
+    code,
+    status: 'unknown',
+    holderFirstName: null,
+    holderKind: null,
+  };
+  if (code === '') return unknown;
+  const holder = await findReferralCodeHolder(prisma, code);
+  if (holder === null) return unknown;
+  const name =
+    holder.kind === 'client'
+      ? (
+          await prisma.client.findUniqueOrThrow({
+            where: { id: holder.clientId },
+            select: { name: true },
+          })
+        ).name
+      : (
+          await prisma.staffMember.findUniqueOrThrow({
+            where: { id: holder.staffMemberId },
+            select: { name: true },
+          })
+        ).name;
+  return {
+    code,
+    status: 'valid',
+    holderFirstName: firstName(name),
+    holderKind: holder.kind,
+  };
 };
