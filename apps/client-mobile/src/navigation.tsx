@@ -23,6 +23,7 @@ import { PixelRatio } from "react-native";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 
 import { BookingsScreen } from "./booking/bookings-screen";
+import { useInviteCodeSources } from "./invite/use-invite-code-sources";
 import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
@@ -273,6 +274,7 @@ function ClientScreens({
   signOutNotice,
 }: MobileNavigationProps) {
   const [handledLink, setHandledLink] = useState<string | null>(null);
+  const invite = useInviteCodeSources();
   const emailChangeToken =
     authenticationIntent?.type === "confirm-email-change" &&
     authenticationIntent.token !== handledLink
@@ -327,6 +329,8 @@ function ClientScreens({
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
       pendingRegistrationStore={pendingRegistrationStore}
+      readClipboardCode={invite.readClipboardCode}
+      suggestedReferralCode={invite.suggestedReferralCode}
     />
   );
 }
