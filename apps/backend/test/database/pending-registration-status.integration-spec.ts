@@ -95,6 +95,23 @@ describe('the status of a pending Client registration', () => {
     readPendingRegistrationStatus(prisma, {
       registrationContinuation,
       now: at,
+      digestEmail: digestTestEmail,
+    });
+
+  const suppress = (
+    email: string,
+    reason: 'HARD_BOUNCE' | 'COMPLAINT',
+    resolvedAt: Date | null = null,
+  ) =>
+    prisma.emailSuppression.create({
+      data: {
+        emailDigest: new Uint8Array(digestTestEmail(email)),
+        reason,
+        provider: 'resend',
+        providerEventId: `event-${randomUUID()}`,
+        providerOccurredAt: now,
+        resolvedAt,
+      },
     });
 
   it('answers pending while the email waits for its link', async () => {
@@ -120,5 +137,28 @@ describe('the status of a pending Client registration', () => {
         new Date(now.getTime() + 8 * 24 * 60 * 60 * 1_000),
       ),
     ).resolves.toBe('expired');
+  });
+
+  // Walkthrough n.º 2 (C01c3): the verification email bounced (Resend's
+  // hard bounce, already kept by the webhook), so the address is wrong.
+  it('answers bounced when the address hard-bounced', async () => {
+    const { email, registrationContinuation } = await register();
+    await suppress(email, 'HARD_BOUNCE');
+
+    await expect(statusOf(registrationContinuation)).resolves.toBe('bounced');
+  });
+
+  it('keeps pending for a complaint or a resolved bounce', async () => {
+    const first = await register();
+    await suppress(first.email, 'COMPLAINT');
+    const second = await register();
+    await suppress(second.email, 'HARD_BOUNCE', now);
+
+    await expect(statusOf(first.registrationContinuation)).resolves.toBe(
+      'pending',
+    );
+    await expect(statusOf(second.registrationContinuation)).resolves.toBe(
+      'pending',
+    );
   });
 });
