@@ -70,4 +70,27 @@ describe("VerifyEmailScreen", () => {
     expect(onSettled).toHaveBeenCalledTimes(1);
     expect(onVerified).not.toHaveBeenCalled();
   });
+
+  // Review: the first answer may have been lost after the server verified,
+  // so a used link after a retry does not claim the link was bad.
+  it("words a used link after a retry as possibly already verified", async () => {
+    const verifyClientEmail = jest
+      .fn()
+      .mockRejectedValueOnce(new Error("aborted"))
+      .mockResolvedValueOnce({ status: "invalid" });
+    const { screen } = renderScreen(verifyClientEmail);
+    const rendered = await screen;
+
+    await waitFor(() => {
+      expect(rendered.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(rendered.getByRole("button", { name: "Reintentar" }));
+
+    await waitFor(() => {
+      expect(rendered.getByText("Enlace ya utilizado")).toBeOnTheScreen();
+    });
+    expect(
+      rendered.getByText("Si ya verificaste tu correo, puedes iniciar sesión."),
+    ).toBeOnTheScreen();
+  });
 });

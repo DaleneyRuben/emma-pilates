@@ -6,7 +6,7 @@ import { Text } from "../ui/text";
 import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
 
-type VerificationState = "loading" | "verified" | "invalid" | "failed";
+type VerificationState = "loading" | "verified" | "invalid" | "used" | "failed";
 
 const outcome = {
   failed: {
@@ -18,6 +18,13 @@ const outcome = {
     badge: { icon: "blocked", tone: "primary" },
     line: "Este enlace venció o ya fue utilizado.",
     title: "Enlace no válido",
+  },
+  // After a failed try the server may have verified and lost its answer, so
+  // a used link then reads as possibly already verified (review).
+  used: {
+    badge: { icon: "mail", tone: "primary" },
+    line: "Si ya verificaste tu correo, puedes iniciar sesión.",
+    title: "Enlace ya utilizado",
   },
   loading: {
     badge: { icon: "mail", tone: "primary" },
@@ -65,7 +72,7 @@ export function VerifyEmailScreen({
       .verifyClientEmail(token)
       .then((result) => {
         if (!active) return;
-        setState(result.status === "verified" ? "verified" : "invalid");
+        setState(result.status === "verified" ? "verified" : attempt > 0 ? "used" : "invalid");
         if (result.status === "verified") verified();
         settled();
       })
