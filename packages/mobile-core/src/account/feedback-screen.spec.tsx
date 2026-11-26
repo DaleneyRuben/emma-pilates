@@ -1,6 +1,8 @@
 import { act, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { DeviceEventEmitter, ScrollView } from "react-native";
 
+import { colors } from "../ui/tokens";
+import { textVariants } from "../ui/type-scale";
 import { FeedbackScreen } from "./feedback-screen";
 import { readFeedbackMetadata } from "./feedback-metadata";
 
@@ -53,6 +55,20 @@ describe("FeedbackScreen (REL-012)", () => {
     await fireEvent.press(sendButton(screen));
 
     expect(screen.getByText("Elige el tipo de comentario")).toBeOnTheScreen();
+    // C25c: the notice is titulo-fila with an alert icon, the three chips
+    // share the width and take the 2 pt dark outline under the «TIPO» eyebrow.
+    expect(screen.getByText("Elige el tipo de comentario")).toHaveStyle(
+      textVariants["titulo-fila"],
+    );
+    expect(screen.getByTestId("feedback-type-error-icon")).toBeOnTheScreen();
+    expect(screen.getByText("TIPO")).toBeOnTheScreen();
+    for (const name of ["Problema", "Sugerencia", "Otro"]) {
+      expect(screen.getByRole("button", { name })).toHaveStyle({
+        borderColor: colors.primary,
+        borderWidth: 2,
+        flex: 1,
+      });
+    }
     expect(screen.getByText("Escribe al menos 10 caracteres.")).toBeOnTheScreen();
     expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ y: 0 }));
     expect(fetcher).not.toHaveBeenCalled();
