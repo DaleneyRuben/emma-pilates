@@ -73,7 +73,7 @@ describe("ScreenHeader", () => {
       backgroundColor: "#E7CCBF",
       borderBottomLeftRadius: 28,
       borderBottomRightRadius: 28,
-      paddingHorizontal: 20,
+      paddingHorizontal: 16,
     });
     expect(screen.getByRole("button", { name: "Volver" })).toHaveStyle({
       backgroundColor: "#FFFBFB",
@@ -162,9 +162,9 @@ describe("ScreenHeader's tablet width", () => {
 });
 
 describe("ScreenTopBar", () => {
-  it("pads the band 20 pt on each side", async () => {
+  it("pads the band 16 pt on each side (walkthrough n.º 8)", async () => {
     const bare = await render(<ScreenTopBar onBack={jest.fn()} title="Recuperar contraseña" />);
-    expect(bare.getByTestId("screen-top-bar")).toHaveStyle({ paddingHorizontal: 20 });
+    expect(bare.getByTestId("screen-top-bar")).toHaveStyle({ paddingHorizontal: 16 });
   });
 
   it("is the shared header", async () => {

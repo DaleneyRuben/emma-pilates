@@ -198,7 +198,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginBottom: spacing.xs,
     paddingBottom: spacing.xlLg - spacing.xs,
-    paddingHorizontal: spacing.xlSm,
+    // Walkthrough n.º 8: one 16 pt left edge for the band, titles and cards.
+    paddingHorizontal: spacing.lg,
   },
   capsule: {
     alignSelf: "flex-start",
