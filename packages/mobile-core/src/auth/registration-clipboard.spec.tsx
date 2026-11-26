@@ -3,7 +3,13 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import type { AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
 
-function createApiMock(): AuthenticationApi {
+function createApiMock(
+  holder: { code: string; holderFirstName: string; holderKind: "client" | "trainer" } = {
+    code: "LUCIA",
+    holderFirstName: "Lucía",
+    holderKind: "client",
+  },
+): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
@@ -11,12 +17,7 @@ function createApiMock(): AuthenticationApi {
     completePasswordRecovery: jest.fn(),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn(),
-    lookUpReferralCode: jest.fn().mockResolvedValue({
-      code: "LUCIA",
-      holderFirstName: "Lucía",
-      holderKind: "client",
-      status: "valid",
-    }),
+    lookUpReferralCode: jest.fn().mockResolvedValue({ ...holder, status: "valid" }),
     readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
     register: jest.fn(),
     requestPasswordRecovery: jest.fn(),
@@ -25,9 +26,12 @@ function createApiMock(): AuthenticationApi {
   } as AuthenticationApi;
 }
 
-async function openRegistration(readClipboardCode: () => Promise<string | null>) {
+async function openRegistration(
+  readClipboardCode: () => Promise<string | null>,
+  api: AuthenticationApi = createApiMock(),
+) {
   const screen = await render(
-    <AuthenticationFlow api={createApiMock()} readClipboardCode={readClipboardCode} />,
+    <AuthenticationFlow api={api} readClipboardCode={readClipboardCode} />,
   );
   await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
   return screen;
@@ -63,5 +67,18 @@ describe("«Crea tu cuenta» and a code on the clipboard", () => {
 
     await waitFor(() => expect(read).toHaveBeenCalled());
     expect(screen.queryByText(/¿Te invitó/)).toBeNull();
+  });
+
+  // #26: a Trainer's link copies her code too; it attributes the client
+  // to her without promising a free class.
+  it("offers a Trainer's code without a free class", async () => {
+    const screen = await openRegistration(
+      jest.fn().mockResolvedValue("DANIELA"),
+      createApiMock({ code: "DANIELA", holderFirstName: "Daniela", holderKind: "trainer" }),
+    );
+
+    expect(await screen.findByText("¿Te invitó Daniela?")).toBeOnTheScreen();
+    expect(screen.getByText("Usa su código al crear tu cuenta.")).toBeOnTheScreen();
+    expect(screen.queryByText(/clase es gratis/)).toBeNull();
   });
 });
