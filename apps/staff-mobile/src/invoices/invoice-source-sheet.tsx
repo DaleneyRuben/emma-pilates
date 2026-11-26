@@ -1,5 +1,5 @@
 import { colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
 export type InvoiceSource = "library" | "document";
@@ -16,7 +16,7 @@ const choices: readonly {
 ];
 
 // iOS reports the close; this only guards a close it never reports.
-const closeFallbackMilliseconds = 500;
+const closeFallbackMilliseconds = 1000;
 
 // E5 «Elegir archivo» (E-D20): where the invoice comes from, a photo or a PDF.
 // Each choice is a `titulo-fila` row; «Cancelar» is a button, `boton`.
@@ -42,21 +42,20 @@ export function InvoiceSourceSheet({
     if (source !== null) onChoose(source);
   };
 
-  useEffect(
-    () => () => {
+  // The fallback counts from the moment the sheet starts closing (review).
+  const handOverLate = useEffectEvent(handOver);
+  useEffect(() => {
+    if (visible || Platform.OS !== "ios" || chosen.current === null) return undefined;
+    fallback.current = setTimeout(() => handOverLate(), closeFallbackMilliseconds);
+    return () => {
       if (fallback.current !== null) clearTimeout(fallback.current);
-    },
-    [],
-  );
+    };
+  }, [visible]);
 
   const choose = (source: InvoiceSource) => {
     chosen.current = source;
     onDismiss();
-    if (Platform.OS !== "ios") {
-      handOver();
-      return;
-    }
-    fallback.current = setTimeout(handOver, closeFallbackMilliseconds);
+    if (Platform.OS !== "ios") handOver();
   };
 
   return (

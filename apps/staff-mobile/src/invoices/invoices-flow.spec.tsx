@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -24,6 +24,10 @@ const pdf = {
 };
 
 jest.setTimeout(20_000);
+
+// Jest's Modal never reports its dismissal, so on iOS the sheet hands the
+// choice over after its one-second fallback (walkthrough n.º 25).
+const sheetClosed = () => act(() => new Promise((resolve) => setTimeout(resolve, 1100)));
 
 const hour = 60 * 60_000;
 const yesterdayAt1940 = `${boliviaCivilDate(new Date(Date.now() - 24 * hour))}T23:40:00.000Z`;
@@ -176,6 +180,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Subir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(screen.getByText("factura-000123.jpg")).toBeOnTheScreen();
@@ -200,6 +205,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir un PDF" }));
+    await sheetClosed();
     return screen;
   };
   const uploadRoutes = (attached: jest.Mock) =>
@@ -282,6 +288,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
 
     expect(
       await screen.findByText(
@@ -371,6 +378,7 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     );
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
     await fireEvent.press(await screen.findByRole("button", { name: "Reintentar" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();

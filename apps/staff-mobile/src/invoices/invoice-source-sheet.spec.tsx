@@ -43,7 +43,7 @@ describe("InvoiceSourceSheet", () => {
     await act(() => dismissed());
     expect(onChoose).toHaveBeenCalledWith("document");
 
-    await act(() => new Promise((resolve) => setTimeout(resolve, 700)));
+    await act(() => new Promise((resolve) => setTimeout(resolve, 1200)));
     expect(onChoose).toHaveBeenCalledTimes(1);
   });
 
@@ -55,7 +55,11 @@ describe("InvoiceSourceSheet", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Elegir una imagen" }));
     expect(onChoose).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(onChoose).toHaveBeenCalledWith("library"));
+    // Review: the fallback counts from the close, not the tap, and waits a
+    // full second, so a slow slide-out is not cut short.
+    await act(() => new Promise((resolve) => setTimeout(resolve, 700)));
+    expect(onChoose).not.toHaveBeenCalled();
+    await waitFor(() => expect(onChoose).toHaveBeenCalledWith("library"), { timeout: 2000 });
     expect(onChoose).toHaveBeenCalledTimes(1);
   });
 
