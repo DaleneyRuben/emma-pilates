@@ -69,6 +69,28 @@ describe("«Crea tu cuenta» with a referral code", () => {
     );
   });
 
+  // Testing session, #18: another chip got selected while the note still
+  // credited Lucía's code, and the server stored «friend» anyway.
+  it("keeps the channel on the code's while a valid code is typed", async () => {
+    const api = createApiMock({
+      lookUpReferralCode: jest.fn().mockResolvedValue({
+        code: "LUCIA",
+        holderFirstName: "Lucía",
+        holderKind: "client",
+        status: "valid",
+      }),
+    });
+    const screen = await openWithCode(api, "lucia");
+    await screen.findByText("La marcamos por el código de Lucía.");
+
+    const walkIn = screen.getByRole("radio", { name: "Pasé por el estudio" });
+    expect(walkIn).toBeDisabled();
+    await fireEvent.press(walkIn);
+
+    expect(walkIn).not.toBeChecked();
+    expect(screen.getByRole("radio", { name: "Recomendación de una amiga" })).toBeChecked();
+  });
+
   it("marks «Una instructora» for a Trainer's code", async () => {
     const api = createApiMock({
       lookUpReferralCode: jest.fn().mockResolvedValue({
