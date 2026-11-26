@@ -12,7 +12,10 @@ import {
   StaffRole,
   type PrismaClient,
 } from '../../generated/prisma/client';
-import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import {
+  settleReviewNotices,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import {
   FeedbackError,
   type FeedbackActor,
@@ -330,6 +333,14 @@ export const createPrismaFeedbackStore = (
             occurredAt,
           }),
         });
+        // Testing session (E-F20): a triaged comment stops asking on every
+        // Administrator's bell, as a decided receipt or Freeze does.
+        if (status !== 'new') {
+          await settleReviewNotices(transaction, {
+            businessEventKey: `feedback-received:${feedbackId}`,
+            settledAt: occurredAt,
+          });
+        }
         return toRow(record);
       }),
   };
