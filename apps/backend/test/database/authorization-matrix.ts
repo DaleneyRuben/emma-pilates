@@ -131,6 +131,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/notifications/unread-count': both('allow'),
   'POST /api/v1/notifications/read-all': both('allow'),
   'POST /api/v1/notifications/{notificationId}/read': both('allow'),
+  'DELETE /api/v1/notifications/{notificationId}': both('allow'),
+  'POST /api/v1/notifications/{notificationId}/restore': both('allow'),
   'PUT /api/v1/notifications/devices/current': both('allow'),
   'POST /api/v1/notifications/devices/current/deactivate': both('allow'),
   // Pending uploads belong to the Account; attaching one is authorized where

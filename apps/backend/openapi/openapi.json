@@ -8236,6 +8236,66 @@
         ]
       }
     },
+    "/api/v1/notifications/{notificationId}": {
+      "delete": {
+        "operationId": "removeNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}/restore": {
+      "post": {
+        "operationId": "restoreNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
+        ]
+      }
+    },
     "/api/v1/notifications/devices/current": {
       "put": {
         "operationId": "registerCurrentDevice",

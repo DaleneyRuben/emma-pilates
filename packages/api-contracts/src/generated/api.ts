@@ -31942,6 +31942,234 @@ export const useMarkNotificationRead = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type removeNotificationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type removeNotificationResponseSuccess =
+  removeNotificationResponse204 & {
+    headers: Headers;
+  };
+export type removeNotificationResponse = removeNotificationResponseSuccess;
+
+export const getRemoveNotificationUrl = (notificationId: string) => {
+  return `/api/v1/notifications/${notificationId}`;
+};
+
+export const removeNotification = async (
+  notificationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<removeNotificationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRemoveNotificationUrl(notificationId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removeNotificationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as removeNotificationResponse;
+};
+
+export const getRemoveNotificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeNotification>>,
+    TError,
+    RemoveNotificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeNotification>>,
+  TError,
+  RemoveNotificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["removeNotification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeNotification>>,
+    RemoveNotificationMutationVariables
+  > = (props) => {
+    const { notificationId } = props ?? {};
+
+    return removeNotification(notificationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveNotificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeNotification>>
+>;
+
+export type RemoveNotificationMutationError = unknown;
+export type RemoveNotificationMutationVariables = { notificationId: string };
+
+export const useRemoveNotification = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeNotification>>,
+      TError,
+      RemoveNotificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeNotification>>,
+  TError,
+  RemoveNotificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRemoveNotificationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type restoreNotificationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type restoreNotificationResponseSuccess =
+  restoreNotificationResponse204 & {
+    headers: Headers;
+  };
+export type restoreNotificationResponse = restoreNotificationResponseSuccess;
+
+export const getRestoreNotificationUrl = (notificationId: string) => {
+  return `/api/v1/notifications/${notificationId}/restore`;
+};
+
+export const restoreNotification = async (
+  notificationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<restoreNotificationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRestoreNotificationUrl(notificationId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: restoreNotificationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as restoreNotificationResponse;
+};
+
+export const getRestoreNotificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof restoreNotification>>,
+    TError,
+    RestoreNotificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof restoreNotification>>,
+  TError,
+  RestoreNotificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["restoreNotification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof restoreNotification>>,
+    RestoreNotificationMutationVariables
+  > = (props) => {
+    const { notificationId } = props ?? {};
+
+    return restoreNotification(notificationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RestoreNotificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof restoreNotification>>
+>;
+
+export type RestoreNotificationMutationError = unknown;
+export type RestoreNotificationMutationVariables = { notificationId: string };
+
+export const useRestoreNotification = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof restoreNotification>>,
+      TError,
+      RestoreNotificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof restoreNotification>>,
+  TError,
+  RestoreNotificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRestoreNotificationMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type registerCurrentDeviceResponse204 = {
   data: void;
   status: 204;
