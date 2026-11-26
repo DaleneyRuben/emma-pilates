@@ -43900,6 +43900,199 @@ export function useExportAdminFeedback<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type getAdminFeedbackResponse200 = {
+  data: AdminFeedbackDto;
+  status: 200;
+};
+
+export type getAdminFeedbackResponseSuccess = getAdminFeedbackResponse200 & {
+  headers: Headers;
+};
+export type getAdminFeedbackResponse = getAdminFeedbackResponseSuccess;
+
+export const getGetAdminFeedbackUrl = (feedbackId: string) => {
+  return `/api/v1/administrator/feedback/${feedbackId}`;
+};
+
+export const getAdminFeedback = async (
+  feedbackId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAdminFeedbackResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAdminFeedbackUrl(feedbackId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAdminFeedbackResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAdminFeedbackResponse;
+};
+
+export const getGetAdminFeedbackQueryKey = (feedbackId: string) => {
+  return [`/api/v1/administrator/feedback/${feedbackId}`] as const;
+};
+
+export const getGetAdminFeedbackQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAdminFeedbackQueryKey(feedbackId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAdminFeedback>>
+  > = ({ signal }) =>
+    getAdminFeedback(feedbackId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: feedbackId !== null && feedbackId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAdminFeedback>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAdminFeedbackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdminFeedback>>
+>;
+export type GetAdminFeedbackQueryError = unknown;
+
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAdminFeedbackQueryOptions(feedbackId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type triageAdminFeedbackResponse200 = {
   data: AdminFeedbackDto;
   status: 200;

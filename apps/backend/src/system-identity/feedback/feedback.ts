@@ -96,6 +96,8 @@ export type FeedbackListQuery = {
   pageSize: number;
   status?: FeedbackStatus;
   app?: FeedbackApp;
+  /** Walkthrough n.º 11 (E-F25): the Staff app filters by type too. */
+  type?: FeedbackType;
 };
 
 export type FeedbackActor = { accountId: string; staffMemberId: string };
@@ -114,6 +116,8 @@ export interface FeedbackStore {
     },
   ) => Promise<{ id: string; createdAt: Date }>;
   list: (query: FeedbackListQuery) => Promise<FeedbackPage>;
+  /** One live Feedback, or null (walkthrough n.º 11, E-F19). */
+  find: (feedbackId: string) => Promise<FeedbackRow | null>;
   listAll: () => Promise<FeedbackRow[]>;
   recordExport: (input: {
     actor: FeedbackActor;
@@ -195,6 +199,19 @@ export const listFeedback = async (
 ): Promise<FeedbackPage> => {
   requireTriage(principal);
   return store.list(query);
+};
+
+// Walkthrough n.º 11 (E-F19, E-F20): the Staff app opens one comment from its
+// notification.
+export const readFeedback = async (
+  command: { feedbackId: string },
+  principal: AuthenticatedPrincipal,
+  { store }: Dependencies,
+): Promise<FeedbackRow> => {
+  requireTriage(principal);
+  const row = await store.find(command.feedbackId);
+  if (row === null) throw new FeedbackError('feedback_not_found');
+  return row;
 };
 
 // The export is the feedback log Google asks for; it leaves the system, so it

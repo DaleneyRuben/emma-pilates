@@ -37,6 +37,7 @@ import type { AuthenticatedPrincipal } from '../authentication/resolve-authentic
 import {
   FeedbackError,
   feedbackApps,
+  feedbackTypes,
   feedbackStatuses,
   type FeedbackListQuery,
   type FeedbackMessage,
@@ -75,6 +76,10 @@ export type FeedbackOperations = {
       status: FeedbackStatus;
       changeNote: string | null;
     },
+    principal: AuthenticatedPrincipal,
+  ) => Promise<FeedbackRow>;
+  read: (
+    command: { feedbackId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<FeedbackRow>;
 };
@@ -176,6 +181,7 @@ export class AdministratorFeedbackController {
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiQuery({ name: 'status', required: false, enum: feedbackStatuses })
   @ApiQuery({ name: 'app', required: false, enum: feedbackApps })
+  @ApiQuery({ name: 'type', required: false, enum: feedbackTypes })
   @ApiOkResponse({ type: AdminFeedbackPageDto })
   @Header('Cache-Control', 'no-store')
   async list(
@@ -201,6 +207,26 @@ export class AdministratorFeedbackController {
     const principal = await this.authenticate(authorization);
     const rows = await run(() => this.operations.export(principal));
     return { items: rows.map(toAdminFeedbackDto) };
+  }
+
+  // Walkthrough n.º 11 (E-F19, E-F20): the Staff app opens one comment.
+  @Get(':feedbackId')
+  @ApiOperation({ operationId: 'getAdminFeedback' })
+  @ApiParam({ name: 'feedbackId', format: 'uuid' })
+  @ApiOkResponse({ type: AdminFeedbackDto })
+  @Header('Cache-Control', 'no-store')
+  async read(
+    @Param('feedbackId') feedbackId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<AdminFeedbackDto> {
+    const id = parsed(
+      uuid.safeParse(feedbackId),
+      'Invalid Feedback identifier',
+    );
+    const principal = await this.authenticate(authorization);
+    return toAdminFeedbackDto(
+      await run(() => this.operations.read({ feedbackId: id }, principal)),
+    );
   }
 
   @Post(':feedbackId/triage')

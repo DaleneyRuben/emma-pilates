@@ -11363,6 +11363,19 @@
         "operationId": "listAdminFeedback",
         "parameters": [
           {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "problem",
+                "suggestion",
+                "other"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "app",
             "required": false,
             "in": "query",
@@ -11439,6 +11452,43 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminFeedbackExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/{feedbackId}": {
+      "get": {
+        "operationId": "getAdminFeedback",
+        "parameters": [
+          {
+            "name": "feedbackId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackDto"
                 }
               }
             }

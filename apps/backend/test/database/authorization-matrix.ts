@@ -159,6 +159,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   'GET /api/v1/administrator/feedback': both('allow'),
   'GET /api/v1/administrator/feedback/export': both('allow'),
+  'GET /api/v1/administrator/feedback/{feedbackId}': both('allow'),
   'GET /api/v1/administrator/founder-memberships': administratorOnly(),
   'POST /api/v1/administrator/feedback/{feedbackId}/triage': both('allow', {
     body: { status: 'reviewed', changeNote: null },

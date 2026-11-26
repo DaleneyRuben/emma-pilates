@@ -238,11 +238,12 @@ export const createPrismaFeedbackStore = (
       return { id: stored.id, createdAt: new Date(stored.createdAt) };
     },
 
-    list: async ({ page, pageSize, status, app }) => {
+    list: async ({ page, pageSize, status, app, type }) => {
       const where: Prisma.FeedbackWhereInput = {
         deletedAt: null,
         ...(status === undefined ? {} : { status: statuses[status] }),
         ...(app === undefined ? {} : { app: apps[app] }),
+        ...(type === undefined ? {} : { type: types[type] }),
       };
       const [records, totalItems, perStatus] = await Promise.all([
         prisma.feedback.findMany({
@@ -271,6 +272,14 @@ export const createPrismaFeedbackStore = (
         reviewedCount: countOf('reviewed'),
         resolvedCount: countOf('resolved'),
       };
+    },
+
+    find: async (feedbackId) => {
+      const record = await prisma.feedback.findFirst({
+        where: { id: feedbackId, deletedAt: null },
+        select: feedbackSelect,
+      });
+      return record === null ? null : toRow(record);
     },
 
     listAll: async () =>

@@ -299,6 +299,7 @@ export * from "./listAdminExpensesParams";
 export * from "./listAdminFeedbackApp";
 export * from "./listAdminFeedbackParams";
 export * from "./listAdminFeedbackStatus";
+export * from "./listAdminFeedbackType";
 export * from "./listAdministratorSessionsParams";
 export * from "./listAdminPaymentsInvoice";
 export * from "./listAdminPaymentsParams";
