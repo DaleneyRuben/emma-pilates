@@ -42,6 +42,7 @@ export function BrandHeader({ teamAccess = false }: { teamAccess?: boolean }) {
 export function AuthenticationScreen({
   actions,
   badge,
+  bare = false,
   brand = true,
   children,
   eyebrow,
@@ -55,6 +56,8 @@ export function AuthenticationScreen({
   actions?: ReactNode;
   /** A confirmation's outcome: the disc over a centred title (MOB-035). */
   badge?: OutcomeBadgeProps;
+  /** The children stand on the screen with no white card around them (C01c3's notice). */
+  bare?: boolean;
   /** «Revisa tu correo» and its siblings draw no wordmark. */
   brand?: boolean;
   /** A small uppercase line over the title, such as «Activar cuenta». */
@@ -128,8 +131,8 @@ export function AuthenticationScreen({
           </View>
         ) : null}
         <View
-          style={[styles.panel, outcomeInCard && styles.panelOutcome]}
-          testID="authentication-panel"
+          style={[bare ? styles.barePanel : styles.panel, outcomeInCard && styles.panelOutcome]}
+          testID={bare ? "authentication-bare" : "authentication-panel"}
         >
           {outcomeInCard ? <OutcomeDisc {...badge} surface="card" /> : null}
           {outcomeInCard ? outcomeTitle : null}
@@ -174,6 +177,7 @@ export const authStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   actions: { gap: spacing.md },
+  barePanel: { gap: spacing.mdLg, marginTop: spacing.xs },
   bandBody: { gap: spacing.md, paddingBottom: spacing.xs, paddingTop: spacing.xl },
   brand: {
     alignItems: "center",

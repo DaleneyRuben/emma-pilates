@@ -162,6 +162,7 @@ export function CheckEmailScreen({
           </>
         }
         badge={{ icon: "mail", tone: "primary" }}
+        bare
         brand={false}
         title="Revisa tu correo"
       >
