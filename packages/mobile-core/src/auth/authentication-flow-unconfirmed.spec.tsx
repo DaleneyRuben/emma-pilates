@@ -127,4 +127,28 @@ describe("AuthenticationFlow with an unconfirmed registration", () => {
     await waitFor(() => expect(api.readRegistrationStatus).toHaveBeenCalled());
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
   });
+
+  // Walkthrough n.º 2 (C01c3): Resend reported the verification email
+  // bounced, so the address is wrong; a resend there would bounce again.
+  it("says the email bounced and offers to change the address", async () => {
+    const api = createApiMock({
+      readRegistrationStatus: jest.fn().mockResolvedValue("bounced"),
+    });
+    const screen = await render(
+      <AuthenticationFlow api={api} pendingRegistrationStore={createStore(carla)} />,
+    );
+
+    expect(await screen.findByText("El correo rebotó")).toBeOnTheScreen();
+    expect(
+      screen.getByText("No pudimos entregar el correo a carla@example.com. Revisa la dirección."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Reenviar correo" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Volver a iniciar sesión" })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar correo" }));
+    expect(
+      screen.getByText("Escribe el correo correcto y te enviamos un enlace nuevo."),
+    ).toBeOnTheScreen();
+  });
 });
+
