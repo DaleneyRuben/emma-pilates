@@ -25,11 +25,14 @@ const pages = (count: number) => (count === 1 ? "1 página" : `${count} páginas
  * a photo by its thumbnail, which opens it big; «Cambiar» and the × beside.
  */
 export function PickedInvoiceCard({
+  busy = false,
   onChange,
   onOpen,
   onRemove,
   picked,
 }: {
+  /** While «Subir factura» sends it, the file cannot be changed (review). */
+  busy?: boolean;
   onChange: () => void;
   onOpen: () => void;
   onRemove: () => void;
@@ -70,6 +73,8 @@ export function PickedInvoiceCard({
       <Pressable
         accessibilityLabel="Cambiar"
         accessibilityRole="button"
+        accessibilityState={{ disabled: busy }}
+        disabled={busy}
         onPress={onChange}
         style={({ pressed }) => [styles.change, pressed && styles.pressed]}
       >
@@ -78,6 +83,8 @@ export function PickedInvoiceCard({
       <Pressable
         accessibilityLabel="Quitar archivo"
         accessibilityRole="button"
+        accessibilityState={{ disabled: busy }}
+        disabled={busy}
         hitSlop={spacing.xs}
         onPress={onRemove}
         style={({ pressed }) => [styles.remove, pressed && styles.pressed]}

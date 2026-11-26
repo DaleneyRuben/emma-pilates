@@ -286,6 +286,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
               <InvoiceDropCard busy={busy} onPress={() => setChoosing(true)} />
             ) : (
               <PickedInvoiceCard
+                busy={busy}
                 onChange={() => setChoosing(true)}
                 onOpen={() => setViewing(true)}
                 onRemove={reset}
