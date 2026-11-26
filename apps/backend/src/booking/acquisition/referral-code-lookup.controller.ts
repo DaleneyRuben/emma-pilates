@@ -35,6 +35,13 @@ export class ReferralCodeLookupDto {
     description: "The holder's first name; null when unknown",
   })
   holderFirstName!: string | null;
+
+  @ApiPropertyOptional({
+    enum: ['client', 'trainer'],
+    nullable: true,
+    description: "Whose code: a Client's or a Trainer's; null when unknown",
+  })
+  holderKind!: 'client' | 'trainer' | null;
 }
 
 // Walkthrough n.º 18 (C01b5, C01b6): «Crea tu cuenta» checks a typed code

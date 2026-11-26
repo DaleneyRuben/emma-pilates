@@ -22,6 +22,7 @@ describe('referral code lookup (e2e)', () => {
       code: 'LUCIA',
       status: 'valid',
       holderFirstName: 'Lucía',
+      holderKind: 'client',
     });
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [ReferralCodeLookupController],
@@ -45,7 +46,12 @@ describe('referral code lookup (e2e)', () => {
       .get('/api/v1/referral-codes/lookup?code=lucia')
       .expect(200)
       .expect('Cache-Control', 'no-store')
-      .expect({ code: 'LUCIA', status: 'valid', holderFirstName: 'Lucía' });
+      .expect({
+        code: 'LUCIA',
+        status: 'valid',
+        holderFirstName: 'Lucía',
+        holderKind: 'client',
+      });
     expect(lookUp).toHaveBeenCalledWith('lucia');
   });
 

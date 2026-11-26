@@ -430,6 +430,7 @@ export * from "./recordFrontDeskTransferDto";
 export * from "./referralCodeAvailabilityDto";
 export * from "./referralCodeAvailabilityDtoStatus";
 export * from "./referralCodeLookupDto";
+export * from "./referralCodeLookupDtoHolderKind";
 export * from "./referralCodeLookupDtoStatus";
 export * from "./referralsDto";
 export * from "./referredClientDto";

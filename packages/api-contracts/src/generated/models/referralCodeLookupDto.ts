@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ReferralCodeLookupDtoHolderKind } from "./referralCodeLookupDtoHolderKind";
 import type { ReferralCodeLookupDtoStatus } from "./referralCodeLookupDtoStatus";
 
 export interface ReferralCodeLookupDto {
@@ -16,4 +17,9 @@ export interface ReferralCodeLookupDto {
    * @nullable
    */
   holderFirstName?: string | null;
+  /**
+   * Whose code: a Client's or a Trainer's; null when unknown
+   * @nullable
+   */
+  holderKind?: ReferralCodeLookupDtoHolderKind;
 }

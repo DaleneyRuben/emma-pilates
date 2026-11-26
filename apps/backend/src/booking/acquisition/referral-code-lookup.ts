@@ -6,6 +6,8 @@ export type ReferralCodeLookup = {
   status: 'valid' | 'unknown';
   /** Only the holder's first name, the most «Crea tu cuenta» shows. */
   holderFirstName: string | null;
+  /** A friend's code marks «Recomendación de una amiga», a Trainer's «Una instructora». */
+  holderKind: 'client' | 'trainer' | null;
 };
 
 const firstName = (name: string): string => name.trim().split(/\s+/)[0] ?? '';
@@ -36,8 +38,21 @@ export const lookUpReferralCode = async (
             staffMember: { select: { name: true } },
           },
         });
-  const name = row?.client?.name ?? row?.staffMember?.name ?? null;
-  return name === null
-    ? { code, status: 'unknown', holderFirstName: null }
-    : { code, status: 'valid', holderFirstName: firstName(name) };
+  if (row?.client != null) {
+    return {
+      code,
+      status: 'valid',
+      holderFirstName: firstName(row.client.name),
+      holderKind: 'client',
+    };
+  }
+  if (row?.staffMember != null) {
+    return {
+      code,
+      status: 'valid',
+      holderFirstName: firstName(row.staffMember.name),
+      holderKind: 'trainer',
+    };
+  }
+  return { code, status: 'unknown', holderFirstName: null, holderKind: null };
 };

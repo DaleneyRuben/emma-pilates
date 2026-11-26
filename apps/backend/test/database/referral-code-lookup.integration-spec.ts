@@ -42,6 +42,7 @@ describe('looking up a referral code before registering', () => {
       code: lucia,
       status: 'valid',
       holderFirstName: 'Lucía',
+      holderKind: 'client',
     });
   });
 
@@ -50,6 +51,21 @@ describe('looking up a referral code before registering', () => {
       code: 'NADIE-123',
       status: 'unknown',
       holderFirstName: null,
+      holderKind: null,
+    });
+  });
+
+  it('names a Trainer’s code as hers', async () => {
+    const daniela = code();
+    await prisma.staffMember.create({
+      data: { name: 'Daniela Ortiz', role: 'TRAINER', referralCode: daniela },
+    });
+
+    await expect(lookUpReferralCode(prisma, daniela)).resolves.toEqual({
+      code: daniela,
+      status: 'valid',
+      holderFirstName: 'Daniela',
+      holderKind: 'trainer',
     });
   });
 

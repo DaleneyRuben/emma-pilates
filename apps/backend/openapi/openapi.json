@@ -18081,6 +18081,15 @@
             "nullable": true,
             "example": "Lucía",
             "description": "The holder's first name; null when unknown"
+          },
+          "holderKind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer"
+            ],
+            "nullable": true,
+            "description": "Whose code: a Client's or a Trainer's; null when unknown"
           }
         },
         "required": [
