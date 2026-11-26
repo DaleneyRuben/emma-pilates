@@ -306,5 +306,5 @@ const styles = StyleSheet.create({
   column: { gap: 0 },
   gapped: { gap: spacing.md },
   note: { textAlign: "center" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

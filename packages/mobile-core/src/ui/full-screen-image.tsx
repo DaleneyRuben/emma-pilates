@@ -4,18 +4,16 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Line } from "react-native-svg";
 
 import { LineIcon } from "./line-icon";
-import { SheetTitle } from "./sheet-title";
 import { Text } from "./text";
-import { colors, spacing, surfaces } from "./tokens";
+import { colors, spacing } from "./tokens";
 
 /**
  * An image over the whole screen, drawn whole and pinch-zoomable, closed by
  * «Cerrar» or the back gesture. «dark» is the photo viewer of a receipt
- * (S12); «light» is the studio QR on Superficie (follow-up 95), which scans
- * best dark on light and sits on a card with an optional note and action;
- * `banner` sits under the top row for an action's outcome (MOB-063). The
- * title is a `SheetTitle`, white on the dark viewer; the light viewer's note
- * is `cuerpo` inside the white card, never on the 100 screen (follow-up 285).
+ * (S12). «light» is a white page (E-D30, C10v, the studio QR of follow-up
+ * 95): the `titulo-pagina` title and a «Cerrar» text button with its × on one
+ * row, the image filling the page and the `cuerpo` note under it, on no inner
+ * card. `banner` sits under the top row for an action's outcome (MOB-063).
  */
 export function FullScreenImage({
   aspectRatio = 1,
@@ -50,6 +48,12 @@ export function FullScreenImage({
         style={light ? [styles.lightImage, { aspectRatio }] : styles.darkImage}
       />
     );
+  const cross = (size: number, color: string) => (
+    <LineIcon color={color} size={size} strokeWidth={light ? 1.7 : 1.3}>
+      <Line x1="6" x2="18" y1="6" y2="18" />
+      <Line x1="18" x2="6" y1="6" y2="18" />
+    </LineIcon>
+  );
 
   return (
     <Modal
@@ -59,14 +63,20 @@ export function FullScreenImage({
       visible={visible && uri !== null}
     >
       <SafeAreaProvider>
-        <SafeAreaView style={[styles.viewer, light ? styles.lightViewer : styles.darkViewer]}>
-          <View style={styles.topRow}>
+        <SafeAreaView
+          style={[styles.viewer, light ? styles.lightViewer : styles.darkViewer]}
+          testID="full-screen-image-page"
+        >
+          <View style={light ? styles.lightTopRow : styles.topRow} testID="full-screen-image-top">
             {title === undefined ? (
               <View />
-            ) : light ? (
-              <SheetTitle>{title}</SheetTitle>
             ) : (
-              <Text accessibilityRole="header" tone="onDark" variant="titulo-seccion">
+              <Text
+                accessibilityRole="header"
+                style={styles.title}
+                tone={light ? "ink" : "onDark"}
+                variant={light ? "titulo-pagina" : "titulo-seccion"}
+              >
                 {title}
               </Text>
             )}
@@ -75,12 +85,16 @@ export function FullScreenImage({
               accessibilityRole="button"
               hitSlop={spacing.md}
               onPress={onClose}
-              style={styles.close}
+              style={light ? styles.lightClose : styles.close}
             >
-              <LineIcon color={light ? colors.text : colors.white} size={22} strokeWidth={1.3}>
-                <Line x1="6" x2="18" y1="6" y2="18" />
-                <Line x1="18" x2="6" y1="6" y2="18" />
-              </LineIcon>
+              {light ? (
+                <>
+                  {cross(18, colors.text)}
+                  <Text variant="boton">Cerrar</Text>
+                </>
+              ) : (
+                cross(22, colors.white)
+              )}
             </Pressable>
           </View>
           {banner === undefined ? null : <View style={styles.banner}>{banner}</View>}
@@ -89,24 +103,11 @@ export function FullScreenImage({
             maximumZoomScale={4}
             minimumZoomScale={1}
           >
-            {light ? (
-              <View style={styles.card} testID="full-screen-image-card">
-                {image}
-                {note === undefined ? null : (
-                  <Text style={styles.note} variant="cuerpo">
-                    {note}
-                  </Text>
-                )}
-              </View>
-            ) : (
-              <>
-                {image}
-                {note === undefined ? null : (
-                  <Text style={styles.note} tone="onDark" variant="cuerpo">
-                    {note}
-                  </Text>
-                )}
-              </>
+            {image}
+            {note === undefined ? null : (
+              <Text style={styles.note} tone={light ? "ink" : "onDark"} variant="cuerpo">
+                {note}
+              </Text>
             )}
           </ScrollView>
           {footer === undefined ? null : <View style={styles.footer}>{footer}</View>}
@@ -117,16 +118,7 @@ export function FullScreenImage({
 }
 
 const styles = StyleSheet.create({
-  banner: { paddingHorizontal: spacing.xlSm, paddingTop: spacing.sm },
-  // A phone column on a tablet: the QR stays scannable without leaving the screen.
-  card: {
-    ...surfaces.flatCard,
-    alignItems: "center",
-    gap: spacing.lgXl,
-    maxWidth: 480,
-    padding: spacing.xlSm,
-    width: "100%",
-  },
+  banner: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
   close: {
     alignItems: "center",
     height: 44,
@@ -136,16 +128,34 @@ const styles = StyleSheet.create({
   darkContent: { flexGrow: 1 },
   darkImage: { height: "100%", width: "100%" },
   darkViewer: { backgroundColor: colors.text },
-  footer: { paddingBottom: spacing.xl, paddingHorizontal: spacing.xlSm },
+  footer: { paddingBottom: spacing.xl, paddingHorizontal: spacing.lg },
+  // A text button, 44 pt tall to tap: the × then «Cerrar».
+  lightClose: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexShrink: 0,
+    gap: spacing.smd,
+    minHeight: 44,
+  },
   lightContent: {
     alignItems: "center",
-    gap: spacing.lgXl,
-    paddingHorizontal: spacing.xlSm,
-    paddingTop: spacing.xl,
+    flexGrow: 1,
+    gap: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
-  lightImage: { width: "100%" },
-  lightViewer: { backgroundColor: colors.surface },
+  // A phone column on a tablet: the QR stays scannable without leaving the screen.
+  lightImage: { borderRadius: spacing.lg, maxWidth: 480, width: "100%" },
+  lightTopRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+  },
+  lightViewer: { backgroundColor: colors.card },
   note: { alignSelf: "center", maxWidth: 300, textAlign: "center" },
+  title: { flex: 1 },
   topRow: {
     alignItems: "center",
     flexDirection: "row",

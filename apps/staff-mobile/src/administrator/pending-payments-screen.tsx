@@ -227,6 +227,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   allClearText: { flex: 1, gap: spacing.xxs },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   totalLine: { alignItems: "baseline", flexDirection: "row", flexWrap: "wrap", gap: spacing.smLg },
 });

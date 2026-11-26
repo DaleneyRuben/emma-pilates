@@ -9,10 +9,63 @@ import {
   surfaces,
   SwipeToRemove,
   Text,
+  useRemoveAction,
 } from "@pilates/mobile-core";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { reviewLine } from "./review-notices";
+
+// The rows read their swipe's «Borrar» to offer it to screen readers (E-F15).
+function PendingRow({
+  detail,
+  onPress,
+  read,
+  time,
+  title,
+}: {
+  detail: string;
+  onPress: () => void;
+  read: boolean;
+  time: string;
+  title: string;
+}) {
+  return (
+    <Pressable
+      {...useRemoveAction()}
+      accessibilityLabel={`${title}. ${detail}. ${time}`}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.row, styles.divided, pressed && styles.pressed]}
+    >
+      {read ? <View style={styles.dotSpace} /> : <View style={styles.dot} />}
+      <View style={styles.body}>
+        <Text variant="titulo-fila">{title}</Text>
+        <Text variant="secundario">{detail}</Text>
+        <Text variant="secundario">{time}</Text>
+      </View>
+      <Chevron direction="right" size={16} strokeWidth={1.5} tone="quiet" />
+    </Pressable>
+  );
+}
+
+function DecidedRow({ detail, title }: { detail: string; title: string }) {
+  return (
+    <View
+      {...useRemoveAction()}
+      accessibilityLabel={`${title}. ${detail}`}
+      accessible
+      style={[styles.row, styles.decided]}
+    >
+      <View style={styles.check}>
+        <Glyph color={colors.text} name="check" size={14} strokeWidth={1.8} />
+      </View>
+      <View style={styles.body}>
+        <Text variant="cuerpo">{title}</Text>
+        <Text variant="secundario">{detail}</Text>
+      </View>
+    </View>
+  );
+}
 
 /**
  * Walkthrough n.º 12 (E-F07): «Por revisar» on a white card, each receipt or
@@ -48,20 +101,13 @@ export function ReviewSections({
                 onRemove={() => onRemove(item)}
                 testID={`notification-swipe-${item.id}`}
               >
-                <Pressable
-                  accessibilityLabel={`${line.title}. ${line.detail}. ${time}`}
-                  accessibilityRole="button"
+                <PendingRow
+                  detail={line.detail}
                   onPress={() => onOpen(item)}
-                  style={({ pressed }) => [styles.row, styles.divided, pressed && styles.pressed]}
-                >
-                  {item.readAt ? <View style={styles.dotSpace} /> : <View style={styles.dot} />}
-                  <View style={styles.body}>
-                    <Text variant="titulo-fila">{line.title}</Text>
-                    <Text variant="secundario">{line.detail}</Text>
-                    <Text variant="secundario">{time}</Text>
-                  </View>
-                  <Chevron direction="right" size={16} strokeWidth={1.5} tone="quiet" />
-                </Pressable>
+                  read={Boolean(item.readAt)}
+                  time={time}
+                  title={line.title}
+                />
               </SwipeToRemove>
             );
           })}
@@ -80,19 +126,7 @@ export function ReviewSections({
                 onRemove={() => onRemove(item)}
                 testID={`notification-swipe-${item.id}`}
               >
-                <View
-                  accessibilityLabel={`${line.title}. ${line.detail}`}
-                  accessible
-                  style={[styles.row, styles.decided]}
-                >
-                  <View style={styles.check}>
-                    <Glyph color={colors.text} name="check" size={14} strokeWidth={1.8} />
-                  </View>
-                  <View style={styles.body}>
-                    <Text variant="cuerpo">{line.title}</Text>
-                    <Text variant="secundario">{line.detail}</Text>
-                  </View>
-                </View>
+                <DecidedRow detail={line.detail} title={line.title} />
               </SwipeToRemove>
             );
           })}

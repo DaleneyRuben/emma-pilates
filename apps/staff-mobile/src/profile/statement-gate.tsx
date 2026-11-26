@@ -56,5 +56,5 @@ export function StatementGate({
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

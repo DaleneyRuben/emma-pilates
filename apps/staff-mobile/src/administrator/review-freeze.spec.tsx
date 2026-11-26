@@ -106,9 +106,9 @@ describe("freeze review", () => {
     while (scroller && scroller.props.contentContainerStyle === undefined) {
       scroller = scroller.parent;
     }
-    expect(StyleSheet.flatten(scroller?.props.style)).toMatchObject({ marginHorizontal: -20 });
+    expect(StyleSheet.flatten(scroller?.props.style)).toMatchObject({ marginHorizontal: -16 });
     expect(StyleSheet.flatten(scroller?.props.contentContainerStyle)).toMatchObject({
-      paddingHorizontal: 20,
+      paddingHorizontal: 16,
     });
     // E9 A: what she asks for with the days counted, then the table.
     expect(

@@ -159,6 +159,6 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
   },
   intro: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   warn: { backgroundColor: colors.warningTint },
 });

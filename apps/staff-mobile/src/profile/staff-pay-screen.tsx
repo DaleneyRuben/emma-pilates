@@ -129,6 +129,6 @@ export function StaffPayScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

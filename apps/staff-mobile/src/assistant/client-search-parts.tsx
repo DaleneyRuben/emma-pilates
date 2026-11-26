@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.md,
     paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.xlSm,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
   },
   disc: {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.7 },
   // The list reaches the screen's sides so the cards' shadows show.
-  scroll: { marginHorizontal: -spacing.xlSm },
+  scroll: { marginHorizontal: -spacing.lg },
   shortcut: {
     alignItems: "center",
     flexDirection: "row",

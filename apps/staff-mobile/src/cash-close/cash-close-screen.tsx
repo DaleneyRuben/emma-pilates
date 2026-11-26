@@ -164,5 +164,5 @@ export function CashCloseScreen() {
 
 const styles = StyleSheet.create({
   column: { gap: 0 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

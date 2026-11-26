@@ -232,5 +232,5 @@ const styles = StyleSheet.create({
   failure: { textAlign: "center" },
   option: { borderColor: "transparent", borderRadius: radii.card + 2, borderWidth: 2 },
   optionSelected: { borderColor: colors.primary },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

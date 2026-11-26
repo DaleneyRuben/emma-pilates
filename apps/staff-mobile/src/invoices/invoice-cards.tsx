@@ -23,7 +23,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
-// E-D19 «Por emitir»: the dashed box that says what to upload. It looks
+// E-D19 «Por emitir»: the double-outlined box that says what to upload. It looks
 // tappable, so it is: it opens the same choice as «Elegir factura»
 // (walkthrough n.º 24).
 export function InvoiceDropCard({ busy, onPress }: { busy: boolean; onPress: () => void }) {
@@ -36,6 +36,7 @@ export function InvoiceDropCard({ busy, onPress }: { busy: boolean; onPress: () 
       onPress={onPress}
       style={({ pressed }) => [styles.drop, pressed && styles.pressed]}
     >
+      <View pointerEvents="none" style={styles.dashes} testID="invoice-drop-dashes" />
       <View style={styles.disc}>
         {busy ? (
           <ActivityIndicator accessibilityLabel="Subiendo la factura" color={colors.primary} />
@@ -104,20 +105,34 @@ export function InvoiceFileCard({
   );
 }
 
+// The width of both E-D19 drop box lines.
+const dropEdge = 1.5;
+
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   // FIX-089: the icon stands alone, with no tinted disc behind it.
   disc: { alignItems: "center", justifyContent: "center", minWidth: 28 },
-  // E-D19: a white box with the 400 dashed outline.
+  // E-D19: the dashed 400 line 6 pt inside the box's outer edge.
+  dashes: {
+    borderColor: colors.borderStrong,
+    borderRadius: radii.card - 6,
+    borderStyle: "dashed",
+    borderWidth: dropEdge,
+    bottom: 6 - dropEdge,
+    left: 6 - dropEdge,
+    position: "absolute",
+    right: 6 - dropEdge,
+    top: 6 - dropEdge,
+  },
+  // E-D19: a white box with a solid 400 edge, its text 20 pt from that edge.
   drop: {
     alignItems: "center",
     backgroundColor: colors.card,
     borderColor: colors.borderStrong,
     borderRadius: radii.card,
-    borderStyle: "dashed",
-    borderWidth: 1.5,
+    borderWidth: dropEdge,
     gap: spacing.smd,
-    padding: spacing.xlSm,
+    padding: spacing.xlSm - dropEdge,
   },
   fileRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   pressed: { opacity: 0.7 },

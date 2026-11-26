@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   dateStrip: { flexGrow: 0, marginHorizontal: -spacing.lg },
   dates: { flexDirection: "row", gap: 6, paddingHorizontal: spacing.lg },
   pills: pillRow,
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // Board N07: the time boxes, white with a 1.5 pt 400 outline and the time in `cifra`.
   timeField: {
     backgroundColor: colors.card,

@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   cards: { gap: spacing.md },
   // iPad: the block and the rows keep a phone-like column instead of stretching.
   column: { gap: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // Board N02: the facts are plain lines on the white sheet, not a card.
   sheetRows: { marginHorizontal: -spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },

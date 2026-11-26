@@ -65,5 +65,5 @@ export function ClientHistoryScreen({ route }: { route: { params: ClientContext 
 }
 
 const styles = StyleSheet.create({
-  screen: { gap: spacing.md, paddingHorizontal: spacing.xlSm },
+  screen: { gap: spacing.md, paddingHorizontal: spacing.lg },
 });

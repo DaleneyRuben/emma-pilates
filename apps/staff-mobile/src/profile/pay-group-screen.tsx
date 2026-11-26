@@ -129,6 +129,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   rowBody: { flex: 1, gap: 2 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

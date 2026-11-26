@@ -263,5 +263,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   list: { ...bodyScroll.content, paddingTop: 0 },
-  screen: { gap: spacing.smLg, paddingHorizontal: spacing.xlSm },
+  screen: { gap: spacing.smLg, paddingHorizontal: spacing.lg },
 });

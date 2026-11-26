@@ -289,5 +289,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.mdLg,
   },
   gapped: { gap: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

@@ -141,11 +141,11 @@ const styles = StyleSheet.create({
   day: {
     gap: spacing.md,
     paddingBottom: spacing.xxl,
-    paddingHorizontal: spacing.xlSm,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
   },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // The day reaches the screen's sides so the cards' shadows show.
-  scroll: { marginHorizontal: -spacing.xlSm },
+  scroll: { marginHorizontal: -spacing.lg },
   top: { gap: spacing.md },
 });

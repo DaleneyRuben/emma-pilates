@@ -106,4 +106,20 @@ describe("NotificationGroup", () => {
     expect(onOpen).toHaveBeenCalledWith(confirmed);
     expect(screen.getAllByRole("button")).toHaveLength(3);
   });
+
+  // C19c: VoiceOver and TalkBack offer «Borrar» on the row they focus.
+  it("offers «Borrar» as the swiped row's own action", async () => {
+    const onRemove = jest.fn();
+    const screen = await render(
+      <NotificationGroup items={[confirmed]} now={now} onOpen={jest.fn()} onRemove={onRemove} />,
+    );
+    const row = screen.getByRole("button", {
+      name: "Pago confirmado. Tu plan de 8 clases ya está activo.",
+    });
+
+    expect(row.props.accessibilityActions).toEqual([{ name: "remove", label: "Borrar" }]);
+    await fireEvent(row, "accessibilityAction", { nativeEvent: { actionName: "remove" } });
+
+    expect(onRemove).toHaveBeenCalledWith(confirmed);
+  });
 });

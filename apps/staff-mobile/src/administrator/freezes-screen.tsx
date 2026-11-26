@@ -98,5 +98,5 @@ export function FreezesScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

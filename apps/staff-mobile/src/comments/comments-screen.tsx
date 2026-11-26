@@ -1,11 +1,9 @@
 import {
   getListAdminFeedbackQueryKey,
   useListAdminFeedback,
-  type AdminFeedbackDto,
   type ListAdminFeedbackStatus,
 } from "@pilates/api-contracts";
 import {
-  AvatarCircle,
   colors,
   EmptyState,
   Glyph,
@@ -30,54 +28,17 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { bodyScroll } from "../ui/card-pieces";
 import {
-  appWords,
   commentCount,
-  commentTime,
   filterCount,
   filterSummary,
   statusTabs,
-  typeWords,
   type CommentFilters,
 } from "./comment-words";
 import { CommentsFilterSheet } from "./comments-filter-sheet";
+import { CommentsList, FilterButton } from "./comments-list";
 
 // One more page each time «Ver más comentarios» is tapped.
 const pageStep = 50;
-
-function CommentCard({
-  comment,
-  now,
-  onOpen,
-}: {
-  comment: AdminFeedbackDto;
-  now: Date;
-  onOpen: () => void;
-}) {
-  const time = commentTime(comment.createdAt, now);
-  const kind = `${typeWords[comment.type]} · ${appWords[comment.app]}`;
-  return (
-    <Pressable
-      accessibilityLabel={`${comment.senderName}, ${time}. ${kind}. ${comment.text}`}
-      accessibilityRole="button"
-      onPress={onOpen}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-    >
-      <AvatarCircle name={comment.senderName} size={36} />
-      <View style={styles.cardBody}>
-        <View style={styles.cardHead}>
-          <Text style={styles.name} variant="titulo-fila">
-            {comment.senderName}
-          </Text>
-          <Text variant="secundario">{time}</Text>
-        </View>
-        <Text variant="secundario">{kind}</Text>
-        <Text numberOfLines={3} variant="cuerpo">
-          {comment.text}
-        </Text>
-      </View>
-    </Pressable>
-  );
-}
 
 /**
  * Walkthrough n.º 11 (E-F18, E-F25, E-F26): the Administrator's comments in
@@ -153,16 +114,7 @@ export function CommentsScreen() {
         <View style={styles.summary}>
           <View style={styles.summaryHead}>
             <Text variant="titulo-fila">{commentCount(page.totalItems)}</Text>
-            <Pressable
-              accessibilityLabel={filtered === 0 ? "Filtrar" : `Filtrar · ${filtered}`}
-              accessibilityRole="button"
-              onPress={() => setFiltering(true)}
-              style={[styles.filter, filtered > 0 && styles.filterOn]}
-            >
-              <Text tone={filtered > 0 ? "onDark" : "ink"} variant="boton-chico">
-                {filtered === 0 ? "Filtrar" : `Filtrar · ${filtered}`}
-              </Text>
-            </Pressable>
+            <FilterButton count={filtered} onPress={() => setFiltering(true)} />
           </View>
           {summary === null ? null : (
             <View style={styles.chip}>
@@ -187,14 +139,11 @@ export function CommentsScreen() {
             variant="plain"
           />
         ) : (
-          page.items.map((comment) => (
-            <CommentCard
-              comment={comment}
-              key={comment.id}
-              now={now}
-              onOpen={() => navigation.navigate("Comment", { feedbackId: comment.id })}
-            />
-          ))
+          <CommentsList
+            comments={page.items}
+            now={now}
+            onOpen={(comment) => navigation.navigate("Comment", { feedbackId: comment.id })}
+          />
         )}
         {page.items.length < page.totalItems ? (
           <OutlinedButton
@@ -219,16 +168,6 @@ export function CommentsScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  cardBody: { flex: 1, gap: 3, minWidth: 0 },
-  cardHead: { flexDirection: "row", gap: spacing.sm, justifyContent: "space-between" },
   chip: {
     ...surfaces.soft,
     alignItems: "center",
@@ -250,18 +189,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 24,
   },
-  filter: {
-    borderColor: colors.primary,
-    borderRadius: radii.pill,
-    borderWidth: 1.5,
-    justifyContent: "center",
-    minHeight: 36,
-    paddingHorizontal: spacing.md,
-  },
-  filterOn: { backgroundColor: colors.primary },
-  name: { flex: 1 },
-  pressed: { opacity: 0.7 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   summary: { ...surfaces.card, gap: spacing.smd, padding: spacing.sm, paddingLeft: spacing.lg },
   summaryHead: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
 });

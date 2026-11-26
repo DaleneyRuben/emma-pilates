@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   backToToday: { alignSelf: "stretch", marginTop: spacing.xs },
   column: { gap: spacing.smLg },
   loading: { gap: spacing.smLg, paddingTop: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   // E1 B on a tablet: a phone's column, centred, so the hero never stretches.
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   // Board I01: a secondary chip, white with a 400 outline, at the card's end.

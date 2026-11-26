@@ -289,5 +289,5 @@ export function ConfirmCashPaymentScreen({
 const styles = StyleSheet.create({
   column: { gap: 0 },
   note: { textAlign: "center" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

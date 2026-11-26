@@ -176,5 +176,5 @@ export function CancelSessionScreen({
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smd, padding: spacing.lg },
   failure: { textAlign: "center" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });
