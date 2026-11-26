@@ -133,7 +133,7 @@ describe('the invite link', () => {
     );
 
     expect(phone).toContain(band);
-    expect(phone.indexOf(band)).toBeLessThan(phone.indexOf('Lucía te regala'));
+    expect(phone.indexOf(band)).toBeLessThan(phone.indexOf('<h1'));
     expect(phone).not.toMatch(/<body[^>]*align-items:center/);
     expect(computer).not.toContain(band);
   });

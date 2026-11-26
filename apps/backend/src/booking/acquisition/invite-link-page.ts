@@ -50,6 +50,27 @@ const button = (href: string, icon: string, label: string, id = ''): string =>
 const copyThenOpen = (code: string): string =>
   `<script>document.getElementById('copy-and-open').addEventListener('click',function(e){e.preventDefault();var go=function(){location.href=${JSON.stringify(appStoreUrl)};};try{navigator.clipboard.writeText(${JSON.stringify(code)}).then(go,go);}catch(_){go();}});</script>`;
 
+const bodyStyle =
+  "margin:0;background:#F9E7DF;color:#93615D;font-family:'Work Sans',Helvetica,Arial,sans-serif;";
+const brand = (padding: string): string =>
+  `<span style="align-self:flex-start;padding:${padding};border-radius:999px;background:#FFFBFB;font-size:12px;font-weight:700;letter-spacing:.12em;">EMMA PILATES STUDIO</span>`;
+const heading = (title: string): string =>
+  `<h1 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.1;">${escapeHtml(title)}</h1>`;
+const buttonRow = (buttons: string): string =>
+  `<div style="display:flex;gap:12px;flex-wrap:wrap;">${buttons}</div>`;
+
+// CW01: on a phone the brand pill and the title sit on the rosa 200 band.
+const phoneBody = (title: string, code: string, buttons: string): string =>
+  `</head><body style="${bodyStyle}">` +
+  `<header style="background:#E7CCBF;padding:40px 16px 22px;border-radius:0 0 28px 28px"><div style="display:flex;flex-direction:column;gap:12px">${brand('5px 10px')}${heading(title)}</div></header>` +
+  `<main style="padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px;">${code}${buttonRow(buttons)}</main>`;
+
+// CW01c: on a computer the block sits in the middle of the window.
+const computerBody = (title: string, code: string, buttons: string): string =>
+  `</head><body style="${bodyStyle}min-height:100vh;display:flex;align-items:center;justify-content:center;">` +
+  `<main style="box-sizing:border-box;width:100%;max-width:520px;padding:40px 16px;display:flex;flex-direction:column;gap:20px;">` +
+  `${brand('4px 10px')}${heading(title)}${code}${buttonRow(buttons)}</main>`;
+
 const render = (input: InviteLinkInput, iphone: boolean): string => {
   const noFreeClass = input.invite?.freeClass === false;
   const title =
@@ -90,14 +111,9 @@ const render = (input: InviteLinkInput, iphone: boolean): string => {
     `<link rel="preconnect" href="https://fonts.googleapis.com">` +
     `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` +
     `<link rel="stylesheet" href="${fontsUrl}">` +
-    // CW01c: the block sits in the middle of the window.
-    `</head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F9E7DF;color:#93615D;font-family:'Work Sans',Helvetica,Arial,sans-serif;">` +
-    `<main style="box-sizing:border-box;width:100%;max-width:520px;padding:40px 16px;display:flex;flex-direction:column;gap:20px;">` +
-    `<span style="align-self:flex-start;padding:4px 10px;border-radius:999px;background:#FFFBFB;font-size:12px;font-weight:700;letter-spacing:.12em;">EMMA PILATES STUDIO</span>` +
-    `<h1 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.1;">${escapeHtml(title)}</h1>` +
-    code +
-    `<div style="display:flex;gap:12px;flex-wrap:wrap;">${buttons}</div>` +
-    `</main>` +
+    (iphone
+      ? phoneBody(title, code, buttons)
+      : computerBody(title, code, buttons)) +
     (iphone && input.invite !== null ? copyThenOpen(input.invite.code) : '') +
     `</body></html>`
   );
