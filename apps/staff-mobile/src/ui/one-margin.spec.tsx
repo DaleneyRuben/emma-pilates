@@ -1,16 +1,23 @@
 import { Text } from "@pilates/mobile-core";
 import { render } from "@testing-library/react-native";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { StyleSheet } from "react-native";
 
 import { bodyScroll, FooterPanel } from "./card-pieces";
 import { TabFooter } from "./tab-footer";
 
+// The app's tsconfig carries no Node types: the little of `fs` this reads.
+type Fs = {
+  readdirSync: (path: string) => string[];
+  readFileSync: (path: string, encoding: "utf8") => string;
+  statSync: (path: string) => { isDirectory: () => boolean };
+};
+declare const __dirname: string;
+const { readdirSync, readFileSync, statSync } = jest.requireActual<Fs>("fs");
+
 // Every hand-written Staff source file but the specs.
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
+    const path = `${dir}/${name}`;
     if (statSync(path).isDirectory()) return sources(path);
     return /\.tsx?$/.test(name) && !/\.spec\.tsx?$/.test(name) ? [path] : [];
   });
@@ -45,7 +52,7 @@ describe("Staff screens on one 16 pt margin", () => {
   });
 
   it("pads no Staff screen with the old 20 pt side margin", () => {
-    const offenders = sources(join(__dirname, "..")).filter((path) => {
+    const offenders = sources(`${__dirname}/..`).filter((path) => {
       const text = readFileSync(path, "utf8");
       return (
         /\bscreen: \{[^}]*paddingHorizontal: spacing\.xlSm/.test(text) ||
