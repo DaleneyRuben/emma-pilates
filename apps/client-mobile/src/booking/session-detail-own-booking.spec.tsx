@@ -44,7 +44,13 @@ describe("Client Session detail with her own Booking", () => {
 
     const footer = within(screen.getByTestId("session-footer"));
     await waitFor(() => expect(footer.getByText("Ya reservaste esta clase")).toBeOnTheScreen());
-    expect(footer.getByText(/^Cancelas gratis hasta (hoy|mañana|el) .*a las \d/)).toBeOnTheScreen();
+    // C04p: a check before the status; the free line ends with its period.
+    expect(
+      footer.getByTestId("own-booking-check", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+    expect(
+      footer.getByText(/^Cancelas gratis hasta (hoy|mañana|el) .*a las \d\d:\d\d\.$/),
+    ).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar esta clase" })).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
