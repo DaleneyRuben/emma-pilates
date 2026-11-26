@@ -41,13 +41,13 @@ describe("E-F18 comments list", () => {
     const row = within(screen.getByRole("button", { name: /^Lucía Fernández/ }));
     expect(row.getByText("LF")).toBeOnTheScreen();
     expect(row.getByText(/lista de espera/)).toHaveProp("numberOfLines", 2);
-    expect(row.getByTestId("chevron")).toBeOnTheScreen();
+    expect(row.getByTestId("chevron", { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it("puts a tag before «Filtrar»", async () => {
     const screen = await render(<FilterButton count={0} onPress={noop} />);
 
     const button = within(screen.getByRole("button", { name: "Filtrar" }));
-    expect(button.getByTestId("glyph-tag")).toBeOnTheScreen();
+    expect(button.getByTestId("glyph-tag", { includeHiddenElements: true })).toBeOnTheScreen();
   });
 });
