@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache, textVariants } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
@@ -38,6 +38,17 @@ describe("Nueva clienta form", () => {
     });
     expect(screen.queryByPlaceholderText("correo@ejemplo.com")).toBeNull();
     expect(screen.getByText("Ej.: lucia@gmail.com")).toHaveStyle(textVariants.secundario);
+  });
+
+  // Walkthrough n.º 6: «Crear cuenta» ends the form and scrolls with it.
+  it("keeps «Crear cuenta» and its note at the end of the form", async () => {
+    const screen = await openNewClient();
+    const end = screen.getByTestId("new-client-end");
+
+    expect(within(end).getByTestId("new-client-submit")).toBeOnTheScreen();
+    expect(
+      within(end).getByText("Le enviaremos un enlace de activación al correo. Vence en 7 días."),
+    ).toBeOnTheScreen();
   });
 
   it("sums up what is missing at the top and marks each field on save", async () => {
