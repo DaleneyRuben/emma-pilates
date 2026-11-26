@@ -267,6 +267,12 @@ export class ReferralsDto {
   @ApiProperty()
   referralCode!: string;
 
+  @ApiProperty({
+    description:
+      'Whether her code gives a friend a Guest Pass now: only while she has a paid Plan in force (not a Courtesy Access nor her own Guest Pass). A friend registered while it is false gets no pass.',
+  })
+  codeActive!: boolean;
+
   @ApiProperty({ type: ReferredClientDto, isArray: true })
   referrals!: ReferredClientDto[];
 }

@@ -110,6 +110,7 @@ import {
 } from './grant-invite-reward';
 import { collectOwedCampaignClasses } from './owed-campaign-classes';
 import { hasEarlierRealPayment } from './gift-class-history';
+import { hasActivePaidPlan } from './host-paid-plan';
 import { isNextPlanPayment } from './next-plan-payment';
 import { listPendingTransfers } from './prisma-pending-payments';
 import { evaluationSaleSelect, evaluationStartsAtOf } from './evaluation-sale';
@@ -1331,11 +1332,12 @@ export function createPrismaPaymentCommands(
     principal: AuthenticatedPrincipal,
   ): Promise<ReferralsView> => {
     const clientId = requireClient(principal);
-    const [client, referrals] = await Promise.all([
+    const [client, codeActive, referrals] = await Promise.all([
       prisma.client.findUniqueOrThrow({
         where: { id: clientId },
         select: { referralCode: true },
       }),
+      hasActivePaidPlan(prisma, clientId, dependencies.now()),
       prisma.referral.findMany({
         where: { referrerClientId: clientId },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -1361,6 +1363,7 @@ export function createPrismaPaymentCommands(
 
     return {
       referralCode: client.referralCode,
+      codeActive,
       referrals: referrals.map((referral) => {
         const pass = referral.referred.guestPassesReceived[0] ?? null;
         const invitationStatus: InvitationStatus = (() => {

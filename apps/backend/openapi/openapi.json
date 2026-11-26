@@ -15204,6 +15204,10 @@
           "referralCode": {
             "type": "string"
           },
+          "codeActive": {
+            "type": "boolean",
+            "description": "Whether her code gives a friend a Guest Pass now: only while she has a paid Plan in force (not a Courtesy Access nor her own Guest Pass). A friend registered while it is false gets no pass."
+          },
           "referrals": {
             "type": "array",
             "items": {
@@ -15213,6 +15217,7 @@
         },
         "required": [
           "referralCode",
+          "codeActive",
           "referrals"
         ]
       },

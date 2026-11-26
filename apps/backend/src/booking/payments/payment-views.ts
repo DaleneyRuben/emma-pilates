@@ -65,6 +65,8 @@ export type InvitationStatus = 'registered' | 'class_booked' | 'bought';
 
 export type ReferralsView = {
   referralCode: string;
+  /** Whether her code opens a Guest Pass today (walkthrough n.º 22). */
+  codeActive: boolean;
   referrals: {
     referredClientId: string;
     referredName: string;
