@@ -107,7 +107,7 @@ describe("«Crea tu cuenta» with a referral code", () => {
     const screen = await openWithCode(createApiMock(), "");
     const toggle = screen.getByRole("button", { name: "¿Tienes un código de referido?" });
 
-    expect(toggle).toHaveAccessibilityState({ expanded: true });
+    expect(toggle).toBeExpanded();
     expect(
       within(toggle).getByTestId("referral-toggle-chevron-up", { includeHiddenElements: true }),
     ).toBeOnTheScreen();
