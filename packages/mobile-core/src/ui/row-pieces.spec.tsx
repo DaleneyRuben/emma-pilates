@@ -38,12 +38,12 @@ describe("CardFooter", () => {
 });
 
 describe("AvatarCircle", () => {
-  it("draws the first letter on the 50 wash, pastilla under 44 pt", async () => {
+  it("draws the initials on the 50 wash, pastilla under 44 pt", async () => {
     const screen = await render(<AvatarCircle name="valeria áñez" size={42} />);
 
-    const letter = screen.getByText("V");
+    const letter = screen.getByText("VÁ");
     expect(letter).toHaveStyle({ ...textVariants.pastilla, color: "#93615D" });
-    // The disc is fixed, so its letter never grows with the phone's text size.
+    // The disc is fixed, so its initials never grow with the phone's text size.
     expect(letter).toHaveProp("allowFontScaling", false);
     expect(screen.getByTestId("avatar-circle")).toHaveStyle({
       backgroundColor: "#FEF6F2",
