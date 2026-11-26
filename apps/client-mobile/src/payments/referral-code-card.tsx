@@ -2,6 +2,7 @@ import {
   colors,
   EditReferralCode,
   Glyph,
+  OutlinedButton,
   PrimaryButton,
   spacing,
   surfaces,
@@ -56,6 +57,30 @@ export function ReferralCodeCard({
       <View style={styles.editRow}>
         <EditReferralCode fetcher={fetcher} onChanged={onChanged} />
       </View>
+    </View>
+  );
+}
+
+/**
+ * C16h (walkthrough n.º 22): a code gives a friend a class only while its
+ * owner has a paid Plan in force, so until then the card shows the code, says
+ * when it starts working and offers the Plans instead of sharing.
+ */
+export function InactiveReferralCodeCard({
+  code,
+  onPurchase,
+}: {
+  code: string;
+  onPurchase: () => void;
+}) {
+  return (
+    <View style={styles.card} testID="referral-code-card">
+      <Text variant="etiqueta">Tu código</Text>
+      <Text selectable variant="cifra-grande">
+        {code}
+      </Text>
+      <Text variant="cuerpo">Se activa cuando compres un plan.</Text>
+      <OutlinedButton label="Comprar un plan" onPress={onPurchase} />
     </View>
   );
 }
