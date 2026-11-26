@@ -28,7 +28,9 @@ export function ButtonLabel({
   return (
     <>
       <View style={busy && styles.hidden} testID={busy ? "button-label-hidden" : undefined}>
-        <Text tone={tone} variant={variant}>
+        {/* #24 (Android): «highQuality» breaking measured «Subir factura» a
+            pixel short and clipped «factura»; «simple» measures as it lays out. */}
+        <Text textBreakStrategy="simple" tone={tone} variant={variant}>
           {label}
         </Text>
       </View>
