@@ -125,6 +125,7 @@ describe('client payments (e2e)', () => {
     commands.readCreditActivity.mockResolvedValue([]);
     commands.readReferrals.mockResolvedValue({
       referralCode: 'LUCIA-2026',
+      codeActive: true,
       referrals: [],
     });
 
@@ -291,7 +292,7 @@ describe('client payments (e2e)', () => {
       .get('/api/v1/clients/current/referrals')
       .set('authorization', bearer)
       .expect(200)
-      .expect({ referralCode: 'LUCIA-2026', referrals: [] });
+      .expect({ referralCode: 'LUCIA-2026', codeActive: true, referrals: [] });
   });
 
   it('answers 404 problems when nothing is open or paid yet', async () => {

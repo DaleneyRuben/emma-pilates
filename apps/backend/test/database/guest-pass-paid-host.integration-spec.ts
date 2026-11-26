@@ -99,6 +99,20 @@ describe('a Guest Pass needs a host with a paid Plan in force', () => {
     await expect(verified(friendId)).resolves.toBe(0);
   });
 
+  it('opens no pass when the host’s paid Plan was voided', async () => {
+    const { hostId, friendId } = await referral();
+    await giveHostPlan(prisma, { clientId: hostId, now, voided: true });
+
+    await expect(verified(friendId)).resolves.toBe(0);
+  });
+
+  it('opens no pass when the host’s paid Plan starts later', async () => {
+    const { hostId, friendId } = await referral();
+    await giveHostPlan(prisma, { clientId: hostId, now, startsInDays: 3 });
+
+    await expect(verified(friendId)).resolves.toBe(0);
+  });
+
   it('opens the pass when the host has a paid Plan in force', async () => {
     const { hostId, friendId } = await referral();
     await giveHostPlan(prisma, { clientId: hostId, now, method: 'CASH' });

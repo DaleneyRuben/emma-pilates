@@ -13,6 +13,8 @@ export const giveHostPlan = async (
     now: Date;
     method?: 'CASH' | 'COURTESY';
     endsInDays?: number;
+    startsInDays?: number;
+    voided?: boolean;
   },
 ) => {
   const author = await prisma.account.findFirstOrThrow({
@@ -46,7 +48,7 @@ export const giveHostPlan = async (
       input.now.getUTCDate(),
     ),
   );
-  const startsOn = new Date(day.getTime() - 2 * dayMs);
+  const startsOn = new Date(day.getTime() + (input.startsInDays ?? -2) * dayMs);
   const endsOn = new Date(day.getTime() + (input.endsInDays ?? 28) * dayMs);
   // A confirmed Payment and its Subscription are written together.
   await prisma.$transaction(async (transaction) => {
@@ -63,7 +65,14 @@ export const giveHostPlan = async (
         startsOn,
         method,
         collectedAtBranchId: branch?.id ?? null,
-        state: 'CONFIRMED',
+        state: input.voided === true ? 'VOIDED' : 'CONFIRMED',
+        ...(input.voided === true
+          ? {
+              voidedAt: startsOn,
+              voidedByAccountId: author.id,
+              voidReason: 'Venta registrada por error',
+            }
+          : {}),
         submittedByAccountId: author.id,
         submittedAt: startsOn,
         decidedByAccountId: author.id,
