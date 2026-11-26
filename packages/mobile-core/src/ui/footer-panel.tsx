@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     gap: spacing.sm,
     marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.xlSm,
+    // Walkthrough n.º 8: the buttons on the cards' 16 pt edge.
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.mdLg,
   },
   wide: { marginHorizontal: -tabletPageMargin, paddingHorizontal: tabletPageMargin },

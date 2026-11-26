@@ -14,10 +14,13 @@ const largeDisc = 44;
  */
 export function PersonAvatar({
   name,
+  onEmphasis = false,
   photoUri,
   size,
 }: {
   name: string;
+  /** Sits on the 600 identity card (walkthrough n.º 16), so the disc turns white. */
+  onEmphasis?: boolean;
   photoUri: string | null;
   size: number;
   /** Kept for callers; palette B draws every circle the same (FIX-089). */
@@ -35,11 +38,11 @@ export function PersonAvatar({
     );
   }
   return (
-    <View style={[styles.initials, frame]}>
+    <View style={[styles.initials, onEmphasis && styles.initialsLight, frame]}>
       {/* A fixed disc: the initials never scale out of it (follow-up 285). */}
       <Text
         allowFontScaling={false}
-        tone="onDark"
+        tone={onEmphasis ? "ink" : "onDark"}
         variant={size >= largeDisc ? "destacado" : "pastilla"}
       >
         {initials(name)}
@@ -54,5 +57,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.emphasis,
     justifyContent: "center",
   },
+  initialsLight: { backgroundColor: colors.card },
   photo: { backgroundColor: colors.emphasis },
 });

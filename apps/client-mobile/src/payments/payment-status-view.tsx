@@ -1,19 +1,15 @@
 import {
   colors,
-  FooterPanel,
-  Glyph,
-  InlineError,
   PrimaryButton,
-  ScreenHeader,
   spacing,
+  StatusLayout,
   surfaces,
-  TabletColumn,
   Text,
   TextButton,
   type GlyphName,
 } from "@pilates/mobile-core";
 import { Fragment, type ReactNode } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
@@ -61,14 +57,10 @@ type Action = { label: string; onPress: () => void; testID?: string };
  * holds the line icon on a white disc and the `titulo-pagina` title; the owner's copy and
  * the Plan's facts are white cards; the buttons sit on the white footer.
  */
-function StatusLayout({
-  children,
-  error,
-  icon,
-  note,
+function PaymentLayout({
   primaryAction,
   textAction,
-  title,
+  ...layout
 }: {
   children: ReactNode;
   error?: string | null;
@@ -79,43 +71,16 @@ function StatusLayout({
   title: string;
 }) {
   return (
-    <>
-      <ScreenHeader>
-        <View style={styles.disc} testID="payment-status-disc">
-          <Glyph
-            color={colors.text}
-            name={icon}
-            size={28}
-            strokeWidth={1.6}
-            testID={`payment-status-icon-${icon}`}
-          />
-        </View>
-        <Text accessibilityRole="header" variant="titulo-pagina">
-          {title}
-        </Text>
-      </ScreenHeader>
-      <ScrollView contentContainerStyle={styles.content} style={styles.scroll}>
-        {/* 11T: the result in a centred 480 pt column. */}
-        <TabletColumn gap={spacing.md} width={480}>
-          <View style={styles.noteCard}>
-            <Text variant="cuerpo">{note}</Text>
-          </View>
-          {children}
-          {error === undefined || error === null ? null : (
-            <View style={styles.errorBox}>
-              <Glyph color={colors.errorText} name="alert" size={18} strokeWidth={1.7} />
-              <InlineError style={styles.error}>{error}</InlineError>
-            </View>
-          )}
-        </TabletColumn>
-      </ScrollView>
-      <FooterPanel testID="payment-status-actions">
-        <TabletColumn gap={spacing.sm} width={480}>
+    <StatusLayout
+      {...layout}
+      actions={
+        <>
           {primaryAction === undefined ? null : <PrimaryButton {...primaryAction} />}
           {textAction === undefined ? null : <TextButton {...textAction} />}
-        </TabletColumn>
-      </FooterPanel>
-    </>
+        </>
+      }
+      testID="payment-status"
+    />
   );
 }
 
@@ -144,7 +109,7 @@ export function PaymentStatusView({
 
   if (state === "confirmed") {
     return (
-      <StatusLayout
+      <PaymentLayout
         error={error}
         icon="check"
         note="Tu plan ya está activo. Nos vemos pronto en el estudio."
@@ -164,14 +129,14 @@ export function PaymentStatusView({
                 ]
           }
         />
-      </StatusLayout>
+      </PaymentLayout>
     );
   }
 
   if (state === "rejected") {
     const reason = sentence(payment.rejectionReason);
     return (
-      <StatusLayout
+      <PaymentLayout
         error={error}
         icon="alert"
         note={`${reason === "" ? "" : `${reason} `}Sube uno nuevo para activar tu plan.`}
@@ -189,12 +154,12 @@ export function PaymentStatusView({
             ["Monto esperado", amount],
           ]}
         />
-      </StatusLayout>
+      </PaymentLayout>
     );
   }
 
   return (
-    <StatusLayout
+    <PaymentLayout
       error={error}
       icon="hourglass"
       note="Nuestro equipo está revisando tu comprobante. Suele tomar unos minutos en horario de atención. Te avisaremos apenas esté listo."
@@ -207,36 +172,14 @@ export function PaymentStatusView({
           ["Monto", amount],
         ]}
       />
-    </StatusLayout>
+    </PaymentLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.lg },
-  disc: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 32,
-    height: 64,
-    justifyContent: "center",
-    width: 64,
-  },
-  error: { flex: 1 },
-  errorBox: {
-    alignItems: "flex-start",
-    backgroundColor: colors.errorSurface,
-    borderColor: colors.borderStrong,
-    borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: "row",
-    gap: spacing.smLg,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
   facts: { ...surfaces.card, overflow: "hidden" },
   hairline: { backgroundColor: colors.hairline, height: 1 },
   label: { flex: 1 },
-  noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.mdLg },
   row: {
     alignItems: "center",
     flexDirection: "row",
@@ -246,6 +189,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  scroll: { flex: 1 },
   value: { flexShrink: 1, textAlign: "right" },
 });

@@ -227,6 +227,14 @@ export const glyphShapes = {
   ),
   // C2 C: a freeze's notice.
   snowflake: <Path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9" />,
+  // Perfil's «Política de privacidad» (walkthrough n.º 16, C18): a shield
+  // with a check, never the padlock (lucide shield-check).
+  shield: (
+    <>
+      <Path d="M12 3.5l7 2.5v5.5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
+      <Polyline points="9,12 11.2,14.2 15.5,9.8" />
+    </>
+  ),
   sun: (
     <>
       <Path d="M12 3v4M12 17v4M3 12h4M17 12h4" />

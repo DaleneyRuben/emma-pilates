@@ -76,6 +76,7 @@ numbered tests.
 | Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
 | Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
 | Class detail knows your bookings | A class she booked opens with «Ya reservaste esta clase», **Cancelar reserva** and «Cancelas gratis hasta …»; a class at the time of another of hers keeps «Reservar esta clase» off with «Ya tienes Mat Pilates a las 10:00 ese día…» and **Ver esa reserva** (Test 203) | «Ver esa reserva» opens Mis reservas, not that one booking |
+| One left margin, error screens and profiles | The band, section titles, cards and footers share one 16 pt left edge; «No pudimos verificar tu enlace», «Enlace ya utilizado» and «Correo verificado» use the payment status layout; both Perfil screens end with «Ayuda y legal»; Staff Perfil has the deep-rose identity card and serif section titles (Test 204) | No «Términos y condiciones» row yet: the public site has no terms page |
 | Sharing the code from one card | Client «Invita a una amiga» and Staff «Tu código de referido» show the code on one line with «Copiar código», «Compartir tu código» (the system sheet with the invite link) and «Editar código» in the same card; a friend who signs up with a Trainer's code becomes that Trainer's Client (Test 205) | The link's app half needs the 1.3.0 native build |
 | A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
 
@@ -12491,6 +12492,61 @@ D. **The API.** `GET /api/v1/sessions/{id}` as the Client answers
    classTypeName, startsAt, endsAt }`, or `null` when she holds none; Staff
    get no `yourBooking`. A cancelled booking does not count. An app build
    without this change ignores the field and keeps working.
+
+## Test 204: one left margin, error screens and profiles (mejoras del recorrido 3, 8, 16)
+
+Boards SYS «un solo margen», C11, C01k, C01k2, C01k3, C18, C18s, E-F01,
+E-F02, E-F03, E-F23 and E-F24. Run both apps against the local API.
+
+A. **One left edge (n.º 8).** On any screen with the pink band in either
+   app (Estado del pago, Mis facturas, Perfil, Horario), the back button,
+   the band's title, the section titles, the left edge of the white cards
+   and the footer buttons all start 16 pt from the screen's edge. The text
+   inside a card starts 16 pt further in. Section titles no longer sit 4 pt
+   inside the cards' edge.
+B. **The email link fails (C01k2).** Stop the API, then open a verification
+   link in the Client app: the band shows the mail icon on a white disc and
+   «No pudimos verificar tu enlace»; a white card reads «Revisa tu conexión e
+   inténtalo de nuevo.»; the white footer at the bottom holds **Reintentar**
+   and **Ir a iniciar sesión**. Start the API and tap **Reintentar**.
+C. **The link was already used (C01k3).** After a failed try whose request
+   did reach the server, **Reintentar** shows «Enlace ya utilizado» and «Si
+   ya verificaste tu correo, puedes iniciar sesión.» with **Ir a iniciar
+   sesión** alone on the footer. A first try with a used or expired link
+   shows «Enlace no válido» the same way.
+D. **The email is verified (C01k).** A fresh link shows the check on the
+   disc, «Correo verificado», «Tu cuenta está lista. Ahora puedes iniciar
+   sesión.» and **Ir a iniciar sesión** on the footer, laid out like Estado
+   del pago (C11).
+E. **Client Perfil (C18, C18s).** «Cuenta» holds only **Cambiar contraseña**,
+   the Face ID switch (where the phone has it) and **Cerrar sesión**. A last
+   section, «Ayuda y legal», holds **Enviar comentarios**, **Soporte** (with
+   «Contacto y WhatsApp del estudio» under it) and **Política de
+   privacidad** with a shield icon; Soporte and the policy open
+   `app.emmapilatesstudio.com/soporte` and `/privacidad`. There is no
+   «Términos y condiciones» row: the public site has no terms page yet.
+F. **Staff Perfil (E-F01, E-F02, E-F03).** Sign in as each role. The
+   identity is a deep-rose card: the white avatar with the initials or the
+   photo, the name in serif, the email and the phone, **Cambiar foto** as an
+   underlined white link (**Quitar foto** beside it once she has a photo)
+   and the note («Tus datos se editan en la web de administración.» for an
+   Administrator, «Tu nombre y tu correo los actualiza administración.» for
+   the others). Below, serif titles outside white cards: «Tu cuenta» (Rol,
+   Sucursal or Sucursales), «Ajustes» and «Ayuda y legal». Every row has its
+   icon on a round pale disc.
+G. **Staff rows per role (E-F03, E-F23 scrolled).** Administrator's Ajustes:
+   **Mi QR de cobro**, **Ver la app como…**, **Comentarios**,
+   **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Trainer
+   (E-F01, E-F24): **Mis pagos**, **Mi QR de cobro**, **Tu código de
+   referido**, **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**.
+   Assistant (E-F02): **Mis pagos** with «Último: …», **Mi QR de cobro**,
+   **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Each role's
+   «Ayuda y legal» holds **Enviar comentarios**, **Soporte** and **Política
+   de privacidad**, and every row opens what it opened before.
+H. **Seeing the app as someone.** As an Administrator, use **Ver la app
+   como…**: Perfil hides the photo links, **Cambiar contraseña**, **Cerrar
+   sesión** and **Enviar comentarios**, and shows **Dejar de ver como …** at
+   the end of Ajustes.
 
 ## Test 205: sharing the referral code from one card (mejoras del recorrido 26, 27)
 

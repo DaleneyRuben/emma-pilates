@@ -61,6 +61,7 @@ describe("Glyph", () => {
       "receipt",
       "refresh",
       "share",
+      "shield",
       "sun",
       "tag",
       "undo",
