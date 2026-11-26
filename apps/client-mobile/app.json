@@ -39,6 +39,11 @@
               "scheme": "https",
               "host": "links.emmapilatesstudio.com",
               "pathPrefix": "/client/authentication/"
+            },
+            {
+              "scheme": "https",
+              "host": "links.emmapilatesstudio.com",
+              "pathPrefix": "/client/invite/"
             }
           ],
           "category": [
