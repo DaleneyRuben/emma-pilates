@@ -1,12 +1,15 @@
 import {
+  type ClientEmailDeliveryDto,
   type ClientInvitationDto,
   formatListDate,
+  getClientEmailDelivery,
   getClientInvitation,
+  getGetClientEmailDeliveryQueryKey,
   getGetClientInvitationQueryKey,
   resendClientInvitation,
 } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock3 } from "lucide-react";
+import { Clock3, MailX } from "lucide-react";
 import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
@@ -19,6 +22,13 @@ import { isAccountEmailLimit } from "../staff/staff-problems";
 import { useEmailLimit } from "../staff/use-email-limit";
 
 type Result = { ok: boolean; message: string };
+
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.4,
+  className: "mt-0.5 flex-none text-texto",
+  "aria-hidden": true,
+} as const;
 
 // Walkthrough finding 95, as in the Staff app: a lapsed link «venció».
 const expiryLine = (expiresAt: string | null | undefined): string | null => {
@@ -43,6 +53,16 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
         .data as ClientInvitationDto,
     staleTime: 0,
   });
+  // Walkthrough n.º 2 (RW-clientas-ficha-correo-rebotado): Resend reported a
+  // hard bounce, so the notice says so; unreadable, it stays «Pendiente».
+  const delivery = useQuery({
+    queryKey: getGetClientEmailDeliveryQueryKey(clientId),
+    queryFn: async ({ signal }) =>
+      (await getClientEmailDelivery(clientId, { signal }, adminFetch))
+        .data as ClientEmailDeliveryDto,
+    staleTime: 0,
+  });
+  const bounced = delivery.data?.bounced === true;
   const resend = useMutation({
     mutationFn: async () =>
       (await resendClientInvitation(clientId, undefined, adminFetch))
@@ -93,23 +113,20 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
   return (
     <>
       <section className={cn(avisoClass, "flex items-start gap-3")}>
-        <Clock3
-          size={18}
-          strokeWidth={1.4}
-          className="mt-0.5 flex-none text-texto"
-          aria-hidden="true"
-        />
+        {bounced ? <MailX {...iconProps} /> : <Clock3 {...iconProps} />}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h3 className="tipo-titulo-fila text-texto">
-            Pendiente de activación
+            {bounced ? "El correo rebotó" : "Pendiente de activación"}
           </h3>
           <p className="tipo-secundario text-texto">
-            Todavía no abrió el enlace del correo para crear su contraseña.
+            {bounced
+              ? `No pudimos entregar el correo de activación a ${delivery.data?.email}: esa dirección no existe. Confirma el correo con la clienta.`
+              : "Todavía no abrió el enlace del correo para crear su contraseña."}
           </p>
-          {expiry === null ? null : (
+          {expiry === null || bounced ? null : (
             <p className="tipo-secundario text-texto">{expiry}</p>
           )}
-          {invitation.data === undefined ? null : (
+          {invitation.data === undefined || bounced ? null : (
             <Button
               variant="link"
               size="sm"
