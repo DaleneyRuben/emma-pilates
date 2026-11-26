@@ -12512,8 +12512,8 @@ B. **The Trainer's card.** Log in to the Staff app as a fixture Trainer and
    free class.
 C. **Attribution.** Open the Trainer's link on a desktop browser: «Ana te
    invita a Emma Pilates Studio» with both stores. Register a new Client with
-   that code: the admin web's Clientas file names the Trainer under «Cómo nos
-   conoció», as before this change.
+   that code: the admin web's Clientas file shows «La trajo la instructora»
+   with the Trainer's name under «¿Cómo nos conociste?», as before.
 
 ## Test 206: a bounced email (mejoras del recorrido 2)
 
