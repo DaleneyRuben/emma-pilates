@@ -69,7 +69,7 @@ describe('what a review or feedback notice is about', () => {
     expect(subjects.get(pendingNotice.id)).toEqual({
       review: {
         subject: 'payment',
-        clientName: expect.stringContaining('Ana Espera'),
+        clientName: expect.stringContaining('Ana Espera') as string,
         planName: 'Paquete de 8 clases',
         amountCentavos: waiting.amountDueCentavos,
         startsOn: null,
@@ -106,7 +106,7 @@ describe('what a review or feedback notice is about', () => {
     });
     const freeze = await world.prisma.freeze.create({
       data: {
-        subscriptionId: client.subscriptions[0]!.id,
+        subscriptionId: client.subscriptions[0].id,
         clientId: client.id,
         startsOn: new Date('2026-11-23T00:00:00.000Z'),
         endsOn: new Date('2026-11-29T00:00:00.000Z'),
@@ -127,7 +127,7 @@ describe('what a review or feedback notice is about', () => {
     expect(subjects.get(freezeNotice.id)?.review).toEqual({
       subject: 'freeze',
       clientName: client.name,
-      planName: client.subscriptions[0]!.planNameSnapshot,
+      planName: client.subscriptions[0].planNameSnapshot,
       amountCentavos: null,
       startsOn: '2026-11-23',
       endsOn: '2026-11-29',
