@@ -19,14 +19,23 @@ import {
 } from "@pilates/mobile-core";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
-// E5 «Por emitir»: the dashed box that says what to upload.
-export function InvoiceDropCard({ busy }: { busy: boolean }) {
+// E-D19 «Por emitir»: the dashed box that says what to upload. It looks
+// tappable, so it is: it opens the same choice as «Elegir factura»
+// (walkthrough n.º 24).
+export function InvoiceDropCard({ busy, onPress }: { busy: boolean; onPress: () => void }) {
   return (
-    <View style={styles.drop}>
+    <Pressable
+      accessibilityLabel="Sube la factura emitida"
+      accessibilityRole="button"
+      accessibilityState={{ busy, disabled: busy }}
+      disabled={busy}
+      onPress={onPress}
+      style={({ pressed }) => [styles.drop, pressed && styles.pressed]}
+    >
       <View style={styles.disc}>
         {busy ? (
           <ActivityIndicator accessibilityLabel="Subiendo la factura" color={colors.primary} />
@@ -35,8 +44,8 @@ export function InvoiceDropCard({ busy }: { busy: boolean }) {
         )}
       </View>
       <Text variant="titulo-fila">{busy ? "Subiendo la factura…" : "Sube la factura emitida"}</Text>
-      <Text variant="secundario">PDF o foto, hasta 10 MB</Text>
-    </View>
+      <Text variant="secundario">Toca para elegir un PDF o una imagen, hasta 10 MB</Text>
+    </Pressable>
   );
 }
 
@@ -111,6 +120,7 @@ const styles = StyleSheet.create({
     padding: spacing.xlSm,
   },
   fileRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
+  pressed: { opacity: 0.7 },
   fileText: { flex: 1, gap: 2 },
   thumb: {
     alignItems: "center",

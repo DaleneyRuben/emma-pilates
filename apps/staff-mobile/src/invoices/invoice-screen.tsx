@@ -10,9 +10,11 @@ import {
   ConfirmationSheet,
   EmphasisCard,
   FormScrollView,
+  FullScreenImage,
   IconRow,
   LoadingState,
   NoticeRow,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -22,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -30,6 +32,7 @@ import { BackBar } from "../ui/back-bar";
 import { invoiceStyles as styles } from "./invoice-styles";
 import { InvoiceApiError, createInvoicesApi } from "./invoices-api";
 import { InvoiceDropCard, InvoiceFileCard } from "./invoice-cards";
+import { PickedInvoiceCard } from "./invoice-picked-card";
 import { InvoiceSourceSheet, type InvoiceSource } from "./invoice-source-sheet";
 import type { PickedImage } from "../uploads/image-upload";
 import { loadDocumentUpload } from "../uploads/load-document-upload";
@@ -79,6 +82,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
   const [failure, setFailure] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
+  const [viewing, setViewing] = useState(false);
 
   const header = <BackBar onBack={() => navigation.goBack()} title="Factura del pago" />;
   if (invoice.isPending) {
@@ -143,7 +147,8 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
 
   const upload = async (from: InvoiceSource) => {
     setChoosing(false);
-    reset();
+    // The file she already chose stays until another one replaces it.
+    setFailure(null);
     let pickPdf: (() => Promise<PickedImage | null>) | undefined;
     if (from === "document") {
       try {
@@ -162,9 +167,16 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
       );
       return;
     }
+    // E-D27 / E-D28: the file shows first; «Subir factura» sends it.
     if (photo === null) return;
+    reset();
     setPicked(photo);
-    await send(photo, null);
+  };
+
+  // E-D30's «Cambiar» closes the big view first: iOS presents one modal at a time.
+  const changeFromViewer = () => {
+    setViewing(false);
+    setTimeout(() => setChoosing(true), Platform.OS === "ios" ? 400 : 0);
   };
 
   const remove = async () => {
@@ -208,7 +220,15 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
         </>
       ) : current.file === null ? (
         <>
-          <PrimaryButton busy={busy} label="Subir factura" onPress={() => setChoosing(true)} />
+          {picked === null ? (
+            <PrimaryButton label="Elegir factura" onPress={() => setChoosing(true)} />
+          ) : (
+            <PrimaryButton
+              busy={busy}
+              label="Subir factura"
+              onPress={() => void send(picked, null)}
+            />
+          )}
           <Text style={styles.note} variant="secundario">
             {`Al subirla, el pago queda como factura emitida y ${firstName} la ve en su app.`}
           </Text>
@@ -262,9 +282,16 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
             )}
           </RowCard>
           {current.file === null ? (
-            canUpload ? (
-              <InvoiceDropCard busy={busy} />
-            ) : null
+            !canUpload ? null : picked === null ? (
+              <InvoiceDropCard busy={busy} onPress={() => setChoosing(true)} />
+            ) : (
+              <PickedInvoiceCard
+                onChange={() => setChoosing(true)}
+                onOpen={() => setViewing(true)}
+                onRemove={reset}
+                picked={picked}
+              />
+            )
           ) : (
             <InvoiceFileCard file={current.file} paymentId={paymentId} />
           )}
@@ -278,6 +305,17 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
           title={notice}
         />
       )}
+      {/* E-D30: the chosen photo big, pinch to zoom, before it is sent. */}
+      <FullScreenImage
+        footer={<OutlinedButton label="Cambiar" onPress={changeFromViewer} />}
+        label="Factura elegida"
+        note="Pellizca para ampliar. Revisa que se lean el NIT, el nombre y el monto."
+        onClose={() => setViewing(false)}
+        title="Tu factura"
+        tone="light"
+        uri={picked !== null && picked.mediaType !== "application/pdf" ? picked.uri : null}
+        visible={viewing}
+      />
       <InvoiceSourceSheet
         onChoose={(from) => void upload(from)}
         onDismiss={() => setChoosing(false)}
