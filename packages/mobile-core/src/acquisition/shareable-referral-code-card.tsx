@@ -11,8 +11,8 @@ import { EditReferralCode } from "./own-referral-code";
 /**
  * «Invita a una amiga» (C16) and the Staff «Tu código de referido» (E-F13):
  * one card with the code and an outlined copy icon, «Compartir tu código» as
- * its one solid action, and «Editar código» centred below. The Staff app
- * draws it as the 600 hero (`emphasis`). A long code shrinks to fit one line
+ * its one solid action, and «Editar código» centred below. Both apps draw it
+ * as the 600 hero (`emphasis`, C16 and E-F13). A long code shrinks to fit one line
  * and never breaks mid-word (walkthrough n.º 27, E-F21).
  */
 export function ShareableReferralCodeCard({
@@ -71,7 +71,7 @@ export function ShareableReferralCodeCard({
         </Pressable>
       </View>
       {emphasis ? (
-        <OnEmphasisButton label="Compartir tu código" onPress={onShare} wide />
+        <OnEmphasisButton icon="share" label="Compartir tu código" onPress={onShare} wide />
       ) : (
         <PrimaryButton label="Compartir tu código" onPress={onShare} />
       )}
