@@ -175,4 +175,36 @@ describe('what a review or feedback notice is about', () => {
       },
     });
   });
+
+  // Review: a comment removed since its notice is no longer described.
+  it('does not describe a removed comment', async () => {
+    const lucia = await world.prisma.account.findFirstOrThrow({
+      where: { email: 'lucia@example.com' },
+      select: { id: true },
+    });
+    const feedback = await world.prisma.feedback.create({
+      data: {
+        id: randomUUID(),
+        accountId: lucia.id,
+        app: 'CLIENT',
+        senderRole: 'client',
+        type: 'OTHER',
+        text: 'Un comentario que luego se quitó de la lista.',
+        appVersion: '1.1.0',
+        appBuild: '12',
+        platform: 'IOS',
+        osVersion: '26.2',
+        createdAt: now,
+        deletedAt: now,
+      },
+      select: { id: true },
+    });
+    const feedbackNotice = notice('feedback_received', 'feedback', feedback.id);
+
+    const subjects = await readNotificationSubjects(world.prisma, [
+      feedbackNotice,
+    ]);
+
+    expect(subjects.get(feedbackNotice.id)?.feedback ?? null).toBeNull();
+  });
 });
