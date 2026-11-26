@@ -42,6 +42,8 @@ const conflicts: Record<string, string> = {
 };
 const uploadFailure = "No pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.";
 const rejected = "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.";
+// Walkthrough n.º 25: the phone's picker failing is not a connection problem.
+const pickerFailure = "No pudimos abrir tus archivos. Inténtalo de nuevo.";
 // FIX-049: a build made before expo-document-picker has no file picker.
 const pdfNeedsUpdate = "Para subir un PDF, actualiza la app. Mientras tanto puedes subir una foto.";
 
@@ -151,17 +153,18 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
         return;
       }
     }
+    let photo: PickedImage | null;
     try {
-      const photo =
-        pickPdf !== undefined
-          ? await pickPdf()
-          : await (await loadImageUpload()).pickImage({ camera: from === "camera" });
-      if (photo === null) return;
-      setPicked(photo);
-      await send(photo, null);
+      photo = pickPdf !== undefined ? await pickPdf() : await (await loadImageUpload()).pickImage();
     } catch (error) {
-      setFailure(failureOf(error));
+      setFailure(
+        error instanceof Error && error.message === "upload_rejected" ? rejected : pickerFailure,
+      );
+      return;
     }
+    if (photo === null) return;
+    setPicked(photo);
+    await send(photo, null);
   };
 
   const remove = async () => {

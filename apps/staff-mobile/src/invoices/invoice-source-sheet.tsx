@@ -1,21 +1,27 @@
 import { colors, Glyph, spacing, surfaces, Text } from "@pilates/mobile-core";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
 
-export type InvoiceSource = "camera" | "library" | "document";
+export type InvoiceSource = "library" | "document";
 
 const choices: readonly {
   source: InvoiceSource;
   label: string;
-  icon: "image" | "upload" | "document";
+  icon: "image" | "document";
 }[] = [
-  { source: "camera", label: "Tomar foto", icon: "image" },
-  { source: "library", label: "Elegir de la galería", icon: "upload" },
+  // Owner, 26 Nov (walkthrough n.º 25): no «Tomar foto»; the invoice is a file.
+  { source: "library", label: "Elegir una imagen", icon: "image" },
   // FIX-049: the issued PDF from the phone's files.
   { source: "document", label: "Elegir un PDF", icon: "document" },
 ];
 
+// iOS reports the close; this only guards a close it never reports.
+const closeFallbackMilliseconds = 500;
+
 // E5 «Elegir archivo» (E-D20): where the invoice comes from, a photo or a PDF.
 // Each choice is a `titulo-fila` row; «Cancelar» is a button, `boton`.
+// iOS cannot present the picker while this sheet is still closing (walkthrough
+// n.º 25), so there the choice is handed over once the Modal has dismissed.
 export function InvoiceSourceSheet({
   onChoose,
   onDismiss,
@@ -25,8 +31,43 @@ export function InvoiceSourceSheet({
   onDismiss: () => void;
   visible: boolean;
 }) {
+  const chosen = useRef<InvoiceSource | null>(null);
+  const fallback = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handOver = () => {
+    if (fallback.current !== null) clearTimeout(fallback.current);
+    fallback.current = null;
+    const source = chosen.current;
+    chosen.current = null;
+    if (source !== null) onChoose(source);
+  };
+
+  useEffect(
+    () => () => {
+      if (fallback.current !== null) clearTimeout(fallback.current);
+    },
+    [],
+  );
+
+  const choose = (source: InvoiceSource) => {
+    chosen.current = source;
+    onDismiss();
+    if (Platform.OS !== "ios") {
+      handOver();
+      return;
+    }
+    fallback.current = setTimeout(handOver, closeFallbackMilliseconds);
+  };
+
   return (
-    <Modal animationType="slide" onRequestClose={onDismiss} transparent visible={visible}>
+    <Modal
+      animationType="slide"
+      onDismiss={handOver}
+      onRequestClose={onDismiss}
+      testID="invoice-source-sheet"
+      transparent
+      visible={visible}
+    >
       <Pressable
         accessibilityLabel="Cerrar"
         accessibilityRole="button"
@@ -40,7 +81,7 @@ export function InvoiceSourceSheet({
               accessibilityRole="button"
               accessibilityLabel={choice.label}
               key={choice.source}
-              onPress={() => onChoose(choice.source)}
+              onPress={() => choose(choice.source)}
               style={({ pressed }) => [
                 styles.choice,
                 index > 0 && styles.divided,

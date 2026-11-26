@@ -1,6 +1,6 @@
-import { act, fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { useState } from "react";
-import { Modal, Platform } from "react-native";
+import { Platform } from "react-native";
 
 import { InvoiceSourceSheet, type InvoiceSource } from "./invoice-source-sheet";
 
@@ -21,7 +21,6 @@ const setOs = (os: typeof Platform.OS) => {
 describe("InvoiceSourceSheet", () => {
   afterEach(() => {
     setOs(originalOs);
-    jest.useRealTimers();
   });
 
   it("offers an image or a PDF, and no camera (owner, 26 Nov)", async () => {
@@ -34,30 +33,29 @@ describe("InvoiceSourceSheet", () => {
 
   it("on iOS opens the picker only once the sheet has finished closing", async () => {
     setOs("ios");
-    jest.useFakeTimers();
     const onChoose = jest.fn();
     const screen = await render(<Harness onChoose={onChoose} />);
+    const dismissed: () => void = screen.getByTestId("invoice-source-sheet").props.onDismiss;
 
     await fireEvent.press(screen.getByRole("button", { name: "Elegir un PDF" }));
     expect(onChoose).not.toHaveBeenCalled();
 
-    await act(() => screen.UNSAFE_getByType(Modal).props.onDismiss());
+    await act(() => dismissed());
     expect(onChoose).toHaveBeenCalledWith("document");
 
-    await act(() => jest.runOnlyPendingTimers());
+    await act(() => new Promise((resolve) => setTimeout(resolve, 700)));
     expect(onChoose).toHaveBeenCalledTimes(1);
   });
 
   it("on iOS still opens the picker if the close is never reported", async () => {
     setOs("ios");
-    jest.useFakeTimers();
     const onChoose = jest.fn();
     const screen = await render(<Harness onChoose={onChoose} />);
 
     await fireEvent.press(screen.getByRole("button", { name: "Elegir una imagen" }));
-    await act(() => jest.runOnlyPendingTimers());
+    expect(onChoose).not.toHaveBeenCalled();
 
-    expect(onChoose).toHaveBeenCalledWith("library");
+    await waitFor(() => expect(onChoose).toHaveBeenCalledWith("library"));
     expect(onChoose).toHaveBeenCalledTimes(1);
   });
 
