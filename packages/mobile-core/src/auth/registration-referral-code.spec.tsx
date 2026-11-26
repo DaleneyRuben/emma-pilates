@@ -103,6 +103,50 @@ describe("«Crea tu cuenta» with a referral code", () => {
     expect(api.register).not.toHaveBeenCalled();
   });
 
+  it("keeps «¿Tienes un código de referido?» above the open field, its chevron up", async () => {
+    const screen = await openWithCode(createApiMock(), "");
+    const toggle = screen.getByRole("button", { name: "¿Tienes un código de referido?" });
+
+    expect(toggle).toHaveAccessibilityState({ expanded: true });
+    expect(
+      within(toggle).getByTestId("referral-toggle-chevron-up", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
+  it("draws a check before «La marcamos por el código de Lucía.» (C01b5)", async () => {
+    const api = createApiMock({
+      lookUpReferralCode: jest.fn().mockResolvedValue({
+        code: "LUCIA",
+        holderFirstName: "Lucía",
+        holderKind: "client",
+        status: "valid",
+      }),
+    });
+    const screen = await openWithCode(api, "lucia");
+
+    await screen.findByText("La marcamos por el código de Lucía.");
+    expect(
+      screen.getByTestId("acquisition-channel-note-check", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
+  it("draws an alert circle before an unknown code's error (C01b6)", async () => {
+    const api = createApiMock({
+      lookUpReferralCode: jest.fn().mockResolvedValue({
+        code: "LUCIAA",
+        holderFirstName: null,
+        holderKind: null,
+        status: "unknown",
+      }),
+    });
+    const screen = await openWithCode(api, "luciaa");
+
+    await screen.findByText("No encontramos el código LUCIAA. Revisa cómo lo escribiste.");
+    expect(
+      screen.getByTestId("inline-error-icon-alert", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
   it("keeps «Crear cuenta» and the way to Login at the end of the form, never pinned", async () => {
     const screen = await openWithCode(createApiMock(), "");
     const end = screen.getByTestId("auth-actions");
