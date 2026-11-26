@@ -12434,7 +12434,12 @@ A. **The link on a computer (CW01c).** Open
    unknown code shows «Tu primera clase en Emma Pilates Studio» and the two
    stores. The page source carries `og:title`, `og:description` and
    `og:image` (`https://app.emmapilatesstudio.com/compartir.png`), so
-   WhatsApp draws a card.
+   WhatsApp draws a card. As on the board, the title and the code are in
+   Lora and the rest in Work Sans, the block sits in the middle of the
+   window, and the code card has its shadow. The code of a Client without a
+   paid Plan in force (Mariana, Sofía) reads «Mariana te invita a Emma
+   Pilates Studio» and «Usa su código MARIANA al crear tu cuenta.», with no
+   free class, as a Trainer's does.
 B. **iPhone (CW01).** With an iPhone user agent (Safari on the Simulator) the
    page has one button, **Copiar código y abrir App Store**: it copies the
    code and opens the App Store.
