@@ -22,6 +22,7 @@ import type { LinkSource } from "./ingress/link-ingress";
 import { createExpoPushPlatform } from "./notifications/expo-push-platform";
 import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
+import { useForgetLinkWhenSignedIn } from "./ingress/forget-link-when-signed-in";
 import { useVerifiedLinkIntent, VerifiedLinkProvider } from "./ingress/verified-link-provider";
 import {
   getAllowedLinkHosts,
@@ -163,6 +164,11 @@ function IdentityNavigation({
 }) {
   const identity = useMobileIdentity();
   const { clearIntent, intent } = useVerifiedLinkIntent();
+  useForgetLinkWhenSignedIn({
+    clearIntent,
+    intent,
+    signedIn: identity.session !== null && identity.session !== undefined,
+  });
   // The fonts are loaded by now; once the session check has answered, the
   // first screen (Login or the saved session's) is drawn under the splash.
   useReleaseLaunchSplash(identity.status !== "restoring");
