@@ -12,12 +12,14 @@ import {
   footerEdges,
   FooterPanel,
   FormScrollView,
+  FullScreenImage,
   Glyph,
   InlineError,
   invoiceChoiceFrom,
   invoiceDataPayload,
   invoiceIncompleteNote,
   LoadingState,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -42,7 +44,7 @@ import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
 import { InvoiceDisclosure } from "./invoice-disclosure";
-import { ReceiptRow } from "./receipt-row";
+import { ReceiptRow, receiptStateOf } from "./receipt-row";
 import { TransferQrCard } from "./transfer-qr-card";
 
 type PaymentNavigation = {
@@ -76,11 +78,15 @@ export function PaymentScreen() {
   };
   const invoiceData = invoiceDataPayload(invoice);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
-  const [uploading, setUploading] = useState(false);
+  // Walkthrough n.º 7 (C10u): the picked photo and how far its upload got.
+  const [upload, setUpload] = useState<{ localUri: string; progress: number } | null>(null);
+  const uploading = upload !== null;
+  const [viewing, setViewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const offReason =
-    receipt === null
+  const offReason = uploading
+    ? "Espera a que termine de subir"
+    : receipt === null
       ? "Adjunta tu comprobante para continuar"
       : invoiceData === "incomplete"
         ? (invoiceIncompleteNote(invoice) ?? undefined)
@@ -119,14 +125,18 @@ export function PaymentScreen() {
     try {
       const picked = await pickReceipt();
       if (picked === null) return;
-      setUploading(true);
-      setReceipt(await uploadReceipt(picked, current.id, fetcher));
+      setUpload({ localUri: picked.uri, progress: 0 });
+      setReceipt(
+        await uploadReceipt(picked, current.id, fetcher, undefined, (progress) =>
+          setUpload({ localUri: picked.uri, progress }),
+        ),
+      );
     } catch (failure) {
       if (__DEV__) console.warn("receipt upload failed", failure);
       const code = failure instanceof Error ? failure.message : "";
       setError(uploadErrorCopy[code] ?? "No pudimos subir el comprobante. Inténtalo de nuevo.");
     } finally {
-      setUploading(false);
+      setUpload(null);
     }
   };
 
@@ -188,9 +198,13 @@ export function PaymentScreen() {
               <View style={styles.group}>
                 <ReceiptRow
                   onAttach={() => void attach()}
+                  onOpen={() => setViewing(true)}
                   onRemove={() => setReceipt(null)}
-                  receipt={receipt}
-                  uploading={uploading}
+                  receipt={
+                    upload !== null
+                      ? { ...upload, status: "uploading" }
+                      : receiptStateOf(receipt, false)
+                  }
                 />
                 <View style={styles.hairline} />
                 <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
@@ -224,6 +238,25 @@ export function PaymentScreen() {
           />
         </TabletColumn>
       </FooterPanel>
+      {/* C10v (walkthrough n.º 23): the receipt big, to check before sending. */}
+      <FullScreenImage
+        footer={
+          <OutlinedButton
+            label="Cambiar comprobante"
+            onPress={() => {
+              setViewing(false);
+              void attach();
+            }}
+          />
+        }
+        label="Comprobante adjunto"
+        note="Revisa que se lean el monto, la fecha y el destinatario."
+        onClose={() => setViewing(false)}
+        title="Tu comprobante"
+        tone="light"
+        uri={receipt?.localUri ?? null}
+        visible={viewing}
+      />
     </Screen>
   );
 }

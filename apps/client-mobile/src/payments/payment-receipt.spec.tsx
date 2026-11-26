@@ -33,7 +33,7 @@ describe("the transfer receipt on Pago por transferencia", () => {
     const putDone = new Promise<void>((resolve) => {
       finishPut = resolve;
     });
-    const fetcher = routeFetcher({
+    const routes = routeFetcher({
       ...baseRoutes(0),
       "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
       "POST /api/v1/uploads": () =>
@@ -41,10 +41,7 @@ describe("the transfer receipt on Pago por transferencia", () => {
           { id: "asset-1", uploadUrl: "/u", expiresAt: "2026-09-21T15:15:00.000Z" },
           201,
         ),
-      "PUT /api/v1/uploads/asset-1/object": async () => {
-        await putDone;
-        return new Response(null, { status: 204 });
-      },
+      "PUT /api/v1/uploads/asset-1/object": () => new Response(null, { status: 204 }),
       "POST /api/v1/uploads/asset-1/finalize": () =>
         jsonResponse({ id: "asset-1", state: "processing" }, 202),
       "/api/v1/uploads/asset-1": () =>
@@ -52,6 +49,11 @@ describe("the transfer receipt on Pago por transferencia", () => {
       "POST /api/v1/purchase-intents/intent-1/receipt": () =>
         jsonResponse({ ...intent, receiptAttached: true }),
     });
+    // The PUT holds until the test lets it finish, to see the upload in flight.
+    const fetcher = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (init?.method === "PUT") await putDone;
+      return routes(input, init);
+    }) as ReturnType<typeof routeFetcher>;
     const screen = await openPlanDetail(fetcher);
     await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
     await fireEvent.press(

@@ -33,7 +33,7 @@ import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { ReceiptRow } from "../payments/receipt-row";
+import { ReceiptRow, receiptStateOf } from "../payments/receipt-row";
 import { pickReceipt, type AttachedReceipt } from "../payments/receipt-upload";
 import { TransferQrCard } from "../payments/transfer-qr-card";
 import { idempotency, uploadImage } from "../uploads/image-upload";
@@ -186,9 +186,8 @@ export function BookEvaluationScreen({
                   <ReceiptRow
                     onAttach={() => void attach()}
                     onRemove={() => setReceipt(null)}
-                    receipt={receipt}
+                    receipt={receiptStateOf(receipt, uploading)}
                     testID="evaluation-receipt"
-                    uploading={uploading}
                   />
                 </View>
               </View>
