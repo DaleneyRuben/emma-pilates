@@ -11,7 +11,12 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 
-import { decodeBase64, encodeBase64 } from "@pilates/mobile-core";
+import {
+  decodeBase64,
+  encodeBase64,
+  uploadMaxEdge,
+  waitForUploadReady,
+} from "@pilates/mobile-core";
 
 // The Client app's upload protocol (UPL-001): pick from the library, convert
 // what the API does not accept, then declare, put, finalize, and poll until
@@ -23,19 +28,14 @@ export type PickedImage = {
   bytes: Uint8Array<ArrayBuffer>;
 };
 
-const verificationPollMilliseconds = 700;
-const verificationPollAttempts = 40;
-
-const wait = (milliseconds: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
-
 export const idempotency = () => ({
   headers: { "idempotency-key": Crypto.randomUUID() },
 });
 
 // MOB-065: the system photo picker runs outside the app (PHPicker on iOS, the
 // photo picker on Android), so no photo library permission is asked for.
-export async function pickImage(): Promise<PickedImage | null> {
+// A profile photo asks for a smaller `maxEdge` (walkthrough n.º 14).
+export async function pickImage({ maxEdge = uploadMaxEdge } = {}): Promise<PickedImage | null> {
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
     // The original, so the photo is encoded only once, by ensureAcceptedFormat.
@@ -43,7 +43,7 @@ export async function pickImage(): Promise<PickedImage | null> {
   });
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
-  const { uri, mediaType } = await ensureAcceptedFormat(asset);
+  const { uri, mediaType } = await ensureAcceptedFormat(asset, maxEdge);
   const base64 = await FileSystem.readAsStringAsync(uri, {
     encoding: FileSystem.EncodingType.Base64,
   });
@@ -55,26 +55,29 @@ export async function pickImage(): Promise<PickedImage | null> {
 // pick, whatever its format, is re-encoded once as JPEG at that size: a
 // 12-megapixel photo or a PNG screenshot shrinks from megabytes to a few
 // hundred kilobytes, and HEIC or an unknown type becomes an accepted format.
-const uploadMaxEdge = 2048;
 const uploadJpegQuality = 0.8;
 
-async function ensureAcceptedFormat(asset: {
-  uri: string;
-  width?: number;
-  height?: number;
-}): Promise<{ uri: string; mediaType: CreatePendingUploadDtoMediaType }> {
-  const converted = await ImageManipulator.manipulateAsync(asset.uri, downscaleActions(asset), {
-    compress: uploadJpegQuality,
-    format: ImageManipulator.SaveFormat.JPEG,
-  });
+async function ensureAcceptedFormat(
+  asset: { uri: string; width?: number; height?: number },
+  maxEdge: number,
+): Promise<{ uri: string; mediaType: CreatePendingUploadDtoMediaType }> {
+  const converted = await ImageManipulator.manipulateAsync(
+    asset.uri,
+    downscaleActions(asset, maxEdge),
+    {
+      compress: uploadJpegQuality,
+      format: ImageManipulator.SaveFormat.JPEG,
+    },
+  );
   return { uri: converted.uri, mediaType: "image/jpeg" };
 }
 
-function downscaleActions({ width = 0, height = 0 }: { width?: number; height?: number }) {
-  if (Math.max(width, height) <= uploadMaxEdge) return [];
-  return width >= height
-    ? [{ resize: { width: uploadMaxEdge } }]
-    : [{ resize: { height: uploadMaxEdge } }];
+function downscaleActions(
+  { width = 0, height = 0 }: { width?: number; height?: number },
+  maxEdge: number,
+) {
+  if (Math.max(width, height) <= maxEdge) return [];
+  return width >= height ? [{ resize: { width: maxEdge } }] : [{ resize: { height: maxEdge } }];
 }
 
 // Declares, uploads, finalizes, and waits until the worker has verified the
@@ -83,7 +86,7 @@ export async function uploadImage(
   image: PickedImage,
   purpose: CreatePendingUploadDtoPurpose,
   fetcher: typeof globalThis.fetch,
-  sleep: (milliseconds: number) => Promise<void> = wait,
+  sleep?: (milliseconds: number) => Promise<void>,
 ): Promise<string> {
   // expo-crypto's native digest only accepts typed arrays, never a bare buffer.
   const digest = await Crypto.digest(Crypto.CryptoDigestAlgorithm.SHA256, image.bytes);
@@ -113,17 +116,10 @@ export async function uploadImage(
   const finalized = await finalizeUpload(imageAssetId, idempotency(), fetcher);
   if (finalized.status !== 202) throw new Error("upload_finalization_failed");
 
-  for (let attempt = 0; attempt < verificationPollAttempts; attempt += 1) {
+  await waitForUploadReady(async () => {
     const status = await getUploadStatus(imageAssetId, undefined, fetcher);
-    if (status.status === 200 && status.data.state === "ready") break;
-    if (status.status === 200 && status.data.state === "failed") {
-      throw new Error("upload_rejected");
-    }
-    if (attempt === verificationPollAttempts - 1) {
-      throw new Error("upload_verification_timeout");
-    }
-    await sleep(verificationPollMilliseconds);
-  }
+    return status.status === 200 ? status.data.state : null;
+  }, sleep);
 
   return imageAssetId;
 }
