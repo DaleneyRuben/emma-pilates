@@ -126,6 +126,7 @@ export * from "./clientAcquisitionDtoDeclaredChannel";
 export * from "./clientAuthenticationIdentityDto";
 export * from "./clientAuthenticationIdentityDtoKind";
 export * from "./clientContactDto";
+export * from "./clientEmailDeliveryDto";
 export * from "./clientEmailVerificationResultDto";
 export * from "./clientEmailVerificationResultDtoStatus";
 export * from "./clientEvaluationDto";

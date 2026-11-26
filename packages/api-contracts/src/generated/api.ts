@@ -86,6 +86,7 @@ import type {
   ClassTypeDto,
   ClassTypeInputDto,
   ClientAcquisitionDto,
+  ClientEmailDeliveryDto,
   ClientEmailVerificationResultDto,
   ClientEvaluationDto,
   ClientEvaluationPageDto,
@@ -2257,6 +2258,205 @@ export function useGetClientInvitation<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetClientInvitationQueryOptions(clientId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getClientEmailDeliveryResponse200 = {
+  data: ClientEmailDeliveryDto;
+  status: 200;
+};
+
+export type getClientEmailDeliveryResponseSuccess =
+  getClientEmailDeliveryResponse200 & {
+    headers: Headers;
+  };
+export type getClientEmailDeliveryResponse =
+  getClientEmailDeliveryResponseSuccess;
+
+export const getGetClientEmailDeliveryUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}/email-delivery`;
+};
+
+export const getClientEmailDelivery = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getClientEmailDeliveryResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetClientEmailDeliveryUrl(clientId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getClientEmailDeliveryResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getClientEmailDeliveryResponse;
+};
+
+export const getGetClientEmailDeliveryQueryKey = (clientId: string) => {
+  return [
+    `/api/v1/assistant/client-invitations/${clientId}/email-delivery`,
+  ] as const;
+};
+
+export const getGetClientEmailDeliveryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getClientEmailDelivery>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientEmailDelivery>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetClientEmailDeliveryQueryKey(clientId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getClientEmailDelivery>>
+  > = ({ signal }) =>
+    getClientEmailDelivery(clientId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: clientId !== null && clientId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getClientEmailDelivery>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetClientEmailDeliveryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getClientEmailDelivery>>
+>;
+export type GetClientEmailDeliveryQueryError = unknown;
+
+export function useGetClientEmailDelivery<
+  TData = Awaited<ReturnType<typeof getClientEmailDelivery>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientEmailDelivery>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientEmailDelivery>>,
+          TError,
+          Awaited<ReturnType<typeof getClientEmailDelivery>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientEmailDelivery<
+  TData = Awaited<ReturnType<typeof getClientEmailDelivery>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientEmailDelivery>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientEmailDelivery>>,
+          TError,
+          Awaited<ReturnType<typeof getClientEmailDelivery>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientEmailDelivery<
+  TData = Awaited<ReturnType<typeof getClientEmailDelivery>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientEmailDelivery>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetClientEmailDelivery<
+  TData = Awaited<ReturnType<typeof getClientEmailDelivery>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientEmailDelivery>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetClientEmailDeliveryQueryOptions(clientId, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

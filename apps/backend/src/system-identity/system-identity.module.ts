@@ -65,6 +65,7 @@ import {
 } from './invitations/client-invitations.controller';
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { sendClientVerification } from './invitations/client-verification-resend';
+import { readClientEmailDelivery } from './invitations/client-email-delivery';
 import { biometricKeysWiring } from './biometric-keys/biometric-keys-wiring';
 import { emailChangeWiring } from './email-change/email-change-wiring';
 import {
@@ -285,6 +286,8 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
             sendClientVerification(command, principal, dependencies),
           cancel: (command, principal) =>
             cancelClientInvitation(command, principal, dependencies),
+          emailDelivery: (command, principal) =>
+            readClientEmailDelivery(command, principal, dependencies),
         };
       },
     },

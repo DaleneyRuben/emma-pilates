@@ -47,6 +47,7 @@ import {
 import { StaffEmailBudget } from '../staff-email-budget/staff-email-budget.guard';
 import {
   ClientInvitationDto,
+  ClientEmailDeliveryDto,
   ClientInvitationResultDto,
   ClientVerificationEmailDto,
   CorrectInvitationEmailDto,
@@ -82,6 +83,10 @@ export type ClientInvitationOperations = {
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<void>;
+  emailDelivery: (
+    command: { clientId: string },
+    principal: AuthenticatedPrincipal,
+  ) => Promise<{ clientId: string; email: string; bounced: boolean }>;
 };
 
 const invalidRequest = (detail: string): BadRequestException =>
@@ -196,6 +201,23 @@ export class AssistantClientInvitationsController {
     const id = requireClientId(clientId);
     const principal = await this.authenticate(authorization);
     return run(() => this.operations.read({ clientId: id }, principal));
+  }
+
+  // Walkthrough n.º 2: whether the pending Client's email hard-bounced.
+  @Get(':clientId/email-delivery')
+  @ApiOperation({ operationId: 'getClientEmailDelivery' })
+  @ApiParam({ name: 'clientId', format: 'uuid' })
+  @ApiOkResponse({ type: ClientEmailDeliveryDto })
+  @Header('Cache-Control', 'no-store')
+  async emailDelivery(
+    @Param('clientId') clientId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<ClientEmailDeliveryDto> {
+    const id = requireClientId(clientId);
+    const principal = await this.authenticate(authorization);
+    return run(() =>
+      this.operations.emailDelivery({ clientId: id }, principal),
+    );
   }
 
   @Post(':clientId/email-corrections')

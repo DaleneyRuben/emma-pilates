@@ -11,6 +11,7 @@ import {
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
 import { removePendingAccount } from '../registration/remove-pending-account';
+import { isEmailBounced } from '../email-suppression/bounced-email';
 import type {
   ClientInvitationRecord,
   ClientInvitationTransaction,
@@ -38,6 +39,7 @@ export class PrismaClientInvitationUnitOfWork implements ClientInvitationUnitOfW
         createInvitationTransaction(
           transaction,
           now,
+          (email) => this.dependencies.digestEmail(email),
           new PrismaClientRegistrationTransaction(
             transaction,
             this.dependencies.boss,
@@ -62,8 +64,10 @@ const staffRoles: Record<InvitationAudit['actorRole'], StaffRole> = {
 const createInvitationTransaction = (
   transaction: Prisma.TransactionClient,
   now: () => Date,
+  digestEmail: (email: string) => Uint8Array,
   registration: PrismaClientRegistrationTransaction,
 ): ClientInvitationTransaction => ({
+  isEmailBounced: (email) => isEmailBounced(transaction, digestEmail, email),
   findAccountByEmail: async (email): Promise<ExistingAccount | null> => {
     const [existing, account] = await Promise.all([
       registration.findAccountByEmail(email),
