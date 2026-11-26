@@ -39,7 +39,11 @@ export class InviteLinksController {
     const destination = inviteLinkDestination({
       userAgent: userAgent ?? '',
       invite:
-        found?.status === 'valid' && found.holderFirstName !== null
+        // Only a Client's code opens a Guest Pass (BKM-014): a Trainer's
+        // leads to the stores without promising a free class.
+        found?.status === 'valid' &&
+        found.holderKind === 'client' &&
+        found.holderFirstName !== null
           ? { code: found.code, holderFirstName: found.holderFirstName }
           : null,
     });
