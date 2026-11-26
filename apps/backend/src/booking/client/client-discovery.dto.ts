@@ -84,6 +84,20 @@ export class ClientGuestPassDto {
       'The start of the class the Guest Pass was used for; null while it is unused.',
   })
   usedClassStartsAt!: string | null;
+
+  @ApiPropertyOptional({
+    example: 'Lucía',
+    description: 'Who invited her, «Te invitó Lucía» (walkthrough n.º 19)',
+  })
+  hostFirstName?: string;
+
+  @ApiPropertyOptional({ example: 'LF', description: "The host's initials" })
+  hostInitials?: string;
+}
+
+export class ClientInactiveInviteDto {
+  @ApiProperty({ example: 'Lucía' })
+  hostFirstName!: string;
 }
 
 export class ClientSubscriptionSummaryDto {
@@ -190,6 +204,13 @@ export class ClientSubscriptionDto {
       'The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued.',
   })
   queuedPlanStartsOn?: string;
+
+  @ApiPropertyOptional({
+    type: ClientInactiveInviteDto,
+    description:
+      "With no Plan ever: she registered with a Client's code that gave her no free class, because that host has no paid Plan (walkthrough n.º 22). Absent otherwise.",
+  })
+  inactiveInvite?: ClientInactiveInviteDto;
 }
 
 export class ClientFreezeDto {

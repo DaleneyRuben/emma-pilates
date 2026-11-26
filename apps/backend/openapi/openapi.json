@@ -12845,6 +12845,16 @@
             "format": "date-time",
             "nullable": true,
             "description": "The start of the class the Guest Pass was used for; null while it is unused."
+          },
+          "hostFirstName": {
+            "type": "string",
+            "example": "Lucía",
+            "description": "Who invited her, «Te invitó Lucía» (walkthrough n.º 19)"
+          },
+          "hostInitials": {
+            "type": "string",
+            "example": "LF",
+            "description": "The host's initials"
           }
         },
         "required": [
@@ -12943,6 +12953,18 @@
           "endsOn"
         ]
       },
+      "ClientInactiveInviteDto": {
+        "type": "object",
+        "properties": {
+          "hostFirstName": {
+            "type": "string",
+            "example": "Lucía"
+          }
+        },
+        "required": [
+          "hostFirstName"
+        ]
+      },
       "ClientSubscriptionDto": {
         "type": "object",
         "properties": {
@@ -13003,6 +13025,14 @@
             "type": "string",
             "format": "date",
             "description": "The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued."
+          },
+          "inactiveInvite": {
+            "description": "With no Plan ever: she registered with a Client's code that gave her no free class, because that host has no paid Plan (walkthrough n.º 22). Absent otherwise.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientInactiveInviteDto"
+              }
+            ]
           }
         },
         "required": [

@@ -135,6 +135,7 @@ export * from "./clientEvaluationPageDto";
 export * from "./clientFreezeDto";
 export * from "./clientFreezeDtoState";
 export * from "./clientGuestPassDto";
+export * from "./clientInactiveInviteDto";
 export * from "./clientInvitationDto";
 export * from "./clientInvitationResultDto";
 export * from "./clientInvitationResultDtoStatus";

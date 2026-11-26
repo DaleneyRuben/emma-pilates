@@ -11,4 +11,8 @@ export interface ClientGuestPassDto {
    * @nullable
    */
   usedClassStartsAt: string | null;
+  /** Who invited her, «Te invitó Lucía» (walkthrough n.º 19) */
+  hostFirstName?: string;
+  /** The host's initials */
+  hostInitials?: string;
 }
