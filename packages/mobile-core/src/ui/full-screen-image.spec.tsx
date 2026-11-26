@@ -1,9 +1,11 @@
-import { fireEvent, render as renderScreen } from "@testing-library/react-native";
+import { fireEvent, render as renderScreen, within } from "@testing-library/react-native";
 import type { ReactElement } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { FullScreenImage } from "./full-screen-image";
 import { Text } from "./text";
+import { colors } from "./tokens";
+import { textVariants } from "./type-scale";
 
 // The viewer's own provider starts from its parent's metrics, as in the app.
 const metrics = {
@@ -15,7 +17,37 @@ const render = (element: ReactElement) =>
 
 // MOB-062, follow-up 95: the light view of the studio QR.
 describe("FullScreenImage", () => {
-  it("draws the light view's image whole on a card no wider than a phone column", async () => {
+  // E-D30, C10v: the page title and a «Cerrar» text button share the top row
+  // of a white page; the image fills it, with the note under it, on no card.
+  it("heads the light view with the page title and a «Cerrar» text button", async () => {
+    const screen = await render(
+      <FullScreenImage
+        label="Factura ampliada"
+        note="Pellizca para ampliar."
+        onClose={jest.fn()}
+        title="Tu factura"
+        tone="light"
+        uri="data:image/png;base64,AA=="
+        visible
+      />,
+    );
+
+    const title = screen.getByRole("header", { name: "Tu factura" });
+    expect(title).toHaveStyle(textVariants["titulo-pagina"]);
+    const close = screen.getByRole("button", { name: "Cerrar" });
+    expect(within(close).getByText("Cerrar")).toHaveStyle(textVariants.boton);
+    const top = within(screen.getByTestId("full-screen-image-top"));
+    expect(top.getByText("Tu factura")).toBeOnTheScreen();
+    expect(top.getByRole("button", { name: "Cerrar" })).toBeOnTheScreen();
+    expect(screen.getByTestId("full-screen-image-page")).toHaveStyle({
+      backgroundColor: colors.card,
+    });
+    expect(screen.queryByTestId("full-screen-image-card")).toBeNull();
+    expect(screen.getByLabelText("Factura ampliada")).toHaveStyle({ borderRadius: 16 });
+    expect(screen.getByText("Pellizca para ampliar.")).toBeOnTheScreen();
+  });
+
+  it("draws the light view's image whole no wider than a phone column", async () => {
     const screen = await render(
       <FullScreenImage
         aspectRatio={0.7}
@@ -30,8 +62,8 @@ describe("FullScreenImage", () => {
 
     expect(screen.getByLabelText("Código QR ampliado")).toHaveProp("resizeMode", "contain");
     expect(screen.getByLabelText("Código QR ampliado")).toHaveStyle({ aspectRatio: 0.7 });
-    // On a tablet the card stops at the 480 pt column instead of filling the screen.
-    expect(screen.getByTestId("full-screen-image-card")).toHaveStyle({ maxWidth: 480 });
+    // On a tablet the image stops at the 480 pt column instead of filling the screen.
+    expect(screen.getByLabelText("Código QR ampliado")).toHaveStyle({ maxWidth: 480 });
   });
 
   it("closes from «Cerrar»", async () => {
