@@ -1,5 +1,5 @@
 import { useRemoveNotification, useRestoreNotification } from "@pilates/api-contracts";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { UndoToast } from "../ui/undo-toast";
 
@@ -44,16 +44,26 @@ export function useNotificationRemoval({
     mutation: { onSettled: onChanged },
   });
 
+  // Each delete still on its way, so an undo waits for it: a restore that
+  // reached the server first would be undone by the delete (review).
+  const pending = useRef(new Map<string, Promise<unknown>>());
   const remove = (notificationId: string) => {
     setRemoved((current) => new Set(current).add(notificationId));
     setLast(notificationId);
-    removal.mutate({ notificationId });
+    const request = removal
+      .mutateAsync({ notificationId })
+      .catch(() => undefined)
+      .finally(() => pending.current.delete(notificationId));
+    pending.current.set(notificationId, request);
   };
   const undo = () => {
     if (last === null) return;
-    unhide(last);
-    restoration.mutate({ notificationId: last });
+    const notificationId = last;
+    unhide(notificationId);
     setLast(null);
+    void (pending.current.get(notificationId) ?? Promise.resolve()).then(() =>
+      restoration.mutate({ notificationId }),
+    );
   };
 
   return {
