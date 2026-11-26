@@ -70,6 +70,7 @@ numbered tests.
 | Client app on tablet | Every Client screen on the iPad and Android tablets in both orientations: the 84 pt tab bar with each icon beside its label, the 40 pt page with the 36 pt title beside the back button, centred columns, two-column screens, and Reservar and Mis facturas as a list beside the chosen item (Test 196) | Needs a native build with `supportsTablet` (release 1.2.3); card internals keep their phone sizes |
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
+| Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
 
 ## Where each designed screen is tested
 
@@ -3869,6 +3870,12 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- from the walkthrough fixes without new design (Test 198): the app copy for
+  a host whose code is not active yet («Activa tu código comprando un plan»,
+  «El código de Lucía todavía no está activo») waits for its design; the
+  worker picks an upload up within half a second by polling, and waking it at
+  once (pg-boss LISTEN/NOTIFY on the upload queue) needs an approved
+  migration;
 - from the Client app on tablet (Test 196): the boards' larger tablet sizes
   inside cards (Lora 64 on Mi plan, 44 on Detalle del plan, 48 on the
   referral code, the 05T and 10T heroes drawn as one row) and the row-style
@@ -5389,8 +5396,9 @@ photo.jpg shot.png` on iOS; `adb push photo.jpg /sdcard/Pictures/` and a
    `apps/backend/.data/uploads/private/transfer_receipt/<id>/` still sharp
    to read.
 3. As Lucía, Perfil → «Editar» → «Cambiar foto» with the large photo.
-   Expected: the photo in the circle and «Quitar foto», the row again a
-   JPEG of at most 2048 px.
+   Expected: the photo in the circle and «Quitar foto», the row a JPEG of at
+   most 1024 px: a profile photo travels at half a receipt's edge
+   (walkthrough n.º 14, Test 198 F).
 4. Timings: `processing_started_at - created_at` is the PUT (declare to
    finalize) and `finalized_at - processing_started_at` the queue pickup plus
    the worker; locally the second is under a second for a 2048 px JPEG.
@@ -9514,8 +9522,9 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    with the count. As Camila (Assistant) and Carolina (Coordinator):
    **Clientes › Facturas por subir**. The list has **Por subir · n** and
    **Subidas**. Open Mariana: the hero, «Datos de la factura», the dashed
-   «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
-   **Elegir de la galería** and **Elegir un PDF** (Test 175, FIX-049); after
+   «Sube la factura emitida». **Subir factura** offers **Elegir una imagen**
+   and **Elegir un PDF** (Test 175, FIX-049; no camera since walkthrough
+   n.º 25, Test 198 C); after
    the upload the toast «Factura subida» and the file card with **Ver
    factura**. **Quitar factura** asks in a sheet. A PDF shows a small
    first-page thumbnail beside the file name that opens the full-screen viewer
@@ -9819,8 +9828,9 @@ J. **No booking on a frozen day (n.º 53c).** Since C1 (Test 186 C) a frozen
 
 Run the API and the worker on a copy of the walkthrough database, the client
 app on the iPhone 16 Pro, the iPad and Android. For the Guest Pass, register
-a new Client with a host's referral code (one invitation per host a month)
-and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
+a new Client with a host's referral code (one invitation per host a month,
+and since walkthrough n.º 22 only from a host with a paid Plan in force,
+Test 198 D) and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
 
 A. **Perfil after a notification (n.º 55).** As Carla, without opening
    Perfil first, tap the Inicio bell and a «Tu pago fue confirmado» notice:
@@ -12179,3 +12189,57 @@ Specs: `packages/phone-number/src/phone-number.spec.ts` and
 `country-names.spec.ts`, `apps/backend/src/phone/contact-phone.spec.ts`,
 `android-test-studio/params.spec.ts`, `phone-field.spec.tsx` (both),
 `new-client-phone.spec.tsx`, `staff-create.spec.tsx`.
+
+## Test 198: walkthrough fixes that need no new design (mejoras del recorrido 3, 7, 12, 14, 17, 22, 25)
+
+The owner's walkthrough of 25–26 Nov 2026 (`mejoras-recorrido.md`). Run the
+API and the worker on a copy of `pilates_golden` (Test 2, Test 46), Metro for
+both apps, and use the iPhone 16 Pro and the Android emulator. Every email
+link comes from `apps/backend/.data/email-capture/` (Test 34).
+
+A. **A stalled email check (n.º 3).** Register a Client in the app, stop the
+   API, then open the verification link on the phone. «Verificando correo»
+   gives way within 15 seconds to «No pudimos verificar tu enlace» · «Revisa
+   tu conexión e inténtalo de nuevo.» with **Reintentar** and **Ir a iniciar
+   sesión**. Start the API and tap **Reintentar**: «Correo verificado». A
+   second **Reintentar** after a lost answer reads «Enlace no válido», because
+   the server answers a used token as `invalid`, never verifying it twice.
+B. **Signing out after a link (n.º 17).** Verify an email from its link, tap
+   **Ir a iniciar sesión**, log in, then Perfil › **Cerrar sesión**: Login,
+   not «Enlace no válido». The same after an activation link (Staff app, a
+   new Staff Member's link) and after a recovery link (both apps): signing
+   out never reopens the used link. A new link opened later still shows its
+   own screen.
+C. **The invoice picker (n.º 25).** Staff app as Paola: Pagos › Accesos ›
+   Facturas por subir › Mariana › **Subir factura**. The sheet offers only
+   **Elegir una imagen** and **Elegir un PDF** (no «Tomar foto»). Each one
+   closes the sheet and then opens the phone's picker; on iOS it no longer
+   fails with «No pudimos subir la factura. Revisa tu conexión…». If the
+   picker itself fails, the screen says «No pudimos abrir tus archivos.
+   Inténtalo de nuevo.» The Client app's receipt picker opens straight from
+   its button, with no sheet, so it never had this race.
+D. **A Guest Pass needs a paid Plan (n.º 22, owner's decision of 26 Nov).**
+   Register a friend with the code of a Client who has never bought a Plan
+   (or holds only a Courtesy Access or her own Guest Pass) and verify her
+   email: the Account is created and logs in, with no Guest Pass on Inicio.
+   Repeat with the code of a Client whose paid Plan is in force (Lucía): the
+   friend gets «Tu clase gratis de invitada». `GET
+   /api/v1/clients/current/referrals` answers `codeActive: true` for the
+   paying host and `false` for the other; the app screens that use it come
+   with their design.
+E. **The receipt notice settles for everyone (n.º 12).** With two
+   Administrators (Paola and one you create in Personal), submit a transfer
+   receipt as a Client, then confirm it as Paola. Both Administrators'
+   «Tienes un comprobante de pago pendiente de revisión.» are read
+   (`select account_id, read_at from system.notifications where
+   business_event_key = 'payment-submitted:<payment id>'`). The server
+   already did this (Test 141); the Staff app shows a read notice almost like
+   an unread one, which the redesign addresses.
+F. **Faster uploads (n.º 7 and 14).** Both apps now ask for the upload's
+   state every 0.25 s instead of 0.7 s, and a profile photo travels at
+   1024 px (a receipt or invoice photo stays at 2048 px). Locally, a 2048 px
+   receipt went from 1.32 s to 0.96 s from declaring to READY, and a profile
+   photo from 0.75 s (781 KB) to 0.50 s (196 KB). On a phone most of the
+   remaining time is the PUT over the mobile network, which the smaller
+   profile photo cuts by three quarters. Read the production numbers with
+   the query of Test 53 step 4.
