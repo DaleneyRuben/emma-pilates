@@ -12,7 +12,7 @@ describe("useForgetLinkWhenSignedIn", () => {
     return clearIntent;
   };
 
-  it.each(["verify-email", "activate-account", "recover-password"] as const)(
+  it.each(["verify-email", "activate-account", "recover-password", "referral-invite"] as const)(
     "forgets a %s link while signed in",
     async (type) => {
       const intent = { token: "t", type };
