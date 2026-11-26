@@ -69,6 +69,10 @@ describe("a pending Client whose email bounced", () => {
         "No pudimos entregar el correo de activación a lucia@ejemplo.con: esa dirección no existe. Confirma el correo con la clienta.",
       ),
     ).toBeVisible();
+    // The board's state pill: solid Rosa profundo, since it waits on staff.
+    expect(within(notice).getByText("El correo rebotó")).toHaveClass(
+      "bg-primario",
+    );
     expect(within(panel).queryByText("Pendiente de activación")).toBeNull();
     expect(
       within(notice).queryByRole("button", { name: "Reenviar enlace" }),
@@ -82,6 +86,10 @@ describe("a pending Client whose email bounced", () => {
     expect(
       await within(panel).findByText("Pendiente de activación"),
     ).toBeVisible();
+    // RW-clientas-ficha-pendiente: the white pill with the Arcilla ring.
+    expect(within(panel).getByText("Pendiente de activación")).toHaveClass(
+      "bg-superficie",
+    );
     expect(within(panel).queryByText("El correo rebotó")).toBeNull();
   });
 
