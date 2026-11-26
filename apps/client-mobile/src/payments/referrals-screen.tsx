@@ -33,7 +33,7 @@ export const inviteLink = (code: string): string =>
 
 // C16g: the system's own share sheet carries the text and the link.
 const shareMessage = (code: string): string =>
-  `Únete a Emma Pilates Studio con mi código ${code}: regístrate en la app y úsalo al crear tu cuenta. ${inviteLink(code)}`;
+  `Únete a Emma Pilates Studio con mi código ${code}: tu primera clase es gratis. ${inviteLink(code)}`;
 
 export function ReferralsScreen() {
   const navigation = useNavigation<{ goBack: () => void; navigate: (route: "Plans") => void }>();
