@@ -9,26 +9,19 @@ import {
   resendClientInvitation,
 } from "@pilates/api-contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock3, MailX } from "lucide-react";
 import { useState } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
 import { fieldMessageClass } from "../../components/form/form";
 import { avisoClass } from "../../components/ui/aviso";
 import { Button } from "../../components/ui/button";
+import { StatusPill } from "../../components/ui/status-pill";
 import { cn } from "../../lib/cn";
 import { EmailLimitNotice } from "../staff/staff-email-limit";
 import { isAccountEmailLimit } from "../staff/staff-problems";
 import { useEmailLimit } from "../staff/use-email-limit";
 
 type Result = { ok: boolean; message: string };
-
-const iconProps = {
-  size: 18,
-  strokeWidth: 1.4,
-  className: "mt-0.5 flex-none text-texto",
-  "aria-hidden": true,
-} as const;
 
 // Walkthrough finding 95, as in the Staff app: a lapsed link «venció».
 const expiryLine = (expiresAt: string | null | undefined): string | null => {
@@ -112,12 +105,19 @@ export function ClientPendingActivation({ clientId }: { clientId: string }) {
 
   return (
     <>
-      <section className={cn(avisoClass, "flex items-start gap-3")}>
-        {bounced ? <MailX {...iconProps} /> : <Clock3 {...iconProps} />}
+      {/* RW-clientas-ficha-pendiente / -correo-rebotado: the state as a pill
+          above its line; a bounce waits on staff, so it is the solid one. */}
+      <section className={cn(avisoClass, "flex flex-col gap-1.5")}>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h3 className="tipo-titulo-fila text-texto">
-            {bounced ? "El correo rebotó" : "Pendiente de activación"}
-          </h3>
+          <span>
+            {bounced ? (
+              <StatusPill tone="accion">El correo rebotó</StatusPill>
+            ) : (
+              <StatusPill tone="advertencia">
+                Pendiente de activación
+              </StatusPill>
+            )}
+          </span>
           <p className="tipo-secundario text-texto">
             {bounced
               ? `No pudimos entregar el correo de activación a ${delivery.data?.email}: esa dirección no existe. Confirma el correo con la clienta.`
