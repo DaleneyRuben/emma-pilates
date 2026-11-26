@@ -90,6 +90,41 @@ describe("NotificationsScreen removal", () => {
     expect(screen.queryByText("Notificación borrada")).not.toBeOnTheScreen();
   });
 
+  // Review: an undo while the delete is still on its way must not reach the
+  // server first, or the delete lands after it and the undo is lost.
+  it("restores only once the delete has been answered", async () => {
+    const calls: string[] = [];
+    let answerDelete: () => void = () => undefined;
+    const fetcher = jest.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const path = typeof input === "string" ? input : input.toString();
+      const method = init?.method?.toUpperCase() ?? "GET";
+      if (method === "GET") return Promise.resolve(jsonResponse(page));
+      calls.push(`${method} ${path}`);
+      if (method === "DELETE") {
+        return new Promise<Response>((resolve) => {
+          answerDelete = () => resolve(jsonResponse(null, 204));
+        });
+      }
+      return Promise.resolve(jsonResponse(null, 204));
+    }) as unknown as typeof globalThis.fetch;
+    const screen = await renderScreen(fetcher);
+    await waitFor(() => expect(screen.getByText("Pago confirmado")).toBeOnTheScreen());
+
+    await fireEvent.press(
+      screen.getAllByRole("button", { name: "Borrar", includeHiddenElements: true })[0]!,
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Deshacer" }));
+
+    expect(calls).toEqual(["DELETE /api/v1/notifications/n1"]);
+    await act(async () => answerDelete());
+    await waitFor(() =>
+      expect(calls).toEqual([
+        "DELETE /api/v1/notifications/n1",
+        "POST /api/v1/notifications/n1/restore",
+      ]),
+    );
+  });
+
   it("lets the «Deshacer» notice go after a few seconds", async () => {
     const { fetcher } = createFetcher();
     const screen = await renderScreen(fetcher);
