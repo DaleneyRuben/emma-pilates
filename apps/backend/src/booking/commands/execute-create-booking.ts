@@ -10,6 +10,7 @@ import {
 import { fundBooking } from './weekly-cap-funding';
 import { findSubscriptionForBooking } from './subscription-for-booking';
 import { loadSession } from './waitlist-promotion';
+import { overlappingBookingWhere } from './overlapping-booking';
 
 export function executeCreate(
   transaction: Prisma.TransactionClient,
@@ -34,17 +35,10 @@ export function executeCreate(
       findApprovedFreeze(transaction, { clientId, onDate }),
     findNotYetStartedSubscription: ({ clientId, onDate }) =>
       findNotYetStartedSubscription(transaction, { clientId, onDate }),
-    hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+    hasOverlappingBooking: (window) =>
       transaction.booking
         .findFirst({
-          where: {
-            clientId,
-            state: 'BOOKED',
-            session: {
-              startsAt: { lt: endsAt },
-              endsAt: { gt: startsAt },
-            },
-          },
+          where: overlappingBookingWhere(window),
           select: { id: true },
         })
         .then((booking) => booking !== null),

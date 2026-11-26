@@ -13264,6 +13264,42 @@
           "durationMinutes"
         ]
       },
+      "SessionOwnBookingDto": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string",
+            "enum": [
+              "this_class",
+              "overlapping"
+            ],
+            "description": "`this_class`: she booked this class; `overlapping`: another class of hers at that time"
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string",
+            "example": "Mat Pilates"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relation",
+          "bookingId",
+          "classTypeName",
+          "startsAt",
+          "endsAt"
+        ]
+      },
       "SessionDetailDto": {
         "type": "object",
         "properties": {
@@ -13327,6 +13363,16 @@
             "minimum": 0,
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent without a cap."
+          },
+          "yourBooking": {
+            "nullable": true,
+            "description": "For a Client: her Booking on this class or overlapping it (walkthrough n.º 1, the rule a Booking is refused with); null when none. Absent for Staff.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionOwnBookingDto"
+              }
+            ]
           }
         },
         "required": [

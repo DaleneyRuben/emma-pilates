@@ -345,7 +345,7 @@ describe('client discovery (e2e)', () => {
       .set('authorization', bearer)
       .expect(200);
 
-    expect(response.body.yourBooking).toEqual({
+    expect((response.body as { yourBooking: unknown }).yourBooking).toEqual({
       relation: 'overlapping',
       bookingId: 'booking-1',
       classTypeName: 'Mat Pilates',

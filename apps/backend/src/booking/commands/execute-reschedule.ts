@@ -14,6 +14,7 @@ import { rescheduleBooking } from './reschedule-booking';
 import { weeklyCapBlocksReschedule } from './reschedule-cap';
 import { moveConsumptionToBooking } from './restore-class';
 import { loadSession } from './waitlist-promotion';
+import { overlappingBookingWhere } from './overlapping-booking';
 
 export function executeReschedule(
   transaction: Prisma.TransactionClient,
@@ -66,17 +67,10 @@ export function executeReschedule(
       findNotYetStartedSubscription(transaction, { clientId, onDate }),
     weeklyCapBlocksDestination: (input) =>
       weeklyCapBlocksReschedule(transaction, input),
-    hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+    hasOverlappingBooking: (window) =>
       transaction.booking
         .findFirst({
-          where: {
-            clientId,
-            state: BookingState.BOOKED,
-            session: {
-              startsAt: { lt: endsAt },
-              endsAt: { gt: startsAt },
-            },
-          },
+          where: overlappingBookingWhere(window),
           select: { id: true },
         })
         .then((booking) => booking !== null),

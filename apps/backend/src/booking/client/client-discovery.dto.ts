@@ -304,6 +304,27 @@ export class ClassTypeDto {
   durationMinutes!: number;
 }
 
+export class SessionOwnBookingDto {
+  @ApiProperty({
+    enum: ['this_class', 'overlapping'],
+    description:
+      '`this_class`: she booked this class; `overlapping`: another class of hers at that time',
+  })
+  relation!: 'this_class' | 'overlapping';
+
+  @ApiProperty({ format: 'uuid' })
+  bookingId!: string;
+
+  @ApiProperty({ example: 'Mat Pilates' })
+  classTypeName!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+}
+
 export class SessionDetailDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -357,4 +378,12 @@ export class SessionDetailDto {
       'Classes left this week from the base allowance. Absent without a cap.',
   })
   classesLeftThisWeek?: number | null;
+
+  @ApiPropertyOptional({
+    type: SessionOwnBookingDto,
+    nullable: true,
+    description:
+      'For a Client: her Booking on this class or overlapping it (walkthrough n.º 1, the rule a Booking is refused with); null when none. Absent for Staff.',
+  })
+  yourBooking?: SessionOwnBookingDto | null;
 }

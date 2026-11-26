@@ -472,6 +472,8 @@ export * from "./sessionEquipmentItemDtoStatus";
 export * from "./sessionEquipmentTypeDto";
 export * from "./sessionEquipmentTypeDtoTracking";
 export * from "./sessionInputDto";
+export * from "./sessionOwnBookingDto";
+export * from "./sessionOwnBookingDtoRelation";
 export * from "./sessionScheduleBatchDto";
 export * from "./sessionScheduleBatchInputDto";
 export * from "./sessionScheduleCreationDto";

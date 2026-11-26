@@ -7,11 +7,13 @@ import {
   cancelBookingCommand,
   createBookingCommand,
   joinWaitlistCommand,
+  ownBookingAroundQuery,
   recordAttendanceCommand,
   rescheduleBookingCommand,
 } from '../booking-controller-support';
 import { leaveWaitlistCommand } from '../client/client-bookings.controller';
 import { cancelSessionCommand } from '../payments/administrator.controller';
+import { findOwnBookingAround } from './overlapping-booking';
 import { PrismaBookingCommands } from './prisma-booking-commands';
 
 // Kept out of booking.module.ts, which already exceeds the file-size limit.
@@ -33,4 +35,13 @@ export const bookingCommandProviders: Provider[] = [
   bookingCommand(recordAttendanceCommand, (c) => c.recordAttendance.bind(c)),
   bookingCommand(leaveWaitlistCommand, (c) => c.leaveWaitlist.bind(c)),
   bookingCommand(cancelSessionCommand, (c) => c.cancelSession.bind(c)),
+  // Walkthrough n.º 1: the class detail reads the overlap rule ahead.
+  {
+    provide: ownBookingAroundQuery,
+    inject: [PRISMA_CLIENT],
+    useFactory:
+      (prisma: PrismaClient) =>
+      (input: Parameters<typeof findOwnBookingAround>[1]) =>
+        findOwnBookingAround(prisma, input),
+  },
 ];

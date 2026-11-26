@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { findOwnBookingAround } from '../../src/booking/commands/overlapping-booking';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
@@ -30,10 +31,21 @@ describe('her own Booking around a class', () => {
     await context?.stop();
   });
 
-  const anotherSession = async (fixture: Fixture, startsAt: Date) => {
+  const anotherSession = async (
+    fixture: Fixture,
+    startsAt: Date,
+    classTypeName: string = randomUUID(),
+  ) => {
+    // Another branch: one branch never runs two classes at once.
+    const branch = await prisma.branch.create({
+      data: { name: randomUUID(), address: 'Calle Dos' },
+    });
+    const trainer = await prisma.staffMember.create({
+      data: { name: 'Trainer', role: 'TRAINER' },
+    });
     const classType = await prisma.classType.create({
       data: {
-        name: 'Mat Pilates',
+        name: classTypeName,
         description: 'Mat',
         durationMinutes: 60,
         defaultCapacity: 8,
@@ -41,9 +53,9 @@ describe('her own Booking around a class', () => {
     });
     return prisma.session.create({
       data: {
-        branchId: fixture.branchId,
+        branchId: branch.id,
         classTypeId: classType.id,
-        trainerStaffMemberId: fixture.trainerId,
+        trainerStaffMemberId: trainer.id,
         startsAt,
         endsAt: new Date(startsAt.getTime() + hour),
         capacity: 8,
@@ -65,6 +77,7 @@ describe('her own Booking around a class', () => {
         state,
         ...(state === 'CANCELLED'
           ? {
+              createdAt: bookingClock,
               cancelledAt: bookingClock,
               cancelledByAccountId: fixture.accountId,
               cancellationCause: 'CLIENT_REQUEST' as const,
@@ -105,6 +118,7 @@ describe('her own Booking around a class', () => {
     const other = await anotherSession(
       fixture,
       new Date(session.startsAt.getTime() - 30 * 60 * 1_000),
+      'Mat Pilates',
     );
     const booking = await book(fixture, other.id);
 
