@@ -160,6 +160,41 @@ describe("Client profile photo", () => {
     expect(screen.queryByRole("button", { name: "Quitar foto" })).not.toBeOnTheScreen();
   });
 
+  // Walkthrough n.º 14: a profile photo shows in a small circle, so it travels
+  // at 1024 px, a quarter of a receipt's pixels, instead of 2048.
+  it("sends a large profile photo at 1024 px", async () => {
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: "file:///me.heic", width: 4032, height: 3024 }],
+    } as never);
+    jest
+      .mocked(ImageManipulator.manipulateAsync)
+      .mockResolvedValue({ uri: "file:///me.jpg", width: 1024, height: 768 });
+    const calls: string[] = [];
+    const screen = await openProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          ...uploadRoutes(calls),
+          "/api/v1/clients/current": () => jsonResponse(profile),
+          "PUT /api/v1/clients/current/photo": () => jsonResponse(withPhoto),
+          "/api/v1/clients/current/photo?variant=display":
+            photoRoutes["/api/v1/clients/current/photo?variant=display"],
+        }),
+      ),
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar foto" }));
+
+    await waitFor(() => expect(calls).toContain("finalize"), { timeout: 10_000 });
+    expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
+      "file:///me.heic",
+      [{ resize: { width: 1024 } }],
+      expect.objectContaining({ format: "jpeg" }),
+    );
+  });
+
   it("reports a failed upload and keeps the initials", async () => {
     pickedPhoto();
     const screen = await openProfile(

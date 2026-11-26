@@ -157,7 +157,7 @@ describe("Staff Perfil photo", () => {
     expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
   });
 
-  it("uploads the picked photo as a 2048 px JPEG and attaches it", async () => {
+  it("uploads the picked photo as a 1024 px JPEG and attaches it", async () => {
     pickedPhoto();
     const calls: string[] = [];
     let current = daniela;
@@ -184,7 +184,8 @@ describe("Staff Perfil photo", () => {
     expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
     expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
       "file:///me.heic",
-      [{ resize: { width: 2048 } }],
+      // Walkthrough n.º 14: a profile photo travels at 1024 px, not 2048.
+      [{ resize: { width: 1024 } }],
       expect.objectContaining({ format: "jpeg" }),
     );
     await waitFor(() =>
