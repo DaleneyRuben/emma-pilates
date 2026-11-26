@@ -19,6 +19,7 @@ import {
   Text,
   useMobileIdentity,
   usePullToRefresh,
+  useNotificationRemoval,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -32,6 +33,8 @@ import {
 } from "../notifications/notification-destinations";
 import { groupNotifications } from "../notifications/notification-groups";
 import { DeniedNotice, NotificationEntries } from "../notifications/notification-entries";
+import { splitStaffNotices } from "../notifications/review-notices";
+import { ReviewSections } from "../notifications/review-sections";
 import { useStaffFetcher } from "../staff-fetcher";
 import { bodyScroll } from "../ui/card-pieces";
 
@@ -69,6 +72,7 @@ export function StaffNotificationsScreen() {
     fetcher,
     mutation: { onSuccess: () => void invalidate() },
   });
+  const removal = useNotificationRemoval({ fetcher, onChanged: () => void invalidate() });
 
   const header = (action?: ReactNode) => (
     <ScreenTopBar
@@ -99,7 +103,7 @@ export function StaffNotificationsScreen() {
     );
   }
 
-  const { items } = notifications.data.data;
+  const items = notifications.data.data.items.filter((item) => !removal.isRemoved(item.id));
   if (items.length === 0) {
     const back =
       role === "trainer" || role === "nutritionist"
@@ -118,6 +122,7 @@ export function StaffNotificationsScreen() {
             variant="plain"
           />
         </ScrollView>
+        {removal.toast}
       </Screen>
     );
   }
@@ -134,6 +139,11 @@ export function StaffNotificationsScreen() {
   };
 
   const anyUnread = items.some((item) => !item.readAt);
+  const remove = (notification: NotificationDto) => removal.remove(notification.id);
+  // Walkthrough n.º 12 (E-F07): the Administrator's reviews, not grouped.
+  const split =
+    role === "administrator" ? splitStaffNotices(items) : { pending: [], decided: [], rest: items };
+  const now = new Date();
   return (
     <Screen style={styles.screen}>
       {header(
@@ -158,8 +168,23 @@ export function StaffNotificationsScreen() {
         testID="notifications-scroll"
       >
         <DeniedNotice />
-        <NotificationEntries entries={groupNotifications(items)} onOpen={open} />
+        <ReviewSections
+          decided={split.decided}
+          now={now}
+          onOpen={open}
+          onRemove={remove}
+          pending={split.pending}
+        />
+        {split.rest.length === 0 ? null : (
+          <NotificationEntries
+            entries={groupNotifications(split.rest)}
+            now={now}
+            onOpen={open}
+            onRemove={remove}
+          />
+        )}
       </ScrollView>
+      {removal.toast}
     </Screen>
   );
 }

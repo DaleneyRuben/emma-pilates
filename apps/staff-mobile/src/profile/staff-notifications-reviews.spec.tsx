@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -133,7 +133,10 @@ describe("Staff Notificaciones for the Administrator", () => {
     const { calls, screen } = await openNotifications();
 
     await fireEvent.press(
-      screen.getByTestId("notification-swipe-c1").findByProps({ accessibilityLabel: "Borrar" }),
+      within(screen.getByTestId("notification-swipe-c1")).getByRole("button", {
+        name: "Borrar",
+        includeHiddenElements: true,
+      }),
     );
 
     await waitFor(() =>
