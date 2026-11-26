@@ -1,7 +1,8 @@
+import { Text } from "@pilates/mobile-core";
 import { render } from "@testing-library/react-native";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { bodyScroll, FooterPanel } from "./card-pieces";
 import { TabFooter } from "./tab-footer";
@@ -27,7 +28,7 @@ describe("Staff screens on one 16 pt margin", () => {
   it("reaches a footer panel past the 16 pt screen padding", async () => {
     const task = await render(
       <FooterPanel testID="panel">
-        <Text>Guardar</Text>
+        <Text variant="boton">Guardar</Text>
       </FooterPanel>,
     );
     expect(StyleSheet.flatten(task.getByTestId("panel").props.style)).toMatchObject({
@@ -35,7 +36,7 @@ describe("Staff screens on one 16 pt margin", () => {
     });
     const tab = await render(
       <TabFooter testID="tab-panel">
-        <Text>Guardar</Text>
+        <Text variant="boton">Guardar</Text>
       </TabFooter>,
     );
     expect(StyleSheet.flatten(tab.getByTestId("tab-panel").props.style)).toMatchObject({
