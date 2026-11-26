@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
+import { Glyph } from "../ui/glyph";
 import { OutlinedButton } from "../ui/outlined-button";
 import { Text } from "../ui/text";
 import { colors, radii, spacing } from "../ui/tokens";
@@ -27,11 +28,14 @@ export function UnconfirmedEmailCard({ email, onResend }: { email: string; onRes
  */
 export function BouncedEmailCard({ email }: { email: string }) {
   return (
-    <View accessibilityRole="alert" style={styles.card} testID="check-email-bounced">
-      <Text variant="titulo-fila">El correo rebotó</Text>
-      <Text variant="cuerpo">
-        {`No pudimos entregar el correo a ${email}. Revisa la dirección.`}
-      </Text>
+    <View accessibilityRole="alert" style={styles.notice} testID="check-email-bounced">
+      <Glyph color={colors.text} name="alert" size={20} strokeWidth={1.7} />
+      <View style={styles.noticeText}>
+        <Text variant="titulo-fila">El correo rebotó</Text>
+        <Text variant="cuerpo">
+          {`No pudimos entregar el correo a ${email}. Revisa la dirección.`}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -46,4 +50,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
   },
+  // C01c3: the alert circle at the left, a 1.5 pt 400 outline on 50.
+  notice: {
+    alignItems: "flex-start",
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.inset,
+    borderWidth: 1.5,
+    flexDirection: "row",
+    gap: spacing.smLg,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
+  noticeText: { flex: 1, gap: spacing.xxs },
 });
