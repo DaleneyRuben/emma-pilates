@@ -75,6 +75,7 @@ numbered tests.
 | Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | A chosen PDF is not shown page by page before it is sent; the invite link opens no page yet |
 | Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
 | Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
+| Class detail knows your bookings | A class she booked opens with «Ya reservaste esta clase», **Cancelar reserva** and «Cancelas gratis hasta …»; a class at the time of another of hers keeps «Reservar esta clase» off with «Ya tienes Mat Pilates a las 10:00 ese día…» and **Ver esa reserva** (Test 203) | «Ver esa reserva» opens Mis reservas, not that one booking |
 
 ## Where each designed screen is tested
 
@@ -12463,3 +12464,28 @@ H. **A code that was not active (C02j).** Register a friend with the code of
    gratis.» above «Elige tu plan y empieza a moverte». The subscription
    answers `inactiveInvite: { hostFirstName }` while she has never had a
    Plan and the host still has no paid Plan.
+
+## Test 203: class detail knows your bookings (mejoras del recorrido 1)
+
+Boards C04p and C04q. Run the API on a copy of `pilates_golden` and Metro for
+the Client app on the iPhone 16 Pro, logged in as a fixture Client with an
+active Plan and classes left.
+
+A. **A class she booked (C04p).** Book a class from Reservar, then open the
+   same class again from Reservar. The footer says «Ya reservaste esta clase»
+   with **Cancelar reserva** instead of «Reservar esta clase», and «Cancelas
+   gratis hasta …» while the free-cancellation window is still open.
+B. **Cancelling it there.** Tap **Cancelar reserva**: «¿Cancelar esta
+   reserva?» asks first; **Sí, cancelar reserva** cancels it and the footer
+   turns back to **Reservar esta clase**. Mis reservas no longer lists it.
+C. **Another class at that time (C04q).** With that class booked, open a
+   class in another Branch that overlaps it. «Reservar esta clase» is off and
+   says under it «Ya tienes Mat Pilates a las 10:00 ese día. Cancélala antes
+   si prefieres esta.» (her class's name and start). **Ver esa reserva** opens
+   Mis reservas, where that booking is listed. A class that starts exactly
+   when hers ends is not blocked.
+D. **The API.** `GET /api/v1/sessions/{id}` as the Client answers
+   `yourBooking: { relation: "this_class" | "overlapping", bookingId,
+   classTypeName, startsAt, endsAt }`, or `null` when she holds none; Staff
+   get no `yourBooking`. A cancelled booking does not count. An app build
+   without this change ignores the field and keeps working.
