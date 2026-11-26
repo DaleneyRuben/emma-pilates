@@ -46,7 +46,9 @@ function Triage({ comment }: { comment: AdminFeedbackDto }) {
   const triage = useTriageAdminFeedback({
     fetcher,
     mutation: {
-      onSuccess: () => {
+      // The generated fetcher resolves a refusal too: only a 200 is saved.
+      onSuccess: (response) => {
+        if (response.status !== 200) return;
         setSaved(true);
         void queryClient.invalidateQueries({ queryKey: getListAdminFeedbackQueryKey() });
         void queryClient.invalidateQueries({

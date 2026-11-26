@@ -10,6 +10,7 @@ import {
   EmptyState,
   Glyph,
   LoadingState,
+  OutlinedButton,
   QueryFailure,
   radii,
   Screen,
@@ -22,6 +23,7 @@ import {
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
+import { keepPreviousData } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
@@ -39,7 +41,8 @@ import {
 } from "./comment-words";
 import { CommentsFilterSheet } from "./comments-filter-sheet";
 
-const pageSize = 50;
+// One more page each time «Ver más comentarios» is tapped.
+const pageStep = 50;
 
 function CommentCard({
   comment,
@@ -90,8 +93,13 @@ export function CommentsScreen() {
   const [status, setStatus] = useState<ListAdminFeedbackStatus>("new");
   const [filters, setFilters] = useState<CommentFilters>({});
   const [filtering, setFiltering] = useState(false);
+  const [pageSize, setPageSize] = useState(pageStep);
   const params = { page: 1, pageSize, status, ...filters };
-  const comments = useListAdminFeedback(params, { fetcher });
+  // A new tab or filter keeps the list on screen while it loads (review).
+  const comments = useListAdminFeedback(params, {
+    fetcher,
+    query: { placeholderData: keepPreviousData },
+  });
   const queryKeys = [getListAdminFeedbackQueryKey(params)];
   useRefetchOnFocus(queryKeys);
   const refreshControl = usePullToRefresh(queryKeys);
@@ -132,7 +140,10 @@ export function CommentsScreen() {
         style={bodyScroll.scroll}
       >
         <SegmentedTabs
-          onSelect={setStatus}
+          onSelect={(next) => {
+            setStatus(next);
+            setPageSize(pageStep);
+          }}
           options={statusTabs.map((tab) => ({
             key: tab.key,
             label: tab.key === status ? `${tab.label} · ${counts[tab.key]}` : tab.label,
@@ -185,11 +196,18 @@ export function CommentsScreen() {
             />
           ))
         )}
+        {page.items.length < page.totalItems ? (
+          <OutlinedButton
+            label="Ver más comentarios"
+            onPress={() => setPageSize((current) => current + pageStep)}
+          />
+        ) : null}
       </ScrollView>
       <CommentsFilterSheet
         filters={filters}
         onApply={(next) => {
           setFilters(next);
+          setPageSize(pageStep);
           setFiltering(false);
         }}
         onClose={() => setFiltering(false)}
