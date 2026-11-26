@@ -200,6 +200,10 @@ export class ClientProfileController {
       ...(view.queuedPlanStartsOn === undefined
         ? {}
         : { queuedPlanStartsOn: view.queuedPlanStartsOn }),
+      // Walkthrough n.º 22 (C02j): whose code was not active yet.
+      ...(view.inactiveInvite === undefined
+        ? {}
+        : { inactiveInvite: view.inactiveInvite }),
       subscription:
         view.subscription === null
           ? null
