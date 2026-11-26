@@ -23,7 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { bodyScroll, CardLabel, FooterPanel, taskEdges } from "../ui/card-pieces";
+import { bodyScroll, CardLabel } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
 import { CenteredCard } from "./assistant-layout";
@@ -156,10 +156,11 @@ export function NewClientScreen() {
   };
 
   const referralLabel = channel === null ? undefined : referralLabels[channel];
-  // E-C05: the hint and «Crear cuenta» share the white footer panel.
+  // E-C05: the hint and «Crear cuenta» go together; walkthrough n.º 6 puts
+  // them at the end of the form, scrolling with it, never pinned.
   const footer =
     selfRegistered !== null ? undefined : (
-      <FooterPanel bleed={0}>
+      <View style={styles.end} testID="new-client-end">
         {failure !== null ? (
           failure === limitedEmailMessage ? (
             <Text accessibilityRole="alert" style={styles.note} variant="secundario">
@@ -188,19 +189,15 @@ export function NewClientScreen() {
           onPress={() => void create()}
           testID="new-client-submit"
         />
-      </FooterPanel>
+      </View>
     );
 
-  const task = footer !== undefined;
   return (
-    <Screen
-      edges={task ? taskEdges : undefined}
-      style={[styles.screen, task && bodyScroll.taskScreen]}
-    >
+    <Screen style={styles.screen}>
       <CenteredCard maxWidth={560} style={styles.column}>
         <BackBar onBack={() => navigation.goBack()} title="Nueva clienta" />
         <View style={bodyScroll.clip}>
-          <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
+          <FormScrollView contentContainerStyle={bodyScroll.content}>
             {selfRegistered !== null ? (
               <SelfRegisteredNotice
                 clientId={selfRegistered.clientId}
@@ -275,6 +272,7 @@ export function NewClientScreen() {
                     />
                   )}
                 </View>
+                {footer}
               </>
             )}
           </FormScrollView>
@@ -288,6 +286,7 @@ const styles = StyleSheet.create({
   // E-C05: each group of fields on a white card under its uppercase label.
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lg },
   column: { gap: 0 },
+  end: { ...surfaces.card, gap: spacing.sm, padding: spacing.lg },
   note: { textAlign: "center" },
   screen: { paddingHorizontal: spacing.xlSm },
 });
