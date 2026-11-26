@@ -65,7 +65,8 @@ describe('invite links (e2e)', () => {
     );
   });
 
-  it('treats a Trainer code like a friend’s', async () => {
+  // Review: a Trainer's code opens no Guest Pass, so the page promises none.
+  it('does not promise a free class for a Trainer code', async () => {
     lookUp.mockResolvedValue({
       code: 'DANIELA',
       status: 'valid',
@@ -78,6 +79,7 @@ describe('invite links (e2e)', () => {
       .set('User-Agent', 'Mozilla/5.0 (Macintosh)')
       .expect(200);
 
-    expect(response.text).toContain('Daniela te regala tu primera clase');
+    expect(response.text).not.toContain('te regala tu primera clase');
+    expect(response.text).toContain('Tu primera clase en Emma Pilates Studio');
   });
 });
