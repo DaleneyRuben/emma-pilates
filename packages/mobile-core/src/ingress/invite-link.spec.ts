@@ -21,5 +21,9 @@ describe("parseVerifiedLink for an invite", () => {
     expect(
       parseVerifiedLink("https://links.emmapilates.test/client/invite/", hosts, "client"),
     ).toBeNull();
+    // Review: a broken escape must not throw inside the running app.
+    expect(
+      parseVerifiedLink("https://links.emmapilates.test/client/invite/%E0", hosts, "client"),
+    ).toBeNull();
   });
 });
