@@ -10,6 +10,7 @@ import {
   AvatarCircle,
   colors,
   FormField,
+  FormScrollView,
   InlineError,
   LoadingState,
   PrimaryButton,
@@ -24,11 +25,11 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { type ReactNode, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
-import { bodyScroll } from "../ui/card-pieces";
+import { bodyScroll, FooterPanel, taskEdges } from "../ui/card-pieces";
 import { appLine, commentSentAt, senderLine, typeWords } from "./comment-words";
 
 const statuses: readonly { key: TriageFeedbackDtoStatus; label: string }[] = [
@@ -37,7 +38,9 @@ const statuses: readonly { key: TriageFeedbackDtoStatus; label: string }[] = [
   { key: "resolved", label: "Resuelto" },
 ];
 
-function Triage({ comment }: { comment: AdminFeedbackDto }) {
+// The comment (`children`) and its triage scroll above E-F19's fixed footer
+// panel, which holds «Guardar» and rises with the keyboard.
+function Triage({ children, comment }: { children: ReactNode; comment: AdminFeedbackDto }) {
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<TriageFeedbackDtoStatus>(comment.status);
@@ -59,33 +62,8 @@ function Triage({ comment }: { comment: AdminFeedbackDto }) {
   });
   const failed = triage.isError || (triage.data !== undefined && triage.data.status !== 200);
 
-  return (
-    <>
-      <View style={styles.card}>
-        <Text variant="etiqueta">Estado</Text>
-        <SegmentedTabs
-          onSelect={(next) => {
-            setSaved(false);
-            setStatus(next);
-          }}
-          options={statuses}
-          selected={status}
-        />
-        <FormField
-          hint="Nota interna: la clienta o el equipo no la ven."
-          label="Qué cambiamos"
-          maxLength={500}
-          multiline
-          onChangeText={(text) => {
-            setSaved(false);
-            setNote(text);
-          }}
-          placeholder="Ej.: Arreglamos la lista de reservas en la versión 1.0.2."
-          value={note}
-        />
-        {failed ? <InlineError>No pudimos guardar. Inténtalo de nuevo.</InlineError> : null}
-        {saved ? <Text variant="secundario">Guardado.</Text> : null}
-      </View>
+  const footer = (
+    <FooterPanel bleed={0} testID="comment-footer">
       <PrimaryButton
         busy={triage.isPending}
         label="Guardar"
@@ -96,7 +74,40 @@ function Triage({ comment }: { comment: AdminFeedbackDto }) {
           })
         }
       />
-    </>
+    </FooterPanel>
+  );
+
+  return (
+    <View style={bodyScroll.clip}>
+      <FormScrollView contentContainerStyle={bodyScroll.content} footer={footer}>
+        {children}
+        <View style={styles.card}>
+          <Text variant="etiqueta">Estado</Text>
+          <SegmentedTabs
+            onSelect={(next) => {
+              setSaved(false);
+              setStatus(next);
+            }}
+            options={statuses}
+            selected={status}
+          />
+          <FormField
+            hint="Nota interna: la clienta o el equipo no la ven."
+            label="Qué cambiamos"
+            maxLength={500}
+            multiline
+            onChangeText={(text) => {
+              setSaved(false);
+              setNote(text);
+            }}
+            placeholder="Ej.: Arreglamos la lista de reservas en la versión 1.0.2."
+            value={note}
+          />
+          {failed ? <InlineError>No pudimos guardar. Inténtalo de nuevo.</InlineError> : null}
+          {saved ? <Text variant="secundario">Guardado.</Text> : null}
+        </View>
+      </FormScrollView>
+    </View>
   );
 }
 
@@ -134,9 +145,9 @@ export function CommentScreen() {
 
   const row = comment.data.data;
   return (
-    <Screen style={styles.screen}>
+    <Screen edges={taskEdges} style={[styles.screen, bodyScroll.taskScreen]}>
       {header}
-      <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
+      <Triage comment={row} key={`${row.id}-${row.status}`}>
         <View style={[styles.card, styles.sender]}>
           <AvatarCircle name={row.senderName} size={44} />
           <View style={styles.senderText}>
@@ -166,8 +177,7 @@ export function CommentScreen() {
             <Text variant="titulo-fila">{commentSentAt(row.createdAt)}</Text>
           </View>
         </View>
-        <Triage comment={row} key={`${row.id}-${row.status}`} />
-      </ScrollView>
+      </Triage>
     </Screen>
   );
 }
