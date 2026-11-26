@@ -38,19 +38,46 @@ const sendButton = (screen: Awaited<ReturnType<typeof render>>) =>
   screen.getByRole("button", { name: "Enviar comentario" });
 
 describe("FeedbackScreen (REL-012)", () => {
-  it("waits for a type and at least 10 characters, counting up to 2,000", async () => {
-    const screen = await renderScreen(jest.fn());
+  // Walkthrough n.º 15 (C25c): the button is always on; a tap with something
+  // missing marks it and brings the form back to it, instead of a silent
+  // disabled button.
+  it("marks the missing type and text on tap, counting up to 2,000", async () => {
+    const scrollTo = jest.spyOn(ScrollView.prototype, "scrollTo").mockImplementation(() => {});
+    const fetcher = jest.fn().mockResolvedValue(sent());
+    const screen = await renderScreen(fetcher);
 
     expect(screen.getByText("Enviar comentarios")).toBeOnTheScreen();
-    expect(sendButton(screen)).toBeDisabled();
+    expect(sendButton(screen)).toBeEnabled();
     await fireEvent.changeText(screen.getByLabelText("Comentario"), "  Muy mal  ");
-    await fireEvent.press(screen.getByRole("button", { name: "Problema" }));
     expect(screen.getByText("11 / 2000")).toBeOnTheScreen();
-    expect(sendButton(screen)).toBeDisabled();
+    await fireEvent.press(sendButton(screen));
 
+    expect(screen.getByText("Elige el tipo de comentario")).toBeOnTheScreen();
+    expect(screen.getByText("Escribe al menos 10 caracteres.")).toBeOnTheScreen();
+    expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ y: 0 }));
+    expect(fetcher).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Problema" }));
     await fireEvent.changeText(screen.getByLabelText("Comentario"), comment);
     expect(screen.getByRole("button", { name: "Problema" })).toBeSelected();
-    expect(sendButton(screen)).toBeEnabled();
+    expect(screen.queryByText("Elige el tipo de comentario")).toBeNull();
+    expect(screen.queryByText("Escribe al menos 10 caracteres.")).toBeNull();
+    await fireEvent.press(sendButton(screen));
+
+    await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
+    scrollTo.mockRestore();
+  });
+
+  // Walkthrough n.º 6 and 15 (C25d): the button ends the form and scrolls
+  // with it; no bar floats over the keyboard.
+  it("keeps the button at the end of the form", async () => {
+    const screen = await renderScreen(jest.fn());
+
+    expect(
+      within(screen.getByTestId("feedback-form")).getByRole("button", {
+        name: "Enviar comentario",
+      }),
+    ).toBeOnTheScreen();
   });
 
   // Walkthrough finding 96: with the keyboard up, the counter row under the
@@ -124,7 +151,7 @@ describe("FeedbackScreen (REL-012)", () => {
 
     await waitFor(() => {
       expect(
-        within(screen.getByTestId("feedback-footer")).getByText(
+        within(screen.getByTestId("feedback-form")).getByText(
           "Ya enviaste 10 comentarios hoy. Puedes enviar otro mañana.",
         ),
       ).toBeOnTheScreen();
