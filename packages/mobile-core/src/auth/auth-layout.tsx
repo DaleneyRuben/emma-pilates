@@ -83,6 +83,7 @@ export function AuthenticationScreen({
         badge={badge}
         eyebrow={eyebrow}
         footer={footer}
+        revealEndWithKeyboard={revealEndWithKeyboard}
         title={title}
         topBar={topBar}
       >

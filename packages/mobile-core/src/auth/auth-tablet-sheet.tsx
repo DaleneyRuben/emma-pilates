@@ -28,6 +28,7 @@ export function TabletAuthScreen({
   children,
   eyebrow,
   footer,
+  revealEndWithKeyboard = false,
   title,
   topBar,
 }: PropsWithChildren<{
@@ -35,6 +36,8 @@ export function TabletAuthScreen({
   badge?: OutcomeBadgeProps;
   eyebrow?: string;
   footer?: ReactNode;
+  /** Scroll to the end above the keyboard while the last field has it (C01b3, #6). */
+  revealEndWithKeyboard?: boolean;
   title?: string;
   topBar?: { onBack: () => void; title: string };
 }>) {
@@ -42,7 +45,10 @@ export function TabletAuthScreen({
   const heading = topBar?.title ?? title;
   return (
     <Screen edges={sheetEdges} style={styles.screen}>
-      <FormScrollView contentContainerStyle={styles.content}>
+      <FormScrollView
+        contentContainerStyle={styles.content}
+        revealEndWithKeyboard={revealEndWithKeyboard}
+      >
         <View style={styles.hero} testID="tablet-auth-hero">
           {topBar === undefined ? null : (
             <Pressable
