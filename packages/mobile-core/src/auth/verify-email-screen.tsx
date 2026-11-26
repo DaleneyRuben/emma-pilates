@@ -1,45 +1,49 @@
 import { useEffect, useEffectEvent, useState } from "react";
+import { StyleSheet } from "react-native";
 
+import { footerEdges } from "../ui/footer-panel";
 import { OutlinedButton } from "../ui/outlined-button";
 import { PrimaryButton } from "../ui/primary-button";
-import { Text } from "../ui/text";
-import { AuthenticationScreen } from "./auth-layout";
+import { Screen } from "../ui/screen";
+import { StatusLayout } from "../ui/status-layout";
+import { colors } from "../ui/tokens";
 import type { AuthenticationApi } from "./authentication-api";
 
 type VerificationState = "loading" | "verified" | "invalid" | "used" | "failed";
 
 const outcome = {
   failed: {
-    badge: { icon: "mail", tone: "primary" },
+    icon: "mail",
     line: "Revisa tu conexión e inténtalo de nuevo.",
     title: "No pudimos verificar tu enlace",
   },
   invalid: {
-    badge: { icon: "blocked", tone: "primary" },
+    icon: "mail",
     line: "Este enlace venció o ya fue utilizado.",
     title: "Enlace no válido",
   },
   // After a failed try the server may have verified and lost its answer, so
   // a used link then reads as possibly already verified (review).
   used: {
-    badge: { icon: "mail", tone: "primary" },
+    icon: "mail",
     line: "Si ya verificaste tu correo, puedes iniciar sesión.",
     title: "Enlace ya utilizado",
   },
   loading: {
-    badge: { icon: "mail", tone: "primary" },
+    icon: "mail",
     line: "Estamos verificando tu enlace.",
     title: "Verificando correo",
   },
   verified: {
-    badge: { icon: "check", tone: "success" },
+    icon: "check",
     line: "Tu cuenta está lista. Ahora puedes iniciar sesión.",
     title: "Correo verificado",
   },
 } as const;
 
 /**
- * C01k: the outcome on the band, its line in the card, the buttons under it.
+ * C01k, C01k2, C01k3 (walkthrough n.º 3 and 8): the payment status layout,
+ * the outcome on the band, its line in a card, the buttons on the footer.
  * A failed request (no network, a server error, the timeout) offers a retry
  * instead of waiting for ever (walkthrough n.º 3); the server answers a
  * second use of the token as «invalid», never verifying it twice.
@@ -88,28 +92,32 @@ export function VerifyEmailScreen({
   const shown = outcome[state];
 
   return (
-    <AuthenticationScreen
-      actions={
-        state === "loading" ? undefined : state === "failed" ? (
-          <>
-            <PrimaryButton
-              label="Reintentar"
-              onPress={() => {
-                setState("loading");
-                setAttempt((current) => current + 1);
-              }}
-            />
-            <OutlinedButton label="Ir a iniciar sesión" onPress={onBack} />
-          </>
-        ) : (
-          <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />
-        )
-      }
-      badge={shown.badge}
-      brand={false}
-      title={shown.title}
-    >
-      <Text variant="cuerpo">{shown.line}</Text>
-    </AuthenticationScreen>
+    <Screen edges={footerEdges} style={styles.screen}>
+      <StatusLayout
+        actions={
+          state === "loading" ? null : state === "failed" ? (
+            <>
+              <PrimaryButton
+                label="Reintentar"
+                onPress={() => {
+                  setState("loading");
+                  setAttempt((current) => current + 1);
+                }}
+              />
+              <OutlinedButton label="Ir a iniciar sesión" onPress={onBack} />
+            </>
+          ) : (
+            <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />
+          )
+        }
+        icon={shown.icon}
+        note={shown.line}
+        title={shown.title}
+      />
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: { backgroundColor: colors.surface, paddingBottom: 0 },
+});
