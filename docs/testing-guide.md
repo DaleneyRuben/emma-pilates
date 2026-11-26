@@ -74,6 +74,7 @@ numbered tests.
 | Walkthrough designs: sign-in and forms | «Todavía no confirmaste tu correo» on Login, «Revisa tu correo» that leaves once the email is confirmed elsewhere, no «Guardar contraseña» where Face ID or a fingerprint works, buttons at the end of every form and always on, and «Código de Lucía» on «Crea tu cuenta» (Test 199) | The «Guardar contraseña» rule needs real phones with and without biometrics to see the system's own prompt |
 | Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | A chosen PDF is not shown page by page before it is sent; the invite link opens no page yet |
 | Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
+| Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
 
 ## Where each designed screen is tested
 
@@ -12415,3 +12416,50 @@ E. **Invita a una amiga (C16, C16s, C16g, C16h).** As Lucía (paid Plan in
    activa cuando compres un plan.» and **Comprar un plan**, which opens the
    Plans; there is no share or edit button. The link itself opens no page yet
    (CW01 waits for approval).
+
+## Test 202: the invite link and the guest's Inicio (mejoras del recorrido 13, 19, 22)
+
+The owner approved CW01, CW01b, CW01c, C01b8, C02f, C05j and C02j on 26 Nov
+2026. Run the API and the worker on a copy of `pilates_golden`, Metro for the
+Client app, the iPhone 16 Pro and the Android emulator.
+
+A. **The link on a computer (CW01c).** Open
+   `http://127.0.0.1:<port>/client/invite/LUCIA` (use Lucía's code from Perfil
+   › Invita a una amiga) in a desktop browser: «Lucía te regala tu primera
+   clase», «SU CÓDIGO», the code, and **App Store** and **Google Play**. An
+   unknown code shows «Tu primera clase en Emma Pilates Studio» and the two
+   stores. The page source carries `og:title`, `og:description` and
+   `og:image` (`https://app.emmapilatesstudio.com/compartir.png`), so
+   WhatsApp draws a card.
+B. **iPhone (CW01).** With an iPhone user agent (Safari on the Simulator) the
+   page has one button, **Copiar código y abrir App Store**: it copies the
+   code and opens the App Store.
+C. **Android (CW01b).** `curl -I -A "Android" …/client/invite/LUCIA` answers
+   302 to `https://play.google.com/store/apps/details?id=com.emmapilates.client&referrer=invite_code%3DLUCIA`.
+D. **With the app installed.** The Client app claims `/client/invite/*`
+   (Apple association and the Android intent filter; needs the 1.3.0 build).
+   Opening the link signed out opens «Crea tu cuenta» with the code written,
+   «Código de Lucía ✓» and «Recomendación de una amiga» marked; signed in it
+   is ignored.
+E. **After installing (CW01b, C01b8).** Android: on the first launch the app
+   asks Google Play for the install referrer once and «Crea tu cuenta» opens
+   with the code. iPhone: the first time «Crea tu cuenta» opens with no code
+   it reads the clipboard once (iOS asks to allow pasting) and, for a live
+   Client code, offers «¿Te invitó Lucía? · Usa su código y tu primera clase
+   es gratis.» with **Usar código LUCIA** / **No, gracias**. A build older than
+   1.3.0 reached by an update offers neither and keeps working.
+F. **The guest's Inicio (C02f).** Register a friend with the code of a host
+   with a paid Plan and verify her: Inicio's card reads «Te invitó Lucía»
+   (with her initials), «Tu clase gratis de invitada», «Úsala antes del …»
+   and **Reservar mi clase gratis**, which opens Reservar. `GET
+   /api/v1/clients/current/subscription` carries `guestPass.hostFirstName`
+   and `hostInitials`.
+G. **Booking it (C05j).** Book a class with the pass: «Reserva confirmada ·
+   Usaste tu clase gratis. ¡Te esperamos el sáb 28 a las 13:00!» with the
+   class's day and time.
+H. **A code that was not active (C02j).** Register a friend with the code of
+   a Client without a paid Plan and verify her: Inicio shows «El código de
+   Lucía todavía no está activo · Esta vez tu cuenta no incluye la clase
+   gratis.» above «Elige tu plan y empieza a moverte». The subscription
+   answers `inactiveInvite: { hostFirstName }` while she has never had a
+   Plan and the host still has no paid Plan.
