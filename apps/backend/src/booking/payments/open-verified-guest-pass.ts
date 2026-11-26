@@ -1,12 +1,14 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { isMonthlyInviteSpent } from './guest-pass';
+import { hasActivePaidPlan } from './host-paid-plan';
 import { GuestPassError, openGuestPass } from './open-guest-pass';
 
 type Transaction = Prisma.TransactionClient;
 
 // The monthly invite is spent here, once her email is verified or her
-// invitation is activated. The host's month is already used, or she has no
-// Client code: either way verification succeeds and no pass is opened.
+// invitation is activated. The host's month is already used, she has no paid
+// Plan in force (walkthrough n.º 22), or she has no Client code: either way
+// verification succeeds and no pass is opened.
 export const openGuestPassForVerifiedClient = async (
   transaction: Transaction,
   input: { friendClientId: string; authorAccountId: string; now: Date },
@@ -21,6 +23,15 @@ export const openGuestPassForVerifiedClient = async (
     select: { id: true },
   });
   if (existing !== null) return;
+  if (
+    !(await hasActivePaidPlan(
+      transaction,
+      acquisition.referrerClientId,
+      input.now,
+    ))
+  ) {
+    return;
+  }
   try {
     await openGuestPass(transaction, {
       hostClientId: acquisition.referrerClientId,
