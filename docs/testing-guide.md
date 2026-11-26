@@ -12201,15 +12201,18 @@ A. **A stalled email check (n.º 3).** Register a Client in the app, stop the
    API, then open the verification link on the phone. «Verificando correo»
    gives way within 15 seconds to «No pudimos verificar tu enlace» · «Revisa
    tu conexión e inténtalo de nuevo.» with **Reintentar** and **Ir a iniciar
-   sesión**. Start the API and tap **Reintentar**: «Correo verificado». A
-   second **Reintentar** after a lost answer reads «Enlace no válido», because
-   the server answers a used token as `invalid`, never verifying it twice.
+   sesión**. Start the API and tap **Reintentar**: «Correo verificado». If the
+   first try did reach the server and only its answer was lost, the retry
+   reads «Enlace ya utilizado» · «Si ya verificaste tu correo, puedes iniciar
+   sesión.»: the server answers a used token as `invalid`, never verifying it
+   twice.
 B. **Signing out after a link (n.º 17).** Verify an email from its link, tap
    **Ir a iniciar sesión**, log in, then Perfil › **Cerrar sesión**: Login,
    not «Enlace no válido». The same after an activation link (Staff app, a
    new Staff Member's link) and after a recovery link (both apps): signing
    out never reopens the used link. A new link opened later still shows its
-   own screen.
+   own screen. A sign-in link opened while signed in is forgotten too: signing
+   out afterwards opens Login.
 C. **The invoice picker (n.º 25).** Staff app as Paola: Pagos › Accesos ›
    Facturas por subir › Mariana › **Subir factura**. The sheet offers only
    **Elegir una imagen** and **Elegir un PDF** (no «Tomar foto»). Each one
