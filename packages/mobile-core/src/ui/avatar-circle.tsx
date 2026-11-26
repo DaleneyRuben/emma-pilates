@@ -1,16 +1,17 @@
 import { StyleSheet, View } from "react-native";
 
+import { initials } from "../account/initials";
 import { Text } from "./text";
 import { colors } from "./tokens";
 
-/** Discs under 44 pt draw the initial in `pastilla`; 44 and over in `destacado`. */
+/** Discs under 44 pt draw the initials in `pastilla`; 44 and over in `destacado`. */
 const largeAvatar = 44;
 
 /**
- * The first letter of a name on the accent wash (MOB-042): S04's results,
- * S11's payments. The letter is a scale variant, `pastilla` or `destacado` by
- * the disc's size, and never grows with the phone's text size, since the disc
- * does not (follow-up 285).
+ * A name's two initials on the accent wash (MOB-042, E-F18): S04's results,
+ * S11's payments, the comments. They are a scale variant, `pastilla` or
+ * `destacado` by the disc's size, and never grow with the phone's text size,
+ * since the disc does not (follow-up 285).
  */
 export function AvatarCircle({
   name,
@@ -29,7 +30,7 @@ export function AvatarCircle({
       testID={testID}
     >
       <Text allowFontScaling={false} variant={size < largeAvatar ? "pastilla" : "destacado"}>
-        {name.trim().charAt(0).toUpperCase()}
+        {initials(name)}
       </Text>
     </View>
   );
