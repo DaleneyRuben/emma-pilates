@@ -1,16 +1,28 @@
-import { Chevron, colors, Glyph, type GlyphName, radii, spacing, Text } from "@pilates/mobile-core";
+import {
+  Chevron,
+  colors,
+  Glyph,
+  type GlyphName,
+  radii,
+  rosa,
+  spacing,
+  Text,
+} from "@pilates/mobile-core";
 import { Pressable, StyleSheet, View } from "react-native";
 
 /**
- * A Perfil settings row (S23): `IconRow`'s shape with the unread count in
- * Rosa profundo, and «Cerrar sesión» as the Error last row (follow-up 225,
- * walkthrough 19) instead of a separate button.
+ * A Perfil row (S23, walkthrough n.º 16 after the Client's C18): the line
+ * glyph on a 36 pt 50 disc, the label in `titulo-fila` with an optional line
+ * under it, the unread count in Rosa profundo or a short value, and the
+ * chevron. A row with no `onPress` only states a fact, such as «Rol».
+ * «Cerrar sesión» is the Error last row (follow-up 225, walkthrough 19).
  */
 export function ProfileRow({
   badge = 0,
   icon,
   label,
   onPress,
+  subtitle,
   testID,
   tone = "default",
   value,
@@ -18,7 +30,9 @@ export function ProfileRow({
   badge?: number;
   icon: GlyphName;
   label: string;
-  onPress: () => void;
+  onPress?: () => void;
+  /** A line under the label, such as Soporte's «Contacto y WhatsApp del estudio». */
+  subtitle?: string;
   testID?: string;
   tone?: "default" | "error";
   /** A short value before the chevron, such as the Trainer's code. */
@@ -31,6 +45,44 @@ export function ProfileRow({
   valueTone?: "muted" | "warning" | "error";
 }) {
   const error = tone === "error";
+  const content = (
+    <>
+      <View style={styles.disc} testID="profile-row-disc">
+        <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
+      </View>
+      {subtitle === undefined ? (
+        <Text style={styles.label} variant="titulo-fila">
+          {label}
+        </Text>
+      ) : (
+        <View style={styles.label}>
+          <Text variant="titulo-fila">{label}</Text>
+          <Text variant="secundario">{subtitle}</Text>
+        </View>
+      )}
+      {badge > 0 ? (
+        <View style={styles.badge} testID="notifications-row-badge">
+          <Text allowFontScaling={false} tone="onDark" variant="pastilla">
+            {badge > 9 ? "9+" : String(badge)}
+          </Text>
+        </View>
+      ) : null}
+      {value === undefined ? null : (
+        // E-F01: the value, a code or a standing, in `compacto` with no hand-made spacing.
+        <Text style={styles.value} variant="compacto">
+          {value}
+        </Text>
+      )}
+      {error || onPress === undefined ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
+    </>
+  );
+  if (onPress === undefined) {
+    return (
+      <View style={styles.row} testID={testID}>
+        {content}
+      </View>
+    );
+  }
   return (
     <Pressable
       accessibilityLabel={
@@ -45,26 +97,7 @@ export function ProfileRow({
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       testID={testID}
     >
-      <View style={styles.disc}>
-        <Glyph color={colors.text} name={icon} size={22} strokeWidth={1.6} />
-      </View>
-      <Text style={styles.label} variant="titulo-fila">
-        {label}
-      </Text>
-      {badge > 0 ? (
-        <View style={styles.badge} testID="notifications-row-badge">
-          <Text allowFontScaling={false} tone="onDark" variant="pastilla">
-            {badge > 9 ? "9+" : String(badge)}
-          </Text>
-        </View>
-      ) : null}
-      {value === undefined ? null : (
-        // E-F01: the value, a code or a standing, in `compacto` with no hand-made spacing.
-        <Text style={styles.value} variant="compacto">
-          {value}
-        </Text>
-      )}
-      {error ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
+      {content}
     </Pressable>
   );
 }
@@ -80,8 +113,15 @@ const styles = StyleSheet.create({
     minWidth: 24,
     paddingHorizontal: spacing.sm,
   },
-  // FIX-089: the icon stands alone, with no tinted disc behind it.
-  disc: { alignItems: "center", justifyContent: "center", width: 24 },
+  // Walkthrough n.º 16 (E-F01): the Client's 36 pt disc on 50.
+  disc: {
+    alignItems: "center",
+    backgroundColor: rosa[50],
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
   // E-F01: the row's label takes the room; its value keeps to 60 percent.
   label: { flex: 1 },
   pressed: { opacity: 0.7 },
@@ -89,9 +129,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: spacing.md,
-    minHeight: 52,
+    minHeight: 64,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.smd,
+    paddingVertical: spacing.mdLg,
   },
   value: { flexShrink: 1, maxWidth: "60%" },
 });

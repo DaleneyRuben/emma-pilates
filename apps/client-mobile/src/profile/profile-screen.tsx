@@ -249,6 +249,7 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     icon="mail"
                     label="Soporte"
                     onPress={() => openPublicPage("support")}
+                    subtitle="Contacto y WhatsApp del estudio"
                   />
                   <ProfileRow
                     icon="shield"

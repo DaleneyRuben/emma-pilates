@@ -7,12 +7,12 @@ import {
 import {
   BiometricSwitchRow,
   BrandToast,
-  IconRow,
   LoadingState,
   LogoutConfirmationSheet,
   openPublicPage,
   QueryFailure,
   Screen,
+  SectionTitle,
   spacing,
   surfaces,
   Text,
@@ -123,94 +123,117 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                 : "Tu nombre y tu correo los actualiza administración."
           }
         />
-        {/* E-F01: each section's label sits inside its white card. */}
-        <RowCard label="Tu cuenta">
-          <IconRow icon="person" label="Rol" value={staffRoleLabel(member.role, member.gender)} />
-          <IconRow
-            icon="pin"
-            label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
-            value={branchesLabel(member)}
-          />
-        </RowCard>
-        <RowCard label="Ajustes">
-          {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
+        {/* Walkthrough n.º 16 (E-F01, E-F03): the Client's C18, a serif title
+            outside each white card of round-icon rows. */}
+        <View testID="profile-section-account">
+          <SectionTitle>Tu cuenta</SectionTitle>
+          <RowCard>
+            <ProfileRow
+              icon="person"
+              label="Rol"
+              value={staffRoleLabel(member.role, member.gender)}
+            />
+            <ProfileRow
+              icon="pin"
+              label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
+              value={branchesLabel(member)}
+            />
+          </RowCard>
+        </View>
+        <View testID="profile-section-settings">
+          <SectionTitle>Ajustes</SectionTitle>
+          <RowCard>
+            {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
                 here: her tab, or for the Assistant the screen itself. */}
-          {pay === "none" ? null : (
-            <ProfileRow
-              icon="credit"
-              label="Mis pagos"
-              onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
-              testID="profile-my-pay"
-              value={lastPayment}
-            />
-          )}
-          {/* FIX-072: every role keeps the QR she is paid by. */}
-          <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
-          {administrator ? (
-            <ProfileRow
-              icon="eye"
-              label="Ver la app como…"
-              onPress={() => navigation.navigate("ViewAs")}
-            />
-          ) : null}
-          {trainer && referralCode !== null ? (
-            <ProfileRow
-              icon="tag"
-              label="Tu código de referido"
-              onPress={() => navigation.navigate("ReferralCode")}
-              value={referralCode}
-            />
-          ) : null}
-          <ProfileRow
-            badge={unreadCount}
-            icon="bell"
-            label="Notificaciones"
-            onPress={() => navigation.navigate("Notifications")}
-          />
-          {administrator ? (
-            // Walkthrough n.º 11 (E-F18): the comments, read from the phone.
-            <ProfileRow
-              icon="message"
-              label="Comentarios"
-              onPress={() => navigation.navigate("Comments")}
-            />
-          ) : null}
-          <ProfileRow icon="mail" label="Soporte" onPress={() => openPublicPage("support")} />
-          <ProfileRow
-            icon="document"
-            label="Política de privacidad"
-            onPress={() => openPublicPage("privacy")}
-          />
-          {viewingAs === null ? (
-            <>
+            {pay === "none" ? null : (
               <ProfileRow
-                icon="lock"
-                label="Cambiar contraseña"
-                onPress={() => navigation.navigate("ChangePassword")}
+                icon="credit"
+                label="Mis pagos"
+                onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
+                testID="profile-my-pay"
+                value={lastPayment}
               />
-              {identity.biometrics.available ? <BiometricSwitchRow appearance="plain" /> : null}
+            )}
+            {/* FIX-072: every role keeps the QR she is paid by. */}
+            <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
+            {administrator ? (
+              <ProfileRow
+                icon="eye"
+                label="Ver la app como…"
+                onPress={() => navigation.navigate("ViewAs")}
+              />
+            ) : null}
+            {administrator ? (
+              // Walkthrough n.º 11 (E-F18): the comments, read from the phone.
+              <ProfileRow
+                icon="message"
+                label="Comentarios"
+                onPress={() => navigation.navigate("Comments")}
+              />
+            ) : null}
+            {trainer && referralCode !== null ? (
+              <ProfileRow
+                icon="tag"
+                label="Tu código de referido"
+                onPress={() => navigation.navigate("ReferralCode")}
+                value={referralCode}
+              />
+            ) : null}
+            <ProfileRow
+              badge={unreadCount}
+              icon="bell"
+              label="Notificaciones"
+              onPress={() => navigation.navigate("Notifications")}
+            />
+            {viewingAs === null ? (
+              <>
+                <ProfileRow
+                  icon="password"
+                  label="Cambiar contraseña"
+                  onPress={() => navigation.navigate("ChangePassword")}
+                />
+                {identity.biometrics.available ? <BiometricSwitchRow /> : null}
+                <ProfileRow
+                  icon="logout"
+                  label="Cerrar sesión"
+                  onPress={() => setConfirmingLogout(true)}
+                  testID="profile-logout"
+                  tone="error"
+                />
+              </>
+            ) : (
+              <ProfileRow
+                icon="logout"
+                label={`Dejar de ver como ${viewingAs}`}
+                onPress={exit}
+                testID="profile-stop-viewing"
+              />
+            )}
+          </RowCard>
+        </View>
+        <View testID="profile-section-help">
+          <SectionTitle>Ayuda y legal</SectionTitle>
+          <RowCard>
+            {viewingAs === null ? (
               <ProfileRow
                 icon="message"
                 label="Enviar comentarios"
                 onPress={() => navigation.navigate("Feedback")}
               />
-              <ProfileRow
-                icon="logout"
-                label="Cerrar sesión"
-                onPress={() => setConfirmingLogout(true)}
-                testID="profile-logout"
-                tone="error"
-              />
-            </>
-          ) : (
+            ) : null}
             <ProfileRow
-              icon="logout"
-              label={`Dejar de ver como ${viewingAs}`}
-              onPress={exit}
-              testID="profile-stop-viewing"
+              icon="mail"
+              label="Soporte"
+              onPress={() => openPublicPage("support")}
+              subtitle="Contacto y WhatsApp del estudio"
             />
-          )}
-        </RowCard>
+            <ProfileRow
+              icon="shield"
+              label="Política de privacidad"
+              onPress={() => openPublicPage("privacy")}
+            />
+          </RowCard>
+        </View>
         <View style={styles.footerCard}>
           <Text style={styles.footer} variant="secundario">
             {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
@@ -233,5 +256,6 @@ const styles = StyleSheet.create({
   footer: { textAlign: "center" },
   // A quiet line goes in a white card, never on the 100 screen.
   footerCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.smLg },
-  screen: { paddingHorizontal: spacing.xlSm },
+  // Walkthrough n.º 8: the band, titles and cards on one 16 pt edge.
+  screen: { paddingHorizontal: spacing.lg },
 });

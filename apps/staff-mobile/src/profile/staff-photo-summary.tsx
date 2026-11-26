@@ -5,7 +5,6 @@ import {
   type StaffProfileDto,
 } from "@pilates/api-contracts";
 import {
-  colors,
   NoticeRow,
   PersonAvatar,
   PhotoUploadRing,
@@ -14,9 +13,7 @@ import {
   spacing,
   surfaces,
   Text,
-  TextButton,
   useStaffPhoto,
-  radii,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -40,13 +37,13 @@ type ProfileQueryData = { data: StaffProfileDto; status: number; headers: Header
 // notice says only what failed.
 const uploadFailed = "No pudimos subir tu foto.";
 const removalFailed = "No pudimos quitar la foto. Inténtalo de nuevo.";
-const avatarSize = 64;
+const avatarSize = 56;
 
 /**
- * S23's summary under proposal A (follow-ups 240–242, 247), on its white card
- * (E-F01): her 64 px photo
- * or initials, her name and email, «Cambiar foto» and «Quitar foto», and the
- * role's note. The photo is saved the moment the upload finishes.
+ * S23's summary (follow-ups 240–242, 247) on the Client's deep-rose identity
+ * card (walkthrough n.º 16, E-F01, E-F03): her 56 px photo or initials, her
+ * name, email and phone, «Cambiar foto» («Quitar foto» once she has one) and
+ * the role's note. The photo is saved the moment the upload finishes.
  */
 export function StaffPhotoSummary({
   editable = true,
@@ -130,23 +127,33 @@ export function StaffPhotoSummary({
   };
 
   return (
-    <View style={styles.block}>
+    <View style={styles.block} testID="profile-identity">
       <View style={styles.summary}>
         <PhotoUploadRing size={avatarSize} uploading={state.status === "uploading"}>
-          <PersonAvatar name={member.name} photoUri={shownUri} size={avatarSize} />
+          <PersonAvatar name={member.name} onEmphasis photoUri={shownUri} size={avatarSize} />
         </PhotoUploadRing>
         <View style={styles.body}>
-          <Text variant="titulo-bloque">{member.name}</Text>
-          <Text variant="secundario">{member.email}</Text>
-          {member.phone ? <Text variant="secundario">{phoneWithFlag(member.phone)}</Text> : null}
+          <Text tone="onDark" variant="titulo-bloque">
+            {member.name}
+          </Text>
+          <Text tone="onDark" variant="cuerpo">
+            {member.email}
+          </Text>
+          {member.phone ? (
+            <Text tone="onDark" variant="cuerpo">
+              {phoneWithFlag(member.phone)}
+            </Text>
+          ) : null}
           <View style={styles.actions}>
             {!editable ? null : state.status === "removing" ? (
-              <Text variant="secundario">Quitando foto…</Text>
+              <Text tone="onDark" variant="secundario">
+                Quitando foto…
+              </Text>
             ) : (
               <>
-                <TintButton label="Cambiar foto" onPress={() => void change()} />
+                <CardLink label="Cambiar foto" onPress={() => void change()} />
                 {member.photo === null ? null : (
-                  <TextButton label="Quitar foto" onPress={() => void remove()} />
+                  <CardLink label="Quitar foto" onPress={() => void remove()} />
                 )}
               </>
             )}
@@ -158,25 +165,30 @@ export function StaffPhotoSummary({
         <>
           <NoticeRow message={uploadFailed} />
           <View style={styles.retry}>
-            <TextButton label="Reintentar" onPress={() => void upload(state.picked)} />
+            <CardLink label="Reintentar" onPress={() => void upload(state.picked)} />
           </View>
         </>
       ) : null}
-      <Text variant="secundario">{note}</Text>
+      <Text tone="onDark" variant="secundario">
+        {note}
+      </Text>
     </View>
   );
 }
 
-/** The secondary button (FIX-089): Crema with a Rosa profundo outline. */
-function TintButton({ label, onPress }: { label: string; onPress: () => void }) {
+/** An underlined white link on the identity card (E-F03 «Cambiar foto»). */
+function CardLink({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
+      hitSlop={spacing.sm}
       onPress={onPress}
-      style={({ pressed }) => [styles.tint, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.link, pressed && styles.pressed]}
     >
-      <Text variant="boton-chico">{label}</Text>
+      <Text tone="onDark" variant="enlace">
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -185,24 +197,13 @@ const styles = StyleSheet.create({
   actions: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-    minHeight: 44,
+    gap: spacing.lg,
+    marginTop: spacing.xs,
   },
-  block: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
+  block: { ...surfaces.emphasis, gap: spacing.smLg, padding: spacing.xlSm },
   body: { flex: 1, gap: spacing.xxs },
+  link: { justifyContent: "center", minHeight: 32 },
   pressed: { opacity: 0.7 },
   summary: { alignItems: "center", flexDirection: "row", gap: spacing.mdLg },
-  // FIX-089: the secondary button, Crema with a Rosa profundo outline.
-  tint: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.primary,
-    borderWidth: 1.5,
-    borderRadius: radii.button,
-    height: 44,
-    justifyContent: "center",
-    paddingHorizontal: 14,
-  },
   retry: { flexDirection: "row", justifyContent: "center" },
 });

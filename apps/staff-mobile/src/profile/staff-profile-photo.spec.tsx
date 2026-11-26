@@ -118,12 +118,10 @@ describe("Staff Perfil photo", () => {
     const screen = await openProfile(routeFetcher(routes(daniela)), "trainer");
 
     expect(screen.getByText("DO")).toBeOnTheScreen();
-    // FIX-089: the secondary button, Crema with a Rosa profundo outline.
-    expect(screen.getByRole("button", { name: "Cambiar foto" })).toHaveStyle({
-      backgroundColor: "#FFFBFB",
-      borderColor: "#93615D",
-      borderWidth: 1.5,
-      height: 44,
+    // Walkthrough n.º 16 (E-F01): an underlined white link on the deep-rose card.
+    expect(screen.getByText("Cambiar foto")).toHaveStyle({
+      color: "#FFFBFB",
+      textDecorationLine: "underline",
     });
     expect(screen.queryByRole("button", { name: "Quitar foto" })).toBeNull();
     expect(
@@ -133,7 +131,7 @@ describe("Staff Perfil photo", () => {
     expect(screen.queryByText("Se recorta al centro en forma de círculo.")).toBeNull();
   });
 
-  it("shows her 64 px photo and «Quitar foto» once one is attached", async () => {
+  it("shows her 56 px photo and «Quitar foto» once one is attached", async () => {
     const screen = await openProfile(routeFetcher(routes(withPhoto)), "trainer");
 
     await waitFor(() =>
@@ -141,7 +139,7 @@ describe("Staff Perfil photo", () => {
         uri: photoDataUri,
       }),
     );
-    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ width: 64, height: 64 });
+    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ width: 56, height: 56 });
     expect(screen.queryByText("DO")).toBeNull();
     expect(screen.getByRole("button", { name: "Quitar foto" })).toBeOnTheScreen();
     expect(screen.queryByText("Se recorta al centro en forma de círculo.")).toBeNull();
