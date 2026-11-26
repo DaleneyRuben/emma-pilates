@@ -31,6 +31,7 @@ import {
   TabletColumn,
   TabletColumns,
   Text,
+  usePushNotifications,
   type InvoiceChoice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -52,6 +53,13 @@ type PaymentNavigation = {
   navigate: (screen: "PaymentStatus") => void;
 };
 
+// C11n (walkthrough n.º 9): «Te avisaremos apenas esté listo» needs the
+// permission; the booking offer's sheet and thirty-day rule, with these words.
+const paymentPermissionCopy = {
+  reason: "Activa las notificaciones y te escribimos apenas el estudio revise tu comprobante.",
+  title: "Te avisamos cuando aprobemos tu pago",
+};
+
 const uploadErrorCopy: Record<string, string> = {
   unsupported_media_type: "Elige una imagen JPEG, PNG o WebP.",
   upload_rejected: "No pudimos leer esa imagen. Prueba con otra captura.",
@@ -60,6 +68,7 @@ const uploadErrorCopy: Record<string, string> = {
 export function PaymentScreen() {
   const navigation = useNavigation<PaymentNavigation>();
   const fetcher = useClientFetcher();
+  const { offerPermission: offerPushPermission } = usePushNotifications();
   const queryClient = useQueryClient();
   const intent = useGetCurrentPurchaseIntent({
     fetcher,
@@ -157,6 +166,7 @@ export function PaymentScreen() {
         queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() }),
       ]);
       navigation.navigate("PaymentStatus");
+      offerPushPermission(paymentPermissionCopy);
     } catch {
       setError("No pudimos enviar el comprobante. Inténtalo de nuevo.");
     } finally {
