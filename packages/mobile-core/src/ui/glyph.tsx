@@ -239,6 +239,8 @@ export const glyphShapes = {
       <Circle cx={8.5} cy={8.5} r={1.5} />
     </>
   ),
+  // Walkthrough n.º 10 (C19c): the swipe's «Borrar».
+  trash: <Path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />,
   undo: <Path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" />,
   upload: (
     <Path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15" />

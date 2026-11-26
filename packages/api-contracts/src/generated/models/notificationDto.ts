@@ -5,6 +5,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { NotificationDtoCategory } from "./notificationDtoCategory";
+import type { NotificationFeedbackDto } from "./notificationFeedbackDto";
+import type { NotificationReviewDto } from "./notificationReviewDto";
 
 export interface NotificationDto {
   id: string;
@@ -19,4 +21,8 @@ export interface NotificationDto {
   createdAt: string;
   /** @nullable */
   readAt?: string | null;
+  /** @nullable */
+  review?: NotificationReviewDto | null;
+  /** @nullable */
+  feedback?: NotificationFeedbackDto | null;
 }

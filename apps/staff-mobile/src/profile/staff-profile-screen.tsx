@@ -43,6 +43,7 @@ type ProfileNavigation = {
       | "MyPay"
       | "ChangePassword"
       | "Feedback"
+      | "Comments"
       | "ReferralCode"
       | "ViewAs"
       | "PayoutQr",
@@ -166,6 +167,14 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
             label="Notificaciones"
             onPress={() => navigation.navigate("Notifications")}
           />
+          {administrator ? (
+            // Walkthrough n.º 11 (E-F18): the comments, read from the phone.
+            <ProfileRow
+              icon="message"
+              label="Comentarios"
+              onPress={() => navigation.navigate("Comments")}
+            />
+          ) : null}
           <ProfileRow icon="mail" label="Soporte" onPress={() => openPublicPage("support")} />
           <ProfileRow
             icon="document"

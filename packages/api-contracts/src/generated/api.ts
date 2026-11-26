@@ -32285,6 +32285,234 @@ export const useMarkNotificationRead = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type removeNotificationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type removeNotificationResponseSuccess =
+  removeNotificationResponse204 & {
+    headers: Headers;
+  };
+export type removeNotificationResponse = removeNotificationResponseSuccess;
+
+export const getRemoveNotificationUrl = (notificationId: string) => {
+  return `/api/v1/notifications/${notificationId}`;
+};
+
+export const removeNotification = async (
+  notificationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<removeNotificationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRemoveNotificationUrl(notificationId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removeNotificationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as removeNotificationResponse;
+};
+
+export const getRemoveNotificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeNotification>>,
+    TError,
+    RemoveNotificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeNotification>>,
+  TError,
+  RemoveNotificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["removeNotification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeNotification>>,
+    RemoveNotificationMutationVariables
+  > = (props) => {
+    const { notificationId } = props ?? {};
+
+    return removeNotification(notificationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveNotificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeNotification>>
+>;
+
+export type RemoveNotificationMutationError = unknown;
+export type RemoveNotificationMutationVariables = { notificationId: string };
+
+export const useRemoveNotification = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeNotification>>,
+      TError,
+      RemoveNotificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeNotification>>,
+  TError,
+  RemoveNotificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRemoveNotificationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type restoreNotificationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type restoreNotificationResponseSuccess =
+  restoreNotificationResponse204 & {
+    headers: Headers;
+  };
+export type restoreNotificationResponse = restoreNotificationResponseSuccess;
+
+export const getRestoreNotificationUrl = (notificationId: string) => {
+  return `/api/v1/notifications/${notificationId}/restore`;
+};
+
+export const restoreNotification = async (
+  notificationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<restoreNotificationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getRestoreNotificationUrl(notificationId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: restoreNotificationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as restoreNotificationResponse;
+};
+
+export const getRestoreNotificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof restoreNotification>>,
+    TError,
+    RestoreNotificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof restoreNotification>>,
+  TError,
+  RestoreNotificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["restoreNotification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof restoreNotification>>,
+    RestoreNotificationMutationVariables
+  > = (props) => {
+    const { notificationId } = props ?? {};
+
+    return restoreNotification(notificationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RestoreNotificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof restoreNotification>>
+>;
+
+export type RestoreNotificationMutationError = unknown;
+export type RestoreNotificationMutationVariables = { notificationId: string };
+
+export const useRestoreNotification = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof restoreNotification>>,
+      TError,
+      RestoreNotificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof restoreNotification>>,
+  TError,
+  RestoreNotificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRestoreNotificationMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type registerCurrentDeviceResponse204 = {
   data: void;
   status: 204;
@@ -44006,6 +44234,199 @@ export function useExportAdminFeedback<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getExportAdminFeedbackQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getAdminFeedbackResponse200 = {
+  data: AdminFeedbackDto;
+  status: 200;
+};
+
+export type getAdminFeedbackResponseSuccess = getAdminFeedbackResponse200 & {
+  headers: Headers;
+};
+export type getAdminFeedbackResponse = getAdminFeedbackResponseSuccess;
+
+export const getGetAdminFeedbackUrl = (feedbackId: string) => {
+  return `/api/v1/administrator/feedback/${feedbackId}`;
+};
+
+export const getAdminFeedback = async (
+  feedbackId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAdminFeedbackResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAdminFeedbackUrl(feedbackId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAdminFeedbackResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAdminFeedbackResponse;
+};
+
+export const getGetAdminFeedbackQueryKey = (feedbackId: string) => {
+  return [`/api/v1/administrator/feedback/${feedbackId}`] as const;
+};
+
+export const getGetAdminFeedbackQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAdminFeedbackQueryKey(feedbackId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAdminFeedback>>
+  > = ({ signal }) =>
+    getAdminFeedback(feedbackId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: feedbackId !== null && feedbackId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAdminFeedback>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAdminFeedbackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdminFeedback>>
+>;
+export type GetAdminFeedbackQueryError = unknown;
+
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminFeedback>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAdminFeedback<
+  TData = Awaited<ReturnType<typeof getAdminFeedback>>,
+  TError = unknown,
+>(
+  feedbackId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminFeedback>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAdminFeedbackQueryOptions(feedbackId, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

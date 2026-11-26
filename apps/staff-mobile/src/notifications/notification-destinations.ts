@@ -11,7 +11,9 @@ export type StaffNotificationRoute =
   | readonly ["PaymentsTab", { screen: "ReviewPayment"; params: { paymentId: string } }]
   | readonly ["PaymentsTab", { screen: "Freezes" }]
   | readonly ["PaymentsTab", { screen: "ReviewFreeze"; params: { freezeId: string } }]
-  | readonly ["ProfileTab", { screen: "PayoutQr"; initial: false }];
+  | readonly ["ProfileTab", { screen: "PayoutQr"; initial: false }]
+  | readonly ["ProfileTab", { screen: "Comments"; initial: false }]
+  | readonly ["ProfileTab", { screen: "Comment"; params: { feedbackId: string }; initial: false }];
 
 // The one map from a notification's destination to a Staff screen, shared by
 // the inbox and push taps (NOT-002). Mi agenda is the first tab of the Trainer
@@ -40,6 +42,15 @@ export function staffNotificationDestination(
     return destinationId === null
       ? ["PaymentsTab", { screen: "Freezes" }]
       : ["PaymentsTab", { screen: "ReviewFreeze", params: { freezeId: destinationId } }];
+  }
+  // Walkthrough n.º 11 (E-F20): a comment's notice opens that comment.
+  if (role === "administrator" && destinationType === "feedback") {
+    return destinationId === null
+      ? ["ProfileTab", { screen: "Comments", initial: false }]
+      : [
+          "ProfileTab",
+          { screen: "Comment", params: { feedbackId: destinationId }, initial: false },
+        ];
   }
   // FIX-072: every role keeps a payout QR; its reminder opens it over Perfil.
   if (destinationType === "payout_qr") {

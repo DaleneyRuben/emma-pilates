@@ -1,3 +1,8 @@
+import {
+  NotificationRemovalController,
+  notificationRemove,
+  notificationRestore,
+} from '../src/notifications/notification-removal.controller';
 import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -205,12 +210,18 @@ describe('commands refused while impersonating (e2e, FUT-001)', () => {
   const markAllRead = jest.fn<() => Promise<{ marked: number }>>();
   const listPage = jest.fn<() => Promise<unknown>>();
   const countUnread = jest.fn<() => Promise<number>>();
+  const removeOne = jest.fn<() => Promise<void>>();
+  const restoreOne = jest.fn<() => Promise<void>>();
 
   beforeEach(async () => {
     listPage.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
     countUnread.mockResolvedValue(2);
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [DevicesController, NotificationsController],
+      controllers: [
+        DevicesController,
+        NotificationsController,
+        NotificationRemovalController,
+      ],
       providers: [
         {
           provide: authenticatedPrincipalResolver,
@@ -222,6 +233,8 @@ describe('commands refused while impersonating (e2e, FUT-001)', () => {
         { provide: notificationUnreadCount, useValue: countUnread },
         { provide: notificationMarkRead, useValue: markRead },
         { provide: notificationMarkAllRead, useValue: markAllRead },
+        { provide: notificationRemove, useValue: removeOne },
+        { provide: notificationRestore, useValue: restoreOne },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -266,6 +279,20 @@ describe('commands refused while impersonating (e2e, FUT-001)', () => {
           '/api/v1/notifications/11111111-1111-4111-8111-111111111111/read',
         ),
     ],
+    [
+      'removing a notification',
+      () =>
+        request(app.getHttpServer()).delete(
+          '/api/v1/notifications/11111111-1111-4111-8111-111111111111',
+        ),
+    ],
+    [
+      'restoring a notification',
+      () =>
+        request(app.getHttpServer()).post(
+          '/api/v1/notifications/11111111-1111-4111-8111-111111111111/restore',
+        ),
+    ],
   ])('refuses %s with impersonation_forbidden', async (_label, send) => {
     await send()
       .set('Authorization', bearer)
@@ -277,6 +304,8 @@ describe('commands refused while impersonating (e2e, FUT-001)', () => {
     expect(deactivate).not.toHaveBeenCalled();
     expect(markRead).not.toHaveBeenCalled();
     expect(markAllRead).not.toHaveBeenCalled();
+    expect(removeOne).not.toHaveBeenCalled();
+    expect(restoreOne).not.toHaveBeenCalled();
   });
 
   it('still lets the acting Staff Member read the inbox and the unread count', async () => {

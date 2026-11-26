@@ -46,6 +46,8 @@ import { AvailabilityBlockFormScreen } from "../nutritionist/availability-block-
 import { AvailabilityScreen } from "../nutritionist/availability-screen";
 import { NutritionistAgendaScreen } from "../nutritionist/nutritionist-agenda-screen";
 import { StaffChangePasswordScreen } from "../profile/staff-change-password-screen";
+import { CommentScreen } from "../comments/comment-screen";
+import { CommentsScreen } from "../comments/comments-screen";
 import { StaffFeedbackScreen } from "../profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "../profile/staff-notifications-screen";
 import { PayoutQrScreen } from "../profile/payout-qr/payout-qr-screen";
@@ -81,6 +83,7 @@ const taskRoutes: ReadonlySet<string> = new Set([
   "Invoice",
   "ChangePassword",
   "Feedback",
+  "Comment",
   "ReferralCode",
   "PayoutQr",
   "ReportFault",
@@ -343,7 +346,13 @@ export const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNav
         ProfileTab: {
           screen: createNativeStackNavigator({
             ...stackConfig,
-            screens: { ...profileScreens, ViewAs: ViewAsScreen },
+            // Walkthrough n.º 11: the Administrator's Comentarios.
+            screens: {
+              ...profileScreens,
+              ViewAs: ViewAsScreen,
+              Comments: CommentsScreen,
+              Comment: CommentScreen,
+            },
           }),
           options: tabOptions("Perfil", "profile", "Profile"),
         },

@@ -132,6 +132,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/notifications/unread-count': both('allow'),
   'POST /api/v1/notifications/read-all': both('allow'),
   'POST /api/v1/notifications/{notificationId}/read': both('allow'),
+  'DELETE /api/v1/notifications/{notificationId}': both('allow'),
+  'POST /api/v1/notifications/{notificationId}/restore': both('allow'),
   'PUT /api/v1/notifications/devices/current': both('allow'),
   'POST /api/v1/notifications/devices/current/deactivate': both('allow'),
   // Pending uploads belong to the Account; attaching one is authorized where
@@ -158,6 +160,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   }),
   'GET /api/v1/administrator/feedback': both('allow'),
   'GET /api/v1/administrator/feedback/export': both('allow'),
+  'GET /api/v1/administrator/feedback/{feedbackId}': both('allow'),
   'GET /api/v1/administrator/founder-memberships': administratorOnly(),
   'POST /api/v1/administrator/feedback/{feedbackId}/triage': both('allow', {
     body: { status: 'reviewed', changeNote: null },

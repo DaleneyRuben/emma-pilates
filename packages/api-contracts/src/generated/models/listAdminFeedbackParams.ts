@@ -6,8 +6,10 @@
  */
 import type { ListAdminFeedbackApp } from "./listAdminFeedbackApp";
 import type { ListAdminFeedbackStatus } from "./listAdminFeedbackStatus";
+import type { ListAdminFeedbackType } from "./listAdminFeedbackType";
 
 export type ListAdminFeedbackParams = {
+  type?: ListAdminFeedbackType;
   app?: ListAdminFeedbackApp;
   status?: ListAdminFeedbackStatus;
   pageSize?: number;

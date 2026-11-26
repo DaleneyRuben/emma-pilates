@@ -8,6 +8,7 @@ import type { NotificationRecorder } from '../../notifications/prisma-notificati
 import { SystemIdentityModule } from '../system-identity.module';
 import {
   exportFeedback,
+  readFeedback,
   listFeedback,
   sendFeedback,
   triageFeedback,
@@ -43,6 +44,8 @@ import { createPrismaFeedbackStore } from './prisma-feedback-store';
           list: (query, principal) =>
             listFeedback(query, principal, dependencies),
           export: (principal) => exportFeedback(principal, dependencies),
+          read: (command, principal) =>
+            readFeedback(command, principal, dependencies),
           triage: (command, principal) =>
             triageFeedback(command, principal, dependencies),
         };

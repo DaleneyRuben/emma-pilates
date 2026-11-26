@@ -204,11 +204,13 @@ export const parseFeedbackQuery = (value: unknown) =>
       pageSize: z.coerce.number().int().min(1).max(100).default(20),
       status: z.enum(feedbackStatuses).optional(),
       app: z.enum(feedbackApps).optional(),
+      type: z.enum(feedbackTypes).optional(),
     })
-    .transform(({ status, app, ...paging }) => ({
+    .transform(({ status, app, type, ...paging }) => ({
       ...paging,
       ...(status === undefined ? {} : { status }),
       ...(app === undefined ? {} : { app }),
+      ...(type === undefined ? {} : { type }),
     }))
     .safeParse(value);
 

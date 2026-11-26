@@ -8299,6 +8299,66 @@
         ]
       }
     },
+    "/api/v1/notifications/{notificationId}": {
+      "delete": {
+        "operationId": "removeNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}/restore": {
+      "post": {
+        "operationId": "restoreNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
+        ]
+      }
+    },
     "/api/v1/notifications/devices/current": {
       "put": {
         "operationId": "registerCurrentDevice",
@@ -11366,6 +11426,19 @@
         "operationId": "listAdminFeedback",
         "parameters": [
           {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "problem",
+                "suggestion",
+                "other"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "app",
             "required": false,
             "in": "query",
@@ -11442,6 +11515,43 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminFeedbackExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/{feedbackId}": {
+      "get": {
+        "operationId": "getAdminFeedback",
+        "parameters": [
+          {
+            "name": "feedbackId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackDto"
                 }
               }
             }
@@ -19011,6 +19121,106 @@
           "keptEvaluations"
         ]
       },
+      "NotificationReviewDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "enum": [
+              "payment",
+              "freeze"
+            ]
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "nullable": true,
+            "description": "A payment’s amount due; null for a Freeze"
+          },
+          "startsOn": {
+            "type": "string",
+            "nullable": true,
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "nullable": true,
+            "format": "date"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "decidedByName": {
+            "type": "string",
+            "nullable": true
+          },
+          "decidedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "subject",
+          "clientName",
+          "planName",
+          "amountCentavos",
+          "startsOn",
+          "endsOn",
+          "outcome",
+          "decidedByName",
+          "decidedAt"
+        ]
+      },
+      "NotificationFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "feedbackId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "client",
+              "staff"
+            ]
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "The start of the text, ending in «…» when cut"
+          }
+        },
+        "required": [
+          "feedbackId",
+          "authorName",
+          "type",
+          "app",
+          "excerpt"
+        ]
+      },
       "NotificationDto": {
         "type": "object",
         "properties": {
@@ -19053,6 +19263,24 @@
             "type": "string",
             "nullable": true,
             "format": "date-time"
+          },
+          "review": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationReviewDto"
+              }
+            ]
+          },
+          "feedback": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationFeedbackDto"
+              }
+            ]
           }
         },
         "required": [
