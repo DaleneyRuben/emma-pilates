@@ -1,5 +1,7 @@
 export * from "./acquisition/acquisition-channel-field";
 export * from "./acquisition/own-referral-code";
+export * from "./acquisition/invite-link";
+export * from "./acquisition/shareable-referral-code-card";
 export * from "./account/complete-phone";
 export * from "./account/phone-number";
 export * from "./account/phone-prompt-sheet";

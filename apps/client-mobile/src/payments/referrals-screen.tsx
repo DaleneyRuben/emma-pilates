@@ -6,6 +6,7 @@ import {
   BrandToast,
   LoadingState,
   QueryFailure,
+  referralInviteLink,
   Screen,
   ScreenTopBar,
   SectionTitle,
@@ -28,8 +29,7 @@ import { HowItWorks, ReferredList } from "./referral-parts";
 const noticeMilliseconds = 3000;
 
 /** The invite link a friend opens (walkthrough n.º 13). */
-export const inviteLink = (code: string): string =>
-  `https://links.emmapilatesstudio.com/client/invite/${encodeURIComponent(code)}`;
+export const inviteLink = referralInviteLink;
 
 // C16g: the system's own share sheet carries the text and the link.
 const shareMessage = (code: string): string =>

@@ -58,6 +58,8 @@ export function ReferralCodeCard({ code, onCopied }: ReferralCodeCardProps) {
 
 type EditReferralCodeProps = {
   fetcher: typeof fetch;
+  /** On the 600 hero card (E-F13): the link and the wait line in white. */
+  onDark?: boolean;
   /** The new code is saved: the screen shows «Código actualizado» and reloads. */
   onChanged: (code: string) => void;
 };
@@ -68,7 +70,7 @@ type Step = "closed" | "confirming" | "editing";
  * C16 / S30's «Editar código», its sheet and its confirmation (follow-ups 228
  * and 229). Inside the 30 days it shows when she can change the code again.
  */
-export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) {
+export function EditReferralCode({ fetcher, onChanged, onDark = false }: EditReferralCodeProps) {
   const queryClient = useQueryClient();
   const own = useGetOwnReferralCode({ fetcher });
   const change = useChangeOwnReferralCode({ fetcher });
@@ -82,7 +84,7 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
   if (current === null) return null;
   if (editableFrom !== null && new Date(editableFrom).getTime() > mountedAt) {
     return (
-      <Text style={styles.waitLine} variant="secundario">
+      <Text style={styles.waitLine} tone={onDark ? "onDark" : "ink"} variant="secundario">
         Podrás cambiarlo de nuevo el {formatListDate(editableFrom)}
       </Text>
     );
@@ -116,7 +118,12 @@ export function EditReferralCode({ fetcher, onChanged }: EditReferralCodeProps) 
   return (
     // E-F13: each app sets «Editar código» on its own white card.
     <>
-      <TextButton label="Editar código" onPress={open} style={styles.edit} />
+      <TextButton
+        label="Editar código"
+        onPress={open}
+        style={styles.edit}
+        tone={onDark ? "onDark" : "ink"}
+      />
       <ReferralCodeSheet
         code={code}
         confirmation={

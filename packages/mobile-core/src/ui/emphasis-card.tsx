@@ -67,13 +67,21 @@ export function EmphasisCard({
 }
 
 /** The white pill action on the hero block, 44 high (follow-up 225 §4), in ink `boton`. */
-export function OnEmphasisButton({ label, onPress, testID }: Action) {
+export function OnEmphasisButton({
+  label,
+  onPress,
+  testID,
+  wide = false,
+}: Action & {
+  /** Fills the card's width, as E-F13's «Compartir tu código». */
+  wide?: boolean;
+}) {
   return (
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.button, wide && styles.wide, pressed && styles.pressed]}
       testID={testID}
     >
       <Text variant="boton">{label}</Text>
@@ -92,5 +100,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xlSm,
   },
   card: { ...surfaces.emphasis, gap: spacing.sm, padding: spacing.xlSm },
+  wide: { alignSelf: "stretch", minHeight: 48 },
   pressed: { opacity: 0.85 },
 });
