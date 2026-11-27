@@ -13,7 +13,8 @@ const disablingReasons: ReadonlySet<AuthenticationSessionRevocationReason> =
 
 // ADR-0025: a device must not keep receiving an Account's notifications once
 // the session that registered it ends. A device another live session of the
-// Account still uses stays active.
+// Account still uses stays active, except on a sign-out: the person left that
+// installation, so an older session of it that was never revoked keeps nothing.
 export const revokeAuthenticationSessions = async (
   transaction: Prisma.TransactionClient,
   where: Prisma.AuthenticationSessionWhereInput,
@@ -49,7 +50,9 @@ export const revokeAuthenticationSessions = async (
       where: {
         id: { in: deviceIds },
         deactivatedAt: null,
-        sessions: { none: { revokedAt: null } },
+        ...(input.reason === AuthenticationSessionRevocationReason.LOGOUT
+          ? {}
+          : { sessions: { none: { revokedAt: null } } }),
       },
       data: {
         deactivatedAt: input.revokedAt,
