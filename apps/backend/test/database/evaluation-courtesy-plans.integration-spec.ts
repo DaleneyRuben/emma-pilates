@@ -156,6 +156,26 @@ describe('evaluations and courtesy plans', () => {
     ).resolves.toMatchObject({ planCoversEvaluation: false });
   });
 
+  it('counts a Plan that starts inside the 30-day horizon, never a spent one', async () => {
+    const later = await courtesyClient('Empieza luego');
+    await world.prisma.subscription.updateMany({
+      where: { clientId: later.clientId },
+      data: { startsOn: new Date('2026-10-01T00:00:00.000Z') },
+    });
+    await expect(
+      commands().listBookableSlots({}, later.principal),
+    ).resolves.toMatchObject({ planCoversEvaluation: true });
+
+    const spent = await courtesyClient('Sin clases');
+    await world.prisma.subscription.updateMany({
+      where: { clientId: spent.clientId },
+      data: { remainingClassAllowance: 0 },
+    });
+    await expect(
+      commands().listBookableSlots({}, spent.principal),
+    ).resolves.toMatchObject({ planCoversEvaluation: false });
+  });
+
   it('keeps the included Evaluation of a paid quarterly Plan', async () => {
     const ana = await world.principalOf('ana@example.com');
     await expect(commands().listBookableSlots({}, ana)).resolves.toMatchObject({
