@@ -236,7 +236,12 @@ describe("Invoices in the Staff app (FIX-044)", () => {
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(mockPickImage).not.toHaveBeenCalled();
-    expect(mockUploadImage).toHaveBeenCalledWith(pdf, "invoice", expect.any(Function));
+    expect(mockUploadImage).toHaveBeenCalledWith(
+      pdf,
+      "invoice",
+      expect.any(Function),
+      expect.any(Function),
+    );
     expect(attached).toHaveBeenCalledWith({
       imageAssetId: "asset-10",
       fileName: "factura-000123.pdf",

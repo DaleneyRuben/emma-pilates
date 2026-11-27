@@ -72,7 +72,7 @@ numbered tests.
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
 | Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
 | Walkthrough designs: sign-in and forms | «Todavía no confirmaste tu correo» on Login, «Revisa tu correo» that leaves once the email is confirmed elsewhere, no «Guardar contraseña» where Face ID or a fingerprint works, buttons at the end of every form and always on, and «Código de Lucía» on «Crea tu cuenta» (Test 199) | The «Guardar contraseña» rule needs real phones with and without biometrics to see the system's own prompt |
-| Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | A chosen PDF is not shown page by page before it is sent; the invite link opens no page yet |
+| Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first, a PDF uploaded at once and shown page by page, and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | The invite link opens no page yet |
 | Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
 | Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
 | Class detail knows your bookings | A class she booked opens with «Ya reservaste esta clase», **Cancelar reserva** and «Cancelas gratis hasta …»; a class at the time of another of hers keeps «Reservar esta clase» off with «Ya tienes Mat Pilates a las 10:00 ese día…» and **Ver esa reserva** (Test 203) | «Ver esa reserva» opens Mis reservas, not that one booking |
@@ -12378,7 +12378,7 @@ G. **One comment (E-F19).** The detail shows who sent it («Clienta · email»),
 
 The owner's approved boards for walkthrough n.º 6 (Editar perfil), 7, 9, 13,
 14, 20, 22, 23, 24 and 25 (canvas «Mejoras del recorrido»: C10u, C10b, C10v,
-C10c, C11n, C22c, C22d, E-D19, E-D20, E-D27, E-D28, E-D30, C16, C16s, C16g,
+C10c, C11n, C22c, C22d, E-D19, E-D20, E-D27, E-D28, E-D29, E-D30, C16, C16s, C16g,
 C16h). Run the API and the worker on a copy of `pilates_golden` (Test 2,
 Test 46), Metro for both apps, and use the iPhone 16 Pro and the Android
 emulator.
@@ -12418,16 +12418,26 @@ C. **The profile photo (C22c, C22d).** Client app: Perfil › Editar › Cambiar
    tu foto.» (Perfil has no other fields to keep). «Guardar cambios» now ends
    the Editar perfil form and scrolls with it, never pinned over the keyboard
    (walkthrough n.º 6).
-D. **The Staff invoice (E-D19, E-D20, E-D27, E-D28, E-D30).** As Paola,
+D. **The Staff invoice (E-D19, E-D20, E-D27, E-D28, E-D29, E-D30).** As Paola,
    Pagos › Facturas por subir › a payment with invoice data. The dashed box
    reads «Toca para elegir un PDF o una imagen, hasta 10 MB» and opens the
    sheet, like the button, which reads **Elegir factura**. Choose a photo:
    «Factura lista» · «Foto · toca la miniatura para verla» with **Cambiar** and
    the ×; the thumbnail opens «Tu factura» big («Pellizca para ampliar. Revisa
    que se lean el NIT, el nombre y el monto.», **Cerrar**, **Cambiar**). Choose
-   a PDF: its name and «PDF · N páginas · size». Nothing is sent until
-   **Subir factura**; then «Factura subida» as before. Cancelling the picker
-   after **Cambiar** keeps the file already chosen; the × clears it.
+   a PDF of two pages: it starts uploading at once («Subiendo factura», a bar
+   and the percentage), then shows its name and «PDF · 2 páginas · size».
+   Tap it (E-D29): a white page with the file name as the title, **× Cerrar**,
+   the first page on a bordered sheet, «Página 1 de 2» between two arrows,
+   «Desliza para pasar de página.» and **Cambiar**; swipe or tap the right
+   arrow for «Página 2 de 2»; **Cambiar** closes it and opens the sheet.
+   Tapping **Subir factura** while the PDF still uploads waits for it. Stop
+   the API before choosing a PDF: «No se pudo subir» on the row and «No
+   pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.» with
+   **Reintentar** (uploads it again, sends nothing), **Elegir otro archivo**
+   and **Cancelar**. Nothing is attached until **Subir factura**; then
+   «Factura subida» as before. Cancelling the picker after **Cambiar** keeps
+   the file already chosen; the × clears it.
 E. **Invita a una amiga (C16, C16s, C16g, C16h).** As Lucía (paid Plan in
    force), the code card is the deep-rose hero: white code, outlined white
    copy button, a white **Compartir tu código** with the share icon (also in

@@ -20,4 +20,10 @@ export const walkthroughAuthorizationRows = (): Record<string, MatrixRow> => ({
   'GET /api/v1/administrator/feedback': allow,
   'GET /api/v1/administrator/feedback/export': allow,
   'GET /api/v1/administrator/feedback/{feedbackId}': allow,
+  // n.º 24: the Staff app shows the pages of the PDF it just uploaded, before
+  // attaching it; only its uploader reads it, so a stranger's id is a 404.
+  'GET /api/v1/staff/invoice-uploads/{imageAssetId}/pages/{page}': {
+    ...allow,
+    bearer: true,
+  },
 });

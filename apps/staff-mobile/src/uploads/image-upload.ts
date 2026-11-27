@@ -73,11 +73,19 @@ function downscaleActions(
   return width >= height ? [{ resize: { width: maxEdge } }] : [{ resize: { height: maxEdge } }];
 }
 
+/**
+ * How far an upload got, from 0 to 1, step by step: declared, sent, finalized,
+ * ready (the Client's receipt, walkthrough n.º 7). React Native's fetch
+ * reports no byte progress.
+ */
+export type UploadProgress = (fraction: number) => void;
+
 /** Uploads the JPEG (or the invoice PDF) and resolves with its asset id once it is READY. */
 export async function uploadImage(
   image: PickedImage,
   purpose: CreatePendingUploadDtoPurpose,
   fetcher: typeof globalThis.fetch,
+  onProgress: UploadProgress = () => undefined,
 ): Promise<string> {
   const { bytes } = image;
   const mediaType = image.mediaType ?? "image/jpeg";
@@ -95,6 +103,7 @@ export async function uploadImage(
   );
   if (declared.status !== 201) throw new Error("upload_declaration_failed");
   const imageAssetId = declared.data.id;
+  onProgress(0.1);
 
   const stored = await fetcher(getPutPendingUploadObjectUrl(imageAssetId), {
     method: "PUT",
@@ -102,6 +111,7 @@ export async function uploadImage(
     body: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
   });
   if (!stored.ok) throw new Error("upload_failed");
+  onProgress(0.7);
 
   const finalized = await finalizeUpload(
     imageAssetId,
@@ -109,10 +119,12 @@ export async function uploadImage(
     fetcher,
   );
   if (finalized.status !== 202) throw new Error("upload_finalization_failed");
+  onProgress(0.8);
 
   await waitForUploadReady(async () => {
     const status = await getUploadStatus(imageAssetId, undefined, fetcher);
     return status.status === 200 ? status.data.state : null;
   });
+  onProgress(1);
   return imageAssetId;
 }

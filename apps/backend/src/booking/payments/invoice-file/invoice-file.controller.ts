@@ -75,9 +75,15 @@ export type InvoiceFileOperations = {
   clientFile: (paymentId: string, p: Principal) => Promise<InvoiceFileObject>;
   readObject: (objectKey: string) => Promise<Buffer>;
   renderPage: (objectKey: string, page: number) => Promise<PdfPageImage>;
+  uploadedFile: (
+    imageAssetId: string,
+    p: Principal,
+  ) => Promise<InvoiceFileObject>;
 };
 
-const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
+export const run = async <Result>(
+  work: () => Promise<Result>,
+): Promise<Result> => {
   try {
     return await work();
   } catch (error) {
@@ -132,7 +138,7 @@ const sendFile = async (
 // FIX-051 (verification n.º 45): one page of a PDF invoice as a PNG, for the
 // apps' thumbnail and viewer; X-Page-Count tells them how many to ask for.
 const maxPages = 100;
-const sendPage = async (
+export const sendPage = async (
   operations: InvoiceFileOperations,
   file: InvoiceFileObject,
   page: string,
@@ -189,7 +195,7 @@ const pageDocs = [
   }),
 ];
 
-abstract class AuthenticatedController {
+export abstract class AuthenticatedController {
   constructor(
     protected readonly operations: InvoiceFileOperations,
     private readonly principalResolver: PrincipalResolver,

@@ -91,6 +91,7 @@ describe("Factura del pago before uploading", () => {
   });
 
   it("shows a chosen PDF with its pages and size before sending it", async () => {
+    mockUploadImage.mockResolvedValue("asset-7");
     mockPickPdf.mockResolvedValue({
       uri: "file:///cache/factura-000123.pdf",
       bytes: twoPages,
@@ -106,7 +107,6 @@ describe("Factura del pago before uploading", () => {
     expect(await screen.findByText("factura-000123.pdf")).toBeOnTheScreen();
     expect(screen.getByText("PDF · 2 páginas · 1 KB")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Subir factura" })).toBeOnTheScreen();
-    expect(mockUploadImage).not.toHaveBeenCalled();
 
     await fireEvent.press(screen.getByRole("button", { name: "Quitar archivo" }));
 

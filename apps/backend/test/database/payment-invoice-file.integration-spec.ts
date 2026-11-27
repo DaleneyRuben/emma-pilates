@@ -6,7 +6,6 @@ import { createPrismaAdministratorPayments } from '../../src/booking/payments/pr
 import { createPrismaVoidPayment } from '../../src/booking/payments/prisma-void-payment';
 import type { NotificationRecorder } from '../../src/notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
-import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import { auditActorOf } from '../../src/system-identity/authentication/audit-actor';
 import {
   fixtures,
@@ -16,6 +15,7 @@ import {
   startPaymentWorld,
   type PaymentWorld,
 } from './payment-lifecycle-test-support';
+import { createInvoiceAsset } from './invoice-asset-test-support';
 
 const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
 const mariana = { taxId: '123456', name: 'Mariana Quiroga' };
@@ -54,53 +54,10 @@ describe('Invoice files (PostgreSQL)', () => {
         randomUUID(),
       );
 
-  const invoiceAsset = async (
+  const invoiceAsset = (
     ownerAccountId: string,
-    options: {
-      state?: 'READY' | 'PROCESSING';
-      purpose?: 'INVOICE' | 'TRANSFER_RECEIPT';
-      mediaType?: 'PDF' | 'JPEG';
-    } = {},
-  ) => {
-    const id = randomUUID();
-    const mediaType = options.mediaType ?? 'PDF';
-    await world.prisma.imageAsset.create({
-      data: {
-        id,
-        ownerAccountId,
-        purpose: options.purpose ?? 'INVOICE',
-        state: options.state ?? 'READY',
-        pendingObjectKey: `pending/invoice/${id}`,
-        declaredMediaType: mediaType,
-        declaredByteSize: 2_048,
-        declaredChecksum: toPrismaBytes(Buffer.alloc(32, 2)),
-        verifiedMediaType: mediaType,
-        verifiedByteSize: 2_048,
-        verifiedChecksum: toPrismaBytes(Buffer.alloc(32, 2)),
-        verifiedWidth: mediaType === 'PDF' ? 0 : 800,
-        verifiedHeight: mediaType === 'PDF' ? 0 : 1_200,
-        createdAt: now,
-        expiresAt: new Date(now.getTime() + 15 * 60 * 1_000),
-        finalizedAt: now,
-        deletionDueAt: new Date(now.getTime() + 72 * hour),
-      },
-    });
-    if (mediaType === 'PDF') {
-      await world.prisma.imageVariant.create({
-        data: {
-          imageAssetId: id,
-          kind: 'DOCUMENT',
-          visibility: 'PRIVATE',
-          storageKey: `private/invoice/${id}/document`,
-          mediaType: 'PDF',
-          byteSize: 2_048,
-          width: 0,
-          height: 0,
-        },
-      });
-    }
-    return id;
-  };
+    options?: Parameters<typeof createInvoiceAsset>[2],
+  ) => createInvoiceAsset(world.prisma, ownerAccountId, options);
 
   const upload = async (
     paymentId: string,

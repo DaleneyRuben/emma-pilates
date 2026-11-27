@@ -6,6 +6,7 @@ import {
   listClientInvoices,
   listStaffInvoices,
   normalizeInvoiceFileName,
+  readUploadedInvoiceFile,
   removePaymentInvoice,
   type InvoiceFileGateway,
 } from './invoice-file';
@@ -40,6 +41,7 @@ const gatewayStub = (): jest.Mocked<InvoiceFileGateway> => ({
   listForClient: jest.fn().mockResolvedValue([]),
   readFileForStaff: jest.fn(),
   readFileForClient: jest.fn(),
+  readUploadedFile: jest.fn(),
 });
 
 describe('who handles invoice files', () => {
@@ -105,6 +107,30 @@ describe('who handles invoice files', () => {
       expect(gateway.remove).not.toHaveBeenCalled();
     },
   );
+
+  // Walkthrough n.º 24 (E-D29): her own upload, read back before attaching.
+  it('reads an invoice file back only to the Staff Member who uploaded it', async () => {
+    const gateway = gatewayStub();
+
+    await readUploadedInvoiceFile(
+      { imageAssetId: 'asset-1' },
+      staff('assistant'),
+      { gateway },
+    );
+
+    expect(gateway.readUploadedFile).toHaveBeenCalledWith({
+      imageAssetId: 'asset-1',
+      accountId: 'account-assistant',
+    });
+    for (const principal of [staff('trainer'), client]) {
+      await expect(
+        readUploadedInvoiceFile({ imageAssetId: 'asset-1' }, principal, {
+          gateway,
+        }),
+      ).rejects.toBeInstanceOf(BookingAccessDeniedError);
+    }
+    expect(gateway.readUploadedFile).toHaveBeenCalledTimes(1);
+  });
 
   it('shows a Client only her own invoices', async () => {
     const gateway = gatewayStub();

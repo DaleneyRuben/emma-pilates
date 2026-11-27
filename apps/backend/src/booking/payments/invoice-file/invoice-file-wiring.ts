@@ -11,6 +11,7 @@ import {
   readClientInvoiceFile,
   readPaymentInvoice,
   readPaymentInvoiceFile,
+  readUploadedInvoiceFile,
   removePaymentInvoice,
 } from './invoice-file';
 import {
@@ -19,6 +20,7 @@ import {
   StaffInvoiceController,
   type InvoiceFileOperations,
 } from './invoice-file.controller';
+import { StaffInvoiceUploadController } from './invoice-upload-page.controller';
 import { createPdfPageRenderer } from './pdf-page-cache';
 import { renderPdfPage } from './pdf-page-image';
 import { createPrismaInvoiceFile } from './prisma-invoice-file';
@@ -26,7 +28,11 @@ import { createPrismaInvoiceFile } from './prisma-invoice-file';
 // FIX-044's slice, wired here so booking.module.ts gains two lines (the
 // invoice-data-wiring pattern).
 export const invoiceFileWiring = {
-  controllers: [StaffInvoiceController, ClientInvoiceController],
+  controllers: [
+    StaffInvoiceController,
+    ClientInvoiceController,
+    StaffInvoiceUploadController,
+  ],
   providers: (prismaToken: symbol): Provider[] => [
     {
       provide: invoiceFileOperations,
@@ -58,6 +64,8 @@ export const invoiceFileWiring = {
             readClientInvoiceFile({ paymentId }, principal, { gateway }),
           readObject: (objectKey) => storage.get(objectKey),
           renderPage,
+          uploadedFile: (imageAssetId, principal) =>
+            readUploadedInvoiceFile({ imageAssetId }, principal, { gateway }),
         };
       },
     },
