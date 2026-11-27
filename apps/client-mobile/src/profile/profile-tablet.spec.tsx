@@ -49,9 +49,9 @@ describe("Perfil on a tablet", () => {
     expect(within(left).getByText("Sofía Guzmán")).toBeOnTheScreen();
     expect(within(left).getByTestId("profile-identity")).toHaveStyle({ flexDirection: "column" });
     expect(within(left).getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
-    expect(within(left).getByText(/Emma Pilates Studio · versión/)).toBeOnTheScreen();
+    expect(within(left).getByTestId("profile-footer")).toBeOnTheScreen();
     expect(within(left).getByTestId("profile-close-account")).toBeOnTheScreen();
-    for (const title of ["Tu plan y tus clases", "Preferencias", "Cuenta"]) {
+    for (const title of ["Tu plan", "Ajustes", "Ayuda"]) {
       expect(within(right).getByText(title)).toBeOnTheScreen();
     }
     expect(screen.getAllByRole("button", { name: "Cerrar sesión" })).toHaveLength(1);
@@ -98,7 +98,7 @@ describe("Perfil on a tablet", () => {
   it("keeps «Enviar comentario» in the form's 560 pt column (25T)", async () => {
     const screen = await openOnTablet();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comentarios" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Envíanos tu opinión" }));
 
     // Walkthrough n.º 6 and 15: the button ends the form, in its 560 pt column.
     const end = await screen.findByTestId("feedback-form");
