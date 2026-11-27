@@ -108,7 +108,9 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
   const administrator = identity.session?.role === "administrator";
   // Follow-up 293 (E-F01–E-F05, E-F29–E-F32): her Role and Branches are
   // facts, so they sit under her name instead of in a group of their own.
-  const roleLine = `${staffRoleLabel(member.role, member.gender)} · ${branchesLabel(member)}`;
+  const branches = branchesLabel(member);
+  const role = staffRoleLabel(member.role, member.gender);
+  const roleLine = branches === "" ? role : `${role} · ${branches}`;
 
   return (
     <Screen style={styles.screen}>
