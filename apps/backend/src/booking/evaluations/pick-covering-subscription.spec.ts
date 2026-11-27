@@ -1,4 +1,4 @@
-import { pickCoveringSubscription } from './evaluation-coverage';
+import { pickCoveringSubscription } from './pick-covering-subscription';
 
 const today = new Date('2026-11-27T00:00:00.000Z');
 const candidate = (id: string, courtesy: boolean, remaining = 4) => ({
