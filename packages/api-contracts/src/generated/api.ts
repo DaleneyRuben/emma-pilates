@@ -25678,11 +25678,21 @@ export type lookUpReferralCodeResponse200 = {
   status: 200;
 };
 
+export type lookUpReferralCodeResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type lookUpReferralCodeResponseSuccess =
   lookUpReferralCodeResponse200 & {
     headers: Headers;
   };
-export type lookUpReferralCodeResponse = lookUpReferralCodeResponseSuccess;
+export type lookUpReferralCodeResponseError = lookUpReferralCodeResponse429 & {
+  headers: Headers;
+};
+
+export type lookUpReferralCodeResponse =
+  lookUpReferralCodeResponseSuccess | lookUpReferralCodeResponseError;
 
 export const getLookUpReferralCodeUrl = (params: LookUpReferralCodeParams) => {
   const normalizedParams = new URLSearchParams();
@@ -25731,7 +25741,7 @@ export const getLookUpReferralCodeQueryKey = (
 
 export const getLookUpReferralCodeQueryOptions = <
   TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
-  TError = unknown,
+  TError = void,
 >(
   params: LookUpReferralCodeParams,
   options?: {
@@ -25770,11 +25780,11 @@ export const getLookUpReferralCodeQueryOptions = <
 export type LookUpReferralCodeQueryResult = NonNullable<
   Awaited<ReturnType<typeof lookUpReferralCode>>
 >;
-export type LookUpReferralCodeQueryError = unknown;
+export type LookUpReferralCodeQueryError = void;
 
 export function useLookUpReferralCode<
   TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
-  TError = unknown,
+  TError = void,
 >(
   params: LookUpReferralCodeParams,
   options: {
@@ -25802,7 +25812,7 @@ export function useLookUpReferralCode<
 };
 export function useLookUpReferralCode<
   TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
-  TError = unknown,
+  TError = void,
 >(
   params: LookUpReferralCodeParams,
   options?: {
@@ -25830,7 +25840,7 @@ export function useLookUpReferralCode<
 };
 export function useLookUpReferralCode<
   TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
-  TError = unknown,
+  TError = void,
 >(
   params: LookUpReferralCodeParams,
   options?: {
@@ -25851,7 +25861,7 @@ export function useLookUpReferralCode<
 
 export function useLookUpReferralCode<
   TData = Awaited<ReturnType<typeof lookUpReferralCode>>,
-  TError = unknown,
+  TError = void,
 >(
   params: LookUpReferralCodeParams,
   options?: {

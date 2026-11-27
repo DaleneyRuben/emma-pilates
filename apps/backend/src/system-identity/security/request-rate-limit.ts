@@ -15,8 +15,13 @@ export const generalRequestLimits = {
   perCredentialPerMinute: 600,
 } as const;
 
-/** Placeholder until the lane exists. */
+/**
+ * Owner (review of the walkthrough PR): a referral code's lookup and its
+ * invite page name the holder without a credential, so an address may ask
+ * for codes 30 times a minute, far more than a person typing one code.
+ */
 export const codeLookupsPerAddressPerMinute = 30;
+const codeLookupPaths = ['/api/v1/referral-codes/lookup', '/client/invite/'];
 
 const windowMilliseconds = 60_000;
 
@@ -28,13 +33,24 @@ const windowMilliseconds = 60_000;
 export const requestRateLimitLanes = (source: {
   networkAddress: string;
   credential: string | null;
+  /** The request's path without its query, for the code lookups' lane. */
+  path?: string;
 }): RateLimitLane[] => {
   const network = {
     key: `network:${source.networkAddress}`,
     allowed: generalRequestLimits.perAddressPerMinute,
   };
+  const path = source.path ?? '';
+  const lookups = codeLookupPaths.some((prefix) => path.startsWith(prefix))
+    ? [
+        {
+          key: `code-lookups:${source.networkAddress}`,
+          allowed: codeLookupsPerAddressPerMinute,
+        },
+      ]
+    : [];
   if (source.credential === null) {
-    return [network];
+    return [network, ...lookups];
   }
   const digest = createHash('sha256').update(source.credential).digest('hex');
   return [
@@ -43,6 +59,7 @@ export const requestRateLimitLanes = (source: {
       key: `credential:${digest}`,
       allowed: generalRequestLimits.perCredentialPerMinute,
     },
+    ...lookups,
   ];
 };
 

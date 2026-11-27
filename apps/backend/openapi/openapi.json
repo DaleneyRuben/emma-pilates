@@ -6700,6 +6700,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many code lookups from this network address this minute (rate_limit_exceeded)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the address may look codes up again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "summary": "",

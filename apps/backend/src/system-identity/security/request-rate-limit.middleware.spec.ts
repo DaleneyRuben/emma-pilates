@@ -137,13 +137,13 @@ describe('BE-025 request rate limit middleware', () => {
 // code's holder without a credential, so one address may ask for codes only
 // a few times a minute; everything else keeps the general limit.
 describe('the code lookups rate limit', () => {
-  const limited = (_path: string) =>
+  const limited = () =>
     createRequestRateLimitMiddleware(createRequestRateLimiter(() => 0));
 
   it.each(['/api/v1/referral-codes/lookup?code=LUCIA', '/client/invite/LUCIA'])(
     'turns an address away after its lookups for the minute (%s)',
     (path) => {
-      const middleware = limited(path);
+      const middleware = limited();
       const next = jest.fn();
       for (let index = 0; index < codeLookupsPerAddressPerMinute; index += 1) {
         middleware(request(path), response().value, next);

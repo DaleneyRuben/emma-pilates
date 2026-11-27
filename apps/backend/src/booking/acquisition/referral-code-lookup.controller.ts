@@ -12,6 +12,7 @@ import {
   ApiProperty,
   ApiPropertyOptional,
   ApiQuery,
+  ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
 import { parseAvailabilityQuery } from './own-referral-code.dto';
 import type { ReferralCodeLookup } from './referral-code-lookup';
@@ -57,6 +58,16 @@ export class ReferralCodeLookupController {
   @ApiOperation({ operationId: 'lookUpReferralCode' })
   @ApiQuery({ name: 'code', type: String })
   @ApiOkResponse({ type: ReferralCodeLookupDto })
+  @ApiTooManyRequestsResponse({
+    description:
+      'Too many code lookups from this network address this minute (rate_limit_exceeded)',
+    headers: {
+      'Retry-After': {
+        description: 'Seconds until the address may look codes up again',
+        schema: { type: 'integer' },
+      },
+    },
+  })
   @Header('Cache-Control', 'no-store')
   async read(@Query('code') code: unknown): Promise<ReferralCodeLookupDto> {
     const parsed = parseAvailabilityQuery(code);
