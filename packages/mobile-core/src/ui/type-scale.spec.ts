@@ -72,8 +72,9 @@ describe("the Rosa Emma type scale", () => {
     ]);
   });
 
-  it("has two tones and a 1.3 cap on the phone's text size", () => {
-    expect(textTones).toEqual({ ink: "#93615D", onDark: "#FFFBFB" });
+  // Follow-up 292 adds Destructivo, for «Cerrar sesión» on white.
+  it("has three tones and a 1.3 cap on the phone's text size", () => {
+    expect(textTones).toEqual({ ink: "#93615D", onDark: "#FFFBFB", destructivo: "#A04640" });
     expect(maxTextScale).toBe(1.3);
   });
 });
