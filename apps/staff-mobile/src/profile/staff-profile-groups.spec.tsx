@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Linking } from "react-native";
+import { Linking, StyleSheet } from "react-native";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -178,6 +178,34 @@ describe("Staff Perfil groups by Role", () => {
       }
     },
   );
+
+  // E-F01: a hairline between every two rows of «Ajustes», Face ID's too.
+  it("splits each Ajustes row from the next with a hairline", async () => {
+    const screen = await openProfile("trainer");
+
+    type Node = {
+      children?: (Node | string)[] | null;
+      props: { style?: unknown; testID?: string };
+    };
+    const find = (node: Node | string, id: string): Node | undefined =>
+      typeof node === "string"
+        ? undefined
+        : node.props.testID === id
+          ? node
+          : (node.children ?? []).map((child) => find(child, id)).find(Boolean);
+    const hairlinesIn = (node: Node | string): number =>
+      typeof node === "string"
+        ? 0
+        : ((StyleSheet.flatten(node.props.style as never) as { height?: number } | undefined)
+            ?.height === 1
+            ? 1
+            : 0) + (node.children ?? []).reduce((sum, child) => sum + hairlinesIn(child), 0);
+    const tree = screen.toJSON() as Node | Node[];
+    const group = (Array.isArray(tree) ? tree : [tree])
+      .map((root) => find(root, "profile-group-settings"))
+      .find(Boolean);
+    expect(group === undefined ? -1 : hairlinesIn(group)).toBe(settings.length - 1);
+  });
 
   it("draws no line under any row and no old names", async () => {
     const screen = await openProfile("trainer");
