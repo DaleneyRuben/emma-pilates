@@ -1,5 +1,5 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { Platform } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 
 import { MobileIdentityProvider } from "../auth/identity-provider";
 import type { SessionManager } from "../auth/session-manager";
@@ -117,5 +117,31 @@ describe("BiometricSwitchRow", () => {
     expect(
       screen.getByText("Sirve cualquier cara guardada en el Face ID de este iPhone"),
     ).toBeOnTheScreen();
+  });
+
+  // Owner, TestFlight 1.3.0: iOS refuses Face ID to an app whose permission
+  // is off, and only Settings turns it back on.
+  it("sends to Settings when iOS no longer lets the app use Face ID", async () => {
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const openSettings = jest.spyOn(Linking, "openSettings").mockResolvedValue(undefined);
+    const manager = managerWith({
+      canUseBiometrics: () => false,
+      wasBiometricSupportSeen: jest.fn().mockResolvedValue(true),
+    });
+    const screen = await renderRow(manager);
+
+    const toggle = await screen.findByRole("switch", { name: "Entrar con Face ID" });
+    await act(async () => {
+      await fireEvent(toggle, "valueChange", true);
+    });
+
+    expect(manager.enableBiometrics).not.toHaveBeenCalled();
+    expect(toggle).toHaveProp("value", false);
+    const [title, message, buttons] = alert.mock.calls[0]!;
+    expect(title).toBe("Face ID está desactivado");
+    expect(message).toBe("Para entrar con Face ID, permite que la app lo use en Ajustes.");
+    const open = buttons?.find((button) => button.text === "Abrir Ajustes");
+    open?.onPress?.();
+    expect(openSettings).toHaveBeenCalledTimes(1);
   });
 });

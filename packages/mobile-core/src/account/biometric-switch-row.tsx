@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Switch, View } from "react-native";
+import { Alert, Linking, Platform, StyleSheet, Switch, View } from "react-native";
 
 import { biometricCopy } from "../auth/biometric-copy";
 import { useMobileIdentity } from "../auth/identity-provider";
@@ -29,7 +29,25 @@ export function BiometricSwitchRow({ appearance = "disc" }: BiometricSwitchRowPr
 
   const copy = biometricCopy();
   const label = copy.switchLabel;
+  // Only Settings gives the permission back: iOS never asks the app twice.
+  const sendToSettings = () =>
+    Alert.alert(copy.blocked.title, copy.blocked.message, [
+      { style: "cancel", text: "Ahora no" },
+      {
+        onPress: () =>
+          void (
+            Platform.OS === "ios"
+              ? Linking.openSettings()
+              : Linking.sendIntent("android.settings.SECURITY_SETTINGS")
+          ).catch(reportRecoveredError),
+        text: copy.blocked.action,
+      },
+    ]);
   const toggle = async (on: boolean) => {
+    if (on && biometrics.blockedBySystem) {
+      sendToSettings();
+      return;
+    }
     setBusy(true);
     try {
       if (on) await biometrics.enable();
