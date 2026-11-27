@@ -197,9 +197,9 @@ describe("Refreshed Mi plan (Client 12)", () => {
     });
     await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Plan actual/ })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Plan actual/ }));
     await waitFor(() => {
       expect(screen.getByText("Último plan · Paquete de 12 clases")).toBeOnTheScreen();
     });

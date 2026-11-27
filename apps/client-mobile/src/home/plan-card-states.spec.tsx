@@ -121,7 +121,7 @@ describe("Inicio and Mi plan plan cards", () => {
     );
 
     await fireEvent.press(screen.getByRole("button", { name: /^Perfil, tab/ }));
-    await fireEvent.press(await screen.findByRole("button", { name: /^Mi plan/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Plan actual/ }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
 
     expect(screen.queryByText(/^Úsala antes del/)).toBeNull();
