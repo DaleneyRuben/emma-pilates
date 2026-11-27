@@ -11,8 +11,8 @@ const STYLES = [
   ['enlace', S, 14, 700, 'u'], ['enlace-cuerpo', S, 15, 700, 'u'], ['enlace-secundario', S, 13, 700, 'u'],
 ];
 const LARGE = new Set(['titulo-pagina', 'titulo-seccion', 'titulo-bloque', 'cifra-grande', 'cifra', 'destacado']);
-const INK = 'rgb(147, 97, 93)', WHITE = 'rgb(255, 251, 251)';
-const SMALL_OK_BG = new Set(['rgb(255, 251, 251)', 'rgb(254, 246, 242)', 'rgb(147, 97, 93)', 'rgb(249, 244, 242)', 'rgb(255, 255, 255)']);
+const INK = 'rgb(147, 97, 93)', WHITE = 'rgb(255, 251, 251)', DESTRUCTIVO = 'rgb(160, 70, 64)'; // Destructivo #A04640 (follow-up 292)
+const SMALL_OK_BG = new Set(['rgb(255, 251, 251)', 'rgb(254, 246, 242)', 'rgb(147, 97, 93)', 'rgb(249, 244, 242)', 'rgb(255, 255, 255)', DESTRUCTIVO]);
 (async () => {
   const b = await chromium.launch(); let total = 0, bad = 0; const counts = {};
   for (const f of files) {
@@ -37,7 +37,7 @@ const SMALL_OK_BG = new Set(['rgb(255, 251, 251)', 'rgb(254, 246, 242)', 'rgb(14
       if (!m) probs.push(`fuera de escala (${fam} ${n.size} ${n.weight})`);
       if (n.size < 12) probs.push('menor a 12 px');
       if (m && !LARGE.has(m[0]) && !SMALL_OK_BG.has(n.bg)) probs.push(`texto chico sobre ${n.bg}`);
-      if (n.color !== INK && n.color !== WHITE && n.color !== 'rgb(255, 255, 255)') probs.push(`color ${n.color}`);
+      if (n.color !== INK && n.color !== DESTRUCTIVO && n.color !== WHITE && n.color !== 'rgb(255, 255, 255)') probs.push(`color ${n.color}`);
       if (n.op < 0.99) probs.push(`transparencia ${n.op.toFixed(2)}`);
       if (n.under && n.weight !== 700) probs.push('subrayado sin negrita (los enlaces van en 700)');
       if (n.upper && !(m && m[0] === 'etiqueta')) probs.push('mayúsculas fuera de etiqueta');
