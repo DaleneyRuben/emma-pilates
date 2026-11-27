@@ -222,3 +222,45 @@ Restore the minimum of Bookings: admin web › **Reglas del estudio** ›
 **Mínimo de reservas por clase** › 2 › **Guardar cambios** (the `previous`
 value of the run's `android_test_minimum_bookings` line). The rest goes with
 the production reset.
+
+## Testers to «Trimestral 36 clases» (`20261127-testers-quarterly-plan`)
+
+Owner, 2026-11-27: every Client whose Plan in force is «Plan de cortesía»
+(or the older «Acceso de prueba»), the store review Account included, moves
+to a cash «Trimestral 36 clases» and loses the courtesy extra classes. On the
+free Plan her referral code stays inactive (Walkthrough n.º 22) and the
+nutrition evaluation is paid; on the quarterly Plan both work as for any
+buyer. For each tester, in the oldest active Administrator's name:
+
+1. **Courtesy extras**: a negative «courtesy» adjustment, as «Ajustar
+   clases» on the admin web makes, for the courtesy extras still unspent
+   (never more than the net she can spend). The grant stays in her history.
+2. **Sale**: the real cash sale («Efectivo») of «Trimestral 36 clases» from
+   today, at the Branch named. It ends the courtesy Subscription the day
+   before (it stays in her history), sends «Pago confirmado», and prices the
+   Plan as for any first real buyer (the line logs `amountDueCentavos` and
+   `discountCentavos`).
+
+Every Client gets one `testers_quarterly_plan_client` line (name, email,
+courtesy Plan and its end, `action`):
+
+- `move` (dry run) with `extrasToRemove` and `startsOn`; `moved` with
+  `extrasRemoved`, `paymentId`, and the amount;
+- `skip` / `paid_plan`: she already holds a paid Plan, in force or queued,
+  so a rerun changes nobody twice;
+- `blocked` / `booked_class` with `lastBookedOn`: the sale never starts a
+  paid Plan on or before a class the courtesy Plan holds (FIX-019). Cancel
+  that class on the admin web and rerun, or rerun with
+  `"afterBookedClass": true` to start her Plan the day after that class;
+- `failed` with the sale's refusal `code` (an open Purchase Intent or a
+  pending Payment, for instance).
+
+`testers_quarterly_plan_done` counts them. A real run with anyone `blocked`
+or `failed` ends `testers_left`, so the run is recorded failed and can run
+again without **Force rerun**; whoever moved is skipped.
+
+Params, all optional: `{"branch": "Achumani", "afterBookedClass": false}`.
+`branch` is needed only when the studio has more than one (`branch_required`,
+`branch_missing`). The run stops before writing with `plan_missing` when no
+visible, priced «Trimestral 36 clases» exists, and `administrator_missing`
+without an active Administrator.
