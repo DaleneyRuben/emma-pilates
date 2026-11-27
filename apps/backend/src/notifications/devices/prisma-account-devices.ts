@@ -17,6 +17,25 @@ export type RegisterCurrentDevice = {
   platform: DevicePlatform;
 };
 
+export const deviceDeactivationReasons = [
+  'permission_revoked',
+  'logout',
+] as const;
+
+export type DeactivateCurrentDevice = {
+  accountId: string;
+  installationId: string;
+  reason: (typeof deviceDeactivationReasons)[number];
+};
+
+const deactivationReasons: Record<
+  DeactivateCurrentDevice['reason'],
+  AccountDeviceDeactivationReason
+> = {
+  permission_revoked: AccountDeviceDeactivationReason.PERMISSION_REVOKED,
+  logout: AccountDeviceDeactivationReason.LOGOUT,
+};
+
 const platforms: Record<DevicePlatform, AccountDevicePlatform> = {
   ios: AccountDevicePlatform.IOS,
   android: AccountDevicePlatform.ANDROID,
@@ -129,20 +148,16 @@ export const createPrismaAccountDevices = (
       }
     }),
 
-  deactivateCurrentDevice: async (input: {
-    accountId: string;
-    installationId: string;
-  }): Promise<void> => {
+  deactivateCurrentDevice: async (
+    input: DeactivateCurrentDevice,
+  ): Promise<void> => {
     await prisma.accountDevice.updateMany({
       where: {
         accountId: input.accountId,
         installationIdDigest: digestInstallationId(input.installationId),
         deactivatedAt: null,
       },
-      data: deactivation(
-        now(),
-        AccountDeviceDeactivationReason.PERMISSION_REVOKED,
-      ),
+      data: deactivation(now(), deactivationReasons[input.reason]),
     });
   },
 });

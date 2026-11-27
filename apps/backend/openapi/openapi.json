@@ -19551,6 +19551,15 @@
             "type": "string",
             "minLength": 8,
             "maxLength": 200
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "permission_revoked",
+              "logout"
+            ],
+            "default": "permission_revoked",
+            "description": "Why this installation stops receiving pushes: the permission was turned off, or it signed out."
           }
         },
         "required": [

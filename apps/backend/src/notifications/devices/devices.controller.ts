@@ -24,16 +24,17 @@ import {
   authenticateBearer,
   type PrincipalResolver,
 } from '../../system-identity/authentication/bearer-principal';
-import type { RegisterCurrentDevice } from './prisma-account-devices';
+import {
+  deviceDeactivationReasons,
+  type DeactivateCurrentDevice,
+  type RegisterCurrentDevice,
+} from './prisma-account-devices';
 
 export const deviceRegistration = Symbol('deviceRegistration');
 export const deviceDeactivation = Symbol('deviceDeactivation');
 
 type RegisterHandler = (input: RegisterCurrentDevice) => Promise<void>;
-type DeactivateHandler = (input: {
-  accountId: string;
-  installationId: string;
-}) => Promise<void>;
+type DeactivateHandler = (input: DeactivateCurrentDevice) => Promise<void>;
 
 const installationIdSchema = z.string().min(8).max(200);
 
@@ -48,8 +49,12 @@ const registrationSchema = z
   })
   .strict();
 
+// Apps before 1.3.1 send no reason: they only ever reported a revoked permission.
 const deactivationSchema = z
-  .object({ installationId: installationIdSchema })
+  .object({
+    installationId: installationIdSchema,
+    reason: z.enum(deviceDeactivationReasons).default('permission_revoked'),
+  })
   .strict();
 
 export class DeviceRegistrationDto {
@@ -66,6 +71,15 @@ export class DeviceRegistrationDto {
 export class DeviceDeactivationDto {
   @ApiProperty({ minLength: 8, maxLength: 200 })
   installationId!: string;
+
+  @ApiProperty({
+    enum: deviceDeactivationReasons,
+    required: false,
+    default: 'permission_revoked',
+    description:
+      'Why this installation stops receiving pushes: the permission was turned off, or it signed out.',
+  })
+  reason?: (typeof deviceDeactivationReasons)[number];
 }
 
 const invalidRequest = (detail: string): BadRequestException =>
@@ -129,6 +143,7 @@ export class DevicesController {
     await this.deactivate({
       accountId: principal.accountId,
       installationId: parsed.data.installationId,
+      reason: parsed.data.reason,
     });
   }
 }
