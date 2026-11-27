@@ -24,6 +24,20 @@ const pickOneReceipt = () => {
   jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
 };
 
+const receiptRoutes = () => ({
+  ...baseRoutes(0),
+  "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
+  "POST /api/v1/uploads": () =>
+    jsonResponse({ id: "asset-1", uploadUrl: "/u", expiresAt: "2026-09-21T15:15:00.000Z" }, 201),
+  "PUT /api/v1/uploads/asset-1/object": () => new Response(null, { status: 204 }),
+  "POST /api/v1/uploads/asset-1/finalize": () =>
+    jsonResponse({ id: "asset-1", state: "processing" }, 202),
+  "/api/v1/uploads/asset-1": () =>
+    jsonResponse({ id: "asset-1", state: "ready", mediaType: "image/jpeg" }),
+  "POST /api/v1/purchase-intents/intent-1/receipt": () =>
+    jsonResponse({ ...intent, receiptAttached: true }),
+});
+
 // Walkthrough n.º 7 and 23 (C10u, C10b, C10v).
 describe("the transfer receipt on Pago por transferencia", () => {
   afterEach(async () => {
@@ -79,6 +93,27 @@ describe("the transfer receipt on Pago por transferencia", () => {
     expect(screen.getByRole("button", { name: "Cambiar comprobante" })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
     await waitFor(() => expect(screen.queryByText("Tu comprobante")).toBeNull());
+  });
+
+  // Review: iOS presents one modal at a time, so «Cambiar comprobante»
+  // closes the big view first and opens the picker once it has gone.
+  it("opens the picker from the big view only after the view has closed", async () => {
+    pickOneReceipt();
+    const screen = await openPlanDetail(routeFetcher(receiptRoutes()));
+    await fireEvent.press(screen.getByTestId("plan-continue-to-payment"));
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver comprobante en grande" }));
+    const picks = jest.mocked(ImagePicker.launchImageLibraryAsync).mock.calls.length;
+
+    await fireEvent.press(await screen.findByRole("button", { name: "Cambiar comprobante" }));
+
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledTimes(picks);
+    await waitFor(() => expect(screen.queryByText("Tu comprobante")).toBeNull());
+    await waitFor(() =>
+      expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledTimes(picks + 1),
+    );
   });
 
   // Walkthrough n.º 9 (C11n): «Te avisaremos apenas esté listo» needs the
