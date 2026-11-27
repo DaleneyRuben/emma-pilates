@@ -24,8 +24,19 @@ describe("Rosa Emma tokens", () => {
     const offScale = Object.entries(colors).filter(
       ([name, value]) => name !== "scrim" && !allowed.includes(value),
     );
-    // Follow-up 292: Destructivo is the one hue outside the rosa family.
-    expect(offScale).toEqual([["destructivo", "#A04640"]]);
+    // Follow-up 292: Destructivo is the one hue outside the rosa family;
+    // follow-up 293 adds the footer's slightly darker Rosa profundo.
+    expect(offScale).toEqual([
+      ["destructivo", "#A04640"],
+      ["textoPie", "#8A5B57"],
+    ]);
+  });
+
+  // Follow-up 293 (owner 2026-11-27): Rosa profundo reaches only 4.27:1 on
+  // Fondo, so Perfil's footer writes in #8A5B57 (4.72:1), and only there.
+  it("names texto-pie #8A5B57 for Perfil's footer", () => {
+    expect(brand.textoPie).toBe("#8A5B57");
+    expect(colors.textoPie).toBe("#8A5B57");
   });
 
   // Follow-up 292 (owner 2026-11-27): a muted brick for actions that end

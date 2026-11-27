@@ -48,7 +48,9 @@ describe("FeedbackScreen (REL-012)", () => {
     const fetcher = jest.fn().mockResolvedValue(sent());
     const screen = await renderScreen(fetcher);
 
-    expect(screen.getByText("Enviar comentarios")).toBeOnTheScreen();
+    // Follow-up 293 (C25, E-F11): the screen takes the Perfil row's name.
+    expect(screen.getByText("Envíanos tu opinión")).toBeOnTheScreen();
+    expect(screen.queryByText("Enviar comentarios")).toBeNull();
     expect(sendButton(screen)).toBeEnabled();
     await fireEvent.changeText(screen.getByLabelText("Comentario"), "  Muy mal  ");
     expect(screen.getByText("11 / 2000")).toBeOnTheScreen();

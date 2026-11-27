@@ -159,6 +159,39 @@ describe("offScaleTexts", () => {
     ).toEqual(["«Salir» is destructivo on #93615D"]);
   });
 
+  // Follow-up 293: Perfil's footer is the one small text on Fondo, in its own
+  // tone and styles, which appear nowhere else.
+  it("lets the footer styles stand on Fondo in texto-pie and nowhere else", async () => {
+    expect(
+      await audit(
+        <>
+          <View style={{ backgroundColor: "#F9E7DF" }}>
+            <Text tone="texto-pie" variant="pie">
+              Emma Pilates Studio · versión 1.3.0
+            </Text>
+            <Text tone="texto-pie" variant="enlace-pie">
+              Política de privacidad
+            </Text>
+            <Text variant="pie">Tinta</Text>
+            <Text tone="texto-pie" variant="secundario">
+              Otro estilo
+            </Text>
+          </View>
+          <View style={{ backgroundColor: "#FFFBFB" }}>
+            <Text tone="texto-pie" variant="pie">
+              En blanco
+            </Text>
+          </View>
+        </>,
+      ),
+    ).toEqual([
+      "«Tinta» is pie outside texto-pie",
+      "«Otro estilo» is texto-pie outside the footer styles",
+      "«Otro estilo» is small text (secundario) on #F9E7DF",
+      "«En blanco» is pie on #FFFBFB",
+    ]);
+  });
+
   it("lets only initials stop growing with the phone's text size", async () => {
     expect(
       await audit(
