@@ -3912,7 +3912,7 @@ C. **A paid quarterly Plan keeps its free one.** As a Client with a paid
    dates, the paid Plan wins.
 
 Specs: `evaluation-courtesy-plans.integration-spec.ts`,
-`evaluation-coverage.spec.ts`, `evaluation-offer.spec.ts`,
+`pick-covering-subscription.spec.ts`, `evaluation-offer.spec.ts`,
 `evaluation-no-plan.spec.tsx`; Maestro: `apps/client-mobile/.maestro/evaluation-no-plan.yaml` (B).
 
 ## What you cannot test yet
