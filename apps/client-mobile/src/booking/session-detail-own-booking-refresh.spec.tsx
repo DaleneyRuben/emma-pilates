@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
@@ -63,5 +63,28 @@ describe("Client Session detail keeping her own Booking current", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Ya reservaste esta clase")).toBeOnTheScreen();
+  });
+
+  // Review: two taps in the same frame both saw «busy» still false and sent
+  // two cancellations; a ref lets only the first through.
+  it("cancels once however fast «Sí, cancelar reserva» is tapped", async () => {
+    let deletes = 0;
+    const { screen } = await openDetail({
+      "/api/v1/sessions/session-1": () => jsonResponse({ ...detail(3), yourBooking: thisClass }),
+      "DELETE /api/v1/bookings/booking-1": () => {
+        deletes += 1;
+        return new Response(null, { status: 204 });
+      },
+    });
+    await fireEvent.press(await screen.findByRole("button", { name: "Cancelar reserva" }));
+    const confirm = await screen.findByRole("button", { name: "Sí, cancelar reserva" });
+
+    act(() => {
+      confirm.props.onClick();
+      confirm.props.onClick();
+    });
+
+    await waitFor(() => expect(deletes).toBeGreaterThan(0));
+    expect(deletes).toBe(1);
   });
 });
