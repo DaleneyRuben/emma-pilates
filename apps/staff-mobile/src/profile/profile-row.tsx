@@ -12,8 +12,8 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * A Perfil row (S23, walkthrough n.º 16 after the Client's C18): the line
- * glyph on a 36 pt 50 disc, the label in `titulo-fila`, the unread count in Rosa profundo or a short value, and the
- * chevron. A row with no `onPress` only states a fact.
+ * glyph on a 36 pt 50 disc, the label in `titulo-fila`, the unread count in
+ * Rosa profundo or a short value, and the chevron.
  */
 export function ProfileRow({
   badge = 0,
@@ -27,7 +27,7 @@ export function ProfileRow({
   badge?: number;
   icon: GlyphName;
   label: string;
-  onPress?: () => void;
+  onPress: () => void;
   testID?: string;
   tone?: "default" | "error";
   /** A short value before the chevron, such as the Trainer's code. */
@@ -62,16 +62,9 @@ export function ProfileRow({
           {value}
         </Text>
       )}
-      {error || onPress === undefined ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
+      {error ? null : <Chevron size={16} strokeWidth={1.5} tone="muted" />}
     </>
   );
-  if (onPress === undefined) {
-    return (
-      <View style={styles.row} testID={testID}>
-        {content}
-      </View>
-    );
-  }
   return (
     <Pressable
       accessibilityLabel={
