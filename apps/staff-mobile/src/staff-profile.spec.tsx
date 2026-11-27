@@ -70,17 +70,15 @@ describe("Staff Perfil", () => {
     expect(
       screen.getByText("Tu nombre y tu correo los actualiza administración."),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Rol")).toBeOnTheScreen();
-    expect(screen.getByText("Instructora")).toBeOnTheScreen();
-    expect(screen.getByText("Sucursales")).toBeOnTheScreen();
-    expect(screen.getByText("Centro, Equipetrol")).toBeOnTheScreen();
+    // Follow-up 293: her Role and Branches under her name.
+    expect(screen.getByText("Instructora · Centro, Equipetrol")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar" })).not.toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Notificaciones, 1 notificación sin leer" }),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
-    // Follow-up 292 (E-F23): «Cerrar sesión» closes Staff Perfil; no version line.
-    expect(screen.queryByText(/Emma Pilates Studio · versión/)).toBeNull();
+    // Follow-up 293 (E-F24): the version line closes Staff Perfil.
+    expect(screen.getByText(/^Emma Pilates Studio · versión/)).toBeOnTheScreen();
 
     // Perfil is a tab root: no back, the tab bar leads back to Agenda.
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();
@@ -109,9 +107,8 @@ describe("Staff Perfil", () => {
     await fireEvent.press(screen.getByTestId("tab-profile"));
 
     await waitFor(() => {
-      expect(screen.getByText("Administradora")).toBeOnTheScreen();
+      expect(screen.getByText("Administradora · Todas las sucursales")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Todas las sucursales")).toBeOnTheScreen();
   });
 
   it("opens the staff inbox with its own empty state", async () => {

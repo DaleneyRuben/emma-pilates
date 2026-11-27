@@ -92,11 +92,12 @@ describe("Mis pagos for every paid Role", () => {
     const screen = await openApp("coordinator");
 
     await fireEvent.press(screen.getByTestId("tab-profile"));
-    await waitFor(() => expect(screen.getByText("Coordinadora")).toBeOnTheScreen());
+    await waitFor(() =>
+      expect(screen.getByText("Coordinadora · Todas las sucursales")).toBeOnTheScreen(),
+    );
     expect(screen.getByText("Cambiar foto")).toBeOnTheScreen();
-    expect(screen.getByText("Sucursales")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Enviar comentarios" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: /^Mi QR de cobro/ })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Envíanos tu opinión" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Tu QR de cobro/ })).toBeOnTheScreen();
     await fireEvent.press(screen.getByTestId("profile-my-pay"));
     await waitFor(() => expect(screen.getByTestId("pay-summary")).toBeOnTheScreen());
   });
@@ -132,7 +133,7 @@ describe("Mis pagos for every paid Role", () => {
     expect(screen.queryByRole("button", { name: "Ver mi agenda" })).toBeNull();
   });
 
-  it("puts «Mis pagos» and «Mi QR de cobro» in the Assistant's Perfil, with no new tab", async () => {
+  it("puts «Historial de pagos» and «Tu QR de cobro» in the Assistant's Perfil, with no new tab", async () => {
     const screen = await openApp("assistant", {
       statements: () => jsonResponse([]),
       payments: () => jsonResponse([handPayment]),
@@ -140,18 +141,20 @@ describe("Mis pagos for every paid Role", () => {
 
     expect(screen.queryByTestId("tab-pay")).toBeNull();
     await fireEvent.press(screen.getByTestId("tab-profile"));
-    await waitFor(() => expect(screen.getByText("Asistente")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen());
     expect(screen.getByText("Cambiar foto")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Enviar comentarios" })).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: /^Mi QR de cobro/ })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Envíanos tu opinión" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: /^Tu QR de cobro/ })).toBeOnTheScreen();
 
     await fireEvent.press(
-      await waitFor(() => screen.getByRole("button", { name: "Mis pagos, Último: Bs 410" })),
+      await waitFor(() =>
+        screen.getByRole("button", { name: "Historial de pagos, Último: Bs 410" }),
+      ),
     );
 
     await waitFor(() => expect(screen.getByTestId("pay-summary")).toBeOnTheScreen());
     expect(within(screen.getByLabelText("Pagos")).getByText("Bs 410")).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
-    await waitFor(() => expect(screen.getByText("Asistente")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("Asistente · Centro")).toBeOnTheScreen());
   });
 });

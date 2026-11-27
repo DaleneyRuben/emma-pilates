@@ -152,8 +152,7 @@ describe("the Coordinator's Staff app", () => {
 
     await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
-      expect(screen.getByText("Coordinadora")).toBeOnTheScreen();
+      expect(screen.getByText("Coordinadora · Todas las sucursales")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Todas las sucursales")).toBeOnTheScreen();
   });
 });

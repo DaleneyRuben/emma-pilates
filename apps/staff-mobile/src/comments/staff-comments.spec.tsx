@@ -77,7 +77,7 @@ async function openComments(triageStatus = 200) {
     timeout: 10_000,
   });
   await fireEvent.press(screen.getByTestId("tab-profile"));
-  await fireEvent.press(await screen.findByRole("button", { name: "Comentarios" }));
+  await fireEvent.press(await screen.findByRole("button", { name: "Comentarios de clientas" }));
   await waitFor(() => expect(screen.getByText("Ana Pérez")).toBeOnTheScreen());
   return { lists, screen, triaged };
 }
@@ -186,8 +186,8 @@ describe("Comentarios in the Staff app", () => {
       timeout: 10_000,
     });
     await fireEvent.press(screen.getByTestId("tab-profile"));
-    await screen.findByRole("button", { name: "Enviar comentarios" });
+    await screen.findByRole("button", { name: "Envíanos tu opinión" });
 
-    expect(screen.queryByRole("button", { name: "Comentarios" })).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Comentarios de clientas" })).not.toBeOnTheScreen();
   });
 });
