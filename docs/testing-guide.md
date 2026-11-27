@@ -12506,6 +12506,12 @@ H. **A code that was not active (C02j).** Register a friend with the code of
    gratis.» above «Elige tu plan y empieza a moverte». The subscription
    answers `inactiveInvite: { hostFirstName }` while she has never had a
    Plan and the host still has no paid Plan.
+I. **Code lookups are limited per address.** From one machine, ask
+   `GET /api/v1/referral-codes/lookup?code=LUCIA` (or open
+   `/client/invite/LUCIA`) 31 times within a minute: the 31st answers `429
+   rate_limit_exceeded` with `Retry-After`, while other routes from that
+   address still answer. Typing a code on «Crea tu cuenta» never comes near
+   the limit.
 
 ## Test 203: class detail knows your bookings (mejoras del recorrido 1)
 
