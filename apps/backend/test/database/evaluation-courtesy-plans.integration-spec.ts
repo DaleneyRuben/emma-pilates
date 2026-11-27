@@ -13,8 +13,9 @@ import {
   startEvaluationTestWorld,
 } from './evaluation-test-support';
 
-// FIX-019 (3), owner 2026-10-30: a paid Evaluation needs a paid Plan. A
-// Guest Pass or Courtesy Access never covers one.
+// FIX-019 (3), owner 2026-10-30: a Guest Pass never covers an Evaluation.
+// Owner 2026-11-27: Courtesy Access does, always as a Paid Evaluation at the
+// studio price, even when its range is quarterly.
 describe('evaluations and courtesy plans', () => {
   let world: EvaluationTestWorld;
   let mondayBlockId: string;
@@ -67,29 +68,106 @@ describe('evaluations and courtesy plans', () => {
         ),
       ),
     ).resolves.toBe('no_eligible_subscription');
+    await expect(
+      commands().listBookableSlots({}, friend.principal),
+    ).resolves.toMatchObject({ planCoversEvaluation: false });
   });
 
-  it('refuses a paid Evaluation to a Client holding only Courtesy Access', async () => {
-    const guest = await newClient('Cortesía');
+  const courtesyClient = async (name: string) => {
+    const guest = await newClient(name);
     await createPrismaCourtesyAccess(world.prisma, {
       now: () => fixtureNow,
     }).grant(
       {
         clientId: guest.clientId,
-        endsOn: new Date('2026-10-20T00:00:00.000Z'),
+        endsOn: new Date('2026-12-20T00:00:00.000Z'),
       },
       await world.principalOf('paola.mendoza@example.com'),
       randomUUID(),
     );
+    // A quarterly range would include an Evaluation on a paid Plan.
+    await world.prisma.subscription.updateMany({
+      where: { clientId: guest.clientId },
+      data: { durationDaysSnapshot: 90 },
+    });
+    return guest;
+  };
 
+  const studioPrice = async () =>
+    (
+      await world.prisma.studioSettingsVersion.findFirstOrThrow({
+        orderBy: { version: 'desc' },
+        select: { evaluationPriceCentavos: true },
+      })
+    ).evaluationPriceCentavos;
+
+  it('offers Courtesy Access a paid Evaluation, never the included one', async () => {
+    const guest = await courtesyClient('Cortesía');
+    const price = await studioPrice();
+
+    const availability = await commands().listBookableSlots(
+      {},
+      guest.principal,
+    );
+    expect(availability).toMatchObject({
+      planCoversEvaluation: true,
+      includedEvaluation: 'none',
+      priceCentavos: price,
+    });
+    const offered = availability.days.flatMap((day) => day.slots);
+    expect(offered.length).toBeGreaterThan(0);
+    expect(
+      offered.every((slot) => !slot.included && slot.priceCentavos === price),
+    ).toBe(true);
+
+    const slotId = await slot('2026-09-28T15:15:00.000Z');
     await expect(
-      codeOf(
-        commands().bookEvaluation(
-          await slot('2026-09-28T15:15:00.000Z'),
-          guest.principal,
-          randomUUID(),
-        ),
+      commands().readEvaluationSlot(slotId, guest.principal),
+    ).resolves.toMatchObject({
+      bookable: true,
+      included: false,
+      priceCentavos: price,
+    });
+    await expect(
+      codeOf(commands().bookEvaluation(slotId, guest.principal, randomUUID())),
+    ).resolves.toBe('evaluation_payment_required');
+
+    const booked = await commands().bookPaidEvaluation(
+      slotId,
+      guest.principal,
+      randomUUID(),
+    );
+    expect(booked).toMatchObject({
+      included: false,
+      priceCentavos: price,
+      paymentState: 'pending',
+    });
+  });
+
+  it('tells a Client with no Plan that no Plan covers an Evaluation', async () => {
+    await expect(
+      commands().listBookableSlots(
+        {},
+        await world.principalOf('mariana@example.com'),
       ),
-    ).resolves.toBe('no_eligible_subscription');
+    ).resolves.toMatchObject({ planCoversEvaluation: false });
+    await expect(
+      commands().listBookableSlots({}, (await newClient('Sin plan')).principal),
+    ).resolves.toMatchObject({ planCoversEvaluation: false });
+  });
+
+  it('keeps the included Evaluation of a paid quarterly Plan', async () => {
+    const ana = await world.principalOf('ana@example.com');
+    await expect(commands().listBookableSlots({}, ana)).resolves.toMatchObject({
+      planCoversEvaluation: true,
+      includedEvaluation: 'available',
+    });
+    await expect(
+      commands().bookEvaluation(
+        await slot('2026-10-05T13:00:00.000Z'),
+        ana,
+        randomUUID(),
+      ),
+    ).resolves.toMatchObject({ included: true, priceCentavos: 0 });
   });
 });
