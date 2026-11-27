@@ -883,14 +883,14 @@
    "y": 12940,
    "w": 390,
    "h": 844,
-   "title": "F11 · Enviar comentarios"
+   "title": "F11 · Envíanos tu opinión"
   },
   "E-F12.dc.html": {
    "x": 5170,
    "y": 12940,
    "w": 390,
    "h": 844,
-   "title": "F12 · Enviar comentarios · gracias"
+   "title": "F12 · Envíanos tu opinión · gracias"
   },
   "E-F13.dc.html": {
    "x": 5640,
@@ -1094,6 +1094,34 @@
    "w": 390,
    "h": 844,
    "title": "Perfil · instructora · ¿cerrar sesión? (desde abajo)"
+  },
+  "E-F29.dc.html": {
+   "x": 0,
+   "y": 18600,
+   "w": 390,
+   "h": 844,
+   "title": "F29 · Perfil · nutricionista"
+  },
+  "E-F30.dc.html": {
+   "x": 470,
+   "y": 18600,
+   "w": 390,
+   "h": 844,
+   "title": "F30 · Perfil · nutricionista · desplazado hasta abajo"
+  },
+  "E-F31.dc.html": {
+   "x": 940,
+   "y": 18600,
+   "w": 390,
+   "h": 844,
+   "title": "F31 · Perfil · coordinadora"
+  },
+  "E-F32.dc.html": {
+   "x": 1410,
+   "y": 18600,
+   "w": 390,
+   "h": 844,
+   "title": "F32 · Perfil · coordinadora · desplazado hasta abajo"
   }
  },
  "order": [
@@ -1251,7 +1279,11 @@
   "E-F25.dc.html",
   "E-F26.dc.html",
   "E-F27.dc.html",
-  "E-F28.dc.html"
+  "E-F28.dc.html",
+  "E-F29.dc.html",
+  "E-F30.dc.html",
+  "E-F31.dc.html",
+  "E-F32.dc.html"
  ],
  "notes": {
   "t0": {
@@ -1351,6 +1383,13 @@
    "text": "Cerrar sesión al final (follow-up 292, 27/11)",
    "kind": "title1",
    "maxW": 2000
+  },
+  "n-perfil-sin-grupos-de-una-fila": {
+   "x": 0,
+   "y": 18320,
+   "text": "Perfil sin grupos de una fila (follow-up 293, 27/11)",
+   "kind": "title1",
+   "maxW": 1820
   }
  },
  "designSystems": []

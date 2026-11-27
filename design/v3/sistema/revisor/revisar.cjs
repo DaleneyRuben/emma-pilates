@@ -9,9 +9,11 @@ const STYLES = [
   ['boton', S, 16, 700, 'box'], ['boton-chico', S, 14, 700, 'box'], ['cuerpo', S, 15, 400], ['compacto', S, 14, 400], ['compacto-600', S, 14, 600],
   ['secundario', S, 13, 400], ['etiqueta', S, 12, 700, 'up'], ['pastilla', S, 12, 700, 'low'],
   ['enlace', S, 14, 700, 'u'], ['enlace-cuerpo', S, 15, 700, 'u'], ['enlace-secundario', S, 13, 700, 'u'],
+  ['enlace-pie', S, 12, 400, 'u'], ['pie', S, 12, 400], // Perfil's footer only, in texto-pie on Fondo (follow-up 293)
 ];
 const LARGE = new Set(['titulo-pagina', 'titulo-seccion', 'titulo-bloque', 'cifra-grande', 'cifra', 'destacado']);
 const INK = 'rgb(147, 97, 93)', WHITE = 'rgb(255, 251, 251)', DESTRUCTIVO = 'rgb(160, 70, 64)'; // Destructivo #A04640 (follow-up 292)
+const PIE = 'rgb(138, 91, 87)', FONDO = 'rgb(249, 231, 223)', PIE_STYLES = new Set(['pie', 'enlace-pie']); // texto-pie #8A5B57, 4.7:1 on Fondo (follow-up 293)
 const SMALL_OK_BG = new Set(['rgb(255, 251, 251)', 'rgb(254, 246, 242)', 'rgb(147, 97, 93)', 'rgb(249, 244, 242)', 'rgb(255, 255, 255)', DESTRUCTIVO]);
 (async () => {
   const b = await chromium.launch(); let total = 0, bad = 0; const counts = {};
@@ -36,10 +38,12 @@ const SMALL_OK_BG = new Set(['rgb(255, 251, 251)', 'rgb(254, 246, 242)', 'rgb(14
       const probs = [];
       if (!m) probs.push(`fuera de escala (${fam} ${n.size} ${n.weight})`);
       if (n.size < 12) probs.push('menor a 12 px');
-      if (m && !LARGE.has(m[0]) && !SMALL_OK_BG.has(n.bg)) probs.push(`texto chico sobre ${n.bg}`);
-      if (n.color !== INK && n.color !== DESTRUCTIVO && n.color !== WHITE && n.color !== 'rgb(255, 255, 255)') probs.push(`color ${n.color}`);
+      const pie = m && PIE_STYLES.has(m[0]);
+      if (m && !LARGE.has(m[0]) && !SMALL_OK_BG.has(n.bg) && !(pie && n.bg === FONDO)) probs.push(`texto chico sobre ${n.bg}`);
+      if (pie && n.color !== PIE) probs.push(`el pie va en texto-pie, no ${n.color}`);
+      if (n.color !== INK && n.color !== DESTRUCTIVO && n.color !== WHITE && n.color !== 'rgb(255, 255, 255)' && !(pie && n.color === PIE)) probs.push(`color ${n.color}`);
       if (n.op < 0.99) probs.push(`transparencia ${n.op.toFixed(2)}`);
-      if (n.under && n.weight !== 700) probs.push('subrayado sin negrita (los enlaces van en 700)');
+      if (n.under && n.weight !== 700 && !(m && m[0] === 'enlace-pie')) probs.push('subrayado sin negrita (los enlaces van en 700)');
       if (n.upper && !(m && m[0] === 'etiqueta')) probs.push('mayúsculas fuera de etiqueta');
       if (probs.length) { bad++; console.log(`${require('path').basename(f)} · «${n.txt}» · ${probs.join('; ')}`); }
       if (m) counts[m[0]] = (counts[m[0]] || 0) + 1;
