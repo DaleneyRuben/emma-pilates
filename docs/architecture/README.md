@@ -44,6 +44,7 @@ Accepted architecture decisions:
 - [x] Calculate Trainer and Coordinator Pay Statements in the system from dated rates, approved by the Administrator (ADR-0105).
 - [x] Let a Trainer's Pay Statement cover a day, a week, a date range, or a month without paying a class twice; the Coordinator stays monthly (ADR-0109).
 - [x] Draw PDF invoice pages on the server as images so both apps show and open them without a native viewer (ADR-0110).
+- [x] Preview a chosen PDF invoice page by page before attaching it, from the uploader's own unattached upload (ADR-0113, extends ADR-0110).
 - [x] Let every paid Staff Member read her own Pay Statements, Salary Payments, and receipts through Role-neutral routes keyed on the signed-in Staff Member (ADR-0111).
 - [x] Log Equipment and its faults in Back Office without introducing a Room (ADR-0106).
 - [x] Booking & Membership's launch rules: Plans by days from a chosen Start Date with Early Renewal, a Weekly Cap with separate extra classes, Minimum Bookings at 3 hours, Founder Membership, invite-a-friend instead of Credit, the Freeze, paid Evaluations, and immutable sales with Invoice Data (booking ADR-0005 to ADR-0012).
