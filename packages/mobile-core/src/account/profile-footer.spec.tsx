@@ -32,7 +32,12 @@ describe("ProfileFooter", () => {
   it("draws the links on one line, underlined at regular weight, split by a dot", async () => {
     const screen = await render(<ProfileFooter links={links} version="1.3.0" />);
 
-    expect(screen.getByTestId("profile-footer-links")).toHaveStyle({ flexDirection: "row" });
+    // The taller links overlap the 2 pt gap, so the lines still sit 2 pt apart.
+    expect(screen.getByTestId("profile-footer-links")).toHaveStyle({
+      flexDirection: "row",
+      flexWrap: "wrap",
+      marginVertical: -13,
+    });
     for (const label of ["Política de privacidad", "Cerrar mi cuenta"]) {
       expect(screen.getByText(label)).toHaveStyle({
         ...textVariants["enlace-pie"],
@@ -55,8 +60,9 @@ describe("ProfileFooter", () => {
     for (const link of links) {
       const button = screen.getByRole("link", { name: link.label });
       expect(button).toBe(screen.getByTestId(link.testID));
-      const slop = button.props.hitSlop as { bottom: number; top: number };
-      expect(textVariants.pie.lineHeight + slop.top + slop.bottom).toBeGreaterThanOrEqual(44);
+      // The link's own box is 44 pt tall: hit slop past an 18 pt parent row
+      // would be clipped by that row's bounds.
+      expect(button).toHaveStyle({ minHeight: 44, justifyContent: "center" });
       await fireEvent.press(button);
       expect(link.onPress).toHaveBeenCalledTimes(1);
     }

@@ -49,7 +49,8 @@ describe("Perfil on a tablet", () => {
     expect(within(left).getByText("Sofía Guzmán")).toBeOnTheScreen();
     expect(within(left).getByTestId("profile-identity")).toHaveStyle({ flexDirection: "column" });
     expect(within(left).getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
-    expect(within(left).getByTestId("profile-footer")).toBeOnTheScreen();
+    // The column's 16 pt gap is already the footer's 16 pt.
+    expect(within(left).getByTestId("profile-footer")).toHaveStyle({ marginTop: 0 });
     expect(within(left).getByTestId("profile-close-account")).toBeOnTheScreen();
     for (const title of ["Tu plan", "Ajustes", "Ayuda"]) {
       expect(within(right).getByText(title)).toBeOnTheScreen();

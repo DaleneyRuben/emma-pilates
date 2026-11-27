@@ -105,6 +105,17 @@ describe("Staff Perfil groups by Role", () => {
     expect(screen.queryByText(/^Sucursal(es)?$/)).toBeNull();
   });
 
+  it("names only the Role when she has no Branch yet", async () => {
+    members.nutritionist = member("nutritionist", "Gabriela Flores", []);
+    const screen = await openProfile("nutritionist");
+    members.nutritionist = member("nutritionist", "Gabriela Flores", ["Centro"]);
+
+    expect(
+      within(screen.getByTestId("profile-identity")).getByText("Nutricionista"),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/ · $/)).toBeNull();
+  });
+
   it("gives the Instructora Tus pagos with her code, Ajustes and Ayuda", async () => {
     const screen = await openProfile("trainer");
 
