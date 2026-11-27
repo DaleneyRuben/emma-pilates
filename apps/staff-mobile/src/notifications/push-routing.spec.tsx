@@ -105,4 +105,18 @@ describe("Staff push notifications (NOT-002)", () => {
       ),
     ).toBeOnTheScreen();
   });
+
+  // Owner, TestFlight 1.3.0: a push sent before sign-out badged the icon.
+  it("keeps the app icon's badge empty while nobody is signed in", async () => {
+    const device = createMemoryPushPlatform();
+    const runtime = createStaffRuntime(routeFetcher({}), "administrator", {
+      pushPlatform: device.platform,
+    });
+    runtime.sessionManager.restore = jest.fn().mockResolvedValue(null);
+    await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(device.state.badgeCounts).toEqual([0]));
+    await act(async () => device.receive());
+    expect(device.state.badgeCounts).toEqual([0, 0]);
+  });
 });

@@ -20,6 +20,7 @@ import {
 } from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
 import { createExpoPushPlatform } from "./notifications/expo-push-platform";
+import { useClearBadgeWithoutSession } from "./notifications/no-session-badge";
 import { releasePushRegistration } from "./notifications/push-registration";
 import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
@@ -172,6 +173,11 @@ function IdentityNavigation({
     clearIntent,
     intent,
     signedIn: identity.session !== null && identity.session !== undefined,
+  });
+  // Until the saved session answers, the badge keeps its count.
+  useClearBadgeWithoutSession({
+    platform: pushPlatform,
+    signedIn: identity.status === "restoring" || identity.session !== null,
   });
   // The fonts are loaded by now; once the session check has answered, the
   // first screen (Login or the saved session's) is drawn under the splash.
