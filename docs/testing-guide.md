@@ -83,6 +83,7 @@ numbered tests.
 | «Cerrar sesión» last | Both Perfil screens end with **Cerrar sesión** alone on a white card in brick red (`#A04640`); «Cuenta» (Client) and «Ajustes» (Staff) no longer hold it; the «¿Cerrar sesión?» sheet's button is filled in the same red; the Client keeps the version and «Cerrar mi cuenta» under it, the Staff app has nothing under it (Test 208) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» in the left column: its board was not redrawn |
 | Perfil with no single-row group | Every role's Perfil: the Role and Branches under the Staff name, «Tu cuenta» gone; Client «Tu plan» · «Ajustes» · «Ayuda», Staff «Tus pagos» (the Administradora «Administración») · «Ajustes» · «Ayuda» (none for the Administradora or while seeing the app as someone); «Envíanos tu opinión» and «Preguntas frecuentes» (the support page); no group with one row, with or without Face ID; a two-line footer straight on the page in `#8A5B57` with «Política de privacidad» (and the Client's «Cerrar mi cuenta») (Test 209) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» and puts the footer in the left column: its board was not redrawn. The Face ID switch keeps its note under the label («Sin escribir tu contraseña»), which the boards do not draw |
 | No badge after sign-out | Signing out releases this phone's push registration (`account_devices` row `logout`, even if an older session of the phone was never revoked), so nothing reaches the icon after a sign-out or a reinstall; the app icon's badge is cleared whenever nobody is signed in (Test 210) | The icon badge needs push permission and a real push to be seen |
+| Face ID switch after «Ahora no» or «No permitir» | Perfil keeps **Entrar con Face ID** (**Entrar con huella**) on a phone that supports it after «Ahora no», and turning it on asks for Face ID; where iOS refuses Face ID to the app («No permitir»), the switch stays and opens the app's Ajustes; a Face ID locked out or no longer set up says «Face ID no está disponible» (Test 211) | **Needs a native build** (`expo-local-authentication`, release 1.3.1); the Simulator never asks for the app's Face ID permission, so «No permitir» is seen only on an iPhone |
 
 ## Where each designed screen is tested
 
@@ -3987,6 +3988,9 @@ The following are not ready for manual product testing:
 - a sale voided after the cash close showing as a negative «Ajuste» on AW151
   needs a closed day and then a void (Test 89; a late cash sale already shows
   as a positive adjustment, Test 76);
+- the app's own Face ID permission («¿Permitir que Emma Pilates use Face
+  ID?» and **No permitir**): the Simulator never asks it, so Test 211 F is
+  seen only on an iPhone; Test 211 G stands in with Face ID un-enrolled;
 - real push delivery on iOS, which needs the APNs key (gate 9): the
   Simulators show pushes only through `xcrun simctl push`, while Android
   receives real pushes on the development, staging, and Play builds
@@ -12095,7 +12099,8 @@ H. **Perfil.** Client **Perfil › Cuenta** and Staff **Perfil › Ajustes** sho
    **Entrar con huella** (iOS **Entrar con Face ID**) with a switch: «Sin
    escribir tu contraseña» while off, «Sirve cualquier huella guardada en este
    celular» (iOS «Sirve cualquier cara guardada en el Face ID de este iPhone»)
-   while on. Off revokes the key on the server.
+   while on. Off revokes the key on the server. Since Test 211 the switch
+   stays after «Ahora no» and when iOS refuses Face ID to the app.
 I. **The server ends it.** Changing or recovering the password, deactivating a
    Staff Member, or closing the Account revokes every key of the Account; the
    phone's next launch prompts, gets 401 `biometric_key_invalid`, forgets the
@@ -12842,3 +12847,45 @@ C. **The badge with nobody signed in.** In either app with push allowed, sign
    A launch that opens on the Face ID prompt (the session is still live behind
    it) keeps the unread count, even if the prompt is cancelled; only signing
    out or **Usar otra cuenta** clears it.
+
+## Test 211: the Face ID switch after «Ahora no» or «No permitir» (TestFlight 1.3.0)
+
+The owner's finding on TestFlight 1.3.0 (2026-11-27): a new Client who did
+not turn Face ID on at «¿Entrar con Face ID?» found no **Entrar con Face ID**
+in Perfil. Her iPhone's **Ajustes › Emma Pilates** showed Face ID off: she had
+answered **No permitir** to iOS's own Face ID alert, and iOS then tells the
+app it cannot use Face ID, as on a phone without it. **This needs a native
+build** (`expo-local-authentication` reads whether iOS refuses Face ID to the
+app; release 1.3.1): build locally (Test 45, `npx expo run:ios`) or use the
+1.3.1 builds. Use the iPhone 16 Pro Simulator with **Features › Face ID ›
+Enrolled**, the Android emulator with a fingerprint enrolled (Test 195), and
+the API on a fixtures copy.
+
+A. **«Ahora no», then Perfil.** Sign in with the password as
+   `lucia@example.com` (Client) and as `emma.vargas@example.com` (Staff);
+   answer **Ahora no**. Perfil still shows **Entrar con Face ID** (Android
+   **Entrar con huella**) with «Sin escribir tu contraseña».
+B. **Turning it on later.** Tap the switch: the system asks for Face ID (iOS
+   **Features › Face ID › Matching Face**) or the fingerprint (`adb -e emu
+   finger touch 1`), the toast «Listo: la próxima vez entras con Face ID.»
+   (Android «… con tu huella.») floats over the tab bar and the switch stays
+   on. The next launch opens with the prompt (Test 195 C).
+C. **Back from Ajustes.** Whatever changes in Settings shows when the app
+   comes back to the foreground, without signing out.
+D. **A phone without biometrics** that never had them shows no switch, as
+   before.
+E. **Android without a fingerprint.** On a phone that had one and no longer
+   does, the switch stays; tapping it shows «Tu huella no está disponible»
+   with **Abrir ajustes**, which opens the security settings.
+F. **iPhone: «No permitir» (a real iPhone only).** On a fresh install, sign in,
+   tap **Usar Face ID** and answer **No permitir** to «¿Permitir que Emma
+   Pilates use Face ID?». Perfil still shows **Entrar con Face ID**; tapping
+   it shows «Face ID está desactivado» / «Para entrar con Face ID, permite que
+   la app lo use en Ajustes.» with **Ahora no** and **Abrir Ajustes**, which
+   opens **Ajustes › Emma Pilates**. Turn **Face ID** on there and come back:
+   the switch now asks for Face ID and turns on (B).
+G. **iPhone: Face ID locked out or not set up.** With the switch off, set
+   **Features › Face ID › Enrolled** off and come back to the app. The switch
+   stays; tapping it shows «Face ID no está disponible» / «Revisa Face ID en
+   los ajustes del iPhone e intenta de nuevo.» with **Entendido** only, and
+   the switch stays off. Enrol Face ID again.
