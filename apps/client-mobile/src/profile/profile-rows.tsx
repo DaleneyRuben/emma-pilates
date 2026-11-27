@@ -23,7 +23,6 @@ export function ProfileRow({
   label,
   onPress,
   pill = false,
-  subtitle,
   value,
 }: {
   chevron?: boolean;
@@ -32,8 +31,6 @@ export function ProfileRow({
   onPress: () => void;
   /** The value is a state, such as «Activo», drawn on the soft pill. */
   pill?: boolean;
-  /** A line under the label, such as Soporte's «Contacto y WhatsApp del estudio». */
-  subtitle?: string;
   value?: string;
 }) {
   return (
@@ -46,16 +43,10 @@ export function ProfileRow({
       <View style={styles.disc} testID="profile-row-disc">
         <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       </View>
-      {subtitle === undefined ? (
-        <Text style={styles.label} variant="titulo-fila">
-          {label}
-        </Text>
-      ) : (
-        <View style={styles.label}>
-          <Text variant="titulo-fila">{label}</Text>
-          <Text variant="secundario">{subtitle}</Text>
-        </View>
-      )}
+      {/* Follow-up 293: a row is its label alone, with no line under it. */}
+      <Text style={styles.label} variant="titulo-fila">
+        {label}
+      </Text>
       {value === undefined ? null : pill ? (
         <View style={styles.pill}>
           <Text variant="pastilla">{value}</Text>
