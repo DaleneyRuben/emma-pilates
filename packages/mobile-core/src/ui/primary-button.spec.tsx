@@ -114,4 +114,13 @@ describe("PrimaryButton label on Android", () => {
     expect(screen.getByText("Subir factura")).not.toBe(before);
     expect(before).not.toBeOnTheScreen();
   });
+
+  // A fresh view measured «Subir factura» short as well, so the label no
+  // longer depends on its own measured width: it takes the button's.
+  it("lays the label across the whole button, centred", async () => {
+    const screen = await render(<PrimaryButton label="Subir factura" />);
+
+    expect(screen.getByTestId("button-label")).toHaveStyle({ alignSelf: "stretch" });
+    expect(screen.getByText("Subir factura")).toHaveStyle({ textAlign: "center" });
+  });
 });
