@@ -9,6 +9,7 @@ import {
 
 import { reportRecoveredError } from "../monitoring/error-reporting";
 import type { MobileSession, SessionManager } from "./session-manager";
+import { useBiometricAvailability } from "./use-biometric-availability";
 
 type MobileIdentityState = {
   /**
@@ -30,6 +31,8 @@ export type MobileBiometrics = {
   autoPrompt: boolean;
   /** The phone can protect the session with Face ID or a fingerprint. */
   available: boolean;
+  /** Available, but the system refuses them to the app now: Settings turns them back on. */
+  blockedBySystem: boolean;
   enabled: boolean;
   /** Set once biometrics were turned on, for the confirming toast. */
   enabledNotice: boolean;
@@ -83,6 +86,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   const [enabledNotice, setEnabledNotice] = useState(false);
   const [autoPrompt, setAutoPrompt] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
+  const availability = useBiometricAvailability(manager);
 
   useEffect(() => {
     let active = true;
@@ -263,8 +267,8 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   const biometrics: MobileBiometrics = {
     autoPrompt,
     forgetAfterPasswordChange,
-    // Read on each render: the person can deny Face ID or remove every fingerprint.
-    available: manager.canUseBiometrics(),
+    available: availability.available,
+    blockedBySystem: availability.blockedBySystem,
     disable: disableBiometrics,
     dismissEnabledNotice: () => setEnabledNotice(false),
     dismissOffer,

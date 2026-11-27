@@ -59,4 +59,41 @@ describe("createCredentialStore", () => {
     expect(values.has("authentication-session-biometric")).toBe(false);
     expect(values.get("biometric-device-key")).toBe("device-key");
   });
+
+  describe("whether this phone was seen to support biometrics", () => {
+    const memoryStorage = (entries: [string, string][] = []) => {
+      const values = new Map<string, string>(entries);
+      return {
+        values,
+        storage: {
+          deleteItemAsync: async (key: string) => void values.delete(key),
+          getItemAsync: async (key: string) => values.get(key) ?? null,
+          setItemAsync: async (key: string, value: string) => void values.set(key, value),
+        },
+      };
+    };
+
+    it("remembers it per application, past sign-out", async () => {
+      const { storage, values } = memoryStorage();
+      const store = createCredentialStore(storage, "client");
+      await expect(store.wasBiometricSupportSeen()).resolves.toBe(false);
+
+      await store.rememberBiometricSupport();
+      await store.clear();
+
+      expect(values.get("client.biometrics-supported")).toBe("true");
+      await expect(store.wasBiometricSupportSeen()).resolves.toBe(true);
+    });
+
+    it.each([
+      ["«Ahora no» answered the offer", "client.biometric-offer-declined", "true"],
+      ["a biometric key is kept", "client.biometric-device-key", "device-key"],
+    ])("counts it when %s", async (_label, key, value) => {
+      const { storage } = memoryStorage([[key, value]]);
+
+      await expect(
+        createCredentialStore(storage, "client").wasBiometricSupportSeen(),
+      ).resolves.toBe(true);
+    });
+  });
 });

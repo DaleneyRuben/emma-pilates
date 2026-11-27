@@ -44,6 +44,8 @@ export function createCredentialStore(
   const legacyMarkerKey = `${prefix}authentication-session-biometric-enabled`;
   // Per device, so «Ahora no» outlives sign-out: `clear` never deletes it.
   const offerDeclinedKey = `${prefix}biometric-offer-declined`;
+  // Per device too: iOS later refuses Face ID to an app whose permission is off.
+  const supportedKey = `${prefix}biometrics-supported`;
   function canUseBiometrics(): boolean {
     return storage.canUseBiometricAuthentication?.() ?? false;
   }
@@ -93,6 +95,9 @@ export function createCredentialStore(
     loadLegacyBiometricSession: () => storage.getItemAsync(legacyCredentialKey, biometricOptions),
     /** Behind the prompt; a cancelled or failed prompt rejects and keeps the key. */
     readUnlockSecret: () => storage.getItemAsync(unlockSecretKey, biometricOptions),
+    async rememberBiometricSupport(): Promise<void> {
+      await storage.setItemAsync(supportedKey, "true");
+    },
     async replaceBiometricDeviceKey(deviceKey: string): Promise<void> {
       await storage.setItemAsync(deviceKeyKey, deviceKey);
     },
@@ -110,6 +115,14 @@ export function createCredentialStore(
     },
     wasBiometricOfferDeclined: async () =>
       (await storage.getItemAsync(offerDeclinedKey)) === "true",
+    /** Biometrics worked here, were offered (and declined), or keep a key. */
+    async wasBiometricSupportSeen(): Promise<boolean> {
+      const [supported, declined] = await Promise.all([
+        storage.getItemAsync(supportedKey),
+        storage.getItemAsync(offerDeclinedKey),
+      ]);
+      return supported === "true" || declined === "true" || (await hasBiometricKey());
+    },
   };
 }
 
