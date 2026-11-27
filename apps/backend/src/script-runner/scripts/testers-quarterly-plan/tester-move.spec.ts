@@ -73,10 +73,18 @@ describe('a tester moving to «Trimestral 36 clases»', () => {
     });
   });
 
-  it('ignores a courtesy Plan that ended for a Client who does not pay', () => {
+  it('ignores a courtesy Plan that ended, unless a paying Client kept extras on it', () => {
     expect(decideTesterMove({ ...base, inForce: false })).toEqual({
       action: 'ignore',
     });
+    expect(
+      decideTesterMove({
+        ...base,
+        courtesy: { ...courtesy, courtesyExtras: 0, netExtras: 0 },
+        inForce: false,
+        hasPaidPlan: true,
+      }),
+    ).toEqual({ action: 'ignore' });
   });
 
   it('holds a tester the sale would refuse, before anything is written', () => {

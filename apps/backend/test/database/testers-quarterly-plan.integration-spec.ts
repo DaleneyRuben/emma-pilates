@@ -70,6 +70,7 @@ describe('testers move to «Trimestral 36 clases» (owner, 2026-11-27)', () => {
         classes: -2,
         reason: 'CONSUMPTION',
         authorAccountId: bea.accountId,
+        createdAt: new Date('2026-09-15T15:00:00.000Z'),
       },
     });
     const admin = await harness.administrator();
@@ -146,9 +147,11 @@ describe('testers move to «Trimestral 36 clases» (owner, 2026-11-27)', () => {
     await sellQuarterlyPlan(world.prisma, {
       clientId: elsa.clientId,
       planId: (await quarterlyPlanId())!,
-      branchId: (await world.prisma.branch.findFirstOrThrow({
-        where: { name: branch },
-      }))!.id,
+      branchId: (
+        await world.prisma.branch.findFirstOrThrow({
+          where: { name: branch },
+        })
+      ).id,
       startsOn: today,
       principal: await harness.administrator(),
       now: () => now,

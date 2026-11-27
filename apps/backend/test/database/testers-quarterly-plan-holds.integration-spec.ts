@@ -47,10 +47,9 @@ describe('testers the quarterly Plan sale would refuse', () => {
       { classes: 40, reason: 'COURTESY' },
     ]);
     // Out of the way for the next cases.
-    await world.prisma.purchaseIntent.updateMany({
-      where: { clientId: fany.clientId },
-      data: { state: 'EXPIRED' },
-    });
+    await world
+      .commands(new Date(now.getTime() + 25 * 60 * 60 * 1_000))
+      .expirePurchaseIntents();
     await run({ branch });
   });
 
