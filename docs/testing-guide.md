@@ -95,7 +95,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 91, 104, 113, 126, 186 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 81, 87, 88, 89, 112, 126, 176, 186 |
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158, 160 |
-| 13 Evaluación nutricional (with the booked ones since FIX-057, the appointment block since C5), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160, 186 |
+| 13 Evaluación nutricional (with the booked ones since FIX-057, the appointment block since C5), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160, 186, 208 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 186 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
@@ -2298,10 +2298,11 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 4. Book one again and open **Evaluación nutricional**: days in that month
    disappear. When no unused month has open turnos, the screen shows "Ya usaste
    tu evaluación de este mes." (naming the month when the used one is a later
-   month). A Client without an active plan sees the centred «Necesitas un plan
-   activo» with «Con el plan trimestral, la primera evaluación del trimestre
-   es gratis.» and **Ver
-   planes**. A studio cancellation reaches the inbox as "…Ya puedes
+   month). A Client with no Plan that covers an Evaluation (the server's
+   `planCoversEvaluation`, Test 208) and nothing booked sees the centred
+   «Necesitas un plan activo» with «Con el plan trimestral, la primera
+   evaluación del trimestre es gratis.» and **Ver planes**, even with past
+   Evaluations. A studio cancellation reaches the inbox as "…Ya puedes
    reservar otra este mes." (or "…otra para octubre.").
 
 **In the Staff app** as `gabriela.flores@example.com`:
@@ -3876,6 +3877,43 @@ crop).
 Deleted Promotions stay archived in `booking.promotions`; the fixtures
 command does not remove them. A refused upload leaves nothing behind; one the
 worker refused waits under `pending/` for the three-day cleanup (Test 68).
+
+## Test 208: Courtesy Access books a paid Evaluation, and no Plan sees C13b first (owner, 2026-11-27)
+
+Run the API and the worker on a copy of `pilates_golden` and the Client
+Metro (Test 1). In the admin web as Paola, give a fixture Client with no
+Plan in use Courtesy Access (client detail → **Acceso de prueba** → **Dar
+acceso**), for example Mariana.
+
+A. **Courtesy Access pays for its Evaluation.** As that Client open
+   **Inicio → Evaluación nutricional** (or **Perfil → Evaluación
+   nutricional**): the plan line says «Cuesta Bs 70 con tu plan.» and every
+   turno costs the studio price, never «Gratis», even if the courtesy range
+   is 90 days or longer. Pick a turno: **Confirma tu cita** shows the QR;
+   upload a receipt and confirm. The screen comes back with «Comprobante
+   enviado» and the appointment reads «Bs 70 · Pago en revisión». Paola
+   finds it in **Pagos pendientes**. `GET /evaluation-slots` answers
+   `planCoversEvaluation: true`, `includedEvaluation: "none"`;
+   `POST /evaluation-slots/{id}/evaluations` answers `409`
+   `evaluation_payment_required`.
+B. **No Plan: C13b up front.** As `mariana@example.com` without a Plan (or
+   `sofia@example.com`, expired; or a friend with only a Guest Pass), open
+   **Evaluación nutricional** from Inicio or Perfil: with nothing booked the
+   screen is only «Necesitas un plan activo», «Con el plan trimestral, la
+   primera evaluación del trimestre es gratis.» and **Ver planes**, with no
+   turnos, QR or receipt, on the iPhone and on the iPad, even with past
+   Evaluations. `GET /evaluation-slots` answers `planCoversEvaluation:
+   false`. If the Plan ends while she is on Confirma tu cita, the booking
+   still answers «Necesitas un plan activo para reservar tu evaluación.».
+C. **A paid quarterly Plan keeps its free one.** As a Client with a paid
+   trimestral (`ana@example.com` in the integration fixtures, or buy one):
+   «Tu primera evaluación del trimestre es gratis.», a turno says «Gratis»
+   and books with no QR. When she also holds Courtesy Access on the same
+   dates, the paid Plan wins.
+
+Specs: `evaluation-courtesy-plans.integration-spec.ts`,
+`pick-covering-subscription.spec.ts`, `evaluation-offer.spec.ts`,
+`evaluation-no-plan.spec.tsx`; Maestro: `apps/client-mobile/.maestro/evaluation-no-plan.yaml` (B).
 
 ## What you cannot test yet
 
@@ -8563,10 +8601,12 @@ C. **A booked guest class comes first (FIX-019).** A friend whose Guest Pass
    confirmar: la clienta tiene una clase reservada con su acceso actual el
    día de inicio o después. Cancela esa clase o espera a que pase, y vuelve
    a confirmar.» Spec: `purchase-renewal-fixes.integration-spec.ts`.
-D. **No paid Evaluation on a courtesy plan (FIX-019).** A friend holding only
-   a Guest Pass, or a Client holding only Courtesy Access, cannot book a
-   nutrition Evaluation (`409` `no_eligible_subscription`, «Necesitas un plan
-   activo…» in the app). Spec: `evaluation-courtesy-plans.integration-spec.ts`.
+D. **No Evaluation on a Guest Pass (FIX-019).** A friend holding only a
+   Guest Pass cannot book a nutrition Evaluation (`409`
+   `no_eligible_subscription`; since Test 208 the app shows «Necesitas un plan
+   activo» before any turno). Courtesy Access books a paid one since
+   2026-11-27 (Test 208). Spec:
+   `evaluation-courtesy-plans.integration-spec.ts`.
 E. **Courtesy Access replaces an unused Guest Pass (FIX-019).** In the admin
    web's client detail, **Acceso de prueba** → **Dar acceso** for a friend
    whose Guest Pass has no class booked succeeds: the pass expires (`subscription.ended_early`) and the

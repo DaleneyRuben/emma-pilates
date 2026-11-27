@@ -13,6 +13,8 @@ export interface EvaluationAvailabilityDto {
   months: EvaluationMonthDto[];
   /** What today’s Plan gives: its included Evaluation still available, already used, or none (under 90 days or no Plan). Older builds ignore it. */
   includedEvaluation: EvaluationAvailabilityDtoIncludedEvaluation;
+  /** Whether a Plan in force (a paid Plan or Courtesy Access, never a Guest Pass) lets her book an Evaluation in the next 30 days. False sends the app to «Necesitas un plan activo» before any slot. Older builds ignore it. */
+  planCoversEvaluation: boolean;
   /** The studio price of an Evaluation in centavos */
   priceCentavos: number;
 }

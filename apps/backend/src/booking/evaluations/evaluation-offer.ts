@@ -1,5 +1,6 @@
 // NUT-003, booking ADR-0011: a Subscription of 90 days or longer includes one
-// Evaluation. The Founder discount never applies to an Evaluation.
+// Evaluation. The Founder discount never applies to an Evaluation. Courtesy
+// Access never includes one, whatever its range (owner, 2026-11-27).
 export const includedEvaluationDays = 90;
 
 export type EvaluationOffer = {
@@ -12,9 +13,12 @@ export const evaluationOffer = (input: {
   includedAlreadyUsed: boolean;
   priceCentavos: number;
   founderDiscountPercent: number;
+  courtesy?: boolean;
 }): EvaluationOffer => {
   const included =
-    input.durationDays >= includedEvaluationDays && !input.includedAlreadyUsed;
+    input.courtesy !== true &&
+    input.durationDays >= includedEvaluationDays &&
+    !input.includedAlreadyUsed;
   return {
     included,
     // The percent is read so a caller cannot apply it by accident.
@@ -34,11 +38,13 @@ export const planEvaluationOffer = (
   subscription: {
     durationDaysSnapshot: number;
     evaluations: readonly unknown[];
+    courtesy: boolean;
   } | null,
   priceCentavos: number,
 ): PlanEvaluationOffer => ({
   includedEvaluation:
     subscription === null ||
+    subscription.courtesy ||
     subscription.durationDaysSnapshot < includedEvaluationDays
       ? 'none'
       : subscription.evaluations.length > 0

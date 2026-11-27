@@ -1,0 +1,24 @@
+# Critical journey (owner, 2026-11-27): a Client with no Plan that covers an
+# Evaluation opens «Evaluación nutricional» from Inicio and sees C13b before
+# any turno, QR or receipt. Mariana never bought a Plan (Test 5A, Test 208 B).
+appId: ${APP_ID}
+env:
+  EMAIL: mariana@example.com
+---
+- runFlow: subflows/login.yaml
+- runFlow: subflows/dismiss-push-permission.yaml
+- extendedWaitUntil:
+    visible: "Evaluación nutricional.*"
+    timeout: 30000
+- tapOn: "Evaluación nutricional.*"
+- extendedWaitUntil:
+    visible: "Necesitas un plan activo"
+    timeout: 15000
+- assertVisible: "Con el plan trimestral, la primera evaluación del trimestre es gratis."
+- assertNotVisible: "Turno .*"
+- assertNotVisible: "Reserva tu evaluación"
+- takeScreenshot: evaluation-no-plan-1-c13b
+- tapOn: "Ver planes"
+- extendedWaitUntil:
+    visible: "Trimestral.*"
+    timeout: 15000

@@ -146,10 +146,16 @@ export function EvaluationAvailabilityScreen({
   }));
   const pastItems = past.data?.status === 200 ? past.data.data.items : [];
   const status = subscription.data?.status === 200 ? subscription.data.data.status : "none";
-  const hasPlan = status === "active" || status === "expiring_soon";
+  // The server says whether a Plan in force lets her book one (a Guest Pass
+  // or a spent Plan does not; Courtesy Access does). An older API leaves it
+  // out, and her Plan card decides as before.
+  const covered = availability?.planCoversEvaluation;
+  const hasPlan = covered ?? (status === "active" || status === "expiring_soon");
   const movingNow = moving === null ? null : (items.find((item) => item.id === moving.id) ?? null);
 
-  if (items.length === 0 && pastItems.length === 0 && !hasPlan) {
+  // C13b up front (owner, 2026-11-27): with nothing booked and no Plan, no
+  // turno, QR or receipt comes first, even with past Evaluations.
+  if (items.length === 0 && !hasPlan && (covered === false || pastItems.length === 0)) {
     return (
       <Screen style={styles.screen}>
         {header}
