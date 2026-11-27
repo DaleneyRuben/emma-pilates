@@ -12839,3 +12839,6 @@ C. **The badge with nobody signed in.** In either app with push allowed, sign
    `"badge": 7`). Opening the app on Login (or «Hola de nuevo») clears the
    icon's badge, and so does every return to the app and every push that
    arrives while it is open. Signed in, the badge is the unread count again.
+   A launch that opens on the Face ID prompt (the session is still live behind
+   it) keeps the unread count, even if the prompt is cancelled; only signing
+   out or **Usar otra cuenta** clears it.
