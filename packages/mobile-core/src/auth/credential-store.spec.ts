@@ -96,4 +96,19 @@ describe("createCredentialStore", () => {
       ).resolves.toBe(true);
     });
   });
+
+  it("asks the system whether it refuses biometrics to the app", async () => {
+    const storage = {
+      deleteItemAsync: jest.fn(),
+      getItemAsync: jest.fn().mockResolvedValue(null),
+      setItemAsync: jest.fn(),
+    };
+
+    await expect(createCredentialStore(storage).isBiometricRefusedBySystem()).resolves.toBe(false);
+    await expect(
+      createCredentialStore(storage, "client", {
+        biometricRefusal: async () => true,
+      }).isBiometricRefusedBySystem(),
+    ).resolves.toBe(true);
+  });
 });

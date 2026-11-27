@@ -25,6 +25,7 @@ function managerWith(overrides: Partial<Record<keyof SessionManager, unknown>> =
     unlockWithBiometrics: jest.fn(),
     wasBiometricOfferDeclined: jest.fn().mockResolvedValue(false),
     wasBiometricSupportSeen: jest.fn().mockResolvedValue(false),
+    isBiometricRefusedBySystem: jest.fn().mockResolvedValue(false),
     ...overrides,
   } as SessionManager;
 }
@@ -36,6 +37,7 @@ function Probe() {
       {[
         biometrics.available ? "available" : "unavailable",
         biometrics.blockedBySystem ? "blocked" : "usable",
+        biometrics.permissionRefused ? "refused" : "allowed",
       ].join(" ")}
     </Text>
   );
@@ -69,14 +71,14 @@ describe("MobileIdentityProvider biometric availability", () => {
       managerWith({ wasBiometricSupportSeen: jest.fn().mockResolvedValue(true) }),
     );
 
-    await waitFor(() => expect(screen.getByText("available blocked")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText("available blocked allowed")).toBeOnTheScreen());
   });
 
   it("shows no switch on a phone that never could use biometrics", async () => {
     const screen = await renderWith(managerWith());
 
     await act(async () => undefined);
-    expect(screen.getByText("unavailable usable")).toBeOnTheScreen();
+    expect(screen.getByText("unavailable usable allowed")).toBeOnTheScreen();
   });
 
   it("remembers that this phone supports biometrics once it can use them", async () => {
@@ -84,7 +86,7 @@ describe("MobileIdentityProvider biometric availability", () => {
     const screen = await renderWith(manager);
 
     await waitFor(() => expect(manager.rememberBiometricSupport).toHaveBeenCalled());
-    expect(screen.getByText("available usable")).toBeOnTheScreen();
+    expect(screen.getByText("available usable allowed")).toBeOnTheScreen();
   });
 
   it("reads the phone's biometrics again when the app comes back from Settings", async () => {
@@ -92,11 +94,21 @@ describe("MobileIdentityProvider biometric availability", () => {
     const manager = managerWith({ canUseBiometrics: jest.fn(() => usable) });
     const screen = await renderWith(manager);
     await act(async () => undefined);
-    expect(screen.getByText("unavailable usable")).toBeOnTheScreen();
+    expect(screen.getByText("unavailable usable allowed")).toBeOnTheScreen();
 
     usable = true;
     await act(async () => appStateListener?.("active"));
 
-    expect(screen.getByText("available usable")).toBeOnTheScreen();
+    expect(screen.getByText("available usable allowed")).toBeOnTheScreen();
+  });
+
+  // Coordinator, 2026-11-27: her iPhone's Settings show Face ID off for Emma
+  // Pilates; nothing on the phone had recorded that it supported Face ID.
+  it("keeps the switch on an iPhone whose Face ID permission the app was refused", async () => {
+    const screen = await renderWith(
+      managerWith({ isBiometricRefusedBySystem: jest.fn().mockResolvedValue(true) }),
+    );
+
+    await waitFor(() => expect(screen.getByText("available blocked refused")).toBeOnTheScreen());
   });
 });

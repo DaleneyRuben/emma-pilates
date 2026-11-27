@@ -33,6 +33,8 @@ export type MobileBiometrics = {
   available: boolean;
   /** Available, but the system refuses them to the app now: Settings turns them back on. */
   blockedBySystem: boolean;
+  /** iOS: the app's own Face ID permission is off. */
+  permissionRefused: boolean;
   enabled: boolean;
   /** Set once biometrics were turned on, for the confirming toast. */
   enabledNotice: boolean;
@@ -269,6 +271,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     forgetAfterPasswordChange,
     available: availability.available,
     blockedBySystem: availability.blockedBySystem,
+    permissionRefused: availability.permissionRefused,
     disable: disableBiometrics,
     dismissEnabledNotice: () => setEnabledNotice(false),
     dismissOffer,

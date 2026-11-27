@@ -9,6 +9,8 @@ export type BiometricAvailability = {
   available: boolean;
   /** Supported, but the system refuses them to the app now (Settings, lockout). */
   blockedBySystem: boolean;
+  /** iOS: the app's own Face ID permission is off; only Settings turns it on. */
+  permissionRefused: boolean;
 };
 
 /**
@@ -20,6 +22,7 @@ export type BiometricAvailability = {
 export function useBiometricAvailability(manager: SessionManager): BiometricAvailability {
   const [, recheck] = useReducer((count: number) => count + 1, 0);
   const [seen, setSeen] = useState(false);
+  const [refused, setRefused] = useState(false);
   const usable = manager.canUseBiometrics();
 
   useEffect(() => {
@@ -31,6 +34,14 @@ export function useBiometricAvailability(manager: SessionManager): BiometricAvai
 
   useEffect(() => {
     let active = true;
+    if (!usable) {
+      manager
+        .isBiometricRefusedBySystem?.()
+        .then((answer) => {
+          if (active) setRefused(answer);
+        })
+        .catch(reportRecoveredError);
+    }
     const answer = usable
       ? Promise.resolve(manager.rememberBiometricSupport?.()).then(() => true)
       : Promise.resolve(manager.wasBiometricSupportSeen?.());
@@ -44,5 +55,10 @@ export function useBiometricAvailability(manager: SessionManager): BiometricAvai
     };
   }, [manager, usable]);
 
-  return { available: usable || seen, blockedBySystem: !usable && seen };
+  const permissionRefused = !usable && refused;
+  return {
+    available: usable || seen || permissionRefused,
+    blockedBySystem: !usable && (seen || permissionRefused),
+    permissionRefused,
+  };
 }
