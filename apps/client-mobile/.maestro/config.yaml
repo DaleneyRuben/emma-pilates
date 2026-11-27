@@ -19,6 +19,7 @@ executionOrder:
     - profile-phone
     - evaluation-book-and-cancel
     - evaluation-paid-qr
+    - evaluation-no-plan
     - home-plan-and-notifications
     - profile-photo
     - profile-without-promotions
