@@ -15,7 +15,6 @@ import { Pressable, StyleSheet, View } from "react-native";
  * glyph on a 36 pt 50 disc, the label in `titulo-fila` with an optional line
  * under it, the unread count in Rosa profundo or a short value, and the
  * chevron. A row with no `onPress` only states a fact, such as «Rol».
- * «Cerrar sesión» is the Error last row (follow-up 225, walkthrough 19).
  */
 export function ProfileRow({
   badge = 0,
