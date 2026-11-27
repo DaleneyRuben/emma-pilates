@@ -111,4 +111,22 @@ describe("MobileIdentityProvider biometric availability", () => {
 
     await waitFor(() => expect(screen.getByText("available blocked refused")).toBeOnTheScreen());
   });
+
+  // Review of PR #399: a refusal made in Settings while Face ID stayed
+  // unusable must show when the app comes back.
+  it("reads the app's Face ID permission again when the app comes back", async () => {
+    let refused = false;
+    const screen = await renderWith(
+      managerWith({
+        isBiometricRefusedBySystem: jest.fn(async () => refused),
+        wasBiometricSupportSeen: jest.fn().mockResolvedValue(true),
+      }),
+    );
+    await waitFor(() => expect(screen.getByText("available blocked allowed")).toBeOnTheScreen());
+
+    refused = true;
+    await act(async () => appStateListener?.("active"));
+
+    await waitFor(() => expect(screen.getByText("available blocked refused")).toBeOnTheScreen());
+  });
 });
