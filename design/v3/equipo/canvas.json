@@ -1087,6 +1087,13 @@
    "w": 390,
    "h": 844,
    "title": "Perfil · asistente · desplazado hasta abajo"
+  },
+  "E-F28.dc.html": {
+   "x": 0,
+   "y": 17200,
+   "w": 390,
+   "h": 844,
+   "title": "Perfil · instructora · ¿cerrar sesión? (desde abajo)"
   }
  },
  "order": [
@@ -1243,7 +1250,8 @@
   "E-F24.dc.html",
   "E-F25.dc.html",
   "E-F26.dc.html",
-  "E-F27.dc.html"
+  "E-F27.dc.html",
+  "E-F28.dc.html"
  ],
  "notes": {
   "t0": {
@@ -1336,6 +1344,13 @@
    "text": "Mejoras del recorrido (follow-up 291, 26/11)",
    "kind": "title1",
    "maxW": 7050
+  },
+  "n-cerrar-sesion-al-final": {
+   "x": 0,
+   "y": 16920,
+   "text": "Cerrar sesión al final (follow-up 292, 27/11)",
+   "kind": "title1",
+   "maxW": 2000
   }
  },
  "designSystems": []
