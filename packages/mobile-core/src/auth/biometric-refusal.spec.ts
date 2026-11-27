@@ -34,6 +34,14 @@ describe("createBiometricRefusalCheck", () => {
     ).resolves.toBe(false);
   });
 
+  // Review of PR #399: iOS has no per-app Touch ID permission, so a Touch ID
+  // phone answering «no hardware» is not something the app's Settings fix.
+  it("does not call a Touch ID iPhone refused", async () => {
+    await expect(
+      createBiometricRefusalCheck(localAuthentication({ hasHardware: false, types: [1] }), "ios")(),
+    ).resolves.toBe(false);
+  });
+
   it("never asks on Android, which has no per-app biometric permission", async () => {
     const native = localAuthentication({ hasHardware: false });
 

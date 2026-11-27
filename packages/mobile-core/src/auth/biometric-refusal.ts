@@ -1,12 +1,15 @@
 import { Platform } from "react-native";
 
+// expo-local-authentication's AuthenticationType.FACIAL_RECOGNITION.
+const facialRecognition = 2;
+
 type LocalAuthentication = {
   hasHardwareAsync: () => Promise<boolean>;
   supportedAuthenticationTypesAsync: () => Promise<number[]>;
 };
 
 /**
- * Whether iOS refuses Face ID (or Touch ID) to the app although the iPhone
+ * Whether iOS refuses Face ID to the app although the iPhone
  * has it: «No permitir» on the system alert, undone only in Settings. iOS
  * still names the phone's biometry then, but reports no hardware for the app.
  * Android has no per-app biometric permission.
@@ -22,7 +25,8 @@ export function createBiometricRefusalCheck(
         native.supportedAuthenticationTypesAsync(),
         native.hasHardwareAsync(),
       ]);
-      return types.length > 0 && !hasHardware;
+      // Only Face ID has a per-app permission; Touch ID has none to refuse.
+      return types.includes(facialRecognition) && !hasHardware;
     } catch {
       return false;
     }
