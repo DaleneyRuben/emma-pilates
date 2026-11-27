@@ -128,7 +128,6 @@ describe('client payments (e2e)', () => {
       codeActive: true,
       referrals: [],
     });
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [
         PurchaseIntentsController,
