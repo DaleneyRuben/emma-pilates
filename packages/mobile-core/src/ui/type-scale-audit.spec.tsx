@@ -139,6 +139,26 @@ describe("offScaleTexts", () => {
     ).toEqual(["«Todas» is white on #FFFBFB", "«Reservar» is ink on #93615D"]);
   });
 
+  // Follow-up 292: Destructivo is for white cards only (5.93:1 there).
+  it("reports Destructivo text on 600 or 500 but lets it stand on white", async () => {
+    expect(
+      await audit(
+        <>
+          <View style={{ backgroundColor: "#FFFBFB" }}>
+            <Text tone="destructivo" variant="boton">
+              Cerrar sesión
+            </Text>
+          </View>
+          <View style={{ backgroundColor: "#93615D" }}>
+            <Text tone="destructivo" variant="boton">
+              Salir
+            </Text>
+          </View>
+        </>,
+      ),
+    ).toEqual(["«Salir» is destructivo on #93615D"]);
+  });
+
   it("lets only initials stop growing with the phone's text size", async () => {
     expect(
       await audit(
