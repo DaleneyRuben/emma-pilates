@@ -31,6 +31,8 @@ type SessionManagerOptions = {
   clearAccountCache: (accountId: string) => Promise<void>;
   credentialStore: CredentialStore;
   installationIdentifier?: () => Promise<string>;
+  /** Ends this phone's push association with the Account, before sign-out. */
+  releaseDevice?: () => Promise<void>;
   resolveCurrent: (credential: string) => Promise<CurrentAuthenticationPrincipalDto | null>;
   revokeCurrent: (credential: string) => Promise<void>;
 };
@@ -84,6 +86,7 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     clearAccountCache,
     credentialStore,
     installationIdentifier,
+    releaseDevice,
     resolveCurrent,
     revokeCurrent,
   } = options;
@@ -209,6 +212,8 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
       const credential = activeCredential ?? (await credentialStore.load());
 
       if (credential !== null) {
+        // Best effort: the server also releases the device the session used.
+        await releaseDevice?.().catch(reportRecoveredError);
         await revokeCurrent(credential);
       }
 

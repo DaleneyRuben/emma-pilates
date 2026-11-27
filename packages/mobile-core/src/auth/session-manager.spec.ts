@@ -150,6 +150,30 @@ describe("createSessionManager", () => {
     expect(clearAccountCache).toHaveBeenCalledWith("account-1");
   });
 
+  it("releases this phone's push device before the session ends, and signs out if that fails", async () => {
+    const calls: string[] = [];
+    const releaseDevice = jest.fn(async () => {
+      calls.push("release");
+      throw new Error("offline");
+    });
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        load: jest.fn().mockResolvedValue("stored-credential"),
+        save: jest.fn(),
+      },
+      releaseDevice,
+      resolveCurrent: jest.fn(),
+      revokeCurrent: jest.fn(async () => void calls.push("revoke")),
+    });
+
+    await manager.logout({ accountId: "account-1", role: "client" });
+
+    expect(releaseDevice).toHaveBeenCalledTimes(1);
+    expect(calls).toEqual(["release", "revoke"]);
+  });
+
   it("ends a session the server already revoked without calling it again", async () => {
     const clearAccountCache = jest.fn();
     const clearCredential = jest.fn();

@@ -20,6 +20,7 @@ import {
 } from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
 import { createExpoPushPlatform } from "./notifications/expo-push-platform";
+import { releasePushRegistration } from "./notifications/push-registration";
 import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import { useForgetLinkWhenSignedIn } from "./ingress/forget-link-when-signed-in";
@@ -113,20 +114,23 @@ export function createDefaultMobileRuntime({
     clearAccountCache,
     credentialStore,
     installationIdentifier,
+    releaseDevice: () =>
+      releasePushRegistration({ fetcher: apiFetcher, installationId: installationIdentifier }),
     resolveCurrent: sessionApi.resolveCurrent,
     revokeCurrent: sessionApi.revokeCurrent,
+  });
+  // The session manager's credential: the active one first, so a biometric
+  // unlock is used even before the plain copy is written.
+  const apiFetcher = createApiFetcher({
+    baseUrl: apiBaseUrl,
+    getCredential: sessionManager.getCredential,
   });
 
   return {
     allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
     linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
-    // The session manager's credential: the active one first, so a biometric
-    // unlock is used even before the plain copy is written.
-    apiFetcher: createApiFetcher({
-      baseUrl: apiBaseUrl,
-      getCredential: sessionManager.getCredential,
-    }),
+    apiFetcher,
     authenticationApi: createAuthenticationApi({
       baseUrl: apiBaseUrl,
       clientIdentifier: installationIdentifier,
