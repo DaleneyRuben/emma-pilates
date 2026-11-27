@@ -169,7 +169,8 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => setConfirmingLogout(true)}
                     testID="profile-logout"
                   />
-                  {footer(spacing.md)}
+                  {/* 18T: the column's own gap is 16 pt. */}
+                  {footer(spacing.lg)}
                 </>
               ) : null}
             </>
