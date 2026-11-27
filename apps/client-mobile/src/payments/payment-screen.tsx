@@ -38,7 +38,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
@@ -254,8 +254,10 @@ export function PaymentScreen() {
           <OutlinedButton
             label="Cambiar comprobante"
             onPress={() => {
+              // iOS presents one modal at a time: the picker waits for the
+              // big view to close (review; as the Staff invoice's «Cambiar»).
               setViewing(false);
-              void attach();
+              setTimeout(() => void attach(), Platform.OS === "ios" ? 400 : 0);
             }}
           />
         }
