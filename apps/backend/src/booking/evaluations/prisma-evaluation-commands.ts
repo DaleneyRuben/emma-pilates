@@ -7,7 +7,6 @@ import {
   EvaluationSlotState,
   EvaluationState,
   PrismaClient,
-  SubscriptionState,
 } from '../../generated/prisma/client';
 import { retrySerializable } from '../../database/retry-serializable';
 import {
@@ -23,8 +22,6 @@ import {
   boliviaMonth,
 } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
-import { netAllowanceClasses } from '../commands/net-allowance';
-import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
 import { attachEvaluationReceipt as attachPaidEvaluationReceipt } from './evaluation-payment-receipt';
 import {
@@ -1175,55 +1172,9 @@ export const createPrismaEvaluationCommands = (
             );
           }
 
+          // Courtesy Access gets a quote that is never included, so she is
+          // sent to the paid booking (owner, 2026-11-27).
           const slotDate = boliviaDate(slot.startsAt);
-          const today = boliviaDate(now);
-          const candidates = await transaction.subscription.findMany({
-            where: {
-              clientId,
-              state: SubscriptionState.ACTIVE,
-              startsOn: { lte: slotDate },
-              endsOn: { gte: slotDate },
-            },
-            orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
-            select: {
-              id: true,
-              endsOn: true,
-              remainingClassAllowance: true,
-              allowanceAdjustments: {
-                where: { deletedAt: null },
-                select: { classes: true },
-              },
-              _count: {
-                select: {
-                  bookings: {
-                    where: {
-                      state: 'BOOKED',
-                      session: { startsAt: { gt: now } },
-                    },
-                  },
-                },
-              },
-            },
-          });
-          const subscription = candidates.find((candidate) =>
-            isSubscriptionEffective(
-              {
-                endsOn: candidate.endsOn,
-                remainingClassAllowance: candidate.remainingClassAllowance,
-                extraClasses: netAllowanceClasses(
-                  candidate.allowanceAdjustments,
-                ),
-                futureBookedCount: candidate._count.bookings,
-              },
-              today,
-            ),
-          );
-          if (subscription === undefined) {
-            throw rule(
-              'no_eligible_subscription',
-              'An active Subscription covering the Evaluation date is required',
-            );
-          }
           const quote = await evaluationQuote(transaction, clientId, slotDate);
           if (quote === null) {
             throw rule(
