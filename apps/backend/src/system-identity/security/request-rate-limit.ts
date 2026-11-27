@@ -15,6 +15,9 @@ export const generalRequestLimits = {
   perCredentialPerMinute: 600,
 } as const;
 
+/** Placeholder until the lane exists. */
+export const codeLookupsPerAddressPerMinute = 30;
+
 const windowMilliseconds = 60_000;
 
 /**
