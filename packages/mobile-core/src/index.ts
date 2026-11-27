@@ -13,6 +13,7 @@ export * from "./account/initials";
 export * from "./account/biometric-switch-row";
 export * from "./account/logout-card";
 export * from "./account/logout-confirmation";
+export * from "./account/profile-footer";
 export * from "./account/public-pages";
 export * from "./staff-photo/client-face";
 export * from "./staff-photo/person-avatar";

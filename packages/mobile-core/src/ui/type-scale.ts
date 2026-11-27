@@ -68,6 +68,13 @@ export const textVariants = {
   "enlace-cuerpo": { ...face(typeFaces.bold, 15, 1.5), ...underline },
   /** A link inside a `secundario` line or a row. */
   "enlace-secundario": { ...face(typeFaces.bold, 13, 1.45), ...underline },
+  /**
+   * Perfil's footer on Fondo, in `texto-pie` (follow-up 293): an exception to
+   * the scale that appears nowhere else.
+   */
+  pie: face(typeFaces.regular, 12, 1.5),
+  /** A footer link: the same regular weight, underlined. */
+  "enlace-pie": { ...face(typeFaces.regular, 12, 1.5), ...underline },
 } satisfies Record<string, TextVariantStyle>;
 
 export type TextVariant = keyof typeof textVariants;
@@ -92,7 +99,12 @@ export const textTones = {
   onDark: brand.white,
   /** «Cerrar sesión» on white only (follow-up 292). */
   destructivo: brand.destructivo,
+  /** Perfil's footer on Fondo, with `pie` and `enlace-pie` only (follow-up 293). */
+  "texto-pie": brand.textoPie,
 } as const;
+
+/** The footer's styles, the only small text allowed on Fondo (follow-up 293). */
+export const footerTextVariants: readonly TextVariant[] = ["pie", "enlace-pie"];
 
 export type TextTone = keyof typeof textTones;
 
