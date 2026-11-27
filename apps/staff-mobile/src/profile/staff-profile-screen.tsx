@@ -183,15 +183,13 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
               label="Notificaciones"
               onPress={() => navigation.navigate("Notifications")}
             />
+            {/* One child per row: RowCard draws a hairline between its children. */}
             {viewingAs === null ? (
-              <>
-                <ProfileRow
-                  icon="password"
-                  label="Cambiar contraseña"
-                  onPress={() => navigation.navigate("ChangePassword")}
-                />
-                {identity.biometrics.available ? <BiometricSwitchRow /> : null}
-              </>
+              <ProfileRow
+                icon="password"
+                label="Cambiar contraseña"
+                onPress={() => navigation.navigate("ChangePassword")}
+              />
             ) : (
               <ProfileRow
                 icon="logout"
@@ -200,6 +198,7 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                 testID="profile-stop-viewing"
               />
             )}
+            {viewingAs === null && identity.biometrics.available ? <BiometricSwitchRow /> : null}
           </RowCard>
         </View>
         {/* The Administrator owns the studio, so she has no «Ayuda». While she
