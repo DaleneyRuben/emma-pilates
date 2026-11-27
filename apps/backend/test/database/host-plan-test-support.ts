@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { PrismaClient } from '../../src/generated/prisma/client';
+import { boliviaDate } from '../../src/time/bolivia-time';
 
 const dayMs = 24 * 60 * 60 * 1_000;
 
@@ -41,13 +42,9 @@ export const giveHostPlan = async (
           select: { id: true },
         })
       : null;
-  const day = new Date(
-    Date.UTC(
-      input.now.getUTCFullYear(),
-      input.now.getUTCMonth(),
-      input.now.getUTCDate(),
-    ),
-  );
+  // The rule reads Bolivia's civil date (ADR-0057); a UTC date runs a day
+  // ahead from 20:00 in La Paz and made «ended yesterday» still in force.
+  const day = boliviaDate(input.now);
   const startsOn = new Date(day.getTime() + (input.startsInDays ?? -2) * dayMs);
   const endsOn = new Date(day.getTime() + (input.endsInDays ?? 28) * dayMs);
   // A confirmed Payment and its Subscription are written together.
