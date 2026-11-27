@@ -11,8 +11,9 @@ import { VoidSaleController } from './payments/void-sale.controller';
 import { voidSaleProvider } from './payments/void-sale-provider';
 
 // The admin web's oversight reads (WEB-004 Clients, WEB-005 Payments) and the
-// Client detail's «Acceso de prueba» grant (REL-011), wired here so
-// booking.module.ts, already past the file-size limit, stays put.
+// Client detail's actions, wired here so booking.module.ts, already past the
+// file-size limit, stays put. The «Acceso de prueba» grant (REL-011) ended
+// on 2026-11-27.
 export const adminWebReads = {
   controllers: [
     AdministratorClientsController,
