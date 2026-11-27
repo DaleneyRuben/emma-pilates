@@ -36,7 +36,7 @@ describe("ProfileFooter", () => {
     expect(screen.getByTestId("profile-footer-links")).toHaveStyle({
       flexDirection: "row",
       flexWrap: "wrap",
-      marginVertical: -13,
+      marginTop: -13,
     });
     for (const label of ["Política de privacidad", "Cerrar mi cuenta"]) {
       expect(screen.getByText(label)).toHaveStyle({

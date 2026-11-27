@@ -7,8 +7,12 @@ import { textVariants } from "../ui/type-scale";
 
 export type ProfileFooterLink = { label: string; onPress: () => void; testID: string };
 
-/** Each 12 pt link reaches the 44 pt touch area above and below its line. */
-const linkSlop = (44 - textVariants["enlace-pie"].lineHeight) / 2;
+/**
+ * Each 12 pt link's own box is 44 pt tall (hit slop past the row's bounds
+ * would be clipped). The row pulls back the extra above it so the lines sit
+ * 2 pt apart; the extra below stays inside the footer, at the end of Perfil.
+ */
+const linkReach = (44 - textVariants["enlace-pie"].lineHeight) / 2;
 
 /**
  * The end of Perfil in both apps (C18s, E-F24; follow-up 293): two fixed
@@ -41,8 +45,8 @@ export function ProfileFooter({
             )}
             <Pressable
               accessibilityRole="link"
-              hitSlop={{ bottom: linkSlop, top: linkSlop }}
               onPress={link.onPress}
+              style={styles.link}
               testID={link.testID}
             >
               <Text tone="texto-pie" variant="enlace-pie">
@@ -59,5 +63,14 @@ export function ProfileFooter({
 const styles = StyleSheet.create({
   centered: { textAlign: "center" },
   footer: { alignItems: "center", gap: spacing.xxs, paddingVertical: spacing.xs },
-  links: { alignItems: "center", flexDirection: "row", justifyContent: "center" },
+  link: { justifyContent: "center", minHeight: 44 },
+  // Two fixed lines; at the largest text sizes the links may break between
+  // them, never inside one.
+  links: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: -linkReach,
+  },
 });
