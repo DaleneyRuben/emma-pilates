@@ -274,7 +274,6 @@ export * from "./getStaffPhotoParams";
 export * from "./getStaffPhotoVariant";
 export * from "./getTodayCashCloseParams";
 export * from "./grantCampaignDto";
-export * from "./grantCourtesyAccessDto";
 export * from "./impersonationDto";
 export * from "./impersonationDtoGender";
 export * from "./impersonationDtoRole";

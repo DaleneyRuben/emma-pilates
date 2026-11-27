@@ -262,17 +262,11 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     'allow',
     { realIds: { clientId: 'clientId' } },
   ),
-  // REL-011: tester access is the Administrator's. The date only has to
-  // parse; the use case refuses a Client who already has a Plan.
-  'POST /api/v1/administrator/clients/{clientId}/courtesy-access':
-    administratorOnly({
-      body: { endsOn: '2026-11-23' },
-    }),
   // BKM-008: extra classes. Administrator only; Coordinator sees no money
   // and does not grant classes. Body must pass the DTO before the Role check.
   'POST /api/v1/administrator/clients/{clientId}/allowance-adjustments':
     administratorOnly({
-      body: { classes: 1, reason: 'courtesy' },
+      body: { classes: 1, reason: 'class_return' },
     }),
   // BKM-011: how she found the studio. A body is required before the Role
   // is checked; the use case decides who may correct it.

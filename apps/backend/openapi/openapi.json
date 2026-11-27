@@ -5311,62 +5311,6 @@
         ]
       }
     },
-    "/api/v1/administrator/clients/{clientId}/courtesy-access": {
-      "post": {
-        "operationId": "grantCourtesyAccess",
-        "parameters": [
-          {
-            "name": "clientId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "idempotency-key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GrantCourtesyAccessDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "CourtesyAccess"
-        ]
-      }
-    },
     "/api/v1/administrator/clients/{clientId}/allowance-adjustments": {
       "post": {
         "operationId": "recordAllowanceAdjustment",
@@ -17196,24 +17140,6 @@
           "pendingCount"
         ]
       },
-      "GrantCourtesyAccessDto": {
-        "type": "object",
-        "properties": {
-          "endsOn": {
-            "type": "string",
-            "format": "date",
-            "description": "Bolivia civil date of the last day of access: today up to one year ahead."
-          },
-          "startsOn": {
-            "type": "string",
-            "format": "date",
-            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
-          }
-        },
-        "required": [
-          "endsOn"
-        ]
-      },
       "RecordAllowanceAdjustmentDto": {
         "type": "object",
         "properties": {
@@ -17224,7 +17150,6 @@
           "reason": {
             "type": "string",
             "enum": [
-              "courtesy",
               "class_return"
             ]
           }
