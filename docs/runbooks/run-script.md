@@ -232,35 +232,56 @@ free Plan her referral code stays inactive (Walkthrough n.º 22) and the
 nutrition evaluation is paid; on the quarterly Plan both work as for any
 buyer. For each tester, in the oldest active Administrator's name:
 
-1. **Courtesy extras**: a negative «courtesy» adjustment, as «Ajustar
+1. **Sale**: the real cash sale («Efectivo») of «Trimestral 36 clases» from
+   today, at the Branch named. It ends the courtesy Subscription the day
+   before (it stays in her history) and sends «Pago confirmado».
+2. **Courtesy extras**: then a negative «courtesy» adjustment, as «Ajustar
    clases» on the admin web makes, for the courtesy extras still unspent
    (never more than the net she can spend). The grant stays in her history.
-2. **Sale**: the real cash sale («Efectivo») of «Trimestral 36 clases» from
-   today, at the Branch named. It ends the courtesy Subscription the day
-   before (it stays in her history), sends «Pago confirmado», and prices the
-   Plan as for any first real buyer (the line logs `amountDueCentavos` and
-   `discountCentavos`).
+
+The sale goes first, so one it refuses leaves her as she was. If a run stops
+between the two, the next run finds her paying with courtesy extras still
+live and only removes them.
+
+What the sale does as for any first real buyer, which the owner should know:
+
+- while founder places are free, each tester takes one, with the founder
+  discount on this and later Plans; once they are gone, she gets the
+  new-Client gift class instead (each `moved` line logs `amountDueCentavos`
+  and `discountCentavos`);
+- each sale is cash collected at that Branch today, so the day's cash close
+  there expects it, and revenue counts it.
+
+The production reset (REL-019) clears all of it.
 
 Every Client gets one `testers_quarterly_plan_client` line (name, email,
 courtesy Plan and its end, `action`):
 
-- `move` (dry run) with `extrasToRemove` and `startsOn`; `moved` with
-  `extrasRemoved`, `paymentId`, and the amount;
+- `move` (dry run) with `extrasToRemove`, `startsOn`, and
+  `afterBookedClassOn` (the class her start waits for, or null); `moved`
+  with `extrasRemoved`, `paymentId`, and the amount;
+- `remove_extras` (dry run) / `extras_removed`: she already pays and only
+  her leftover courtesy extras go;
 - `skip` / `paid_plan`: she already holds a paid Plan, in force or queued,
   so a rerun changes nobody twice;
-- `blocked` / `booked_class` with `lastBookedOn`: the sale never starts a
-  paid Plan on or before a class the courtesy Plan holds (FIX-019). Cancel
-  that class on the admin web and rerun, or rerun with
-  `"afterBookedClass": true` to start her Plan the day after that class;
-- `failed` with the sale's refusal `code` (an open Purchase Intent or a
-  pending Payment, for instance).
+- `blocked`, before anything of hers is written, with a `reason`:
+  - `booked_class` with `lastBookedOn`: the sale never starts a paid Plan on
+    or before a class the courtesy Plan holds (FIX-019). Rerun with
+    `"afterBookedClass": true` to start her Plan the day after that class;
+    her bookings are not touched;
+  - `start_date_out_of_window` with `startsOn`: that day is past the Start
+    Date limit (Studio Settings);
+  - `purchase_intent_open_exists`, `payment_pending_exists`,
+    `future_subscription_exists`: what the sale refuses;
+- `failed` with the sale's refusal `code`, for anything not foreseen.
 
 `testers_quarterly_plan_done` counts them. A real run with anyone `blocked`
 or `failed` ends `testers_left`, so the run is recorded failed and can run
 again without **Force rerun**; whoever moved is skipped.
 
-Params, all optional: `{"branch": "Achumani", "afterBookedClass": false}`.
+Params, all optional: `{"branch": "Achumani", "afterBookedClass": true}`.
 `branch` is needed only when the studio has more than one (`branch_required`,
 `branch_missing`). The run stops before writing with `plan_missing` when no
 visible, priced «Trimestral 36 clases» exists, and `administrator_missing`
-without an active Administrator.
+without an active Administrator. The owner chose `afterBookedClass: true`
+for the testers (2026-11-27).
