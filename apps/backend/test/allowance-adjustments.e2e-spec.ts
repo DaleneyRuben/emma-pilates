@@ -85,22 +85,34 @@ describe('allowance adjustment endpoint', () => {
   afterAll(() => app.close());
   beforeEach(() => record.mockReset());
 
-  it('answers 201 for an Administrator', async () => {
+  it('answers 201 for an Administrator returning a class', async () => {
     signedIn = principal('administrator');
     record.mockResolvedValue({
       id: '22222222-2222-4222-8222-222222222222',
       classes: 1,
-      reason: 'courtesy' as const,
+      reason: 'class_return' as const,
     });
 
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/clients/${clientId}/allowance-adjustments`)
       .set('authorization', bearer)
-      .send({ classes: 1, reason: 'courtesy' })
+      .send({ classes: 1, reason: 'class_return' })
       .expect(201)
       .expect(({ body }: { body: { reason: string } }) =>
-        expect(body.reason).toBe('courtesy'),
+        expect(body.reason).toBe('class_return'),
       );
+  });
+
+  // 2026-11-27: courtesy classes are no longer granted (owner decision).
+  it('refuses a courtesy class with 400 and records nothing', async () => {
+    signedIn = principal('administrator');
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/administrator/clients/${clientId}/allowance-adjustments`)
+      .set('authorization', bearer)
+      .send({ classes: 1, reason: 'courtesy' })
+      .expect(400);
+    expect(record).not.toHaveBeenCalled();
   });
 
   it.each(['assistant', 'trainer', 'nutritionist', 'coordinator'] as const)(

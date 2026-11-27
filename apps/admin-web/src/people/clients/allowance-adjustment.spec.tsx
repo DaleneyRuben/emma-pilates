@@ -43,7 +43,8 @@ describe("AW22 courtesy and class return", () => {
     );
   });
 
-  it("records a courtesy class on the Client's current Plan", async () => {
+  // 2026-11-27: courtesy classes are no longer granted (owner decision).
+  it("offers no courtesy class", async () => {
     const { user } = renderAdmin("/clientas");
     await user.click(
       await screen.findByRole("button", { name: "Lucía Fernández" }),
@@ -51,27 +52,10 @@ describe("AW22 courtesy and class return", () => {
     const panel = await screen.findByRole("dialog", {
       name: "Lucía Fernández",
     });
-    await user.click(
-      await within(panel).findByRole("button", {
-        name: "Dar clase de cortesía",
-      }),
-    );
-    const dialog = await screen.findByRole("alertdialog", {
-      name: /clase de cortesía/,
-    });
-    fireEvent.change(
-      within(dialog).getByRole("spinbutton", { name: "Clases" }),
-      {
-        target: { value: "1" },
-      },
-    );
-    await user.click(
-      within(dialog).getByRole("button", { name: "Registrar cortesía" }),
-    );
-
-    await waitFor(() =>
-      expect(adjustments).toEqual([{ classes: 1, reason: "courtesy" }]),
-    );
+    await within(panel).findByRole("button", { name: "Devolver una clase" });
+    expect(
+      within(panel).queryByRole("button", { name: /cortesía/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("records a returned class", async () => {

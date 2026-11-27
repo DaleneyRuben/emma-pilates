@@ -46,7 +46,6 @@ describe("W7 the Client file's actions at the end", () => {
     const { panel } = await openLucia();
 
     expect(actionNames(panel)).toEqual([
-      "Dar clase de cortesía",
       "Devolver una clase",
       "Cerrar cuenta",
     ]);
