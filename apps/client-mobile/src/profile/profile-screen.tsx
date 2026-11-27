@@ -7,6 +7,7 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
+  appVersionLabel,
   BiometricSwitchRow,
   BrandToast,
   LoadingState,
@@ -34,7 +35,6 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { appVersionLabel } from "./app-version";
 import { ClientAvatar } from "./client-avatar";
 import { ProfileRow, ProfileRowCard } from "./profile-rows";
 import { useClientPhoto } from "./use-client-photo";

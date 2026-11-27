@@ -10,6 +10,7 @@ export * from "./account/email-change-link-screen";
 export * from "./account/feedback-metadata";
 export * from "./account/feedback-screen";
 export * from "./account/initials";
+export * from "./account/app-version";
 export * from "./account/biometric-switch-row";
 export * from "./account/logout-card";
 export * from "./account/logout-confirmation";
