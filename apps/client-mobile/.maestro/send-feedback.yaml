@@ -1,4 +1,4 @@
-# Critical journey: a Client sends «Enviar comentarios» from Perfil
+# Critical journey: a Client sends «Envíanos tu opinión» from Perfil
 # (REL-012, Prompt 25). Each run stores one Feedback; the API takes ten per
 # Account in 24 hours.
 appId: ${APP_ID}
@@ -12,9 +12,9 @@ env:
     visible: "Cambiar contraseña"
     timeout: 15000
 - scrollUntilVisible:
-    element: "Enviar comentarios"
+    element: "Preguntas frecuentes"
     direction: DOWN
-- tapOn: "Enviar comentarios"
+- tapOn: "Envíanos tu opinión"
 - extendedWaitUntil:
     visible: "Cuéntanos qué falló o qué mejorarías.*"
     timeout: 15000

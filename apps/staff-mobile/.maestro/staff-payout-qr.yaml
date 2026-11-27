@@ -1,5 +1,5 @@
 # Critical journey (FIX-072): a Staff Member uploads her payout QR from
-# Perfil › Mi QR de cobro and says until when it is valid (follow-up 276).
+# Perfil › Tu QR de cobro and says until when it is valid (follow-up 276).
 # Needs the worker running, an image in the device's photo library
 # (`xcrun simctl addmedia <udid> qr.png`, or `adb push` on Android), and
 # Camila without a current payout QR (the fixtures give her none; a rerun
@@ -25,8 +25,8 @@ env:
     visible:
       id: "profile-payout-qr"
     timeout: 15000
-# The row carries its own label: «Mi QR de cobro, <standing>».
-- assertVisible: "Mi QR de cobro, Sin subir"
+# The row carries its own label: «Tu QR de cobro, <standing>» (follow-up 293).
+- assertVisible: "Tu QR de cobro, Sin subir"
 - takeScreenshot: fix072-1-perfil-sin-subir
 - tapOn:
     id: "profile-payout-qr"
@@ -79,6 +79,6 @@ env:
 - tapOn:
     id: "back-bar"
 - extendedWaitUntil:
-    visible: "Mi QR de cobro, Vale hasta .*15 [a-z]+.*"
+    visible: "Tu QR de cobro, Vale hasta .*15 [a-z]+.*"
     timeout: 15000
 - takeScreenshot: fix072-6-perfil-vale-hasta
