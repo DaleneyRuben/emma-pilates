@@ -9583,7 +9583,7 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    (Test 144, FIX-051).
 E. **Mis facturas (K1–K3).** As Mariana, the notification «Tu factura está
    lista · La factura de tu Paquete de 8 clases ya está en Mis facturas.»
-   opens **Mis facturas** (also **Perfil › Mis facturas**). Rows read
+   opens **Mis facturas** (also **Perfil › Facturas**). Rows read
    «Paquete de 8 clases · 5 nov 2026 · Bs 502» with **Lista**, **En
    preparación** (asked, not uploaded) or **Pago anulado** (voided after the
    upload; the invoice stays). An empty list says «Aún no tienes facturas».
@@ -9749,7 +9749,7 @@ C. **Sign out and close account (n.º 43, 44).** Client app **Perfil**:
    still opens the screen that asks for the password. Staff app **Perfil**:
    **Cerrar sesión** is the same red row with the same exit icon (no ✕).
 D. **PDF invoice (n.º 45).** As staff, upload a PDF invoice for a confirmed
-   payment, then as the Client open **Perfil › Mis facturas › Factura**: the
+   payment, then as the Client open **Perfil › Facturas › Factura**: the
    first page shows like a photo with «Ver · N páginas»; tapping opens a dark
    full-screen viewer «Factura · 1 de N» with every page (pinch to zoom),
    **Descargar** under it, and ✕. In the Staff app the uploaded PDF shows a
@@ -10079,8 +10079,8 @@ iPhone 16 Pro, the iPad and Android. Lucía (8-class Plan) pays Bs 70 for an
 evaluation; the studio QR is set (Test 148) and the device has one photo. The
 Maestro flow `evaluation-book-and-cancel` walks A–E.
 
-A. **One row (n.º 70).** **Perfil › Tu plan y tus clases** lists **Mi plan**,
-   **Evaluación nutricional**, **Mis facturas** and **Invita a una amiga**;
+A. **One row (n.º 70).** **Perfil › Tu plan** lists **Plan actual**,
+   **Evaluación nutricional**, **Invita a una amiga** and **Facturas** (Test 209);
    there is no **Mis evaluaciones**. The Inicio tile and the evaluation
    notices open the same screen.
 B. **Nothing booked.** **Evaluación nutricional** says what her Plan gives
@@ -10934,7 +10934,7 @@ A. **Staff app, Elegir un PDF.** As Camila (Assistant) or Ana: **Clientes ›
 B. **Refused before sending.** A PDF over 10 MB: «Este archivo no sirve. Sube
    un PDF, JPG o PNG de hasta 10 MB.» and nothing reaches the API (no
    `system.image_assets` row). Leaving the picker changes nothing.
-C. **Client app, Android.** As Mariana: **Perfil › Mis facturas** → a ready
+C. **Client app, Android.** As Mariana: **Perfil › Facturas** → a ready
    invoice → **Descargar**. No folder picker opens; the toast says «Guardada
    en Descargas» and the file is in **Files › Downloads** under its name (a
    second download of the same name gets Android's « (1)» suffix). Android 9
