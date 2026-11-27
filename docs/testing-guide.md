@@ -82,6 +82,7 @@ numbered tests.
 | Fixes from the testing session | The Staff app keeps answering after «Ahora no» on the first sign-in with Face ID; no «Save Password?» over «¿Entrar con Face ID?»; a triaged comment's notice turns read; a friend without a Guest Pass reads «No recibió la clase gratis.»; Inicio says whose code was not active (Test 207) | «Save Password?» needs a real iPhone |
 | «Cerrar sesión» last | Both Perfil screens end with **Cerrar sesión** alone on a white card in brick red (`#A04640`); «Cuenta» (Client) and «Ajustes» (Staff) no longer hold it; the «¿Cerrar sesión?» sheet's button is filled in the same red; the Client keeps the version and «Cerrar mi cuenta» under it, the Staff app has nothing under it (Test 208) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» in the left column: its board was not redrawn |
 | Perfil with no single-row group | Every role's Perfil: the Role and Branches under the Staff name, «Tu cuenta» gone; Client «Tu plan» · «Ajustes» · «Ayuda», Staff «Tus pagos» (the Administradora «Administración») · «Ajustes» · «Ayuda» (none for the Administradora or while seeing the app as someone); «Envíanos tu opinión» and «Preguntas frecuentes» (the support page); no group with one row, with or without Face ID; a two-line footer straight on the page in `#8A5B57` with «Política de privacidad» (and the Client's «Cerrar mi cuenta») (Test 209) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» and puts the footer in the left column: its board was not redrawn. The Face ID switch keeps its note under the label («Sin escribir tu contraseña»), which the boards do not draw |
+| No badge after sign-out | Signing out releases this phone's push registration (`account_devices` row `logout`, even if an older session of the phone was never revoked), so nothing reaches the icon after a sign-out or a reinstall; the app icon's badge is cleared whenever nobody is signed in (Test 210) | The icon badge needs push permission and a real push to be seen |
 
 ## Where each designed screen is tested
 
@@ -12809,3 +12810,32 @@ G. **Seeing the app as someone (E-D26).** As Paola, **Ver la app como…** a
    **Cerrar sesión** card, and the footer under «Ajustes».
 H. **Android.** Repeat A, B and D on the emulator: the fingerprint switch
    reads **Entrar con huella**, and the footer's two lines never wrap.
+
+## Test 210: no badge after sign-out (TestFlight 1.3.0)
+
+The owner's finding on TestFlight 1.3.0 (2026-11-27): after signing out and
+reinstalling, the Emma Pilates icon showed 1 and the Staff icon 7 with nobody
+signed in. The apps change only in JavaScript (an OTA reaches 1.3.0); the
+backend change ships with the API, and a 1.3.0 app keeps working with it. Use
+the development builds and the API and worker on a fixtures copy (Test 5A).
+
+A. **Sign-out releases the phone.** Sign in on the Android emulator (it gets
+   a real push token) as `emma.vargas@example.com`, let the app register
+   (`system.account_devices` gets a live row), then **Perfil › Cerrar
+   sesión**. The row now has `deactivated_at`, no token and the reason
+   `logout`; the API log shows `POST /notifications/devices/current/deactivate`
+   before `DELETE /authentication-sessions/current`. Nothing is deleted.
+B. **A stale session does not keep it.** With `curl`, sign in twice as the
+   same Account, register one `installationId` from both credentials, then
+   `DELETE /api/v1/authentication-sessions/current` with the second: the
+   device row turns `logout` although the first session is still live, and
+   a notification for that Account queues no delivery to it. A
+   `POST …/devices/current/deactivate` with `"reason": "logout"` records
+   `logout`; without a reason (apps before this change) it records
+   `permission_revoked`, as before.
+C. **The badge with nobody signed in.** In either app with push allowed, sign
+   out, send the app to the background and push a badge to it (iOS:
+   `xcrun simctl push <udid> com.emmapilates.staff push.json` with
+   `"badge": 7`). Opening the app on Login (or «Hola de nuevo») clears the
+   icon's badge, and so does every return to the app and every push that
+   arrives while it is open. Signed in, the badge is the unread count again.
