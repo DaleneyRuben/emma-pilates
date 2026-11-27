@@ -80,6 +80,7 @@ numbered tests.
 | Sharing the code from one card | Client «Invita a una amiga» and Staff «Tu código de referido» show the code on one line with «Copiar código», «Compartir tu código» (the system sheet with the invite link) and «Editar código» in the same card; a friend who signs up with a Trainer's code becomes that Trainer's Client (Test 205) | The link's app half needs the 1.3.0 native build |
 | A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
 | Fixes from the testing session | The Staff app keeps answering after «Ahora no» on the first sign-in with Face ID; no «Save Password?» over «¿Entrar con Face ID?»; a triaged comment's notice turns read; a friend without a Guest Pass reads «No recibió la clase gratis.»; Inicio says whose code was not active (Test 207) | «Save Password?» needs a real iPhone |
+| «Cerrar sesión» last | Both Perfil screens end with **Cerrar sesión** alone on a white card in brick red (`#A04640`); «Cuenta» (Client) and «Ajustes» (Staff) no longer hold it; the «¿Cerrar sesión?» sheet's button is filled in the same red; the Client keeps the version and «Cerrar mi cuenta» under it, the Staff app has nothing under it (Test 208) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» in the left column: its board was not redrawn |
 
 ## Where each designed screen is tested
 
@@ -97,7 +98,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | 12 Mi plan | 5, 18, 71, 81, 85, 87, 88, 89, 158, 160 |
 | 13 Evaluación nutricional (with the booked ones since FIX-057, the appointment block since C5), 14 Confirmar evaluación | 15, 18, 19, 54, 93, 112, 149, 151, 160, 186, 208 |
 | 16 Invita a una amiga (17 Mi crédito retired by PAY-005) | 10, 18, 86 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 186 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 186, 208 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
 | 25 Enviar comentarios | 19, 80 |
@@ -114,7 +115,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 106, 112, 113, 145 |
 | S13 Cancelar una clase, S14 Cancelar sesión, Horario (HOR) | 10, 19, 20, 113, 145 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 93, 149, 187 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106, 187 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 95, 106, 187, 208 |
 | S29 Mis pagos (every paid role since E8) | 95, 124, 127, 187 |
 | CON Congelamientos, Revisar congelamiento | 92, 124, 160, 187 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
@@ -1655,12 +1656,13 @@ label, a quiet chevron): «Tu plan y tus clases» (**Mi plan** with its state,
 FIX-057 no **Mis evaluaciones**, Test 151),
 «Preferencias» (**Notificaciones** with «N sin leer» on the right; since
 FIX-060 there is no **Recibir promociones** switch nor its note, Test 155),
-and «Cuenta»
-(**Cambiar contraseña**, **Enviar comentarios**, **Soporte**, **Política de
-privacidad** (Test 194), and **Cerrar sesión** as the last row, which opens
-the «¿Cerrar sesión?» sheet). Then the discreet
-**Cerrar mi cuenta** text button in Error and "Emma Pilates Studio · versión
-1.0.1" (the installed app version, Test 76). The **Perfil** tab no longer
+«Cuenta» (**Cambiar contraseña** and the Face ID switch) and «Ayuda y legal»
+(**Enviar comentarios**, **Soporte**, **Política de privacidad**, Test 194).
+Then **Cerrar sesión** alone on a white card, centred, in brick red
+(Destructivo `#A04640`), which opens the «¿Cerrar sesión?» sheet (Test 208).
+Under it, "Emma Pilates Studio · versión 1.0.1 · Cerrar mi cuenta" (the
+installed app version, Test 76), with **Cerrar mi cuenta** as the small
+underlined link. The **Perfil** tab no longer
 carries the unread pill; the count is on the Inicio bell (VoiceOver reads
 "Notificaciones, 2 sin leer"). From the bell, an empty inbox offers **Volver
 al inicio**.
@@ -1729,10 +1731,11 @@ test password.
 Tap **Cerrar sesión**. A bottom sheet slides up over the dimmed screen (the
 design's confirmation sheet, not the system dialog, UX-002): «¿Cerrar sesión?»
 in Lora, the note "Vuelves al inicio de sesión y tendrás que entrar de nuevo
-con tu correo y contraseña.", an outlined Error **Cerrar sesión** and a quiet
-**Cancelar** link. **Cancelar** (or the Android back button) closes the sheet
-and keeps you signed in; **Cerrar sesión** spins in Error while the session is
-revoked and returns to Login. The sheet is the same in the Staff app (E) and
+con tu correo y contraseña.", **Cerrar sesión** filled in brick red
+(`#A04640`) with white text (Test 208) and a quiet **Cancelar** link.
+**Cancelar** (or the Android back button) closes the sheet and keeps you
+signed in; **Cerrar sesión** spins while the session is revoked and returns
+to Login. The sheet is the same in the Staff app (E) and
 on Android, where the old native dialog drew Material teal buttons.
 
 ### E. Staff Perfil
@@ -1746,10 +1749,10 @@ initials with **Cambiar foto** (Test 135 A), her name and email, and «Tu
 nombre y tu correo los actualiza administración.»; «Tu cuenta» with **Rol**
 (`Entrenadora`) and **Sucursales** (`Centro, Equipetrol, Urubó`); «Ajustes»
 with **Mis pagos**, **Mi QR de cobro** (Test 166), **Tu código de referido**, **Notificaciones** (with the
-unread count), **Soporte**, **Política de privacidad** (Test 194), **Cambiar
-contraseña**, **Enviar comentarios** and **Cerrar sesión** as the last row in
-Error; then the version footer «Emma Pilates
-Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
+unread count) and **Cambiar contraseña** last; «Ayuda y legal» with
+**Enviar comentarios**, **Soporte** and **Política de privacidad** (Test
+194); then **Cerrar sesión** alone on a white card in brick red, the last
+thing on the screen, with no version line under it (Test 208).
 Log in as `paola.mendoza@example.com` to see **Administración** with "Todas
 las sucursales", «Tus datos se editan en la web de administración.» and
 **Ver la app como…** first under «Ajustes». The staff inbox draws the same
@@ -12605,8 +12608,9 @@ D. **The email is verified (C01k).** A fresh link shows the check on the
    disc, «Correo verificado», «Tu cuenta está lista. Ahora puedes iniciar
    sesión.» and **Ir a iniciar sesión** on the footer, laid out like Estado
    del pago (C11).
-E. **Client Perfil (C18, C18s).** «Cuenta» holds only **Cambiar contraseña**,
-   the Face ID switch (where the phone has it) and **Cerrar sesión**. A last
+E. **Client Perfil (C18, C18s).** «Cuenta» holds only **Cambiar contraseña**
+   and the Face ID switch (where the phone has it); since Test 208
+   **Cerrar sesión** is a card of its own at the end. A last
    section, «Ayuda y legal», holds **Enviar comentarios**, **Soporte** (with
    «Contacto y WhatsApp del estudio» under it) and **Política de
    privacidad** with a shield icon; Soporte and the policy open
@@ -12629,7 +12633,8 @@ G. **Staff rows per role (E-F03, E-F23 scrolled).** Administrator's Ajustes:
    Assistant (E-F02): **Mis pagos** with «Último: …», **Mi QR de cobro**,
    **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Each role's
    «Ayuda y legal» holds **Enviar comentarios**, **Soporte** and **Política
-   de privacidad**, and every row opens what it opened before.
+   de privacidad**, and every row opens what it opened before. Since Test 208
+   **Cerrar sesión** leaves «Ajustes» for its own card after «Ayuda y legal».
 H. **Seeing the app as someone.** As an Administrator, use **Ver la app
    como…**: Perfil hides the photo links, **Cambiar contraseña**, **Cerrar
    sesión** and **Enviar comentarios**, and shows **Dejar de ver como …** at
@@ -12725,3 +12730,31 @@ D. **A friend without a free class (#20, #22).** Register a friend with
    de Mariana todavía no está activo» (`GET /clients/current/subscription`
    answers `inactiveInvite`).
 
+## Test 208: «Cerrar sesión» last, in brick red (follow-up 292)
+
+Boards C18, C18s, C18l, E-F01, E-F02, E-F03, E-F23, E-F24, E-F27, E-F04 and
+E-F28. Run both apps against the local API with the Test 5A fixtures. This
+is JavaScript only: Metro reloads it, no new build.
+
+A. **Client Perfil (C18, C18s).** Sign in as `sofia@example.com` and open
+   **Perfil**. «Cuenta» holds only **Cambiar contraseña** and, where the
+   phone has it, **Entrar con Face ID**. «Ayuda y legal» follows unchanged.
+   Scroll to the bottom: **Cerrar sesión** stands alone on a white card,
+   with a wider gap above it than between the other cards, its exit icon and
+   label centred in brick red (`#A04640`). Under it, «Emma Pilates Studio ·
+   versión … · Cerrar mi cuenta», and **Cerrar mi cuenta** still opens
+   «Cerrar mi cuenta» (C24).
+B. **The confirmation (C18l).** Tap **Cerrar sesión**: «¿Cerrar sesión?»
+   slides up with its note, **Cerrar sesión** filled in brick red with white
+   text, and **Cancelar** as a quiet link. **Cancelar** keeps you signed in;
+   **Cerrar sesión** returns to Login.
+C. **Staff Perfil (E-F01, E-F02, E-F03; scrolled E-F23, E-F24, E-F27).** Sign
+   in as each role (Paola, Daniela, the Assistant). «Ajustes» now ends with
+   **Cambiar contraseña** (and the Face ID switch where the phone has it).
+   After «Ayuda y legal» comes the same brick-red **Cerrar sesión** card, and
+   nothing follows it: the version line is gone.
+D. **Staff confirmation (E-F04, E-F28).** Tap the card: the same sheet with
+   the brick-red button; confirm and the app returns to Login.
+E. **Seeing the app as someone.** As Paola use **Ver la app como…**: there is
+   no **Cerrar sesión** card; **Dejar de ver como …** stays at the end of
+   «Ajustes».
