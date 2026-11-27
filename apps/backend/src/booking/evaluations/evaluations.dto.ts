@@ -95,6 +95,12 @@ export class EvaluationAvailabilityDto {
   includedEvaluation!: 'available' | 'used' | 'none';
 
   @ApiProperty({
+    description:
+      'Whether a Plan in force (a paid Plan or Courtesy Access, never a Guest Pass) lets her book an Evaluation in the next 30 days. False sends the app to «Necesitas un plan activo» before any slot. Older builds ignore it.',
+  })
+  planCoversEvaluation!: boolean;
+
+  @ApiProperty({
     description: 'The studio price of an Evaluation in centavos',
   })
   priceCentavos!: number;

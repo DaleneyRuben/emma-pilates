@@ -154,6 +154,7 @@ export class EvaluationSlotsController {
         month: civilDate(month.month),
       })),
       includedEvaluation: availability.includedEvaluation,
+      planCoversEvaluation: availability.planCoversEvaluation,
       priceCentavos: availability.priceCentavos,
     };
   }

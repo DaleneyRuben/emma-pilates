@@ -1,6 +1,5 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
-  EvaluationState,
   ImageAssetPurpose,
   ImageAssetState,
   PaymentKind,
@@ -11,8 +10,6 @@ import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { PaymentRuleError } from '../payments/payment-errors';
 import { notifyPaymentSubmitted } from '../payments/payment-submitted-notice';
-import { netAllowanceClasses } from '../commands/net-allowance';
-import { isSubscriptionEffective } from '../payments/purchase-eligibility';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -118,71 +115,6 @@ export const attachEvaluationReceipt = async (
     paymentId: payment.id,
     now: input.now,
   });
-};
-
-// The same effectiveness check a class booking uses. A date range alone is
-// not enough: an exhausted Plan cannot buy a paid Evaluation. Only a paid
-// Plan counts: a Guest Pass or Courtesy Access never covers an Evaluation
-// (FIX-019, owner 2026-10-30).
-export const coveringSubscription = async (
-  transaction: Transaction,
-  input: { clientId: string; slotDate: Date; today: Date; now: Date },
-) => {
-  const candidates = await transaction.subscription.findMany({
-    where: {
-      clientId: input.clientId,
-      state: 'ACTIVE',
-      startsOn: { lte: input.slotDate },
-      endsOn: { gte: input.slotDate },
-      plan: { priceCentavos: { gt: 0 } },
-      NOT: { payment: { is: { method: 'COURTESY' } } },
-    },
-    orderBy: [{ endsOn: 'desc' }, { id: 'asc' }],
-    select: {
-      id: true,
-      planId: true,
-      planNameSnapshot: true,
-      durationDaysSnapshot: true,
-      weeklyClassCapSnapshot: true,
-      originalClassAllowance: true,
-      startsOn: true,
-      endsOn: true,
-      remainingClassAllowance: true,
-      allowanceAdjustments: {
-        where: { deletedAt: null },
-        select: { classes: true },
-      },
-      evaluations: {
-        where: {
-          state: { in: [EvaluationState.BOOKED, EvaluationState.NO_SHOW] },
-        },
-        select: { id: true },
-      },
-      _count: {
-        select: {
-          bookings: {
-            where: {
-              state: 'BOOKED',
-              session: { startsAt: { gt: input.now } },
-            },
-          },
-        },
-      },
-    },
-  });
-  return (
-    candidates.find((candidate) =>
-      isSubscriptionEffective(
-        {
-          endsOn: candidate.endsOn,
-          remainingClassAllowance: candidate.remainingClassAllowance,
-          extraClasses: netAllowanceClasses(candidate.allowanceAdjustments),
-          futureBookedCount: candidate._count.bookings,
-        },
-        input.today,
-      ),
-    ) ?? null
-  );
 };
 
 export const evaluationReceiptOf = (
