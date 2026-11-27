@@ -174,6 +174,29 @@ describe("createSessionManager", () => {
     expect(calls).toEqual(["release", "revoke"]);
   });
 
+  it("signs out after five seconds when releasing the push device hangs", async () => {
+    jest.useFakeTimers();
+    const revokeCurrent = jest.fn().mockResolvedValue(undefined);
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        load: jest.fn().mockResolvedValue("stored-credential"),
+        save: jest.fn(),
+      },
+      releaseDevice: () => new Promise<void>(() => undefined),
+      resolveCurrent: jest.fn(),
+      revokeCurrent,
+    });
+
+    const logout = manager.logout({ accountId: "account-1", role: "client" });
+    await jest.advanceTimersByTimeAsync(5_000);
+    await logout;
+
+    expect(revokeCurrent).toHaveBeenCalledWith("stored-credential");
+    jest.useRealTimers();
+  });
+
   it("ends a session the server already revoked without calling it again", async () => {
     const clearAccountCache = jest.fn();
     const clearCredential = jest.fn();

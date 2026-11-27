@@ -71,6 +71,8 @@ export type SessionManager = {
   unlockWithBiometrics: () => Promise<BiometricUnlockResult>;
 };
 
+const releaseTimeoutMs = 5_000;
+
 function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSession {
   return {
     accountId: principal.accountId,
@@ -212,8 +214,18 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
       const credential = activeCredential ?? (await credentialStore.load());
 
       if (credential !== null) {
-        // Best effort: the server also releases the device the session used.
-        await releaseDevice?.().catch(reportRecoveredError);
+        // Best effort and bounded: the server also releases the device the
+        // session used, so a slow network never holds the sign-out.
+        if (releaseDevice !== undefined) {
+          let timer: ReturnType<typeof setTimeout> | undefined;
+          await Promise.race([
+            releaseDevice().catch(reportRecoveredError),
+            new Promise<void>((resolve) => {
+              timer = setTimeout(resolve, releaseTimeoutMs);
+            }),
+          ]);
+          clearTimeout(timer);
+        }
         await revokeCurrent(credential);
       }
 
