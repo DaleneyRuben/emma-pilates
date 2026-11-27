@@ -8,6 +8,10 @@ describe("biometricCopy", () => {
         message: "Para entrar con Face ID, permite que la app lo use en Ajustes.",
         title: "Face ID está desactivado",
       },
+      unavailable: {
+        message: "Revisa Face ID en los ajustes del iPhone e intenta de nuevo.",
+        title: "Face ID no está disponible",
+      },
       enabledToast: "Listo: la próxima vez entras con Face ID.",
       glyph: "faceId",
       offerAction: "Usar Face ID",
@@ -26,6 +30,7 @@ describe("biometricCopy", () => {
         message: "Para entrar con tu huella, guarda una en los ajustes de seguridad del celular.",
         title: "Tu huella no está disponible",
       },
+      unavailable: null,
       enabledToast: "Listo: la próxima vez entras con tu huella.",
       glyph: "fingerprint",
       offerAction: "Usar mi huella",

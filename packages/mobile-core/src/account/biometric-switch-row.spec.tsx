@@ -126,7 +126,7 @@ describe("BiometricSwitchRow", () => {
     const openSettings = jest.spyOn(Linking, "openSettings").mockResolvedValue(undefined);
     const manager = managerWith({
       canUseBiometrics: () => false,
-      wasBiometricSupportSeen: jest.fn().mockResolvedValue(true),
+      isBiometricRefusedBySystem: jest.fn().mockResolvedValue(true),
     });
     const screen = await renderRow(manager);
 
@@ -143,5 +143,27 @@ describe("BiometricSwitchRow", () => {
     const open = buttons?.find((button) => button.text === "Abrir Ajustes");
     open?.onPress?.();
     expect(openSettings).toHaveBeenCalledTimes(1);
+  });
+
+  // Review of PR #399: a Face ID locked out or no longer set up is not the
+  // app's permission, so Settings for the app would not help.
+  it("says Face ID is unavailable when the app's permission is not the reason", async () => {
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const manager = managerWith({
+      canUseBiometrics: () => false,
+      wasBiometricSupportSeen: jest.fn().mockResolvedValue(true),
+    });
+    const screen = await renderRow(manager);
+
+    const toggle = await screen.findByRole("switch", { name: "Entrar con Face ID" });
+    await act(async () => {
+      await fireEvent(toggle, "valueChange", true);
+    });
+
+    expect(manager.enableBiometrics).not.toHaveBeenCalled();
+    const [title, message, buttons] = alert.mock.calls[0]!;
+    expect(title).toBe("Face ID no está disponible");
+    expect(message).toBe("Revisa Face ID en los ajustes del iPhone e intenta de nuevo.");
+    expect(buttons?.map((button) => button.text)).toEqual(["Entendido"]);
   });
 });

@@ -45,7 +45,11 @@ export function BiometricSwitchRow({ appearance = "disc" }: BiometricSwitchRowPr
     ]);
   const toggle = async (on: boolean) => {
     if (on && biometrics.blockedBySystem) {
-      sendToSettings();
+      if (copy.unavailable !== null && !biometrics.permissionRefused) {
+        Alert.alert(copy.unavailable.title, copy.unavailable.message, [{ text: "Entendido" }]);
+      } else {
+        sendToSettings();
+      }
       return;
     }
     setBusy(true);
