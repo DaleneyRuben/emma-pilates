@@ -101,14 +101,17 @@ describe("PrimaryButton palette B", () => {
   });
 });
 
-// The testing session on Android (#24): «Subir factura» was measured a pixel
-// short, so «factura» wrapped to a clipped second line and only «Subir»
-// showed. A one-line label uses Android's simple line breaking, which
-// measures and lays out the same way.
+// The testing session on Android (#24): «Elegir factura» turned into «Subir
+// factura» in the same button, Android kept the old text view's measured
+// width, and «factura» wrapped out of sight. A new label gets a new view.
 describe("PrimaryButton label on Android", () => {
-  it("breaks its one line the simple way", async () => {
-    const screen = await render(<PrimaryButton label="Subir factura" />);
+  it("draws a changed label in a fresh text view", async () => {
+    const screen = await render(<PrimaryButton label="Elegir factura" />);
+    const before = screen.getByText("Elegir factura");
 
-    expect(screen.getByText("Subir factura")).toHaveProp("textBreakStrategy", "simple");
+    await screen.rerender(<PrimaryButton label="Subir factura" />);
+
+    expect(screen.getByText("Subir factura")).not.toBe(before);
+    expect(before).not.toBeOnTheScreen();
   });
 });
