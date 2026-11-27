@@ -44,3 +44,19 @@ export async function syncPushRegistration({
     return "failed";
   }
 }
+
+// ADR-0025: signing out ends this installation's push association before the
+// session goes, so a reinstall that keeps the token gets nothing of the Account.
+export async function releasePushRegistration({
+  fetcher,
+  installationId,
+}: {
+  fetcher: typeof globalThis.fetch;
+  installationId: () => Promise<string>;
+}): Promise<void> {
+  await deactivateCurrentDevice(
+    { installationId: await installationId(), reason: "logout" },
+    undefined,
+    fetcher,
+  );
+}

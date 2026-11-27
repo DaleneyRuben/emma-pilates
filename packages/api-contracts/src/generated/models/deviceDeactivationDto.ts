@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { DeviceDeactivationDtoReason } from "./deviceDeactivationDtoReason";
 
 export interface DeviceDeactivationDto {
   /**
@@ -11,4 +12,6 @@ export interface DeviceDeactivationDto {
    * @maxLength 200
    */
   installationId: string;
+  /** Why this installation stops receiving pushes: the permission was turned off, or it signed out. */
+  reason?: DeviceDeactivationDtoReason;
 }

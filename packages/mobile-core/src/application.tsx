@@ -20,6 +20,8 @@ import {
 } from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
 import { createExpoPushPlatform } from "./notifications/expo-push-platform";
+import { useClearBadgeWithoutSession } from "./notifications/no-session-badge";
+import { releasePushRegistration } from "./notifications/push-registration";
 import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import { useForgetLinkWhenSignedIn } from "./ingress/forget-link-when-signed-in";
@@ -113,20 +115,23 @@ export function createDefaultMobileRuntime({
     clearAccountCache,
     credentialStore,
     installationIdentifier,
+    releaseDevice: () =>
+      releasePushRegistration({ fetcher: apiFetcher, installationId: installationIdentifier }),
     resolveCurrent: sessionApi.resolveCurrent,
     revokeCurrent: sessionApi.revokeCurrent,
+  });
+  // The session manager's credential: the active one first, so a biometric
+  // unlock is used even before the plain copy is written.
+  const apiFetcher = createApiFetcher({
+    baseUrl: apiBaseUrl,
+    getCredential: sessionManager.getCredential,
   });
 
   return {
     allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
     linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
-    // The session manager's credential: the active one first, so a biometric
-    // unlock is used even before the plain copy is written.
-    apiFetcher: createApiFetcher({
-      baseUrl: apiBaseUrl,
-      getCredential: sessionManager.getCredential,
-    }),
+    apiFetcher,
     authenticationApi: createAuthenticationApi({
       baseUrl: apiBaseUrl,
       clientIdentifier: installationIdentifier,
@@ -168,6 +173,15 @@ function IdentityNavigation({
     clearIntent,
     intent,
     signedIn: identity.session !== null && identity.session !== undefined,
+  });
+  // Until the saved session answers, and while Face ID guards a live one at
+  // launch, the badge keeps its count.
+  useClearBadgeWithoutSession({
+    platform: pushPlatform,
+    signedIn:
+      identity.status === "restoring" ||
+      identity.session !== null ||
+      identity.sessionBehindLock === true,
   });
   // The fonts are loaded by now; once the session check has answered, the
   // first screen (Login or the saved session's) is drawn under the splash.

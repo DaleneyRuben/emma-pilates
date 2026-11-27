@@ -1,4 +1,4 @@
-import { syncPushRegistration } from "./push-registration";
+import { releasePushRegistration, syncPushRegistration } from "./push-registration";
 import type { PushPlatform } from "./push-platform";
 
 const installationId = "3f0d4c1e-7c1b-4a8e-9a55-5d7c3b2a1f00";
@@ -96,5 +96,18 @@ describe("syncPushRegistration", () => {
         platform: platform(),
       }),
     ).resolves.toBe("failed");
+  });
+});
+
+describe("releasePushRegistration", () => {
+  it("deactivates this installation as signed out", async () => {
+    const fetcher = respond(204);
+
+    await releasePushRegistration({ fetcher, installationId: async () => installationId });
+
+    const [url, init] = fetcher.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("/api/v1/notifications/devices/current/deactivate");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({ installationId, reason: "logout" });
   });
 });

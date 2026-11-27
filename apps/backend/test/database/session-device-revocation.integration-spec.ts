@@ -133,12 +133,39 @@ describe('Revoking a session deactivates its device (NOT-002)', () => {
       revokeAuthenticationSessions(
         transaction,
         { id: first.sessionId },
-        { revokedAt: at, reason: AuthenticationSessionRevocationReason.LOGOUT },
+        {
+          revokedAt: at,
+          reason: AuthenticationSessionRevocationReason.LOGOUT_OTHER_DEVICES,
+        },
       ),
     );
 
     await expect(device(first.deviceId)).resolves.toMatchObject({
       deactivatedAt: null,
+    });
+  });
+
+  // ADR-0025: signing out on an installation ends its push association even
+  // when an older session of that installation was never revoked.
+  it('deactivates the device on logout even when another live session uses it', async () => {
+    const accountId = await accountIdFor('lucia@example.com');
+    const first = await signInOnDevice(accountId);
+    const stale = await createSession(accountId);
+    await prisma.authenticationSession.update({
+      where: { id: stale },
+      data: { accountDeviceId: first.deviceId },
+    });
+
+    await new PrismaAuthenticationGateway(prisma).revokeSession({
+      authenticationSessionId: first.sessionId,
+      revokedAt: at,
+      reason: 'logout',
+    });
+
+    await expect(device(first.deviceId)).resolves.toMatchObject({
+      deactivatedAt: at,
+      deactivationReason: 'LOGOUT',
+      expoPushToken: null,
     });
   });
 

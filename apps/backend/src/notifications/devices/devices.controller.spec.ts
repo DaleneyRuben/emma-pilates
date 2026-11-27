@@ -71,7 +71,31 @@ describe('DevicesController', () => {
     expect(deactivate).toHaveBeenCalledWith({
       accountId: 'account-id',
       installationId: body.installationId,
+      reason: 'permission_revoked',
     });
+  });
+
+  it('deactivates the current device when this installation signs out', async () => {
+    await controller.deactivateCurrent(bearer, {
+      installationId: body.installationId,
+      reason: 'logout',
+    });
+
+    expect(deactivate).toHaveBeenCalledWith({
+      accountId: 'account-id',
+      installationId: body.installationId,
+      reason: 'logout',
+    });
+  });
+
+  it('rejects a deactivation with an unknown reason', async () => {
+    await expect(
+      controller.deactivateCurrent(bearer, {
+        installationId: body.installationId,
+        reason: 'account_changed',
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(deactivate).not.toHaveBeenCalled();
   });
 
   it('rejects a deactivation without an installation id', async () => {

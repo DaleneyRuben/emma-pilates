@@ -218,6 +218,7 @@ describe('Account devices (NOT-002)', () => {
     await devices().deactivateCurrentDevice({
       accountId: valeria,
       installationId,
+      reason: 'permission_revoked',
     });
     await expect(rowsFor(installationId)).resolves.toEqual([
       expect.objectContaining({ deactivatedAt: null }),
@@ -226,6 +227,7 @@ describe('Account devices (NOT-002)', () => {
     await devices().deactivateCurrentDevice({
       accountId: lucia,
       installationId,
+      reason: 'permission_revoked',
     });
     await expect(rowsFor(installationId)).resolves.toEqual([
       expect.objectContaining({
@@ -245,6 +247,31 @@ describe('Account devices (NOT-002)', () => {
     const rows = await rowsFor(installationId);
     expect(rows).toHaveLength(2);
     expect(rows[1]).toMatchObject({ deactivatedAt: null });
+  });
+
+  it('records a sign-out as the reason when the installation signs out', async () => {
+    const installationId = randomUUID();
+    await devices().registerCurrentDevice({
+      accountId: lucia,
+      authenticationSessionId: await createSession(lucia),
+      installationId,
+      expoPushToken: token('signed-out'),
+      platform: 'ios',
+    });
+
+    await devices().deactivateCurrentDevice({
+      accountId: lucia,
+      installationId,
+      reason: 'logout',
+    });
+
+    await expect(rowsFor(installationId)).resolves.toEqual([
+      expect.objectContaining({
+        deactivatedAt: clock,
+        deactivationReason: 'LOGOUT',
+        expoPushToken: null,
+      }),
+    ]);
   });
 
   it('keeps one active row when the same installation registers twice at once', async () => {

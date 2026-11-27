@@ -179,6 +179,7 @@ export * from "./currentAuthenticationPrincipalDto";
 export * from "./decideFreezeDto";
 export * from "./decideFreezeDtoDecision";
 export * from "./deviceDeactivationDto";
+export * from "./deviceDeactivationDtoReason";
 export * from "./deviceRegistrationDto";
 export * from "./deviceRegistrationDtoPlatform";
 export * from "./draftPayStatementsParams";

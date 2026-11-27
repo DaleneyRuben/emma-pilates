@@ -31,6 +31,8 @@ type SessionManagerOptions = {
   clearAccountCache: (accountId: string) => Promise<void>;
   credentialStore: CredentialStore;
   installationIdentifier?: () => Promise<string>;
+  /** Ends this phone's push association with the Account, before sign-out. */
+  releaseDevice?: () => Promise<void>;
   resolveCurrent: (credential: string) => Promise<CurrentAuthenticationPrincipalDto | null>;
   revokeCurrent: (credential: string) => Promise<void>;
 };
@@ -69,6 +71,8 @@ export type SessionManager = {
   unlockWithBiometrics: () => Promise<BiometricUnlockResult>;
 };
 
+const releaseTimeoutMs = 5_000;
+
 function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSession {
   return {
     accountId: principal.accountId,
@@ -84,6 +88,7 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     clearAccountCache,
     credentialStore,
     installationIdentifier,
+    releaseDevice,
     resolveCurrent,
     revokeCurrent,
   } = options;
@@ -209,6 +214,18 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
       const credential = activeCredential ?? (await credentialStore.load());
 
       if (credential !== null) {
+        // Best effort and bounded: the server also releases the device the
+        // session used, so a slow network never holds the sign-out.
+        if (releaseDevice !== undefined) {
+          let timer: ReturnType<typeof setTimeout> | undefined;
+          await Promise.race([
+            releaseDevice().catch(reportRecoveredError),
+            new Promise<void>((resolve) => {
+              timer = setTimeout(resolve, releaseTimeoutMs);
+            }),
+          ]);
+          clearTimeout(timer);
+        }
         await revokeCurrent(credential);
       }
 

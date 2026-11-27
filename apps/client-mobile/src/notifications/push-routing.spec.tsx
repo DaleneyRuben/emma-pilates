@@ -113,4 +113,30 @@ describe("Client push notifications (NOT-002)", () => {
 
     expect(screen.queryByText("Mi plan")).toBeNull();
   });
+
+  // Owner, TestFlight 1.3.0: a push sent before sign-out badged the icon.
+  it("keeps the app icon's badge empty while nobody is signed in", async () => {
+    const device = createMemoryPushPlatform();
+    const runtime = createClientRuntime(routeFetcher({}), { pushPlatform: device.platform });
+    runtime.sessionManager.restore = jest.fn().mockResolvedValue(null);
+    await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(device.state.badgeCounts).toEqual([0]));
+    await act(async () => device.receive());
+    expect(device.state.badgeCounts).toEqual([0, 0]);
+  });
+
+  // Review of PR #400: a launch that waits for Face ID still has her session,
+  // so the icon keeps the unread count until she unlocks or signs out.
+  it("keeps the badge while a launch waits for Face ID", async () => {
+    const device = createMemoryPushPlatform();
+    const runtime = createClientRuntime(routeFetcher({}), { pushPlatform: device.platform });
+    runtime.sessionManager.restore = jest.fn().mockResolvedValue(null);
+    runtime.sessionManager.hasBiometricSession = jest.fn().mockResolvedValue(true);
+    const screen = await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(screen.getByText("Hola de nuevo")).toBeOnTheScreen());
+    await act(async () => device.receive());
+    expect(device.state.badgeCounts).toEqual([]);
+  });
 });
