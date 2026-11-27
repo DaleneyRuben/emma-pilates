@@ -39,7 +39,7 @@ numbered tests.
 | Promotion Contacts           | Every active Client is a promotions contact (Clientas lists her; AW35 did until FIX-065) whether or not she agreed, Perfil has no «Recibir promociones» switch, and closing the Account with the box ticked keeps a «Cuenta cerrada» contact (Test 155, FIX-060; Test 60 for app builds before it) | The owner's decision on walkthrough finding 85; the closure part is permanent, so use a copy of the fixtures |
 | Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario with Nutrición and a class's bookings and waitlist, where she books a Client, Clientes with «Editar perfil» and Congelamientos, Promociones › Carrusel, Referidos and Contactos, Comentarios, Insumos with withdrawals and restocks only, Equipos, Personal where she assigns a Trainer's Branches and reads everyone else, Reglas del estudio read-only, no amount anywhere) and in the Staff app (Client search, «Nuevo cliente» with the invitation card since FIX-040, Bookings, «Cancelar una clase», no sale; client file with WhatsApp, Llamar and Anotar contacto (Test 177); her own «Mis pagos» tab (Test 95)); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 77) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
-| Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
+| Feedback                     | Send «Envíanos tu opinión» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 80) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation, class, and Plan reminders (Tests 7 and 105), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 98) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
@@ -57,7 +57,7 @@ numbered tests.
 | Staff profile photo | A Staff Member sets or removes her photo from Perfil; the Administrator or the Coordinator does it for anyone from Estudio › Personal; the photo shows in the top bar, Personal, Horario, the Staff app's class detail and the client's class detail; class rows name the Trainer without a photo (Test 135) | The upload needs the worker; a phone that already loaded a photo keeps it until the asset changes |
 | Settled review notices | A confirmed or rejected receipt and a decided Freeze mark every Administrator's «… por revisar» notice read; a Minimum Bookings cancellation notice names its day (Test 141) | Notices already stale before FIX-046 stay unread |
 | Walkthrough 59, 74, 88 | «Hace un momento» under a minute in both apps' Notificaciones and Pagos pendientes; «Celular incompleto» on Clientes and the client file for a missing or unusable phone; Comentarios names who sent each one, linked to the Client's file (Test 157) | A phone saved before the rule can only be fixed by the Client or from «Editar perfil»; nothing rewrites it |
-| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Mi QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
+| Staff payout QR | A Staff Member uploads her bank QR and its last valid day from Perfil › «Tu QR de cobro», Sueldos' «Aprobar Bs …» and Pagados › Registrar pago show it with Ampliar and Guardar QR, an expired one is never shown («QR vencido · pídele uno nuevo»), and the worker reminds her 7 days before and when it expires (Test 166) | The upload needs the worker; «Subir comprobante» opens Pagados on the person, not her payment's panel |
 | Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 83) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 | Calmer admin web pages | Horario's white blocks with one amber dot for a class short of Equipment and faint dashed cancelled classes, Inicio's «Por resolver» list first with grouped recommendations, and Sueldos' one card per person with its own «Aprobar Bs …» (Test 178) | Recommendations are grouped on the web only; the API still lists one per weekday and per Client |
 | Client app redesign picks | Inicio led by the next class with its free places and who else is coming by initials (C7), a payment in review or rejected and a coming Freeze as one block on top (C8, C1), the lock and the frozen-day card on Reservar (C1), the class detail as a block over a table (C4), Elige tu plan with the plan to renew on top (C3), Notificaciones with topics and links (C2), the evaluation appointment block with the next three turnos (C5), and registration's one summary and short errors (C6) (Test 186) | A Freeze needs a quarterly Plan, which the Test 5A fixtures lack, so C1 uses Carla on the walkthrough database; the attendee initials need an API from this branch (an older one leaves the places and circles out) |
@@ -81,6 +81,7 @@ numbered tests.
 | A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
 | Fixes from the testing session | The Staff app keeps answering after «Ahora no» on the first sign-in with Face ID; no «Save Password?» over «¿Entrar con Face ID?»; a triaged comment's notice turns read; a friend without a Guest Pass reads «No recibió la clase gratis.»; Inicio says whose code was not active (Test 207) | «Save Password?» needs a real iPhone |
 | «Cerrar sesión» last | Both Perfil screens end with **Cerrar sesión** alone on a white card in brick red (`#A04640`); «Cuenta» (Client) and «Ajustes» (Staff) no longer hold it; the «¿Cerrar sesión?» sheet's button is filled in the same red; the Client keeps the version and «Cerrar mi cuenta» under it, the Staff app has nothing under it (Test 208) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» in the left column: its board was not redrawn |
+| Perfil with no single-row group | Every role's Perfil: the Role and Branches under the Staff name, «Tu cuenta» gone; Client «Tu plan» · «Ajustes» · «Ayuda», Staff «Tus pagos» (the Administradora «Administración») · «Ajustes» · «Ayuda» (none for the Administradora or while seeing the app as someone); «Envíanos tu opinión» and «Preguntas frecuentes» (the support page); no group with one row, with or without Face ID; a two-line footer straight on the page in `#8A5B57` with «Política de privacidad» (and the Client's «Cerrar mi cuenta») (Test 209) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» and puts the footer in the left column: its board was not redrawn. The Face ID switch keeps its note under the label («Sin escribir tu contraseña»), which the boards do not draw |
 
 ## Where each designed screen is tested
 
@@ -101,7 +102,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 104, 105, 151, 160, 176, 186, 208 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 104 |
-| 25 Enviar comentarios | 19, 80 |
+| 25 Envíanos tu opinión | 19, 80, 209 |
 | 01T–25T, the same screens on a tablet | 196 |
 
 | Staff app | Tests |
@@ -120,7 +121,7 @@ screen's look is also walked by Test 189 against its board in `design/v3/`.
 | CON Congelamientos, Revisar congelamiento | 92, 124, 160, 187 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
-| S27 Enviar comentarios | 19, 80 |
+| S27 Envíanos tu opinión | 19, 80, 209 |
 
 | Admin web | Tests |
 | --- | --- |
@@ -1650,19 +1651,18 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 ### A. Client Perfil
 
 Log in as `sofia@example.com` and open the **Perfil** tab (`C18`). Below the
-summary card come three sections of v2 icon rows (a Rosa tinte disc, the
-label, a quiet chevron): «Tu plan y tus clases» (**Mi plan** with its state,
-**Evaluación nutricional**, **Mis facturas**, **Invita a una amiga**; since
-FIX-057 no **Mis evaluaciones**, Test 151),
-«Preferencias» (**Notificaciones** with «N sin leer» on the right; since
-FIX-060 there is no **Recibir promociones** switch nor its note, Test 155),
-«Cuenta» (**Cambiar contraseña** and the Face ID switch) and «Ayuda y legal»
-(**Enviar comentarios**, **Soporte**, **Política de privacidad**, Test 194).
-Then **Cerrar sesión** alone on a white card, centred, in brick red
-(Destructivo `#A04640`), which opens the «¿Cerrar sesión?» sheet (Test 208).
-Under it, "Emma Pilates Studio · versión 1.0.1 · Cerrar mi cuenta" (the
-installed app version, Test 76), with **Cerrar mi cuenta** as the small
-underlined link. The **Perfil** tab no longer
+summary card come three groups of v2 icon rows (a Rosa tinte disc, the
+label, a quiet chevron; Test 209): «Tu plan» (**Plan actual** with its
+state, **Evaluación nutricional**, **Invita a una amiga**, **Facturas**;
+since FIX-057 no **Mis evaluaciones**, Test 151), «Ajustes»
+(**Notificaciones** with «N sin leer» on the right, **Cambiar contraseña**
+and the Face ID switch; since FIX-060 there is no **Recibir promociones**
+switch nor its note, Test 155) and «Ayuda» (**Envíanos tu opinión**,
+**Preguntas frecuentes**). Then **Cerrar sesión** alone on a white card,
+centred, in brick red (Destructivo `#A04640`), which opens the «¿Cerrar
+sesión?» sheet (Test 208). Under it, straight on the page, two small lines:
+"Emma Pilates Studio · versión 1.3.0" (the installed app version, Test 76)
+and "Política de privacidad · Cerrar mi cuenta", both underlined links. The **Perfil** tab no longer
 carries the unread pill; the count is on the Inicio bell (VoiceOver reads
 "Notificaciones, 2 sin leer"). From the bell, an empty inbox offers **Volver
 al inicio**.
@@ -1746,16 +1746,17 @@ and open `exp://127.0.0.1:8082` in Expo Go. Log in as
 124 A); no root shows an avatar any more, and the unread count sits on the
 root's bell and on the **Notificaciones** row. Perfil shows her photo or
 initials with **Cambiar foto** (Test 135 A), her name and email, and «Tu
-nombre y tu correo los actualiza administración.»; «Tu cuenta» with **Rol**
-(`Entrenadora`) and **Sucursales** (`Centro, Equipetrol, Urubó`); «Ajustes»
-with **Mis pagos**, **Mi QR de cobro** (Test 166), **Tu código de referido**, **Notificaciones** (with the
-unread count) and **Cambiar contraseña** last; «Ayuda y legal» with
-**Enviar comentarios**, **Soporte** and **Política de privacidad** (Test
-194); then **Cerrar sesión** alone on a white card in brick red, the last
-thing on the screen, with no version line under it (Test 208).
-Log in as `paola.mendoza@example.com` to see **Administración** with "Todas
-las sucursales", «Tus datos se editan en la web de administración.» and
-**Ver la app como…** first under «Ajustes». The staff inbox draws the same
+nombre y tu correo los actualiza administración.», with «Instructora · Centro,
+Equipetrol, Urubó» under her name (Test 209); «Tus pagos» with **Historial de
+pagos**, **Tu QR de cobro** (Test 166) and **Tu código de referido**;
+«Ajustes» with **Notificaciones** (with the unread count), **Cambiar
+contraseña** and the Face ID switch; «Ayuda» with **Envíanos tu opinión**
+and **Preguntas frecuentes**; then **Cerrar sesión** alone on a white card in
+brick red (Test 208) and the footer «Emma Pilates Studio · versión …» /
+«Política de privacidad».
+Log in as `paola.mendoza@example.com` to see «Administradora · Todas las
+sucursales», «Tus datos se editan en la web de administración.» and
+**Ver la app como…** first under «Administración». The staff inbox draws the same
 bare empty state as the Client's (quiet bell, Lora title) with the line "Te
 avisaremos aquí cuando haya algo que necesite tu atención." and **Volver a
 mi agenda** for the Trainer and the Nutritionist.
@@ -1789,9 +1790,9 @@ no Plan and no referrals. Since PAY-005 nobody earns, holds, or spends Credit
 
 ### A. The referral code from Perfil
 
-Log in as `sofia@example.com` and open **Perfil** (`C18`). Under «Tu plan y
-tus clases» the rows read **Mi plan**, **Evaluación nutricional**, **Mis
-evaluaciones**, and **Invita a una amiga**; there is no **Mi crédito**.
+Log in as `sofia@example.com` and open **Perfil** (`C18`). Under «Tu plan»
+the rows read **Plan actual**, **Evaluación nutricional**, **Invita a una
+amiga** and **Facturas** (Test 209); there is no **Mi crédito**.
 
 Tap **Invita a una amiga** (`C16`, Test 176 D). One Lino card holds «Tu
 código» with `REF-SOFIA` large in Lora and an outlined copy icon («Copiar
@@ -7478,16 +7479,16 @@ referrer when a Referral named one.
 
 ## Test 80: send feedback from the apps and triage it on the admin web (REL-012)
 
-«Enviar comentarios» is the last row of Perfil in the Client app (Prompt 25,
-follow-up 165) and a row after «Cambiar contraseña» on the Staff app's Perfil
-for every Role (`S27`). The admin web lists what arrives under
+«Envíanos tu opinión» is the first row of Perfil's «Ayuda» in both apps
+(Prompt 25, `S27`, follow-up 293); the Administrator has none. The admin web lists what arrives under
 **Comentarios** (`AW38`), the last entry of the sidebar.
 
 ### A. Send one from each app
 
 1. With the backend, the worker, and Metro running (Test 2), log in to the
    Client app as `isabel@example.com` on the iPhone, the iPad, or the Android
-   emulator and open **Perfil → Enviar comentarios**.
+   emulator and open **Perfil → Envíanos tu opinión** (the screen has the
+   same title).
 2. The button «Enviar comentario» stays disabled until you pick a type
    (Problema, Sugerencia, Otro) and write at least 10 characters; the counter
    reads «n / 2000» and the field stops at 2,000. The card under the field
@@ -7498,7 +7499,7 @@ for every Role (`S27`). The admin web lists what arrives under
 3. Send it: «¡Gracias por tu comentario!» replaces the form, and «Volver al
    perfil» returns to Perfil.
 4. In the Staff app, log in as `emma.vargas@example.com` (or any Staff
-   fixture), open the account avatar → **Enviar comentarios**, and send one.
+   fixture but Paola), open **Perfil → Envíanos tu opinión**, and send one.
    While an Administrator sees the app as someone (Test 67) the send answers
    «Mientras ves la app como otra persona no puedes enviar comentarios.»
 5. Each Administrator except the sender gets the inbox entry «Comentario
@@ -8079,8 +8080,8 @@ and lists only her own statements (ADR-0111). Log in as Test 24 describes.
    (Test 12); **Mis pagos** is her second tab. Carolina and Gabriela have a
    **Mis pagos** tab too (**Clientas · Para contactar · Horario · Mis pagos ·
    Perfil** / **Agenda · Disponibilidad · Mis pagos · Perfil**), ending in
-   **Mi QR de cobro**; Camila opens **Mis pagos** («Último: Bs N») from
-   Perfil, above **Mi QR de cobro**; Paola has none (Test 187 E8). With no
+   **Mi QR de cobro**; Camila opens **Historial de pagos** («Último: Bs N»)
+   from Perfil's «Tus pagos», above **Tu QR de cobro**; Paola has none (Test 187 E8). With no
    statements the payments list is «Pagos». On top sits one Rosa profundo summary, the first
    that applies: **Por cobrar** with the sum of every approved statement not
    yet paid («Liquidación de octubre 2026, ya aprobada. Falta el pago.», or
@@ -8718,13 +8719,10 @@ A. **One tab bar per role.** The bar is Lino; the current tab is Rosa
 B. **Perfil (S23).** The photo or initials with **Cambiar foto** (Test 135
    A), name, email and «Tu nombre y tu correo los actualiza administración.»
    («Tus datos se editan en la web de administración.» for Paola);
-   «Tu cuenta» rows **Rol** and **Sucursal(es)**; «Ajustes» rows (**Ver la app
-   como…** for Paola, **Mis pagos** for everyone but Paola (the Assistant's
-   with «Último: Bs N», Test 187 E8), **Tu código de referido** for the
-   Trainer, **Notificaciones** with a
-   Rosa tinte count, **Cambiar contraseña**, **Enviar comentarios**) and
-   **Cerrar sesión** as the last row in Error, which opens «¿Cerrar sesión?».
-   The footer reads «Emma Pilates Studio · versión …».
+   the Role and Branches under the name; the groups of Test 209 («Tus
+   pagos» or Paola's «Administración», «Ajustes», «Ayuda»), then the brick-red
+   **Cerrar sesión** card, which opens «¿Cerrar sesión?» (Test 208), and the
+   footer «Emma Pilates Studio · versión …» / «Política de privacidad».
 C. **Entrenadora.** Mi agenda (S02) opens on today, with «Entrenadora · Lunes
    2 de noviembre» over the greeting. «Esta semana · clases por día» shows today
    («Hoy») and the next six days, never a past day, each with its number of
@@ -9717,7 +9715,7 @@ H. **Tab bars (follow-up 254 § 3).** Staff: the bar stays on the client
    attendance list; it hides inside Registrar pago (Elige un plan included),
    Reservar para… (class list and detail), Reprogramar, Nuevo cliente,
    Cancelar una clase, Revisar pago, Revisar congelamiento, Factura del
-   pago, Cambiar contraseña, Enviar comentarios, Reportar una falla, Mi
+   pago, Cambiar contraseña, Envíanos tu opinión, Reportar una falla, Mi
    código and Ver la app como. The Assistant's **Caja** keeps its bar (a
    tab root); the Administrator's Cerrar caja, opened from Pagos, hides it.
    Client: the bar stays on the class detail, Mi plan, Notificaciones, Mis
@@ -10208,7 +10206,7 @@ copy.
    receipt (Test 19's `seed.mjs` sends two). Within a minute **Pagos
    pendientes** reads «Paquete de 8 clases · hace un momento», never «hace 0
    minutos». After a minute it reads «hace 1 minuto».
-2. Have a Client send «Enviar comentarios»: the Administrator's
+2. Have a Client send «Envíanos tu opinión»: the Administrator's
    **Notificaciones** shows «Llegó una sugerencia…» with «Hace un momento».
 3. In the Client app, cancel a class she booked from the admin web or the
    Staff app: her **Perfil › Notificaciones** shows «Tu clase de … fue
@@ -10237,7 +10235,7 @@ update booking.clients set phone = null where name = 'Mariana Peña';
 
 ### C. Who sent a comment (n.º 88)
 
-1. Send «Enviar comentarios» from the Client app (Lucía) and from the Staff
+1. Send «Envíanos tu opinión» from the Client app (Lucía) and from the Staff
    app (Camila).
 2. Admin web **Comentarios**: the new column **Enviado por** shows «Lucía
    Fernández» as a link and «Camila Rojas» as plain text. At 420 px the
@@ -10381,8 +10379,8 @@ API, the worker, both apps and the admin web on your own ports
    and the coordinator's **Para contactar** card reads «Celular incompleto ·
    empezó el …» with no **Abrir WhatsApp** button («Sin teléfono» when there
    is none).
-5. **Enviar comentarios (n.º 96).** In the Client app, **Perfil › Enviar
-   comentarios**, tap the field: with the keyboard up the form scrolls so
+5. **Envíanos tu opinión (n.º 96).** In the Client app, **Perfil › Envíanos tu
+   opinión**, tap the field: with the keyboard up the form scrolls so
    «Mínimo 10 caracteres.» and «n / 2000» show whole under the field. A long
    comment scrolls inside the field once it is 240 pt tall.
 6. **Released Evaluation (n.º 97).** As Valeria with a paid Evaluation whose
@@ -10599,8 +10597,9 @@ one. Design option A (follow-ups 275 and 276). The migration
    pilates_fix072_dev`, then `prisma migrate deploy`), and run the API, the
    **worker** (uploads stay processing without it), the admin web and Staff
    Metro on your own ports (surface-verification skill).
-2. **Staff app, Perfil.** Log in as Emma (Test 12). Expected: «Ajustes»
-   starts with **Mi QR de cobro** and «Sin subir» at the right. Every role
+2. **Staff app, Perfil.** Log in as Emma (Test 12). Expected: «Tus pagos»
+   (Paola: «Administración») has **Tu QR de cobro** with «Sin subir» at the
+   right (Test 209). Every role
    has the row (try Camila and Carolina too).
 3. Open it. Expected: «Mi QR de cobro», the note «Administración lo usa para
    pagarte tu sueldo. Los QR del banco vencen: …», the empty card «Todavía
@@ -10861,7 +10860,7 @@ No migration; no API change.
    banner, with no blank band between them (the status bar counts once), on
    iPhone, iPad, and Android.
 4. While viewing, **Perfil**: no **Cambiar foto** / **Quitar foto**, **Cambiar
-   contraseña**, **Enviar comentarios**, or **Cerrar sesión**; the note under
+   contraseña**, **Envíanos tu opinión**, or **Cerrar sesión**; the note under
    her name reads «Mientras ves la app como <nombre>, su foto, su contraseña,
    sus comentarios y su sesión son solo suyos.», and the last row **Dejar de
    ver como <nombre>** ends the viewing like the banner's **Salir** («Dejaste
@@ -11672,9 +11671,9 @@ D. **E8 · «Mis pagos» for every paid role.** As Carolina the tabs are
    de cobro**; with nothing calculated or paid it reads «Todavía no tienes
    pagos» («Aquí verás cada mes lo que te corresponde y lo que se te
    pagó.»), and with payments but no statement the list is «Pagos». As
-   Camila, **Perfil** has **Mis pagos** («Último: Bs N» once she has a
-   payment) above **Mi QR de cobro**, and it opens the same screen with a
-   back arrow. Paola has no **Mis pagos**. Through Swagger, `GET
+   Camila, **Perfil** has **Historial de pagos** («Último: Bs N» once she has
+   a payment) above **Tu QR de cobro**, and it opens the same screen with a
+   back arrow. Paola has no **Historial de pagos**. Through Swagger, `GET
    /api/v1/staff-members/current/salary-payments` and `…/pay-statements`
    return each one's own (Camila's `[]` until Paola pays her in Nómina);
    as Paola they answer `403` `back_office_access_denied`.
@@ -12132,7 +12131,7 @@ B. **Tab bar.** On a tablet the white bar shows the four tabs centred in one
    600 pill with white icon and label. Tapping a tab opens it on its root
    screen, as on the phone. The bar hides on the same task screens as on the
    phone (plans, payment, Congelar plan, booking an Evaluation, Reprogramar,
-   Editar perfil, Cambiar contraseña, Enviar comentarios, Cerrar mi cuenta).
+   Editar perfil, Cambiar contraseña, Envíanos tu opinión, Cerrar mi cuenta).
 C. **Page and header.** Content keeps 40 pt from both sides. The Rubor band
    pads 40 pt and its title is Lora 36; on a pushed screen the white back
    button sits left of the title on the same row, and «Marcar leídas» on
@@ -12195,7 +12194,7 @@ N. **The rest (19T, 22T–25T).** Notificaciones in a centred 640 pt column;
    Editar perfil 560 pt (and its button); Cambiar contraseña 480 pt; Cerrar
    mi cuenta in two columns (what happens on the left; the data note,
    promotions, password, «Cerrar mi cuenta» and «Cancelar» on the right,
-   with no footer); Enviar comentarios 560 pt.
+   with no footer); Envíanos tu opinión 560 pt.
 O. **States.** Loading, empty and error states show inside the same
    column or panel as the screen.
 P. **The phone is unchanged.** On the iPhone 16 Pro every screen above looks
@@ -12336,9 +12335,9 @@ D. **Buttons at the end of the form (n.º 6, C01b3, C01b4).** With the
    keyboard open, «Crear cuenta» and «¿Ya tienes una cuenta? Inicia sesión»
    sit after the last field and scroll with it; nothing is pinned over the
    keyboard. The same in «Crea tu contraseña» / «Crea una contraseña nueva»
-   (links), «Cambiar contraseña», «Enviar comentarios» and the Staff app's
+   (links), «Cambiar contraseña», «Envíanos tu opinión» and the Staff app's
    «Nueva clienta» (its note and «Crear cuenta» on a white card at the end).
-E. **Always-on buttons (n.º 15, C25c, C25d).** In «Enviar comentarios» tap
+E. **Always-on buttons (n.º 15, C25c, C25d).** In «Envíanos tu opinión» tap
    **Enviar comentario** with nothing chosen: «Elige el tipo de comentario»
    appears under the chips, «Escribe al menos 10 caracteres.» under a short
    text, and the screen scrolls back up; nothing is sent. «Guardar
@@ -12398,7 +12397,7 @@ D. **Reviews for the Administrator (n.º 12, E-F07).** As a Client submit a
    «rechazado por»; a Freeze reads «Congelamiento de <Client> aprobado por …»
    with «Del lun 23 al dom 29 nov». They are no longer grouped as «N
    comprobantes recibidos». Every other notice keeps its grouped rows.
-E. **A comment's notice (n.º 11, E-F20).** As Lucía send «Enviar comentarios»;
+E. **A comment's notice (n.º 11, E-F20).** As Lucía send «Envíanos tu opinión»;
    as Paola the comments group lists «Lucía … · Problema: «<start of the
    text>…»» and «App de clientas · Hace un momento», opens that comment, and
    ends with «Ver todos los comentarios».
@@ -12611,7 +12610,7 @@ D. **The email is verified (C01k).** A fresh link shows the check on the
 E. **Client Perfil (C18, C18s).** «Cuenta» holds only **Cambiar contraseña**
    and the Face ID switch (where the phone has it); since Test 208
    **Cerrar sesión** is a card of its own at the end. A last
-   section, «Ayuda y legal», holds **Enviar comentarios**, **Soporte** (with
+   section, «Ayuda y legal», holds **Envíanos tu opinión**, **Soporte** (with
    «Contacto y WhatsApp del estudio» under it) and **Política de
    privacidad** with a shield icon; Soporte and the policy open
    `app.emmapilatesstudio.com/soporte` and `/privacidad`. There is no
@@ -12632,12 +12631,14 @@ G. **Staff rows per role (E-F03, E-F23 scrolled).** Administrator's Ajustes:
    referido**, **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**.
    Assistant (E-F02): **Mis pagos** with «Último: …», **Mi QR de cobro**,
    **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Each role's
-   «Ayuda y legal» holds **Enviar comentarios**, **Soporte** and **Política
+   «Ayuda y legal» holds **Envíanos tu opinión**, **Soporte** and **Política
    de privacidad**, and every row opens what it opened before. Since Test 208
-   **Cerrar sesión** leaves «Ajustes» for its own card after «Ayuda y legal».
+   **Cerrar sesión** leaves «Ajustes» for its own card after «Ayuda y legal»,
+   and since Test 209 the groups are «Tus pagos» / «Administración»,
+   «Ajustes» and «Ayuda», with Rol and Sucursal in the header.
 H. **Seeing the app as someone.** As an Administrator, use **Ver la app
    como…**: Perfil hides the photo links, **Cambiar contraseña**, **Cerrar
-   sesión** and **Enviar comentarios**, and shows **Dejar de ver como …** at
+   sesión** and **Envíanos tu opinión**, and shows **Dejar de ver como …** at
    the end of Ajustes.
 I. **Staff screens on the same edge.** Step A holds on every Staff screen
    too (Hoy, Agenda, Pagos, Comentarios, Notificaciones, Mis pagos), lists
@@ -12758,3 +12759,53 @@ D. **Staff confirmation (E-F04, E-F28).** Tap the card: the same sheet with
 E. **Seeing the app as someone.** As Paola use **Ver la app como…**: there is
    no **Cerrar sesión** card; **Dejar de ver como …** stays at the end of
    «Ajustes».
+
+## Test 209: Perfil with no single-row group, the role in the header, a quiet footer (follow-up 293)
+
+Boards C18, C18s, C18l, C18t, C25–C25e and E-F01–E-F05, E-F11, E-F12,
+E-F23, E-F24, E-F27, E-F28, E-D26, E-F29–E-F32. Run both apps against the
+local API with the Test 5A fixtures. This is JavaScript only: Metro reloads
+it, no new build. Check each case once with Face ID (or a fingerprint) set
+up and once without: no group may ever show a single row.
+
+A. **Client Perfil (C18, C18s).** Sign in as `sofia@example.com` and open
+   **Perfil**. The groups read, in order: «Tu plan» (**Plan actual** with its
+   state pill, **Evaluación nutricional**, **Invita a una amiga**,
+   **Facturas**), «Ajustes» (**Notificaciones** with «N sin leer»,
+   **Cambiar contraseña**, **Entrar con Face ID**) and «Ayuda» (**Envíanos tu
+   opinión**, **Preguntas frecuentes**). No row has a line under its label,
+   and there is no «Preferencias», «Cuenta», «Ayuda y legal», **Soporte** or
+   **Política de privacidad** row. Without Face ID, «Ajustes» keeps two rows.
+B. **Client footer (C18s).** Scroll to the bottom: after the brick-red
+   **Cerrar sesión** card come two small lines straight on the pink page,
+   centred, in a slightly darker rose (`#8A5B57`): «Emma Pilates Studio ·
+   versión 1.3.0» and «Política de privacidad · Cerrar mi cuenta», both links
+   underlined at regular weight. **Política de privacidad** opens the
+   studio's privacy page in the browser; **Cerrar mi cuenta** opens C24. Each
+   link is easy to hit although the text is small (44 pt touch area).
+C. **Help rows.** **Preguntas frecuentes** opens
+   `app.emmapilatesstudio.com/soporte` in the browser (not WhatsApp).
+   **Envíanos tu opinión** opens the feedback form titled «Envíanos tu
+   opinión» (C25, E-F11); the rest of the form is unchanged (Test 80).
+D. **Instructora (E-F01, E-F24).** Sign in as `emma.vargas@example.com`.
+   Under her name, in a bold small line: «Instructora · Centro, Equipetrol,
+   Urubó». There is no «Tu cuenta». «Tus pagos» holds **Historial de pagos**
+   (opens her «Mis pagos» tab), **Tu QR de cobro** with its standing and
+   **Tu código de referido** with her code; then «Ajustes», «Ayuda», **Cerrar
+   sesión** and the footer with **Política de privacidad** alone.
+E. **Nutricionista and Coordinadora (E-F29–E-F32), Asistente (E-F02,
+   E-F27).** Sign in as Gabriela, Carolina and Camila. Each header reads
+   «Nutricionista · …», «Coordinadora · Todas las sucursales», «Asistente ·
+   …». «Tus pagos» has two rows; the Assistant's **Historial de pagos** says
+   «Último: Bs N» and opens her payments screen.
+F. **Administradora (E-F03, E-F23).** Sign in as `paola.mendoza@example.com`:
+   «Administradora · Todas las sucursales»; «Administración» holds **Ver la
+   app como…**, **Comentarios de clientas** and **Tu QR de cobro**; «Ajustes»
+   follows, and there is no «Ayuda» group. **Cerrar sesión** and the footer
+   end the screen.
+G. **Seeing the app as someone (E-D26).** As Paola, **Ver la app como…** a
+   Trainer and open her **Perfil**: «Tus pagos» as hers, «Ajustes» with
+   **Notificaciones** and **Dejar de ver como …** only, no «Ayuda», no
+   **Cerrar sesión** card, and the footer under «Ajustes».
+H. **Android.** Repeat A, B and D on the emulator: the fingerprint switch
+   reads **Entrar con huella**, and the footer's two lines never wrap.
