@@ -87,7 +87,12 @@ export const largeTextVariants: readonly TextVariant[] = [
 ];
 
 /** One ink, and white on 600 (rule 5: never transparent). */
-export const textTones = { ink: rosa[600], onDark: brand.white } as const;
+export const textTones = {
+  ink: rosa[600],
+  onDark: brand.white,
+  /** «Cerrar sesión» on white only (follow-up 292). */
+  destructivo: brand.destructivo,
+} as const;
 
 export type TextTone = keyof typeof textTones;
 

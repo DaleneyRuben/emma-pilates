@@ -11,6 +11,7 @@ export * from "./account/feedback-metadata";
 export * from "./account/feedback-screen";
 export * from "./account/initials";
 export * from "./account/biometric-switch-row";
+export * from "./account/logout-card";
 export * from "./account/logout-confirmation";
 export * from "./account/public-pages";
 export * from "./staff-photo/client-face";
