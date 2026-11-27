@@ -8,92 +8,122 @@ const courtesy = {
   netExtras: 40,
   lastBookedOn: null,
 };
+const base = {
+  today,
+  courtesy,
+  inForce: true,
+  hasPaidPlan: false,
+  saleBlock: null,
+  afterBookedClass: false,
+  startDateLimitDays: 14,
+};
 
 describe('a tester moving to «Trimestral 36 clases»', () => {
-  it('removes her unspent courtesy extras and sells the Plan from today', () => {
-    expect(
-      decideTesterMove({
-        today,
-        courtesy,
-        hasPaidPlan: false,
-        afterBookedClass: false,
-      }),
-    ).toEqual({
+  it('sells the Plan from today and removes her unspent courtesy extras', () => {
+    expect(decideTesterMove(base)).toEqual({
       action: 'move',
       subscriptionId: 'courtesy-1',
       extrasToRemove: 40,
       startsOn: today,
+      afterBookedClassOn: null,
     });
   });
 
   it('removes only the courtesy extras still unspent', () => {
     expect(
       decideTesterMove({
-        today,
+        ...base,
         courtesy: { ...courtesy, courtesyExtras: 40, netExtras: 12 },
-        hasPaidPlan: false,
-        afterBookedClass: false,
       }),
     ).toMatchObject({ extrasToRemove: 12 });
   });
 
-  it('leaves other extra classes to the Plan that ends, never removes more than the courtesy ones', () => {
+  it('never removes more than the courtesy extras, nor other extra classes', () => {
     expect(
       decideTesterMove({
-        today,
+        ...base,
         courtesy: { ...courtesy, courtesyExtras: 30, netExtras: 31 },
-        hasPaidPlan: false,
-        afterBookedClass: false,
       }),
     ).toMatchObject({ extrasToRemove: 30 });
     expect(
       decideTesterMove({
-        today,
+        ...base,
         courtesy: { ...courtesy, courtesyExtras: 0, netExtras: 3 },
-        hasPaidPlan: false,
-        afterBookedClass: false,
       }),
     ).toMatchObject({ extrasToRemove: 0 });
   });
 
-  it('skips a Client who already has a paid Plan', () => {
+  it('skips a Client who already pays and has no courtesy extras left', () => {
     expect(
       decideTesterMove({
-        today,
-        courtesy,
+        ...base,
+        courtesy: { ...courtesy, courtesyExtras: 0, netExtras: 0 },
         hasPaidPlan: true,
-        afterBookedClass: false,
       }),
     ).toEqual({ action: 'skip', reason: 'paid_plan' });
+  });
+
+  it('still removes the courtesy extras a paying Client kept, after a run stopped between the sale and the removal', () => {
+    expect(
+      decideTesterMove({ ...base, inForce: false, hasPaidPlan: true }),
+    ).toEqual({
+      action: 'remove_extras',
+      subscriptionId: 'courtesy-1',
+      extrasToRemove: 40,
+    });
+  });
+
+  it('ignores a courtesy Plan that ended for a Client who does not pay', () => {
+    expect(decideTesterMove({ ...base, inForce: false })).toEqual({
+      action: 'ignore',
+    });
+  });
+
+  it('holds a tester the sale would refuse, before anything is written', () => {
+    expect(
+      decideTesterMove({ ...base, saleBlock: 'payment_pending_exists' }),
+    ).toEqual({ action: 'blocked', reason: 'payment_pending_exists' });
   });
 
   it('holds a tester with a class booked ahead, since the sale refuses to strand it', () => {
     const lastBookedOn = new Date('2026-11-29T00:00:00.000Z');
 
     expect(
-      decideTesterMove({
-        today,
-        courtesy: { ...courtesy, lastBookedOn },
-        hasPaidPlan: false,
-        afterBookedClass: false,
-      }),
+      decideTesterMove({ ...base, courtesy: { ...courtesy, lastBookedOn } }),
     ).toEqual({ action: 'blocked', reason: 'booked_class', lastBookedOn });
   });
 
   it('starts the Plan the day after her last booked class when asked to', () => {
     expect(
       decideTesterMove({
-        today,
+        ...base,
         courtesy: {
           ...courtesy,
           lastBookedOn: new Date('2026-11-29T00:00:00.000Z'),
         },
-        hasPaidPlan: false,
         afterBookedClass: true,
       }),
     ).toMatchObject({
       action: 'move',
       startsOn: new Date('2026-11-30T00:00:00.000Z'),
+      afterBookedClassOn: new Date('2026-11-29T00:00:00.000Z'),
+    });
+  });
+
+  it('holds her when that day falls past the Start Date limit', () => {
+    expect(
+      decideTesterMove({
+        ...base,
+        courtesy: {
+          ...courtesy,
+          lastBookedOn: new Date('2026-12-11T00:00:00.000Z'),
+        },
+        afterBookedClass: true,
+      }),
+    ).toEqual({
+      action: 'blocked',
+      reason: 'start_date_out_of_window',
+      startsOn: new Date('2026-12-12T00:00:00.000Z'),
     });
   });
 });
