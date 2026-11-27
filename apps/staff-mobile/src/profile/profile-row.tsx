@@ -12,16 +12,14 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 /**
  * A Perfil row (S23, walkthrough n.º 16 after the Client's C18): the line
- * glyph on a 36 pt 50 disc, the label in `titulo-fila` with an optional line
- * under it, the unread count in Rosa profundo or a short value, and the
- * chevron. A row with no `onPress` only states a fact, such as «Rol».
+ * glyph on a 36 pt 50 disc, the label in `titulo-fila`, the unread count in Rosa profundo or a short value, and the
+ * chevron. A row with no `onPress` only states a fact.
  */
 export function ProfileRow({
   badge = 0,
   icon,
   label,
   onPress,
-  subtitle,
   testID,
   tone = "default",
   value,
@@ -30,8 +28,6 @@ export function ProfileRow({
   icon: GlyphName;
   label: string;
   onPress?: () => void;
-  /** A line under the label, such as Soporte's «Contacto y WhatsApp del estudio». */
-  subtitle?: string;
   testID?: string;
   tone?: "default" | "error";
   /** A short value before the chevron, such as the Trainer's code. */
@@ -49,16 +45,10 @@ export function ProfileRow({
       <View style={styles.disc} testID="profile-row-disc">
         <Glyph color={colors.text} name={icon} size={18} strokeWidth={1.6} />
       </View>
-      {subtitle === undefined ? (
-        <Text style={styles.label} variant="titulo-fila">
-          {label}
-        </Text>
-      ) : (
-        <View style={styles.label}>
-          <Text variant="titulo-fila">{label}</Text>
-          <Text variant="secundario">{subtitle}</Text>
-        </View>
-      )}
+      {/* Follow-up 293: a row is its label alone, with no line under it. */}
+      <Text style={styles.label} variant="titulo-fila">
+        {label}
+      </Text>
       {badge > 0 ? (
         <View style={styles.badge} testID="notifications-row-badge">
           <Text allowFontScaling={false} tone="onDark" variant="pastilla">

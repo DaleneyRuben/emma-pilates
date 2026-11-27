@@ -5,12 +5,14 @@ import {
   staffRoleLabel,
 } from "@pilates/api-contracts";
 import {
+  appVersionLabel,
   BiometricSwitchRow,
   BrandToast,
   LoadingState,
   LogoutCard,
   LogoutConfirmationSheet,
   openPublicPage,
+  ProfileFooter,
   QueryFailure,
   Screen,
   SectionTitle,
@@ -104,7 +106,9 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
 
   const member = profile.data.data;
   const administrator = identity.session?.role === "administrator";
-  const singleBranch = member.role !== "administrator" && member.role !== "coordinator";
+  // Follow-up 293 (E-F01–E-F05, E-F29–E-F32): her Role and Branches are
+  // facts, so they sit under her name instead of in a group of their own.
+  const roleLine = `${staffRoleLabel(member.role, member.gender)} · ${branchesLabel(member)}`;
 
   return (
     <Screen style={styles.screen}>
@@ -120,63 +124,59 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                 ? "Tus datos se editan en la web de administración."
                 : "Tu nombre y tu correo los actualiza administración."
           }
+          roleLine={roleLine}
         />
-        {/* Walkthrough n.º 16 (E-F01, E-F03): the Client's C18, a serif title
-            outside each white card of round-icon rows. */}
-        <View testID="profile-section-account">
-          <SectionTitle>Tu cuenta</SectionTitle>
-          <RowCard>
-            <ProfileRow
-              icon="person"
-              label="Rol"
-              value={staffRoleLabel(member.role, member.gender)}
-            />
-            <ProfileRow
-              icon="pin"
-              label={singleBranch && member.branches.length === 1 ? "Sucursal" : "Sucursales"}
-              value={branchesLabel(member)}
-            />
-          </RowCard>
-        </View>
-        <View testID="profile-section-settings">
-          <SectionTitle>Ajustes</SectionTitle>
-          <RowCard>
-            {/* E8 (ADR-0111): everyone who is paid reaches «Mis pagos» from
-                here: her tab, or for the Assistant the screen itself. */}
-            {pay === "none" ? null : (
-              <ProfileRow
-                icon="credit"
-                label="Mis pagos"
-                onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
-                testID="profile-my-pay"
-                value={lastPayment}
-              />
-            )}
-            {/* FIX-072: every role keeps the QR she is paid by. */}
-            <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
-            {administrator ? (
+        {/* Follow-up 293: no group holds a single row. Her work group first:
+            the Administrator's «Administración», everyone else's «Tus pagos». */}
+        {administrator ? (
+          <View testID="profile-group-admin">
+            <SectionTitle>Administración</SectionTitle>
+            <RowCard>
               <ProfileRow
                 icon="eye"
                 label="Ver la app como…"
                 onPress={() => navigation.navigate("ViewAs")}
               />
-            ) : null}
-            {administrator ? (
-              // Walkthrough n.º 11 (E-F18): the comments, read from the phone.
+              {/* Walkthrough n.º 11 (E-F18): the comments, read from the phone. */}
               <ProfileRow
                 icon="message"
-                label="Comentarios"
+                label="Comentarios de clientas"
                 onPress={() => navigation.navigate("Comments")}
               />
-            ) : null}
-            {trainer && referralCode !== null ? (
-              <ProfileRow
-                icon="tag"
-                label="Tu código de referido"
-                onPress={() => navigation.navigate("ReferralCode")}
-                value={referralCode}
-              />
-            ) : null}
+              {/* FIX-072: every role keeps the QR she is paid by. */}
+              <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
+            </RowCard>
+          </View>
+        ) : (
+          <View testID="profile-group-pay">
+            <SectionTitle>Tus pagos</SectionTitle>
+            <RowCard>
+              {/* E8 (ADR-0111): everyone who is paid reaches her pay from
+                  here: her tab, or for the Assistant the screen itself. */}
+              {pay === "none" ? null : (
+                <ProfileRow
+                  icon="credit"
+                  label="Historial de pagos"
+                  onPress={() => navigation.navigate(pay === "tab" ? "PayTab" : "MyPay")}
+                  testID="profile-my-pay"
+                  value={lastPayment}
+                />
+              )}
+              <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
+              {trainer && referralCode !== null ? (
+                <ProfileRow
+                  icon="tag"
+                  label="Tu código de referido"
+                  onPress={() => navigation.navigate("ReferralCode")}
+                  value={referralCode}
+                />
+              ) : null}
+            </RowCard>
+          </View>
+        )}
+        <View testID="profile-group-settings">
+          <SectionTitle>Ajustes</SectionTitle>
+          <RowCard>
             <ProfileRow
               badge={unreadCount}
               icon="bell"
@@ -202,38 +202,50 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
             )}
           </RowCard>
         </View>
-        <View testID="profile-section-help">
-          <SectionTitle>Ayuda y legal</SectionTitle>
-          <RowCard>
-            {viewingAs === null ? (
+        {/* The Administrator owns the studio, so she has no «Ayuda». While she
+            sees the app as someone, the feedback is that person's, and
+            «Preguntas frecuentes» alone would be a single row (E-D26). */}
+        {administrator || viewingAs !== null ? null : (
+          <View testID="profile-group-help">
+            <SectionTitle>Ayuda</SectionTitle>
+            <RowCard>
               <ProfileRow
                 icon="message"
-                label="Enviar comentarios"
+                label="Envíanos tu opinión"
                 onPress={() => navigation.navigate("Feedback")}
               />
-            ) : null}
-            <ProfileRow
-              icon="mail"
-              label="Soporte"
-              onPress={() => openPublicPage("support")}
-              subtitle="Contacto y WhatsApp del estudio"
-            />
-            <ProfileRow
-              icon="shield"
-              label="Política de privacidad"
-              onPress={() => openPublicPage("privacy")}
-            />
-          </RowCard>
-        </View>
-        {/* Follow-up 292 (E-F23, E-F28): «Cerrar sesión» closes the screen on
-            a card of its own; nothing follows it. Her session is hers, so an
-            Administrator seeing the app as her leaves from «Ajustes» instead. */}
+              <ProfileRow
+                icon="mail"
+                label="Preguntas frecuentes"
+                onPress={() => openPublicPage("support")}
+              />
+            </RowCard>
+          </View>
+        )}
+        {/* Follow-up 292 (E-F23, E-F28): «Cerrar sesión» on a card of its own.
+            Her session is hers, so an Administrator seeing the app as her
+            leaves from «Ajustes» instead. */}
         {viewingAs === null ? (
           <LogoutCard
             onPress={() => setConfirmingLogout(true)}
             screenGap={bodyScroll.content.gap}
           />
         ) : null}
+        {/* Follow-up 293 (E-F24): the footer, 16 pt under «Cerrar sesión», or
+            28 pt under «Ajustes» while seeing the app as someone (E-D26). */}
+        <ProfileFooter
+          links={[
+            {
+              label: "Política de privacidad",
+              onPress: () => openPublicPage("privacy"),
+              testID: "profile-privacy",
+            },
+          ]}
+          screenGap={
+            viewingAs === null ? bodyScroll.content.gap : bodyScroll.content.gap - spacing.md
+          }
+          version={appVersionLabel()}
+        />
       </ScrollView>
       {passwordChanged === null ? null : (
         <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />

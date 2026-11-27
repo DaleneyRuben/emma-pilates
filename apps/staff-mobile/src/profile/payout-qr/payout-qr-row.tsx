@@ -5,10 +5,17 @@ import { ProfileRow } from "../profile-row";
 import { payoutQrRowValue } from "./payout-qr-copy";
 
 /**
- * FIX-072: «Mi QR de cobro» with its standing, in Perfil for every role and,
- * since E8, last on the «Mis pagos» tab.
+ * FIX-072: the payout QR with its standing, in Perfil for every role («Tu QR
+ * de cobro», follow-up 293) and, since E8, last on the «Mis pagos» tab («Mi
+ * QR de cobro», E-M01).
  */
-export function PayoutQrRow({ onPress }: { onPress: () => void }) {
+export function PayoutQrRow({
+  label = "Tu QR de cobro",
+  onPress,
+}: {
+  label?: string;
+  onPress: () => void;
+}) {
   const fetcher = useStaffFetcher();
   const payoutQr = useGetOwnPayoutQr({ fetcher, query: { refetchOnMount: "always" } });
   const value =
@@ -16,7 +23,7 @@ export function PayoutQrRow({ onPress }: { onPress: () => void }) {
   return (
     <ProfileRow
       icon="image"
-      label="Mi QR de cobro"
+      label={label}
       onPress={onPress}
       testID="profile-payout-qr"
       value={value?.text}
