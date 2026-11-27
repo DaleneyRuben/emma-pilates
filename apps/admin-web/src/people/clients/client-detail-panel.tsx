@@ -35,7 +35,6 @@ import { ClientPendingActivation } from "./client-pending-activation";
 import { ClientPlanBlock } from "./client-plan-block";
 import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
-import { CourtesyAccessAction } from "./courtesy-access-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -53,11 +52,9 @@ const clientDetailQueryOptions = (clientId: string) =>
 // (AW22: nothing left to grant or close).
 function ClientActions({
   client,
-  onGranted,
   onClosed,
 }: {
   client: AdminClientDetailDto;
-  onGranted: (notice: string) => void;
   onClosed: (notice: string) => void;
 }) {
   const open = client.accountStatus !== "disabled";
@@ -65,18 +62,10 @@ function ClientActions({
   if (!open && !active) return null;
   return (
     <ActionList title="Acciones">
+      {/* 2026-11-27: courtesy classes and tester access are no longer
+          granted (owner decision); a returned class remains. */}
       {active ? (
-        <>
-          <AllowanceAdjustmentAction clientId={client.id} reason="courtesy" />
-          <AllowanceAdjustmentAction
-            clientId={client.id}
-            reason="class_return"
-          />
-        </>
-      ) : null}
-      {/* REL-011: only without an active Plan. */}
-      {open && !active ? (
-        <CourtesyAccessAction client={client} onGranted={onGranted} />
+        <AllowanceAdjustmentAction clientId={client.id} reason="class_return" />
       ) : null}
       {open ? (
         <CloseClientAccountAction client={client} onClosed={onClosed} />
@@ -157,7 +146,6 @@ export function ClientDetailPanel({
   onClosed: (notice: string) => void;
 }) {
   const query = useQuery(clientDetailQueryOptions(clientId));
-  const [granted, setGranted] = useState<string | null>(null);
   const role = useAdminRole();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -210,11 +198,7 @@ export function ClientDetailPanel({
                 role={role}
                 actions={
                   role === "administrator" ? (
-                    <ClientActions
-                      client={query.data}
-                      onGranted={setGranted}
-                      onClosed={onClosed}
-                    />
+                    <ClientActions client={query.data} onClosed={onClosed} />
                   ) : null
                 }
                 contact={
@@ -240,24 +224,17 @@ export function ClientDetailPanel({
       {tab !== "resumen" ||
       query.data === undefined ||
       query.data.accountStatus === "disabled" ||
-      (editing && granted === null) ? null : (
+      editing ? null : (
         <SidePanelFooter>
-          {granted === null ? null : (
-            <p role="status" className="tipo-secundario text-texto">
-              {granted}
-            </p>
-          )}
-          {editing ? null : (
-            <Button
-              className="self-end"
-              onClick={() => {
-                setSaved(false);
-                setEditing(true);
-              }}
-            >
-              Editar perfil
-            </Button>
-          )}
+          <Button
+            className="self-end"
+            onClick={() => {
+              setSaved(false);
+              setEditing(true);
+            }}
+          >
+            Editar perfil
+          </Button>
         </SidePanelFooter>
       )}
     </>

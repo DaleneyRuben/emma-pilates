@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import { apiUrl, jsonResponse, server, useMockServer } from "../../test/msw";
 import {
