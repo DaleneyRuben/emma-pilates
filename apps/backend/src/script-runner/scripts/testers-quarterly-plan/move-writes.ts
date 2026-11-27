@@ -1,19 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import {
-  SubscriptionState,
-  type PrismaClient,
-} from '../../../generated/prisma/client';
+import type { PrismaClient } from '../../../generated/prisma/client';
 import { recordAllowanceAdjustment } from '../../../booking/payments/allowance-adjustments';
 import { createPrismaPaymentCommands } from '../../../booking/payments/prisma-payment-commands';
 import { recordAdministratorAdjustment } from '../../../booking/payments/record-allowance-adjustment';
 import type { AuthenticatedPrincipal } from '../../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../../time/bolivia-time';
 
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
 
 // «Ajustar clases» on the admin web (allowance-adjustment-provider): a
 // negative courtesy adjustment on the courtesy Subscription, audited. The
-// grant stays in her history; the two net to nothing.
+// grant stays in her history; the two net to nothing. It runs after the
+// sale, so a refused sale never strips her.
 export const removeCourtesyExtras = async (
   prisma: PrismaClient,
   input: {
@@ -30,14 +27,11 @@ export const removeCourtesyExtras = async (
       {
         principal: input.principal,
         now: input.now,
+        // The sale has already ended it (or expired it, when it began
+        // today), so only her own courtesy Subscription is checked.
         findSubscription: () =>
           transaction.subscription.findFirst({
-            where: {
-              id: input.subscriptionId,
-              clientId: input.clientId,
-              state: SubscriptionState.ACTIVE,
-              endsOn: { gte: boliviaDate(input.now) },
-            },
+            where: { id: input.subscriptionId, clientId: input.clientId },
             select: { id: true },
           }),
         record: (adjustment) =>

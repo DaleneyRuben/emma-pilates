@@ -42,40 +42,77 @@ export type CourtesyFacts = {
   lastBookedOn: Date | null;
 };
 
+export type SaleBlock =
+  | 'purchase_intent_open_exists'
+  | 'payment_pending_exists'
+  | 'future_subscription_exists';
+
 export type TesterMove =
+  | { action: 'ignore' }
   | { action: 'skip'; reason: 'paid_plan' }
+  | { action: 'remove_extras'; subscriptionId: string; extrasToRemove: number }
+  | { action: 'blocked'; reason: SaleBlock }
   | { action: 'blocked'; reason: 'booked_class'; lastBookedOn: Date }
+  | { action: 'blocked'; reason: 'start_date_out_of_window'; startsOn: Date }
   | {
       action: 'move';
       subscriptionId: string;
       extrasToRemove: number;
       startsOn: Date;
+      afterBookedClassOn: Date | null;
     };
 
 // Owner, 2026-11-27: every tester on the courtesy Plan moves to a cash
-// «Trimestral 36 clases» from today and loses the courtesy extras. A Client
-// who already pays is left alone, so a rerun changes nobody twice. The sale
-// refuses to start a paid Plan on or before a class the courtesy one holds
-// (FIX-019), so she waits unless the run starts her after that class.
+// «Trimestral 36 clases» from today and loses the courtesy extras. The sale
+// goes first, so one it refuses leaves her as she was; the extras of a run
+// stopped after it are still removed on the next one, and nobody pays twice.
+// The sale refuses what the decision holds up front, so a dry run reads
+// like the real one: an open purchase, a pending Payment, a queued Plan, a
+// start on or before a class the courtesy Plan holds (FIX-019), and a start
+// past the Start Date limit.
 export const decideTesterMove = (input: {
   today: Date;
   courtesy: CourtesyFacts;
+  /** Whether the courtesy Plan is the one in force today. */
+  inForce: boolean;
   hasPaidPlan: boolean;
+  saleBlock: SaleBlock | null;
   afterBookedClass: boolean;
+  startDateLimitDays: number;
 }): TesterMove => {
+  const extrasToRemove = Math.max(
+    0,
+    Math.min(input.courtesy.courtesyExtras, input.courtesy.netExtras),
+  );
+  if (input.hasPaidPlan && extrasToRemove > 0) {
+    return {
+      action: 'remove_extras',
+      subscriptionId: input.courtesy.subscriptionId,
+      extrasToRemove,
+    };
+  }
+  if (!input.inForce) return { action: 'ignore' };
   if (input.hasPaidPlan) return { action: 'skip', reason: 'paid_plan' };
+  if (input.saleBlock !== null) {
+    return { action: 'blocked', reason: input.saleBlock };
+  }
   const { lastBookedOn } = input.courtesy;
   if (lastBookedOn !== null && !input.afterBookedClass) {
     return { action: 'blocked', reason: 'booked_class', lastBookedOn };
   }
+  const startsOn =
+    lastBookedOn === null ? input.today : addCivilDays(lastBookedOn, 1);
+  if (
+    startsOn.getTime() >
+    addCivilDays(input.today, input.startDateLimitDays).getTime()
+  ) {
+    return { action: 'blocked', reason: 'start_date_out_of_window', startsOn };
+  }
   return {
     action: 'move',
     subscriptionId: input.courtesy.subscriptionId,
-    extrasToRemove: Math.max(
-      0,
-      Math.min(input.courtesy.courtesyExtras, input.courtesy.netExtras),
-    ),
-    startsOn:
-      lastBookedOn === null ? input.today : addCivilDays(lastBookedOn, 1),
+    extrasToRemove,
+    startsOn,
+    afterBookedClassOn: lastBookedOn,
   };
 };
