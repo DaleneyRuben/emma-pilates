@@ -11,6 +11,11 @@ import { reportRecoveredError } from "../monitoring/error-reporting";
 import type { MobileSession, SessionManager } from "./session-manager";
 
 type MobileIdentityState = {
+  /**
+   * Locked at launch with the saved session still live behind Face ID; false
+   * once signing out or another account ended it.
+   */
+  sessionBehindLock?: boolean;
   session: MobileSession | null;
   status: "biometric-locked" | "restoring" | "signed-in" | "signed-out";
 };
@@ -89,6 +94,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
           setAutoPrompt(session === null && hasBiometricSession);
           setIdentity({
             session,
+            sessionBehindLock: session === null && hasBiometricSession,
             status:
               session === null && hasBiometricSession
                 ? "biometric-locked"

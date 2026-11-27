@@ -174,10 +174,14 @@ function IdentityNavigation({
     intent,
     signedIn: identity.session !== null && identity.session !== undefined,
   });
-  // Until the saved session answers, the badge keeps its count.
+  // Until the saved session answers, and while Face ID guards a live one at
+  // launch, the badge keeps its count.
   useClearBadgeWithoutSession({
     platform: pushPlatform,
-    signedIn: identity.status === "restoring" || identity.session !== null,
+    signedIn:
+      identity.status === "restoring" ||
+      identity.session !== null ||
+      identity.sessionBehindLock === true,
   });
   // The fonts are loaded by now; once the session check has answered, the
   // first screen (Login or the saved session's) is drawn under the splash.

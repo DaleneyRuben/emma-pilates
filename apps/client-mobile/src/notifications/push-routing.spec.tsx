@@ -125,4 +125,18 @@ describe("Client push notifications (NOT-002)", () => {
     await act(async () => device.receive());
     expect(device.state.badgeCounts).toEqual([0, 0]);
   });
+
+  // Review of PR #400: a launch that waits for Face ID still has her session,
+  // so the icon keeps the unread count until she unlocks or signs out.
+  it("keeps the badge while a launch waits for Face ID", async () => {
+    const device = createMemoryPushPlatform();
+    const runtime = createClientRuntime(routeFetcher({}), { pushPlatform: device.platform });
+    runtime.sessionManager.restore = jest.fn().mockResolvedValue(null);
+    runtime.sessionManager.hasBiometricSession = jest.fn().mockResolvedValue(true);
+    const screen = await render(<App runtime={runtime} />);
+
+    await waitFor(() => expect(screen.getByText("Hola de nuevo")).toBeOnTheScreen());
+    await act(async () => device.receive());
+    expect(device.state.badgeCounts).toEqual([]);
+  });
 });
