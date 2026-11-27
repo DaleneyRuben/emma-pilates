@@ -1,7 +1,6 @@
 import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
-import appConfig from "../app.json";
 import App from "../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "./test-support";
 
@@ -80,10 +79,8 @@ describe("Staff Perfil", () => {
       screen.getByRole("button", { name: "Notificaciones, 1 notificación sin leer" }),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
-    expect(
-      screen.getByText(`Emma Pilates Studio · versión ${appConfig.expo.version}`),
-    ).toBeOnTheScreen();
-    expect(screen.queryByText("Emma Pilates Studio · versión 1.0")).toBeNull();
+    // Follow-up 292 (E-F23): «Cerrar sesión» closes Staff Perfil; no version line.
+    expect(screen.queryByText(/Emma Pilates Studio · versión/)).toBeNull();
 
     // Perfil is a tab root: no back, the tab bar leads back to Agenda.
     expect(screen.queryByRole("button", { name: "Volver" })).toBeNull();

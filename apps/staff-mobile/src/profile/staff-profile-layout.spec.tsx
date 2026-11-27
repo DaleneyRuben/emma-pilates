@@ -8,6 +8,20 @@ jest.setTimeout(20_000);
 
 const hidden = { includeHiddenElements: true };
 
+/** The test IDs of the rendered tree, in the order they are drawn. */
+function drawnOrder(rendered: unknown): string[] {
+  const ids: string[] = [];
+  const walk = (node: unknown) => {
+    if (node === null || typeof node !== "object") return;
+    if (Array.isArray(node)) return node.forEach(walk);
+    const { children, props } = node as { children?: unknown[]; props?: { testID?: unknown } };
+    if (typeof props?.testID === "string") ids.push(props.testID);
+    (children ?? []).forEach(walk);
+  };
+  walk(rendered);
+  return ids;
+}
+
 const trainer = {
   id: "staff-1",
   name: "Daniela Ortiz",
@@ -67,7 +81,7 @@ describe("Staff Perfil layout", () => {
       });
     }
     const settings = within(screen.getByTestId("profile-section-settings"));
-    for (const row of ["Notificaciones", "Cambiar contraseña", "Cerrar sesión"]) {
+    for (const row of ["Notificaciones", "Cambiar contraseña"]) {
       expect(settings.getByRole("button", { name: row })).toBeOnTheScreen();
     }
     const help = within(screen.getByTestId("profile-section-help"));
@@ -85,5 +99,24 @@ describe("Staff Perfil layout", () => {
     const discs = screen.getAllByTestId("profile-row-disc");
     expect(discs.length).toBeGreaterThan(5);
     expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", borderRadius: 18, height: 36 });
+  });
+
+  // Follow-up 292 (E-F01, E-F23, E-F28): «Ajustes» ends with «Cambiar
+  // contraseña»; «Cerrar sesión» is a Destructivo card of its own after
+  // «Ayuda y legal», and nothing follows it.
+  it("closes with «Cerrar sesión» on its own card after Ayuda y legal", async () => {
+    const screen = await openProfile();
+
+    const settings = within(screen.getByTestId("profile-section-settings"));
+    expect(settings.queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
+    const order = drawnOrder(screen.toJSON());
+    expect(order.indexOf("profile-logout")).toBeGreaterThan(order.indexOf("profile-section-help"));
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBe(
+      screen.getByTestId("profile-logout"),
+    );
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04640" });
+    // The screen's 10 pt gap plus 14 makes the 24 pt above the card.
+    expect(screen.getByTestId("profile-logout")).toHaveStyle({ marginTop: 14 });
+    expect(screen.queryByText(/Emma Pilates Studio · versión/)).toBeNull();
   });
 });
