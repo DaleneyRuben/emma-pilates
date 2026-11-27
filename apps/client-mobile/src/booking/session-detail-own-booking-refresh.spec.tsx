@@ -79,7 +79,7 @@ describe("Client Session detail keeping her own Booking current", () => {
     await fireEvent.press(await screen.findByRole("button", { name: "Cancelar reserva" }));
     const confirm = await screen.findByRole("button", { name: "Sí, cancelar reserva" });
 
-    act(() => {
+    await act(async () => {
       confirm.props.onClick();
       confirm.props.onClick();
     });

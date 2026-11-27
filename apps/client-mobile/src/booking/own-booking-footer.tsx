@@ -12,7 +12,7 @@ import {
   TextButton,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -71,6 +71,8 @@ function BookedFooter({
   const mountedAt = useMountedAt();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Two taps in one frame both read «busy» as false (review), as in Mis reservas.
+  const started = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
   const deadline =
     cancellationWindowMinutes === undefined
@@ -82,6 +84,8 @@ function BookedFooter({
       : `Cancelas gratis hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}.`;
 
   const cancel = async () => {
+    if (started.current) return;
+    started.current = true;
     setConfirming(false);
     setBusy(true);
     setFailure(null);
@@ -98,6 +102,7 @@ function BookedFooter({
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
     } finally {
+      started.current = false;
       setBusy(false);
     }
   };
@@ -131,9 +136,7 @@ function BookedFooter({
       <ConfirmationSheet
         confirmLabel="Sí, cancelar reserva"
         confirmTestID="session-cancel-confirm"
-        onConfirm={() => {
-          if (!busy) void cancel();
-        }}
+        onConfirm={() => void cancel()}
         onDismiss={() => setConfirming(false)}
         testID="session-cancel-sheet"
         title="¿Cancelar esta reserva?"
