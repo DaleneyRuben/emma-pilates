@@ -9,6 +9,5 @@ export type RecordAllowanceAdjustmentDtoReason =
   (typeof RecordAllowanceAdjustmentDtoReason)[keyof typeof RecordAllowanceAdjustmentDtoReason];
 
 export const RecordAllowanceAdjustmentDtoReason = {
-  courtesy: "courtesy",
   class_return: "class_return",
 } as const;

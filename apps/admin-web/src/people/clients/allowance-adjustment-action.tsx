@@ -12,12 +12,6 @@ import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 
 const forms = {
-  courtesy: {
-    open: "Dar clase de cortesía",
-    title: "¿Agregar una clase de cortesía?",
-    confirm: "Registrar cortesía",
-    note: "La clase se suma al plan vigente. No es un pago.",
-  },
   class_return: {
     open: "Devolver una clase",
     title: "¿Registrar una clase devuelta?",
@@ -27,13 +21,13 @@ const forms = {
 } as const;
 
 // PAY-006's form for the allowance adjustment the Administrator already has
-// (BKM-008). Courtesy and a returned class, never a gift.
+// (BKM-008): a returned class. Courtesy classes ended 2026-11-27.
 export function AllowanceAdjustmentAction({
   clientId,
   reason,
 }: {
   clientId: string;
-  reason: RecordAllowanceAdjustmentDtoReason;
+  reason: Extract<RecordAllowanceAdjustmentDtoReason, "class_return">;
 }) {
   const copy = forms[reason];
   const queryClient = useQueryClient();

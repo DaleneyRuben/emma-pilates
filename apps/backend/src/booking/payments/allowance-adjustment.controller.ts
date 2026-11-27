@@ -43,8 +43,10 @@ export class RecordAllowanceAdjustmentDto {
   @ApiProperty({ description: 'A signed number of classes, never zero' })
   classes!: number;
 
-  @ApiProperty({ enum: ['courtesy', 'class_return'] })
-  reason!: 'courtesy' | 'class_return';
+  // 2026-11-27: courtesy classes are no longer granted (owner decision);
+  // past `courtesy` adjustments still read back below.
+  @ApiProperty({ enum: ['class_return'] })
+  reason!: 'class_return';
 }
 
 export class AllowanceAdjustmentDto {
@@ -61,7 +63,7 @@ export class AllowanceAdjustmentDto {
 const bodySchema = z
   .object({
     classes: z.number().int().min(-100).max(100),
-    reason: z.enum(['courtesy', 'class_return']),
+    reason: z.literal('class_return'),
   })
   .strict();
 

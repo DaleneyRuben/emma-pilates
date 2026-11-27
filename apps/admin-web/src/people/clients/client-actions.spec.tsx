@@ -45,11 +45,7 @@ describe("W7 the Client file's actions at the end", () => {
     server.use(...signedInHandlers(), ...showing(luciaDetail));
     const { panel } = await openLucia();
 
-    expect(actionNames(panel)).toEqual([
-      "Dar clase de cortesía",
-      "Devolver una clase",
-      "Cerrar cuenta",
-    ]);
+    expect(actionNames(panel)).toEqual(["Devolver una clase", "Cerrar cuenta"]);
     const tabPanel = within(panel).getByRole("tabpanel");
     const actions = within(panel).getByRole("list", { name: "Acciones" });
     const referrals = within(panel).getByText("LUCIA25");
@@ -73,7 +69,7 @@ describe("W7 the Client file's actions at the end", () => {
     expect(footerButtons).toEqual(["Editar perfil"]);
   });
 
-  it("offers trial access instead of the Plan's classes without an active Plan", async () => {
+  it("offers only closing the account without an active Plan", async () => {
     server.use(
       ...signedInHandlers(),
       ...showing({
@@ -83,7 +79,7 @@ describe("W7 the Client file's actions at the end", () => {
     );
     const { panel } = await openLucia();
 
-    expect(actionNames(panel)).toEqual(["Acceso de prueba", "Cerrar cuenta"]);
+    expect(actionNames(panel)).toEqual(["Cerrar cuenta"]);
   });
 
   it("shows the Coordinator no actions", async () => {
