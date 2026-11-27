@@ -126,6 +126,14 @@ async function openNotifications() {
       calls.push("DELETE c1");
       return new Response(null, { status: 204 });
     },
+    "DELETE /api/v1/notifications/p2": () => {
+      calls.push("DELETE p2");
+      return new Response(null, { status: 204 });
+    },
+    "POST /api/v1/notifications/p2/restore": () => {
+      calls.push("POST p2/restore");
+      return new Response(null, { status: 204 });
+    },
   });
   const screen = await render(<App runtime={createStaffRuntime(fetcher, "administrator")} />);
   await waitFor(() => expect(screen.getByTestId("tab-profile")).toBeOnTheScreen(), {
@@ -185,6 +193,24 @@ describe("Staff Notificaciones for the Administrator", () => {
     expect(screen.getByText("Notificación borrada")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Deshacer" })).toBeOnTheScreen();
     await waitFor(() => expect(calls).toEqual(["DELETE c1"]));
+  });
+
+  // Testing session (#10, E-F15, iPad): «Deshacer» after removing a «Ya
+  // revisados» notice closed the toast but never restored it.
+  it("brings a removed decided review back with «Deshacer»", async () => {
+    const { calls, screen } = await openNotifications();
+
+    await fireEvent.press(
+      within(screen.getByTestId("notification-swipe-p2")).getByRole("button", {
+        name: "Borrar",
+        includeHiddenElements: true,
+      }),
+    );
+    await waitFor(() => expect(calls).toEqual(["DELETE p2"]));
+    await fireEvent.press(screen.getByRole("button", { name: "Deshacer" }));
+
+    await waitFor(() => expect(calls).toEqual(["DELETE p2", "POST p2/restore"]));
+    expect(screen.getByTestId("notification-swipe-p2")).toBeOnTheScreen();
   });
 
   // Walkthrough n.º 11 (E-F20): a comment's notice says who wrote it and how
