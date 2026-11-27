@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useStaffFetcher } from "../staff-fetcher";
 
-// REL-012: «Enviar comentarios» from S23 Perfil, for every Role.
+// REL-012: «Envíanos tu opinión» (follow-up 293) from S23 Perfil.
 export function StaffFeedbackScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useStaffFetcher();

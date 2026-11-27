@@ -15,8 +15,8 @@ const trainer = {
   branches: [{ id: "branch-1", name: "Centro" }],
 };
 
-// REL-012: «Enviar comentarios» on S23 for every Role.
-describe("Staff «Enviar comentarios»", () => {
+// REL-012: «Envíanos tu opinión» (follow-up 293) on S23.
+describe("Staff «Envíanos tu opinión»", () => {
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
@@ -37,9 +37,9 @@ describe("Staff «Enviar comentarios»", () => {
     });
     await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Enviar comentarios" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Envíanos tu opinión" })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comentarios" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Envíanos tu opinión" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Comentario")).toBeOnTheScreen();
     });

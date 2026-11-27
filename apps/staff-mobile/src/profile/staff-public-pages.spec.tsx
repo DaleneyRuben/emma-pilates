@@ -23,7 +23,8 @@ describe("Staff Perfil public pages", () => {
     clearMobileQueryCache();
   });
 
-  it("opens Soporte and the privacy policy on the studio's public pages", async () => {
+  // Follow-up 293: «Preguntas frecuentes» in «Ayuda», the policy in the footer.
+  it("opens Preguntas frecuentes and the privacy policy on the studio's public pages", async () => {
     const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true);
     const fetcher = routeFetcher({
       "/api/v1/trainer/sessions": () => jsonResponse([]),
@@ -37,10 +38,10 @@ describe("Staff Perfil public pages", () => {
     });
     await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Soporte" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Preguntas frecuentes" })).toBeOnTheScreen();
     });
-    await fireEvent.press(screen.getByRole("button", { name: "Soporte" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Política de privacidad" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Preguntas frecuentes" }));
+    await fireEvent.press(screen.getByRole("link", { name: "Política de privacidad" }));
 
     expect(openURL.mock.calls).toEqual([
       ["https://app.emmapilatesstudio.com/soporte"],

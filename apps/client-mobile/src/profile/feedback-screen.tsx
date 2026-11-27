@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useClientFetcher } from "../client-fetcher";
 
-// REL-012: «Enviar comentarios» from 18 Perfil.
+// REL-012: «Envíanos tu opinión» (follow-up 293) from 18 Perfil.
 export function ClientFeedbackScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useClientFetcher();

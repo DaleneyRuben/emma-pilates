@@ -42,18 +42,21 @@ const avatarSize = 56;
 /**
  * S23's summary (follow-ups 240–242, 247) on the Client's deep-rose identity
  * card (walkthrough n.º 16, E-F01, E-F03): her 56 px photo or initials, her
- * name, email and phone, «Cambiar foto» («Quitar foto» once she has one) and
+ * name, her Role and Branches (follow-up 293), email and phone, «Cambiar foto» («Quitar foto» once she has one) and
  * the role's note. The photo is saved the moment the upload finishes.
  */
 export function StaffPhotoSummary({
   editable = true,
   member,
   note,
+  roleLine,
 }: {
   /** False while an Administrator sees the app as her (walkthrough finding 115). */
   editable?: boolean;
   member: StaffProfileDto;
   note: string;
+  /** Her Role and Branches under her name, «Instructora · Achumani, Norte» (follow-up 293). */
+  roleLine: string;
 }) {
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
@@ -135,6 +138,9 @@ export function StaffPhotoSummary({
         <View style={styles.body}>
           <Text tone="onDark" variant="titulo-bloque">
             {member.name}
+          </Text>
+          <Text tone="onDark" variant="compacto-600">
+            {roleLine}
           </Text>
           <Text tone="onDark" variant="cuerpo">
             {member.email}

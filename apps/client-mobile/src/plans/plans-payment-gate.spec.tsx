@@ -92,9 +92,9 @@ describe("Client Plans with a payment in review or rejected", () => {
       { timeout: 10_000 },
     );
     await fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
-    await waitFor(() => expect(screen.getByText("Tu plan y tus clases")).toBeOnTheScreen());
-    const myPlan = screen.getAllByRole("button", { name: /^Mi plan/ });
-    await fireEvent.press(myPlan[myPlan.length - 1]!);
+    await waitFor(() => expect(screen.getByRole("header", { name: "Tu plan" })).toBeOnTheScreen());
+    // Follow-up 293: Perfil's «Tu plan» row is «Plan actual».
+    await fireEvent.press(screen.getByRole("button", { name: /^Plan actual/ }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Renovar mi plan" })).toBeOnTheScreen(),
     );
@@ -107,7 +107,7 @@ describe("Client Plans with a payment in review or rejected", () => {
     await waitFor(() => expect(screen.getByTestId("home-plan-card")).toBeOnTheScreen());
     await fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
 
-    await waitFor(() => expect(screen.getByText("Tu plan y tus clases")).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByRole("header", { name: "Tu plan" })).toBeOnTheScreen());
     expect(screen.queryByRole("button", { name: "Volver al inicio" })).toBeNull();
   });
 

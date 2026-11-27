@@ -313,8 +313,8 @@ describe("Staff Mis pagos", () => {
     );
     await fireEvent.press(screen.getByTestId("tab-profile"));
     await waitFor(() => {
-      expect(screen.getByText("Administradora")).toBeOnTheScreen();
+      expect(screen.getByText(/^Administradora · /)).toBeOnTheScreen();
     });
-    expect(screen.queryByRole("button", { name: "Mis pagos" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Historial de pagos" })).toBeNull();
   });
 });

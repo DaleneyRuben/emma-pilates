@@ -217,17 +217,28 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
       timeout: 10_000,
     });
     await fireEvent.press(screen.getByTestId("tab-profile"));
-    await waitFor(() => expect(screen.getByText("Tu cuenta")).toBeOnTheScreen());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Dejar de ver como Diego" })).toBeOnTheScreen(),
+    );
 
     expect(
       screen.getByText(
         "Mientras ves la app como Diego, su foto, su contraseña, sus comentarios y su sesión son solo suyos.",
       ),
     ).toBeOnTheScreen();
-    for (const action of ["Cambiar foto", "Cambiar contraseña", "Enviar comentarios"]) {
+    for (const action of ["Cambiar foto", "Cambiar contraseña", "Envíanos tu opinión"]) {
       expect(screen.queryByRole("button", { name: action })).not.toBeOnTheScreen();
     }
     expect(screen.queryByText("Cerrar sesión")).not.toBeOnTheScreen();
+    // Follow-up 293 (E-D26): «Ajustes» keeps Notificaciones and the way out,
+    // «Ayuda» is hidden (one row would be left), and the footer stays.
+    const settings = within(screen.getByTestId("profile-group-settings"))
+      .getAllByRole("button")
+      .map((row) => String(row.props.accessibilityLabel));
+    expect(settings).toEqual(["Notificaciones", "Dejar de ver como Diego"]);
+    expect(screen.queryByTestId("profile-group-help")).toBeNull();
+    expect(screen.queryByText("Preguntas frecuentes")).toBeNull();
+    expect(screen.getByRole("link", { name: "Política de privacidad" })).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Dejar de ver como Diego" }));
     await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen());

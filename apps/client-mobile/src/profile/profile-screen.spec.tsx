@@ -1,5 +1,4 @@
 import { act, cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
-import { Linking } from "react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -127,42 +126,21 @@ describe("Client Profile", () => {
     expect(screen.queryByText("No pudimos cargar tu perfil.")).not.toBeOnTheScreen();
   });
 
-  // Follow-up 227 (C18): the rows are v2 icon rows in three sections;
-  // follow-up 292 moved «Cerrar sesión» out of «Cuenta» to a card of its own.
-  it("groups the rows under Tu plan y tus clases, Preferencias and Cuenta", async () => {
+  // Follow-up 227 (C18): the rows are v2 icon rows; follow-up 293 groups
+  // them under Tu plan, Ajustes and Ayuda (profile-groups.spec.tsx).
+  it("draws every row as an icon row on a 36 pt disc", async () => {
     const screen = await openProfile();
 
-    for (const title of ["Tu plan y tus clases", "Preferencias", "Cuenta"]) {
-      expect(screen.getByRole("header", { name: title })).toBeOnTheScreen();
-    }
-    for (const row of [
-      "Evaluación nutricional",
-      "Invita a una amiga",
-      "Notificaciones",
-      "Cambiar contraseña",
-      "Enviar comentarios",
-      "Soporte",
-      "Política de privacidad",
-      "Cerrar sesión",
-    ]) {
-      expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
-    }
     // Finding 70: one evaluation row; «Mis evaluaciones» lives inside it.
     expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
     // Rosa Emma (C18): every row's icon sits on a 36 pt 50 disc.
     const discs = screen.getAllByTestId("profile-row-disc");
-    expect(discs).toHaveLength(9);
+    expect(discs).toHaveLength(8);
     expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", height: 36, width: 36 });
     // The identity is the 600 hero under the «Perfil» band.
     expect(screen.getByRole("header", { name: "Perfil" })).toBeOnTheScreen();
-    // Follow-up 292: «Cerrar sesión» in Destructivo, as in the Staff app;
-    // follow-up 256 § 2: «Cerrar mi cuenta» a quiet link after the version.
+    // Follow-up 292: «Cerrar sesión» in Destructivo, as in the Staff app.
     expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04640" });
-    expect(screen.getByText("Cerrar mi cuenta")).toHaveStyle({
-      color: "#93615D",
-      textDecorationLine: "underline",
-    });
-    expect(screen.getByText(/^Emma Pilates Studio · versión .+ ·$/)).toBeOnTheScreen();
     // PAY-005 retired Credit: Perfil has no «Mi crédito» row.
     expect(screen.queryByRole("button", { name: /Mi crédito/ })).toBeNull();
   });
@@ -194,14 +172,14 @@ describe("Client Profile", () => {
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
     expect(screen.getByText("🇧🇴 +591 70011004")).toBeOnTheScreen();
     expect(screen.getByText("Plan vencido")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Mi plan, Plan vencido" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Plan actual, Plan vencido" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
   });
 
   it("opens the expired Plan detail with a purchase action", async () => {
     const screen = await openProfile();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Mi plan, Plan vencido" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Plan actual, Plan vencido" }));
 
     await waitFor(() => {
       expect(screen.getByText(/^Último plan · /)).toBeOnTheScreen();
@@ -241,7 +219,7 @@ describe("Client Profile", () => {
       expect(screen.getByText("2 sin leer")).toBeOnTheScreen();
     });
     // MOB-070: the footer reads the installed app version, not a hard-coded 1.0.
-    expect(screen.getByText("Emma Pilates Studio · versión 1.0.1 ·")).toBeOnTheScreen();
+    expect(screen.getByText("Emma Pilates Studio · versión 1.0.1")).toBeOnTheScreen();
 
     await fireEvent.press(
       screen.getByRole("button", {
@@ -296,25 +274,10 @@ describe("Client Profile", () => {
     expect(screen.queryByText("Contraseña actualizada")).toBeNull();
   });
 
-  // App Review 5.1.1(i): the privacy policy and support open from the app.
-  it("opens Soporte and the privacy policy on the studio's public pages", async () => {
-    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true);
+  it("opens «Envíanos tu opinión» from Perfil (REL-012)", async () => {
     const screen = await openProfile();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Soporte" }));
-    await fireEvent.press(screen.getByRole("button", { name: "Política de privacidad" }));
-
-    expect(openURL.mock.calls).toEqual([
-      ["https://app.emmapilatesstudio.com/soporte"],
-      ["https://app.emmapilatesstudio.com/privacidad"],
-    ]);
-    openURL.mockRestore();
-  });
-
-  it("opens «Enviar comentarios» from Perfil (REL-012)", async () => {
-    const screen = await openProfile();
-
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar comentarios" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Envíanos tu opinión" }));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Comentario")).toBeOnTheScreen();

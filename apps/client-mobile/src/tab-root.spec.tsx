@@ -84,7 +84,7 @@ describe("tapping a Client tab after Mi plan", () => {
     const { screen } = await renderSignedIn();
 
     await tab(screen, "Perfil");
-    await fireEvent.press(await screen.findByRole("button", { name: /^Mi plan/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Plan actual/ }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
     await tab(screen, "Perfil");
 

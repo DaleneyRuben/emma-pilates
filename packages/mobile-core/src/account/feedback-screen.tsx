@@ -92,7 +92,7 @@ function Thanks({ onBack }: { onBack: () => void }) {
   );
 }
 
-// REL-012: «Enviar comentarios» on Perfil in both apps (system-identity
+// REL-012: «Envíanos tu opinión» (follow-up 293) on Perfil in both apps (system-identity
 // CONTEXT, Feedback). The app version, build, system, and Role travel with the
 // text; no screenshot does, which keeps Data safety simple.
 export function FeedbackScreen({
@@ -123,7 +123,7 @@ export function FeedbackScreen({
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={onBack} title="Enviar comentarios" />
+      <ScreenTopBar fullBleed onBack={onBack} title="Envíanos tu opinión" />
       {feedback.sent ? (
         <Thanks onBack={onBack} />
       ) : (

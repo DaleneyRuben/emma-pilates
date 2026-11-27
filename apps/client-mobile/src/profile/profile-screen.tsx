@@ -7,6 +7,7 @@ import {
   useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
+  appVersionLabel,
   BiometricSwitchRow,
   BrandToast,
   LoadingState,
@@ -14,6 +15,7 @@ import {
   LogoutConfirmationSheet,
   openPublicPage,
   OutlinedButton,
+  ProfileFooter,
   QueryFailure,
   Screen,
   ScreenHeader,
@@ -33,7 +35,6 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { appVersionLabel } from "./app-version";
 import { ClientAvatar } from "./client-avatar";
 import { ProfileRow, ProfileRowCard } from "./profile-rows";
 import { useClientPhoto } from "./use-client-photo";
@@ -103,32 +104,32 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
   const status = subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : undefined;
 
-  // Follow-up 256 § 2: «Cerrar mi cuenta» is a quiet link after the
-  // version, away from «Cerrar sesión»; it still opens C24.
-  const endBlock = (
-    <View style={styles.end}>
-      <Text
-        style={styles.centered}
-        variant="secundario"
-      >{`Emma Pilates Studio · versión ${appVersionLabel()} ·`}</Text>
-      <Pressable
-        accessibilityRole="button"
-        hitSlop={spacing.md}
-        onPress={() => navigation.navigate("CloseAccount")}
-        testID="profile-close-account"
-      >
-        <Text style={styles.centered} variant="enlace">
-          Cerrar mi cuenta
-        </Text>
-      </Pressable>
-    </View>
+  // Follow-up 293 (C18s): two quiet lines straight on the page, the version
+  // and the links; «Cerrar mi cuenta» still opens C24.
+  const footer = (screenGap: number) => (
+    <ProfileFooter
+      links={[
+        {
+          label: "Política de privacidad",
+          onPress: () => openPublicPage("privacy"),
+          testID: "profile-privacy",
+        },
+        {
+          label: "Cerrar mi cuenta",
+          onPress: () => navigation.navigate("CloseAccount"),
+          testID: "profile-close-account",
+        },
+      ]}
+      screenGap={screenGap}
+      version={appVersionLabel()}
+    />
   );
 
   return (
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* 18T: on a tablet the identity, «Cerrar sesión» and the version sit
+        {/* 18T: on a tablet the identity, «Cerrar sesión» and the footer sit
             in a 300 pt column beside the lists. */}
         <TabletColumns
           left={
@@ -168,7 +169,8 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => setConfirmingLogout(true)}
                     testID="profile-logout"
                   />
-                  {endBlock}
+                  {/* 18T: the column's own gap is 16 pt. */}
+                  {footer(spacing.lg)}
                 </>
               ) : null}
             </>
@@ -176,12 +178,13 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
           leftWidth={300}
           right={
             <>
-              <View>
-                <SectionTitle>Tu plan y tus clases</SectionTitle>
+              {/* Follow-up 293 (C18): no group holds a single row. */}
+              <View testID="profile-group-plan">
+                <SectionTitle>Tu plan</SectionTitle>
                 <ProfileRowCard>
                   <ProfileRow
                     icon="card"
-                    label="Mi plan"
+                    label="Plan actual"
                     onPress={() => navigation.navigate("Subscription")}
                     pill
                     value={status === null || status === "none" ? undefined : planPill[status]}
@@ -192,19 +195,19 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => navigation.navigate("EvaluationAvailability")}
                   />
                   <ProfileRow
-                    icon="document"
-                    label="Mis facturas"
-                    onPress={() => navigation.navigate("MyInvoices")}
-                  />
-                  <ProfileRow
                     icon="personAdd"
                     label="Invita a una amiga"
                     onPress={() => navigation.navigate("Referrals")}
                   />
+                  <ProfileRow
+                    icon="document"
+                    label="Facturas"
+                    onPress={() => navigation.navigate("MyInvoices")}
+                  />
                 </ProfileRowCard>
               </View>
-              <View>
-                <SectionTitle>Preferencias</SectionTitle>
+              <View testID="profile-group-settings">
+                <SectionTitle>Ajustes</SectionTitle>
                 <ProfileRowCard>
                   <ProfileRow
                     icon="bell"
@@ -216,11 +219,6 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                         : `${unreadCount} sin leer`
                     }
                   />
-                </ProfileRowCard>
-              </View>
-              <View testID="profile-section-account">
-                <SectionTitle>Cuenta</SectionTitle>
-                <ProfileRowCard>
                   <ProfileRow
                     icon="password"
                     label="Cambiar contraseña"
@@ -229,25 +227,18 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                   {identity.biometrics.available ? <BiometricSwitchRow /> : null}
                 </ProfileRowCard>
               </View>
-              {/* Walkthrough n.º 16 (C18): help and the studio's pages close Perfil. */}
-              <View testID="profile-section-help">
-                <SectionTitle>Ayuda y legal</SectionTitle>
+              <View testID="profile-group-help">
+                <SectionTitle>Ayuda</SectionTitle>
                 <ProfileRowCard>
                   <ProfileRow
                     icon="message"
-                    label="Enviar comentarios"
+                    label="Envíanos tu opinión"
                     onPress={() => navigation.navigate("Feedback")}
                   />
                   <ProfileRow
                     icon="mail"
-                    label="Soporte"
+                    label="Preguntas frecuentes"
                     onPress={() => openPublicPage("support")}
-                    subtitle="Contacto y WhatsApp del estudio"
-                  />
-                  <ProfileRow
-                    icon="shield"
-                    label="Política de privacidad"
-                    onPress={() => openPublicPage("privacy")}
                   />
                 </ProfileRowCard>
               </View>
@@ -255,9 +246,9 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
           }
         />
         {/* Follow-up 292 (C18s): «Cerrar sesión» closes the screen on a card
-            of its own, the version and «Cerrar mi cuenta» under it. */}
+            of its own; follow-up 293's footer sits under it. */}
         {wide ? null : <LogoutCard onPress={() => setConfirmingLogout(true)} />}
-        {wide ? null : endBlock}
+        {wide ? null : footer(spacing.md)}
       </ScrollView>
       {passwordChanged === null ? null : (
         <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />
@@ -279,21 +270,8 @@ const planPill = {
 } as const;
 
 const styles = StyleSheet.create({
-  centered: { textAlign: "center" },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   edit: { alignSelf: "center", minHeight: 44, justifyContent: "center" },
-  // C18s: the version line on its own white card.
-  end: {
-    ...surfaces.card,
-    alignItems: "center",
-    columnGap: spacing.xs,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-
   hero: {
     ...surfaces.emphasis,
     alignItems: "center",

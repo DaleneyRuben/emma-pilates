@@ -1,4 +1,4 @@
-# Critical journey: a Trainer sends «Enviar comentarios» from Perfil
+# Critical journey: a Trainer sends «Envíanos tu opinión» from Perfil
 # (REL-012, Prompt S27). Each run stores one Feedback; the API takes ten per
 # Account in 24 hours.
 appId: ${APP_ID}
@@ -14,9 +14,13 @@ env:
 - tapOn:
     id: "tab-profile"
 - extendedWaitUntil:
-    visible: "Enviar comentarios"
+    visible: "Cambiar foto"
     timeout: 15000
-- tapOn: "Enviar comentarios"
+# Follow-up 293: «Ayuda» sits below the fold; «Preguntas frecuentes» is its last row.
+- scrollUntilVisible:
+    element: "Preguntas frecuentes"
+    direction: DOWN
+- tapOn: "Envíanos tu opinión"
 - extendedWaitUntil:
     visible: "Cuéntanos qué falló o qué mejorarías.*"
     timeout: 15000
@@ -34,5 +38,5 @@ env:
 - takeScreenshot: staff-feedback-2-enviado
 - tapOn: "Volver al perfil"
 - extendedWaitUntil:
-    visible: "Enviar comentarios"
+    visible: "Preguntas frecuentes"
     timeout: 15000

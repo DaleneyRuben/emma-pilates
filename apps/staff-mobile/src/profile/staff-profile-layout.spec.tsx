@@ -47,7 +47,7 @@ async function openProfile() {
 
 // Walkthrough n.º 16 (E-F01, E-F02, E-F03, E-F23, E-F24): Staff Perfil
 // follows the Client's C18, a deep-rose identity card, serif section titles
-// outside white row cards, and «Ayuda y legal» last.
+// outside white row cards, and «Ayuda» last (follow-up 293).
 describe("Staff Perfil layout", () => {
   afterEach(async () => {
     await cleanup();
@@ -66,31 +66,29 @@ describe("Staff Perfil layout", () => {
     expect(card.queryByRole("button", { name: "Editar" })).toBeNull();
   });
 
-  it("titles each section outside its card and closes with Ayuda y legal", async () => {
+  // Follow-up 293 (E-F01): «Tus pagos», «Ajustes» and «Ayuda», each titled
+  // in serif outside its card (staff-profile-groups.spec.tsx has the rows).
+  it("titles each group outside its card and closes with Ayuda", async () => {
     const screen = await openProfile();
 
-    const sections = [
-      ["profile-section-account", "Tu cuenta"],
-      ["profile-section-settings", "Ajustes"],
-      ["profile-section-help", "Ayuda y legal"],
+    const groups = [
+      ["profile-group-pay", "Tus pagos"],
+      ["profile-group-settings", "Ajustes"],
+      ["profile-group-help", "Ayuda"],
     ] as const;
-    for (const [testID, title] of sections) {
-      const section = within(screen.getByTestId(testID));
-      expect(section.getByRole("header", { name: title })).toHaveStyle({
+    for (const [testID, title] of groups) {
+      const group = within(screen.getByTestId(testID));
+      expect(group.getByRole("header", { name: title })).toHaveStyle({
         fontFamily: "Lora_500Medium",
       });
     }
-    const settings = within(screen.getByTestId("profile-section-settings"));
-    for (const row of ["Notificaciones", "Cambiar contraseña"]) {
-      expect(settings.getByRole("button", { name: row })).toBeOnTheScreen();
-    }
-    const help = within(screen.getByTestId("profile-section-help"));
-    for (const row of ["Enviar comentarios", "Soporte", "Política de privacidad"]) {
-      expect(help.getByRole("button", { name: row })).toBeOnTheScreen();
-    }
-    expect(help.getByText("Contacto y WhatsApp del estudio")).toBeOnTheScreen();
-    expect(help.getByTestId("glyph-shield", hidden)).toBeOnTheScreen();
-    expect(settings.queryByRole("button", { name: "Soporte" })).toBeNull();
+    const order = drawnOrder(screen.toJSON());
+    expect(order.indexOf("profile-group-help")).toBeGreaterThan(
+      order.indexOf("profile-group-settings"),
+    );
+    expect(
+      within(screen.getByTestId("profile-group-help")).getByTestId("glyph-mail", hidden),
+    ).toBeOnTheScreen();
   });
 
   it("draws each row's icon on a 36 pt round disc", async () => {
@@ -101,22 +99,21 @@ describe("Staff Perfil layout", () => {
     expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", borderRadius: 18, height: 36 });
   });
 
-  // Follow-up 292 (E-F01, E-F23, E-F28): «Ajustes» ends with «Cambiar
-  // contraseña»; «Cerrar sesión» is a Destructivo card of its own after
-  // «Ayuda y legal», and nothing follows it.
-  it("closes with «Cerrar sesión» on its own card after Ayuda y legal", async () => {
+  // Follow-up 292 (E-F01, E-F23, E-F28): «Cerrar sesión» is a Destructivo
+  // card of its own after «Ayuda»; follow-up 293's footer follows it.
+  it("closes with «Cerrar sesión» on its own card after Ayuda, then the footer", async () => {
     const screen = await openProfile();
 
-    const settings = within(screen.getByTestId("profile-section-settings"));
+    const settings = within(screen.getByTestId("profile-group-settings"));
     expect(settings.queryByRole("button", { name: "Cerrar sesión" })).toBeNull();
     const order = drawnOrder(screen.toJSON());
-    expect(order.indexOf("profile-logout")).toBeGreaterThan(order.indexOf("profile-section-help"));
+    expect(order.indexOf("profile-logout")).toBeGreaterThan(order.indexOf("profile-group-help"));
+    expect(order.indexOf("profile-footer")).toBeGreaterThan(order.indexOf("profile-logout"));
     expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBe(
       screen.getByTestId("profile-logout"),
     );
     expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04640" });
     // The screen's 10 pt gap plus 14 makes the 24 pt above the card.
     expect(screen.getByTestId("profile-logout")).toHaveStyle({ marginTop: 14 });
-    expect(screen.queryByText(/Emma Pilates Studio · versión/)).toBeNull();
   });
 });

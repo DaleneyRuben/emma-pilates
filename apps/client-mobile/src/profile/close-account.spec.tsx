@@ -76,7 +76,8 @@ async function openClosure(routes = closureRoutes(), tablet = false) {
   const runtime = createClientRuntime(routeFetcher(routes));
   const screen = await (tablet ? openProfileOnTablet : openProfile)(runtime);
 
-  await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+  // Follow-up 293: a link in Perfil's footer.
+  await fireEvent.press(screen.getByRole("link", { name: "Cerrar mi cuenta" }));
   await waitFor(() => {
     expect(
       screen.getByText("Esto pasa al cerrar tu cuenta en Emma Pilates Studio:"),
@@ -265,7 +266,7 @@ describe("Cerrar mi cuenta", () => {
     );
     const screen = await openProfile(runtime);
 
-    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+    await fireEvent.press(screen.getByRole("link", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
       expect(

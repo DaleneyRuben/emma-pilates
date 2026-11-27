@@ -68,7 +68,8 @@ const openInvoices = async (items: unknown[], tablet = false) => {
       }),
     ),
   );
-  await fireEvent.press(screen.getByRole("button", { name: "Mis facturas" }));
+  // Follow-up 293: Perfil's «Tu plan» names the row «Facturas».
+  await fireEvent.press(screen.getByRole("button", { name: "Facturas" }));
   return screen;
 };
 

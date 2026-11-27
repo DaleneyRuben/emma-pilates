@@ -2,6 +2,7 @@ import { StyleSheet, type TextStyle } from "react-native";
 
 import { brand, rosa } from "./tokens";
 import {
+  footerTextVariants,
   largeTextVariants,
   maxTextScale,
   textTones,
@@ -101,7 +102,20 @@ function auditText(node: RenderedNode, ground: string | undefined, opacity: numb
       problems.push(`${label} is destructivo on ${ground}`);
     }
   }
-  if (ground !== undefined && colouredGrounds.has(ground) && !largeTextVariants.includes(variant)) {
+  // Follow-up 293: the footer's styles and tone go together, on Fondo only.
+  const footer = footerTextVariants.includes(variant);
+  const footerTone = style.color === textTones["texto-pie"];
+  if (footer && !footerTone) problems.push(`${label} is ${variant} outside texto-pie`);
+  if (footerTone && !footer) problems.push(`${label} is texto-pie outside the footer styles`);
+  if (footer && ground !== undefined && ground !== rosa[100]) {
+    problems.push(`${label} is ${variant} on ${ground}`);
+  }
+  if (
+    ground !== undefined &&
+    colouredGrounds.has(ground) &&
+    !largeTextVariants.includes(variant) &&
+    !(footer && ground === rosa[100])
+  ) {
     problems.push(`${label} is small text (${variant}) on ${ground}`);
   }
   return problems;

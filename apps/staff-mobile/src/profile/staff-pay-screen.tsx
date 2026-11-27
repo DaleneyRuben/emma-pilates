@@ -49,7 +49,7 @@ export function StaffPayScreen() {
   );
   const qrRow = tab ? (
     <IconRowGroup>
-      <PayoutQrRow onPress={() => navigation.navigate("PayoutQr")} />
+      <PayoutQrRow label="Mi QR de cobro" onPress={() => navigation.navigate("PayoutQr")} />
     </IconRowGroup>
   ) : null;
   if (pay.pending) {

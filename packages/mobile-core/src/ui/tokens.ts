@@ -22,6 +22,9 @@ export const brand = {
   // Follow-up 292 (owner 2026-11-27): the one hue outside the rosa family, a
   // muted brick only for actions that end something («Cerrar sesión»).
   destructivo: "#A04640",
+  // Follow-up 293 (owner 2026-11-27): a slightly darker Rosa profundo for
+  // Perfil's footer, the one small text on Fondo (4.72:1 on #F9E7DF).
+  textoPie: "#8A5B57",
 } as const;
 
 const white = brand.white;
@@ -106,6 +109,8 @@ export const colors = {
   // «Cerrar sesión» and its confirmation (follow-up 292): 5.93:1 on white.
   destructivo: brand.destructivo,
   onDestructivo: white,
+  // Perfil's footer only (follow-up 293).
+  textoPie: brand.textoPie,
 } as const;
 
 export const spacing = {

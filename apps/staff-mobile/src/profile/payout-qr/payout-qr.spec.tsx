@@ -112,7 +112,7 @@ async function openProfile(fetcher: typeof globalThis.fetch) {
   return screen;
 }
 
-// FIX-072, follow-up 276: Perfil › «Mi QR de cobro» (option A).
+// FIX-072, follow-up 276: Perfil › «Tu QR de cobro» (option A; follow-up 293 names it).
 describe("Mi QR de cobro", () => {
   afterEach(async () => {
     await cleanup();
@@ -127,7 +127,7 @@ describe("Mi QR de cobro", () => {
       ),
     );
 
-    const row = await screen.findByRole("button", { name: "Mi QR de cobro, Vence el sáb 5 dic" });
+    const row = await screen.findByRole("button", { name: "Tu QR de cobro, Vence el sáb 5 dic" });
     await fireEvent.press(row);
 
     expect(
@@ -146,7 +146,7 @@ describe("Mi QR de cobro", () => {
       routeFetcher(routes({ id: "qr-1", validUntil: "2026-11-15", standing: "expired", imageUrl })),
     );
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Mi QR de cobro, Vencido" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Tu QR de cobro, Vencido" }));
 
     expect(
       await screen.findByText(
@@ -179,7 +179,7 @@ describe("Mi QR de cobro", () => {
     );
     const screen = await openProfile(fetcher);
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Mi QR de cobro, Sin subir" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Tu QR de cobro, Sin subir" }));
     expect(await screen.findByText("Todavía no subiste tu QR de cobro")).toBeOnTheScreen();
     await fireEvent.press(screen.getByTestId("payout-qr-upload"));
     expect(await screen.findByText("Sube tu QR de cobro")).toBeOnTheScreen();
@@ -228,7 +228,7 @@ describe("Mi QR de cobro", () => {
       ),
     );
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Mi QR de cobro, Sin subir" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Tu QR de cobro, Sin subir" }));
     await fireEvent.press(await screen.findByTestId("payout-qr-upload"));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Mes siguiente" }));

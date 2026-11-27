@@ -51,6 +51,14 @@ describe("the Rosa Emma type scale", () => {
         lineHeight: 19,
         textDecorationLine: "underline",
       },
+      // Follow-up 293: Perfil's footer only, an exception to 285's scale.
+      pie: { fontFamily: regular, fontSize: 12, lineHeight: 18 },
+      "enlace-pie": {
+        fontFamily: regular,
+        fontSize: 12,
+        lineHeight: 18,
+        textDecorationLine: "underline",
+      },
     });
   });
 
@@ -72,9 +80,15 @@ describe("the Rosa Emma type scale", () => {
     ]);
   });
 
-  // Follow-up 292 adds Destructivo, for «Cerrar sesión» on white.
-  it("has three tones and a 1.3 cap on the phone's text size", () => {
-    expect(textTones).toEqual({ ink: "#93615D", onDark: "#FFFBFB", destructivo: "#A04640" });
+  // Follow-up 292 adds Destructivo, for «Cerrar sesión» on white; 293 adds
+  // texto-pie, for Perfil's footer on Fondo.
+  it("has four tones and a 1.3 cap on the phone's text size", () => {
+    expect(textTones).toEqual({
+      ink: "#93615D",
+      onDark: "#FFFBFB",
+      destructivo: "#A04640",
+      "texto-pie": "#8A5B57",
+    });
     expect(maxTextScale).toBe(1.3);
   });
 });
