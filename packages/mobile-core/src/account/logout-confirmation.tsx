@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import { ConfirmationSheet } from "../ui/confirmation-sheet";
 
-/** «¿Cerrar sesión?» under Perfil in both apps (18, S23), as the confirmation sheet (UX-002). */
+/** «¿Cerrar sesión?» under Perfil in both apps (18, S23), as the confirmation sheet (UX-002),
+ * its button filled with Destructivo (C18l, E-F04, E-F28; follow-up 292). */
 export function LogoutConfirmationSheet({
   logout,
   onDismiss,
@@ -32,6 +33,7 @@ export function LogoutConfirmationSheet({
       onDismiss={onDismiss}
       testID="logout-sheet"
       title="¿Cerrar sesión?"
+      tone="destructivo"
       visible={visible}
     />
   );

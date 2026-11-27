@@ -23,8 +23,9 @@ type ConfirmationSheetProps = PropsWithChildren<{
   onDismiss: () => void;
   /** The confirming request is in flight: the button spins, nothing else reacts. */
   busy?: boolean;
-  /** «destructive» fills the action in Error (follow-up 226); «primary» in Palo de rosa (S24). */
-  tone?: "destructive" | "primary";
+  /** «destructive» fills the action in Error (follow-up 226); «primary» in Palo de rosa (S24);
+   * «destructivo» in Destructivo, for «Cerrar sesión» (follow-up 292). */
+  tone?: "destructive" | "destructivo" | "primary";
   /** An outlined second action under the main one (S28's «Marcar contactada»). */
   secondaryAction?: { label: string; onPress: () => void; busy?: boolean };
   testID?: string;
@@ -95,7 +96,7 @@ export function ConfirmationSheet({
             label={confirmLabel}
             onPress={onConfirm}
             testID={confirmTestID}
-            tone={tone === "primary" ? "primary" : "error"}
+            tone={tone === "destructive" ? "error" : tone}
           />
           {secondaryAction === undefined ? null : (
             <OutlinedButton

@@ -10,6 +10,7 @@ import {
   BiometricSwitchRow,
   BrandToast,
   LoadingState,
+  LogoutCard,
   LogoutConfirmationSheet,
   openPublicPage,
   OutlinedButton,
@@ -226,14 +227,6 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
                     onPress={() => navigation.navigate("ChangePassword")}
                   />
                   {identity.biometrics.available ? <BiometricSwitchRow /> : null}
-                  {wide ? null : (
-                    <ProfileRow
-                      chevron={false}
-                      icon="logout"
-                      label="Cerrar sesión"
-                      onPress={() => setConfirmingLogout(true)}
-                    />
-                  )}
                 </ProfileRowCard>
               </View>
               {/* Walkthrough n.º 16 (C18): help and the studio's pages close Perfil. */}
@@ -261,6 +254,9 @@ export function ProfileScreen({ route }: { route: { params?: ProfileParams } }) 
             </>
           }
         />
+        {/* Follow-up 292 (C18s): «Cerrar sesión» closes the screen on a card
+            of its own, the version and «Cerrar mi cuenta» under it. */}
+        {wide ? null : <LogoutCard onPress={() => setConfirmingLogout(true)} />}
         {wide ? null : endBlock}
       </ScrollView>
       {passwordChanged === null ? null : (

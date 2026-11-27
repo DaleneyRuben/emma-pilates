@@ -26,6 +26,21 @@ describe("LogoutConfirmationSheet", () => {
     expect(logout).toHaveBeenCalledTimes(1);
   });
 
+  // Follow-up 292 (C18l, E-F04, E-F28): the confirm button is filled with
+  // Destructivo and labelled in white; «Cancelar» stays a quiet link.
+  it("fills «Cerrar sesión» with Destructivo", async () => {
+    const screen = await render(
+      <LogoutConfirmationSheet logout={jest.fn()} onDismiss={jest.fn()} visible />,
+    );
+
+    expect(screen.getByTestId("logout-confirm")).toHaveStyle({
+      backgroundColor: "#A04640",
+      borderColor: "#A04640",
+    });
+    const sheet = within(screen.getByTestId("logout-sheet"));
+    expect(sheet.getByText("Cerrar sesión")).toHaveStyle({ color: "#FFFBFB" });
+  });
+
   it("keeps «Cerrar sesión» busy while the logout runs", async () => {
     let finish: () => void = () => undefined;
     const logout = jest.fn(

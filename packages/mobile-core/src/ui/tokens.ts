@@ -19,6 +19,9 @@ export const brand = {
   rosaProfundo: rosa[600],
   crema: "#F9F4F2",
   white: "#FFFBFB",
+  // Follow-up 292 (owner 2026-11-27): the one hue outside the rosa family, a
+  // muted brick only for actions that end something («Cerrar sesión»).
+  destructivo: "#A04640",
 } as const;
 
 const white = brand.white;
@@ -100,6 +103,9 @@ export const colors = {
   typeCadillac: rosa[500],
   typeOther: rosa[400],
   scrim: "rgba(147,97,93,0.42)",
+  // «Cerrar sesión» and its confirmation (follow-up 292): 5.93:1 on white.
+  destructivo: brand.destructivo,
+  onDestructivo: white,
 } as const;
 
 export const spacing = {

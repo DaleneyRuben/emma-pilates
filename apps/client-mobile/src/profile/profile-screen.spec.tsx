@@ -127,8 +127,8 @@ describe("Client Profile", () => {
     expect(screen.queryByText("No pudimos cargar tu perfil.")).not.toBeOnTheScreen();
   });
 
-  // Follow-up 227 (C18): the rows are v2 icon rows in three sections, and
-  // «Cerrar sesión» is the last row of «Cuenta» (walkthrough n.º 19).
+  // Follow-up 227 (C18): the rows are v2 icon rows in three sections;
+  // follow-up 292 moved «Cerrar sesión» out of «Cuenta» to a card of its own.
   it("groups the rows under Tu plan y tus clases, Preferencias and Cuenta", async () => {
     const screen = await openProfile();
 
@@ -151,14 +151,13 @@ describe("Client Profile", () => {
     expect(screen.queryByRole("button", { name: "Mis evaluaciones" })).toBeNull();
     // Rosa Emma (C18): every row's icon sits on a 36 pt 50 disc.
     const discs = screen.getAllByTestId("profile-row-disc");
-    expect(discs).toHaveLength(10);
+    expect(discs).toHaveLength(9);
     expect(discs[0]).toHaveStyle({ backgroundColor: "#FEF6F2", height: 36, width: 36 });
     // The identity is the 600 hero under the «Perfil» band.
     expect(screen.getByRole("header", { name: "Perfil" })).toBeOnTheScreen();
-    // Follow-up 256 § 2 (verification n.º 43, 44): «Cerrar sesión» is the Error
-    // last row, as in the Staff app, and «Cerrar mi cuenta» a muted link after
-    // the version, far from it.
-    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#93615D" });
+    // Follow-up 292: «Cerrar sesión» in Destructivo, as in the Staff app;
+    // follow-up 256 § 2: «Cerrar mi cuenta» a quiet link after the version.
+    expect(screen.getByText("Cerrar sesión")).toHaveStyle({ color: "#A04640" });
     expect(screen.getByText("Cerrar mi cuenta")).toHaveStyle({
       color: "#93615D",
       textDecorationLine: "underline",

@@ -15,8 +15,10 @@ type PrimaryButtonProps = {
   /** «compact» for the 48 pt action inside a card. */
   size?: "compact" | "regular";
   testID?: string;
-  /** «error» confirms a destructive action: the secondary look, never red (FIX-089). */
-  tone?: "error" | "primary";
+  /** «error» confirms a destructive action: the secondary look, never red (FIX-089).
+   * «destructivo» fills it in Destructivo for an action that ends something
+   * («Cerrar sesión», follow-up 292). */
+  tone?: "destructivo" | "error" | "primary";
 };
 
 /**
@@ -49,6 +51,7 @@ export function PrimaryButton({
         styles.button,
         size === "compact" && styles.compact,
         tone === "error" && styles.secondary,
+        tone === "destructivo" && styles.destructivo,
         greyed && styles.disabledButton,
       ]}
       testID={testID}
@@ -86,6 +89,10 @@ const styles = StyleSheet.create({
   },
   compact: {
     minHeight: 48,
+  },
+  destructivo: {
+    backgroundColor: colors.destructivo,
+    borderColor: colors.destructivo,
   },
   secondary: {
     backgroundColor: colors.card,

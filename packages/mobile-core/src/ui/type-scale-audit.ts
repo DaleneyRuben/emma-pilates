@@ -96,6 +96,10 @@ function auditText(node: RenderedNode, ground: string | undefined, opacity: numb
     if (style.color === textTones.ink && darkGrounds.has(ground)) {
       problems.push(`${label} is ink on ${ground}`);
     }
+    // Follow-up 292: Destructivo reads only on white and the light grounds.
+    if (style.color === textTones.destructivo && darkGrounds.has(ground)) {
+      problems.push(`${label} is destructivo on ${ground}`);
+    }
   }
   if (ground !== undefined && colouredGrounds.has(ground) && !largeTextVariants.includes(variant)) {
     problems.push(`${label} is small text (${variant}) on ${ground}`);

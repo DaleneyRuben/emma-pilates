@@ -8,14 +8,13 @@ import {
   BiometricSwitchRow,
   BrandToast,
   LoadingState,
+  LogoutCard,
   LogoutConfirmationSheet,
   openPublicPage,
   QueryFailure,
   Screen,
   SectionTitle,
   spacing,
-  surfaces,
-  Text,
   useMobileIdentity,
   useStickyNotice,
 } from "@pilates/mobile-core";
@@ -23,7 +22,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import appConfig from "../../app.json";
 import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
@@ -193,13 +191,6 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
                   onPress={() => navigation.navigate("ChangePassword")}
                 />
                 {identity.biometrics.available ? <BiometricSwitchRow /> : null}
-                <ProfileRow
-                  icon="logout"
-                  label="Cerrar sesión"
-                  onPress={() => setConfirmingLogout(true)}
-                  testID="profile-logout"
-                  tone="error"
-                />
               </>
             ) : (
               <ProfileRow
@@ -234,11 +225,15 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
             />
           </RowCard>
         </View>
-        <View style={styles.footerCard}>
-          <Text style={styles.footer} variant="secundario">
-            {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
-          </Text>
-        </View>
+        {/* Follow-up 292 (E-F23, E-F28): «Cerrar sesión» closes the screen on
+            a card of its own; nothing follows it. Her session is hers, so an
+            Administrator seeing the app as her leaves from «Ajustes» instead. */}
+        {viewingAs === null ? (
+          <LogoutCard
+            onPress={() => setConfirmingLogout(true)}
+            screenGap={bodyScroll.content.gap}
+          />
+        ) : null}
       </ScrollView>
       {passwordChanged === null ? null : (
         <BrandToast onClose={dismissPasswordChanged} title="Contraseña actualizada" />
@@ -253,9 +248,6 @@ export function StaffProfileScreen({ route }: { route: { params?: StaffProfilePa
 }
 
 const styles = StyleSheet.create({
-  footer: { textAlign: "center" },
-  // A quiet line goes in a white card, never on the 100 screen.
-  footerCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.smLg },
   // Walkthrough n.º 8: the band, titles and cards on one 16 pt edge.
   screen: { paddingHorizontal: spacing.lg },
 });

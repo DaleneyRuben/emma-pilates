@@ -24,7 +24,16 @@ describe("Rosa Emma tokens", () => {
     const offScale = Object.entries(colors).filter(
       ([name, value]) => name !== "scrim" && !allowed.includes(value),
     );
-    expect(offScale).toEqual([]);
+    // Follow-up 292: Destructivo is the one hue outside the rosa family.
+    expect(offScale).toEqual([["destructivo", "#A04640"]]);
+  });
+
+  // Follow-up 292 (owner 2026-11-27): a muted brick for actions that end
+  // something, «Cerrar sesión» and its confirmation, with white on it.
+  it("names Destructivo #A04640 with white on it", () => {
+    expect(brand.destructivo).toBe("#A04640");
+    expect(colors.destructivo).toBe("#A04640");
+    expect(colors.onDestructivo).toBe("#FFFBFB");
   });
 
   it("paints the screen 100 and the header band 200", () => {
