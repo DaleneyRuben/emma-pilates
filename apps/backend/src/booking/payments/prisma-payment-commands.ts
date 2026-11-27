@@ -58,18 +58,18 @@ import {
   type PaymentRow,
   type PaymentView,
   type PendingPaymentSummary,
-  type InvitationStatus,
   type PurchaseIntentView,
   type ReferralsView,
 } from './payment-views';
+import { invitationOf } from './referral-invitation';
 import {
   scheduleReceiptDeletion,
   settleReservation,
 } from './purchase-intent-settlement';
 
+export type { InvitationStatus } from './payment-views';
 export type {
   CreditActivityEntry,
-  InvitationStatus,
   PaymentReview,
   PaymentView,
   PendingPaymentSummary,
@@ -110,6 +110,7 @@ import {
 } from './grant-invite-reward';
 import { collectOwedCampaignClasses } from './owed-campaign-classes';
 import { hasEarlierRealPayment } from './gift-class-history';
+import { hasActivePaidPlan } from './host-paid-plan';
 import { isNextPlanPayment } from './next-plan-payment';
 import { listPendingTransfers } from './prisma-pending-payments';
 import { evaluationSaleSelect, evaluationStartsAtOf } from './evaluation-sale';
@@ -1331,11 +1332,12 @@ export function createPrismaPaymentCommands(
     principal: AuthenticatedPrincipal,
   ): Promise<ReferralsView> => {
     const clientId = requireClient(principal);
-    const [client, referrals] = await Promise.all([
+    const [client, codeActive, referrals] = await Promise.all([
       prisma.client.findUniqueOrThrow({
         where: { id: clientId },
         select: { referralCode: true },
       }),
+      hasActivePaidPlan(prisma, clientId, dependencies.now()),
       prisma.referral.findMany({
         where: { referrerClientId: clientId },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
@@ -1361,20 +1363,14 @@ export function createPrismaPaymentCommands(
 
     return {
       referralCode: client.referralCode,
+      codeActive,
       referrals: referrals.map((referral) => {
-        const pass = referral.referred.guestPassesReceived[0] ?? null;
-        const invitationStatus: InvitationStatus = (() => {
-          if (pass === null) return 'registered';
-          if (pass.rewardedAt !== null || pass.rewardOwed) return 'bought';
-          if (pass.bookingId !== null) return 'class_booked';
-          return 'registered';
-        })();
         return {
           referredClientId: referral.referred.id,
           referredName: abbreviateName(referral.referred.name),
           state:
             referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
-          invitationStatus,
+          ...invitationOf(referral.referred.guestPassesReceived[0] ?? null),
           createdAt: referral.createdAt,
           awardedAt: referral.awardedAt,
           awardCentavos: referral.awardCentavos,

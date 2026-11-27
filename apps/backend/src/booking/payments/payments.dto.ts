@@ -248,6 +248,12 @@ export class ReferredClientDto {
   })
   invitationStatus!: 'registered' | 'class_booked' | 'bought';
 
+  @ApiProperty({
+    description:
+      'Walkthrough n.º 22: a Guest Pass was opened for her; false when the code was not active when she registered.',
+  })
+  freeClass!: boolean;
+
   @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
 
@@ -266,6 +272,12 @@ export class ReferredClientDto {
 export class ReferralsDto {
   @ApiProperty()
   referralCode!: string;
+
+  @ApiProperty({
+    description:
+      'Whether her code gives a friend a Guest Pass now: only while she has a paid Plan in force (not a Courtesy Access nor her own Guest Pass). A friend who verifies her email while it is false gets no pass.',
+  })
+  codeActive!: boolean;
 
   @ApiProperty({ type: ReferredClientDto, isArray: true })
   referrals!: ReferredClientDto[];

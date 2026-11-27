@@ -1,9 +1,18 @@
 export type LinkIdentityKind = "client" | "staff";
 
 export type AuthenticationLinkIntent = {
-  type: "verify-email" | "activate-account" | "recover-password" | "confirm-email-change";
+  type:
+    | "verify-email"
+    | "activate-account"
+    | "recover-password"
+    | "confirm-email-change"
+    // Walkthrough n.º 13: a friend's invite; `token` holds her code.
+    | "referral-invite";
   token: string;
 };
+
+const invitePrefix = "/client/invite/";
+const inviteCode = /^[A-Z0-9][A-Z0-9-]{2,19}$/;
 
 const authenticationPaths: Readonly<Record<string, AuthenticationLinkIntent["type"]>> = {
   "authentication/verify-email": "verify-email",
@@ -24,6 +33,19 @@ export function parseVerifiedLink(
     url = new URL(value);
   } catch {
     return null;
+  }
+
+  // Walkthrough n.º 13: only the Client app opens an invite, by its code.
+  if (
+    identityKind === "client" &&
+    url.protocol === "https:" &&
+    allowedHosts.includes(url.hostname) &&
+    url.pathname.startsWith(invitePrefix)
+  ) {
+    // Valid codes carry no escapes, so the raw segment is checked as it is:
+    // decoding a broken escape would throw inside the running app.
+    const code = url.pathname.slice(invitePrefix.length).toUpperCase();
+    return inviteCode.test(code) ? { type: "referral-invite", token: code } : null;
   }
 
   // ADR-0095: each app claims only its own Accounts' prefix.

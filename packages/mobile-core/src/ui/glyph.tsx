@@ -169,6 +169,13 @@ export const glyphShapes = {
       <Path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
     </>
   ),
+  // A gift, for the free class a friend gives (walkthrough n.º 22, C02j).
+  gift: (
+    <>
+      <Rect height={11} rx={1} width={16} x={4} y={9} />
+      <Path d="M4 13h16M12 9v11M12 9c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1" />
+    </>
+  ),
   flame: (
     <Path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1 2.5 2 3 0-3.5.5-6 1-8.5z" />
   ),
@@ -220,6 +227,14 @@ export const glyphShapes = {
   ),
   // C2 C: a freeze's notice.
   snowflake: <Path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9" />,
+  // Perfil's «Política de privacidad» (walkthrough n.º 16, C18): a shield
+  // with a check, never the padlock (lucide shield-check).
+  shield: (
+    <>
+      <Path d="M12 3.5l7 2.5v5.5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
+      <Polyline points="9,12 11.2,14.2 15.5,9.8" />
+    </>
+  ),
   sun: (
     <>
       <Path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
@@ -232,6 +247,8 @@ export const glyphShapes = {
       <Circle cx={8.5} cy={8.5} r={1.5} />
     </>
   ),
+  // Walkthrough n.º 10 (C19c): the swipe's «Borrar».
+  trash: <Path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />,
   undo: <Path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" />,
   upload: (
     <Path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15" />

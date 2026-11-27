@@ -320,7 +320,8 @@ describe("Client Profile", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Comentario")).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Enviar comentario" })).toBeDisabled();
+    // Walkthrough n.º 15: always on; a tap marks what is missing.
+    expect(screen.getByRole("button", { name: "Enviar comentario" })).toBeEnabled();
   });
 
   it("edits the name and phone and saves them through the API", async () => {

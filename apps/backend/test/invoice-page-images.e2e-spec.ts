@@ -9,6 +9,7 @@ import {
   invoiceFileOperations,
   StaffInvoiceController,
 } from '../src/booking/payments/invoice-file/invoice-file.controller';
+import { StaffInvoiceUploadController } from '../src/booking/payments/invoice-file/invoice-upload-page.controller';
 import {
   PdfPageNotFoundError,
   PdfPageUnreadableError,
@@ -52,17 +53,23 @@ describe('Invoice page images (e2e)', () => {
     clientFile: operation(),
     readObject: operation(),
     renderPage: operation(),
+    uploadedFile: operation(),
   };
 
   beforeEach(async () => {
     operations.staffFile.mockResolvedValue(pdfFile);
     operations.clientFile.mockResolvedValue(pdfFile);
+    operations.uploadedFile.mockResolvedValue(pdfFile);
     operations.renderPage.mockResolvedValue({
       png: Buffer.concat([pngSignature, Buffer.from('rest')]),
       pageCount: 2,
     });
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [StaffInvoiceController, ClientInvoiceController],
+      controllers: [
+        StaffInvoiceController,
+        ClientInvoiceController,
+        StaffInvoiceUploadController,
+      ],
       providers: [
         {
           provide: authenticatedPrincipalResolver,
@@ -98,6 +105,25 @@ describe('Invoice page images (e2e)', () => {
       expect(operations.renderPage).toHaveBeenCalledWith(pdfFile.objectKey, 2);
     },
   );
+
+  // Walkthrough n.º 24 (E-D29): the PDF she chose, uploaded but not attached.
+  it('serves a page of the Staff Member’s own uploaded invoice file', async () => {
+    const assetId = '33333333-3333-4333-8333-333333333333';
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/staff/invoice-uploads/${assetId}/pages/1`)
+      .set('authorization', bearer)
+      .expect(200)
+      .expect('Content-Type', 'image/png')
+      .expect('Cache-Control', 'no-store')
+      .expect('X-Page-Count', '2');
+    expect(operations.uploadedFile).toHaveBeenCalledWith(assetId, principal);
+    expect(operations.renderPage).toHaveBeenCalledWith(pdfFile.objectKey, 1);
+    await request(app.getHttpServer())
+      .get('/api/v1/staff/invoice-uploads/not-an-id/pages/1')
+      .set('authorization', bearer)
+      .expect(400);
+  });
 
   it('answers a missing page as not found', async () => {
     operations.renderPage.mockRejectedValueOnce(new PdfPageNotFoundError(2));

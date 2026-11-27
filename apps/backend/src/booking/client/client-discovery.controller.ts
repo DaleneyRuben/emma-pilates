@@ -43,10 +43,14 @@ import {
   parseUpdateClientProfile,
   PlanDto,
   SessionDetailDto,
+  SessionOwnBookingDto,
   UpdateClientProfileDto,
 } from './client-discovery.dto';
 import { denyNonClients } from './deny-non-clients';
-import { classesLeftThisWeekQuery } from '../booking-controller-support';
+import {
+  classesLeftThisWeekQuery,
+  ownBookingAroundQuery,
+} from '../booking-controller-support';
 
 export const clientProfile = Symbol('clientProfile');
 export const clientSubscription = Symbol('clientSubscription');
@@ -196,6 +200,10 @@ export class ClientProfileController {
       ...(view.queuedPlanStartsOn === undefined
         ? {}
         : { queuedPlanStartsOn: view.queuedPlanStartsOn }),
+      // Walkthrough n.º 22 (C02j): whose code was not active yet.
+      ...(view.inactiveInvite === undefined
+        ? {}
+        : { inactiveInvite: view.inactiveInvite }),
       subscription:
         view.subscription === null
           ? null
@@ -324,6 +332,13 @@ export class SessionDetailController {
       clientId: string,
       at: Date,
     ) => Promise<number | null>,
+    @Inject(ownBookingAroundQuery)
+    private readonly ownBooking: (input: {
+      clientId: string;
+      sessionId: string;
+      startsAt: Date;
+      endsAt: Date;
+    }) => Promise<SessionOwnBookingDto | null>,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -354,12 +369,16 @@ export class SessionDetailController {
     }
 
     if (principal.identity.kind !== 'client') return detail;
+    const { clientId } = principal.identity;
     return {
       ...detail,
-      classesLeftThisWeek: await this.classesLeft(
-        principal.identity.clientId,
-        detail.startsAt,
-      ),
+      classesLeftThisWeek: await this.classesLeft(clientId, detail.startsAt),
+      yourBooking: await this.ownBooking({
+        clientId,
+        sessionId: parsedSessionId,
+        startsAt: detail.startsAt,
+        endsAt: detail.endsAt,
+      }),
     };
   }
 }

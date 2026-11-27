@@ -18,7 +18,10 @@ import {
   SessionDetailController,
   sessionDetail,
 } from '../src/booking/client/client-discovery.controller';
-import { classesLeftThisWeekQuery } from '../src/booking/booking-controller-support';
+import {
+  classesLeftThisWeekQuery,
+  ownBookingAroundQuery,
+} from '../src/booking/booking-controller-support';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
@@ -54,6 +57,7 @@ describe('client discovery (e2e)', () => {
     >();
   const findPlan = jest.fn<(id: string) => Promise<unknown>>();
   const findSessionDetail = jest.fn<(id: string) => Promise<unknown>>();
+  const findOwnBooking = jest.fn<(input: unknown) => Promise<unknown>>();
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue({
@@ -63,6 +67,7 @@ describe('client discovery (e2e)', () => {
     });
     findPlan.mockResolvedValue(null);
     findSessionDetail.mockResolvedValue(null);
+    findOwnBooking.mockResolvedValue(null);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [
@@ -147,6 +152,7 @@ describe('client discovery (e2e)', () => {
           provide: classesLeftThisWeekQuery,
           useValue: () => Promise.resolve(null),
         },
+        { provide: ownBookingAroundQuery, useValue: findOwnBooking },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -255,6 +261,27 @@ describe('client discovery (e2e)', () => {
     }
   });
 
+  // Walkthrough n.º 22 (C02j): a friend whose host's code was not active
+  // learns why her account has no free class.
+  it('says whose code was not active yet when she has no Plan', async () => {
+    subscriptionView.mockResolvedValueOnce({
+      status: 'none',
+      subscription: null,
+      inactiveInvite: { hostFirstName: 'Mariana' },
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/v1/clients/current/subscription')
+      .set('authorization', bearer)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({
+          status: 'none',
+          inactiveInvite: { hostFirstName: 'Mariana' },
+        });
+      });
+  });
+
   it('serves the Plan, Branch, and Class Type catalogs', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/plans')
@@ -310,6 +337,48 @@ describe('client discovery (e2e)', () => {
       .expect(({ body }) => {
         expect(body).toMatchObject({ code: 'session_not_found' });
       });
+  });
+
+  // Walkthrough n.º 1 (C04p, C04q): the detail says, when it opens, which of
+  // her Bookings stands on this class or at its time.
+  it('tells the Client her own Booking around the class', async () => {
+    const startsAt = new Date('2026-11-20T14:00:00.000Z');
+    const endsAt = new Date('2026-11-20T14:50:00.000Z');
+    findSessionDetail.mockResolvedValue({
+      id: sessionId,
+      startsAt,
+      endsAt,
+      capacity: 12,
+      bookedCount: 9,
+      availableSeats: 3,
+      waitlistCount: 0,
+    });
+    findOwnBooking.mockResolvedValue({
+      relation: 'overlapping',
+      bookingId: 'booking-1',
+      classTypeName: 'Mat Pilates',
+      startsAt,
+      endsAt,
+    });
+
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/sessions/${sessionId}`)
+      .set('authorization', bearer)
+      .expect(200);
+
+    expect((response.body as { yourBooking: unknown }).yourBooking).toEqual({
+      relation: 'overlapping',
+      bookingId: 'booking-1',
+      classTypeName: 'Mat Pilates',
+      startsAt: startsAt.toISOString(),
+      endsAt: endsAt.toISOString(),
+    });
+    expect(findOwnBooking).toHaveBeenCalledWith({
+      clientId: 'client-id',
+      sessionId,
+      startsAt,
+      endsAt,
+    });
   });
 
   it('requires authentication on every discovery route', async () => {

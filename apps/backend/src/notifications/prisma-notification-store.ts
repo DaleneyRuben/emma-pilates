@@ -115,12 +115,17 @@ export const createNotificationStore = (prisma: PrismaClient) => ({
     accountId: string;
     after: NotificationCursor | null;
     limit: number;
+    /** Only notifications created from then on (walkthrough n.º 10). */
+    since?: Date;
   }): Promise<NotificationRecord[]> =>
     prisma.notification
       .findMany({
         where: {
           accountId: input.accountId,
           deletedAt: null,
+          ...(input.since === undefined
+            ? {}
+            : { createdAt: { gte: input.since } }),
           ...(input.after === null
             ? {}
             : {
@@ -140,10 +145,47 @@ export const createNotificationStore = (prisma: PrismaClient) => ({
       .then((rows) =>
         rows.map((row) => ({ ...row, category: categoryNames[row.category] })),
       ),
-  countUnread: (accountId: string): Promise<number> =>
+  countUnread: (accountId: string, since?: Date): Promise<number> =>
     prisma.notification.count({
-      where: { accountId, readAt: null, deletedAt: null },
+      where: {
+        accountId,
+        readAt: null,
+        deletedAt: null,
+        ...(since === undefined ? {} : { createdAt: { gte: since } }),
+      },
     }),
+  // Walkthrough n.º 10: removing hides one of her own notifications; nothing
+  // is deleted (ADR-0086), and «Deshacer» clears the mark while it is fresh.
+  remove: (input: {
+    notificationId: string;
+    accountId: string;
+    removedAt: Date;
+  }): Promise<number> =>
+    prisma.notification
+      .updateMany({
+        where: {
+          id: input.notificationId,
+          accountId: input.accountId,
+          deletedAt: null,
+        },
+        data: { deletedAt: input.removedAt },
+      })
+      .then((result) => result.count),
+  restore: (input: {
+    notificationId: string;
+    accountId: string;
+    removedSince: Date;
+  }): Promise<number> =>
+    prisma.notification
+      .updateMany({
+        where: {
+          id: input.notificationId,
+          accountId: input.accountId,
+          deletedAt: { gte: input.removedSince },
+        },
+        data: { deletedAt: null },
+      })
+      .then((result) => result.count),
   markRead: (input: {
     notificationId: string;
     accountId: string;

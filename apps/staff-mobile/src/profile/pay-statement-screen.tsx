@@ -77,6 +77,6 @@ export function PayStatementScreen({ route }: { route: { params: { statementId: 
 
 const styles = StyleSheet.create({
   body: { flex: 1 },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
 });

@@ -71,6 +71,7 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
     list: operation(),
     export: operation(),
     triage: operation(),
+    read: operation(),
   };
   const principal: AuthenticatedPrincipal = {
     accountId: 'client-account',
@@ -92,6 +93,7 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
     });
     operations.export.mockResolvedValue([row]);
     operations.triage.mockResolvedValue(row);
+    operations.read.mockResolvedValue(row);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [...feedbackControllers],
@@ -228,6 +230,34 @@ describe('Feedback endpoints (e2e, REL-012)', () => {
         { page: 1, pageSize: 20 },
         principal,
       );
+    });
+
+    // Walkthrough n.º 11 (E-F25): the Staff app also filters by type.
+    it('filters by type', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/administrator/feedback?type=suggestion')
+        .set('authorization', bearer)
+        .expect(200);
+      expect(operations.list).toHaveBeenCalledWith(
+        { page: 1, pageSize: 20, type: 'suggestion' },
+        principal,
+      );
+    });
+
+    // Walkthrough n.º 11 (E-F19, E-F20): a notification opens one comment.
+    it('reads one Feedback without caching', async () => {
+      await request(app.getHttpServer())
+        .get(`/api/v1/administrator/feedback/${feedbackId}`)
+        .set('authorization', bearer)
+        .expect(200)
+        .expect('Cache-Control', 'no-store')
+        .expect(({ body }) => expect(body).toEqual(serialized));
+      expect(operations.read).toHaveBeenCalledWith({ feedbackId }, principal);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/administrator/feedback/not-a-uuid')
+        .set('authorization', bearer)
+        .expect(400);
     });
 
     it('refuses unknown filters', async () => {

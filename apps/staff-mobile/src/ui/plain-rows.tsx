@@ -1,4 +1,12 @@
-import { Chevron, colors, radii, spacing, surfaces, Text } from "@pilates/mobile-core";
+import {
+  Chevron,
+  colors,
+  radii,
+  spacing,
+  surfaces,
+  Text,
+  useRemoveAction,
+} from "@pilates/mobile-core";
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { Pressable, StyleSheet, View, type AccessibilityState } from "react-native";
 
@@ -67,9 +75,12 @@ export function PlainRow({
     </>
   );
   const a11yLabel = accessibilityLabel ?? [label, value].filter(Boolean).join(", ");
+  // Inside a swipe (E-F15) the row screen readers focus offers its «Borrar».
+  const removeAction = useRemoveAction();
   if (onPress === undefined) {
     return (
       <View
+        {...removeAction}
         accessibilityLabel={a11yLabel}
         accessible
         style={[styles.row, indent && styles.indent]}
@@ -81,6 +92,7 @@ export function PlainRow({
   }
   return (
     <Pressable
+      {...removeAction}
       accessibilityLabel={a11yLabel}
       accessibilityRole="button"
       accessibilityState={accessibilityState}

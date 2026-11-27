@@ -18,6 +18,8 @@ export interface ReferredClientDto {
   state: ReferredClientDtoState;
   /** BKM-014: the invitation's status. Older releases ignore it and read state. */
   invitationStatus: ReferredClientDtoInvitationStatus;
+  /** Walkthrough n.º 22: a Guest Pass was opened for her; false when the code was not active when she registered. */
+  freeClass: boolean;
   createdAt: string;
   /**
    * @deprecated

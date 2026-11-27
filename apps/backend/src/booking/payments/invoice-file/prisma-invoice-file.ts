@@ -25,6 +25,7 @@ import {
   listStaffInvoices,
   readInvoiceObject,
   readStaffInvoice,
+  readUploadedInvoiceObject,
 } from './prisma-invoice-file-reads';
 
 type Transaction = Prisma.TransactionClient;
@@ -263,5 +264,6 @@ export const createPrismaInvoiceFile = (
     readFileForStaff: (paymentId) => readInvoiceObject(prisma, { paymentId }),
     readFileForClient: ({ paymentId, clientId }) =>
       readInvoiceObject(prisma, { paymentId, clientId }),
+    readUploadedFile: (where) => readUploadedInvoiceObject(prisma, where),
   };
 };

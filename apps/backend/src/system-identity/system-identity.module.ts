@@ -44,7 +44,10 @@ import { PrismaAuthenticationGateway } from './authentication/prisma-authenticat
 import { principalResolverProvider } from './authentication/principal-resolver-wiring';
 import { CancelPendingClientRegistration } from './registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from './registration/client-email-verification.controller';
-import { ClientRegistrationController } from './registration/client-registration.controller';
+import {
+  ClientRegistrationController,
+  pendingRegistrationStatusReader,
+} from './registration/client-registration.controller';
 import { CorrectPendingClientEmail } from './registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from './registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from './registration/register-client';
@@ -62,6 +65,7 @@ import {
 } from './invitations/client-invitations.controller';
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { sendClientVerification } from './invitations/client-verification-resend';
+import { readClientEmailDelivery } from './invitations/client-email-delivery';
 import { biometricKeysWiring } from './biometric-keys/biometric-keys-wiring';
 import { emailChangeWiring } from './email-change/email-change-wiring';
 import {
@@ -73,6 +77,7 @@ import { emailSourceBudgetProviders } from './email-source-budget/email-source-b
 import { staffEmailBudgetProviders } from './staff-email-budget/staff-email-budget-providers';
 import { staffEmailAdmission } from './staff-email-budget/staff-email-budget.guard';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
+import { readPendingRegistrationStatus } from './registration/prisma-pending-registration-status';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
 import { authenticationDigest } from './security/authentication-digest';
@@ -281,6 +286,8 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
             sendClientVerification(command, principal, dependencies),
           cancel: (command, principal) =>
             cancelClientInvitation(command, principal, dependencies),
+          emailDelivery: (command, principal) =>
+            readClientEmailDelivery(command, principal, dependencies),
         };
       },
     },
@@ -340,6 +347,18 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
           now: () => new Date(),
           newId: randomUUID,
         }),
+    },
+    {
+      provide: pendingRegistrationStatusReader,
+      inject: [PRISMA_CLIENT, ConfigService],
+      useFactory:
+        (prisma: PrismaClient, config: ConfigService<Environment, true>) =>
+        (registrationContinuation: string) =>
+          readPendingRegistrationStatus(prisma, {
+            registrationContinuation,
+            now: new Date(),
+            digestEmail: authenticationDigest(config),
+          }),
     },
     {
       provide: VerifyClientEmail,

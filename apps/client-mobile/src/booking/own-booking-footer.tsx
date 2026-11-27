@@ -1,0 +1,158 @@
+import { cancelBooking, type SessionOwnBookingDto } from "@pilates/api-contracts";
+import {
+  colors,
+  ConfirmationSheet,
+  formatCancellationDeadline,
+  formatStartTime,
+  Glyph,
+  InlineError,
+  PrimaryButton,
+  spacing,
+  Text,
+  TextButton,
+  useMountedAt,
+} from "@pilates/mobile-core";
+import { useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+
+import { useClientFetcher } from "../client-fetcher";
+import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
+
+/** Why Reservar is off while she holds another class at that time (C04q). */
+export const overlappingReason = (booking: SessionOwnBookingDto) =>
+  `Ya tienes ${booking.classTypeName} a las ${formatStartTime(booking.startsAt)} ese día. Cancélala antes si prefieres esta.`;
+
+/**
+ * Walkthrough n.º 1 (C04p, C04q): the class detail's footer when she already
+ * booked this class, or holds another one at that time.
+ */
+export function OwnBookingFooter({
+  booking,
+  cancellationWindowMinutes,
+  onCancelled,
+  onOpenBooking,
+}: {
+  booking: SessionOwnBookingDto;
+  cancellationWindowMinutes: number | undefined;
+  onCancelled: () => Promise<unknown>;
+  onOpenBooking: () => void;
+}) {
+  if (booking.relation === "overlapping") {
+    return (
+      <>
+        <PrimaryButton
+          disabled
+          disabledReason={overlappingReason(booking)}
+          label="Reservar esta clase"
+        />
+        <TextButton label="Ver esa reserva" onPress={onOpenBooking} testID="session-own-booking" />
+      </>
+    );
+  }
+  return (
+    <BookedFooter
+      booking={booking}
+      cancellationWindowMinutes={cancellationWindowMinutes}
+      onCancelled={onCancelled}
+    />
+  );
+}
+
+function BookedFooter({
+  booking,
+  cancellationWindowMinutes,
+  onCancelled,
+}: {
+  booking: SessionOwnBookingDto;
+  cancellationWindowMinutes: number | undefined;
+  onCancelled: () => Promise<unknown>;
+}) {
+  const fetcher = useClientFetcher();
+  const mountedAt = useMountedAt();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  // Two taps in one frame both read «busy» as false (review), as in Mis reservas.
+  const started = useRef(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const deadline =
+    cancellationWindowMinutes === undefined
+      ? null
+      : new Date(new Date(booking.startsAt).getTime() - cancellationWindowMinutes * 60_000);
+  const freeLine =
+    deadline === null || deadline.getTime() <= mountedAt
+      ? null
+      : `Cancelas gratis hasta ${formatCancellationDeadline(deadline, new Date(mountedAt))}.`;
+
+  const cancel = async () => {
+    if (started.current) return;
+    started.current = true;
+    setConfirming(false);
+    setBusy(true);
+    setFailure(null);
+    try {
+      const response = await cancelBooking(booking.bookingId, undefined, fetcher);
+      if (response.status === 204) {
+        await onCancelled();
+        return;
+      }
+      setFailure(
+        bookingRejectionMessage(problemCode(response.data)) ??
+          "No pudimos cancelar la reserva. Inténtalo de nuevo.",
+      );
+    } catch {
+      setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
+    } finally {
+      started.current = false;
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      {/* C04p: a check before the status, centred. */}
+      <View style={styles.status}>
+        <Glyph
+          color={colors.text}
+          name="check"
+          size={18}
+          strokeWidth={1.7}
+          testID="own-booking-check"
+        />
+        <Text variant="titulo-fila">Ya reservaste esta clase</Text>
+      </View>
+      <PrimaryButton
+        busy={busy}
+        label="Cancelar reserva"
+        onPress={() => setConfirming(true)}
+        testID="session-cancel"
+        tone="error"
+      />
+      {freeLine === null ? null : (
+        <Text style={styles.centered} variant="secundario">
+          {freeLine}
+        </Text>
+      )}
+      {failure === null ? null : <InlineError style={styles.centered}>{failure}</InlineError>}
+      <ConfirmationSheet
+        confirmLabel="Sí, cancelar reserva"
+        confirmTestID="session-cancel-confirm"
+        onConfirm={() => void cancel()}
+        onDismiss={() => setConfirming(false)}
+        testID="session-cancel-sheet"
+        title="¿Cancelar esta reserva?"
+        visible={confirming}
+      />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  centered: { textAlign: "center" },
+  status: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    paddingVertical: spacing.sm,
+  },
+});

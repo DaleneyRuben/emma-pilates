@@ -7,6 +7,7 @@ import {
   adminDatabaseUrl,
   apiOrigin,
   apiPort,
+  resendWebhookSecret,
   webOrigin,
   webPort,
 } from "./environment";
@@ -65,6 +66,7 @@ const backendEnvironment = (databaseUrl: string): NodeJS.ProcessEnv => ({
   NODE_ENV: "development",
   PORT: String(apiPort),
   ADMIN_WEB_TRUSTED_ORIGINS: webOrigin,
+  RESEND_WEBHOOK_SECRET: resendWebhookSecret,
 });
 
 const waitFor = async (url: string, what: string): Promise<void> => {

@@ -1,0 +1,98 @@
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
+
+import type { AuthenticationApi } from "./authentication-api";
+import { AuthenticationFlow } from "./authentication-flow";
+
+function createApiMock(
+  holder: { code: string; holderFirstName: string; holderKind: "client" | "trainer" } = {
+    code: "LUCIA",
+    holderFirstName: "Lucía",
+    holderKind: "client",
+  },
+): AuthenticationApi {
+  return {
+    activateAccount: jest.fn(),
+    cancelRegistration: jest.fn(),
+    completeEmailChange: jest.fn(),
+    completePasswordRecovery: jest.fn(),
+    correctRegistrationEmail: jest.fn(),
+    inspectLink: jest.fn(),
+    lookUpReferralCode: jest.fn().mockResolvedValue({ ...holder, status: "valid" }),
+    readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
+    register: jest.fn(),
+    requestPasswordRecovery: jest.fn(),
+    resendRegistrationVerification: jest.fn(),
+    verifyClientEmail: jest.fn(),
+  } as AuthenticationApi;
+}
+
+async function openRegistration(
+  readClipboardCode: () => Promise<string | null>,
+  api: AuthenticationApi = createApiMock(),
+) {
+  const screen = await render(
+    <AuthenticationFlow api={api} readClipboardCode={readClipboardCode} />,
+  );
+  await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
+  return screen;
+}
+
+// Walkthrough n.º 13 (C01b8): on an iPhone the invite page copied the code;
+// «Crea tu cuenta» offers it instead of filling it unasked.
+describe("«Crea tu cuenta» and a code on the clipboard", () => {
+  it("offers a friend's code it finds, and fills it on «Usar código»", async () => {
+    const screen = await openRegistration(jest.fn().mockResolvedValue("lucia"));
+
+    expect(await screen.findByText("¿Te invitó Lucía?")).toBeOnTheScreen();
+    expect(screen.getByText("Usa su código y tu primera clase es gratis.")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Usar código LUCIA" }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("Código de referido")).toHaveProp("value", "LUCIA"),
+    );
+    expect(screen.queryByText("¿Te invitó Lucía?")).toBeNull();
+  });
+
+  it("draws the gift disc above a centred title and note", async () => {
+    const screen = await openRegistration(jest.fn().mockResolvedValue("lucia"));
+    const hidden = { includeHiddenElements: true };
+
+    const title = await screen.findByText("¿Te invitó Lucía?");
+    const disc = screen.getByTestId("confirmation-sheet-disc", hidden);
+    expect(disc).toHaveStyle({ backgroundColor: "#FEF6F2", height: 52, width: 52 });
+    expect(screen.getByTestId("glyph-gift", hidden)).toBeOnTheScreen();
+    expect(title).toHaveStyle({ textAlign: "center" });
+    expect(screen.getByText("Usa su código y tu primera clase es gratis.")).toHaveStyle({
+      textAlign: "center",
+    });
+  });
+
+  it("leaves the form as it was on «No, gracias»", async () => {
+    const screen = await openRegistration(jest.fn().mockResolvedValue("LUCIA"));
+
+    await fireEvent.press(await screen.findByRole("button", { name: "No, gracias" }));
+
+    expect(screen.queryByLabelText("Código de referido")).toBeNull();
+  });
+
+  it("offers nothing for text that is not a code", async () => {
+    const read = jest.fn().mockResolvedValue("hola, ¿vamos al pilates mañana?");
+    const screen = await openRegistration(read);
+
+    await waitFor(() => expect(read).toHaveBeenCalled());
+    expect(screen.queryByText(/¿Te invitó/)).toBeNull();
+  });
+
+  // #26: a Trainer's link copies her code too; it attributes the client
+  // to her without promising a free class.
+  it("offers a Trainer's code without a free class", async () => {
+    const screen = await openRegistration(
+      jest.fn().mockResolvedValue("DANIELA"),
+      createApiMock({ code: "DANIELA", holderFirstName: "Daniela", holderKind: "trainer" }),
+    );
+
+    expect(await screen.findByText("¿Te invitó Daniela?")).toBeOnTheScreen();
+    expect(screen.getByText("Usa su código al crear tu cuenta.")).toBeOnTheScreen();
+    expect(screen.queryByText(/clase es gratis/)).toBeNull();
+  });
+});

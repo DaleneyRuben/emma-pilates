@@ -60,6 +60,59 @@ const notificationCategories: [
   ...NotificationCategory[],
 ] = ['booking_schedule', 'reminder', 'subscription_payment', 'announcement'];
 
+// Walkthrough n.º 12 (E-F07): whose receipt or Freeze an Administrator's
+// review notice is about, and how it was decided.
+export class NotificationReviewDto {
+  @ApiProperty({ enum: ['payment', 'freeze'] })
+  subject!: 'payment' | 'freeze';
+
+  @ApiProperty()
+  clientName!: string;
+
+  @ApiProperty()
+  planName!: string;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    description: 'A payment’s amount due; null for a Freeze',
+  })
+  amountCentavos!: number | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'date' })
+  startsOn!: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'date' })
+  endsOn!: string | null;
+
+  @ApiProperty({ enum: ['pending', 'approved', 'rejected', 'withdrawn'] })
+  outcome!: 'pending' | 'approved' | 'rejected' | 'withdrawn';
+
+  @ApiProperty({ type: String, nullable: true })
+  decidedByName!: string | null;
+
+  @ApiProperty({ type: String, nullable: true, format: 'date-time' })
+  decidedAt!: Date | null;
+}
+
+// Walkthrough n.º 11 (E-F20): who wrote a comment and how it begins.
+export class NotificationFeedbackDto {
+  @ApiProperty({ format: 'uuid' })
+  feedbackId!: string;
+
+  @ApiProperty()
+  authorName!: string;
+
+  @ApiProperty({ enum: ['problem', 'suggestion', 'other'] })
+  type!: 'problem' | 'suggestion' | 'other';
+
+  @ApiProperty({ enum: ['client', 'staff'] })
+  app!: 'client' | 'staff';
+
+  @ApiProperty({ description: 'The start of the text, ending in «…» when cut' })
+  excerpt!: string;
+}
+
 export class NotificationDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -87,6 +140,12 @@ export class NotificationDto {
 
   @ApiPropertyOptional({ type: String, nullable: true, format: 'date-time' })
   readAt!: Date | null;
+
+  @ApiPropertyOptional({ type: NotificationReviewDto, nullable: true })
+  review?: NotificationReviewDto | null;
+
+  @ApiPropertyOptional({ type: NotificationFeedbackDto, nullable: true })
+  feedback?: NotificationFeedbackDto | null;
 }
 
 export class NotificationPageDto {

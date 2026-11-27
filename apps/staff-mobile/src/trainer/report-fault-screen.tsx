@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.smLg, padding: spacing.lg },
   centered: { alignItems: "center", justifyContent: "center" },
   emptyGap: { paddingTop: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   textArea: { minHeight: 104, textAlignVertical: "top" },
 });

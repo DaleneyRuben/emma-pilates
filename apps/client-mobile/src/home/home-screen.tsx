@@ -42,9 +42,15 @@ import { freezeToAnnounce, HomeFreezeNotice } from "./home-freeze-notice";
 import { HomeHeader } from "./home-header";
 import { evaluationShortcut, referralShortcut } from "./home-format";
 import { bookingLockNote, PaymentInReviewCard, PaymentRejectedCard } from "./home-payment-card";
-import { GuestPassCard, PurchasePlanCard } from "./home-plan-card";
+import { GuestPassCard, InactiveInviteNotice, PurchasePlanCard } from "./home-plan-card";
 import { PlanRow } from "./home-plan-row";
-import { LockedShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
+import {
+  LockedShortcutRow,
+  ShortcutRow,
+  ShortcutSection,
+  ShortcutTile,
+  ShortcutTiles,
+} from "./home-shortcuts";
 import { useRetryCachedHome } from "./retry-cached-home";
 import { NextClassCard, nextBookedClass } from "./next-class-card";
 import { PhonePrompt } from "./phone-prompt";
@@ -149,6 +155,8 @@ export function HomeScreen() {
     view.subscription !== null &&
     view.subscription !== undefined;
 
+  // C02f: a Guest Pass is not a paid Plan; its card is the screen's offer.
+  const guestPass = hasActivePlan && view.subscription?.guestPass !== undefined;
   const nextClass =
     hasActivePlan && bookings.data?.status === 200
       ? nextBookedClass(bookings.data.data)
@@ -216,6 +224,7 @@ export function HomeScreen() {
   const planBlock =
     hasActivePlan && view.subscription?.guestPass !== undefined ? (
       <GuestPassCard
+        onBook={() => navigation.navigate("Booking")}
         onDetail={() => navigation.navigate("Subscription")}
         onPurchase={() => navigation.navigate("Plans")}
         view={view}
@@ -227,10 +236,15 @@ export function HomeScreen() {
         subscription={view.subscription!}
       />
     ) : standing.kind === "none" ? (
-      <PurchasePlanCard
-        onPurchase={() => navigation.navigate("Plans")}
-        plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
-      />
+      <>
+        {view?.inactiveInvite === undefined ? null : (
+          <InactiveInviteNotice hostFirstName={view.inactiveInvite.hostFirstName} />
+        )}
+        <PurchasePlanCard
+          onPurchase={() => navigation.navigate("Plans")}
+          plansFromPriceCentavos={studioRules?.plansFromPriceCentavos}
+        />
+      </>
     ) : null;
   // 02T: on a tablet the next class and the Plan row sit side by side, then
   // «Reservar otra clase» and the promotion.
@@ -277,6 +291,13 @@ export function HomeScreen() {
               {bookBlock}
               {promotionsBlock}
             </>
+          ) : guestPass ? (
+            // C02f: the guest card comes before any promotion.
+            <>
+              {nextClassBlock}
+              {planBlock}
+              {promotionsBlock}
+            </>
           ) : (
             <>
               {nextClassBlock}
@@ -285,32 +306,32 @@ export function HomeScreen() {
               {planBlock}
             </>
           )}
-          <ShortcutSection>
-            {hasActivePlan ? (
-              <ShortcutTiles>
-                <ShortcutTile {...evaluationTile} />
-                <ShortcutTile {...referralTile} />
-              </ShortcutTiles>
-            ) : (
-              <>
-                <LockedShortcutRow
-                  label="Reservar una clase"
-                  note={
-                    standing.kind === "none"
-                      ? "Necesitas un plan activo"
-                      : bookingLockNote[standing.kind]
-                  }
-                />
+          {guestPass ? null : (
+            <ShortcutSection>
+              {hasActivePlan ? (
                 <ShortcutTiles>
-                  <ShortcutTile
+                  <ShortcutTile {...evaluationTile} />
+                  <ShortcutTile {...referralTile} />
+                </ShortcutTiles>
+              ) : (
+                <>
+                  <LockedShortcutRow
+                    label="Reservar una clase"
+                    note={
+                      standing.kind === "none"
+                        ? "Necesitas un plan activo"
+                        : bookingLockNote[standing.kind]
+                    }
+                  />
+                  {/* Walkthrough n.º 22: only a paid plan can give a free class. */}
+                  <ShortcutRow
                     {...evaluationTile}
                     note={nextEvaluation === undefined ? "Agenda tu cita" : evaluationTile.hint}
                   />
-                  <ShortcutTile {...referralTile} note="Su primera clase es gratis" />
-                </ShortcutTiles>
-              </>
-            )}
-          </ShortcutSection>
+                </>
+              )}
+            </ShortcutSection>
+          )}
         </TabletColumn>
       </BandScrollView>
       <PhonePrompt client={loadedProfile.data} />

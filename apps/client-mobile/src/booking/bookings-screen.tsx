@@ -45,6 +45,7 @@ import { NextBookingHero } from "./next-booking-hero";
 import { nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import { formatTimeRange } from "@pilates/mobile-core";
+import { usedFreeClass } from "./free-class-notice";
 
 type BookingsTab = "history" | "upcoming";
 
@@ -290,7 +291,7 @@ export function BookingsScreen({
         <BrandToast
           note={
             confirmed.planName === "Pase de invitada"
-              ? "Tu pase de invitada ya se usó."
+              ? usedFreeClass(confirmed.startsAt)
               : remaining !== undefined
                 ? `Te quedan ${remaining} clases en tu plan`
                 : `${confirmed.classTypeName} · ${formatListDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`

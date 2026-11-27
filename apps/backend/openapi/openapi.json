@@ -419,6 +419,43 @@
         ]
       }
     },
+    "/api/v1/assistant/client-invitations/{clientId}/email-delivery": {
+      "get": {
+        "operationId": "getClientEmailDelivery",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEmailDeliveryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
     "/api/v1/assistant/client-invitations/{clientId}/email-corrections": {
       "post": {
         "operationId": "correctClientInvitationEmail",
@@ -1029,6 +1066,38 @@
         "summary": "",
         "tags": [
           "ClientEmailVerification"
+        ]
+      }
+    },
+    "/api/v1/client-registrations/status-checks": {
+      "post": {
+        "operationId": "readPendingClientRegistrationStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PendingRegistrationContinuationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingRegistrationStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
         ]
       }
     },
@@ -6608,6 +6677,48 @@
         ]
       }
     },
+    "/api/v1/referral-codes/lookup": {
+      "get": {
+        "operationId": "lookUpReferralCode",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralCodeLookupDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many code lookups from this network address this minute (rate_limit_exceeded)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the address may look codes up again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ReferralCodeLookup"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -7441,6 +7552,60 @@
         ]
       }
     },
+    "/api/v1/staff/invoice-uploads/{imageAssetId}/pages/{page}": {
+      "get": {
+        "operationId": "getStaffInvoiceUploadPage",
+        "parameters": [
+          {
+            "name": "imageAssetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "X-Page-Count": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "description": "",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffInvoiceUpload"
+        ]
+      }
+    },
     "/api/v1/evaluation-slots": {
       "get": {
         "operationId": "listEvaluationSlots",
@@ -8233,6 +8398,66 @@
         "summary": "",
         "tags": [
           "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}": {
+      "delete": {
+        "operationId": "removeNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notificationId}/restore": {
+      "post": {
+        "operationId": "restoreNotification",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NotificationRemoval"
         ]
       }
     },
@@ -11303,6 +11528,19 @@
         "operationId": "listAdminFeedback",
         "parameters": [
           {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "problem",
+                "suggestion",
+                "other"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "app",
             "required": false,
             "in": "query",
@@ -11379,6 +11617,43 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminFeedbackExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFeedback"
+        ]
+      }
+    },
+    "/api/v1/administrator/feedback/{feedbackId}": {
+      "get": {
+        "operationId": "getAdminFeedback",
+        "parameters": [
+          {
+            "name": "feedbackId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFeedbackDto"
                 }
               }
             }
@@ -11943,6 +12218,27 @@
           "cancellable"
         ]
       },
+      "ClientEmailDeliveryDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "bounced": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "clientId",
+          "email",
+          "bounced"
+        ]
+      },
       "CorrectInvitationEmailDto": {
         "type": "object",
         "properties": {
@@ -12212,6 +12508,24 @@
         },
         "required": [
           "registrationContinuation"
+        ]
+      },
+      "PendingRegistrationStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified",
+              "expired",
+              "bounced"
+            ],
+            "description": "`verified`: the email was confirmed (on any device); `expired`: the registration can no longer continue; `bounced`: the verification email hard-bounced, so the address needs correcting"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "PendingVerificationResendDto": {
@@ -12765,6 +13079,16 @@
             "format": "date-time",
             "nullable": true,
             "description": "The start of the class the Guest Pass was used for; null while it is unused."
+          },
+          "hostFirstName": {
+            "type": "string",
+            "example": "Lucía",
+            "description": "Who invited her, «Te invitó Lucía» (walkthrough n.º 19)"
+          },
+          "hostInitials": {
+            "type": "string",
+            "example": "LF",
+            "description": "The host's initials"
           }
         },
         "required": [
@@ -12863,6 +13187,18 @@
           "endsOn"
         ]
       },
+      "ClientInactiveInviteDto": {
+        "type": "object",
+        "properties": {
+          "hostFirstName": {
+            "type": "string",
+            "example": "Lucía"
+          }
+        },
+        "required": [
+          "hostFirstName"
+        ]
+      },
       "ClientSubscriptionDto": {
         "type": "object",
         "properties": {
@@ -12923,6 +13259,14 @@
             "type": "string",
             "format": "date",
             "description": "The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued."
+          },
+          "inactiveInvite": {
+            "description": "With no Plan ever: she registered with a Client's code that gave her no free class, because that host has no paid Plan (walkthrough n.º 22). Absent otherwise.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientInactiveInviteDto"
+              }
+            ]
           }
         },
         "required": [
@@ -13044,6 +13388,42 @@
           "durationMinutes"
         ]
       },
+      "SessionOwnBookingDto": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string",
+            "enum": [
+              "this_class",
+              "overlapping"
+            ],
+            "description": "`this_class`: she booked this class; `overlapping`: another class of hers at that time"
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string",
+            "example": "Mat Pilates"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relation",
+          "bookingId",
+          "classTypeName",
+          "startsAt",
+          "endsAt"
+        ]
+      },
       "SessionDetailDto": {
         "type": "object",
         "properties": {
@@ -13107,6 +13487,16 @@
             "minimum": 0,
             "nullable": true,
             "description": "Classes left this week from the base allowance. Absent without a cap."
+          },
+          "yourBooking": {
+            "nullable": true,
+            "description": "For a Client: her Booking on this class or overlapping it (walkthrough n.º 1, the rule a Booking is refused with); null when none. Absent for Staff.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionOwnBookingDto"
+              }
+            ]
           }
         },
         "required": [
@@ -15174,6 +15564,10 @@
             ],
             "description": "BKM-014: the invitation's status. Older releases ignore it and read state."
           },
+          "freeClass": {
+            "type": "boolean",
+            "description": "Walkthrough n.º 22: a Guest Pass was opened for her; false when the code was not active when she registered."
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -15195,6 +15589,7 @@
           "referredName",
           "state",
           "invitationStatus",
+          "freeClass",
           "createdAt"
         ]
       },
@@ -15203,6 +15598,10 @@
         "properties": {
           "referralCode": {
             "type": "string"
+          },
+          "codeActive": {
+            "type": "boolean",
+            "description": "Whether her code gives a friend a Guest Pass now: only while she has a paid Plan in force (not a Courtesy Access nor her own Guest Pass). A friend who verifies her email while it is false gets no pass."
           },
           "referrals": {
             "type": "array",
@@ -15213,6 +15612,7 @@
         },
         "required": [
           "referralCode",
+          "codeActive",
           "referrals"
         ]
       },
@@ -17975,6 +18375,43 @@
           "status"
         ]
       },
+      "ReferralCodeLookupDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "LUCIA",
+            "description": "The code as it is stored"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "unknown"
+            ],
+            "description": "`unknown`: registering with it would be refused"
+          },
+          "holderFirstName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Lucía",
+            "description": "The holder's first name; null when unknown"
+          },
+          "holderKind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer"
+            ],
+            "nullable": true,
+            "description": "Whose code: a Client's or a Trainer's; null when unknown"
+          }
+        },
+        "required": [
+          "code",
+          "status"
+        ]
+      },
       "SetClientPhotoDto": {
         "type": "object",
         "properties": {
@@ -18859,6 +19296,106 @@
           "keptEvaluations"
         ]
       },
+      "NotificationReviewDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "enum": [
+              "payment",
+              "freeze"
+            ]
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "nullable": true,
+            "description": "A payment’s amount due; null for a Freeze"
+          },
+          "startsOn": {
+            "type": "string",
+            "nullable": true,
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "nullable": true,
+            "format": "date"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "decidedByName": {
+            "type": "string",
+            "nullable": true
+          },
+          "decidedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "subject",
+          "clientName",
+          "planName",
+          "amountCentavos",
+          "startsOn",
+          "endsOn",
+          "outcome",
+          "decidedByName",
+          "decidedAt"
+        ]
+      },
+      "NotificationFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "feedbackId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "suggestion",
+              "other"
+            ]
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "client",
+              "staff"
+            ]
+          },
+          "excerpt": {
+            "type": "string",
+            "description": "The start of the text, ending in «…» when cut"
+          }
+        },
+        "required": [
+          "feedbackId",
+          "authorName",
+          "type",
+          "app",
+          "excerpt"
+        ]
+      },
       "NotificationDto": {
         "type": "object",
         "properties": {
@@ -18901,6 +19438,24 @@
             "type": "string",
             "nullable": true,
             "format": "date-time"
+          },
+          "review": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationReviewDto"
+              }
+            ]
+          },
+          "feedback": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationFeedbackDto"
+              }
+            ]
           }
         },
         "required": [

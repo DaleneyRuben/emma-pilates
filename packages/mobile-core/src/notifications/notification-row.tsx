@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { Glyph } from "../ui/glyph";
+import { SwipeToRemove, useRemoveAction } from "../ui/swipe-to-remove";
 import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
@@ -60,10 +61,12 @@ function NotificationRow({
   const message = readableNotificationMessage(notification.message);
   const icon = notificationTopicIcon(notification);
   // The action is a sibling of the row's button, never nested in it, so
-  // VoiceOver and TalkBack reach both.
+  // VoiceOver and TalkBack reach both; the row's button carries its swipe's «Borrar».
+  const removeAction = useRemoveAction();
   return (
     <View style={styles.row}>
       <Pressable
+        {...removeAction}
         accessibilityLabel={`${notification.title}. ${message}`}
         accessibilityRole="button"
         onPress={onPress}
@@ -109,6 +112,7 @@ export function NotificationGroup({
   now,
   onAction,
   onOpen,
+  onRemove,
 }: {
   actionFor?: NotificationActionFor;
   items: readonly NotificationDto[];
@@ -116,30 +120,44 @@ export function NotificationGroup({
   /** Runs before a notice's action, so the screen can mark it read. */
   onAction?: (notification: NotificationDto) => void;
   onOpen: (notification: NotificationDto) => void;
+  /** Walkthrough n.º 10: swiping a notice to the left removes it. */
+  onRemove?: (notification: NotificationDto) => void;
 }) {
   return (
     <View style={styles.group} testID="notification-group">
       {items.map((item, index) => {
         const action = actionFor?.(item) ?? null;
+        const row = (
+          <NotificationRow
+            action={
+              action === null
+                ? null
+                : {
+                    label: action.label,
+                    onPress: () => {
+                      onAction?.(item);
+                      action.onPress();
+                    },
+                  }
+            }
+            notification={item}
+            now={now}
+            onPress={() => onOpen(item)}
+          />
+        );
         return (
           <Fragment key={item.id}>
             {index === 0 ? null : <View style={styles.divider} testID="notification-divider" />}
-            <NotificationRow
-              action={
-                action === null
-                  ? null
-                  : {
-                      label: action.label,
-                      onPress: () => {
-                        onAction?.(item);
-                        action.onPress();
-                      },
-                    }
-              }
-              notification={item}
-              now={now}
-              onPress={() => onOpen(item)}
-            />
+            {onRemove === undefined ? (
+              row
+            ) : (
+              <SwipeToRemove
+                onRemove={() => onRemove(item)}
+                testID={`notification-swipe-${item.id}`}
+              >
+                {row}
+              </SwipeToRemove>
+            )}
           </Fragment>
         );
       })}

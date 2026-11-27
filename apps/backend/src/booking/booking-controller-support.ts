@@ -15,6 +15,8 @@ export const trainerSchedule = Symbol('trainerSchedule');
 export const trainerSessionRoster = Symbol('trainerSessionRoster');
 export const sessionAvailability = Symbol('sessionAvailability');
 export const classesLeftThisWeekQuery = Symbol('classesLeftThisWeekQuery');
+/** Her Booking on a class or overlapping it (walkthrough n.º 1). */
+export const ownBookingAroundQuery = Symbol('ownBookingAroundQuery');
 
 export type CommandHandler = (
   command: { sessionId: string; clientId?: string },

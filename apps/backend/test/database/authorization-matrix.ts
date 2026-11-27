@@ -10,6 +10,7 @@ import { studioFactsAuthorizationRows } from './studio-facts-authorization';
 import { supplyMovementAuthorizationRows } from './supply-movement-authorization';
 import { staffPhotoAuthorizationRows } from './staff-photo-authorization';
 import { transferQrAuthorizationRows } from './transfer-qr-authorization';
+import { walkthroughAuthorizationRows } from './walkthrough-authorization';
 import type { RealIds } from './authorization-matrix-support';
 
 // IDN-009 / ADR-0102 / ADR-0108: every endpoint the API serves, with an
@@ -155,8 +156,6 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
       osVersion: '18.2',
     },
   }),
-  'GET /api/v1/administrator/feedback': both('allow'),
-  'GET /api/v1/administrator/feedback/export': both('allow'),
   'GET /api/v1/administrator/founder-memberships': administratorOnly(),
   'POST /api/v1/administrator/feedback/{feedbackId}/triage': both('allow', {
     body: { status: 'reviewed', changeNote: null },
@@ -467,6 +466,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   ...campaignAuthorizationRows(),
   ...transferQrAuthorizationRows(),
   ...staffPhotoAuthorizationRows(),
+  ...walkthroughAuthorizationRows(),
   ...payoutQrAuthorizationRows(),
 };
 

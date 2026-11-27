@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import type { TextInputProps } from "react-native";
 
 import { fieldTextProps } from "./field-text";
-import { Glyph } from "./glyph";
+import { Glyph, type GlyphName } from "./glyph";
 import { InlineError } from "./inline-error";
 import { Text } from "./text";
 import { colors, radii, spacing } from "./tokens";
@@ -12,6 +12,8 @@ const dotsOnly = /^[\s•·*.●]+$/;
 
 type FormFieldProps = TextInputProps & {
   error?: string;
+  /** A line icon before the error, where a board draws one (C01b6). */
+  errorIcon?: GlyphName;
   /** An example or a rule under the field, «Ej.: …»; never in the placeholder (FormB). */
   hint?: string;
   label: string;
@@ -26,6 +28,7 @@ type FormFieldProps = TextInputProps & {
  */
 export function FormField({
   error,
+  errorIcon,
   hint,
   label,
   optional = false,
@@ -89,7 +92,11 @@ export function FormField({
         ) : null}
       </View>
       {hint === undefined ? null : <Text variant="secundario">{hint}</Text>}
-      {error === undefined ? null : <InlineError field>{error}</InlineError>}
+      {error === undefined ? null : (
+        <InlineError field icon={errorIcon}>
+          {error}
+        </InlineError>
+      )}
     </View>
   );
 }

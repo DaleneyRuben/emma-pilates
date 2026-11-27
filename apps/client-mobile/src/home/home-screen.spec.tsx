@@ -188,7 +188,7 @@ describe("Client Home", () => {
     expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Activo")).not.toBeOnTheScreen();
     expect(screen.getByTestId("shortcut-lock", { includeHiddenElements: true })).toBeOnTheScreen();
-    expect(screen.getByText("Su primera clase es gratis")).toBeOnTheScreen();
+    expect(screen.queryByText("Su primera clase es gratis")).toBeNull();
   });
 
   it("recovers from a failed load with a retry", async () => {

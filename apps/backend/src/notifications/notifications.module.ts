@@ -26,6 +26,17 @@ import {
   NOTIFICATION_RECORDER,
 } from './notification-recorder.provider';
 import { createNotificationStore } from './prisma-notification-store';
+import { readNotificationSubjects } from './prisma-notification-subjects';
+import {
+  NotificationRemovalController,
+  notificationRemove,
+  notificationRestore,
+} from './notification-removal.controller';
+import {
+  notificationCutoff,
+  removeNotification,
+  restoreNotification,
+} from './remove-notification';
 
 const notificationStore = Symbol('notificationStore');
 const accountDevices = Symbol('accountDevices');
@@ -35,7 +46,11 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
 
 @Module({
   imports: [SystemIdentityModule],
-  controllers: [NotificationsController, DevicesController],
+  controllers: [
+    NotificationsController,
+    NotificationRemovalController,
+    DevicesController,
+  ],
   exports: [NOTIFICATION_RECORDER],
   providers: [
     notificationRecorderProvider,
@@ -61,23 +76,31 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
     },
     {
       provide: notificationList,
-      inject: [notificationStore],
+      inject: [notificationStore, PRISMA_CLIENT],
       useFactory:
-        (store: Store) =>
+        (store: Store, prisma: PrismaClient) =>
         (
           query: { limit: number; cursor: string | null },
           principal: AuthenticatedPrincipal,
         ) =>
           listNotifications(query, {
             principal,
-            findPage: (input) => store.findPage(input),
+            // Walkthrough n.º 10: a month of notifications, no more.
+            findPage: (input) =>
+              store.findPage({
+                ...input,
+                since: notificationCutoff(new Date()),
+              }),
+            // Walkthrough n.º 11 and 12: what review and feedback notices
+            // are about.
+            describe: (items) => readNotificationSubjects(prisma, items),
           }),
     },
     {
       provide: notificationUnreadCount,
       inject: [notificationStore],
       useFactory: (store: Store) => (principal: AuthenticatedPrincipal) =>
-        store.countUnread(principal.accountId),
+        store.countUnread(principal.accountId, notificationCutoff(new Date())),
     },
     {
       provide: notificationMarkRead,
@@ -103,6 +126,36 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
           markAllRead: (input) => store.markAllRead(input),
           now: () => new Date(),
         }),
+    },
+    {
+      provide: notificationRemove,
+      inject: [notificationStore],
+      useFactory:
+        (store: Store) =>
+        (
+          command: { notificationId: string },
+          principal: AuthenticatedPrincipal,
+        ) =>
+          removeNotification(command, {
+            principal,
+            remove: (input) => store.remove(input),
+            now: () => new Date(),
+          }),
+    },
+    {
+      provide: notificationRestore,
+      inject: [notificationStore],
+      useFactory:
+        (store: Store) =>
+        (
+          command: { notificationId: string },
+          principal: AuthenticatedPrincipal,
+        ) =>
+          restoreNotification(command, {
+            principal,
+            restore: (input) => store.restore(input),
+            now: () => new Date(),
+          }),
     },
   ],
 })

@@ -12,7 +12,10 @@ import {
   StaffRole,
   type PrismaClient,
 } from '../../generated/prisma/client';
-import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
+import {
+  settleReviewNotices,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import {
   FeedbackError,
   type FeedbackActor,
@@ -238,11 +241,12 @@ export const createPrismaFeedbackStore = (
       return { id: stored.id, createdAt: new Date(stored.createdAt) };
     },
 
-    list: async ({ page, pageSize, status, app }) => {
+    list: async ({ page, pageSize, status, app, type }) => {
       const where: Prisma.FeedbackWhereInput = {
         deletedAt: null,
         ...(status === undefined ? {} : { status: statuses[status] }),
         ...(app === undefined ? {} : { app: apps[app] }),
+        ...(type === undefined ? {} : { type: types[type] }),
       };
       const [records, totalItems, perStatus] = await Promise.all([
         prisma.feedback.findMany({
@@ -271,6 +275,14 @@ export const createPrismaFeedbackStore = (
         reviewedCount: countOf('reviewed'),
         resolvedCount: countOf('resolved'),
       };
+    },
+
+    find: async (feedbackId) => {
+      const record = await prisma.feedback.findFirst({
+        where: { id: feedbackId, deletedAt: null },
+        select: feedbackSelect,
+      });
+      return record === null ? null : toRow(record);
     },
 
     listAll: async () =>
@@ -321,6 +333,14 @@ export const createPrismaFeedbackStore = (
             occurredAt,
           }),
         });
+        // Testing session (E-F20): a triaged comment stops asking on every
+        // Administrator's bell, as a decided receipt or Freeze does.
+        if (status !== 'new') {
+          await settleReviewNotices(transaction, {
+            businessEventKey: `feedback-received:${feedbackId}`,
+            settledAt: occurredAt,
+          });
+        }
         return toRow(record);
       }),
   };

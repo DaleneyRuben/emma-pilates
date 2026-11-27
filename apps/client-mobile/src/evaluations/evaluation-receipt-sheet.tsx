@@ -12,7 +12,7 @@ import {
 } from "@pilates/mobile-core";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { ReceiptRow } from "../payments/receipt-row";
+import { ReceiptRow, receiptStateOf } from "../payments/receipt-row";
 import { TransferQrCard } from "../payments/transfer-qr-card";
 
 /**
@@ -56,9 +56,8 @@ export function EvaluationReceiptSheet({
                 <ReceiptRow
                   onAttach={onAttach}
                   onRemove={() => undefined}
-                  receipt={null}
+                  receipt={receiptStateOf(null, uploading)}
                   testID="evaluation-receipt-sheet-row"
-                  uploading={uploading}
                 />
               </View>
             </View>

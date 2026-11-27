@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   state: { paddingTop: spacing.md },
   // FIX-089: the weekday is a word in weight, with no tinted disc behind it.
   tag: { justifyContent: "center", width: 40 },

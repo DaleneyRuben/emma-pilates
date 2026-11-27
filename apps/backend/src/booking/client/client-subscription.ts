@@ -1,6 +1,7 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import type { SubscriptionSummary } from '../catalog/catalog-repository';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { nameInitials } from './name-initials';
 
 export type ClientSubscriptionSummary = {
   id: string;
@@ -15,19 +16,33 @@ export type ClientSubscriptionSummary = {
   classesLeftThisWeek?: number | null;
   /** Live extra classes on top of the allowance (walkthrough n.º 61). */
   extraClasses?: number;
-  /** Set on a Guest Pass (walkthrough n.º 56); its class, once used. */
-  guestPass?: { usedClassStartsAt: Date | null } | null;
+  /** Set on a Guest Pass (walkthrough n.º 56); its class, once used, and its host (n.º 19). */
+  guestPass?: { usedClassStartsAt: Date | null; hostName?: string } | null;
 };
+
+const firstName = (name: string): string => name.trim().split(/\s+/)[0] ?? '';
 
 // The transport shape of a Guest Pass: absent on a Plan.
 export const guestPassField = (
   guestPass: ClientSubscriptionSummary['guestPass'],
-): { guestPass?: { usedClassStartsAt: string | null } } =>
+): {
+  guestPass?: {
+    usedClassStartsAt: string | null;
+    hostFirstName?: string;
+    hostInitials?: string;
+  };
+} =>
   guestPass == null
     ? {}
     : {
         guestPass: {
           usedClassStartsAt: guestPass.usedClassStartsAt?.toISOString() ?? null,
+          ...(guestPass.hostName === undefined
+            ? {}
+            : {
+                hostFirstName: firstName(guestPass.hostName),
+                hostInitials: nameInitials(guestPass.hostName),
+              }),
         },
       };
 
@@ -85,6 +100,8 @@ export type ClientSubscriptionView = {
    * review). A Freeze must end the current plan before it (finding 51).
    */
   queuedPlanStartsOn?: string;
+  /** With no Plan: her friend's code gave her no free class (n.º 22, C02j). */
+  inactiveInvite?: { hostFirstName: string };
 };
 
 type LoadClientSubscriptionDependencies = {
@@ -106,6 +123,9 @@ type LoadClientSubscriptionDependencies = {
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
   readRenewalStartsOn?(clientId: string): Promise<string | null>;
   readQueuedPlanStart?(clientId: string, after: Date): Promise<string | null>;
+  readInactiveInvite?(
+    clientId: string,
+  ): Promise<{ hostFirstName: string } | null>;
 };
 
 // The renewal reminder is sent 3 days before the paid-through date.
@@ -130,6 +150,9 @@ type SubscriptionLookup = {
   readPlanDurationDays?(subscriptionId: string): Promise<number | null>;
   readRenewalStartsOn?(clientId: string): Promise<string | null>;
   readQueuedPlanStart?(clientId: string, after: Date): Promise<string | null>;
+  readInactiveInvite?(
+    clientId: string,
+  ): Promise<{ hostFirstName: string } | null>;
 };
 
 const renewalDeadline = async (
@@ -193,6 +216,10 @@ export const describeSubscription = async (
   }
 
   const latest = await dependencies.findLatestSubscription(clientId);
+  const inactiveInvite =
+    latest === null
+      ? ((await dependencies.readInactiveInvite?.(clientId)) ?? null)
+      : null;
 
   return latest === null
     ? {
@@ -202,6 +229,7 @@ export const describeSubscription = async (
         founderRenewalDeadline: null,
         freeze: null,
         canRequestFreeze: false,
+        ...(inactiveInvite === null ? {} : { inactiveInvite }),
       }
     : {
         status: 'expired',

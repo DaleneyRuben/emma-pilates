@@ -6,18 +6,22 @@ import {
   type AcquisitionChannelChoice,
 } from "../acquisition/acquisition-channel-field";
 import { bolivia, phoneProblem, storedPhone } from "../account/phone-number";
+import { Chevron } from "../ui/chevron";
 import { FormErrorSummary } from "../ui/form-error-summary";
 import { FormField } from "../ui/form-field";
+import { Glyph } from "../ui/glyph";
 import { PhoneField, type PhoneValue } from "../ui/phone-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Text } from "../ui/text";
-import { spacing } from "../ui/tokens";
+import { colors, spacing } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
 import { restartPendingWindow, type PendingRegistration } from "./pending-registration-screens";
 import { limitKeepsAnyLink } from "./request-limit-copy";
+import { useReferralCodeCheck } from "./use-referral-code-check";
+import { ClipboardInviteSheet, useClipboardInvite } from "./clipboard-invite";
 
 export const minimumPasswordLength = 8;
 
@@ -34,12 +38,18 @@ function problemCode(error: unknown): string | null {
 
 export function RegistrationScreen({
   api,
+  initialReferralCode = null,
   onBack,
   onRegistered,
+  readClipboardCode,
 }: {
   api: AuthenticationApi;
+  /** A friend's code it was given (invite link, install referrer, n.º 13). */
+  initialReferralCode?: string | null;
   onBack: () => void;
   onRegistered: (registration: PendingRegistration) => void;
+  /** iPhone only: the copied invite code, read once (n.º 13, C01b8). */
+  readClipboardCode?: () => Promise<string | null>;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,13 +57,45 @@ export function RegistrationScreen({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [channel, setChannel] = useState<AcquisitionChannelChoice | null>(null);
-  const [referralOpen, setReferralOpen] = useState(false);
-  const [referralCode, setReferralCode] = useState("");
+  const [referralOpen, setReferralOpen] = useState(initialReferralCode !== null);
+  const [referralCode, setReferralCode] = useState(initialReferralCode ?? "");
+  const [codeFocused, setCodeFocused] = useState(false);
+  // A code that arrives while the form is open (the install referrer answers
+  // late) fills an empty field.
+  const [givenCode, setGivenCode] = useState(initialReferralCode);
+  if (initialReferralCode !== givenCode) {
+    setGivenCode(initialReferralCode);
+    if (initialReferralCode !== null && referralCode.trim() === "") {
+      setReferralOpen(true);
+      setReferralCode(initialReferralCode);
+    }
+  }
   const [submitted, setSubmitted] = useState(false);
   const [referralError, setReferralError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
+  const clipboard = useClipboardInvite(
+    api,
+    initialReferralCode === null ? readClipboardCode : undefined,
+  );
+  // n.º 18: whose code it is, and the channel it marked by itself.
+  const codeCheck = useReferralCodeCheck(api, referralOpen ? referralCode : "");
+  const [markedBy, setMarkedBy] = useState<string | null>(null);
+  // Adjusted while rendering when a new code is confirmed (React's pattern
+  // for state that follows a value), so the chip is marked in the same frame.
+  const [seenCheck, setSeenCheck] = useState(codeCheck);
+  if (codeCheck !== seenCheck) {
+    setSeenCheck(codeCheck);
+    if (codeCheck.status === "valid") {
+      setChannel(codeCheck.holderKind === "client" ? "friend" : "trainer");
+      setMarkedBy(codeCheck.holderFirstName);
+    }
+  }
+  const unknownCode =
+    codeCheck.status === "unknown"
+      ? `No encontramos el código ${codeCheck.code}. Revisa cómo lo escribiste.`
+      : undefined;
 
   // C6 B: a short error under each marked field, after a «!».
   const nameError = submitted && name.trim() === "" ? "! Escribe tu nombre" : undefined;
@@ -99,7 +141,8 @@ export function RegistrationScreen({
       phoneMistake !== null ||
       password.length < minimumPasswordLength ||
       password !== confirmation ||
-      channel === null
+      channel === null ||
+      codeCheck.status === "unknown"
     ) {
       return;
     }
@@ -134,8 +177,8 @@ export function RegistrationScreen({
 
   return (
     <AuthenticationScreen
-      brand={false}
-      footer={
+      // n.º 6 (C01b3, C01b4): the button ends the form and scrolls with it.
+      actions={
         <>
           <PrimaryButton
             busy={submitting}
@@ -143,9 +186,17 @@ export function RegistrationScreen({
             label="Crear cuenta"
             onPress={submit}
           />
-          <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
+          <FooterPrompt
+            action="Inicia sesión"
+            onPress={onBack}
+            pill
+            prompt="¿Ya tienes una cuenta?"
+          />
         </>
       }
+      brand={false}
+      // C01b3: the code field ends the form, so the form scrolls to its end.
+      revealEndWithKeyboard={referralOpen && codeFocused}
       topBar={{ onBack, title: "Crea tu cuenta" }}
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
@@ -198,43 +249,80 @@ export function RegistrationScreen({
         secureTextEntry
         value={confirmation}
       />
-      <AcquisitionChannelField error={channelError} onChange={setChannel} value={channel} />
+      <AcquisitionChannelField
+        error={channelError}
+        locked={markedBy !== null && codeCheck.status === "valid"}
+        note={
+          markedBy !== null && codeCheck.status === "valid"
+            ? `La marcamos por el código de ${markedBy}.`
+            : undefined
+        }
+        onChange={setChannel}
+        value={channel}
+      />
+      {/* C01b5/C01b6: the row stays above the open field, its chevron up. */}
+      <Pressable
+        accessibilityLabel="¿Tienes un código de referido?"
+        accessibilityRole="button"
+        accessibilityState={{ expanded: referralOpen }}
+        onPress={() => setReferralOpen((open) => !open)}
+        style={styles.referralToggle}
+      >
+        <Text style={styles.referralQuestion} variant="titulo-fila">
+          ¿Tienes un código de referido?
+        </Text>
+        <Chevron
+          direction={referralOpen ? "up" : "down"}
+          size={18}
+          strokeWidth={1.7}
+          testID="referral-toggle-chevron"
+        />
+      </Pressable>
       {referralOpen ? (
         <View style={styles.referral}>
           <FormField
             autoCapitalize="characters"
             autoCorrect={false}
-            error={referralError ? "! Revisa el código de referido" : undefined}
-            hint="Ej.: EMMA-2026"
+            error={unknownCode ?? (referralError ? "! Revisa el código de referido" : undefined)}
+            errorIcon={unknownCode === undefined ? undefined : "alert"}
+            hint="Ej.: LUCIA"
             label="Código de referido"
+            onBlur={() => setCodeFocused(false)}
             onChangeText={setReferralCode}
+            onFocus={() => setCodeFocused(true)}
             value={referralCode}
           />
-          <Text variant="secundario">De una amiga o de tu instructora.</Text>
+          {codeCheck.status === "valid" ? (
+            <View style={styles.holder}>
+              <Glyph color={colors.text} name="check" size={18} strokeWidth={1.7} />
+              <Text variant="compacto-600">{`Código de ${codeCheck.holderFirstName}`}</Text>
+            </View>
+          ) : (
+            <Text variant="secundario">De una amiga o de tu instructora.</Text>
+          )}
         </View>
-      ) : (
-        <Pressable
-          accessibilityLabel="¿Tienes un código de referido?"
-          accessibilityRole="button"
-          onPress={() => setReferralOpen(true)}
-          style={styles.referralToggle}
-        >
-          <Text variant="compacto-600">¿Tienes un código de referido?</Text>
-          <Text variant="compacto-600">⌄</Text>
-        </Pressable>
-      )}
+      ) : null}
+      <ClipboardInviteSheet
+        offer={clipboard.offer}
+        onDismiss={clipboard.dismiss}
+        onUse={(code) => {
+          clipboard.dismiss();
+          setReferralOpen(true);
+          setReferralCode(code);
+        }}
+      />
     </AuthenticationScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  holder: { alignItems: "center", flexDirection: "row", gap: spacing.xs },
   referral: { gap: spacing.xs },
+  referralQuestion: { flex: 1 },
   referralToggle: {
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.sm,
-    justifyContent: "space-between",
+    gap: spacing.md,
     minHeight: 44,
-    paddingHorizontal: spacing.xxs,
   },
 });

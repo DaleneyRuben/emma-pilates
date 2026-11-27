@@ -5,7 +5,12 @@ import {
   getUploadStatus,
   type CreatePendingUploadDtoPurpose,
 } from "@pilates/api-contracts";
-import { decodeBase64, encodeBase64 } from "@pilates/mobile-core";
+import {
+  decodeBase64,
+  encodeBase64,
+  uploadMaxEdge,
+  waitForUploadReady,
+} from "@pilates/mobile-core";
 import * as Crypto from "expo-crypto";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -25,21 +30,19 @@ export type PickedImage = {
   fileName?: string;
 };
 
-const pollMilliseconds = 700;
-const pollAttempts = 40;
 // UPL-003: nothing beyond the studio's 2048 px readable size is worth sending.
-const uploadMaxEdge = 2048;
 const uploadJpegQuality = 0.8;
-
-const wait = (milliseconds: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 
 /**
  * Picks one image, from the camera when asked and allowed, otherwise from the
  * system photo library (which asks no permission, MOB-065), re-encoded once
- * as a JPEG at most 2048 px on its longest side. Cancelled returns null.
+ * as a JPEG at most `maxEdge` px on its longest side: 2048, or 1024 for a
+ * profile photo (walkthrough n.º 14). Cancelled returns null.
  */
-export async function pickImage({ camera = false } = {}): Promise<PickedImage | null> {
+export async function pickImage({
+  camera = false,
+  maxEdge = uploadMaxEdge,
+} = {}): Promise<PickedImage | null> {
   const options: ImagePicker.ImagePickerOptions = { mediaTypes: ["images"], quality: 1 };
   const useCamera = camera && (await ImagePicker.requestCameraPermissionsAsync()).granted;
   const result = useCamera
@@ -48,28 +51,41 @@ export async function pickImage({ camera = false } = {}): Promise<PickedImage | 
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
 
-  const converted = await ImageManipulator.manipulateAsync(asset.uri, downscaleActions(asset), {
-    compress: uploadJpegQuality,
-    format: ImageManipulator.SaveFormat.JPEG,
-  });
+  const converted = await ImageManipulator.manipulateAsync(
+    asset.uri,
+    downscaleActions(asset, maxEdge),
+    {
+      compress: uploadJpegQuality,
+      format: ImageManipulator.SaveFormat.JPEG,
+    },
+  );
   const base64 = await FileSystem.readAsStringAsync(converted.uri, {
     encoding: FileSystem.EncodingType.Base64,
   });
   return { uri: converted.uri, bytes: decodeBase64(base64) };
 }
 
-function downscaleActions({ width = 0, height = 0 }: { width?: number; height?: number }) {
-  if (Math.max(width, height) <= uploadMaxEdge) return [];
-  return width >= height
-    ? [{ resize: { width: uploadMaxEdge } }]
-    : [{ resize: { height: uploadMaxEdge } }];
+function downscaleActions(
+  { width = 0, height = 0 }: { width?: number; height?: number },
+  maxEdge: number,
+) {
+  if (Math.max(width, height) <= maxEdge) return [];
+  return width >= height ? [{ resize: { width: maxEdge } }] : [{ resize: { height: maxEdge } }];
 }
+
+/**
+ * How far an upload got, from 0 to 1, step by step: declared, sent, finalized,
+ * ready (the Client's receipt, walkthrough n.º 7). React Native's fetch
+ * reports no byte progress.
+ */
+export type UploadProgress = (fraction: number) => void;
 
 /** Uploads the JPEG (or the invoice PDF) and resolves with its asset id once it is READY. */
 export async function uploadImage(
   image: PickedImage,
   purpose: CreatePendingUploadDtoPurpose,
   fetcher: typeof globalThis.fetch,
+  onProgress: UploadProgress = () => undefined,
 ): Promise<string> {
   const { bytes } = image;
   const mediaType = image.mediaType ?? "image/jpeg";
@@ -87,6 +103,7 @@ export async function uploadImage(
   );
   if (declared.status !== 201) throw new Error("upload_declaration_failed");
   const imageAssetId = declared.data.id;
+  onProgress(0.1);
 
   const stored = await fetcher(getPutPendingUploadObjectUrl(imageAssetId), {
     method: "PUT",
@@ -94,6 +111,7 @@ export async function uploadImage(
     body: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
   });
   if (!stored.ok) throw new Error("upload_failed");
+  onProgress(0.7);
 
   const finalized = await finalizeUpload(
     imageAssetId,
@@ -101,14 +119,12 @@ export async function uploadImage(
     fetcher,
   );
   if (finalized.status !== 202) throw new Error("upload_finalization_failed");
+  onProgress(0.8);
 
-  for (let attempt = 0; attempt < pollAttempts; attempt += 1) {
+  await waitForUploadReady(async () => {
     const status = await getUploadStatus(imageAssetId, undefined, fetcher);
-    if (status.status === 200 && status.data.state === "ready") return imageAssetId;
-    if (status.status === 200 && status.data.state === "failed") {
-      throw new Error("upload_rejected");
-    }
-    await wait(pollMilliseconds);
-  }
-  throw new Error("upload_verification_timeout");
+    return status.status === 200 ? status.data.state : null;
+  });
+  onProgress(1);
+  return imageAssetId;
 }

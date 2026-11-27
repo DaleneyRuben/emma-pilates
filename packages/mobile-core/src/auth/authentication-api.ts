@@ -5,6 +5,8 @@ import {
   completePasswordRecovery as completePasswordRecoveryRequest,
   correctPendingClientEmail,
   inspectAuthenticationLink,
+  lookUpReferralCode as lookUpReferralCodeRequest,
+  readPendingClientRegistrationStatus,
   registerClient,
   requestPasswordRecovery as requestPasswordRecoveryRequest,
   resendPendingClientVerification,
@@ -56,6 +58,9 @@ function failure(label: string, response: ApiResponse): AuthenticationApiError {
     Number.isFinite(retryAfter) ? Math.max(0, Math.floor(retryAfter)) : 0,
   );
 }
+
+/** How long a link verification may wait for the server (walkthrough n.º 3). */
+export const verificationTimeoutMilliseconds = 15_000;
 
 type AuthenticationApiOptions = {
   baseUrl: string;
@@ -138,6 +143,30 @@ export function createAuthenticationApi({
 
       return response.data;
     },
+    /** Whose code it is before registering (walkthrough n.º 18). */
+    async lookUpReferralCode(code: string) {
+      const response = await lookUpReferralCodeRequest({ code }, undefined, fetcher);
+
+      if (response.status !== 200) {
+        throw failure("Referral code lookup", response);
+      }
+
+      return response.data;
+    },
+    /** Whether the pending registration's email was confirmed (n.º 4). */
+    async readRegistrationStatus(registrationContinuation: string) {
+      const response = await readPendingClientRegistrationStatus(
+        { registrationContinuation },
+        undefined,
+        fetcher,
+      );
+
+      if (response.status !== 200) {
+        throw failure("Registration status", response);
+      }
+
+      return response.data.status;
+    },
     async register(values: StartClientRegistrationDto) {
       const response = await registerClient(values, await identified(), fetcher);
 
@@ -170,7 +199,19 @@ export function createAuthenticationApi({
       return response.data;
     },
     async verifyClientEmail(verificationToken: string) {
-      const response = await verifyClientEmailRequest({ verificationToken }, undefined, fetcher);
+      // A stalled network would otherwise leave «Verificando correo» up for ever.
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), verificationTimeoutMilliseconds);
+      let response: Awaited<ReturnType<typeof verifyClientEmailRequest>>;
+      try {
+        response = await verifyClientEmailRequest(
+          { verificationToken },
+          { signal: controller.signal },
+          fetcher,
+        );
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (response.status !== 200) {
         throw failure("Email verification", response);

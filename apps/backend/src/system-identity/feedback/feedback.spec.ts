@@ -84,6 +84,7 @@ const storeWith = (overrides: Partial<FeedbackStore> = {}): FeedbackStore => ({
   listAll: jest.fn().mockResolvedValue([row]),
   recordExport: jest.fn().mockResolvedValue(undefined),
   triage: jest.fn().mockResolvedValue({ ...row, status: 'resolved' }),
+  find: jest.fn().mockResolvedValue(row),
   ...overrides,
 });
 

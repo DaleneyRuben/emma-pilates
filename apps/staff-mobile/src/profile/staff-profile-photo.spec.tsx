@@ -118,12 +118,10 @@ describe("Staff Perfil photo", () => {
     const screen = await openProfile(routeFetcher(routes(daniela)), "trainer");
 
     expect(screen.getByText("DO")).toBeOnTheScreen();
-    // FIX-089: the secondary button, Crema with a Rosa profundo outline.
-    expect(screen.getByRole("button", { name: "Cambiar foto" })).toHaveStyle({
-      backgroundColor: "#FFFBFB",
-      borderColor: "#93615D",
-      borderWidth: 1.5,
-      height: 44,
+    // Walkthrough n.º 16 (E-F01): an underlined white link on the deep-rose card.
+    expect(screen.getByText("Cambiar foto")).toHaveStyle({
+      color: "#FFFBFB",
+      textDecorationLine: "underline",
     });
     expect(screen.queryByRole("button", { name: "Quitar foto" })).toBeNull();
     expect(
@@ -133,7 +131,7 @@ describe("Staff Perfil photo", () => {
     expect(screen.queryByText("Se recorta al centro en forma de círculo.")).toBeNull();
   });
 
-  it("shows her 64 px photo and «Quitar foto» once one is attached", async () => {
+  it("shows her 56 px photo and «Quitar foto» once one is attached", async () => {
     const screen = await openProfile(routeFetcher(routes(withPhoto)), "trainer");
 
     await waitFor(() =>
@@ -141,7 +139,7 @@ describe("Staff Perfil photo", () => {
         uri: photoDataUri,
       }),
     );
-    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ width: 64, height: 64 });
+    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveStyle({ width: 56, height: 56 });
     expect(screen.queryByText("DO")).toBeNull();
     expect(screen.getByRole("button", { name: "Quitar foto" })).toBeOnTheScreen();
     expect(screen.queryByText("Se recorta al centro en forma de círculo.")).toBeNull();
@@ -157,7 +155,7 @@ describe("Staff Perfil photo", () => {
     expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
   });
 
-  it("uploads the picked photo as a 2048 px JPEG and attaches it", async () => {
+  it("uploads the picked photo as a 1024 px JPEG and attaches it", async () => {
     pickedPhoto();
     const calls: string[] = [];
     let current = daniela;
@@ -184,7 +182,8 @@ describe("Staff Perfil photo", () => {
     expect(ImagePicker.requestCameraPermissionsAsync).not.toHaveBeenCalled();
     expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
       "file:///me.heic",
-      [{ resize: { width: 2048 } }],
+      // Walkthrough n.º 14: a profile photo travels at 1024 px, not 2048.
+      [{ resize: { width: 1024 } }],
       expect.objectContaining({ format: "jpeg" }),
     );
     await waitFor(() =>
@@ -229,7 +228,9 @@ describe("Staff Perfil photo", () => {
     await waitFor(() => expect(sessionsReads).toBeGreaterThan(readsBefore));
   });
 
-  it("shows the chosen photo under the veil while it uploads", async () => {
+  // Walkthrough n.º 14 (C22c): the chosen photo at once with the upload ring,
+  // no «Subiendo foto…» line and no veil.
+  it("shows the chosen photo at once with its ring while it uploads", async () => {
     pickedPhoto();
     const screen = await openProfile(
       routeFetcher(
@@ -240,24 +241,28 @@ describe("Staff Perfil photo", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar foto" }));
 
-    await waitFor(() => expect(screen.getByText("Subiendo foto…")).toBeOnTheScreen());
+    expect(await screen.findByTestId("photo-upload-ring")).toBeOnTheScreen();
     expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveProp("source", {
       uri: "file:///me.jpg",
     });
-    expect(screen.getByTestId("photo-veil")).toHaveStyle({
-      backgroundColor: "rgba(147,97,93,0.42)",
-    });
-    expect(screen.queryByRole("button", { name: "Cambiar foto" })).toBeNull();
+    expect(screen.queryByText("Subiendo foto…")).toBeNull();
+    expect(screen.queryByTestId("photo-veil")).toBeNull();
   });
 
-  it("brings the initials back with the warning when the upload fails", async () => {
+  // C22d: only a failure speaks; the photo stays and «Reintentar» sends it again.
+  it("keeps the chosen photo with Reintentar when the upload fails", async () => {
     pickedPhoto();
+    let attempts = 0;
     const screen = await openProfile(
       routeFetcher(
         routes(daniela, {
           ...uploadRoutes([]),
-          "PUT /api/v1/staff-members/current/photo": () =>
-            jsonResponse({ code: "profile_photo_not_ready", status: 409 }, 409),
+          "PUT /api/v1/staff-members/current/photo": () => {
+            attempts += 1;
+            return attempts === 1
+              ? jsonResponse({ code: "profile_photo_not_ready", status: 409 }, 409)
+              : jsonResponse({ staffMemberId: "staff-1", photo: { imageAssetId: "asset-new" } });
+          },
         }),
       ),
       "trainer",
@@ -265,13 +270,18 @@ describe("Staff Perfil photo", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Cambiar foto" }));
 
-    await waitFor(() =>
-      expect(screen.getByText("No pudimos subir la foto. Inténtalo de nuevo.")).toBeOnTheScreen(),
-    );
+    expect(await screen.findByText("No pudimos subir tu foto.")).toBeOnTheScreen();
     // FIX-089: the notice draws no disc.
     expect(screen.queryByTestId("notice-row-disc")).toBeNull();
-    expect(screen.getByText("DO")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Cambiar foto" })).toBeOnTheScreen();
+    expect(screen.getByLabelText("Foto de Daniela Ortiz")).toHaveProp("source", {
+      uri: "file:///me.jpg",
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+
+    await waitFor(() => expect(attempts).toBe(2));
+    await waitFor(() => expect(screen.queryByText("No pudimos subir tu foto.")).toBeNull());
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledTimes(1);
   });
 
   it("removes the photo and falls back to the initials", async () => {

@@ -1,6 +1,10 @@
 import { HttpException } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { RateLimitLane } from './request-rate-limit';
+import {
+  codeLookupsPerAddressPerMinute,
+  createRequestRateLimiter,
+  type RateLimitLane,
+} from './request-rate-limit';
 import { createRequestRateLimitMiddleware } from './request-rate-limit.middleware';
 
 const credential = 'k'.repeat(43);
@@ -127,4 +131,33 @@ describe('BE-025 request rate limit middleware', () => {
     expect(admit).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith();
   });
+});
+
+// Owner (review of the walkthrough PR): the public code lookups name a
+// code's holder without a credential, so one address may ask for codes only
+// a few times a minute; everything else keeps the general limit.
+describe('the code lookups rate limit', () => {
+  const limited = () =>
+    createRequestRateLimitMiddleware(createRequestRateLimiter(() => 0));
+
+  it.each(['/api/v1/referral-codes/lookup?code=LUCIA', '/client/invite/LUCIA'])(
+    'turns an address away after its lookups for the minute (%s)',
+    (path) => {
+      const middleware = limited();
+      const next = jest.fn();
+      for (let index = 0; index < codeLookupsPerAddressPerMinute; index += 1) {
+        middleware(request(path), response().value, next);
+      }
+      expect(next).toHaveBeenCalledTimes(codeLookupsPerAddressPerMinute);
+
+      const refused = response();
+      expect(() => middleware(request(path), refused.value, next)).toThrow(
+        HttpException,
+      );
+      expect(refused.headers.get('Retry-After')).toBe('60');
+      // Other routes from that address are not held back.
+      middleware(request('/api/v1/plans'), response().value, next);
+      expect(next).toHaveBeenCalledTimes(codeLookupsPerAddressPerMinute + 1);
+    },
+  );
 });

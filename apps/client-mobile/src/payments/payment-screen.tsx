@@ -12,12 +12,14 @@ import {
   footerEdges,
   FooterPanel,
   FormScrollView,
+  FullScreenImage,
   Glyph,
   InlineError,
   invoiceChoiceFrom,
   invoiceDataPayload,
   invoiceIncompleteNote,
   LoadingState,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -29,25 +31,33 @@ import {
   TabletColumn,
   TabletColumns,
   Text,
+  usePushNotifications,
   type InvoiceChoice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatCivilDate } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
 import { InvoiceDisclosure } from "./invoice-disclosure";
-import { ReceiptRow } from "./receipt-row";
+import { ReceiptRow, receiptStateOf } from "./receipt-row";
 import { TransferQrCard } from "./transfer-qr-card";
 
 type PaymentNavigation = {
   goBack: () => void;
   navigate: (screen: "PaymentStatus") => void;
+};
+
+// C11n (walkthrough n.º 9): «Te avisaremos apenas esté listo» needs the
+// permission; the booking offer's sheet and thirty-day rule, with these words.
+const paymentPermissionCopy = {
+  reason: "Activa las notificaciones y te escribimos apenas el estudio revise tu comprobante.",
+  title: "Te avisamos cuando aprobemos tu pago",
 };
 
 const uploadErrorCopy: Record<string, string> = {
@@ -58,6 +68,7 @@ const uploadErrorCopy: Record<string, string> = {
 export function PaymentScreen() {
   const navigation = useNavigation<PaymentNavigation>();
   const fetcher = useClientFetcher();
+  const { offerPermission: offerPushPermission } = usePushNotifications();
   const queryClient = useQueryClient();
   const intent = useGetCurrentPurchaseIntent({
     fetcher,
@@ -76,11 +87,15 @@ export function PaymentScreen() {
   };
   const invoiceData = invoiceDataPayload(invoice);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
-  const [uploading, setUploading] = useState(false);
+  // Walkthrough n.º 7 (C10u): the picked photo and how far its upload got.
+  const [upload, setUpload] = useState<{ localUri: string; progress: number } | null>(null);
+  const uploading = upload !== null;
+  const [viewing, setViewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const offReason =
-    receipt === null
+  const offReason = uploading
+    ? "Espera a que termine de subir"
+    : receipt === null
       ? "Adjunta tu comprobante para continuar"
       : invoiceData === "incomplete"
         ? (invoiceIncompleteNote(invoice) ?? undefined)
@@ -119,14 +134,18 @@ export function PaymentScreen() {
     try {
       const picked = await pickReceipt();
       if (picked === null) return;
-      setUploading(true);
-      setReceipt(await uploadReceipt(picked, current.id, fetcher));
+      setUpload({ localUri: picked.uri, progress: 0 });
+      setReceipt(
+        await uploadReceipt(picked, current.id, fetcher, undefined, (progress) =>
+          setUpload({ localUri: picked.uri, progress }),
+        ),
+      );
     } catch (failure) {
       if (__DEV__) console.warn("receipt upload failed", failure);
       const code = failure instanceof Error ? failure.message : "";
       setError(uploadErrorCopy[code] ?? "No pudimos subir el comprobante. Inténtalo de nuevo.");
     } finally {
-      setUploading(false);
+      setUpload(null);
     }
   };
 
@@ -147,6 +166,7 @@ export function PaymentScreen() {
         queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() }),
       ]);
       navigation.navigate("PaymentStatus");
+      offerPushPermission(paymentPermissionCopy);
     } catch {
       setError("No pudimos enviar el comprobante. Inténtalo de nuevo.");
     } finally {
@@ -188,9 +208,13 @@ export function PaymentScreen() {
               <View style={styles.group}>
                 <ReceiptRow
                   onAttach={() => void attach()}
+                  onOpen={() => setViewing(true)}
                   onRemove={() => setReceipt(null)}
-                  receipt={receipt}
-                  uploading={uploading}
+                  receipt={
+                    upload !== null
+                      ? { ...upload, status: "uploading" }
+                      : receiptStateOf(receipt, false)
+                  }
                 />
                 <View style={styles.hairline} />
                 <InvoiceDisclosure onChange={setInvoiceEdit} value={invoice} />
@@ -224,6 +248,27 @@ export function PaymentScreen() {
           />
         </TabletColumn>
       </FooterPanel>
+      {/* C10v (walkthrough n.º 23): the receipt big, to check before sending. */}
+      <FullScreenImage
+        footer={
+          <OutlinedButton
+            label="Cambiar comprobante"
+            onPress={() => {
+              // iOS presents one modal at a time: the picker waits for the
+              // big view to close (review; as the Staff invoice's «Cambiar»).
+              setViewing(false);
+              setTimeout(() => void attach(), Platform.OS === "ios" ? 400 : 0);
+            }}
+          />
+        }
+        label="Comprobante adjunto"
+        note="Revisa que se lean el monto, la fecha y el destinatario."
+        onClose={() => setViewing(false)}
+        title="Tu comprobante"
+        tone="light"
+        uri={receipt?.localUri ?? null}
+        visible={viewing}
+      />
     </Screen>
   );
 }

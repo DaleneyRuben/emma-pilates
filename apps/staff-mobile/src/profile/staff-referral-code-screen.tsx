@@ -1,11 +1,11 @@
 import { getGetOwnReferralCodeQueryKey, useGetOwnReferralCode } from "@pilates/api-contracts";
 import {
   BrandToast,
-  EditReferralCode,
   LoadingState,
   QueryFailure,
-  ReferralCodeCard,
+  referralInviteLink,
   Screen,
+  ShareableReferralCodeCard,
   spacing,
   surfaces,
   Text,
@@ -14,7 +14,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, Share, StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { BackBar } from "../ui/back-bar";
@@ -22,13 +22,21 @@ import { bodyScroll, RowCard } from "../ui/card-pieces";
 
 const noticeMilliseconds = 3000;
 
+// E-F13: the link brings her code with it (walkthrough n.º 26).
 const steps = [
-  "Compartes tu código con tus clientas",
-  "Ella lo escribe al crear su cuenta",
+  "Compartes tu código o tu enlace con tus clientas",
+  "Ella instala la app y crea su cuenta con tu código",
   "Queda registrada como tu clienta",
 ] as const;
 
-/** S30 «Tu código de referido» (follow-up 229): the Trainer's own code. */
+// E-F22: the system's own share sheet. A Trainer's code gives no free class.
+const shareMessage = (code: string): string =>
+  `Crea tu cuenta en Emma Pilates Studio con mi código ${code}. ${referralInviteLink(code)}`;
+
+/**
+ * S30 «Tu código de referido» (follow-up 229; E-F13, E-F21, E-F22): the
+ * Trainer's own code on one 600 card with copy, share and «Editar código».
+ */
 export function StaffReferralCodeScreen() {
   const navigation = useNavigation<{ goBack: () => void }>();
   const fetcher = useStaffFetcher();
@@ -62,11 +70,14 @@ export function StaffReferralCodeScreen() {
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={bodyScroll.content} style={bodyScroll.scroll}>
-        <ReferralCodeCard code={code} onCopied={() => setNotice("Código copiado")} />
-        {/* E-F13: «Editar código» on its own white card. */}
-        <View style={styles.edit}>
-          <EditReferralCode fetcher={fetcher} onChanged={() => setNotice("Código actualizado")} />
-        </View>
+        <ShareableReferralCodeCard
+          code={code}
+          emphasis
+          fetcher={fetcher}
+          onChanged={() => setNotice("Código actualizado")}
+          onCopied={() => setNotice("Código copiado")}
+          onShare={() => void Share.share({ message: shareMessage(code) })}
+        />
         <RowCard label="Cómo funciona">
           {steps.map((step, index) => (
             <View key={step} style={styles.row}>
@@ -92,7 +103,6 @@ export function StaffReferralCodeScreen() {
 }
 
 const styles = StyleSheet.create({
-  edit: { ...surfaces.card, alignItems: "flex-start", paddingHorizontal: spacing.xs },
   label: { flex: 1 },
   // A quiet line goes in a white card, never on the 100 screen.
   noteCard: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
@@ -105,5 +115,5 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
 });

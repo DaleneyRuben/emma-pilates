@@ -8,7 +8,9 @@ export type GuestPassCopy = {
   title: string;
   note: string;
   /** What the card's one action does next. */
-  next: "detail" | "purchase";
+  next: "book" | "detail" | "purchase";
+  /** Who invited her, on the unused pass (walkthrough n.º 19, C02f). */
+  invitedBy?: { firstName: string; initials: string };
 };
 
 /**
@@ -27,7 +29,13 @@ export function guestPassCopy(
     return {
       title: "Tu clase gratis de invitada",
       note: `Úsala antes del ${formatCivilDate(subscription.endsOn)}`,
-      next: "detail",
+      // C02f: the card books the free class straight away.
+      next: "book",
+      ...(pass.hostFirstName === undefined
+        ? {}
+        : {
+            invitedBy: { firstName: pass.hostFirstName, initials: pass.hostInitials ?? "" },
+          }),
     };
   }
   const next = view.nextSubscription;

@@ -67,6 +67,11 @@ export type InvoiceFileGateway = {
     paymentId: string;
     clientId: string;
   }) => Promise<InvoiceFileObject>;
+  /** The uploader's own file before it is attached (walkthrough n.º 24). */
+  readUploadedFile: (input: {
+    imageAssetId: string;
+    accountId: string;
+  }) => Promise<InvoiceFileObject>;
 };
 
 export type InvoiceFileErrorCode =
@@ -185,6 +190,20 @@ export const readPaymentInvoiceFile = async (
 ): Promise<InvoiceFileObject> => {
   requireInvoiceStaff(principal);
   return gateway.readFileForStaff(command.paymentId);
+};
+
+// Walkthrough n.º 24 (E-D29): the file she just uploaded, read back by her
+// alone (the gateway matches its owner) before «Subir factura» attaches it.
+export const readUploadedInvoiceFile = async (
+  command: { imageAssetId: string },
+  principal: AuthenticatedPrincipal,
+  { gateway }: { gateway: InvoiceFileGateway },
+): Promise<InvoiceFileObject> => {
+  requireInvoiceStaff(principal);
+  return gateway.readUploadedFile({
+    imageAssetId: command.imageAssetId,
+    accountId: principal.accountId,
+  });
 };
 
 export const listStaffInvoices = async (

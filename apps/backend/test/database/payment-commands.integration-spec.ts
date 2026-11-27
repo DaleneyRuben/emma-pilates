@@ -312,7 +312,6 @@ describe('Prisma payment commands', () => {
       sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
 
     await expect(commands().readCreditActivity(isabel)).resolves.toEqual([]);
-
     const referrals = await commands().readReferrals(isabel);
     expect(referrals.referralCode).toEqual(expect.any(String));
     expect(referrals.referrals).toEqual([
@@ -321,6 +320,7 @@ describe('Prisma payment commands', () => {
         referredName: 'Sofía G.',
         state: 'awarded',
         invitationStatus: 'registered',
+        freeClass: false,
         createdAt: now,
         awardedAt: now,
         awardCentavos: 6000,

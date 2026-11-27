@@ -54,6 +54,8 @@ export function createClientRuntime(
       completePasswordRecovery: jest.fn(),
       correctRegistrationEmail: jest.fn(),
       inspectLink: jest.fn(),
+      lookUpReferralCode: jest.fn(),
+      readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
       register: jest.fn(),
       requestPasswordRecovery: jest.fn(),
       resendRegistrationVerification: jest.fn(),

@@ -1,5 +1,6 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { loadQueuedRenewalStart } from '../payments/freeze-window';
+import { readInactiveInvite } from './prisma-inactive-invite';
 import type { ClientFreezeSummary } from './client-subscription';
 
 const civil = (date: Date) => date.toISOString().slice(0, 10);
@@ -10,6 +11,10 @@ const civil = (date: Date) => date.toISOString().slice(0, 10);
  * length, and the start of a next plan already queued, which caps the days.
  */
 export const clientSubscriptionFreezeReads = (prisma: PrismaClient) => ({
+  // Kept here so booking.module.ts, past the size limit, does not grow: a
+  // friend whose code gave no pass (walkthrough n.º 22, C02j).
+  readInactiveInvite: (clientId: string) =>
+    readInactiveInvite(prisma, clientId, new Date()),
   readQueuedPlanStart: (clientId: string, after: Date) =>
     loadQueuedRenewalStart(prisma, { clientId, after }).then((start) =>
       start === null ? null : civil(start),

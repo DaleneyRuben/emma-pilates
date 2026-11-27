@@ -102,6 +102,12 @@ export class ClientVerificationEmailDto {
   email!: string;
 }
 
+// Walkthrough n.º 2: the email to a pending Client hard-bounced.
+export class ClientEmailDeliveryDto extends ClientVerificationEmailDto {
+  @ApiProperty()
+  bounced!: boolean;
+}
+
 export class ClientInvitationDto {
   @ApiProperty({ format: 'uuid' })
   clientId!: string;

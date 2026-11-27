@@ -40,6 +40,13 @@ const pendingHandlers = (
   http.get(apiUrl(`${clientsPath}/:clientId`), () =>
     jsonResponse({ ...luciaDetail, accountStatus: "pending" }),
   ),
+  http.get(apiUrl(`${invitationPath}/email-delivery`), () =>
+    jsonResponse({
+      clientId: lucia.id,
+      email: "lucia@example.com",
+      bounced: false,
+    }),
+  ),
   http.get(apiUrl(invitationPath), () => {
     reads += 1;
     return read();

@@ -7,6 +7,7 @@
 import type { BranchDto } from "./branchDto";
 import type { ClassTypeDto } from "./classTypeDto";
 import type { SessionDetailDtoTrainerGender } from "./sessionDetailDtoTrainerGender";
+import type { SessionOwnBookingDto } from "./sessionOwnBookingDto";
 import type { StaffPhotoDto } from "./staffPhotoDto";
 
 export interface SessionDetailDto {
@@ -37,4 +38,9 @@ export interface SessionDetailDto {
    * @nullable
    */
   classesLeftThisWeek?: number | null;
+  /**
+   * For a Client: her Booking on this class or overlapping it (walkthrough n.º 1, the rule a Booking is refused with); null when none. Absent for Staff.
+   * @nullable
+   */
+  yourBooking?: SessionOwnBookingDto | null;
 }

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -24,6 +24,10 @@ const pdf = {
 };
 
 jest.setTimeout(20_000);
+
+// Jest's Modal never reports its dismissal, so on iOS the sheet hands the
+// choice over after its one-second fallback (walkthrough n.º 25).
+const sheetClosed = () => act(() => new Promise((resolve) => setTimeout(resolve, 1100)));
 
 const hour = 60 * 60_000;
 const yesterdayAt1940 = `${boliviaCivilDate(new Date(Date.now() - 24 * hour))}T23:40:00.000Z`;
@@ -174,12 +178,15 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     expect(await screen.findByText("Sube la factura emitida")).toBeOnTheScreen();
     expect(screen.getByText("Mariana Quiroga")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Elegir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
+    // Walkthrough n.º 24 (E-D28): the file shows first; «Subir factura» confirms.
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(screen.getByText("factura-000123.jpg")).toBeOnTheScreen();
-    expect(mockPickImage).toHaveBeenCalledWith({ camera: false });
+    expect(mockPickImage).toHaveBeenCalledWith();
     expect(mockUploadImage).toHaveBeenCalledWith(photo, "invoice", expect.any(Function));
     expect(attached).toHaveBeenCalledWith({ imageAssetId: "asset-9", fileName: "factura.jpg" });
 
@@ -198,8 +205,9 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
-    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Elegir un PDF" }));
+    await sheetClosed();
     return screen;
   };
   const uploadRoutes = (attached: jest.Mock) =>
@@ -224,10 +232,16 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     mockUploadImage.mockResolvedValue("asset-10");
 
     const screen = await openUpload(uploadRoutes(attached));
+    await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();
     expect(mockPickImage).not.toHaveBeenCalled();
-    expect(mockUploadImage).toHaveBeenCalledWith(pdf, "invoice", expect.any(Function));
+    expect(mockUploadImage).toHaveBeenCalledWith(
+      pdf,
+      "invoice",
+      expect.any(Function),
+      expect.any(Function),
+    );
     expect(attached).toHaveBeenCalledWith({
       imageAssetId: "asset-10",
       fileName: "factura-000123.pdf",
@@ -280,8 +294,10 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Tomar foto" }));
 
     expect(
       await screen.findByText(
@@ -289,6 +305,19 @@ describe("Invoices in the Staff app (FIX-044)", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
+  });
+
+  // Walkthrough n.º 25: a picker that fails is not a connection problem.
+  it("says the files could not be opened when the picker fails", async () => {
+    mockPickPdf.mockRejectedValueOnce(new Error("Another picker is already presented"));
+
+    const screen = await openUpload(uploadRoutes(jest.fn()));
+
+    expect(
+      await screen.findByText("No pudimos abrir tus archivos. Inténtalo de nuevo."),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/Revisa tu conexión/)).not.toBeOnTheScreen();
+    expect(mockUploadImage).not.toHaveBeenCalled();
   });
 
   it("opens Facturas por subir from Clientas for the Assistant", async () => {
@@ -356,8 +385,10 @@ describe("Invoices in the Staff app (FIX-044)", () => {
     await fireEvent.press(
       await screen.findByRole("button", { name: /Mariana Quiroga, NIT 123456/ }),
     );
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir factura" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Elegir una imagen" }));
+    await sheetClosed();
     await fireEvent.press(await screen.findByRole("button", { name: "Subir factura" }));
-    await fireEvent.press(await screen.findByRole("button", { name: "Elegir de la galería" }));
     await fireEvent.press(await screen.findByRole("button", { name: "Reintentar" }));
 
     expect(await screen.findByText("Factura subida")).toBeOnTheScreen();

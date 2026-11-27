@@ -70,6 +70,16 @@ numbered tests.
 | Client app on tablet | Every Client screen on the iPad and Android tablets in both orientations: the 84 pt tab bar with each icon beside its label, the 40 pt page with the 36 pt title beside the back button, centred columns, two-column screens, and Reservar and Mis facturas as a list beside the chosen item (Test 196) | Needs a native build with `supportsTablet` (release 1.2.3); card internals keep their phone sizes |
 | Biometric device key | The short offer, the prompt on every launch, «Hola de nuevo» after cancel or sign-out, «Usar otra cuenta», the offline error, Perfil's switch, server revocation (Test 195) | Needs a development build; Expo Go has no Face ID permission |
 | Phones checked by libphonenumber | Every «Celular» field, the backend and the tester script accept any real mobile Google's libphonenumber knows (a Bolivian `57007684` too) and refuse fixed lines (`22123456`), with «Ese número no parece un celular de <país>.»; every country in the list (Test 197) | The country names come from Node's Spanish ICU names when the list is regenerated |
+| Walkthrough fixes without new design | A failed email-link check offers «Reintentar» and «Ir a iniciar sesión»; signing out after using a link opens Login; the invoice picker opens with «Elegir una imagen» or «Elegir un PDF»; a Guest Pass only from a host with a paid Plan and `codeActive` on the referrals API; the receipt notice read for every Administrator; faster uploads and 1024 px profile photos (Test 198) | The app copy for an inactive code waits for its design; the worker's instant pickup needs an approved migration |
+| Walkthrough designs: sign-in and forms | «Todavía no confirmaste tu correo» on Login, «Revisa tu correo» that leaves once the email is confirmed elsewhere, no «Guardar contraseña» where Face ID or a fingerprint works, buttons at the end of every form and always on, and «Código de Lucía» on «Crea tu cuenta» (Test 199) | The «Guardar contraseña» rule needs real phones with and without biometrics to see the system's own prompt |
+| Walkthrough designs: payments, photo, invoice, referrals | The receipt uploads on pick with its progress, then «Comprobante listo» with «Cambiar», the × and the receipt big; the notification offer after sending it; the profile photo at once under a ring, with «Reintentar» only on failure, and «Guardar cambios» at the end of Editar perfil; the Staff invoice chosen first, a PDF uploaded at once and shown page by page, and sent with «Subir factura»; «Invita a una amiga» shares the link through the system sheet, shows each friend's next step, and asks a host without a paid Plan to buy one (Test 201) | The invite link opens no page yet |
+| Notifications and comments (walkthrough designs) | Swipe a notification away in either app and bring it back with «Deshacer»; notices older than 30 days leave the list; the Administrator's «Por revisar» and «Ya revisados» with whose receipt or Freeze and how it was decided; comment notices with the author and the start of the text; «Comentarios» from Perfil with Nuevos / Revisados / Resueltos, «Filtrar» and the triage (Test 200) | No «Borrar todas» by design; a notice removed more than two minutes ago cannot be brought back |
+| Invite link and the guest's Inicio | `links…/client/invite/CODE`: Google Play with the code on Android, one «Copiar código y abrir App Store» on iPhone, both stores elsewhere, a WhatsApp preview; the app opens «Crea tu cuenta» with the code; «Te invitó Lucía» and «Reservar mi clase gratis», «Usaste tu clase gratis…», and «El código de Lucía todavía no está activo» (Test 202) | The app half (invite links opening the app, the install referrer, the clipboard offer) needs the 1.3.0 native build |
+| Class detail knows your bookings | A class she booked opens with «Ya reservaste esta clase», **Cancelar reserva** and «Cancelas gratis hasta …»; a class at the time of another of hers keeps «Reservar esta clase» off with «Ya tienes Mat Pilates a las 10:00 ese día…» and **Ver esa reserva** (Test 203) | «Ver esa reserva» opens Mis reservas, not that one booking |
+| One left margin, error screens and profiles | The band, section titles, cards and footers share one 16 pt left edge; «No pudimos verificar tu enlace», «Enlace ya utilizado» and «Correo verificado» use the payment status layout; both Perfil screens end with «Ayuda y legal»; Staff Perfil has the deep-rose identity card and serif section titles (Test 204) | No «Términos y condiciones» row yet: the public site has no terms page |
+| Sharing the code from one card | Client «Invita a una amiga» and Staff «Tu código de referido» show the code on one line with «Copiar código», «Compartir tu código» (the system sheet with the invite link) and «Editar código» in the same card; a friend who signs up with a Trainer's code becomes that Trainer's Client (Test 205) | The link's app half needs the 1.3.0 native build |
+| A bounced email | «Revisa tu correo» says «El correo rebotó» with «Cambiar correo» once Resend reports a hard bounce; the Clientas file says «El correo rebotó» instead of «Pendiente de activación» and offers no resend (Test 206) | The admin web cannot change a Client's email (IDN-008); she corrects it in the app, or the Staff app corrects a staff invitation |
+| Fixes from the testing session | The Staff app keeps answering after «Ahora no» on the first sign-in with Face ID; no «Save Password?» over «¿Entrar con Face ID?»; a triaged comment's notice turns read; a friend without a Guest Pass reads «No recibió la clase gratis.»; Inicio says whose code was not active (Test 207) | «Save Password?» needs a real iPhone |
 
 ## Where each designed screen is tested
 
@@ -2401,7 +2411,9 @@ In the Client app as `lucia@example.com`:
    hint) and
    **Invita a una amiga**. Without an active Plan the booking shortcut is a
    full-width row at 60 % with «Necesitas un plan activo» and a lock, over
-   two tiles with «Agenda tu cita» and «Su primera clase es gratis».
+   a white **Evaluación nutricional** row with «Agenda tu cita» and a
+   chevron; there is no «Invita a una amiga» without a paid Plan
+   (walkthrough n.º 22, C02b, C02c, C02d, C02j).
 2. Tapping the plan row anywhere opens **Mi plan** (`C12`, Test 176 E): a
    Lino card with the plan name and an «Activo» dot, the classes left in
    large Lora «de N clases restantes» and «Vence el …»; the solid **Renovar
@@ -3869,6 +3881,12 @@ worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 The following are not ready for manual product testing:
 
+- from the walkthrough fixes without new design (Test 198): the app copy for
+  a host whose code is not active yet («Activa tu código comprando un plan»,
+  «El código de Lucía todavía no está activo») waits for its design; the
+  worker picks an upload up within half a second by polling, and waking it at
+  once (pg-boss LISTEN/NOTIFY on the upload queue) needs an approved
+  migration;
 - from the Client app on tablet (Test 196): the boards' larger tablet sizes
   inside cards (Lora 64 on Mi plan, 44 on Detalle del plan, 48 on the
   referral code, the 05T and 10T heroes drawn as one row) and the row-style
@@ -5389,8 +5407,9 @@ photo.jpg shot.png` on iOS; `adb push photo.jpg /sdcard/Pictures/` and a
    `apps/backend/.data/uploads/private/transfer_receipt/<id>/` still sharp
    to read.
 3. As Lucía, Perfil → «Editar» → «Cambiar foto» with the large photo.
-   Expected: the photo in the circle and «Quitar foto», the row again a
-   JPEG of at most 2048 px.
+   Expected: the photo in the circle and «Quitar foto», the row a JPEG of at
+   most 1024 px: a profile photo travels at half a receipt's edge
+   (walkthrough n.º 14, Test 198 F).
 4. Timings: `processing_started_at - created_at` is the PUT (declare to
    finalize) and `finalized_at - processing_started_at` the queue pickup plus
    the worker; locally the second is under a second for a 2048 px JPEG.
@@ -9514,8 +9533,9 @@ D. **Staff app (E2–E5).** As Paola: **Pagos › Accesos › Facturas por subir
    with the count. As Camila (Assistant) and Carolina (Coordinator):
    **Clientes › Facturas por subir**. The list has **Por subir · n** and
    **Subidas**. Open Mariana: the hero, «Datos de la factura», the dashed
-   «Sube la factura emitida». **Subir factura** offers **Tomar foto** and
-   **Elegir de la galería** and **Elegir un PDF** (Test 175, FIX-049); after
+   «Sube la factura emitida». **Subir factura** offers **Elegir una imagen**
+   and **Elegir un PDF** (Test 175, FIX-049; no camera since walkthrough
+   n.º 25, Test 198 C); after
    the upload the toast «Factura subida» and the file card with **Ver
    factura**. **Quitar factura** asks in a sheet. A PDF shows a small
    first-page thumbnail beside the file name that opens the full-screen viewer
@@ -9819,8 +9839,9 @@ J. **No booking on a frozen day (n.º 53c).** Since C1 (Test 186 C) a frozen
 
 Run the API and the worker on a copy of the walkthrough database, the client
 app on the iPhone 16 Pro, the iPad and Android. For the Guest Pass, register
-a new Client with a host's referral code (one invitation per host a month)
-and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
+a new Client with a host's referral code (one invitation per host a month,
+and since walkthrough n.º 22 only from a host with a paid Plan in force,
+Test 198 D) and confirm the email from `apps/backend/.data/email-capture/` (Test 34).
 
 A. **Perfil after a notification (n.º 55).** As Carla, without opening
    Perfil first, tap the Inicio bell and a «Tu pago fue confirmado» notice:
@@ -12179,3 +12200,488 @@ Specs: `packages/phone-number/src/phone-number.spec.ts` and
 `country-names.spec.ts`, `apps/backend/src/phone/contact-phone.spec.ts`,
 `android-test-studio/params.spec.ts`, `phone-field.spec.tsx` (both),
 `new-client-phone.spec.tsx`, `staff-create.spec.tsx`.
+
+## Test 198: walkthrough fixes that need no new design (mejoras del recorrido 3, 7, 12, 14, 17, 22, 25)
+
+The owner's walkthrough of 25–26 Nov 2026 (`mejoras-recorrido.md`). Run the
+API and the worker on a copy of `pilates_golden` (Test 2, Test 46), Metro for
+both apps, and use the iPhone 16 Pro and the Android emulator. Every email
+link comes from `apps/backend/.data/email-capture/` (Test 34).
+
+A. **A stalled email check (n.º 3).** Register a Client in the app, stop the
+   API, then open the verification link on the phone. «Verificando correo»
+   gives way within 15 seconds to «No pudimos verificar tu enlace» · «Revisa
+   tu conexión e inténtalo de nuevo.» with **Reintentar** and **Ir a iniciar
+   sesión**. Start the API and tap **Reintentar**: «Correo verificado». If the
+   first try did reach the server and only its answer was lost, the retry
+   reads «Enlace ya utilizado» · «Si ya verificaste tu correo, puedes iniciar
+   sesión.»: the server answers a used token as `invalid`, never verifying it
+   twice.
+B. **Signing out after a link (n.º 17).** Verify an email from its link, tap
+   **Ir a iniciar sesión**, log in, then Perfil › **Cerrar sesión**: Login,
+   not «Enlace no válido». The same after an activation link (Staff app, a
+   new Staff Member's link) and after a recovery link (both apps): signing
+   out never reopens the used link. A new link opened later still shows its
+   own screen. A sign-in link opened while signed in is forgotten too: signing
+   out afterwards opens Login.
+C. **The invoice picker (n.º 25).** Staff app as Paola: Pagos › Accesos ›
+   Facturas por subir › Mariana › **Subir factura**. The sheet offers only
+   **Elegir una imagen** and **Elegir un PDF** (no «Tomar foto»). Each one
+   closes the sheet and then opens the phone's picker; on iOS it no longer
+   fails with «No pudimos subir la factura. Revisa tu conexión…». If the
+   picker itself fails, the screen says «No pudimos abrir tus archivos.
+   Inténtalo de nuevo.» The Client app's receipt picker opens straight from
+   its button, with no sheet, so it never had this race.
+D. **A Guest Pass needs a paid Plan (n.º 22, owner's decision of 26 Nov).**
+   Register a friend with the code of a Client who has never bought a Plan
+   (or holds only a Courtesy Access or her own Guest Pass) and verify her
+   email: the Account is created and logs in, with no Guest Pass on Inicio.
+   Repeat with the code of a Client whose paid Plan is in force (Lucía): the
+   friend gets «Tu clase gratis de invitada». `GET
+   /api/v1/clients/current/referrals` answers `codeActive: true` for the
+   paying host and `false` for the other; the app screens that use it come
+   with their design.
+E. **The receipt notice settles for everyone (n.º 12).** With two
+   Administrators (Paola and one you create in Personal), submit a transfer
+   receipt as a Client, then confirm it as Paola. Both Administrators'
+   «Tienes un comprobante de pago pendiente de revisión.» are read
+   (`select account_id, read_at from system.notifications where
+   business_event_key = 'payment-submitted:<payment id>'`). The server
+   already did this (Test 141); the Staff app shows a read notice almost like
+   an unread one, which the redesign addresses.
+F. **Faster uploads (n.º 7 and 14).** Both apps now ask for the upload's
+   state every 0.25 s instead of 0.7 s, and a profile photo travels at
+   1024 px (a receipt or invoice photo stays at 2048 px). Locally, a 2048 px
+   receipt went from 1.32 s to 0.96 s from declaring to READY, and a profile
+   photo from 0.75 s (781 KB) to 0.50 s (196 KB). On a phone most of the
+   remaining time is the PUT over the mobile network, which the smaller
+   profile photo cuts by three quarters. Read the production numbers with
+   the query of Test 53 step 4.
+
+## Test 199: walkthrough designs — sign-in and forms (mejoras del recorrido 4, 5, 6, 15, 18)
+
+The owner approved these boards on 26 Nov 2026 (C01e2, C01c2, C01q, C01r,
+C01b3–C01b6, C25c, C25d). Run the API and the worker on a copy of
+`pilates_golden`, Metro for both apps, the iPhone 16 Pro and the Android
+emulator. Emails land in `apps/backend/.data/email-capture/` (Test 34).
+
+A. **An unconfirmed email on Login (n.º 4, C01e2).** In the Client app
+   register a new Client and leave «Revisa tu correo» with **Iniciar
+   sesión**. Log in with that address and its password: instead of «El
+   correo o la contraseña no son correctos.» Login shows «Todavía no
+   confirmaste tu correo · Te enviamos un enlace a … Ábrelo para activar tu
+   cuenta y después inicia sesión.» with **Reenviar correo**, which opens
+   «Revisa tu correo» and sends the email again. Any other address keeps the
+   generic message (the server still answers the same for both).
+B. **Confirmed elsewhere (n.º 4, C01c2).** With «Revisa tu correo» open,
+   confirm the email from its link in a browser
+   (`POST /api/v1/client-email-verifications` with the captured token). Send
+   the app to the background and back, or reopen it: it goes to Login with
+   «Tu correo ya está confirmado. Inicia sesión para entrar.», the email
+   field already holding the registered address (C01c2). The server
+   answers `POST /api/v1/client-registrations/status-checks` with
+   `{ "registrationContinuation": … }` as `pending`, `verified` or `expired`.
+C. **Only the Face ID offer (n.º 5, C01q, C01r).** On a phone with Face ID
+   or a fingerprint enrolled, sign in for the first time: iOS or Android
+   does not ask to save the password; only «¿Entrar con Face ID?» (or the
+   fingerprint) appears. On a phone without biometrics (the emulator with no
+   fingerprint enrolled) the email and password fields keep autofill and the
+   system may offer to save the password, with no biometric offer. Same in
+   the Staff app. The Simulator cannot show the system prompt reliably;
+   check on real phones.
+D. **Buttons at the end of the form (n.º 6, C01b3, C01b4).** With the
+   keyboard open, «Crear cuenta» and «¿Ya tienes una cuenta? Inicia sesión»
+   sit after the last field and scroll with it; nothing is pinned over the
+   keyboard. The same in «Crea tu contraseña» / «Crea una contraseña nueva»
+   (links), «Cambiar contraseña», «Enviar comentarios» and the Staff app's
+   «Nueva clienta» (its note and «Crear cuenta» on a white card at the end).
+E. **Always-on buttons (n.º 15, C25c, C25d).** In «Enviar comentarios» tap
+   **Enviar comentario** with nothing chosen: «Elige el tipo de comentario»
+   appears under the chips, «Escribe al menos 10 caracteres.» under a short
+   text, and the screen scrolls back up; nothing is sent. «Guardar
+   contraseña» and «Activar cuenta» likewise mark the missing fields on tap.
+F. **A referral code on «Crea tu cuenta» (n.º 18, C01b5, C01b6).** The
+   example reads «Ej.: LUCIA». Type Lucía's code (`lucia@example.com`'s, see
+   Perfil › Invita a una amiga): after a moment «Código de Lucía» with a ✓
+   shows under the field and «Recomendación de una amiga» is marked with «La
+   marcamos por el código de Lucía.» A Trainer's code marks «Una
+   instructora». A code nobody holds shows «No encontramos el código … Revisa
+   cómo lo escribiste.» after an alert circle and **Crear cuenta** creates
+   nothing. The open field keeps «¿Tienes un código de referido?» above it
+   with an up chevron (tapping it closes the field and drops the code), the
+   «La marcamos…» line starts with a check, and while a valid code is typed
+   the other «¿Cómo nos conociste?» chips do not respond. With the code
+   field focused on a phone (iPhone 16 Pro, the emulator) the form scrolls
+   so the field and «Código de Lucía» sit above the keyboard. The «¿Te
+   invitó Lucía?» sheet (C01b8) shows the gift on a round disc above a
+   centred title and note.
+   `GET /api/v1/referral-codes/lookup?code=lucia` answers without a
+   credential: `{ code, status, holderFirstName, holderKind }`.
+
+## Test 200: walkthrough designs — notifications and comments
+
+The owner approved these boards on 26 Nov 2026 (`aprobacion-disenos-recorrido.md`
+rows 3–6): C19, C19c, C19d, E-F06, E-F15 (n.º 10), E-F07 (n.º 12), and E-F20,
+E-F18, E-F25, E-F26, E-F19 (n.º 11). Run the API and the worker on a copy of
+`pilates_golden` (Test 2, Test 46), Metro for both apps, and use the iPhone 16
+Pro and the Android emulator. The new API pieces are additive: `DELETE
+/api/v1/notifications/{id}`, `POST /api/v1/notifications/{id}/restore`,
+`review` and `feedback` on each notification, `type` on `GET
+/api/v1/administrator/feedback`, and `GET /api/v1/administrator/feedback/{id}`.
+
+A. **Swipe a notification away (n.º 10, Client app).** As Lucía, Inicio's bell
+   › Notificaciones. Swipe a notice to the left: «Borrar» shows on the 600
+   ground. Tap it: the notice leaves, «Nuevas · N» counts one less, and «Notificación
+   borrada» shows with «Deshacer» over the tab bar for about five seconds.
+   «Deshacer» brings it back in place. With VoiceOver or TalkBack the row
+   offers «Borrar» as an action. There is no «Borrar todas»; «Marcar leídas»
+   stays. In the database the row keeps its data with `deleted_at` set
+   (`select id, deleted_at from system.notifications where account_id = …`);
+   «Deshacer» clears it. A notice removed more than two minutes ago answers
+   `404 notification_not_found` to `POST …/restore`.
+B. **The same in the Staff app (E-F06, E-F15).** As any Staff Member,
+   Perfil › Notificaciones: swipe a single notice or one inside an opened group;
+   a group row itself does not swipe. «Marcar todo leído» stays.
+C. **A month of notifications.** Back-date a notice of yours past 30 days
+   (`update system.notifications set created_at = now() - interval '31 days'
+   where id = …`, on your copy only): it leaves the list and the bell's count
+   in both apps.
+D. **Reviews for the Administrator (n.º 12, E-F07).** As a Client submit a
+   transfer receipt; as Paola open Notificaciones. «Por revisar» on top reads
+   «<Client> · <plan> · Bs <amount>», «Comprobante por revisar» and the time,
+   and opens Revisar pago. Approve it and go back: it moves to the dimmed «Ya
+   revisados» card with a ✓ and no chevron, «Pago de <Client> aprobado por
+   Paola · hace un momento» and «<plan> · Bs <amount>». A rejected receipt reads
+   «rechazado por»; a Freeze reads «Congelamiento de <Client> aprobado por …»
+   with «Del lun 23 al dom 29 nov». They are no longer grouped as «N
+   comprobantes recibidos». Every other notice keeps its grouped rows.
+E. **A comment's notice (n.º 11, E-F20).** As Lucía send «Enviar comentarios»;
+   as Paola the comments group lists «Lucía … · Problema: «<start of the
+   text>…»» and «App de clientas · Hace un momento», opens that comment, and
+   ends with «Ver todos los comentarios».
+F. **Comentarios (E-F18, E-F25, E-F26).** As Paola, Perfil › «Comentarios»
+   (only the Administrator sees the row). The tabs read «Nuevos · N»,
+   «Revisados» and «Resueltos»; each card shows the initials, the name, «hoy
+   11:20», «Problema · App de clientas» and the text. «Filtrar» opens «Filtrar
+   comentarios» with Tipo (Todos, Problema, Sugerencia, Otro) and App (Las
+   dos, Clientas, Personal); «Ver N comentarios» counts the choice. After it
+   the button reads «Filtrar · 2» and one chip «Problema · Clientas» with
+   «Quitar filtro» clears both. «Quitar filtros» in the sheet does the same.
+G. **One comment (E-F19).** The detail shows who sent it («Clienta · email»),
+   the type, the text, «App de clientas · 1.1.0 · iOS 26.2», «Enviado» with the
+   day and time, «Estado» (Nuevo, Revisado, Resuelto) and «Qué cambiamos»,
+   the internal note. «Guardar» triages it like the admin web (Test 80): the
+   web shows the same status and note, and `system.audit_records` holds
+   `feedback.triaged`.
+
+## Test 201: walkthrough designs — payments, profile photo, invoice and referrals
+
+The owner's approved boards for walkthrough n.º 6 (Editar perfil), 7, 9, 13,
+14, 20, 22, 23, 24 and 25 (canvas «Mejoras del recorrido»: C10u, C10b, C10v,
+C10c, C11n, C22c, C22d, E-D19, E-D20, E-D27, E-D28, E-D29, E-D30, C16, C16s, C16g,
+C16h). Run the API and the worker on a copy of `pilates_golden` (Test 2,
+Test 46), Metro for both apps, and use the iPhone 16 Pro and the Android
+emulator.
+
+A. **The receipt (C10u, C10b, C10v, C10c).** As Mariana, buy «Paquete de 8
+   clases» by transfer and tap «Elegir comprobante». The upload starts as soon
+   as the photo is chosen: the row reads «Subiendo comprobante» with a bar and
+   the percentage, and «Enviar comprobante» is off with «Espera a que termine
+   de subir». Then «Comprobante listo» with an outlined **Cambiar** and the ×,
+   the title whole on a 390–402 pt phone;
+   the row itself no longer opens the picker. Tap the thumbnail: «Tu
+   comprobante» over the whole screen, «Revisa que se lean el monto, la fecha
+   y el destinatario.», **Cambiar comprobante** and **Cerrar**. Open «¿Necesitas
+   factura?» with an empty NIT: «Completa el NIT o CI, o cierra la factura»
+   under the button. The percentage follows the steps (declared, sent,
+   finalized, ready, attached), not each byte. The paid Evaluation's receipt
+   uses the same row, with «Cambiar» and the ×, without the big view.
+B. **Notifications after the receipt (C11n).** On a phone that was never
+   asked for notifications, send the receipt: over «Tu pago está en revisión»
+   the sheet «Te avisamos cuando aprobemos tu pago» · «Activa las
+   notificaciones y te escribimos apenas el estudio revise tu comprobante.»
+   with **Activar notificaciones** and **Ahora no**. After «Ahora no», neither
+   this sheet nor the booking one (C04n) comes back for thirty days; once the
+   phone has answered the system prompt, never again.
+C. **The profile photo (C22c, C22d).** Client app: Perfil › Editar › Cambiar
+   foto. The new photo shows in the circle at once, under a ring while it
+   uploads; there is no «Subiendo foto…» line and «Guardar cambios» stays on.
+   Stop the API before choosing to make it fail: the photo stays, with «No
+   pudimos subir tu foto. Tus otros cambios sí se guardaron.» and
+   **Reintentar**, which sends the same photo without opening the picker.
+   **Quitar foto** shows beside **Cambiar foto** for a first photo too, while
+   it uploads and after it fails; after a failure it takes the photo away and
+   the initials come back. On Android the picker's photo shows under the ring
+   right after choosing it, never the initials while it is prepared, and it
+   stays until the uploaded one has loaded.
+   Staff app: Perfil › Cambiar foto behaves the same, with «No pudimos subir
+   tu foto.» (Perfil has no other fields to keep). «Guardar cambios» now ends
+   the Editar perfil form and scrolls with it, never pinned over the keyboard
+   (walkthrough n.º 6).
+D. **The Staff invoice (E-D19, E-D20, E-D27, E-D28, E-D29, E-D30).** As Paola,
+   Pagos › Facturas por subir › a payment with invoice data. The dashed box
+   reads «Toca para elegir un PDF o una imagen, hasta 10 MB» and opens the
+   sheet, like the button, which reads **Elegir factura**. Choose a photo:
+   «Factura lista» · «Foto · toca la miniatura para verla» with **Cambiar** and
+   the ×; the thumbnail opens «Tu factura» big («Pellizca para ampliar. Revisa
+   que se lean el NIT, el nombre y el monto.», **Cerrar**, **Cambiar**). Choose
+   a PDF of two pages: it starts uploading at once («Subiendo factura», a bar
+   and the percentage), then shows its name and «PDF · 2 páginas · size».
+   Tap it (E-D29): a white page with the file name as the title, **× Cerrar**,
+   the first page on a bordered sheet, «Página 1 de 2» between two arrows,
+   «Desliza para pasar de página.» and **Cambiar**; swipe or tap the right
+   arrow for «Página 2 de 2»; **Cambiar** closes it and opens the sheet.
+   Tapping **Subir factura** while the PDF still uploads waits for it. Stop
+   the API before choosing a PDF: «No se pudo subir» on the row and «No
+   pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.» with
+   **Reintentar** (uploads it again, sends nothing), **Elegir otro archivo**
+   and **Cancelar**. Nothing is attached until **Subir factura**; then
+   «Factura subida» as before. Cancelling the picker after **Cambiar** keeps
+   the file already chosen; the × clears it.
+E. **Invita a una amiga (C16, C16s, C16g, C16h).** As Lucía (paid Plan in
+   force), the code card is the deep-rose hero: white code, outlined white
+   copy button, a white **Compartir tu código** with the share icon (also in
+   the Staff app's «Tu código de referido», E-F13) and a white **Editar
+   código** link. **Compartir tu código** opens the phone's own share sheet with the
+   text and `https://links.emmapilatesstudio.com/client/invite/LUCIA`. «Tus
+   invitadas» shows under each status its next step: «Todavía no reservó su
+   clase gratis.», «Si compra su primer plan, ganas una clase.» or «Ganaste 1
+   clase. Ya está en tu plan.». «Cómo funciona» ends with «Puedes invitar a una
+   amiga por mes.». As Mariana (no Plan) the card shows the code with «Se
+   activa cuando compres un plan.» and a white **Comprar un plan** on the
+   deep-rose card, which opens the Plans; there is no share or edit button,
+   and no «Tus invitadas» while she has invited nobody. The link itself opens no page yet
+   (CW01 waits for approval).
+
+## Test 202: the invite link and the guest's Inicio (mejoras del recorrido 13, 19, 22)
+
+The owner approved CW01, CW01b, CW01c, C01b8, C02f, C05j and C02j on 26 Nov
+2026. Run the API and the worker on a copy of `pilates_golden`, Metro for the
+Client app, the iPhone 16 Pro and the Android emulator.
+
+A. **The link on a computer (CW01c).** Open
+   `http://127.0.0.1:<port>/client/invite/LUCIA` (use Lucía's code from Perfil
+   › Invita a una amiga) in a desktop browser: «Lucía te regala tu primera
+   clase», «SU CÓDIGO», the code, and **App Store** and **Google Play**. An
+   unknown code shows «Tu primera clase en Emma Pilates Studio» and the two
+   stores. The page source carries `og:title`, `og:description` and
+   `og:image` (`https://app.emmapilatesstudio.com/compartir.png`), so
+   WhatsApp draws a card. As on the board, the title and the code are in
+   Lora and the rest in Work Sans, the block sits in the middle of the
+   window, and the code card has its shadow. The code of a Client without a
+   paid Plan in force (Mariana, Sofía) reads «Mariana te invita a Emma
+   Pilates Studio» and «Usa su código MARIANA al crear tu cuenta.», with no
+   free class, as a Trainer's does.
+B. **iPhone (CW01).** With an iPhone user agent (Safari on the Simulator) the
+   page has one button, **Copiar código y abrir App Store**: it copies the
+   code and opens the App Store.
+C. **Android (CW01b).** `curl -I -A "Android" …/client/invite/LUCIA` answers
+   302 to `https://play.google.com/store/apps/details?id=com.emmapilates.client&referrer=invite_code%3DLUCIA`.
+D. **With the app installed.** The Client app claims `/client/invite/*`
+   (Apple association and the Android intent filter; needs the 1.3.0 build).
+   Opening the link signed out opens «Crea tu cuenta» with the code written,
+   «Código de Lucía ✓» and «Recomendación de una amiga» marked; signed in it
+   is ignored.
+E. **After installing (CW01b, C01b8).** Android: on the first launch the app
+   asks Google Play for the install referrer once and «Crea tu cuenta» opens
+   with the code. iPhone: the first time «Crea tu cuenta» opens with no code
+   it reads the clipboard once (iOS asks to allow pasting) and, for a live
+   Client code, offers «¿Te invitó Lucía? · Usa su código y tu primera clase
+   es gratis.» with **Usar código LUCIA** / **No, gracias**. A build older than
+   1.3.0 reached by an update offers neither and keeps working.
+F. **The guest's Inicio (C02f).** Register a friend with the code of a host
+   with a paid Plan and verify her: Inicio's card reads «Te invitó Lucía»
+   (with her initials), «Tu clase gratis de invitada», «Úsala antes del …»
+   and a full-width white **Reservar mi clase gratis**, which opens Reservar.
+   The card comes before the promotions, and there is no «Accesos rápidos»
+   while she only holds the pass (no «Invita a una amiga» either). `GET
+   /api/v1/clients/current/subscription` carries `guestPass.hostFirstName`
+   and `hostInitials`.
+G. **Booking it (C05j).** Book a class with the pass: «Reserva confirmada ·
+   Usaste tu clase gratis. ¡Te esperamos el sáb 28 a las 13:00!» with the
+   class's day and time.
+H. **A code that was not active (C02j).** Register a friend with the code of
+   a Client without a paid Plan and verify her: Inicio shows «El código de
+   Lucía todavía no está activo · Esta vez tu cuenta no incluye la clase
+   gratis.» above «Elige tu plan y empieza a moverte». The subscription
+   answers `inactiveInvite: { hostFirstName }` while she has never had a
+   Plan and the host still has no paid Plan.
+I. **Code lookups are limited per address.** From one machine, ask
+   `GET /api/v1/referral-codes/lookup?code=LUCIA` (or open
+   `/client/invite/LUCIA`) 31 times within a minute: the 31st answers `429
+   rate_limit_exceeded` with `Retry-After`, while other routes from that
+   address still answer. Typing a code on «Crea tu cuenta» never comes near
+   the limit.
+
+## Test 203: class detail knows your bookings (mejoras del recorrido 1)
+
+Boards C04p and C04q. Run the API on a copy of `pilates_golden` and Metro for
+the Client app on the iPhone 16 Pro, logged in as a fixture Client with an
+active Plan and classes left.
+
+A. **A class she booked (C04p).** Book a class from Reservar, then open the
+   same class again from Reservar. The footer says «Ya reservaste esta clase»
+   after a check, with **Cancelar reserva** instead of «Reservar esta clase»,
+   and «Cancelas gratis hasta el vie 20 nov a las 07:30.» (or «hoy» /
+   «mañana a las …», with the month otherwise and a final period) while the
+   free-cancellation window is still open.
+B. **Cancelling it there.** Tap **Cancelar reserva**: «¿Cancelar esta
+   reserva?» asks first; **Sí, cancelar reserva** cancels it and the footer
+   turns back to **Reservar esta clase**. Mis reservas no longer lists it.
+C. **Another class at that time (C04q).** With that class booked, open a
+   class in another Branch that overlaps it. «Reservar esta clase» is off and
+   says under it «Ya tienes Mat Pilates a las 10:00 ese día. Cancélala antes
+   si prefieres esta.» (her class's name and start). **Ver esa reserva** opens
+   Mis reservas, where that booking is listed. A class that starts exactly
+   when hers ends is not blocked.
+D. **The API.** `GET /api/v1/sessions/{id}` as the Client answers
+   `yourBooking: { relation: "this_class" | "overlapping", bookingId,
+   classTypeName, startsAt, endsAt }`, or `null` when she holds none; Staff
+   get no `yourBooking`. A cancelled booking does not count. An app build
+   without this change ignores the field and keeps working.
+
+## Test 204: one left margin, error screens and profiles (mejoras del recorrido 3, 8, 16)
+
+Boards SYS «un solo margen», C11, C01k, C01k2, C01k3, C18, C18s, E-F01,
+E-F02, E-F03, E-F23 and E-F24. Run both apps against the local API.
+
+A. **One left edge (n.º 8).** On any screen with the pink band in either
+   app (Estado del pago, Mis facturas, Perfil, Horario), the back button,
+   the band's title, the section titles, the left edge of the white cards
+   and the footer buttons all start 16 pt from the screen's edge. The text
+   inside a card starts 16 pt further in. Section titles no longer sit 4 pt
+   inside the cards' edge.
+B. **The email link fails (C01k2).** Stop the API, then open a verification
+   link in the Client app: the band shows the mail icon on a white disc and
+   «No pudimos verificar tu enlace»; a white card reads «Revisa tu conexión e
+   inténtalo de nuevo.»; the white footer at the bottom holds **Reintentar**
+   and **Ir a iniciar sesión**. Start the API and tap **Reintentar**.
+C. **The link was already used (C01k3).** After a failed try whose request
+   did reach the server, **Reintentar** shows «Enlace ya utilizado» and «Si
+   ya verificaste tu correo, puedes iniciar sesión.» with **Ir a iniciar
+   sesión** alone on the footer. A first try with a used or expired link
+   shows «Enlace no válido» the same way.
+D. **The email is verified (C01k).** A fresh link shows the check on the
+   disc, «Correo verificado», «Tu cuenta está lista. Ahora puedes iniciar
+   sesión.» and **Ir a iniciar sesión** on the footer, laid out like Estado
+   del pago (C11).
+E. **Client Perfil (C18, C18s).** «Cuenta» holds only **Cambiar contraseña**,
+   the Face ID switch (where the phone has it) and **Cerrar sesión**. A last
+   section, «Ayuda y legal», holds **Enviar comentarios**, **Soporte** (with
+   «Contacto y WhatsApp del estudio» under it) and **Política de
+   privacidad** with a shield icon; Soporte and the policy open
+   `app.emmapilatesstudio.com/soporte` and `/privacidad`. There is no
+   «Términos y condiciones» row: the public site has no terms page yet.
+F. **Staff Perfil (E-F01, E-F02, E-F03).** Sign in as each role. The
+   identity is a deep-rose card: the white avatar with the initials or the
+   photo, the name in serif, the email and the phone, **Cambiar foto** as an
+   underlined white link (**Quitar foto** beside it once she has a photo)
+   and the note («Tus datos se editan en la web de administración.» for an
+   Administrator, «Tu nombre y tu correo los actualiza administración.» for
+   the others). Below, serif titles outside white cards: «Tu cuenta» (Rol,
+   Sucursal or Sucursales), «Ajustes» and «Ayuda y legal». Every row has its
+   icon on a round pale disc.
+G. **Staff rows per role (E-F03, E-F23 scrolled).** Administrator's Ajustes:
+   **Mi QR de cobro**, **Ver la app como…**, **Comentarios**,
+   **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Trainer
+   (E-F01, E-F24): **Mis pagos**, **Mi QR de cobro**, **Tu código de
+   referido**, **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**.
+   Assistant (E-F02): **Mis pagos** with «Último: …», **Mi QR de cobro**,
+   **Notificaciones**, **Cambiar contraseña**, **Cerrar sesión**. Each role's
+   «Ayuda y legal» holds **Enviar comentarios**, **Soporte** and **Política
+   de privacidad**, and every row opens what it opened before.
+H. **Seeing the app as someone.** As an Administrator, use **Ver la app
+   como…**: Perfil hides the photo links, **Cambiar contraseña**, **Cerrar
+   sesión** and **Enviar comentarios**, and shows **Dejar de ver como …** at
+   the end of Ajustes.
+I. **Staff screens on the same edge.** Step A holds on every Staff screen
+   too (Hoy, Agenda, Pagos, Comentarios, Notificaciones, Mis pagos), lists
+   and fixed footers included.
+J. **Images and invoices (E-D19, E-D30, C10v).** The invoice drop box has a
+   solid outline with a dashed line just inside it. Opening the uploaded
+   invoice, the attached receipt (Client) or a QR shows a white page with
+   the serif title and **Cerrar** with its × on one row, the image under it
+   and the note under the image, on no inner card.
+K. **Comentarios (E-F18, E-F19).** The comments are rows of one white card
+   split by hairlines: two initials, two lines of text with «…», a chevron.
+   **Filtrar** has a tag before it. In a comment, **Guardar** stays on the
+   white footer at the bottom while the page scrolls.
+L. **«Borrar» for screen readers.** With VoiceOver or TalkBack on, a
+   notification row in either app offers «Borrar» among its actions.
+
+## Test 205: sharing the referral code from one card (mejoras del recorrido 26, 27)
+
+Boards C16, E-F13, E-F14, E-F21 and E-F22. Run the API on a copy of
+`pilates_golden` and Metro for both apps, the Client app on the iPhone 16 Pro
+and the Staff app on the Android emulator.
+
+A. **The Client's card.** In the Client app open Perfil → «Invita a una
+   amiga». One card holds the code on a single line (a long code shrinks,
+   never wraps), **Copiar código** («Código copiado»), **Compartir tu código**
+   (the system sheet with `https://links.emmapilatesstudio.com/client/invite/CODE`)
+   and **Editar código**, which edits it in place.
+B. **The Trainer's card.** Log in to the Staff app as a fixture Trainer and
+   open Perfil → «Tu código de referido». The same card on Rosa Emma 600, with
+   «Cómo funciona» in three steps («Compartes tu código o tu enlace con tus
+   clientas», «Ella instala la app y crea su cuenta con tu código», «Queda
+   registrada como tu clienta»). **Compartir tu código** sends «Crea tu cuenta
+   en Emma Pilates Studio con mi código CODE.» with the link, and promises no
+   free class.
+C. **Attribution.** Open the Trainer's link on a desktop browser: «Ana te
+   invita a Emma Pilates Studio» with both stores. Register a new Client with
+   that code: the admin web's Clientas file shows «La trajo la instructora»
+   with the Trainer's name under «¿Cómo nos conociste?», as before.
+
+## Test 206: a bounced email (mejoras del recorrido 2)
+
+Boards C01c3 and RW-clientas-ficha-correo-rebotado. A bounce is what Resend's
+webhook stores in `system.email_suppressions` (ADR-0094); on a local database
+insert one by hand for the address's digest, or send a signed
+`email.bounced` event with `bounce.type: "Permanent"` to
+`POST /api/v1/email-delivery-events/resend` when `RESEND_WEBHOOK_SECRET` is
+set (the admin web's Playwright journey does that).
+
+A. **The app (C01c3).** Register in the Client app with an address, then
+   record its hard bounce. Reopen the app on «Revisa tu correo» (or bring it
+   back to the front): a card says «El correo rebotó · No pudimos entregar el
+   correo a {email}. Revisa la dirección.», with **Cambiar correo** and
+   **Volver a iniciar sesión**; «Reenviar correo» is gone. **Cambiar correo**
+   opens «Cambiar correo»; once the new address is sent, «Revisa tu correo»
+   waits for it as usual. `POST /api/v1/client-registrations/status-checks`
+   answers `bounced`; a complaint or a resolved bounce keeps `pending`.
+B. **The Clientas file.** Invite a Client from the Staff app and record the
+   bounce of her address. In the admin web open her file: the aviso reads «El
+   correo rebotó · No pudimos entregar el correo de activación a {email}: esa
+   dirección no existe. Confirma el correo con la clienta.», with no
+   «Reenviar enlace» and no expiry line. A pending Client whose email did not
+   bounce keeps «Pendiente de activación». `GET
+   /api/v1/assistant/client-invitations/{clientId}/email-delivery` answers
+   `{ clientId, email, bounced }` to the Administrator and the Coordinator.
+C. **Automated.** `pnpm test:e2e e2e/clients.spec.ts` in `apps/admin-web`
+   walks B at 1440 and 420 px through the real backend.
+
+## Test 207: fixes from the testing session (mejoras del recorrido 5, 11, 20, 22)
+
+Run the API on a copy of `pilates_golden` and Metro for both apps.
+
+A. **Staff first sign-in with Face ID.** On an iPhone Simulator with Face ID
+   enrolled (Simulator › Features › Face ID › Enrolled), sign in
+   to the Staff app for the first time as Paola. «¿Entrar con Face ID?» comes
+   first; after **Ahora no** the notification sheet «¿Te avisamos?» follows,
+   never under it, and every tap on Pagos pendientes works afterwards.
+B. **No «Save Password?» where biometrics are offered (#5).** On a real iPhone
+   with Face ID, the first sign-in shows only «¿Entrar con Face ID?». The
+   password field empties as she signs in and comes back if the sign-in is
+   refused. A phone without biometrics keeps the system's autofill and its
+   «Save Password?».
+C. **A triaged comment (E-F20).** Send a comment from the Client app, then
+   mark it «Revisado» from the Staff app's Comentarios as Paola: its
+   «Nuevo comentario» notice turns read on every Administrator's bell. Setting
+   it back to «Nuevo» does not.
+D. **A friend without a free class (#20, #22).** Register a friend with
+   MARIANA's code (no paid Plan) and verify her: Mariana's «Tus invitadas»
+   reads «Rosa A. · Registrada · No recibió la clase gratis.», the same as a
+   second friend of Lucía's in one month. The friend's Inicio reads «El código
+   de Mariana todavía no está activo» (`GET /clients/current/subscription`
+   answers `inactiveInvite`).
+

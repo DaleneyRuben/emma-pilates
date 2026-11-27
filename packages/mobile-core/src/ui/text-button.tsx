@@ -9,6 +9,8 @@ type TextButtonProps = {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
+  /** White on a 600 hero (E-F13), instead of ink. */
+  tone?: "ink" | "onDark";
 };
 
 /**
@@ -16,7 +18,14 @@ type TextButtonProps = {
  * contraseña?» (follow-up 285): `enlace`, Work Sans 14 · 700, underlined, in
  * ink, with a 44 pt tap height.
  */
-export function TextButton({ disabled = false, label, onPress, style, testID }: TextButtonProps) {
+export function TextButton({
+  disabled = false,
+  label,
+  onPress,
+  style,
+  testID,
+  tone = "ink",
+}: TextButtonProps) {
   return (
     <Pressable
       accessibilityLabel={label}
@@ -28,7 +37,9 @@ export function TextButton({ disabled = false, label, onPress, style, testID }: 
       style={[styles.button, style]}
       testID={testID}
     >
-      <Text variant="enlace">{label}</Text>
+      <Text tone={tone} variant="enlace">
+        {label}
+      </Text>
     </Pressable>
   );
 }

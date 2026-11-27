@@ -1,78 +1,48 @@
 import {
-  colors,
-  EditReferralCode,
-  Glyph,
-  PrimaryButton,
+  OnEmphasisButton,
+  ShareableReferralCodeCard,
   spacing,
   surfaces,
   Text,
 } from "@pilates/mobile-core";
-import * as Clipboard from "expo-clipboard";
-import { Pressable, StyleSheet, View } from "react-native";
+import type { ComponentProps } from "react";
+import { StyleSheet, View } from "react-native";
+
+/** C16, C16s, C16g: the shared card as the deep-rose hero, like the Staff one (E-F13). */
+export function ReferralCodeCard(
+  props: Omit<ComponentProps<typeof ShareableReferralCodeCard>, "emphasis">,
+) {
+  return <ShareableReferralCodeCard {...props} emphasis />;
+}
 
 /**
- * Invita option A (FIX-082): one card with the code in `cifra-grande` and an
- * outlined copy icon, «Compartir tu código» right under it as the screen's
- * one solid action, and «Editar código» centred below. Rosa Emma C16 draws
- * this card as the 600 hero; it stays white until the shared «Editar código»
- * can be drawn in white on 600.
+ * C16h (walkthrough n.º 22): a code gives a friend a class only while its
+ * owner has a paid Plan in force, so until then the deep-rose card shows the
+ * code, says when it starts working and offers the Plans instead of sharing.
  */
-export function ReferralCodeCard({
+export function InactiveReferralCodeCard({
   code,
-  fetcher,
-  onChanged,
-  onCopied,
-  onShare,
+  onPurchase,
 }: {
   code: string;
-  fetcher: typeof fetch;
-  onChanged: () => void;
-  onCopied: () => void;
-  onShare: () => void;
+  onPurchase: () => void;
 }) {
-  const copy = async () => {
-    await Clipboard.setStringAsync(code);
-    onCopied();
-  };
   return (
     <View style={styles.card} testID="referral-code-card">
-      <Text variant="etiqueta">Tu código</Text>
-      <View style={styles.codeRow}>
-        {/* Up to 20 characters: a long code wraps rather than shrinking (follow-up 285). */}
-        <Text selectable style={styles.code} variant="cifra-grande">
-          {code}
-        </Text>
-        <Pressable
-          accessibilityLabel="Copiar código"
-          accessibilityRole="button"
-          onPress={() => void copy()}
-          style={({ pressed }) => [styles.copy, pressed && styles.pressed]}
-        >
-          <Glyph color={colors.text} name="copy" size={20} strokeWidth={1.7} />
-        </Pressable>
-      </View>
-      <PrimaryButton label="Compartir tu código" onPress={onShare} />
-      {/* A row centres the link: the shared «Editar código» aligns itself left. */}
-      <View style={styles.editRow}>
-        <EditReferralCode fetcher={fetcher} onChanged={onChanged} />
-      </View>
+      <Text tone="onDark" variant="etiqueta">
+        Tu código
+      </Text>
+      <Text selectable tone="onDark" variant="cifra-grande">
+        {code}
+      </Text>
+      <Text tone="onDark" variant="cuerpo">
+        Se activa cuando compres un plan.
+      </Text>
+      <OnEmphasisButton label="Comprar un plan" onPress={onPurchase} wide />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.card, gap: spacing.md, padding: spacing.xlSm },
-  code: { flex: 1 },
-  codeRow: { alignItems: "center", flexDirection: "row", gap: spacing.md },
-  copy: {
-    alignItems: "center",
-    borderColor: colors.borderStrong,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    height: 44,
-    justifyContent: "center",
-    width: 44,
-  },
-  editRow: { flexDirection: "row", justifyContent: "center" },
-  pressed: { opacity: 0.7 },
+  card: { ...surfaces.emphasis, gap: spacing.smLg, padding: spacing.xlSm },
 });

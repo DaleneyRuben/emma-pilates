@@ -15,14 +15,15 @@ const profile = {
   referralCode: "LUCIA",
 };
 
-const routes = (referrals: unknown[]) => ({
+const routes = (referrals: unknown[], codeActive = true) => ({
   "/api/v1/clients/current": () => jsonResponse(profile),
   "/api/v1/clients/current/subscription": () =>
     jsonResponse({ status: "none", subscription: null }),
   "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
   "/api/v1/clients/current/credit": () =>
     jsonResponse({ availableCentavos: 0, reservedCentavos: 0, activity: [] }),
-  "/api/v1/clients/current/referrals": () => jsonResponse({ referralCode: "LUCIA", referrals }),
+  "/api/v1/clients/current/referrals": () =>
+    jsonResponse({ referralCode: "LUCIA", codeActive, referrals }),
   "/api/v1/referral-codes/current": () =>
     jsonResponse({ referralCode: "LUCIA", editableFrom: null }),
 });
@@ -88,9 +89,8 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("1. Compartes tu código.")).toBeOnTheScreen();
     expect(screen.getByText("2. Tu amiga toma una clase gratis.")).toBeOnTheScreen();
     expect(screen.getByText("3. Si compra su primer plan, tú ganas una clase.")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Una amiga por mes. La clase gratis es una sola vez para ella."),
-    ).toBeOnTheScreen();
+    // Owner, 26 Nov (C16): the shorter footnote.
+    expect(screen.getByText("Puedes invitar a una amiga por mes.")).toBeOnTheScreen();
     expect(screen.queryByText("Tu crédito")).toBeNull();
     expect(screen.queryByText(/crédito/i)).toBeNull();
     expect(screen.queryByText(/Bs/)).toBeNull();
@@ -101,34 +101,107 @@ describe("Invita a una amiga (BKM-014)", () => {
     expect(screen.getByText("Registrada")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Compartir tu código" }));
+    // Walkthrough n.º 13 (C16g): the system's own share sheet, with the link.
     expect(share).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringContaining("LUCIA") }),
+      expect.objectContaining({
+        message:
+          "Únete a Emma Pilates Studio con mi código LUCIA: tu primera clase es gratis. https://links.emmapilatesstudio.com/client/invite/LUCIA",
+      }),
     );
     share.mockRestore();
+  });
+
+  // Walkthrough n.º 20 (C16s): each friend's next step under her status.
+  it("tells the host what comes next for each friend", async () => {
+    const friend = (id: string, invitationStatus: string) => ({
+      referredClientId: id,
+      referredName: `Amiga ${id}`,
+      state: invitationStatus === "bought" ? "awarded" : "pending",
+      invitationStatus,
+      createdAt: "2026-09-10T15:00:00.000Z",
+      awardedAt: null,
+      awardCentavos: null,
+    });
+    const screen = await openInvita(
+      routeFetcher(
+        routes([friend("1", "bought"), friend("2", "class_booked"), friend("3", "registered")]),
+      ),
+    );
+
+    expect(await screen.findByText("Ganaste 1 clase. Ya está en tu plan.")).toBeOnTheScreen();
+    expect(screen.getByText("Si compra su primer plan, ganas una clase.")).toBeOnTheScreen();
+    expect(screen.getByText("Todavía no reservó su clase gratis.")).toBeOnTheScreen();
+  });
+
+  // Testing session (#20 + #22): a friend who registered while the code was
+  // not active got no Guest Pass, so her row promises no free class.
+  it("promises no free class to a friend who never got one", async () => {
+    const screen = await openInvita(
+      routeFetcher(
+        routes([
+          {
+            referredClientId: "rosa",
+            referredName: "Rosa A.",
+            state: "pending",
+            invitationStatus: "registered",
+            freeClass: false,
+            createdAt: "2026-09-10T15:00:00.000Z",
+            awardedAt: null,
+            awardCentavos: null,
+          },
+        ]),
+      ),
+    );
+
+    expect(await screen.findByText("No recibió la clase gratis.")).toBeOnTheScreen();
+    expect(screen.queryByText("Todavía no reservó su clase gratis.")).toBeNull();
+  });
+
+  // Walkthrough n.º 22 (C16h): without a paid Plan in force the code gives no
+  // class yet, so the card asks for a Plan instead of sharing.
+  it("asks a host without a paid Plan to buy one instead of sharing", async () => {
+    const screen = await openInvita(routeFetcher(routes([], false)));
+
+    expect(await screen.findByText("Se activa cuando compres un plan.")).toBeOnTheScreen();
+    expect(screen.getByText("LUCIA")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Compartir tu código" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Editar código" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+    // C16h: the deep-rose hero with a white «Comprar un plan», and no
+    // «Tus invitadas» while there are none.
+    expect(screen.getByTestId("referral-code-card")).toHaveStyle({ backgroundColor: "#93615D" });
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toHaveStyle({
+      alignSelf: "stretch",
+      backgroundColor: "#FFFBFB",
+    });
+    expect(screen.queryByText("Tus invitadas")).toBeNull();
   });
 
   // BKM-017: copy next to the code, and «Editar código» on the card. FIX-082
   // (Invita option A): one white card, the code in Lora, a 44 pt outlined copy
   // icon, «Compartir tu código» right under it and «Editar código» centred.
-  it("holds the code, copy, share and edit on one light card", async () => {
+  // C16, C16s, C16g (walkthrough 291): the deep-rose hero, like the Staff one.
+  it("holds the code, copy, share and edit on one deep-rose card", async () => {
     const screen = await openInvita(routeFetcher(routes([])));
 
     const card = await screen.findByTestId("referral-code-card");
-    expect(card).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 20 });
+    expect(card).toHaveStyle({ backgroundColor: "#93615D", borderRadius: 24 });
     expect(screen.getByText("Tu código")).toBeOnTheScreen();
     // Follow-up 285: the code is `cifra-grande`, with no hand-made spacing.
     expect(screen.getByText("LUCIA")).toHaveStyle({
-      color: "#93615D",
+      color: "#FFFBFB",
       fontFamily: "Lora_500Medium",
       fontSize: 34,
     });
     expect(StyleSheet.flatten(screen.getByText("LUCIA").props.style).letterSpacing).toBeUndefined();
     const copy = screen.getByRole("button", { name: "Copiar código" });
-    expect(copy).toHaveStyle({ borderWidth: 1.5, height: 44, width: 44 });
+    expect(copy).toHaveStyle({ borderColor: "#FFFBFB", borderWidth: 1.5, height: 44, width: 44 });
     expect(screen.getAllByRole("button", { name: "Compartir tu código" })).toHaveLength(1);
-    expect(screen.getByRole("button", { name: "Compartir tu código" })).toHaveStyle({
-      backgroundColor: "#93615D",
-    });
+    const shareButton = screen.getByRole("button", { name: "Compartir tu código" });
+    expect(shareButton).toHaveStyle({ backgroundColor: "#FFFBFB", borderRadius: 16 });
+    expect(
+      within(shareButton).getByTestId("glyph-share", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
 
     await fireEvent.press(copy);
     expect(await screen.findByText("Código copiado")).toBeOnTheScreen();

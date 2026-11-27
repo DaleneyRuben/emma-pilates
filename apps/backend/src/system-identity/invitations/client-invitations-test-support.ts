@@ -44,6 +44,7 @@ export const createTransaction = (
   removeInvitation: jest.fn().mockResolvedValue(undefined),
   scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
   recordAudit: jest.fn().mockResolvedValue(undefined),
+  isEmailBounced: jest.fn().mockResolvedValue(false),
   ...overrides,
 });
 

@@ -9,6 +9,7 @@ import {
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import { overlappingBookingWhere } from './overlapping-booking';
 
 export type WaitlistPromotionDependencies = {
   now: () => Date;
@@ -81,17 +82,10 @@ export const promoteWaitlistInTransaction = (
           })),
         };
       },
-      hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+      hasOverlappingBooking: (window) =>
         transaction.booking
           .findFirst({
-            where: {
-              clientId,
-              state: 'BOOKED',
-              session: {
-                startsAt: { lt: endsAt },
-                endsAt: { gt: startsAt },
-              },
-            },
+            where: overlappingBookingWhere(window),
             select: { id: true },
           })
           .then((booking) => booking !== null),

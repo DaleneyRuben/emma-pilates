@@ -1003,6 +1003,223 @@
    "w": 390,
    "h": 844,
    "title": "C26 · Enlace de cambio de correo"
+  },
+  "C01b3-registrate-teclado.dc.html": {
+   "x": 0,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01b3 Crea tu cuenta · teclado abierto"
+  },
+  "C01b4-registrate-teclado-final.dc.html": {
+   "x": 470,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01b4 Crea tu cuenta · teclado abierto, al final"
+  },
+  "C01b5-registrate-codigo-de-una-amiga.dc.html": {
+   "x": 940,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01b5 Crea tu cuenta · código válido"
+  },
+  "C01b6-registrate-codigo-no-existe.dc.html": {
+   "x": 1410,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01b6 Crea tu cuenta · código que no existe"
+  },
+  "C01b8-codigo-copiado-de-una-amiga.dc.html": {
+   "x": 1880,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01b8 Crea tu cuenta · «¿Te invitó Lucía?»"
+  },
+  "C01c2-correo-ya-confirmado.dc.html": {
+   "x": 2350,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01c2 Revisa tu correo · ya estaba confirmado"
+  },
+  "C01c3-revisa-tu-correo-rebotado.dc.html": {
+   "x": 2820,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01c3 Revisa tu correo · el correo rebotó"
+  },
+  "C01e2-iniciar-sesion-correo-sin-confirmar.dc.html": {
+   "x": 3290,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01e2 Iniciar sesión · correo sin confirmar"
+  },
+  "C01k2-no-pudimos-verificar-enlace.dc.html": {
+   "x": 3760,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01k2 Verificar enlace · falló la conexión (#3)"
+  },
+  "C01k3-enlace-ya-utilizado.dc.html": {
+   "x": 4230,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01k3 Verificar enlace · enlace ya utilizado (#3)"
+  },
+  "C01q-face-id-primer-inicio.dc.html": {
+   "x": 4700,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01q Primer inicio · solo la oferta de Face ID"
+  },
+  "C01r-guardar-contrasena-sin-biometria.dc.html": {
+   "x": 5170,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C01r Excepción · Android sin huella: guardar contraseña"
+  },
+  "C02j-inicio-codigo-no-activo.dc.html": {
+   "x": 5640,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C02j Inicio · el código de la amiga no está activo"
+  },
+  "C04p-detalle-ya-reservada.dc.html": {
+   "x": 6110,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C04p Detalle · ya reservaste esta clase"
+  },
+  "C04q-detalle-otra-reserva-a-esa-hora.dc.html": {
+   "x": 6580,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C04q Detalle · otra reserva a esa hora"
+  },
+  "C05j-mis-reservas-clase-gratis-usada.dc.html": {
+   "x": 7050,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C05j Mis reservas · clase gratis reservada"
+  },
+  "C10u-pago-subiendo-comprobante.dc.html": {
+   "x": 7520,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C10u Pago · subiendo el comprobante"
+  },
+  "C10v-pago-comprobante-ampliado.dc.html": {
+   "x": 7990,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C10v Pago · comprobante en grande"
+  },
+  "C11n-pago-en-revision-permiso.dc.html": {
+   "x": 8460,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C11n Pago en revisión · permiso de notificaciones"
+  },
+  "C16g-compartir-enlace.dc.html": {
+   "x": 8930,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C16g Invita a una amiga · hoja nativa para compartir"
+  },
+  "C16h-invita-sin-plan-activo.dc.html": {
+   "x": 9400,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C16h Invita a una amiga · sin plan pagado activo"
+  },
+  "C16s-invita-a-una-amiga-abajo.dc.html": {
+   "x": 9870,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C16s Invita a una amiga · Tus invitadas"
+  },
+  "C19c-notificaciones-deslizar.dc.html": {
+   "x": 10340,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C19c Notificaciones · deslizar para borrar"
+  },
+  "C19d-notificaciones-deshacer.dc.html": {
+   "x": 10810,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C19d Notificaciones · borrada, con Deshacer"
+  },
+  "C22c-editar-perfil-foto-nueva.dc.html": {
+   "x": 11280,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C22c Editar perfil · foto nueva al instante"
+  },
+  "C22d-editar-perfil-foto-no-subio.dc.html": {
+   "x": 11750,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C22d Editar perfil · la foto no se subió"
+  },
+  "C25c-enviar-comentarios-falta-tipo.dc.html": {
+   "x": 12220,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C25c Enviar comentarios · falta el tipo"
+  },
+  "C25d-enviar-comentarios-teclado.dc.html": {
+   "x": 12690,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "C25d Enviar comentarios · teclado abierto"
+  },
+  "CW01-invitacion-web.dc.html": {
+   "x": 13160,
+   "y": 11108,
+   "w": 390,
+   "h": 844,
+   "title": "CW01 Enlace · iPhone sin la app: copiar y abrir App Store"
+  },
+  "CW01b-invitacion-android.dc.html": {
+   "x": 13630,
+   "y": 11108,
+   "w": 1280,
+   "h": 760,
+   "title": "CW01b Enlace · Android sin página: directo a Google Play"
+  },
+  "CW01c-invitacion-computadora.dc.html": {
+   "x": 14990,
+   "y": 11108,
+   "w": 1280,
+   "h": 760,
+   "title": "CW01c Enlace · computadora u otro equipo: las dos tiendas"
   }
  },
  "order": [
@@ -1147,7 +1364,38 @@
   "C21c-enlace-vencido.dc.html",
   "C21e-enlace-vencido-restablecer.dc.html",
   "C21d-invitacion-eliminada.dc.html",
-  "C26-cambio-de-correo-enlace.dc.html"
+  "C26-cambio-de-correo-enlace.dc.html",
+  "C01b3-registrate-teclado.dc.html",
+  "C01b4-registrate-teclado-final.dc.html",
+  "C01b5-registrate-codigo-de-una-amiga.dc.html",
+  "C01b6-registrate-codigo-no-existe.dc.html",
+  "C01b8-codigo-copiado-de-una-amiga.dc.html",
+  "C01c2-correo-ya-confirmado.dc.html",
+  "C01c3-revisa-tu-correo-rebotado.dc.html",
+  "C01e2-iniciar-sesion-correo-sin-confirmar.dc.html",
+  "C01k2-no-pudimos-verificar-enlace.dc.html",
+  "C01k3-enlace-ya-utilizado.dc.html",
+  "C01q-face-id-primer-inicio.dc.html",
+  "C01r-guardar-contrasena-sin-biometria.dc.html",
+  "C02j-inicio-codigo-no-activo.dc.html",
+  "C04p-detalle-ya-reservada.dc.html",
+  "C04q-detalle-otra-reserva-a-esa-hora.dc.html",
+  "C05j-mis-reservas-clase-gratis-usada.dc.html",
+  "C10u-pago-subiendo-comprobante.dc.html",
+  "C10v-pago-comprobante-ampliado.dc.html",
+  "C11n-pago-en-revision-permiso.dc.html",
+  "C16g-compartir-enlace.dc.html",
+  "C16h-invita-sin-plan-activo.dc.html",
+  "C16s-invita-a-una-amiga-abajo.dc.html",
+  "C19c-notificaciones-deslizar.dc.html",
+  "C19d-notificaciones-deshacer.dc.html",
+  "C22c-editar-perfil-foto-nueva.dc.html",
+  "C22d-editar-perfil-foto-no-subio.dc.html",
+  "C25c-enviar-comentarios-falta-tipo.dc.html",
+  "C25d-enviar-comentarios-teclado.dc.html",
+  "CW01-invitacion-web.dc.html",
+  "CW01b-invitacion-android.dc.html",
+  "CW01c-invitacion-computadora.dc.html"
  ],
  "notes": {
   "n-inicio": {
@@ -1226,6 +1474,13 @@
    "w": 390,
    "text": "Otros resultados del enlace, misma pantalla: «Confirmando tu correo» / «Estamos confirmando tu enlace.» · «Enlace vencido» / «Este enlace venció o ya fue utilizado. Pide el cambio de nuevo desde Editar perfil.» · «Enlace no válido» / «Este enlace no es válido.» · «Correo no disponible» / «Ese correo ya está en uso. Pide el cambio con otro correo desde Editar perfil.»",
    "size": "s"
+  },
+  "n-mejoras-recorrido": {
+   "x": 0,
+   "y": 10828,
+   "text": "Mejoras del recorrido (follow-up 291, 26/11)",
+   "kind": "title1",
+   "maxW": 14570
   }
  },
  "designSystems": []

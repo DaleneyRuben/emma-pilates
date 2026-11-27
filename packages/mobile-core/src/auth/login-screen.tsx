@@ -7,6 +7,8 @@ import { z } from "zod";
 
 import logo from "../../assets/emma-logo.png";
 import { TeamAccessBadge } from "./auth-layout";
+import { UnconfirmedEmailCard } from "./unconfirmed-email-card";
+import { useOptionalMobileIdentity } from "./identity-provider";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricWelcome } from "../ui/biometric-login-button";
@@ -46,26 +48,54 @@ export type LoginSubmissionResult =
 type LoginScreenProps = {
   /** A one-time message, such as the one left by closing the Account. */
   notice?: string | null;
+  /** The address to start with, such as the one just confirmed elsewhere (C01c2). */
+  initialEmail?: string;
   /** Set while a biometric key waits: the sheet greets instead of the form. */
   biometricLock?: BiometricLock;
   onForgotPassword?: () => void;
   onRegister?: () => void;
   /** The Staff app marks its Login as the team's entrance (S01). */
   teamAccess?: boolean;
+  /**
+   * The address this phone registered and has not confirmed (n.º 4): a
+   * refusal for it says so, with «Reenviar correo», instead of the generic one.
+   */
+  unconfirmedEmail?: string | null;
+  onResendConfirmation?: () => void;
   onSubmit?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
+  /**
+   * Walkthrough n.º 5 (C01q, C01r): the system may fill and save the password
+   * only on a phone without Face ID or a fingerprint; elsewhere the app's own
+   * biometric offer is the only one. Read from the identity when omitted.
+   */
+  passwordAutofill?: boolean;
 };
+
+// No autofill, no «Save password?»: email and password fields alike.
+const autofillOff = {
+  autoComplete: "off",
+  importantForAutofill: "no",
+  textContentType: "none",
+} as const;
 
 export function LoginScreen({
   biometricLock,
+  initialEmail = "",
   notice = null,
   onForgotPassword,
   onRegister,
+  onResendConfirmation,
   onSubmit = () => undefined,
+  passwordAutofill,
   teamAccess = false,
+  unconfirmedEmail = null,
 }: LoginScreenProps) {
-  const [rejected, setRejected] = useState(false);
+  // The address the last refusal was for.
+  const [rejected, setRejected] = useState<string | null>(null);
+  const biometricsAvailable = useOptionalMobileIdentity()?.biometrics.available === true;
+  const autofill = passwordAutofill ?? !biometricsAvailable;
   // Until the launch's own prompt answers, only the logo shows (canvas Main, iOS-1).
   const [autoPrompting, setAutoPrompting] = useState(biometricLock?.autoPrompt === true);
   // A development build mounts effects twice; the phone takes one prompt at a time.
@@ -89,16 +119,28 @@ export function LoginScreen({
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
+    setValue,
   } = useForm<LoginValues>({
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: initialEmail, password: "" },
     resolver: zodResolver(loginSchema),
   });
   const submitLogin = handleSubmit(async (values) => {
-    setRejected(false);
-    const result = await onSubmit(values);
+    setRejected(null);
+    // Testing session (#5, iOS 26): iOS offers «Save Password?» when a filled
+    // password field leaves the screen after a sign-in, so where biometrics
+    // are the offer the field is emptied now and refilled only if refused.
+    if (!autofill) setValue("password", "");
+    let result: LoginSubmissionResult | void;
+    try {
+      result = await onSubmit(values);
+    } catch (error) {
+      if (!autofill) setValue("password", values.password);
+      throw error;
+    }
+    if (!autofill && result !== undefined) setValue("password", values.password);
 
     if (result?.status === "rejected") {
-      setRejected(true);
+      setRejected(values.email.trim().toLowerCase());
     }
 
     if (result?.status === "throttled") {
@@ -146,9 +188,13 @@ export function LoginScreen({
             )}
             {biometricLock === undefined ? (
               <>
-                {rejected ? (
+                {rejected === null ? null : unconfirmedEmail !== null &&
+                  onResendConfirmation !== undefined &&
+                  rejected === unconfirmedEmail.trim().toLowerCase() ? (
+                  <UnconfirmedEmailCard email={unconfirmedEmail} onResend={onResendConfirmation} />
+                ) : (
                   <FormAlert>El correo o la contraseña no son correctos.</FormAlert>
-                ) : null}
+                )}
                 {retryAfterSeconds > 0 ? (
                   <WaitNotice
                     message="Demasiados intentos. Intenta de nuevo en un momento."
@@ -162,7 +208,7 @@ export function LoginScreen({
                   render={({ field: { onBlur, onChange, value } }) => (
                     <FormField
                       autoCapitalize="none"
-                      autoComplete="email"
+                      {...(autofill ? { autoComplete: "email" as const } : autofillOff)}
                       error={errors.email?.message}
                       keyboardType="email-address"
                       label="Correo electrónico"
@@ -178,7 +224,7 @@ export function LoginScreen({
                   name="password"
                   render={({ field: { onBlur, onChange, value } }) => (
                     <FormField
-                      autoComplete="current-password"
+                      {...(autofill ? { autoComplete: "current-password" as const } : autofillOff)}
                       error={errors.password?.message}
                       label="Contraseña"
                       onBlur={onBlur}

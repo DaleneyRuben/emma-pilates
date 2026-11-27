@@ -12,6 +12,6 @@ export const invoiceStyles = StyleSheet.create({
   heroTop: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   note: { textAlign: "center" },
   row: { flexDirection: "row", justifyContent: "space-around" },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   toast: { bottom: spacing.xl * 4, left: 0, position: "absolute", right: 0 },
 });

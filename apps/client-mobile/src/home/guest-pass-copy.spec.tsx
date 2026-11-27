@@ -62,7 +62,10 @@ describe("Guest Pass copy", () => {
     expect(screen.queryByText(/clases? restantes?/)).toBeNull();
     expect(screen.queryByRole("progressbar")).toBeNull();
 
-    await fireEvent.press(card.getByRole("button", { name: "Mi plan" }));
+    // C02f: the card books the class; Mi plan is reached from Perfil.
+    expect(card.getByRole("button", { name: "Reservar mi clase gratis" })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: /^Perfil, tab/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Mi plan/ }));
     await waitFor(() => expect(screen.getByRole("header", { name: "Mi plan" })).toBeOnTheScreen());
 
     const hero = within(screen.getByTestId("subscription-guest-pass"));

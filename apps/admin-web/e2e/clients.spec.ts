@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { inviteClient, sendTransfer } from "./support/api";
+import { bounceEmail, inviteClient, sendTransfer } from "./support/api";
 import { signIn } from "./support/session";
 
 // AW22 through the real backend: the closure the rules refuse (a transfer
@@ -106,3 +106,34 @@ test("resends a pending Client's activation link and shows the recipient wait", 
   ).toBeVisible();
   await expect(resend).toBeDisabled();
 });
+
+// Walkthrough n.º 2 (RW-clientas-ficha-correo-rebotado): Resend reports
+// that her activation email bounced, and her file says so instead of
+// «Pendiente de activación», on a laptop and a narrow window alike.
+for (const width of [1440, 420]) {
+  test(`says a pending Client's email bounced at ${width} px`, async ({
+    page,
+  }) => {
+    const email = `rebote.${width}@ejemplo.con`;
+    await inviteClient(`Rebote ${width}`, email);
+    await bounceEmail(email);
+    await page.setViewportSize({ width, height: 900 });
+    await signIn(page, "/clientas");
+
+    await page.getByRole("button", { name: `Rebote ${width}` }).click();
+    const panel = page.getByRole("dialog", { name: `Rebote ${width}` });
+    await expect(panel.getByText("El correo rebotó")).toBeVisible();
+    await expect(
+      panel.getByText(
+        `No pudimos entregar el correo de activación a ${email}: esa dirección no existe. Confirma el correo con la clienta.`,
+      ),
+    ).toBeVisible();
+    await expect(panel.getByText("Pendiente de activación")).toHaveCount(0);
+    await expect(
+      panel.getByRole("button", { name: "Reenviar enlace" }),
+    ).toHaveCount(0);
+    await page.screenshot({
+      path: test.info().outputPath(`correo-rebotado-${width}.png`),
+    });
+  });
+}

@@ -18,6 +18,7 @@ import {
   startRegistrationWorld,
   type RegistrationWorld,
 } from './client-registration-test-support';
+import { giveHostPlan } from './host-plan-test-support';
 
 const code = () =>
   `REF-${randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`;
@@ -120,6 +121,8 @@ describe('guest pass opens at email verification', () => {
       },
       select: { id: true, referralCode: true },
     });
+    // Walkthrough n.º 22: only a host with a paid Plan opens a pass.
+    await giveHostPlan(prisma, { clientId: host.id, now });
     const email = `unverified-${randomUUID()}@example.com`;
 
     await register(email, host.referralCode);
@@ -205,6 +208,8 @@ describe('guest pass opens at email verification', () => {
         referralCode: code(),
       },
     });
+    // Walkthrough n.º 22: only a host with a paid Plan opens a pass.
+    await giveHostPlan(prisma, { clientId: host.id, now });
     const first = `race-a-${randomUUID()}@example.com`;
     const second = `race-b-${randomUUID()}@example.com`;
     await register(first, host.referralCode);
@@ -230,6 +235,8 @@ describe('guest pass opens at email verification', () => {
         referralCode: code(),
       },
     });
+    // Walkthrough n.º 22: only a host with a paid Plan opens a pass.
+    await giveHostPlan(prisma, { clientId: host.id, now });
     const friend = await prisma.client.create({
       data: { name: 'Invitada pendiente', referralCode: `REF-${randomUUID()}` },
     });

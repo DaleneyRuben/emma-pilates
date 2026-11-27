@@ -22,6 +22,7 @@ import { Text } from "../ui/text";
 import { colors, radii, spacing, surfaces } from "../ui/tokens";
 import { NotificationGroup, type NotificationActionFor } from "./notification-row";
 import { usePushNotifications } from "./push-notifications";
+import { useNotificationRemoval } from "./use-notification-removal";
 import { LoadingState } from "../ui/loading-state";
 import { usePullToRefresh } from "../query/pull-to-refresh";
 import { useRefetchOnFocus } from "../query/refetch-on-focus";
@@ -106,6 +107,7 @@ export function NotificationsScreen({
     fetcher,
     mutation: { onSuccess: () => void invalidate() },
   });
+  const removal = useNotificationRemoval({ fetcher, onChanged: () => void invalidate() });
 
   const header = (action?: ReactNode) => (
     <ScreenTopBar action={action} fullBleed onBack={onBack} title="Notificaciones" />
@@ -132,7 +134,7 @@ export function NotificationsScreen({
     );
   }
 
-  const items = notifications.data.data.items;
+  const items = notifications.data.data.items.filter((item) => !removal.isRemoved(item.id));
   const unread = items.filter((item) => !item.readAt);
   const earlier = items.filter((item) => Boolean(item.readAt));
   const currentTime = now();
@@ -155,6 +157,7 @@ export function NotificationsScreen({
         now={currentTime}
         onAction={read}
         onOpen={open}
+        onRemove={(notification) => removal.remove(notification.id)}
       />
     </View>
   );
@@ -175,6 +178,7 @@ export function NotificationsScreen({
           title="No tienes notificaciones."
           variant="plain"
         />
+        {removal.toast}
       </Screen>
     );
   }
@@ -203,6 +207,7 @@ export function NotificationsScreen({
           {earlier.length > 0 ? section("Anteriores", earlier) : null}
         </TabletColumn>
       </ScrollView>
+      {removal.toast}
     </Screen>
   );
 }

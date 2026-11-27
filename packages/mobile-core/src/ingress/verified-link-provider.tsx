@@ -1,10 +1,24 @@
-import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  type PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Linking } from "react-native";
 
 import { type LinkSource, subscribeToVerifiedLinks } from "./link-ingress";
 import type { AuthenticationLinkIntent, LinkIdentityKind } from "./verified-link";
 
 type VerifiedLinkState = {
+  /**
+   * Forgets a link once its screen used it, so a later Login (after signing
+   * out, say) does not open it again (walkthrough n.º 17). A newer link that
+   * arrived meanwhile stays.
+   */
+  clearIntent: (intent: AuthenticationLinkIntent) => void;
   intent: AuthenticationLinkIntent | null;
 };
 
@@ -35,7 +49,12 @@ export function VerifiedLinkProvider({
     [allowedHosts, identityKind, source],
   );
 
-  return <VerifiedLinkContext.Provider value={{ intent }}>{children}</VerifiedLinkContext.Provider>;
+  const clearIntent = useCallback((handled: AuthenticationLinkIntent) => {
+    setIntent((current) => (current === handled ? null : current));
+  }, []);
+  const state = useMemo(() => ({ clearIntent, intent }), [clearIntent, intent]);
+
+  return <VerifiedLinkContext.Provider value={state}>{children}</VerifiedLinkContext.Provider>;
 }
 
 export function useVerifiedLinkIntent(): VerifiedLinkState {

@@ -19,7 +19,10 @@ import { authenticatedPrincipalResolver } from '../src/system-identity/authentic
 import { EmailSourceThrottledError } from '../src/system-identity/email-source-budget/admit-email-request';
 import { emailSourceAdmission } from '../src/system-identity/email-source-budget/email-source-budget.guard';
 import { CancelPendingClientRegistration } from '../src/system-identity/registration/cancel-pending-client-registration';
-import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
+import {
+  ClientRegistrationController,
+  pendingRegistrationStatusReader,
+} from '../src/system-identity/registration/client-registration.controller';
 import { CorrectPendingClientEmail } from '../src/system-identity/registration/correct-pending-client-email';
 import { RegisterClient } from '../src/system-identity/registration/register-client';
 import { ResendPendingClientVerification } from '../src/system-identity/registration/resend-pending-client-verification';
@@ -95,6 +98,7 @@ describe('client and network email budgets (e2e)', () => {
           provide: CancelPendingClientRegistration,
           useValue: { execute: jest.fn() },
         },
+        { provide: pendingRegistrationStatusReader, useValue: jest.fn() },
         { provide: authenticationLinkInspection, useValue: jest.fn() },
         { provide: accountActivation, useValue: jest.fn() },
         { provide: passwordRecoveryRequest, useValue: requestRecovery },

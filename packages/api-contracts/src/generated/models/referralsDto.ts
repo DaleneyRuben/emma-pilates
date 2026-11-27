@@ -8,5 +8,7 @@ import type { ReferredClientDto } from "./referredClientDto";
 
 export interface ReferralsDto {
   referralCode: string;
+  /** Whether her code gives a friend a Guest Pass now: only while she has a paid Plan in force (not a Courtesy Access nor her own Guest Pass). A friend who verifies her email while it is false gets no pass. */
+  codeActive: boolean;
   referrals: ReferredClientDto[];
 }

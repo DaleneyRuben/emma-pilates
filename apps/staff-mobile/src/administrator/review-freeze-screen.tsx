@@ -180,6 +180,6 @@ const styles = StyleSheet.create({
   column: { alignSelf: "center", flex: 1, width: "100%" },
   // E-D10: who decided and when, in a white card.
   decision: { ...surfaces.card, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  screen: { paddingHorizontal: spacing.xlSm },
+  screen: { paddingHorizontal: spacing.lg },
   tablet: { maxWidth: 560 },
 });

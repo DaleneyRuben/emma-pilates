@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor, within } from "@testing-library/react-native";
 
 import type { AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
@@ -17,6 +17,8 @@ function createApiMock(
       .mockResolvedValue({ credential: "credential", status: "recovered" }),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn().mockResolvedValue(inspection),
+    lookUpReferralCode: jest.fn(),
+    readRegistrationStatus: jest.fn().mockResolvedValue("pending"),
     register: jest.fn(),
     requestPasswordRecovery: jest.fn(),
     resendRegistrationVerification: jest.fn(),
@@ -63,13 +65,17 @@ describe("Crear contraseña (21, S19)", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByPlaceholderText("Repite la contraseña")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Activar cuenta" })).toBeDisabled();
+    // Walkthrough n.º 6 and 15: at the end of the form, always on.
+    expect(
+      within(screen.getByTestId("auth-actions")).getByRole("button", { name: "Activar cuenta" }),
+    ).toBeEnabled();
 
     await typePasswords(screen, "pilates2026", "pilates202");
     expect(
       await screen.findByRole("alert", { name: "Las contraseñas no coinciden." }),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Activar cuenta" })).toBeDisabled();
+    await fireEvent.press(screen.getByRole("button", { name: "Activar cuenta" }));
+    expect(api.activateAccount).not.toHaveBeenCalled();
 
     await typePasswords(screen, "pilates2026", "pilates2026");
     await waitFor(() =>

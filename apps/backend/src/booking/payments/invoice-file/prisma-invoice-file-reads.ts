@@ -1,5 +1,7 @@
 import type { Prisma } from '../../../generated/prisma/client';
 import {
+  ImageAssetPurpose,
+  ImageAssetState,
   ImageVariantKind,
   ImageVariantVisibility,
   PaymentState,
@@ -247,5 +249,51 @@ export const readInvoiceObject = async (
     objectKey: variant.storageKey,
     mediaType: imageMediaTypes[variant.mediaType] as InvoiceMediaType,
     fileName: invoice.fileName,
+  };
+};
+
+const extensionOf: Record<InvoiceMediaType, string> = {
+  'application/pdf': 'pdf',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+};
+
+/**
+ * Walkthrough n.º 24 (E-D29): the file a Staff Member uploaded and has not
+ * attached yet, read back by her alone so she sees its pages before
+ * «Subir factura». Anyone else's, or one already attached, is not found.
+ */
+export const readUploadedInvoiceObject = async (
+  reader: Pick<Prisma.TransactionClient, 'imageAsset'>,
+  where: { imageAssetId: string; accountId: string },
+): Promise<InvoiceFileObject> => {
+  const asset = await reader.imageAsset.findFirst({
+    where: {
+      id: where.imageAssetId,
+      ownerAccountId: where.accountId,
+      purpose: ImageAssetPurpose.INVOICE,
+      state: ImageAssetState.READY,
+      deletedAt: null,
+    },
+    select: {
+      variants: {
+        where: {
+          kind: { in: [ImageVariantKind.DOCUMENT, ImageVariantKind.READABLE] },
+          visibility: ImageVariantVisibility.PRIVATE,
+          deleteRequestedAt: null,
+          deletedAt: null,
+        },
+        select: { storageKey: true, mediaType: true },
+        take: 1,
+      },
+    },
+  });
+  const variant = asset?.variants[0];
+  if (variant === undefined) throw new InvoiceFileError('invoice_not_found');
+  const mediaType = imageMediaTypes[variant.mediaType] as InvoiceMediaType;
+  return {
+    objectKey: variant.storageKey,
+    mediaType,
+    fileName: `factura.${extensionOf[mediaType]}`,
   };
 };

@@ -36,6 +36,90 @@ const session = {
   waitlistCount: 0,
 };
 
+async function bookFromDetail() {
+  let remaining = 5;
+  let upcoming: unknown[] = [];
+  const fetcher = routeFetcher({
+    "/api/v1/clients/current": () => jsonResponse(profile),
+    "/api/v1/clients/current/subscription": () =>
+      jsonResponse({
+        status: "active",
+        subscription: {
+          id: "subscription-1",
+          planName: "Paquete de 8 clases",
+          originalClassAllowance: 8,
+          remainingClassAllowance: remaining,
+          startsOn: "2026-10-30",
+          endsOn: "2026-11-29",
+        },
+      }),
+    "/api/v1/branches": () => jsonResponse([branch]),
+    "/api/v1/class-types": () => jsonResponse([classType]),
+    [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+      () => jsonResponse([session]),
+    "/api/v1/sessions/session-1": () =>
+      jsonResponse({
+        ...session,
+        branch,
+        classType,
+        trainerName: "Daniela Ortiz",
+        yourBooking:
+          upcoming.length === 0
+            ? null
+            : {
+                relation: "this_class",
+                bookingId: "booking-1",
+                classTypeName: classType.name,
+                startsAt: session.startsAt,
+                endsAt: session.endsAt,
+              },
+      }),
+    "POST /api/v1/sessions/session-1/bookings": () => {
+      remaining -= 1;
+      upcoming = [
+        {
+          kind: "booking",
+          bookingId: "booking-1",
+          sessionId: "session-1",
+          classTypeName: classType.name,
+          trainerName: "Daniela Ortiz",
+          branchName: branch.name,
+          startsAt: session.startsAt,
+          endsAt: session.endsAt,
+        },
+      ];
+      return jsonResponse({ id: "booking-1" }, 201);
+    },
+    "/api/v1/bookings": () => jsonResponse(upcoming),
+    "DELETE /api/v1/bookings/booking-1": () => {
+      remaining += 1;
+      upcoming = [];
+      return new Response(null, { status: 204 });
+    },
+  });
+  const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+  await waitFor(
+    () => expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen(),
+    { timeout: 10_000 },
+  );
+  await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+  await waitFor(() => expect(screen.getByTestId(`browse-day-${tomorrow}`)).toBeOnTheScreen());
+  await fireEvent.press(screen.getByTestId(`browse-day-${tomorrow}`));
+  await waitFor(
+    () => expect(screen.getByRole("button", { name: /^Mat Pilates \d/ })).toBeOnTheScreen(),
+    { timeout: 5_000 },
+  );
+  await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d/ }));
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeOnTheScreen(),
+  );
+  await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
+  await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
+
+  return screen;
+}
+
 // Seen on the emulator (MOB-074): «Reserva confirmada · Te quedan 5 clases»
 // stayed over «Aún no tienes reservas» after the same booking was cancelled.
 describe("the booking toast after a cancellation", () => {
@@ -45,70 +129,7 @@ describe("the booking toast after a cancellation", () => {
   });
 
   it("closes once the Client cancels a booking", async () => {
-    let remaining = 5;
-    let upcoming: unknown[] = [];
-    const fetcher = routeFetcher({
-      "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () =>
-        jsonResponse({
-          status: "active",
-          subscription: {
-            id: "subscription-1",
-            planName: "Paquete de 8 clases",
-            originalClassAllowance: 8,
-            remainingClassAllowance: remaining,
-            startsOn: "2026-10-30",
-            endsOn: "2026-11-29",
-          },
-        }),
-      "/api/v1/branches": () => jsonResponse([branch]),
-      "/api/v1/class-types": () => jsonResponse([classType]),
-      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
-        () => jsonResponse([session]),
-      "/api/v1/sessions/session-1": () =>
-        jsonResponse({ ...session, branch, classType, trainerName: "Daniela Ortiz" }),
-      "POST /api/v1/sessions/session-1/bookings": () => {
-        remaining -= 1;
-        upcoming = [
-          {
-            kind: "booking",
-            bookingId: "booking-1",
-            sessionId: "session-1",
-            classTypeName: classType.name,
-            trainerName: "Daniela Ortiz",
-            branchName: branch.name,
-            startsAt: session.startsAt,
-            endsAt: session.endsAt,
-          },
-        ];
-        return jsonResponse({ id: "booking-1" }, 201);
-      },
-      "/api/v1/bookings": () => jsonResponse(upcoming),
-      "DELETE /api/v1/bookings/booking-1": () => {
-        remaining += 1;
-        upcoming = [];
-        return new Response(null, { status: 204 });
-      },
-    });
-    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
-
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
-    await waitFor(() => expect(screen.getByTestId(`browse-day-${tomorrow}`)).toBeOnTheScreen());
-    await fireEvent.press(screen.getByTestId(`browse-day-${tomorrow}`));
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: /^Mat Pilates \d/ })).toBeOnTheScreen(),
-      { timeout: 5_000 },
-    );
-    await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d/ }));
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeOnTheScreen(),
-    );
-    await fireEvent.press(screen.getByRole("button", { name: "Reservar esta clase" }));
-    await waitFor(() => expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen());
+    const screen = await bookFromDetail();
 
     const notNow = screen.queryByRole("button", { name: "Ahora no" });
     if (notNow !== null) await fireEvent.press(notNow);
@@ -120,6 +141,27 @@ describe("the booking toast after a cancellation", () => {
     // the refreshed one from its first frame (review of FIX-043).
     await waitFor(() => expect(screen.getByText("Reserva cancelada")).toBeOnTheScreen());
     expect(screen.getByText("La clase volvió a tu plan · Te quedan 5 clases")).toBeOnTheScreen();
+    await waitFor(() => expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen());
+    expect(screen.queryByText("Reserva confirmada")).toBeNull();
+  });
+
+  // Review of walkthrough n.º 1: the class detail cancels too, and Mis
+  // reservas must not keep confirming the booking she cancelled there.
+  it("closes once she cancels that booking from the class detail", async () => {
+    const screen = await bookFromDetail();
+    const notNow = screen.queryByRole("button", { name: "Ahora no" });
+    if (notNow !== null) await fireEvent.press(notNow);
+
+    await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+    await fireEvent.press(await screen.findByRole("button", { name: /^Mat Pilates \d/ }));
+    await waitFor(() => expect(screen.getByText("Ya reservaste esta clase")).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar reserva" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Sí, cancelar reserva" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Reservar esta clase" })).toBeEnabled(),
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: /Mis reservas, tab/ }));
     await waitFor(() => expect(screen.getByText("Aún no tienes reservas")).toBeOnTheScreen());
     expect(screen.queryByText("Reserva confirmada")).toBeNull();
   });

@@ -10,9 +10,11 @@ import {
   ConfirmationSheet,
   EmphasisCard,
   FormScrollView,
+  FullScreenImage,
   IconRow,
   LoadingState,
   NoticeRow,
+  OutlinedButton,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -22,7 +24,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { bodyScroll, FooterPanel, RowCard, taskEdges } from "../ui/card-pieces";
 import { useStaffFetcher } from "../staff-fetcher";
@@ -30,6 +32,9 @@ import { BackBar } from "../ui/back-bar";
 import { invoiceStyles as styles } from "./invoice-styles";
 import { InvoiceApiError, createInvoicesApi } from "./invoices-api";
 import { InvoiceDropCard, InvoiceFileCard } from "./invoice-cards";
+import { PickedInvoiceCard } from "./invoice-picked-card";
+import { PickedPdfViewer } from "./picked-pdf-viewer";
+import { usePickedPdfUpload } from "./use-picked-pdf-upload";
 import { InvoiceSourceSheet, type InvoiceSource } from "./invoice-source-sheet";
 import type { PickedImage } from "../uploads/image-upload";
 import { loadDocumentUpload } from "../uploads/load-document-upload";
@@ -42,6 +47,8 @@ const conflicts: Record<string, string> = {
 };
 const uploadFailure = "No pudimos subir la factura. Revisa tu conexión e inténtalo de nuevo.";
 const rejected = "Este archivo no sirve. Sube un PDF, JPG o PNG de hasta 10 MB.";
+// Walkthrough n.º 25: the phone's picker failing is not a connection problem.
+const pickerFailure = "No pudimos abrir tus archivos. Inténtalo de nuevo.";
 // FIX-049: a build made before expo-document-picker has no file picker.
 const pdfNeedsUpdate = "Para subir un PDF, actualiza la app. Mientras tanto puedes subir una foto.";
 
@@ -77,6 +84,9 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
   const [failure, setFailure] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
+  const [viewing, setViewing] = useState(false);
+  // E-D29: a chosen PDF goes up at once so its pages show before it is sent.
+  const pdfUpload = usePickedPdfUpload(fetcher);
 
   const header = <BackBar onBack={() => navigation.goBack()} title="Factura del pago" />;
   if (invoice.isPending) {
@@ -109,6 +119,7 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
   };
 
   const reset = () => {
+    pdfUpload.clear();
     setPicked(null);
     setUploadedAssetId(null);
     setFailure(null);
@@ -120,8 +131,12 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
     setFailure(null);
     setNotice(null);
     try {
-      const { uploadImage } = await loadImageUpload();
-      const imageAssetId = assetId ?? (await uploadImage(photo, "invoice", fetcher));
+      // A PDF is already on its way since she chose it: wait for it.
+      const imageAssetId =
+        assetId ??
+        (photo.mediaType === "application/pdf"
+          ? await pdfUpload.ensure(photo)
+          : await (await loadImageUpload()).uploadImage(photo, "invoice", fetcher));
       setUploadedAssetId(imageAssetId);
       await settle(
         await api.attach(paymentId, { imageAssetId, fileName: photo.fileName ?? "factura.jpg" }),
@@ -141,7 +156,8 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
 
   const upload = async (from: InvoiceSource) => {
     setChoosing(false);
-    reset();
+    // The file she already chose stays until another one replaces it.
+    setFailure(null);
     let pickPdf: (() => Promise<PickedImage | null>) | undefined;
     if (from === "document") {
       try {
@@ -151,17 +167,26 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
         return;
       }
     }
+    let photo: PickedImage | null;
     try {
-      const photo =
-        pickPdf !== undefined
-          ? await pickPdf()
-          : await (await loadImageUpload()).pickImage({ camera: from === "camera" });
-      if (photo === null) return;
-      setPicked(photo);
-      await send(photo, null);
+      photo = pickPdf !== undefined ? await pickPdf() : await (await loadImageUpload()).pickImage();
     } catch (error) {
-      setFailure(failureOf(error));
+      setFailure(
+        error instanceof Error && error.message === "upload_rejected" ? rejected : pickerFailure,
+      );
+      return;
     }
+    // E-D27 / E-D28: the file shows first; «Subir factura» sends it.
+    if (photo === null) return;
+    reset();
+    setPicked(photo);
+    if (photo.mediaType === "application/pdf") void pdfUpload.start(photo);
+  };
+
+  // E-D30's «Cambiar» closes the big view first: iOS presents one modal at a time.
+  const changeFromViewer = () => {
+    setViewing(false);
+    setTimeout(() => setChoosing(true), Platform.OS === "ios" ? 400 : 0);
   };
 
   const remove = async () => {
@@ -184,19 +209,24 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
 
   const data = current.invoiceData;
   const canUpload = data !== null && !current.voided;
+  // The PDF did not go up when she chose it: «Reintentar» uploads it again.
+  const pickFailed = failure === null && pdfUpload.state.status === "failed";
+  const shownFailure = failure ?? (pickFailed ? uploadFailure : null);
   const footer = !canUpload ? undefined : (
     <FooterPanel bleed={0}>
-      {failure === null ? null : (
-        <View accessibilityLabel={failure} accessibilityRole="alert">
-          <NoticeRow message={failure} />
+      {shownFailure === null ? null : (
+        <View accessibilityLabel={shownFailure} accessibilityRole="alert">
+          <NoticeRow message={shownFailure} />
         </View>
       )}
-      {failure !== null && retryable && picked !== null ? (
+      {((failure !== null && retryable) || pickFailed) && picked !== null ? (
         <>
           <PrimaryButton
             busy={busy}
             label="Reintentar"
-            onPress={() => void send(picked, uploadedAssetId)}
+            onPress={() =>
+              pickFailed ? void pdfUpload.start(picked) : void send(picked, uploadedAssetId)
+            }
           />
           <View style={styles.row}>
             <TextButton label="Elegir otro archivo" onPress={() => setChoosing(true)} />
@@ -205,7 +235,15 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
         </>
       ) : current.file === null ? (
         <>
-          <PrimaryButton busy={busy} label="Subir factura" onPress={() => setChoosing(true)} />
+          {picked === null ? (
+            <PrimaryButton label="Elegir factura" onPress={() => setChoosing(true)} />
+          ) : (
+            <PrimaryButton
+              busy={busy}
+              label="Subir factura"
+              onPress={() => void send(picked, null)}
+            />
+          )}
           <Text style={styles.note} variant="secundario">
             {`Al subirla, el pago queda como factura emitida y ${firstName} la ve en su app.`}
           </Text>
@@ -259,9 +297,18 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
             )}
           </RowCard>
           {current.file === null ? (
-            canUpload ? (
-              <InvoiceDropCard busy={busy} />
-            ) : null
+            !canUpload ? null : picked === null ? (
+              <InvoiceDropCard busy={busy} onPress={() => setChoosing(true)} />
+            ) : (
+              <PickedInvoiceCard
+                busy={busy}
+                onChange={() => setChoosing(true)}
+                onOpen={() => setViewing(true)}
+                onRemove={reset}
+                picked={picked}
+                upload={pdfUpload.state}
+              />
+            )
           ) : (
             <InvoiceFileCard file={current.file} paymentId={paymentId} />
           )}
@@ -275,6 +322,25 @@ export function InvoiceScreen({ route }: { route: { params: { paymentId: string 
           title={notice}
         />
       )}
+      {/* E-D30: the chosen photo big, pinch to zoom, before it is sent. */}
+      <FullScreenImage
+        footer={<OutlinedButton label="Cambiar" onPress={changeFromViewer} />}
+        label="Factura elegida"
+        note="Pellizca para ampliar. Revisa que se lean el NIT, el nombre y el monto."
+        onClose={() => setViewing(false)}
+        title="Tu factura"
+        tone="light"
+        uri={picked !== null && picked.mediaType !== "application/pdf" ? picked.uri : null}
+        visible={viewing}
+      />
+      <PickedPdfViewer
+        assetId={pdfUpload.state.status === "ready" ? pdfUpload.state.assetId : null}
+        fetcher={fetcher}
+        fileName={picked?.fileName ?? "factura.pdf"}
+        onChange={changeFromViewer}
+        onClose={() => setViewing(false)}
+        visible={viewing && picked?.mediaType === "application/pdf"}
+      />
       <InvoiceSourceSheet
         onChoose={(from) => void upload(from)}
         onDismiss={() => setChoosing(false)}

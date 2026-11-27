@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ClientFreezeDto } from "./clientFreezeDto";
+import type { ClientInactiveInviteDto } from "./clientInactiveInviteDto";
 import type { ClientSubscriptionDtoStatus } from "./clientSubscriptionDtoStatus";
 import type { ClientSubscriptionSummaryDto } from "./clientSubscriptionSummaryDto";
 
@@ -33,4 +34,6 @@ export interface ClientSubscriptionDto {
   renewalStartsOn?: string;
   /** The start of a next plan already queued (bought, or a transfer in review). A Freeze must end the current plan before it (walkthrough finding 51). Absent when none is queued. */
   queuedPlanStartsOn?: string;
+  /** With no Plan ever: she registered with a Client's code that gave her no free class, because that host has no paid Plan (walkthrough n.º 22). Absent otherwise. */
+  inactiveInvite?: ClientInactiveInviteDto;
 }

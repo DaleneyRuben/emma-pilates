@@ -97,7 +97,11 @@ describe('app links', () => {
               'TEAM123456.com.emmapilates.client',
               'TEAM123456.com.emmapilates.client.staging',
             ],
-            components: [{ '/': '/client/authentication/*' }],
+            // Walkthrough n.º 13: an invite link opens the Client app too.
+            components: [
+              { '/': '/client/authentication/*' },
+              { '/': '/client/invite/*' },
+            ],
           },
           {
             appIDs: [

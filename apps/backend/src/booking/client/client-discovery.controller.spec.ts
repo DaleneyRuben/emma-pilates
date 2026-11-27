@@ -258,9 +258,11 @@ describe('SessionDetailController', () => {
   const resolvePrincipal = jest.fn().mockResolvedValue(principal);
   const findSessionDetail = jest.fn();
   const classesLeft = jest.fn().mockResolvedValue(null);
+  const ownBooking = jest.fn().mockResolvedValue(null);
   const controller = new SessionDetailController(
     findSessionDetail,
     classesLeft,
+    ownBooking,
     resolvePrincipal,
   );
 

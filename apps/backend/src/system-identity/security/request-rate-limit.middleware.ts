@@ -30,6 +30,7 @@ export const createRequestRateLimitMiddleware =
       requestRateLimitLanes({
         networkAddress: requestNetworkAddress(request),
         credential,
+        path,
       }),
     );
 

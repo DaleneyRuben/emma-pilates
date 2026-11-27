@@ -100,3 +100,27 @@ describe("PrimaryButton palette B", () => {
     expect(screen.queryByText("Motivo")).toBeNull();
   });
 });
+
+// The testing session on Android (#24): «Elegir factura» turned into «Subir
+// factura» in the same button, Android kept the old text view's measured
+// width, and «factura» wrapped out of sight. A new label gets a new view.
+describe("PrimaryButton label on Android", () => {
+  it("draws a changed label in a fresh text view", async () => {
+    const screen = await render(<PrimaryButton label="Elegir factura" />);
+    const before = screen.getByText("Elegir factura");
+
+    await screen.rerender(<PrimaryButton label="Subir factura" />);
+
+    expect(screen.getByText("Subir factura")).not.toBe(before);
+    expect(before).not.toBeOnTheScreen();
+  });
+
+  // A fresh view measured «Subir factura» short as well, so the label no
+  // longer depends on its own measured width: it takes the button's.
+  it("lays the label across the whole button, centred", async () => {
+    const screen = await render(<PrimaryButton label="Subir factura" />);
+
+    expect(screen.getByTestId("button-label")).toHaveStyle({ alignSelf: "stretch" });
+    expect(screen.getByText("Subir factura")).toHaveStyle({ textAlign: "center" });
+  });
+});

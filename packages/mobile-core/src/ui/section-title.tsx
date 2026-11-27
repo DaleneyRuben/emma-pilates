@@ -17,8 +17,8 @@ export function SectionTitle({ children }: { children: string }) {
 
 const styles = StyleSheet.create({
   title: {
+    // Walkthrough n.º 8: on the cards' edge, with no inset of its own.
     marginBottom: spacing.md,
-    paddingHorizontal: spacing.xs,
     paddingTop: spacing.sm,
   },
 });

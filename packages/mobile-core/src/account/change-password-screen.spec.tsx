@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { fireEvent, render, waitFor, within } from "@testing-library/react-native";
 
 import { MobileIdentityProvider } from "../auth/identity-provider";
 import type { SessionManager } from "../auth/session-manager";
@@ -22,12 +22,22 @@ async function fillForm(
 }
 
 describe("ChangePasswordScreen", () => {
-  it("keeps the save button disabled until the three fields are valid", async () => {
+  // Walkthrough n.º 6 and 15: the button ends the form, always on; a tap
+  // marks what is missing instead of a silent disabled button.
+  it("marks the missing fields on tap and sends nothing", async () => {
+    const fetcher = jest.fn();
     const screen = await render(
-      <ChangePasswordScreen fetcher={jest.fn()} onBack={jest.fn()} onSaved={jest.fn()} />,
+      <ChangePasswordScreen fetcher={fetcher} onBack={jest.fn()} onSaved={jest.fn()} />,
     );
+    const save = within(screen.getByTestId("change-password-form")).getByRole("button", {
+      name: "Guardar contraseña",
+    });
 
-    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeDisabled();
+    expect(save).toBeEnabled();
+    await fireEvent.press(save);
+
+    expect(await screen.findAllByRole("alert")).not.toHaveLength(0);
+    expect(fetcher).not.toHaveBeenCalled();
 
     await fillForm(screen, {
       current: "Emma2026lucia",
@@ -36,7 +46,8 @@ describe("ChangePasswordScreen", () => {
     });
 
     expect(screen.getByText("Las contraseñas no coinciden.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeDisabled();
+    await fireEvent.press(save);
+    expect(fetcher).not.toHaveBeenCalled();
   });
 
   it("changes the password through the API and reports success", async () => {

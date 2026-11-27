@@ -27,8 +27,14 @@ export function ButtonLabel({
 }) {
   return (
     <>
-      <View style={busy && styles.hidden} testID={busy ? "button-label-hidden" : undefined}>
-        <Text tone={tone} variant={variant}>
+      <View
+        style={[styles.label, busy && styles.hidden]}
+        testID={busy ? "button-label-hidden" : "button-label"}
+      >
+        {/* #24 (Android): the label was measured short («Subir factura»
+            drew as «Subir»), so it spans the button and centres itself rather
+            than trusting its own measured width; a new label gets a fresh view. */}
+        <Text key={label} style={styles.text} tone={tone} variant={variant}>
           {label}
         </Text>
       </View>
@@ -48,6 +54,8 @@ const styles = StyleSheet.create({
   hidden: {
     opacity: 0,
   },
+  label: { alignSelf: "stretch" },
+  text: { textAlign: "center" },
   spinner: {
     bottom: 0,
     left: 0,
