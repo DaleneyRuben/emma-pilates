@@ -8376,7 +8376,9 @@ B. **Review.** As Paola, Pagos shows **Tipo** **Evaluación**, the receipt,
    de transferencia**, and the notice says «Sube uno nuevo para mantener tu
    cita». A new receipt goes on a new pending evaluation Payment (the
    rejected one stays in Pagos) while the slot is still bookable (more than
-   3 hours ahead). With no new receipt within 24 hours, or once the slot is
+   3 hours ahead); a rejection inside 3 hours, or on a slot the studio
+   released, still cancels the Evaluation with «Puedes reservar la
+   evaluación de nuevo». With no new receipt within 24 hours, or once the slot is
    inside 3 hours, the worker cancels the Evaluation with cause
    `payment_expired` and frees the slot. The CSV gains **Tipo** and dates a
    decided sale by the decision date.
