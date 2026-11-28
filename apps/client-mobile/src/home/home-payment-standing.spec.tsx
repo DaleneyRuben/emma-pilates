@@ -95,6 +95,58 @@ describe("Client Home with a payment in review or rejected", () => {
     expect(created).toHaveBeenCalledWith({ planId: payment.planId });
   });
 
+  // Isabella, 2026-11-27: a Plan bought over a Guest Pass starts after the
+  // pass's booked class, so the new payment keeps the start already chosen.
+  it("keeps the start date of the rejected payment", async () => {
+    const created = jest.fn();
+    const screen = await openHome({
+      "/api/v1/payments/current": () =>
+        jsonResponse({ ...rejectedPayment, startsOn: "2099-01-02" }),
+      "POST /api/v1/purchase-intents": (init) => {
+        created(JSON.parse(String(init?.body)));
+        return jsonResponse(intent, 201);
+      },
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Subir otro comprobante" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("2 · Sube tu comprobante")).toBeOnTheScreen();
+    });
+    expect(created).toHaveBeenCalledWith({ planId: payment.planId, startsOn: "2099-01-02" });
+  });
+
+  it("opens the Plan to choose a start when that date is no longer allowed", async () => {
+    const screen = await openHome({
+      "/api/v1/payments/current": () =>
+        jsonResponse({ ...rejectedPayment, startsOn: "2099-01-02" }),
+      "POST /api/v1/purchase-intents": () =>
+        jsonResponse({ code: "start_date_before_booked_class", status: 409 }, 409),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Subir otro comprobante" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("header", { name: "Paquete de 8 clases" })).toBeOnTheScreen();
+    });
+    expect(screen.queryByText("No pudimos iniciar un nuevo pago. Inténtalo de nuevo.")).toBeNull();
+  });
+
+  it("opens the Plan when the kept date falls outside the start window", async () => {
+    const screen = await openHome({
+      "/api/v1/payments/current": () =>
+        jsonResponse({ ...rejectedPayment, startsOn: "2099-01-02" }),
+      "POST /api/v1/purchase-intents": () =>
+        jsonResponse({ code: "start_date_out_of_window", status: 400 }, 400),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Subir otro comprobante" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("header", { name: "Paquete de 8 clases" })).toBeOnTheScreen();
+    });
+  });
+
   it("ignores a second tap while the new payment is being prepared", async () => {
     const created = jest.fn();
     let answer: (response: Response) => void = () => undefined;

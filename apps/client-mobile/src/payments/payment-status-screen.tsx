@@ -99,7 +99,7 @@ export function PaymentStatusScreen() {
           current.state === "confirmed"
             ? () => leaveFor("Booking", "Browse")
             : current.state === "rejected"
-              ? () => void resend(current.planId)
+              ? () => void resend(current)
               : undefined
         }
         payment={current}
