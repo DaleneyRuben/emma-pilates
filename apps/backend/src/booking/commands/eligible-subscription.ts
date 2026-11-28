@@ -12,11 +12,14 @@ const covering = (clientId: string, onDate: Date) => ({
 
 // The booking check reads Subscription.startsOn (booking ADR-0005): a Session
 // before it is not eligible, and is reported apart from a spent allowance.
+// When several cover the day, a paid Plan comes before a Guest Pass, which
+// only funds a class no other Subscription can (owner, 2026-11-28); then the
+// earliest start. A Plan with no class left cannot fund one, so the pass does.
 export const findCoveringSubscription = async (
   transaction: Transaction,
   input: { clientId: string; onDate: Date; needsAllowance: boolean },
 ) => {
-  const subscription = await transaction.subscription.findFirst({
+  const candidates = await transaction.subscription.findMany({
     where: {
       ...covering(input.clientId, input.onDate),
       startsOn: { lte: boliviaDate(input.onDate) },
@@ -29,6 +32,7 @@ export const findCoveringSubscription = async (
           }
         : {}),
     },
+    orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
     select: {
       id: true,
       remainingClassAllowance: true,
@@ -36,28 +40,31 @@ export const findCoveringSubscription = async (
         where: { deletedAt: null },
         select: { classes: true },
       },
+      guestPasses: {
+        where: { deletedAt: null },
+        select: { bookingId: true },
+      },
     },
   });
-  if (subscription === null) return null;
-  if (!input.needsAllowance) return { id: subscription.id };
-  if (
-    subscription.remainingClassAllowance > 0 ||
-    hasSpendableExtra(subscription.allowanceAdjustments)
-  ) {
-    return { id: subscription.id };
+  const ordered = [
+    ...candidates.filter((candidate) => candidate.guestPasses.length === 0),
+    ...candidates.filter((candidate) => candidate.guestPasses.length > 0),
+  ];
+  if (!input.needsAllowance) {
+    return ordered[0] === undefined ? null : { id: ordered[0].id };
   }
+  const funding = ordered.find(
+    (candidate) =>
+      candidate.remainingClassAllowance > 0 ||
+      hasSpendableExtra(candidate.allowanceAdjustments),
+  );
+  if (funding !== undefined) return { id: funding.id };
   // A spent Guest Pass still covers her, so a second class answers
   // guest_pass_already_used instead of looking like no Subscription.
-  const pass = await transaction.guestPass.findFirst({
-    where: {
-      friendClientId: input.clientId,
-      courtesySubscriptionId: subscription.id,
-      bookingId: { not: null },
-      deletedAt: null,
-    },
-    select: { id: true },
-  });
-  return pass === null ? null : { id: subscription.id };
+  const spentPass = ordered.find((candidate) =>
+    candidate.guestPasses.some((pass) => pass.bookingId !== null),
+  );
+  return spentPass === undefined ? null : { id: spentPass.id };
 };
 
 // One approved Freeze covers a Client on a Bolivia date. Booking, waitlist
