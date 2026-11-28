@@ -1,5 +1,6 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  EvaluationCancellationCause,
   EvaluationState,
   PaymentKind,
   PaymentMethod,
@@ -7,8 +8,14 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { EvaluationRuleError } from './evaluation-errors';
-import { rejectPaymentOfCancelledEvaluation } from './evaluation-payment-decision';
-import { evaluationHoldExpiresAt } from './evaluation-rules';
+import {
+  cancelEvaluationRow,
+  rejectPaymentOfCancelledEvaluation,
+} from './evaluation-payment-decision';
+import {
+  evaluationHoldExpiresAt,
+  isEvaluationBookable,
+} from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -148,5 +155,47 @@ export const releaseExpiredEvaluationHolds = async (
       reason: evaluationPaymentReason,
     });
   }
-  return due.length;
+  // Board C13h: a rejected receipt keeps the slot for a day, and never past
+  // the time the slot can still be booked, while she sends another one.
+  const rejected = await transaction.evaluation.findMany({
+    where: {
+      state: EvaluationState.BOOKED,
+      payment: {
+        kind: PaymentKind.EVALUATION,
+        state: PaymentState.REJECTED,
+      },
+    },
+    select: {
+      id: true,
+      evaluationSlotId: true,
+      slot: { select: { startsAt: true } },
+      payment: { select: { decidedAt: true } },
+    },
+  });
+  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1_000);
+  const lapsed = rejected.filter(
+    (row) =>
+      !isEvaluationBookable(row.slot.startsAt, now) ||
+      (row.payment?.decidedAt != null && row.payment.decidedAt <= dayAgo),
+  );
+  let released = 0;
+  for (const row of lapsed) {
+    // A receipt sent since the read moved it to a pending Payment: keep it.
+    const still = await transaction.evaluation.count({
+      where: {
+        id: row.id,
+        state: EvaluationState.BOOKED,
+        payment: { state: PaymentState.REJECTED },
+      },
+    });
+    if (still === 0) continue;
+    await cancelEvaluationRow(transaction, {
+      evaluation: row,
+      now,
+      accountId: null,
+      cause: EvaluationCancellationCause.PAYMENT_EXPIRED,
+    });
+    released += 1;
+  }
+  return due.length + released;
 };

@@ -20,7 +20,10 @@ export const toClientEvaluationView = (
   slotId: row.evaluationSlotId,
   included: row.paymentId === null,
   priceCentavos:
-    row.payment?.state === 'CONFIRMED' || row.payment?.state === 'PENDING'
+    row.payment?.state === 'CONFIRMED' ||
+    row.payment?.state === 'PENDING' ||
+    // C13h: a booked Evaluation still shows what its new receipt must cover.
+    (row.payment?.state === 'REJECTED' && row.state === EvaluationState.BOOKED)
       ? row.payment.amountDueCentavos
       : 0,
   paymentId: row.paymentId,
@@ -29,7 +32,10 @@ export const toClientEvaluationView = (
       ? null
       : (row.payment.state.toLowerCase() as ClientEvaluationView['paymentState']),
   receiptAttached: row.payment?.receiptImageAssetId != null,
-  receiptUploadable: receiptUploadable(row.payment),
+  receiptUploadable: receiptUploadable(row.payment, {
+    booked: row.state === EvaluationState.BOOKED && row.slotReleasedAt === null,
+    bookable: isEvaluationBookable(row.slot.startsAt, now),
+  }),
   state:
     row.state === EvaluationState.BOOKED
       ? 'booked'
