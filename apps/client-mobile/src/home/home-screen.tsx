@@ -275,7 +275,7 @@ export function HomeScreen() {
               busy={resendReceipt.busy}
               error={resendReceipt.error}
               hasActivePlan={hasActivePlan}
-              onResend={() => void resendReceipt.resend(standing.payment.planId)}
+              onResend={() => void resendReceipt.resend(standing.payment)}
               payment={standing.payment}
             />
           ) : null}

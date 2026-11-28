@@ -343,8 +343,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
             error={resendReceipt.error}
             onAction={() => {
               if (standing.kind === "in_review") navigation.navigate("PaymentStatus");
-              else if (standing.kind === "rejected")
-                void resendReceipt.resend(standing.payment.planId);
+              else if (standing.kind === "rejected") void resendReceipt.resend(standing.payment);
               else navigation.navigate("Plans");
             }}
             reason={bookingOffReason(standing, hasPlan)}
