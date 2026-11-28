@@ -12753,6 +12753,11 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The Subscription the new Booking consumed, which may be a later Plan than the current one (FIX-019). Absent on a Waitlist Entry."
           }
         },
         "required": [
@@ -13471,6 +13476,11 @@
           "bookingId": {
             "type": "string",
             "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The Subscription the Booking consumed, which may be a later Plan than the current one. Absent on a Waitlist Entry."
           },
           "waitlistEntryId": {
             "type": "string",
@@ -16287,6 +16297,11 @@
           "bookingId": {
             "type": "string",
             "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The Subscription the Booking consumed, which may be a later Plan than the current one. Absent on a Waitlist Entry."
           },
           "waitlistEntryId": {
             "type": "string",

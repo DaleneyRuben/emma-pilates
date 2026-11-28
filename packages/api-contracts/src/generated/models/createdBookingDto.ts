@@ -7,4 +7,6 @@
 
 export interface CreatedBookingDto {
   id: string;
+  /** The Subscription the new Booking consumed, which may be a later Plan than the current one (FIX-019). Absent on a Waitlist Entry. */
+  subscriptionId?: string;
 }

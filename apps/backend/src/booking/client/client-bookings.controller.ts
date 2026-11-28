@@ -48,6 +48,13 @@ export class UpcomingBookingDto {
   @ApiPropertyOptional({ format: 'uuid' })
   bookingId?: string;
 
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description:
+      'The Subscription the Booking consumed, which may be a later Plan than the current one. Absent on a Waitlist Entry.',
+  })
+  subscriptionId?: string;
+
   @ApiPropertyOptional({ format: 'uuid' })
   waitlistEntryId?: string;
 

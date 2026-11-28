@@ -10,6 +10,8 @@ import type { UpcomingBookingDtoKind } from "./upcomingBookingDtoKind";
 export interface UpcomingBookingDto {
   kind: UpcomingBookingDtoKind;
   bookingId?: string;
+  /** The Subscription the Booking consumed, which may be a later Plan than the current one. Absent on a Waitlist Entry. */
+  subscriptionId?: string;
   waitlistEntryId?: string;
   sessionId: string;
   branchId: string;

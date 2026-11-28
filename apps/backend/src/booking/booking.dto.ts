@@ -12,6 +12,13 @@ export class CreateBookingDto {
 export class CreatedBookingDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description:
+      'The Subscription the new Booking consumed, which may be a later Plan than the current one (FIX-019). Absent on a Waitlist Entry.',
+  })
+  subscriptionId?: string;
 }
 
 export class ClassHistoryEntryDto {
