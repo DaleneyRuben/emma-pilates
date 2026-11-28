@@ -1,7 +1,6 @@
 import {
   listSessionAvailability,
   rescheduleBooking,
-  useGetCurrentClientSubscription,
   useListBranches,
   type SessionAvailabilityDto,
   type UpcomingBookingDto,
@@ -81,7 +80,6 @@ export function RescheduleScreen({
   const { booking } = route.params;
   const navigation = useNavigation<RescheduleNavigation>();
   const fetcher = useClientFetcher();
-  const subscription = useGetCurrentClientSubscription({ fetcher });
   const branches = useListBranches({ fetcher });
   const branchIds = branches.data?.status === 200 ? branches.data.data.map((b) => b.id) : [];
   const alternatives = useQuery({
@@ -122,10 +120,7 @@ export function RescheduleScreen({
             startsAt: target.startsAt,
             endsAt: target.endsAt,
             rescheduled: true,
-            planName:
-              subscription.data?.status === 200
-                ? subscription.data.data.subscription?.planName
-                : undefined,
+            subscriptionId: response.data.subscriptionId,
           },
         });
         return;

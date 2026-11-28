@@ -45,6 +45,7 @@ import { NextBookingHero } from "./next-booking-hero";
 import { nextBookedClass } from "./next-class-hero";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import { formatTimeRange } from "@pilates/mobile-core";
+import { bookedSubscription, isGuestPass } from "./booked-subscription";
 import { usedFreeClass } from "./free-class-notice";
 
 type BookingsTab = "history" | "upcoming";
@@ -75,10 +76,9 @@ export function BookingsScreen({
   const cancelStarted = useRef(false);
   const [failure, setFailure] = useState<string | null>(null);
   // Walkthrough n.º 29: a cancellation is confirmed like a booking is.
-  const [cancelledShown, setCancelledShown] = useState(false);
-  const cancelledNotice = useStickyNotice(cancelledShown ? true : undefined, () =>
-    setCancelledShown(false),
-  );
+  // FIX-019: with the Subscription the cancelled Booking had consumed.
+  const [cancelled, setCancelled] = useState<{ subscriptionId?: string } | undefined>();
+  const cancelledNotice = useStickyNotice(cancelled, () => setCancelled(undefined));
   // FIX-090: leaving the waitlist is confirmed afterwards, like a cancel.
   const [leftShown, setLeftShown] = useState(false);
   const leftNotice = useStickyNotice(leftShown ? true : undefined, () => setLeftShown(false));
@@ -115,7 +115,7 @@ export function BookingsScreen({
     cancelStarted.current = true;
     setCancelInFlight(true);
     setFailure(null);
-    setCancelledShown(false);
+    setCancelled(undefined);
     let accepted = false;
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
@@ -138,14 +138,14 @@ export function BookingsScreen({
       setCancelling(null);
       await refresh();
       // After the refresh, so the toast's count is the one the cancel left.
-      if (accepted) setCancelledShown(true);
+      if (accepted) setCancelled({ subscriptionId: cancelling.subscriptionId });
     }
   };
 
   const leave = async (item: UpcomingBookingDto) => {
     if (item.waitlistEntryId === undefined) return;
     setFailure(null);
-    setCancelledShown(false);
+    setCancelled(undefined);
     setLeftShown(false);
     try {
       const response = await leaveWaitlist(item.waitlistEntryId, undefined, fetcher);
@@ -161,12 +161,10 @@ export function BookingsScreen({
     }
   };
 
-  const remaining =
-    subscription.data?.status === 200
-      ? subscription.data.data.subscription?.remainingClassAllowance
-      : undefined;
-  const planName =
-    subscription.data?.status === 200 ? subscription.data.data.subscription?.planName : undefined;
+  const view = subscription.data?.status === 200 ? subscription.data.data : null;
+  // The toasts speak of the Subscription the Booking consumed (FIX-019).
+  const booked = bookedSubscription(view, confirmed?.subscriptionId);
+  const freed = bookedSubscription(view, cancelledNotice?.subscriptionId);
   const items = upcoming.data?.status === 200 ? upcoming.data.data : [];
   // ClaseE (FIX-089): the first booked class tops the list as the hero.
   const next = nextBookedClass(items);
@@ -290,10 +288,10 @@ export function BookingsScreen({
       ) : confirmed !== null ? (
         <BrandToast
           note={
-            confirmed.planName === "Pase de invitada"
+            isGuestPass(booked)
               ? usedFreeClass(confirmed.startsAt)
-              : remaining !== undefined
-                ? `Te quedan ${remaining} clases en tu plan`
+              : booked !== null
+                ? `Te quedan ${booked.remainingClassAllowance} clases en tu plan`
                 : `${confirmed.classTypeName} · ${formatListDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`
           }
           onClose={dismissConfirmed}
@@ -305,13 +303,13 @@ export function BookingsScreen({
           // The API accepts a cancellation only outside the window, and every
           // accepted one gives the class back (restoreBookedClass).
           note={
-            planName === "Pase de invitada"
+            isGuestPass(freed)
               ? "Tu pase de invitada vuelve a estar disponible."
-              : remaining === undefined
+              : freed === null
                 ? "La clase volvió a tu plan"
-                : `La clase volvió a tu plan · Te ${remaining === 1 ? "queda 1 clase" : `quedan ${remaining} clases`}`
+                : `La clase volvió a tu plan · Te ${freed.remainingClassAllowance === 1 ? "queda 1 clase" : `quedan ${freed.remainingClassAllowance} clases`}`
           }
-          onClose={() => setCancelledShown(false)}
+          onClose={() => setCancelled(undefined)}
           title="Reserva cancelada"
         />
       ) : null}

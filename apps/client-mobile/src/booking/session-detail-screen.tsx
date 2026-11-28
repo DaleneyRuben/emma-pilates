@@ -47,7 +47,8 @@ export type ConfirmedBooking = {
   classTypeName: string;
   startsAt: string;
   endsAt: string;
-  planName?: string;
+  /** The Subscription the Booking consumed, from the API (FIX-019). */
+  subscriptionId?: string;
   /** FIX-090: a Reschedule moved her Booking; the toast says so. */
   rescheduled?: boolean;
 };
@@ -182,7 +183,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               classTypeName: detail.classType.name,
               startsAt: detail.startsAt,
               endsAt: detail.endsAt,
-              planName: view?.subscription?.planName,
+              subscriptionId: response.data.subscriptionId,
             },
           },
         });
