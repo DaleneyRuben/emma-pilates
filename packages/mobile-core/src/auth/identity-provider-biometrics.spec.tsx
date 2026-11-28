@@ -310,13 +310,14 @@ describe("MobileIdentityProvider biometrics", () => {
     expect(screen.getByText("signed-in available disabled no-offer no-notice")).toBeOnTheScreen();
   });
 
-  it("reads the phone's ability again on each render", async () => {
+  // Owner, TestFlight 1.3.0: Perfil lost its switch once iOS stopped answering.
+  it("keeps the switch once the phone used biometrics, even when iOS later refuses them", async () => {
     const canUseBiometrics = jest.fn(() => true);
     const screen = await renderWith(managerWith({ canUseBiometrics }));
     canUseBiometrics.mockReturnValue(false);
 
     await press(screen, "Recovery");
 
-    expect(screen.getByText(/^signed-in unavailable/)).toBeOnTheScreen();
+    expect(screen.getByText(/^signed-in available/)).toBeOnTheScreen();
   });
 });

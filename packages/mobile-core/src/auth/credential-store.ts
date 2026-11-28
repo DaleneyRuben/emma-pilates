@@ -1,5 +1,8 @@
+import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+
+import { createBiometricRefusalCheck } from "./biometric-refusal";
 
 const biometricOptions = {
   authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
@@ -19,6 +22,8 @@ type CredentialStorage = {
 };
 
 type CredentialStoreOptions = {
+  /** Whether iOS refuses Face ID to the app although the phone has it. */
+  biometricRefusal?: () => Promise<boolean>;
   /** Android asks for the fingerprint while it encrypts the protected copy. */
   promptsOnSave?: boolean;
 };
@@ -33,7 +38,7 @@ export type BiometricKey = { deviceKey: string; unlockSecret: string };
 export function createCredentialStore(
   storage: CredentialStorage,
   namespace = "",
-  { promptsOnSave = false }: CredentialStoreOptions = {},
+  { biometricRefusal = async () => false, promptsOnSave = false }: CredentialStoreOptions = {},
 ) {
   const prefix = namespace === "" ? "" : `${namespace}.`;
   const credentialKey = `${prefix}authentication-session`;
@@ -44,6 +49,8 @@ export function createCredentialStore(
   const legacyMarkerKey = `${prefix}authentication-session-biometric-enabled`;
   // Per device, so «Ahora no» outlives sign-out: `clear` never deletes it.
   const offerDeclinedKey = `${prefix}biometric-offer-declined`;
+  // Per device too: iOS later refuses Face ID to an app whose permission is off.
+  const supportedKey = `${prefix}biometrics-supported`;
   function canUseBiometrics(): boolean {
     return storage.canUseBiometricAuthentication?.() ?? false;
   }
@@ -86,6 +93,7 @@ export function createCredentialStore(
     },
     forgetLegacyBiometricSession,
     hasBiometricKey,
+    isBiometricRefusedBySystem: biometricRefusal,
     hasLegacyBiometricSession: async () => (await storage.getItemAsync(legacyMarkerKey)) === "true",
     load: () => storage.getItemAsync(credentialKey),
     loadBiometricDeviceKey,
@@ -93,6 +101,9 @@ export function createCredentialStore(
     loadLegacyBiometricSession: () => storage.getItemAsync(legacyCredentialKey, biometricOptions),
     /** Behind the prompt; a cancelled or failed prompt rejects and keeps the key. */
     readUnlockSecret: () => storage.getItemAsync(unlockSecretKey, biometricOptions),
+    async rememberBiometricSupport(): Promise<void> {
+      await storage.setItemAsync(supportedKey, "true");
+    },
     async replaceBiometricDeviceKey(deviceKey: string): Promise<void> {
       await storage.setItemAsync(deviceKeyKey, deviceKey);
     },
@@ -110,11 +121,20 @@ export function createCredentialStore(
     },
     wasBiometricOfferDeclined: async () =>
       (await storage.getItemAsync(offerDeclinedKey)) === "true",
+    /** Biometrics worked here, were offered (and declined), or keep a key. */
+    async wasBiometricSupportSeen(): Promise<boolean> {
+      const [supported, declined] = await Promise.all([
+        storage.getItemAsync(supportedKey),
+        storage.getItemAsync(offerDeclinedKey),
+      ]);
+      return supported === "true" || declined === "true" || (await hasBiometricKey());
+    },
   };
 }
 
 export function createNativeCredentialStore(namespace: "client" | "staff") {
   return createCredentialStore(SecureStore, namespace, {
+    biometricRefusal: createBiometricRefusalCheck(LocalAuthentication),
     promptsOnSave: Platform.OS === "android",
   });
 }

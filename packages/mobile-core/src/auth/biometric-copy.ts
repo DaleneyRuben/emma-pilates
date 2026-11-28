@@ -1,6 +1,13 @@
 import { Platform } from "react-native";
 
 export type BiometricCopy = {
+  /**
+   * The system refuses them to the app (iOS: its Face ID permission; Android:
+   * no fingerprint saved): the alert that leads to Settings.
+   */
+  blocked: { action: string; message: string; title: string };
+  /** iOS: Face ID locked out or no longer set up; the app's Settings cannot help. */
+  unavailable: { message: string; title: string } | null;
   enabledToast: string;
   glyph: "faceId" | "fingerprint";
   offerAction: string;
@@ -16,6 +23,15 @@ export type BiometricCopy = {
 export function biometricCopy(os: string = Platform.OS): BiometricCopy {
   if (os === "ios") {
     return {
+      blocked: {
+        action: "Abrir Ajustes",
+        message: "Para entrar con Face ID, permite que la app lo use en Ajustes.",
+        title: "Face ID está desactivado",
+      },
+      unavailable: {
+        message: "Revisa Face ID en los ajustes del iPhone e intenta de nuevo.",
+        title: "Face ID no está disponible",
+      },
       enabledToast: "Listo: la próxima vez entras con Face ID.",
       glyph: "faceId",
       offerAction: "Usar Face ID",
@@ -28,6 +44,12 @@ export function biometricCopy(os: string = Platform.OS): BiometricCopy {
   }
 
   return {
+    blocked: {
+      action: "Abrir ajustes",
+      message: "Para entrar con tu huella, guarda una en los ajustes de seguridad del celular.",
+      title: "Tu huella no está disponible",
+    },
+    unavailable: null,
     enabledToast: "Listo: la próxima vez entras con tu huella.",
     glyph: "fingerprint",
     offerAction: "Usar mi huella",

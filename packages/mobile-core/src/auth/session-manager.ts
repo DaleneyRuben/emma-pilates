@@ -19,6 +19,9 @@ export type MobileSession = {
 type CredentialStore = BiometricKeychainStore & {
   clear: () => Promise<void>;
   declineBiometricOffer?: () => Promise<void>;
+  rememberBiometricSupport?: () => Promise<void>;
+  wasBiometricSupportSeen?: () => Promise<boolean>;
+  isBiometricRefusedBySystem?: () => Promise<boolean>;
   load: () => Promise<string | null>;
   save: (credential: string) => Promise<void>;
   wasBiometricOfferDeclined?: () => Promise<boolean>;
@@ -64,6 +67,12 @@ export type SessionManager = {
   hasBiometricSession: () => Promise<boolean>;
   /** The server already revoked the key, such as after a password change. */
   forgetBiometricsLocally?: () => Promise<void>;
+  /** Notes that this phone can use biometrics, for when iOS later refuses them. */
+  rememberBiometricSupport?: () => Promise<void>;
+  /** Biometrics worked, were offered, or keep a key on this phone before. */
+  wasBiometricSupportSeen?: () => Promise<boolean>;
+  /** iOS refuses Face ID to the app although the phone has it (Settings). */
+  isBiometricRefusedBySystem?: () => Promise<boolean>;
   /** Ends the session; the biometric key stays for the next launch. */
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
@@ -187,6 +196,13 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
     isBiometricsEnabled: () => keychain.isEnabled(),
     wasBiometricOfferDeclined: async () =>
       (await credentialStore.wasBiometricOfferDeclined?.()) ?? false,
+    async rememberBiometricSupport(): Promise<void> {
+      await credentialStore.rememberBiometricSupport?.();
+    },
+    wasBiometricSupportSeen: async () =>
+      (await credentialStore.wasBiometricSupportSeen?.()) ?? false,
+    isBiometricRefusedBySystem: async () =>
+      (await credentialStore.isBiometricRefusedBySystem?.()) ?? false,
     async restore(): Promise<MobileSession | null> {
       // Owner, 2026-11-23: with a key on the phone every launch asks first.
       if ((await credentialStore.hasBiometricKey?.()) === true) {
