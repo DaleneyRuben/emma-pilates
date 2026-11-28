@@ -8370,9 +8370,16 @@ B. **Review.** As Paola, Pagos shows **Tipo** **Evaluación**, the receipt,
    and the submission date while the transfer is pending. Confirming writes
    the audit `payment.transfer_confirmed` and tells the Client «Tu pago fue
    confirmado. Tu evaluación quedó reservada.» It does not create a
-   Subscription. Rejecting cancels the Evaluation with cause
-   `payment_rejected` and writes `payment.transfer_rejected`. The CSV gains
-   **Tipo** and dates a decided sale by the decision date.
+   Subscription. Rejecting writes `payment.transfer_rejected` and, since
+   2026-11-27 (board C13h), keeps the Evaluation booked: the Client reads
+   «El estudio no aprobó tu comprobante de Bs …» with **Sube tu comprobante
+   de transferencia**, and the notice says «Sube uno nuevo para mantener tu
+   cita». A new receipt goes on a new pending evaluation Payment (the
+   rejected one stays in Pagos) while the slot is still bookable (more than
+   3 hours ahead). With no new receipt within 24 hours, or once the slot is
+   inside 3 hours, the worker cancels the Evaluation with cause
+   `payment_expired` and frees the slot. The CSV gains **Tipo** and dates a
+   decided sale by the decision date.
 C. **Cancel and confirm.** Cancelling the pending Evaluation rejects its
    Payment with «La evaluación fue cancelada». Confirming after that answers
    `409` `payment_confirmation_conflict` and leaves the Payment rejected, with
