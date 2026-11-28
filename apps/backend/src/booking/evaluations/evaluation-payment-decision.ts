@@ -19,6 +19,7 @@ import { PaymentRuleError } from '../payments/payment-errors';
 import { paymentSubmittedKey } from '../payments/payment-submitted-notice';
 import { scheduleReceiptDeletion } from '../payments/purchase-intent-settlement';
 import { releaseSlot } from './evaluation-slot-release';
+import { isEvaluationBookable } from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -54,7 +55,13 @@ export const decideEvaluationTransfer = async (
       rejectionReason: true,
       receiptImageAssetId: true,
       evaluation: {
-        select: { id: true, state: true, evaluationSlotId: true },
+        select: {
+          id: true,
+          state: true,
+          evaluationSlotId: true,
+          slotReleasedAt: true,
+          slot: { select: { startsAt: true } },
+        },
       },
     },
   });
@@ -153,6 +160,21 @@ const rejectEvaluationTransfer = async (
   });
   // Board C13h (owner 2026-11-27): the Evaluation stays booked so she can
   // send another receipt; the worker releases it if none arrives in a day.
+  // Too close to send one (inside 3 hours), or with the slot already
+  // released by the studio, it is cancelled as before.
+  const evaluation = input.payment.evaluation;
+  const keepsSlot =
+    evaluation.state === EvaluationState.BOOKED &&
+    evaluation.slotReleasedAt === null &&
+    isEvaluationBookable(evaluation.slot.startsAt, input.now);
+  if (evaluation.state === EvaluationState.BOOKED && !keepsSlot) {
+    await cancelEvaluationRow(transaction, {
+      evaluation,
+      now: input.now,
+      accountId: input.principal.accountId,
+      cause: EvaluationCancellationCause.PAYMENT_REJECTED,
+    });
+  }
   const sentence = input.reason.endsWith('.')
     ? input.reason
     : `${input.reason}.`;
@@ -165,7 +187,9 @@ const rejectEvaluationTransfer = async (
     newState: 'rejected',
     type: 'payment_rejected',
     title: 'Comprobante rechazado',
-    message: `Tu comprobante fue rechazado: ${sentence} Sube uno nuevo para mantener tu cita.`,
+    message: keepsSlot
+      ? `Tu comprobante fue rechazado: ${sentence} Sube uno nuevo para mantener tu cita.`
+      : `Tu comprobante fue rechazado: ${sentence} Puedes reservar la evaluación de nuevo.`,
   });
 };
 
@@ -256,7 +280,13 @@ type EvaluationPayment = {
   receiptImageAssetId: string | null;
   rejectionReason: string | null;
   state: PaymentState;
-  evaluation: { id: string; state: EvaluationState; evaluationSlotId: string };
+  evaluation: {
+    id: string;
+    state: EvaluationState;
+    evaluationSlotId: string;
+    slotReleasedAt: Date | null;
+    slot: { startsAt: Date };
+  };
 };
 
 export const cancelEvaluationRow = async (

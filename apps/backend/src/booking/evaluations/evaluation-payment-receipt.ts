@@ -11,6 +11,7 @@ import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { PaymentRuleError } from '../payments/payment-errors';
 import { notifyPaymentSubmitted } from '../payments/payment-submitted-notice';
+import { EvaluationRuleError } from './evaluation-errors';
 import { isEvaluationBookable } from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
@@ -67,27 +68,38 @@ const replaceRejectedPayment = async (
   ) {
     return null;
   }
-  const replacement = await transaction.payment.create({
-    data: {
-      clientId: input.clientId,
-      planId: rejected.planId,
-      planNameSnapshot: rejected.planNameSnapshot,
-      durationDaysSnapshot: rejected.durationDaysSnapshot,
-      weeklyClassCapSnapshot: rejected.weeklyClassCapSnapshot,
-      classAllowanceSnapshot: rejected.classAllowanceSnapshot,
-      planPriceCentavos: rejected.planPriceCentavos,
-      creditAppliedCentavos: 0,
-      amountDueCentavos: rejected.amountDueCentavos,
-      startsOn: rejected.startsOn,
-      method: rejected.method,
-      kind: PaymentKind.EVALUATION,
-      state: PaymentState.PENDING,
-      submittedByAccountId: input.accountId,
-      submittedAt: input.now,
-      createdAt: input.now,
-    },
-    select: { id: true, receiptImageAssetId: true },
-  });
+  // Another evaluation transfer already pending, or a second receipt sent at
+  // the same moment: the one-pending-per-kind index answers, not a 500.
+  const replacement = await transaction.payment
+    .create({
+      data: {
+        clientId: input.clientId,
+        planId: rejected.planId,
+        planNameSnapshot: rejected.planNameSnapshot,
+        durationDaysSnapshot: rejected.durationDaysSnapshot,
+        weeklyClassCapSnapshot: rejected.weeklyClassCapSnapshot,
+        classAllowanceSnapshot: rejected.classAllowanceSnapshot,
+        planPriceCentavos: rejected.planPriceCentavos,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: rejected.amountDueCentavos,
+        startsOn: rejected.startsOn,
+        method: rejected.method,
+        kind: PaymentKind.EVALUATION,
+        state: PaymentState.PENDING,
+        submittedByAccountId: input.accountId,
+        submittedAt: input.now,
+        createdAt: input.now,
+      },
+      select: { id: true, receiptImageAssetId: true },
+    })
+    .catch((error: unknown) => {
+      const code = (error as { code?: unknown }).code;
+      if (code !== 'P2002') throw error;
+      throw new EvaluationRuleError(
+        'evaluation_payment_pending',
+        'Ya tienes un pago de evaluación pendiente.',
+      );
+    });
   await transaction.evaluation.update({
     where: { id: evaluation.id },
     data: { paymentId: replacement.id },

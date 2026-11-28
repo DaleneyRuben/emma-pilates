@@ -33,7 +33,7 @@ export const toClientEvaluationView = (
       : (row.payment.state.toLowerCase() as ClientEvaluationView['paymentState']),
   receiptAttached: row.payment?.receiptImageAssetId != null,
   receiptUploadable: receiptUploadable(row.payment, {
-    booked: row.state === EvaluationState.BOOKED,
+    booked: row.state === EvaluationState.BOOKED && row.slotReleasedAt === null,
     bookable: isEvaluationBookable(row.slot.startsAt, now),
   }),
   state:

@@ -178,13 +178,24 @@ export const releaseExpiredEvaluationHolds = async (
       !isEvaluationBookable(row.slot.startsAt, now) ||
       (row.payment?.decidedAt != null && row.payment.decidedAt <= dayAgo),
   );
+  let released = 0;
   for (const row of lapsed) {
+    // A receipt sent since the read moved it to a pending Payment: keep it.
+    const still = await transaction.evaluation.count({
+      where: {
+        id: row.id,
+        state: EvaluationState.BOOKED,
+        payment: { state: PaymentState.REJECTED },
+      },
+    });
+    if (still === 0) continue;
     await cancelEvaluationRow(transaction, {
       evaluation: row,
       now,
       accountId: null,
       cause: EvaluationCancellationCause.PAYMENT_EXPIRED,
     });
+    released += 1;
   }
-  return due.length + lapsed.length;
+  return due.length + released;
 };

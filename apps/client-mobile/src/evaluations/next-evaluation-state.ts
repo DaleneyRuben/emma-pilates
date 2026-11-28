@@ -39,7 +39,7 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
   // review she may move it and, while the studio has not confirmed, cancel it.
   const canMove = evaluation.reschedulable === true && open;
   const canCancel = evaluation.cancellable && open;
-  const needsReceipt = evaluation.receiptUploadable === true;
+  const needsReceipt = evaluation.receiptUploadable === true && open;
   const chip = paidEvaluationLabel(evaluation.paymentState);
   // C13h (owner 2026-11-27): a rejected receipt says so first, even while
   // she may send another one.

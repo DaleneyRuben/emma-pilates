@@ -250,4 +250,59 @@ describe('paid Evaluation: another receipt after a rejection', () => {
       cancellationCause: 'PAYMENT_EXPIRED',
     });
   });
+  it('cancels as before when the rejection comes inside 3 hours', async () => {
+    const buyer = await client('Mia Rojas', 'mia.rojas@example.com');
+    const principal = await world.principalOf('mia.rojas@example.com');
+    const startsAt = '2026-10-12T15:15:00.000Z';
+    const slotId = await slotIdAt(world.prisma, mondayBlockId, startsAt);
+    const booked = await evaluations().bookPaidEvaluation(
+      slotId,
+      principal,
+      randomUUID(),
+    );
+    const late = new Date(new Date(startsAt).getTime() - 2 * hour);
+
+    await payments(late).rejectTransfer(
+      { paymentId: booked.paymentId!, reason: 'No coincide.' },
+      await admin(),
+    );
+
+    await expect(
+      world.prisma.evaluation.findUniqueOrThrow({
+        where: { id: booked.id },
+        select: { state: true, cancellationCause: true },
+      }),
+    ).resolves.toEqual({
+      state: 'CANCELLED',
+      cancellationCause: 'PAYMENT_REJECTED',
+    });
+    const notice = await world.prisma.notification.findFirstOrThrow({
+      where: { accountId: buyer.accountId, type: 'payment_rejected' },
+      select: { message: true },
+    });
+    expect(notice.message).toContain('Puedes reservar la evaluación de nuevo');
+  });
+
+  it('refuses another receipt while another evaluation transfer is pending', async () => {
+    const buyer = await client('Zoe Rojas', 'zoe.rojas@example.com');
+    const hold = await rejectedHold(
+      'zoe.rojas@example.com',
+      '2026-10-12T16:00:00.000Z',
+    );
+    await evaluations().bookPaidEvaluation(
+      await slotIdAt(world.prisma, mondayBlockId, '2026-10-19T15:15:00.000Z'),
+      buyer,
+      randomUUID(),
+    );
+    const imageAssetId = await receipt(buyer.accountId);
+
+    await expect(
+      codeOf(
+        evaluations().attachEvaluationReceipt(
+          { evaluationId: hold.evaluationId, imageAssetId },
+          buyer,
+        ),
+      ),
+    ).resolves.toBe('evaluation_payment_pending');
+  });
 });
