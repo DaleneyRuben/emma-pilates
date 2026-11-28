@@ -12938,3 +12938,14 @@ D. **The free class itself is unchanged.** A friend booking the Guest Pass
    class still sees «Usaste tu clase gratis. ¡Te esperamos el … a las …!»
    (Test 202 G), and cancelling it «Tu pase de invitada vuelve a estar
    disponible.».
+E. **A paid Plan comes before the Guest Pass (owner, 2026-11-28).** When a
+   Guest Pass and a paid Plan both cover a class's day, the Booking uses the
+   Plan and the pass stays unused; the pass funds only a class no paid Plan
+   can (one before the Plan starts, or once the Plan has no class left). In
+   the app: book the guest class, buy the Plan from the day after it, then
+   cancel the guest class (which frees the pass). A class from the Plan's
+   start reads «Usarás 1 de tus N clases.», not «Es tu clase gratis de
+   invitada», and books on the Plan; the friend's pass stays unused. A
+   purchase already ends the pass the day before the Plan starts (Test 122 C),
+   so both rarely cover one day; the rule makes the choice explicit. Spec:
+   `covering-subscription-order.integration-spec.ts`.
