@@ -45,7 +45,11 @@ describe('paid Evaluation: another receipt after a rejection', () => {
         name,
         referralCode: `REF-${randomUUID().slice(0, 8)}`,
         account: {
-          create: { email, activatedAt: fixtureNow, emailVerifiedAt: fixtureNow },
+          create: {
+            email,
+            activatedAt: fixtureNow,
+            emailVerifiedAt: fixtureNow,
+          },
         },
         subscriptions: {
           create: {
@@ -134,14 +138,14 @@ describe('paid Evaluation: another receipt after a rejection', () => {
       { scope: 'upcoming' },
       buyer,
     );
-    expect(page.items.find((row) => row.id === hold.evaluationId)).toMatchObject(
-      {
-        state: 'booked',
-        paymentState: 'rejected',
-        receiptUploadable: true,
-        priceCentavos: expect.any(Number) as number,
-      },
-    );
+    expect(
+      page.items.find((row) => row.id === hold.evaluationId),
+    ).toMatchObject({
+      state: 'booked',
+      paymentState: 'rejected',
+      receiptUploadable: true,
+      priceCentavos: expect.any(Number) as number,
+    });
     const view = page.items.find((row) => row.id === hold.evaluationId)!;
     expect(view.priceCentavos).toBeGreaterThan(0);
   });
@@ -193,9 +197,9 @@ describe('paid Evaluation: another receipt after a rejection', () => {
       { scope: 'upcoming' },
       buyer,
     );
-    expect(page.items.find((row) => row.id === hold.evaluationId)).toMatchObject(
-      { paymentState: 'pending', receiptUploadable: false },
-    );
+    expect(
+      page.items.find((row) => row.id === hold.evaluationId),
+    ).toMatchObject({ paymentState: 'pending', receiptUploadable: false });
   });
 
   it('refuses another receipt once the slot is too close to book', async () => {
@@ -243,7 +247,7 @@ describe('paid Evaluation: another receipt after a rejection', () => {
       }),
     ).resolves.toEqual({
       state: 'CANCELLED',
-      cancellationCause: 'PAYMENT_REJECTED',
+      cancellationCause: 'PAYMENT_EXPIRED',
     });
   });
 });

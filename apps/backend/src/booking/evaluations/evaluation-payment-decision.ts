@@ -151,14 +151,8 @@ const rejectEvaluationTransfer = async (
       rejectionReason: input.reason,
     },
   });
-  if (input.payment.evaluation.state === EvaluationState.BOOKED) {
-    await cancelEvaluationRow(transaction, {
-      evaluation: input.payment.evaluation,
-      now: input.now,
-      accountId: input.principal.accountId,
-      cause: EvaluationCancellationCause.PAYMENT_REJECTED,
-    });
-  }
+  // Board C13h (owner 2026-11-27): the Evaluation stays booked so she can
+  // send another receipt; the worker releases it if none arrives in a day.
   const sentence = input.reason.endsWith('.')
     ? input.reason
     : `${input.reason}.`;
@@ -171,7 +165,7 @@ const rejectEvaluationTransfer = async (
     newState: 'rejected',
     type: 'payment_rejected',
     title: 'Comprobante rechazado',
-    message: `Tu comprobante fue rechazado: ${sentence} Puedes reservar la evaluación de nuevo.`,
+    message: `Tu comprobante fue rechazado: ${sentence} Sube uno nuevo para mantener tu cita.`,
   });
 };
 
@@ -265,12 +259,12 @@ type EvaluationPayment = {
   evaluation: { id: string; state: EvaluationState; evaluationSlotId: string };
 };
 
-const cancelEvaluationRow = async (
+export const cancelEvaluationRow = async (
   transaction: Transaction,
   input: {
     evaluation: { id: string; evaluationSlotId: string };
     now: Date;
-    accountId: string;
+    accountId: string | null;
     cause: EvaluationCancellationCause;
   },
 ) => {

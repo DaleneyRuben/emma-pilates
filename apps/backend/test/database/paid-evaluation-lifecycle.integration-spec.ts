@@ -108,7 +108,7 @@ describe('paid Evaluation payment lifecycle', () => {
     }
   };
 
-  it('rejects an evaluation transfer and cancels the Evaluation', async () => {
+  it('rejects an evaluation transfer and keeps the Evaluation booked for another receipt', async () => {
     const buyer = await eightClassClient('Nora Paz', 'nora@example.com');
     const hold = await paidHold('nora@example.com', '2026-09-28T15:15:00.000Z');
 
@@ -129,8 +129,8 @@ describe('paid Evaluation payment lifecycle', () => {
         select: { state: true, cancellationCause: true },
       }),
     ).resolves.toEqual({
-      state: 'CANCELLED',
-      cancellationCause: 'PAYMENT_REJECTED',
+      state: 'BOOKED',
+      cancellationCause: null,
     });
     await expect(
       world.prisma.auditRecord.findFirst({

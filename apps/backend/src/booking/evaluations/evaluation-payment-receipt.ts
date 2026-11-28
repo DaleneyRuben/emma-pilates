@@ -1,5 +1,6 @@
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  EvaluationState,
   ImageAssetPurpose,
   ImageAssetState,
   PaymentKind,
@@ -10,6 +11,7 @@ import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { PaymentRuleError } from '../payments/payment-errors';
 import { notifyPaymentSubmitted } from '../payments/payment-submitted-notice';
+import { isEvaluationBookable } from './evaluation-rules';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -19,6 +21,79 @@ const receiptSelect = {
   declaredMediaType: true,
   verifiedMediaType: true,
 } as const;
+
+// Board C13h (owner 2026-11-27): a rejected decision is final (the payments
+// trigger), so another receipt goes on a new pending Payment with the same
+// commercial terms, and the still-booked Evaluation points at it. The
+// rejected Payment stays as history.
+const replaceRejectedPayment = async (
+  transaction: Transaction,
+  input: { paymentId: string; clientId: string; accountId: string; now: Date },
+): Promise<{ id: string; receiptImageAssetId: string | null } | null> => {
+  const rejected = await transaction.payment.findFirst({
+    where: {
+      id: input.paymentId,
+      clientId: input.clientId,
+      kind: PaymentKind.EVALUATION,
+      state: PaymentState.REJECTED,
+    },
+    select: {
+      planId: true,
+      planNameSnapshot: true,
+      durationDaysSnapshot: true,
+      weeklyClassCapSnapshot: true,
+      classAllowanceSnapshot: true,
+      planPriceCentavos: true,
+      amountDueCentavos: true,
+      startsOn: true,
+      method: true,
+      evaluation: {
+        select: {
+          id: true,
+          state: true,
+          slotReleasedAt: true,
+          slot: { select: { startsAt: true } },
+        },
+      },
+    },
+  });
+  const evaluation = rejected?.evaluation ?? null;
+  if (
+    rejected === null ||
+    evaluation === null ||
+    evaluation.state !== EvaluationState.BOOKED ||
+    evaluation.slotReleasedAt !== null ||
+    !isEvaluationBookable(evaluation.slot.startsAt, input.now)
+  ) {
+    return null;
+  }
+  const replacement = await transaction.payment.create({
+    data: {
+      clientId: input.clientId,
+      planId: rejected.planId,
+      planNameSnapshot: rejected.planNameSnapshot,
+      durationDaysSnapshot: rejected.durationDaysSnapshot,
+      weeklyClassCapSnapshot: rejected.weeklyClassCapSnapshot,
+      classAllowanceSnapshot: rejected.classAllowanceSnapshot,
+      planPriceCentavos: rejected.planPriceCentavos,
+      creditAppliedCentavos: 0,
+      amountDueCentavos: rejected.amountDueCentavos,
+      startsOn: rejected.startsOn,
+      method: rejected.method,
+      kind: PaymentKind.EVALUATION,
+      state: PaymentState.PENDING,
+      submittedByAccountId: input.accountId,
+      submittedAt: input.now,
+      createdAt: input.now,
+    },
+    select: { id: true, receiptImageAssetId: true },
+  });
+  await transaction.evaluation.update({
+    where: { id: evaluation.id },
+    data: { paymentId: replacement.id },
+  });
+  return replacement;
+};
 
 // An Evaluation transfer has no Purchase Intent, so the receipt lives on the
 // Payment and uses the same image asset a Plan receipt uses (ADR-0011).
@@ -50,7 +125,7 @@ export const attachEvaluationReceipt = async (
   const payment =
     paymentId === undefined
       ? null
-      : await transaction.payment.findFirst({
+      : ((await transaction.payment.findFirst({
           where: {
             id: paymentId,
             clientId: input.principal.identity.clientId,
@@ -58,7 +133,13 @@ export const attachEvaluationReceipt = async (
             state: PaymentState.PENDING,
           },
           select: { id: true, receiptImageAssetId: true },
-        });
+        })) ??
+        (await replaceRejectedPayment(transaction, {
+          paymentId,
+          clientId: input.principal.identity.clientId,
+          accountId: input.principal.accountId,
+          now: input.now,
+        })));
   if (payment === null) {
     throw new PaymentRuleError('payment_not_pending', 'Payment is not pending');
   }
