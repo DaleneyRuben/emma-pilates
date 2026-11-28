@@ -84,6 +84,7 @@ numbered tests.
 | Perfil with no single-row group | Every role's Perfil: the Role and Branches under the Staff name, «Tu cuenta» gone; Client «Tu plan» · «Ajustes» · «Ayuda», Staff «Tus pagos» (the Administradora «Administración») · «Ajustes» · «Ayuda» (none for the Administradora or while seeing the app as someone); «Envíanos tu opinión» and «Preguntas frecuentes» (the support page); no group with one row, with or without Face ID; a two-line footer straight on the page in `#8A5B57` with «Política de privacidad» (and the Client's «Cerrar mi cuenta») (Test 209) | The iPad's Perfil (18T) keeps its outlined «Cerrar sesión» and puts the footer in the left column: its board was not redrawn. The Face ID switch keeps its note under the label («Sin escribir tu contraseña»), which the boards do not draw |
 | No badge after sign-out | Signing out releases this phone's push registration (`account_devices` row `logout`, even if an older session of the phone was never revoked), so nothing reaches the icon after a sign-out or a reinstall; the app icon's badge is cleared whenever nobody is signed in (Test 210) | The icon badge needs push permission and a real push to be seen |
 | Face ID switch after «Ahora no» or «No permitir» | Perfil keeps **Entrar con Face ID** (**Entrar con huella**) on a phone that supports it after «Ahora no», and turning it on asks for Face ID; where iOS refuses Face ID to the app («No permitir»), the switch stays and opens the app's Ajustes; a Face ID locked out or no longer set up says «Face ID no está disponible» (Test 211) | **Needs a native build** (`expo-local-authentication`, release 1.3.1); the Simulator never asks for the app's Face ID permission, so «No permitir» is seen only on an iPhone |
+| Booking toasts on a Plan bought over a Guest Pass | A class from the Plan bought over a spent Guest Pass confirms «Te quedan N clases en tu plan», not «Usaste tu clase gratis…», and cancelling it says «La clase volvió a tu plan · Te quedan N clases» (Test 212) | Needs the 1.3.1 app with the API from the same release; an older API leaves the app reading the Subscription in force today, as 1.3.0 did |
 
 ## Where each designed screen is tested
 
@@ -12906,3 +12907,45 @@ G. **iPhone: Face ID locked out or not set up.** With the switch off, set
    stays; tapping it shows «Face ID no está disponible» / «Revisa Face ID en
    los ajustes del iPhone e intenta de nuevo.» with **Entendido** only, and
    the switch stays off. Enrol Face ID again.
+
+## Test 212: the booking toasts on a Plan bought over a Guest Pass (TestFlight 1.3.0)
+
+The owner's finding on TestFlight 1.3.0 (2026-11-28): Sofía used her Guest
+Pass class, then bought «Trimestral 36 clases» starting the next day (a Plan
+bought over a Guest Pass starts after its class, Test 122 C). Every class she
+then booked from the new Plan confirmed «Usaste tu clase gratis. ¡Te esperamos
+…!», although the class detail said «Usarás 1 de tus 34 clases.». The toasts
+now speak of the Subscription the Booking consumed: `POST
+/api/v1/sessions/{id}/bookings` and `POST /api/v1/bookings/{id}/reschedule`
+answer `subscriptionId` beside `id`, and every booking in `GET
+/api/v1/bookings` carries it too (a Waitlist Entry does not). A 1.3.0 app
+ignores the new field. Use the iPhone 16 Pro Simulator or the Android
+emulator with the API and worker on a fixtures copy (Test 5A).
+
+A. **Set up the friend.** Register a friend with Lucía's code and verify her
+   (Test 202 F), book her free class for today or tomorrow (Test 202 G), then
+   buy a Plan from **Elige tu plan** starting the day after that class and
+   have it confirmed (Paola in AW29, or cash at the Assistant's S10). Inicio
+   shows «Tu plan · …» and «Empieza el …».
+B. **A class from the new Plan.** Book a class on or after the Plan's start:
+   the detail says «Usarás 1 de tus N clases.» and Mis reservas confirms
+   «Reserva confirmada · Te quedan N−1 clases en tu plan». No «Usaste tu clase
+   gratis» anywhere.
+C. **Cancelling it.** Cancel that class from Mis reservas: «Reserva cancelada ·
+   La clase volvió a tu plan · Te quedan N clases», never «Tu pase de invitada
+   vuelve a estar disponible.».
+D. **The free class itself is unchanged.** A friend booking the Guest Pass
+   class still sees «Usaste tu clase gratis. ¡Te esperamos el … a las …!»
+   (Test 202 G), and cancelling it «Tu pase de invitada vuelve a estar
+   disponible.».
+E. **A paid Plan comes before the Guest Pass (owner, 2026-11-28).** When a
+   Guest Pass and a paid Plan both cover a class's day, the Booking uses the
+   Plan and the pass stays unused; the pass funds only a class no paid Plan
+   can (one before the Plan starts, or once the Plan has no class left). In
+   the app: book the guest class, buy the Plan from the day after it, then
+   cancel the guest class (which frees the pass). A class from the Plan's
+   start reads «Usarás 1 de tus N clases.», not «Es tu clase gratis de
+   invitada», and books on the Plan; the friend's pass stays unused. A
+   purchase already ends the pass the day before the Plan starts (Test 122 C),
+   so both rarely cover one day; the rule makes the choice explicit. Spec:
+   `covering-subscription-order.integration-spec.ts`.

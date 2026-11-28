@@ -86,6 +86,34 @@ describe('Client upcoming bookings', () => {
     });
   });
 
+  it('names the Subscription each upcoming Booking consumed, so a cancel toast speaks of the right Plan', async () => {
+    const later = futureSessions()[8];
+    const commands = new PrismaBookingCommands(prisma, () => now);
+    const booking = await commands.create(
+      { sessionId: later.id },
+      await principal(),
+    );
+    const { subscriptionId } = await prisma.booking.findUniqueOrThrow({
+      where: { id: booking.id },
+      select: { subscriptionId: true },
+    });
+
+    const upcoming = await createCatalogRepository(
+      prisma,
+    ).findUpcomingClientBookings({ clientId: lucia.id, from: now });
+
+    expect(
+      upcoming.find(
+        (item) => item.kind === 'booking' && item.bookingId === booking.id,
+      ),
+    ).toMatchObject({ subscriptionId });
+    expect(
+      upcoming
+        .filter((item) => item.kind === 'waitlist')
+        .every((item) => !('subscriptionId' in item)),
+    ).toBe(true);
+  });
+
   it('tells who else is coming and the places, by initials only', async () => {
     const sessionId = futureSessions()[3].id;
     const valeria = fixtures.clients.find(

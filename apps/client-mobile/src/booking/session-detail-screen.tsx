@@ -47,7 +47,8 @@ export type ConfirmedBooking = {
   classTypeName: string;
   startsAt: string;
   endsAt: string;
-  planName?: string;
+  /** The Subscription the Booking consumed, from the API (FIX-019). */
+  subscriptionId?: string;
   /** FIX-090: a Reschedule moved her Booking; the toast says so. */
   rescheduled?: boolean;
 };
@@ -182,7 +183,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               classTypeName: detail.classType.name,
               startsAt: detail.startsAt,
               endsAt: detail.endsAt,
-              planName: view?.subscription?.planName,
+              subscriptionId: response.data.subscriptionId,
             },
           },
         });
@@ -328,9 +329,12 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
               testID="session-book"
             />
             <Text style={styles.centered} variant="secundario">
-              {view?.subscription?.guestPass?.usedClassStartsAt === null
-                ? "Es tu clase gratis de invitada"
-                : usesLine(nextCovers ? next : (view?.subscription ?? null))}
+              {/* A paid Plan covering the day books first (owner, 2026-11-28). */}
+              {nextCovers
+                ? usesLine(next)
+                : view?.subscription?.guestPass?.usedClassStartsAt === null
+                  ? "Es tu clase gratis de invitada"
+                  : usesLine(view?.subscription ?? null)}
             </Text>
           </>
         ) : paymentPending ? (

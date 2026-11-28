@@ -22,7 +22,7 @@ export type CommandHandler = (
   command: { sessionId: string; clientId?: string },
   principal: AuthenticatedPrincipal,
   idempotencyKey: string,
-) => Promise<{ id: string }>;
+) => Promise<{ id: string; subscriptionId?: string }>;
 export type CancellationCommandHandler = (
   command: { bookingId: string },
   principal: AuthenticatedPrincipal,
@@ -30,7 +30,7 @@ export type CancellationCommandHandler = (
 export type RescheduleCommandHandler = (
   command: { bookingId: string; targetSessionId: string },
   principal: AuthenticatedPrincipal,
-) => Promise<{ id: string }>;
+) => Promise<{ id: string; subscriptionId?: string }>;
 export type ClassHistoryHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<ClassHistoryEntryDto[]>;

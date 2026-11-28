@@ -19,7 +19,12 @@ type UpcomingSessionFacts = {
 };
 
 export type UpcomingClientBooking =
-  | ({ kind: 'booking'; bookingId: string } & UpcomingSessionFacts)
+  | ({
+      kind: 'booking';
+      bookingId: string;
+      /** The Subscription the Booking consumed. */
+      subscriptionId: string;
+    } & UpcomingSessionFacts)
   | ({ kind: 'waitlist'; waitlistEntryId: string } & UpcomingSessionFacts);
 
 type ListClientBookingsDependencies = {

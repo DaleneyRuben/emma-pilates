@@ -55,10 +55,11 @@ export function executeCreate(
         where: { id: input.sessionId },
         select: { startsAt: true, capacity: true },
       });
-      if (
-        pass !== null &&
-        pass.courtesySubscriptionId === input.subscriptionId
-      ) {
+      // Only a Booking the pass itself funds spends it: a paid Plan covering
+      // the same day books first (owner, 2026-11-28) and leaves it unused.
+      const spendsPass =
+        pass !== null && pass.courtesySubscriptionId === input.subscriptionId;
+      if (spendsPass) {
         const taken = await transaction.booking.count({
           where: { sessionId: input.sessionId, state: 'BOOKED' },
         });
@@ -93,7 +94,7 @@ export function executeCreate(
             : 'guest_pass_already_used',
         );
       }
-      if (pass !== null) {
+      if (spendsPass) {
         await transaction.guestPass.update({
           where: { id: pass.id },
           data: { bookingId: booking.id },

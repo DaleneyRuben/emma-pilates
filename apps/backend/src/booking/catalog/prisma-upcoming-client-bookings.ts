@@ -35,7 +35,11 @@ export const findUpcomingClientBookings =
     const [bookings, entries] = await Promise.all([
       prisma.booking.findMany({
         where: { clientId, state: 'BOOKED', session: upcoming },
-        select: { id: true, session: { select: sessionFacts } },
+        select: {
+          id: true,
+          subscriptionId: true,
+          session: { select: sessionFacts },
+        },
       }),
       prisma.waitlistEntry.findMany({
         where: { clientId, closedAt: null, session: upcoming },
@@ -62,6 +66,7 @@ export const findUpcomingClientBookings =
       ...bookings.map((booking) => ({
         kind: 'booking' as const,
         bookingId: booking.id,
+        subscriptionId: booking.subscriptionId,
         ...facts(booking.session),
       })),
       ...entries.map((entry) => ({
