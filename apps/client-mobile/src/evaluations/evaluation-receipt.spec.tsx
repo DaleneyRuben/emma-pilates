@@ -212,6 +212,56 @@ describe("Paid Evaluation receipt", () => {
     ).toBeOnTheScreen();
   });
 
+  // Board C13h (owner 2026-11-27): a rejected receipt keeps the Evaluation
+  // booked; she reads the rejection and sends another one.
+  it("offers another receipt after the studio rejects one", async () => {
+    chooseReceipt();
+    const attached: string[] = [];
+    const fetcher = routeFetcher(
+      baseRoutes({
+        ...uploadRoutes(),
+        "/api/v1/evaluations?scope=upcoming": () => {
+          const uploaded = attached.length > 0;
+          return jsonResponse(
+            page([
+              upcomingEvaluation("evaluation-paid", bookedStart(), {
+                ...paid,
+                paymentId: "payment-1",
+                receiptAttached: true,
+                receiptUploadable: !uploaded,
+                paymentState: uploaded ? "pending" : "rejected",
+              }),
+            ]),
+          );
+        },
+        "POST /api/v1/evaluations/evaluation-paid/receipt": (init) => {
+          attached.push(String(init?.body));
+          return new Response(null, { status: 204 });
+        },
+      }),
+    );
+    const screen = await openProfileRow(fetcher, "Evaluación nutricional");
+
+    expect(
+      await screen.findByText("El estudio no aprobó tu comprobante de Bs 70."),
+    ).toBeOnTheScreen();
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
+    await fireEvent.press(
+      within(screen.getByTestId("evaluation-receipt-sheet")).getByRole("button", {
+        name: "Sube tu comprobante de transferencia",
+      }),
+    );
+
+    await waitFor(() => {
+      expect(attached).toEqual([JSON.stringify({ imageAssetId: "asset-1" })]);
+    });
+    expect(
+      await screen.findByText("El estudio revisa tu comprobante de Bs 70 y te avisa por la app."),
+    ).toBeOnTheScreen();
+  });
+
   it("shows Subiendo and ignores a second tap while the receipt uploads", async () => {
     let releasePicker: () => void = () => {};
     const pickerHeld = new Promise<void>((resolve) => {
