@@ -41,16 +41,19 @@ export function nextEvaluationState(evaluation: ClientEvaluationDto, shownAt: nu
   const canCancel = evaluation.cancellable && open;
   const needsReceipt = evaluation.receiptUploadable === true;
   const chip = paidEvaluationLabel(evaluation.paymentState);
-  const line = needsReceipt
-    ? `Sube tu comprobante de ${amount} para que el estudio revise tu pago.`
-    : evaluation.paymentState === "pending"
-      ? `El estudio revisa tu comprobante de ${amount} y te avisa por la app.`
-      : evaluation.paymentState === "rejected"
-        ? `El estudio no aprobó tu comprobante de ${amount}.`
-        : canMove
-          ? "Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella."
-          : canCancel
-            ? "Puedes cancelarla hasta 3 horas antes."
-            : "Ya no se puede reprogramar.";
+  // C13h (owner 2026-11-27): a rejected receipt says so first, even while
+  // she may send another one.
+  const line =
+    evaluation.paymentState === "rejected"
+      ? `El estudio no aprobó tu comprobante de ${amount}.`
+      : needsReceipt
+        ? `Sube tu comprobante de ${amount} para que el estudio revise tu pago.`
+        : evaluation.paymentState === "pending"
+          ? `El estudio revisa tu comprobante de ${amount} y te avisa por la app.`
+          : canMove
+            ? "Puedes reprogramarla hasta 3 horas antes. El pago sigue con ella."
+            : canCancel
+              ? "Puedes cancelarla hasta 3 horas antes."
+              : "Ya no se puede reprogramar.";
   return { ...base, canCancel, canMove, chip, line, needsReceipt };
 }
